@@ -1,0 +1,83 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: TTY module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-TTY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+tty MODULE-IDENTITY
+    LAST-UPDATED "200606281222Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    TTY module. "
+
+    REVISION "200606281222Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 36 }
+
+
+ttyTraps OBJECT IDENTIFIER ::= { tty 100 }
+
+loginFailureUser OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The user whose login failed"
+	::= { ttyTraps 1 } 
+
+loginFailureIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The IP address from where the failed login attempt came"
+	::= { ttyTraps 2 } 
+
+loginFailureAttempts OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "The number of failed logins"
+	::= { ttyTraps 3 } 
+	
+loginFailureTrap NOTIFICATION-TYPE
+    OBJECTS 	{ loginFailureUser, loginFailureIPAddress, loginFailureAttempts }
+    STATUS      current
+    DESCRIPTION
+                "A user has been locked out because of too many 
+                consecutive failed logins."
+	::= { ttyTraps 11 } 
+
+END

@@ -1,0 +1,174 @@
+-- %DNP% $Id: RBN-CPU-METER-CAP.my,v 1.1.2.4.388.5 2011/12/16 22:31:28 chiachun Exp $
+-- %DNP% $Source: /cvsroot/pkt/sw/se/xc/bsd/config/snmp/mibs/Attic/RBN-CPU-METER-CAP.my,v $
+-- *****************************************************************
+-- RBN-CPU-METER-CAP    The RBN CPU METER MIB Capabilities
+--
+-- Copyright (c) 1999, 2003, 2010-2011 Ericsson AB
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+RBN-CPU-METER-CAP DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+                FROM SNMPv2-SMI
+        AGENT-CAPABILITIES
+                FROM SNMPv2-CONF
+        rbnCapabilities
+                FROM RBN-SMI;
+
+rbnCpuMeterCap MODULE-IDENTITY
+        LAST-UPDATED    "201112131800Z" -- Dec 13, 2011 
+        ORGANIZATION    "Ericsson Inc."
+        CONTACT-INFO
+                "       Ericsson, Inc.
+
+                Postal: 100 Headquarters Dr.
+                        San Jose, CA  95134
+                        USA
+
+                 Phone: +1 408 750 5000
+                   Fax: +1 408 750 5599
+                "
+        DESCRIPTION
+                "The Agent Capabilities of the 
+                CPU METER MIB (RBN-CPU-METER-MIB).
+
+                If this MIB implementation is platform-dependent,
+                the PRODUCT-RELEASE clause contains Ericsson SEOS version and
+                at least one of the following Ericsson product families:
+                    [SE]  SmartEdge Multi-service Edge Router (MSER) family
+                    [SM]  SM family of Metro Ethernet Service Transport platforms
+                    [SSR] Smart Service Router (SSR) family"
+
+        REVISION        "201112131800Z" -- Dec 13, 2011
+        DESCRIPTION
+                "Added rbnCpuMeterCap6."
+
+        REVISION        "201106150000Z" -- Jun 15, 2011
+        DESCRIPTION
+                "Update DESCRIPTION clause of MODULE-IDENTITY
+                and PRODUCT-RELEASE clause of AGENT-CAPABILITIES."
+
+        REVISION    "201011010000Z" -- Nov 1, 2010
+        DESCRIPTION
+                "Modified PRODUCT-RELEASE clause for consistent naming.
+                Updated CONTACT-INFO."
+
+        REVISION        "200310140000Z" -- Oct 14, 2003
+        DESCRIPTION
+                "Added new OID: rbnCpuMeterCap5."
+
+        REVISION        "200307070000Z" -- Jul 7, 2003
+        DESCRIPTION
+                "Added new OID: rbnCpuMeterCap4."
+
+        REVISION        "200302110000Z" -- Feb 11, 2003
+        DESCRIPTION
+                "Added new OID: rbnCpuMeterCap3."
+
+        REVISION        "200206260000Z" -- June 26, 2002
+        DESCRIPTION
+                "Updated CONTACT-INFO.  Added new OID: rbnCpuMeterCap2."
+
+        REVISION        "9906162300Z" -- June 16, 1999
+        DESCRIPTION
+                "Initial version."
+        ::= { rbnCapabilities 22 }
+
+rbnCpuMeterCap1 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 3.0.X.X"
+        STATUS          current
+        DESCRIPTION     "RBN-CPU-METER-MIB capabilities"
+        SUPPORTS        RBN-CPU-METER-MIB
+        INCLUDES {
+                    rbnCpuMeterStatsGroup
+                 }
+        ::= { rbnCpuMeterCap 1 }
+
+rbnCpuMeterCap2 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.3.3"
+        STATUS          current
+        DESCRIPTION     "RBN-CPU-METER-MIB capabilities"
+        SUPPORTS        RBN-CPU-METER-MIB
+        INCLUDES {
+                    rbnCpuMeterStatsGroup
+                 }
+                 
+        VARIATION       rbnCpuMeterFiveSecondAvg
+        ACCESS          not-implemented
+        DESCRIPTION
+                "This object is not supported."
+
+        VARIATION       rbnCpuMeterFiveMinuteAvg
+        ACCESS          not-implemented
+        DESCRIPTION
+                "This object is not supported."
+        ::= { rbnCpuMeterCap 2 }
+
+rbnCpuMeterCap3 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "AOS 6.0.X.X"
+        STATUS          current
+        DESCRIPTION     "RBN-CPU-METER-MIB capabilities"
+        SUPPORTS        RBN-CPU-METER-MIB
+        INCLUDES {
+                    rbnCpuMeterStatsGroup,
+                    rbnCpuProcGroup
+                 }
+        ::= { rbnCpuMeterCap 3 }
+
+rbnCpuMeterCap4 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.5.4"
+        STATUS          current
+        DESCRIPTION     "RBN-CPU-METER-MIB capabilities"
+        SUPPORTS        RBN-CPU-METER-MIB
+        INCLUDES {
+                    rbnCpuMeterStatsGroup
+                 }
+        ::= { rbnCpuMeterCap 4 }
+
+rbnCpuMeterCap5 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "SEOS 2.6.3 [SE]; SEOS 6.3.X [SM]; SEOS 11.1.X [SSR]"
+        STATUS          current
+        DESCRIPTION     "RBN-CPU-METER-MIB capabilities"
+        SUPPORTS        RBN-CPU-METER-MIB
+        INCLUDES {
+                    rbnCpuMeterStatsGroup,
+                    rbnCpuProcGroup
+                 }
+
+        VARIATION       rbnCpuProcCalls
+        ACCESS          not-implemented
+        DESCRIPTION
+                "This object is not supported."
+
+        VARIATION       rbnCpuProcLongest
+        ACCESS          not-implemented
+        DESCRIPTION
+                "This object is not supported."
+
+        ::= { rbnCpuMeterCap 5 }
+
+rbnCpuMeterCap6 AGENT-CAPABILITIES
+        PRODUCT-RELEASE "IPOS 11.2.X"
+        STATUS          current
+        DESCRIPTION     "RBN-CPU-METER-MIB capabilities"
+        SUPPORTS        RBN-CPU-METER-MIB
+        INCLUDES {
+                    rbnCpuMeterStatsGroup2,
+                    rbnCpuProcGroup
+                 }
+
+        VARIATION       rbnCpuProcCalls
+        ACCESS          not-implemented
+        DESCRIPTION
+                "This object is not supported."
+
+        VARIATION       rbnCpuProcLongest
+        ACCESS          not-implemented
+        DESCRIPTION
+                "This object is not supported."
+
+        ::= { rbnCpuMeterCap 6 }
+END

@@ -1,0 +1,142 @@
+
+TEL2N-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, enterprises, 
+	Integer32, TimeTicks, IpAddress
+		FROM SNMPv2-SMI;
+
+tel2n MODULE-IDENTITY
+	LAST-UPDATED "201505011057Z"
+	ORGANIZATION 
+		"2N TELEKOMUNIKACE a.s."
+	CONTACT-INFO 
+		"Modranska 621, 143 01 Praha 4"
+	DESCRIPTION 
+		"telecommunication company"
+
+	REVISION "201505011057Z"
+	DESCRIPTION 
+		"Initial version."
+::= { enterprises 6530 }
+
+
+-- Helios IP intercoms
+
+heliosip             OBJECT IDENTIFIER ::= { tel2n 11 }
+
+hipProductName  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Name of product"
+	::= { heliosip 1 }
+
+hipHwVersion  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Hardware version"
+	::= { heliosip 2 }
+
+hipSerial  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(14))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Unique serial number"
+	::= { heliosip 3 }
+
+hipVersion  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(16))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Firmware version number"
+	::= { heliosip 4 }
+
+hipBootVersion  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Bootloader version number"
+	::= { heliosip 5 }
+
+hipSipTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF HipSipEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"State of SIP accounts"
+	::= { heliosip 6 }
+
+hipSipEntry  OBJECT-TYPE
+	SYNTAX 	HipSipEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		""
+	INDEX { hipIndex }
+	::= { hipSipTable 1 }
+
+HipSipEntry ::= SEQUENCE {
+	hipIndex
+		Integer32,
+	hipPhoneNumber
+		OCTET STRING,
+	hipState
+		INTEGER,
+	hipRegistrationAt
+		IpAddress,
+	hipRegistrationTime
+		TimeTicks
+}
+
+hipIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Identifier of SIP account"
+	::= { hipSipEntry 1 }
+
+hipPhoneNumber  OBJECT-TYPE
+	SYNTAX     OCTET STRING
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Registered phone number"
+	::= { hipSipEntry 2 }
+
+hipState  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		down (0),
+		goingup (1),
+		up (2),
+		goingdown (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current state of account"
+	::= { hipSipEntry 3 }
+
+hipRegistrationAt  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Registrar IP address"
+	::= { hipSipEntry 4 }
+
+hipRegistrationTime  OBJECT-TYPE
+	SYNTAX     TimeTicks
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Registration time"
+	::= { hipSipEntry 5 }
+END

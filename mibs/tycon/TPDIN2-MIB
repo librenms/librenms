@@ -1,0 +1,176 @@
+TPDIN2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, enterprises, 
+	Integer32
+		FROM SNMPv2-SMI
+	DisplayString
+		FROM SNMPv2-TC;
+
+tpdin2 MODULE-IDENTITY
+	LAST-UPDATED "201703031251Z"
+	ORGANIZATION 
+		"Tycon Systems"
+	CONTACT-INFO 
+		"http://www.tyconsystems.com/"
+	DESCRIPTION 
+		"TPDIN Monitor Web V2 custom MIB"
+::= { tycon 2 }
+
+-- TPDIN Monitor Web V2
+
+tycon                OBJECT IDENTIFIER ::= { enterprises 45621 }
+product              OBJECT IDENTIFIER ::= { tpdin2 1 }
+monitor              OBJECT IDENTIFIER ::= { tpdin2 2 }
+
+-- product properties
+
+Tenths ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+            "tenths"
+    SYNTAX       INTEGER (0..10000)
+    
+			
+name  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Product name."
+	::= { product 1 }
+
+version  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Product version."
+	::= { product 2 }
+
+builddate  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Build date."
+	::= { product 3 }
+
+-- relay properties
+
+relay1  OBJECT-TYPE
+	SYNTAX	   INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 1"
+	::= { monitor 1 }
+
+relay2  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 2"
+	::= { monitor 2 }
+
+relay3  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 3"
+	::= { monitor 3 }
+
+relay4  OBJECT-TYPE
+	SYNTAX     INTEGER
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Relay 4"
+	::= { monitor 4 }
+
+-- monitor properties
+
+voltage1  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 1"
+	::= { monitor 5 }
+
+voltage2  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 2"
+	::= { monitor 6 }
+
+voltage3  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 3"
+	::= { monitor 7 }
+
+voltage4  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Voltage 4"
+	::= { monitor 8 }
+
+current1  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 1"
+	::= { monitor 9 }
+
+current2  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 2"
+	::= { monitor 10 }
+
+current3  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 3"
+	::= { monitor 11 }
+
+current4  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Current 4"
+	::= { monitor 12 }
+
+temperature1  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"External Temp"
+	::= { monitor 13 }
+
+temperature2  OBJECT-TYPE
+	SYNTAX     Tenths
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Internal Temp"
+	::= { monitor 14 }
+
+END

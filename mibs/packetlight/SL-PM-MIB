@@ -1,0 +1,248 @@
+SL-PM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, transmission
+          FROM SNMPv2-SMI
+    DisplayString, TruthValue, DateAndTime
+          FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+          FROM SNMPv2-CONF
+    ifIndex
+          FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	XpdrServiceType						FROM SL-XPDR-MIB
+    slMain				      		   	FROM SL-MAIN-MIB;
+
+--  This is the MIB module for the PM data.
+
+
+slPmMib MODULE-IDENTITY
+	LAST-UPDATED "201105170000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This PM module "
+	::= { slMain 25 }
+
+
+SlPmType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The PM types:
+        	Native types:
+        	GBE 	- ifType=117, Path=0 
+        	FC  	- ifType=56,  Path=0 
+        	SONET 	- ifType=39,  Path=0 
+        	OTU		- ifType=195, Path=0 
+        	ODU		- ifType=195, Path=1..4 
+        	FEC		- ifType=195, Path=5..6
+        	OPT		- ifType=196, Path=0"
+       SYNTAX       INTEGER {
+            native(1)  
+       }
+
+SlPmDirectionType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The PM direction type.
+       This relevant only to OTU or ODU types"
+       SYNTAX       INTEGER {
+            near(1),   	-- near-end pm
+            far(2)   	-- far-end pm
+       }
+
+SlPmIntervalType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+       "The PM interval types."
+       SYNTAX       INTEGER {
+            fifteen(1),   	-- 15 minutes interval
+            day(2)   		-- day interval
+       }
+
+slPmIntervals            OBJECT IDENTIFIER ::= { slPmMib 1 }
+
+
+-- The PM Interval Table contains various statistics
+-- collected by each system over a maximum of the previous 24 hours of operation.  
+-- The past 24 hours may be broken into 96 completed 15 minute intervals.
+-- A system is required to store at least 4 completed 15 minute interval.
+-- The default value is 32 intervals.
+
+slPmIntervalTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SlPmIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "The PM Interval table."
+     ::= { slPmIntervals 1 }
+
+slPmIntervalEntry OBJECT-TYPE
+    SYNTAX  SlPmIntervalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "An entry in the PM Interval table."
+    INDEX   { ifIndex,            
+              slPmType,					-- native/...
+              slPmDirectionType,		-- near/far
+              slPmIntervalType,			-- 15min/day
+              slPmIntervalNumber }
+     ::= { slPmIntervalTable 1 }
+
+SlPmIntervalEntry ::=
+    SEQUENCE {
+         slPmType			  	SlPmType,
+         slPmDirectionType	  	SlPmDirectionType,
+         slPmIntervalType	  	SlPmIntervalType,
+         slPmIntervalNumber  	Integer32,		-- interval 0 is for the current
+         slPmIntervalCVs     	PerfIntervalCount,
+         slPmIntervalESs     	PerfIntervalCount,
+         slPmIntervalSESs    	PerfIntervalCount,
+         slPmIntervalSEFSs   	PerfIntervalCount,
+         slPmIntervalUASs   	PerfIntervalCount,
+         slPmIntervalValidData  TruthValue,
+         slPmIntervalTcaFlag    TruthValue,
+         slPmIntervalReset   	INTEGER,
+         slPmIntervalStartTime	DateAndTime,
+         slPmServiceType		XpdrServiceType        
+    }
+
+slPmType OBJECT-TYPE
+    SYNTAX  SlPmType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "The PM type"
+     ::= { slPmIntervalEntry 1 }
+
+slPmDirectionType OBJECT-TYPE
+    SYNTAX  SlPmDirectionType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "The PM direction near-end/far-end."
+     ::= { slPmIntervalEntry 2 }
+
+slPmIntervalType OBJECT-TYPE
+    SYNTAX  SlPmIntervalType
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "The type of the PM interval 15min/day"
+     ::= { slPmIntervalEntry 3 }
+
+slPmIntervalNumber OBJECT-TYPE
+    SYNTAX  Integer32 (0..96)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+      "A number between 1 to 96, which identifies the
+      interval for which the set of statistics is available.
+      The interval identified by 1 is the most recently
+      completed 15 minute interval,
+      and the interval identified
+      by N is the interval immediately preceding the
+      one identified
+      by N-1."
+     ::= { slPmIntervalEntry 4 }
+
+slPmIntervalCVs OBJECT-TYPE
+    SYNTAX  PerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The counter associated with the number of Coding
+       Violations encountered in a particular 15-minute interval
+       in the past 24 hours."
+    ::= { slPmIntervalEntry 5 }
+
+slPmIntervalESs OBJECT-TYPE
+    SYNTAX  PerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The counter associated with the number of
+       Errored Seconds encountered
+       in a particular 15-minute interval
+       in the past 24 hours."
+     ::= { slPmIntervalEntry 6 }
+
+slPmIntervalSESs OBJECT-TYPE
+    SYNTAX  PerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The counter associated with the number of
+       Severely Errored Seconds encountered in a
+       particular 15-minute interval in the past 24 hours."
+    ::= { slPmIntervalEntry 7 }
+
+slPmIntervalSEFSs OBJECT-TYPE
+    SYNTAX  PerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The counter associated with the number of
+       Severely Errored Framing Seconds
+       encountered in a particular 15-minute interval
+       in the past 24 hours."
+    ::= { slPmIntervalEntry 8 }
+
+slPmIntervalUASs OBJECT-TYPE
+    SYNTAX  PerfIntervalCount
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The counter associated with the number of
+       Unavailable Seconds encountered in a particular 15-minute interval
+       in the past 24 hours."
+    ::= { slPmIntervalEntry 9 }
+
+slPmIntervalValidData OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "This variable indicates if the data for this interval is valid."
+    ::= { slPmIntervalEntry 10 }
+
+slPmIntervalTcaFlag OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "TRUE if one of the counters crossed the threshold during the 15 minutes interval."
+    ::= { slPmIntervalEntry 11 }
+
+slPmIntervalReset OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "Writing to this object reset the PM counters in this interval."
+    ::= { slPmIntervalEntry 12 }
+
+slPmIntervalStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the date and time at which this 
+        interval of measurements began on this interface."
+    REFERENCE   "ANSI T1.231-1997 clause 9.1.5.1."
+    ::= { slPmIntervalEntry 13 }
+
+slPmServiceType OBJECT-TYPE
+    SYNTAX      XpdrServiceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates the XPDR service type of the port 
+         during the PM interval."
+    ::= { slPmIntervalEntry 14 }
+
+END

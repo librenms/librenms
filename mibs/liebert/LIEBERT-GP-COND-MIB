@@ -1,0 +1,4816 @@
+LIEBERT-GP-CONDITIONS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE,
+    Gauge32,
+    TimeTicks,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    lgpConditions,
+    liebertConditionsModuleReg
+        FROM LIEBERT-GP-REGISTRATION-MIB
+   ;
+
+-- =============================================================================
+-- Module Identification and Registration
+-- =============================================================================
+
+liebertGlobalProductsConditionsModule MODULE-IDENTITY
+  LAST-UPDATED "201302120000Z"
+  ORGANIZATION "Liebert Corporation"
+  CONTACT-INFO
+      "Contact:   Technical Support
+
+      Postal:
+      Liebert Corporation
+      1050 Dearborn Drive
+      P.O. Box 29186
+      Columbus OH, 43229
+      US
+
+      Tel: +1 (800) 222-5877
+
+      E-mail: liebert.monitoring@vertivco.com
+      Web:    www.vertivco.com
+
+      Author:  Gregory M. Hoge"
+
+   DESCRIPTION
+      "The MIB module used to register Liebert SNMP OIDs.
+
+      Copyright 2000-2008,2013 Liebert Corporation. All rights reserved.
+      Reproduction of this document is authorized on the condition
+      that the forgoing copyright notice is included.
+
+      This Specification is supplied 'AS IS' and Liebert Corporation
+      makes no warranty, either express or implied, as to the use,
+      operation, condition, or performance of the Specification."
+
+   REVISION "201302120000Z"
+   DESCRIPTION
+    "Added Surge Protection Device to lgpConditionCondenserTVSSFailure
+       DESCRIPTION"
+
+   REVISION "200811170000Z"
+   DESCRIPTION
+    "Added support for NXL unit."
+
+   REVISION "200807020000Z"
+   DESCRIPTION
+    "o Expanded condtions table with new columns with a set of richer
+       alarm/condition properties.
+     o Added additional reference columns to conditions table to allow the
+       same alarm to be active on multiple instances of an item.
+    "
+
+   REVISION "200801100000Z"
+   DESCRIPTION
+    "Modified contact email address and added lgpNetworkName object."
+
+   REVISION "200705290000Z"
+   DESCRIPTION
+    "Added support for XDF Unit."
+
+   REVISION "200608150000Z"
+   DESCRIPTION
+    "Added support for HP release and a condition for firmware corrupt."
+
+   REVISION "200602220000Z"
+   DESCRIPTION
+    "Added support for Liebert DS Unit."
+
+   ::= { liebertConditionsModuleReg 1 }
+
+-- =============================================================================
+--  lgpConditions - Liebert Conditions Registrations
+-- =============================================================================
+
+lgpConditionsWellKnown OBJECT IDENTIFIER
+    -- STATUS      current
+    -- DESCRIPTION
+    --    "Liebert well known conditions are defined by OIDs that reside
+    --    in this sub-tree."
+    ::= { lgpConditions 1 }
+
+lgpConditionsPresent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present number of conditions (rows) in the lgpConditionsTable."
+    ::= { lgpConditions 2 }
+
+lgpConditionsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF LgpConditionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of condition table entries.  The table contains zero, one,
+         or many rows at any moment, depending upon the number of conditions
+         in effect.  The number of rows in the table is given by
+         (lgpConditionsPresent).  The table is initially empty at agent startup.
+         The agent creates a row in the table each time a condition is detected
+         and deletes that row subject to the following rules:
+
+         Rows are removed from the table based on the following rules:
+         1. If a condition does not require acknowledgement
+            (see 'lgpConditionAckReq') the condition is removed as soon as
+            the issue clears (see 'lgpConditionCurrentState').
+         2. If a condition requires acknowledgement (see 'lgpConditionAckReq')
+            the condition is removed as soon as the issue clears
+            (see 'lgpConditionCurrentState') AND the condition is acknowledged
+            (see 'lgpConditionAcknowledged').
+         3. If the columns 'lgpConditionCurrentState' and
+            'lgpConditionAcknowledged' are not present for the condition
+            then the condition will be removed as soon as the issue causing
+            the condition clears.
+
+         The agent creates the first row with lgpConditionId equal to 1,
+         and increments the value of 'lgpConditionId' each time a new row is
+         created, wrapping to the first free value greater than or equal to 1
+         when the maximum value of lgpConditionId would otherwise be exceeded.
+         The number of rows in the table at any given time is reflected by
+         the value of 'lgpConditionsPresent'.
+        "
+    ::= { lgpConditions 3 }
+
+    lgpConditionEntry OBJECT-TYPE
+        SYNTAX      LgpConditionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the contents of the rows for the table
+            'lgpConditionsTable'.  A row in this table cannot be created
+            or deleted by SNMP operations on columns of the table."
+        INDEX       { lgpConditionId }
+        ::= { lgpConditionsTable 1 }
+
+    LgpConditionEntry ::= SEQUENCE {
+            lgpConditionId              Unsigned32,
+            lgpConditionDescr           OBJECT IDENTIFIER,
+            lgpConditionTime            TimeTicks,
+            lgpConditionTableRef        OBJECT IDENTIFIER,
+            lgpConditionTableRowRef     OBJECT IDENTIFIER,
+            lgpConditionType            INTEGER,
+            lgpConditionCurrentState    INTEGER,
+            lgpConditionSeverity        INTEGER,
+
+            lgpConditionAcknowledged    INTEGER,
+            lgpConditionAckReq          INTEGER
+            }
+
+    lgpConditionId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A unique identifier for a condition. This value must remain
+            constant between agent initializations.  This OID is used as
+            an index to identify a row in the table 'lgpConditionsTable'."
+        ::= { lgpConditionEntry 1 }
+
+    lgpConditionDescr OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A reference to a condition description object. The object
+            referenced should not be accessible, but rather be used to provide
+            a unique description."
+        ::= { lgpConditionEntry 2 }
+
+    lgpConditionTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of sysUpTime when the condition occurred (became active)."
+        ::= { lgpConditionEntry 3 }
+
+    lgpConditionTableRef OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object will be included as a varbind in some
+             rows of the table.  It is a reference to a table object in
+             the MIB.  The value of this object will be the OID of a table
+             that the object that the condition applies to is defined.
+             The table row corresponding to this object will also contain
+             a varbind 'lgpConditionTableRowRef' that will specify which
+             instance (row) in the referenced table the object is defined in.
+
+             Example:
+               TABLE ROW:
+                lgpConditionId              5
+                lgpConditionDescr           lgpConditionRcpBranchBreakerOpen
+                lgpConditionTime            393884848
+                lgpConditionTableRef        lgpPduRbTable
+                lgpConditionTableRowRef     lgpPduRbEntryId.1.4
+                lgpConditionType            alarm
+                lgpConditionCurrentState    active
+                lgpConditionSeverity        major
+                lgpConditionAcknowledged    acknowledged
+                lgpConditionAckReq          required
+
+             In the above example the breaker opened for a Receptacle branch.
+             The specific receptacle branch is specified by the additional
+             varbind (lgpEventParmTableRowRef).  In this case the notification
+             is for the 4th receptacle branch on the 1st PDU in the cluster.
+            "
+        ::= { lgpConditionEntry 5 }
+
+    lgpConditionTableRowRef OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is a reference to the (cell) in the table specified by the
+             companion varbind (lgpConditionTableRef) in this condition.
+             The row in the table where this cell exists represents the object
+             that this condition applies to.
+
+             Example:
+               TABLE ROW:
+                lgpConditionId              5
+                lgpConditionDescr           lgpConditionRcpBranchBreakerOpen
+                lgpConditionTime            393884848
+                lgpConditionTableRef        lgpPduRbTable
+                lgpConditionTableRowRef     lgpPduRbEntryId.1.4
+                lgpConditionType
+                lgpConditionCurrentState    active
+                lgpConditionSeverity        major
+                lgpConditionAcknowledged    acknowledged
+                lgpConditionAckReq          required
+
+             The table containing the definition of the receptacle branch
+             (lgpPduRbTable) is given by the varbind (lgpConditionTableRef)
+
+             The specific receptacle branch (instance) is specified by the
+             varbind (lgpConditionTableRowRef).  In this case the condition
+             is for the 4th receptacle branch on the 1st PDU in the PDU cluster.
+
+             If one wanted to retrieve the serial number for this
+             receptacle branch the OID would be: lgpPduRbEntrySerialNum.1.4.
+            "
+        ::= { lgpConditionEntry 6 }
+
+    lgpConditionType OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        not-specified(0),
+                        message(2),
+                        warning(4),
+                        alarm(6),
+                        fault(8)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of condition in this row in the table."
+        ::= { lgpConditionEntry 10 }
+
+    lgpConditionCurrentState OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        active(1),
+                        inactive(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indication of the current state of the event.  If the state
+             is 'active' then the condition currently exists.  If the
+             state is 'inactive' then the condition no longer exists (i.e.
+             the situation causing the condition has cleared or been
+             resolved).  The behavior of some devices is to remove
+             the condition from this table when the condition clears.
+             The behavior of other devices is to leave the condition
+             entry in the table until the condition is acknowledged (
+             see lgpConditionAcknowledged and lgpConditionAckReq)."
+        ::= { lgpConditionEntry 12 }
+
+    lgpConditionSeverity OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        not-applicable(0),
+                        minor(3),
+                        major(6),
+                        critical(9)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This represents the relative severity of the condition."
+        ::= { lgpConditionEntry 14 }
+
+    lgpConditionAcknowledged OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        notAcknowledged(1),
+                        acknowledged(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This indicates if the condition has been acknowledged.
+             If the value is 'notAcknowledged' then the condition has
+             not been acknowledged.  If the value is 'acknowledged'
+             then the condition has been acknowledged.  Writing a value
+             of 'acknowledged' to this object acknowledges the condition
+             and the value will be changed to 'acknowledged'.
+
+             If the current state of the condition is 'active'
+             (see lgpConditionCurrentState) the condition will, for all
+             devices remain in the table regardless of the state of the
+             'lgpConditionAcknowledged' object.
+
+             If the 'lgpConditionAckReq' is 'notRequired' or this column
+             does not exist for the row then this object has no affect on
+             the duration the condition stays in the lgpConditionsTable.
+
+             If the 'lgpConditionAckReq' is 'required' then the condition
+             will remain in the condition table until both the
+             'lgpConditionCurrentState' is 'inactive' AND
+             'lgpConditionAcknowledged' is 'acknowledged'.
+            "
+        ::= { lgpConditionEntry 18 }
+
+    lgpConditionAckReq OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        required(1),
+                        notRequired(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This indicates if the corresponding condition does or does not
+             require user acknowledgement.  Conditions that require
+             user acknowledgement will have a value of 'required'.  Those
+             conditions that do not require user acknowledgement will have
+             a value of 'notRequired' or in some devices the column may
+             not be present at all.
+
+             If a condition requires acknowledgement it will remain in the
+             table until both the 'lgpConditionCurrentState' and
+             'lgpConditionAcknowledged' are 'inactive' and 'acknowledged'
+             respectively (see lgpConditionAcknowledged).
+
+             If a condition does not require acknowledgement it will
+             be removed from the table as soon as its
+             'lgpConditionCurrentState' is 'inactive'.
+            "
+        ::= { lgpConditionEntry 19 }
+
+-- =============================================================================
+-- lgpConditionControl - Condition Control Group
+-- =============================================================================
+
+lgpConditionControl OBJECT IDENTIFIER
+    -- STATUS      current
+    -- DESCRIPTION
+    --    "Items under this sub-tree allow the user to control actions
+    --     associated with conditions."
+    ::= { lgpConditions 4 }
+
+    lgpConditionControlEventReset OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        noAction(1),
+                        resetAll(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Event Reset Command.  This command will reset all of the
+            device's events.  On some units, when an event is activated, a
+            'set' field is also marked and maintained even when the event has
+            become inactive.  The 'set' field is only cleared when the user
+            clears it and the event is no longer active.  This item will clear
+            the 'set' field for all events that are not active."
+        ::= { lgpConditionControl 1 }
+
+    lgpConditionControlEventAck OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        noAction(1),
+                        ackAll(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Event Acknowledge Command.  This command will acknowledge all of the
+            device's events."
+        ::= { lgpConditionControl 2 }
+
+lgpConditionControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF LgpConditionControlEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of condition control table entries.  The table contains zero, one,
+         or many rows at any moment, depending upon the number of conditions that
+         are controllable by the unit.  This table does not necessarily contain all
+         conditions supported by the unit.  This table only contains conditions that
+         are end-user modifiable."
+    ::= { lgpConditionControl 20 }
+
+    lgpConditionControlEntry OBJECT-TYPE
+        SYNTAX      LgpConditionControlEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the contents of the rows for the table
+            'lgpConditionControlTable'.  A row in this table cannot be created
+            or deleted by user initiated SNMP operations on columns of the table."
+        INDEX       { lgpConditionControlIndex }
+        ::= { lgpConditionControlTable 1 }
+
+    LgpConditionControlEntry ::= SEQUENCE {
+            lgpConditionControlIndex            Unsigned32,
+            lgpConditionControlDescr            OBJECT IDENTIFIER,
+            lgpConditionControlEnableStatus     INTEGER,
+            lgpConditionControlType             INTEGER,
+            lgpConditionControlEnableCapability INTEGER
+            }
+
+    lgpConditionControlIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the nth element of the table."
+        ::= { lgpConditionControlEntry 1 }
+
+    lgpConditionControlDescr OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A reference to an Object Identifier (OID) representing a unique
+            condition. The referenced OID is used solely for identification
+            purposes.
+
+            The object identifier referenced here will be the same object
+            identifier referenced in the lgpConditionsTable (column:
+            lgpConditionDescr) when the condition is activated."
+        ::= { lgpConditionControlEntry 2 }
+
+    lgpConditionControlEnableStatus    OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        not-specified(0),
+                        enabled(1),
+                        disabled(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The value in this column determines if the device is currently
+            capable of generating this event. If the value is 'enabled' then
+            the event will be generated if the condition indicated by
+            lgpConditionControlDescr becomes active. If the value is
+            'disabled' the device will never generate the event. This value is
+            stored on the managed device.
+            Some devices do not allow write access to some entries in this
+            column. The 'lgpConditionControlEnableCapability' column indicates
+            whether this entry can be written."
+        ::= { lgpConditionControlEntry 3 }
+
+    lgpConditionControlType       OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        not-specified(0),
+                        message(2),
+                        warning(4),
+                        alarm(6),
+                        fault(8)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The 'type' assigned or configured for this condition. The value
+            assigned to the condition here is displayed in the
+            lgpConditionsTable (column: lgpConditionType). For some units this
+            is user configurable. This value is stored on the managed device."
+        ::= { lgpConditionControlEntry 4 }
+
+    lgpConditionControlEnableCapability       OBJECT-TYPE
+        SYNTAX      INTEGER
+                    {
+                        not-specified(0),
+                        readonly(1),
+                        readwrite(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Some devices do not allow write access to some entries in the
+            'lgpConditionControlEnableStatus' column. This column indicates
+            whether the 'lgpConditionControlEnableStatus' entry for this row
+            can be written."
+        ::= { lgpConditionControlEntry 5 }
+
+lgpConditionDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ASCII text description for the condition."
+    ::= { lgpConditions 5 }
+
+lgpNetworkName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The network name in a node.domain.com like format.  This object is
+        intended to be used as a varbind object by other notifications that
+        have a context of a network address.  As an example the
+        lgpAgentDnsLookupFailure trap which describes a network name that
+        is failing or has failed to be resolved from a Domain Name Service (DNS)
+        lookup.
+
+        Refer to RFC 952 for further information."
+    ::= { lgpConditions 6 }
+
+-- =============================================================================
+-- lgpConditions - Additional Liebert Conditions Registrations
+-- =============================================================================
+
+lgpFlexConditions OBJECT IDENTIFIER
+    -- STATUS      current
+    -- DESCRIPTION
+    --    "Liebert well known Flexible conditions are defined by OIDs that reside
+    --    in this sub-tree.  These OIDs can be found in the
+    --    LIEBERT-GP-FLEXIBLE-CONDITIONS-MIB which is located in the file
+    --    LIEBERT_GP_FLEXIBLE_COND.MIB."
+    ::= { lgpConditions 7 }
+
+-- =============================================================================
+-- lgpConditionsWellKnown - Liebert "well-known" conditions
+-- =============================================================================
+
+lgpConditionHighTemperature  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The temperature has exceeded the high temperature threshold."
+    ::= { lgpConditionsWellKnown 1 }
+
+lgpConditionLowTemperature  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The temperature is below the low temperature threshold."
+    ::= { lgpConditionsWellKnown 2 }
+
+lgpConditionHighHumidity  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The humidity has exceeded the high humidity threshold."
+    ::= { lgpConditionsWellKnown 3 }
+
+lgpConditionLowHumidity  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The humidity is below the low humidity threshold."
+    ::= { lgpConditionsWellKnown 4 }
+
+lgpConditionLossOfAirflow  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a loss of air flow."
+    ::= { lgpConditionsWellKnown 5 }
+
+    lgpConditionLossOfAirflow1  OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of air flow at sensor 1."
+        ::= { lgpConditionLossOfAirflow 1 }
+
+    lgpConditionLossOfAirflow2  OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of air flow at sensor 2."
+        ::= { lgpConditionLossOfAirflow 2 }
+
+    lgpConditionLossOfAirflowBlower1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of air flow from blower 1."
+        ::= { lgpConditionLossOfAirflow 3 }
+
+    lgpConditionLossOfAirflowAllBlowers OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "No air flow through the unit due to failure of all blowers."
+        ::= { lgpConditionLossOfAirflow 4 }
+
+lgpConditionChangeFilter  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a condition indicating the air filter
+        should be changed."
+    ::= { lgpConditionsWellKnown 6 }
+
+lgpConditionCompressorHighHeadPressure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an excessive head pressure condition."
+    ::= { lgpConditionsWellKnown 7 }
+
+    lgpConditionCompressor1HighHeadPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected excessive head pressure in compressor 1."
+        ::= { lgpConditionCompressorHighHeadPressure 1 }
+
+      lgpConditionCompressor1AHighHeadPressure OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "The system has detected excessive head pressure in compressor 1A."
+          ::= { lgpConditionCompressor1HighHeadPressure 1 }
+
+      lgpConditionCompressor1BHighHeadPressure OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "The system has detected excessive head pressure in compressor 1B."
+          ::= { lgpConditionCompressor1HighHeadPressure 2 }
+
+    lgpConditionCompressor2HighHeadPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected excessive head pressure in compressor 2."
+        ::= { lgpConditionCompressorHighHeadPressure 2 }
+
+      lgpConditionCompressor2AHighHeadPressure OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "The system has detected excessive head pressure in compressor 2A."
+          ::= { lgpConditionCompressor2HighHeadPressure 1 }
+
+      lgpConditionCompressor2BHighHeadPressure OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "The system has detected excessive head pressure in compressor 2B."
+          ::= { lgpConditionCompressor2HighHeadPressure 2 }
+
+    lgpConditionCompressor3HighHeadPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected excessive head pressure in compressor 3."
+        ::= { lgpConditionCompressorHighHeadPressure 3 }
+
+    lgpConditionCompressor4HighHeadPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected excessive head pressure in compressor 4."
+        ::= { lgpConditionCompressorHighHeadPressure 4 }
+
+lgpConditionCompressorOverload  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+         "This system has detected a compressor overload condition."
+    ::= { lgpConditionsWellKnown 8 }
+
+    lgpConditionCompressor1Overload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an overload condition on compressor 1."
+        ::= { lgpConditionCompressorOverload 1 }
+
+    lgpConditionCompressor2Overload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an overload condition on compressor 2."
+        ::= { lgpConditionCompressorOverload 2 }
+
+    lgpConditionCompressor3Overload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an overload condition on compressor 3."
+        ::= { lgpConditionCompressorOverload 3 }
+
+    lgpConditionCompressor4Overload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an overload condition on compressor 4."
+        ::= { lgpConditionCompressorOverload 4 }
+
+lgpConditionCompressorShortCycle  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A compressor has exceeded the maximum number of starts in a
+        minimum time period."
+    ::= { lgpConditionsWellKnown 9 }
+
+    lgpConditionCompressor1ShortCycle OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short cycle event on compressor 1.
+            The compressor has exceeded the maximum number of starts for
+            specified amount of time."
+        ::= { lgpConditionCompressorShortCycle 1 }
+
+      lgpConditionCompressor1AShortCycle OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "The system has detected a short cycle event on compressor 1A.
+              The compressor has exceeded the maximum number of starts for
+              specified amount of time."
+          ::= { lgpConditionCompressor1ShortCycle 1 }
+
+      lgpConditionCompressor1BShortCycle OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "The system has detected a short cycle event on compressor 1B.
+              The compressor has exceeded the maximum number of starts for
+              specified amount of time."
+          ::= { lgpConditionCompressor1ShortCycle 2 }
+
+    lgpConditionCompressor2ShortCycle OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short cycle event on compressor 2.
+            The compressor has exceeded the maximum number of starts for
+            specified amount of time."
+        ::= { lgpConditionCompressorShortCycle 2 }
+
+      lgpConditionCompressor2AShortCycle OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "The system has detected a short cycle event on compressor 2A.
+              The compressor has exceeded the maximum number of starts for
+              specified amount of time."
+          ::= { lgpConditionCompressor2ShortCycle 1 }
+
+      lgpConditionCompressor2BShortCycle OBJECT-IDENTITY
+          STATUS current
+          DESCRIPTION
+              "The system has detected a short cycle event on compressor 2B.
+              The compressor has exceeded the maximum number of starts for
+              specified amount of time."
+          ::= { lgpConditionCompressor2ShortCycle 2 }
+
+    lgpConditionCompressor3ShortCycle OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short cycle event on compressor 3.
+            The compressor has exceeded the maximum number of starts for
+            specified amount of time."
+        ::= { lgpConditionCompressorShortCycle 3 }
+
+    lgpConditionCompressor4ShortCycle OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short cycle event on compressor 4.
+            The compressor has exceeded the maximum number of starts for
+            specified amount of time."
+        ::= { lgpConditionCompressorShortCycle 4 }
+
+lgpConditionCompressorLowSuctionPressure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The pressure at a compressor inlet has dropped below the
+        minimum setting."
+    ::= { lgpConditionsWellKnown 10 }
+
+    lgpConditionCompressor1LowSuctionPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The pressure at compressor 1 inlet has dropped below the
+            minimum setting."
+        ::= { lgpConditionCompressorLowSuctionPressure 1 }
+
+    lgpConditionCompressor2LowSuctionPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The pressure at compressor 2 inlet has dropped below the
+            minimum setting."
+        ::= { lgpConditionCompressorLowSuctionPressure 2 }
+
+    lgpConditionCompressor3LowSuctionPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The pressure at compressor 3 inlet has dropped below the
+            minimum setting."
+        ::= { lgpConditionCompressorLowSuctionPressure 3 }
+
+    lgpConditionCompressor4LowSuctionPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The pressure at compressor 4 inlet has dropped below the
+            minimum setting."
+        ::= { lgpConditionCompressorLowSuctionPressure 4 }
+
+lgpConditionMainFanOverLoad  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a main fan overload condition."
+    ::= { lgpConditionsWellKnown 11 }
+
+lgpConditionManualOverride  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a manual override condition."
+    ::= { lgpConditionsWellKnown 12 }
+
+lgpConditionStandbyGlycoolPumpOn  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The standby Glycol or Glycool pump is activated."
+    ::= { lgpConditionsWellKnown 13 }
+
+lgpConditionWaterUnderFloor  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Moisture has been detected under the floor."
+    ::= { lgpConditionsWellKnown 14 }
+
+lgpConditionHumidifierProblem  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a humidifier problem."
+    ::= { lgpConditionsWellKnown 15 }
+
+lgpConditionLowWaterInHumidifier  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a low water condition in the humidifier
+        reservoir."
+    ::= { lgpConditionsWellKnown 16 }
+
+lgpConditionSmokeDetected  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected smoke."
+    ::= { lgpConditionsWellKnown 17 }
+
+lgpConditionLowWaterFlow  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a low water flow rate condition."
+    ::= { lgpConditionsWellKnown 18 }
+
+lgpConditionLostPower  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has lost power before being switched off using the
+        controls.  This condition is activated when power is restored."
+    ::= { lgpConditionsWellKnown 19 }
+
+lgpGeneralFault  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A fault condition has been detected that is not identified
+        in the well known list."
+    ::= { lgpConditionsWellKnown 20 }
+
+lgpConditionLocalAlarm  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a local, or customer, alarm condition."
+    ::= { lgpConditionsWellKnown 21 }
+
+    lgpConditionLocalAlarm1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that customer alarm condition 1 is active."
+        ::= { lgpConditionLocalAlarm 1 }
+
+    lgpConditionLocalAlarm2 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that customer alarm condition 2 is active."
+        ::= { lgpConditionLocalAlarm 2 }
+
+    lgpConditionLocalAlarm3 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that customer alarm condition 3 is active."
+        ::= { lgpConditionLocalAlarm 3 }
+
+    lgpConditionLocalAlarm4 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that customer alarm condition 4 is active."
+        ::= { lgpConditionLocalAlarm 4 }
+
+    lgpConditionLocalAlarm5 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that customer alarm condition 5 is active."
+        ::= { lgpConditionLocalAlarm 5 }
+
+    lgpConditionLocalAlarm6 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that customer alarm condition 6 is active."
+        ::= { lgpConditionLocalAlarm 6 }
+
+    lgpConditionLocalAlarm7 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that customer alarm condition 7 is active."
+        ::= { lgpConditionLocalAlarm 7 }
+
+    lgpConditionLocalAlarm8 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that customer alarm condition 8 is active."
+        ::= { lgpConditionLocalAlarm 8 }
+
+lgpConditionStandbyUnitOn  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the standby unit is operating."
+    ::= { lgpConditionsWellKnown 22 }
+
+lgpConditionCompressorLowPressure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a low head compressor condition."
+    ::= { lgpConditionsWellKnown 23 }
+
+    lgpConditionCompressor1LowPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected low pressure in compressor 1."
+        ::= { lgpConditionCompressorLowPressure 1 }
+
+        lgpConditionTandemCompressorCircuit1LowPressure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected low pressure in tandem compressor circuit 1."
+            ::= { lgpConditionCompressor1LowPressure 1 }
+
+    lgpConditionCompressor2LowPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected low pressure in compressor 2."
+        ::= { lgpConditionCompressorLowPressure 2 }
+
+        lgpConditionTandemCompressorCircuit2LowPressure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected low pressure in tandem compressor circuit 2."
+            ::= { lgpConditionCompressor2LowPressure 1 }
+
+    lgpConditionCompressor3LowPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected low pressure in compressor 3."
+        ::= { lgpConditionCompressorLowPressure 3 }
+
+    lgpConditionCompressor4LowPressure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected low pressure in compressor 4."
+        ::= { lgpConditionCompressorLowPressure 4 }
+
+lgpConditionHighWaterInPan OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a high water condition in the condenser pan."
+    ::= { lgpConditionsWellKnown 24 }
+
+lgpConditionFaultySensor OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a faulty temperature/humidity sensor."
+    ::= { lgpConditionsWellKnown 25 }
+
+lgpConditionServiceCooling OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The Cooling system requires scheduled maintenance."
+    ::= { lgpConditionsWellKnown 26 }
+
+lgpConditionServiceHumidifier OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The Humidifier requires scheduled maintenance."
+    ::= { lgpConditionsWellKnown 27 }
+
+lgpConditionSystemControlBatteryLow OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Charge level of the system control's battery is below the
+        alarm set point."
+    ::= { lgpConditionsWellKnown 28 }
+
+lgpConditionGroundSystemFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a ground system fault."
+    ::= { lgpConditionsWellKnown 29 }
+
+lgpConditionGroundFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a ground failure."
+    ::= { lgpConditionsWellKnown 30 }
+
+lgpConditionSecurityBreach OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a security breach."
+    ::= { lgpConditionsWellKnown 31 }
+
+lgpConditionEmergencyShutdown OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an emergency shutdown condition.  The System
+        is shutting down as a result of this emergency."
+    ::= { lgpConditionsWellKnown 32 }
+
+lgpConditionOnBypass OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected the load is being powered by a bypass
+        source."
+    ::= { lgpConditionsWellKnown 33 }
+
+    lgpConditionLoadOnBypass OBJECT-IDENTITY
+        STATUS obsolete
+        DESCRIPTION
+            "The load is being powered by a bypass source."
+        ::= { lgpConditionOnBypass 1 }
+
+    lgpConditionLoadOnMaintenceBypass OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The load is being powered by a maintenance bypass source."
+        ::= { lgpConditionOnBypass 2 }
+
+    lgpConditionParallelSysLoadOnBypass OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The parallel system has transferred to bypass."
+        ::= { lgpConditionOnBypass 3 }
+
+    lgpConditionLoadOnBypassByImpact OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a load impact and has transferred the
+            load to the bypass source."
+        ::= { lgpConditionOnBypass 4 }
+
+    lgpConditionLoadTransferedToBypass OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has transferred to bypass.  The load is being powered by
+            the bypass source."
+        ::= { lgpConditionOnBypass 5 }
+
+    lgpConditionEmergencyTransferToBypass OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has performed an emergency transfer to bypass."
+        ::= { lgpConditionOnBypass 6 }
+
+lgpConditionOutputToLoadVoltTHD OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The total harmonic distortion (THD) of the output voltage has exceeded a
+        pre-determined threshold for a device, or system, defined amount of
+        time."
+    ::= { lgpConditionsWellKnown 34 }
+
+lgpConditionLogicFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a control logic failure."
+    ::= { lgpConditionsWellKnown 35 }
+
+lgpConditionPowerSupplyFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system had detected a power supply fault condition."
+    ::= { lgpConditionsWellKnown 36 }
+
+    lgpConditionPowerSupply1Fault OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected power supply 1 is in a fault condition."
+        ::= { lgpConditionPowerSupplyFault 1 }
+
+    lgpConditionPowerSupply2Fault OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected power supply 2 is in a fault condition."
+        ::= { lgpConditionPowerSupplyFault 2 }
+
+lgpConditionPowerSupplyFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a power supply failure condition."
+    ::= { lgpConditionsWellKnown 37 }
+
+    lgpConditionPowerSupply1Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected power supply 1 has failed."
+        ::= { lgpConditionPowerSupplyFailure 1 }
+
+    lgpConditionPowerSupply2Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected power supply 2 has failed."
+        ::= { lgpConditionPowerSupplyFailure 2 }
+
+    lgpConditionSource1PowerSupplyInputFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected the source 1 Power supply input has failed."
+        ::= { lgpConditionPowerSupplyFailure 3 }
+
+    lgpConditionSource2PowerSupplyInputFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected the source 2 Power supply input has failed."
+        ::= { lgpConditionPowerSupplyFailure 4 }
+
+    lgpConditionPowerSupplyLogicFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected a power supply logic failure."
+        ::= { lgpConditionPowerSupplyFailure 5 }
+
+    lgpConditionCompressorPowerSupplyFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+         "The system has detected the power supply to the compressors
+         has failed."
+        ::= { lgpConditionPowerSupplyFailure 6 }
+
+lgpConditionOverVoltage OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an over voltage condition."
+    ::= { lgpConditionsWellKnown 38 }
+
+    lgpConditionSource1OverVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over voltage condition on source 1.
+            The voltage measurement has risen above a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionOverVoltage 1 }
+
+    lgpConditionSource2OverVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over voltage condition on source 2.
+            The voltage measurement has risen above a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionOverVoltage 2 }
+
+    lgpConditionOutputToLoadOverVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the output to load is in an over-voltage
+             condition.  The voltage for the load has risen above a
+             pre-determined threshold for a device, or system, defined amount
+             of time."
+        ::= { lgpConditionOverVoltage 3 }
+
+    lgpConditionInputOverVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an input over voltage condition.  The
+            voltage measurement has risen above a pre-determined threshold for
+            a specified amount of time."
+        ::= { lgpConditionOverVoltage 4 }
+
+    lgpConditionBypassOverVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over voltage condition on the bypass.
+            The voltage measurement has risen above a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionOverVoltage 5 }
+
+    lgpConditionBypassOverVoltageFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over voltage failure condition on the
+            bypass.  The voltage measurement has risen above a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverVoltage 6 }
+
+    lgpConditionBatteryOverVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a battery over voltage condition."
+        ::= { lgpConditionOverVoltage 7 }
+
+    lgpConditionDcBusOverVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "This system has detected a DC Bus over voltage condition."
+        ::= { lgpConditionOverVoltage 8 }
+
+        lgpConditionDcBus1OverVoltage OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an over voltage condition on DC Bus
+                1."
+            ::= { lgpConditionDcBusOverVoltage 1 }
+
+        lgpConditionDcBus2OverVoltage OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an over voltage condition on DC Bus
+                2."
+            ::= { lgpConditionDcBusOverVoltage 2 }
+
+        lgpConditionDcBus1OverVoltageFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an over voltage failure condition
+                on DC Bus 1."
+            ::= { lgpConditionDcBusOverVoltage 3 }
+
+        lgpConditionDcBus2OverVoltageFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an over voltage failure condition
+                on DC Bus 2."
+            ::= { lgpConditionDcBusOverVoltage 4 }
+
+lgpConditionUnderVoltage OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an under voltage condition."
+    ::= { lgpConditionsWellKnown 39 }
+
+    lgpConditionSource1UnderVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an under voltage condition on source 1.
+            The voltage measurement has fallen below a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionUnderVoltage 1 }
+
+    lgpConditionSource2UnderVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an under voltage condition on source 2.
+            The voltage measurement has fallen below a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionUnderVoltage 2 }
+
+    lgpConditionOutputToLoadUnderVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the output to load is in an under-voltage
+             condition.  The voltage for the load has fallen below a
+             pre-determined threshold for a device, or system, defined amount
+             of time."
+        ::= { lgpConditionUnderVoltage 3 }
+
+    lgpConditionSource1UnderVoltageRMS OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an under voltage condition on source 1.
+            The voltage measurement has fallen below a pre-determined threshold
+            for a specified amount of time."
+        ::= { lgpConditionUnderVoltage 4 }
+
+    lgpConditionSource2UnderVoltageRMS OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an under voltage condition on source 2.
+            The voltage measurement has fallen below a pre-determined threshold
+            for a specified amount of time."
+        ::= { lgpConditionUnderVoltage 5 }
+
+    lgpConditionInputUnderVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an input under voltage condition.
+            The voltage measurement has fallen below a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionUnderVoltage 6 }
+
+    lgpConditionBypassUnderVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an under voltage condition on the bypass.
+            The voltage measurement has fallen below a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionUnderVoltage 7 }
+
+    lgpConditionBypassUnderVoltageFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an under voltage failure condition on the
+            bypass.  The voltage measurement has fallen below a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionUnderVoltage 8 }
+
+    lgpConditionBatteryUnderVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a battery under voltage condition."
+        ::= { lgpConditionUnderVoltage 9 }
+
+    lgpConditionDcBusUnderVoltage OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "This system has detected a DC bus under voltage condition"
+        ::= { lgpConditionUnderVoltage 10 }
+
+        lgpConditionDcBus1UnderVoltage OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an under voltage condition on DC Bus
+                1."
+            ::= { lgpConditionDcBusUnderVoltage 1 }
+
+        lgpConditionDcBus2UnderVoltage OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an under voltage condition on DC Bus
+                2."
+            ::= { lgpConditionDcBusUnderVoltage 2 }
+
+        lgpConditionDcBus1UnderVoltageFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an under voltage failure condition
+                on DC Bus 1."
+            ::= { lgpConditionDcBusUnderVoltage 3 }
+
+        lgpConditionDcBus2UnderVoltageFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an under voltage failure condition
+                on DC Bus 2."
+            ::= { lgpConditionDcBusUnderVoltage 4 }
+
+lgpConditionOverload OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an overload condition."
+    ::= { lgpConditionsWellKnown 40 }
+
+    lgpConditionSource1Overload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected an overload condition on source 1.  The
+         power requirement for this source has risen above a pre-determined
+         threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverload 1 }
+
+    lgpConditionSystemOverload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an overload condition."
+        ::= { lgpConditionOverload 2 }
+
+    lgpConditionSource1PeakCurrentOverLoad OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected source 1 in is experiencing a peak over load
+        condition.  The current has risen above a pre-determined threshold for
+        a specified amount of time."
+        ::= { lgpConditionOverload 3 }
+
+    lgpConditionSource2PeakCurrentOverLoad OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected source 2 in is experiencing a peak over load
+        condition.  The current has risen above a pre-determined threshold for
+        a specified amount of time."
+        ::= { lgpConditionOverload 4 }
+
+    lgpConditionOutputToLoadOverLimit OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system had detected that the output to the load has exceeded the
+        lgpPwrOutputToLoadUserOverloadLimit."
+        ::= { lgpConditionOverload 5 }
+
+    lgpConditionOutputToLoadOverload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an output overload condition."
+        ::= { lgpConditionOverload 6 }
+
+    lgpConditionParallelSysOverload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The parallel system has detected an overload condition."
+        ::= { lgpConditionOverload 7 }
+
+    lgpConditionBypassCurrentOverload OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "With the load on bypass static switch, the measured output
+            RMS current has exceeded a specified percentage of the nominal
+            RMS current."
+        ::= { lgpConditionOverload 8 }
+
+        lgpConditionBypassCurrentOverloadPhsA OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+            "With the load on bypass static switch, the measured phase A output
+            RMS current has exceeded a specified percentage of the nominal
+            per-phase RMS current."
+            ::= { lgpConditionBypassCurrentOverload 1 }
+
+        lgpConditionBypassCurrentOverloadPhsB OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+            "With the load on bypass static switch, the measured phase B output
+            RMS current has exceeded a specified percentage of the nominal
+            per-phase RMS current."
+            ::= { lgpConditionBypassCurrentOverload 2 }
+
+        lgpConditionBypassCurrentOverloadPhsC OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+            "With the load on bypass static switch, the measured phase C output
+            RMS current has exceeded a specified percentage of the nominal
+            per-phase RMS current."
+            ::= { lgpConditionBypassCurrentOverload 3 }
+
+lgpConditionScrShort OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a Silicon Controlled Rectifier (SCR)
+        short condition."
+    ::= { lgpConditionsWellKnown 41 }
+
+    lgpConditionSource1ScrShort OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 1 Silicon Controlled Rectifier
+            (SCR) short condition."
+        ::= { lgpConditionScrShort 1 }
+
+    lgpConditionSource2ScrShort OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 2 Silicon Controlled Rectifier
+            (SCR) short condition."
+        ::= { lgpConditionScrShort 2 }
+
+    lgpConditionBypassScrShort OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a Silicon Controlled Rectifier (SCR) short
+            condition on the bypass."
+        ::= { lgpConditionScrShort 3 }
+
+    lgpConditionInvStaticSwScrShort OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short across one or more inverter static
+            switch Silicon Controlled Rectifiers (SCRs)."
+        ::= { lgpConditionScrShort 4 }
+
+    lgpConditionSource1NeutralScrShort OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 1 Silicon Controlled Rectifier
+            (SCR) short condition on the neutral line."
+        ::= { lgpConditionScrShort 5 }
+
+    lgpConditionSource2NeutralScrShort OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 2 Silicon Controlled Rectifier
+            (SCR) short condition on the neutral line."
+        ::= { lgpConditionScrShort 6 }
+
+lgpConditionScrOpen OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a Silicon Controlled Rectifier (SCR)
+        open condition."
+    ::= { lgpConditionsWellKnown 42 }
+
+    lgpConditionSource1ScrOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 1 Silicon Controlled Rectifier
+            (SCR) open condition."
+        ::= { lgpConditionScrOpen 1 }
+
+    lgpConditionSource2ScrOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 2 Silicon Controlled Rectifier
+            (SCR) open condition."
+        ::= { lgpConditionScrOpen 2 }
+
+    lgpConditionBypassScrOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a Silicon Controlled Rectifier (SCR) open
+            condition on the bypass."
+        ::= { lgpConditionScrOpen 3 }
+
+    lgpConditionSource1NeutralScrOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 1 Silicon Controlled Rectifier
+            (SCR) open condition on the neutral line."
+        ::= { lgpConditionScrOpen 4 }
+
+    lgpConditionSource2NeutralScrOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 2 Silicon Controlled Rectifier
+            (SCR) open condition on the neutral line."
+        ::= { lgpConditionScrOpen 5 }
+
+lgpConditionFanFailure  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a fan failure condition."
+    ::= { lgpConditionsWellKnown 43 }
+
+    lgpConditionFan1Failure  OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a fan 1 failure condition."
+        ::= { lgpConditionFanFailure 1 }
+
+    lgpConditionRedundantFanFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "A failure has occurred in a fan that cools the system's internal
+            components and has resulted in a loss of fan redundancy."
+        ::= { lgpConditionFanFailure 2 }
+
+    lgpConditionMultipleFanFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Multiple fans have failed resulting in a decreased ability to cool
+            the system's internal components."
+        ::= { lgpConditionFanFailure 3 }
+
+    lgpConditionBlowerFanFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a problem with one or more of the blower
+            fans.  These are not the system internal cooling fans."
+        ::= { lgpConditionFanFailure 4 }
+
+        lgpConditionBottomBlowerFanFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The bottom environmental unit blower fan is not operating
+                within its normal parameters."
+            ::= { lgpConditionBlowerFanFailure 1 }
+
+        lgpConditionTopBlowerFanFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The top environmental unit blower fan is not operating
+                within its normal parameters."
+            ::= { lgpConditionBlowerFanFailure 2 }
+
+    lgpConditionCondenserFanVFDFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a problem with the Variable Frequency
+            Drive system for the condenser fan."
+        ::= { lgpConditionFanFailure 5 }
+
+    lgpConditionFanPowerFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a power failure on one or more fans."
+        ::= { lgpConditionFanFailure 6 }
+
+lgpConditionTransferInhibited OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is preventing a transfer of the load to the alternate
+        source."
+    ::= { lgpConditionsWellKnown 44 }
+
+lgpConditionAutoReTransferPrimed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is capable to retransfer to the preferred source."
+    ::= { lgpConditionsWellKnown 45 }
+
+lgpConditionSourcesOutOfSync OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected that the input sources are not within the
+        specified phase difference (synchronization window)."
+    ::= { lgpConditionsWellKnown 46 }
+
+lgpConditionSourceFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an input source failure condition."
+    ::= { lgpConditionsWellKnown 47 }
+
+    lgpConditionSource1Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected source 1 has failed."
+        ::= { lgpConditionSourceFailure 1 }
+
+    lgpConditionSource2Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected source 2 has failed."
+        ::= { lgpConditionSourceFailure 2 }
+
+lgpConditionAutoReTransferInhibited OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is preventing a retransfer of the load back to the
+        preferred source."
+    ::= { lgpConditionsWellKnown 48 }
+
+lgpConditionAutoReTransferFailed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is failing to automatically retransfer the load back to the
+        preferred source."
+    ::= { lgpConditionsWellKnown 49 }
+
+lgpConditionFuseOpen OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an open fuse condition."
+    ::= { lgpConditionsWellKnown 50 }
+
+    lgpConditionControlFuse1Open OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a control power fuse 1 open condition."
+        ::= { lgpConditionFuseOpen 1 }
+
+    lgpConditionControlFuse2Open OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a control power fuse 2 open condition."
+        ::= { lgpConditionFuseOpen 2 }
+
+    lgpConditionRectifierFuseOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a rectifier fuse open condition."
+        ::= { lgpConditionFuseOpen 3 }
+
+    lgpConditionInverterFuseOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an inverter fuse open condition."
+        ::= { lgpConditionFuseOpen 4 }
+
+    lgpConditionOutputToLoadFuseOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an output to load fuse open condition."
+        ::= { lgpConditionFuseOpen 5 }
+
+    lgpConditionDcCapacitorFuseOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a DC capacitor fuse open condition."
+        ::= { lgpConditionFuseOpen 6 }
+
+lgpConditionDisconnect OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a disconnect condition."
+    ::= { lgpConditionsWellKnown 51 }
+
+    lgpConditionSource1DisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the source 1 disconnect is open.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 1 }
+
+    lgpConditionSource2DisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the source 2 disconnect is open.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 2 }
+
+    lgpConditionSource1PduDisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the source 1 PDU (Power Distribution Unit)
+            disconnect is open.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 3 }
+
+    lgpConditionSource2PduDisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the source 2 PDU (Power Distribution Unit)
+            disconnect is open.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 4 }
+
+    lgpConditionOutputToLoadDisconnect1Open OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected Output to load disconnect 1 is open.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 5 }
+
+    lgpConditionOutputToLoadDisconnect2Open OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected Output to load disconnect 2 is open.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 6 }
+
+    lgpConditionSource1BypassDisconnectClosed OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the source 1 bypass disconnect is closed.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 7 }
+
+    lgpConditionSource2BypassDisconnectClosed OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the source 2 bypass disconnect is closed.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 8 }
+
+    lgpConditionOutputToLoadNeutralDisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the output to load neutral disconnect is
+            open.  A disconnect is a device which disconnects a conductor of a
+            circuit from its supply (ex. circuit breaker, contactor, isolating
+            switch, disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 9 }
+
+    lgpConditionBatteryDisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the battery disconnect is open.
+            A disconnect is a device which disconnects a conductor of a
+            circuit from its supply (ex. circuit breaker, contactor, isolating
+            switch, disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 10 }
+
+        lgpConditionBatteryDiscOpenCab01 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the cabinet 1 battery disconnect is
+                open."
+            ::= { lgpConditionBatteryDisconnectOpen 1 }
+
+        lgpConditionBatteryDiscOpenCab02 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the cabinet 2 battery disconnect is
+                open."
+            ::= { lgpConditionBatteryDisconnectOpen 2 }
+
+        lgpConditionBatteryDiscOpenCab03 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the cabinet 3 battery disconnect is
+                open."
+            ::= { lgpConditionBatteryDisconnectOpen 3 }
+
+        lgpConditionBatteryDiscOpenCab04 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the cabinet 4 battery disconnect is
+                open."
+            ::= { lgpConditionBatteryDisconnectOpen 4 }
+
+        lgpConditionBatteryDiscOpenCab05 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the cabinet 5 battery disconnect is
+                open."
+            ::= { lgpConditionBatteryDisconnectOpen 5 }
+
+        lgpConditionBatteryDiscOpenCab06 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+               "The system has detected the cabinet 6 battery disconnect is
+               open."
+            ::= { lgpConditionBatteryDisconnectOpen 6 }
+
+        lgpConditionBatteryDiscOpenCab07 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the cabinet 7 battery disconnect is
+                open."
+            ::= { lgpConditionBatteryDisconnectOpen 7 }
+
+        lgpConditionBatteryDiscOpenCab08 OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the cabinet 8 battery disconnect is
+                open."
+            ::= { lgpConditionBatteryDisconnectOpen 8 }
+
+    lgpConditionInputDisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the input disconnect is open.
+            A disconnect is a device which disconnects a conductor of a
+            circuit from its supply (ex. circuit breaker, contactor, isolating
+            switch, disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 11 }
+
+    lgpConditionOutputToLoadDisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the Output to load disconnect is open.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 12 }
+
+    lgpConditionBypassDisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the bypass disconnect is open.  A
+            disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 13 }
+
+    lgpConditionStaticSwitchDisconnectOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the static switch disconnect is open.
+            A disconnect is a device which disconnects a conductor of a circuit
+            from its supply (ex. circuit breaker, contactor, isolating switch,
+            disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnect 14 }
+
+    lgpConditionBreakerOpenFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "A breaker in the system has failed to respond to an Open signal."
+        ::= { lgpConditionDisconnect 15 }
+
+    lgpConditionBreakerCloseFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "A breaker in the system has failed to respond to a Close signal."
+        ::= { lgpConditionDisconnect 16 }
+
+lgpConditionFrequencyDeviation OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a frequency deviation condition.
+        The frequency of a source is outside of the pre-determined thresholds
+         for a specified amount of time."
+    ::= { lgpConditionsWellKnown 52 }
+
+    lgpConditionSource1FrequencyDeviation OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The frequency for source 1 has been outside of the pre-determined
+            thresholds for a specified period of time."
+        ::= { lgpConditionFrequencyDeviation 1 }
+
+    lgpConditionSource2FrequencyDeviation OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The frequency for source 2 has been outside of the pre-determined
+            thresholds for a specified period of time."
+        ::= { lgpConditionFrequencyDeviation 2 }
+
+    lgpConditionInputFrequencyDeviation OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The frequency for the input has been outside of the pre-determined
+            thresholds for a specified period of time."
+        ::= { lgpConditionFrequencyDeviation 3 }
+
+    lgpConditionOutputToLoadFrequencyDeviation
+        OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The frequency for the output has been outside of the pre-determined
+             thresholds for a specified period of time."
+        ::= { lgpConditionFrequencyDeviation 4 }
+
+    lgpConditionBypassFrequencyDeviation OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The frequency for the bypass input has been outside of the
+            pre-determined thresholds for a specified period of time."
+        ::= { lgpConditionFrequencyDeviation 5 }
+
+lgpConditionOverCurrent OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an over-current condition.  The current of a
+        source has risen above a pre-determined threshold for a device,
+        or system, defined amount of time."
+    ::= { lgpConditionsWellKnown 53 }
+
+    lgpConditionSource1OverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over current condition on source 1.
+            The current of a source has risen above a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverCurrent 1 }
+
+    lgpConditionSource2OverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over current condition on source 2.
+            The current of a source has risen above a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverCurrent 2 }
+
+    lgpConditionOutputToLoadOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the output to load is in an over-current
+             condition.  The current for the load has risen above a
+             pre-determined threshold for a device, or system, defined amount
+             of time."
+        ::= { lgpConditionOverCurrent 3 }
+
+        lgpConditionOutputToLoadOverCurrentPhsA OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the output to load on phase A is in an
+                over-current condition.  The current on this phase has risen above
+                a pre-determined threshold for a device, or system, defined amount
+                of time."
+            ::= { lgpConditionOutputToLoadOverCurrent 1 }
+
+        lgpConditionOutputToLoadOverCurrentPhsB OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the output to load on phase B is in an
+                over-current condition.  The current on this phase has risen above
+                a pre-determined threshold for a device, or system, defined amount
+                of time."
+            ::= { lgpConditionOutputToLoadOverCurrent 2 }
+
+        lgpConditionOutputToLoadOverCurrentPhsC OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected the output to load on phase C is in an
+                over-current condition.  The current on this phase has risen above
+                a pre-determined threshold for a device, or system, defined amount
+                of time."
+            ::= { lgpConditionOutputToLoadOverCurrent 3 }
+
+    lgpConditionGroundOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "A ground source is experiencing an over-current condition.  The
+            current for the ground line has risen above a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverCurrent 4 }
+
+    lgpConditionRectifierOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a rectifier over current condition.
+            The current for the rectifier has risen above a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverCurrent 5 }
+
+    lgpConditionInverterOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an inverter over current condition.
+            The current for the inverter has risen above a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverCurrent 6 }
+
+        lgpConditionInverterOverCurrentPhsA OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an inverter over current condition on
+                phase A.  The current for the this phase in the inverter has risen
+                above a pre-determined threshold for a device, or system, defined
+                amount of time."
+            ::= { lgpConditionInverterOverCurrent 1 }
+
+        lgpConditionInverterOverCurrentPhsB OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an inverter over current condition on
+                phase B.  The current for the this phase in the inverter has risen
+                above a pre-determined threshold for a device, or system, defined
+                amount of time."
+            ::= { lgpConditionInverterOverCurrent 2 }
+
+        lgpConditionInverterOverCurrentPhsC OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected an inverter over current condition on
+                phase C.  The current for the this phase in the inverter has risen
+                above a pre-determined threshold for a device, or system, defined
+                amount of time."
+            ::= { lgpConditionInverterOverCurrent 3 }
+
+    lgpConditionBatteryConverterOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over current condition on the battery
+            converter.  The current of the converter has risen above a
+            pre-determined threshold for a device, or system, defined amount
+            of time."
+        ::= { lgpConditionOverCurrent 7 }
+
+    lgpConditionBatteryBalancerOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a battery balancer over current condition.
+            The current at this point has risen above a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverCurrent 8 }
+
+    lgpConditionHumidifierOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over current condition on the
+            humidifier. The current of the humidifier has risen above
+            a pre-determined threshold for a defined amount of time."
+        ::= { lgpConditionOverCurrent 9 }
+
+    lgpConditionInputOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "There is an over current condition on the system input power.
+             The input current has risen above a pre-determined threshold for
+             a pre-defined amount of time."
+        ::= { lgpConditionOverCurrent 10 }
+
+    lgpConditionSource1NeutralOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over current condition on the neutral
+            line of source 1. The neutral current at source 1 has risen above
+            a pre-determined threshold for a pre-defined amount of time."
+        ::= { lgpConditionOverCurrent 11 }
+
+    lgpConditionSource2NeutralOverCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an over current condition on the neutral
+            line of source 2. The neutral current at source 2 has risen above
+            a pre-determined threshold for a pre-defined amount of time."
+        ::= { lgpConditionOverCurrent 12 }
+
+lgpConditionSensorFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a sensor failure condition."
+    ::= { lgpConditionsWellKnown 54 }
+
+    lgpConditionOutputToLoadVoltageSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system had detected an output to load voltage sensor failure."
+        ::= { lgpConditionSensorFailure 1 }
+
+    lgpConditionSource1VoltageSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system had detected a source 1 voltage sensor failure."
+        ::= { lgpConditionSensorFailure 2 }
+
+    lgpConditionSource2VoltageSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system had detected a source 2 voltage sensor failure."
+        ::= { lgpConditionSensorFailure 3 }
+
+    lgpConditionSource1ScrSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system had detected a source 1 SCR (Silicon Controlled
+            Rectifier) sensor failure."
+        ::= { lgpConditionSensorFailure 4 }
+
+    lgpConditionSource2ScrSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system had detected a source 2 SCR (Silicon Controlled
+            Rectifier) sensor failure."
+        ::= { lgpConditionSensorFailure 5 }
+
+    lgpConditionSource1CurrentSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 1 current sensor failure."
+        ::= { lgpConditionSensorFailure 6 }
+
+    lgpConditionSource2CurrentSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a source 2 current sensor failure."
+        ::= { lgpConditionSensorFailure 7 }
+
+    lgpConditionRoomTempHumiditySensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a device temperature and humidity sensor
+            failure."
+        ::= { lgpConditionSensorFailure 8 }
+
+    lgpConditionGlycolTempSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a glycol temperature sensor failure."
+        ::= { lgpConditionSensorFailure 9 }
+
+    lgpConditionLocal1SensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a local 1 sensor failure."
+        ::= { lgpConditionSensorFailure 10 }
+
+    lgpConditionCompressor1SensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a compressor 1 digital scroll sensor
+            failure condition."
+        ::= { lgpConditionSensorFailure 11 }
+
+    lgpConditionCompressor2SensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a compressor 2 digital scroll sensor
+            failure condition."
+        ::= { lgpConditionSensorFailure 12 }
+
+    lgpConditionSupplySensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a supply sensor failure."
+        ::= { lgpConditionSensorFailure 13 }
+
+    lgpConditionCabinetTemperatureSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a cabinet temperature sensor failure."
+        ::= { lgpConditionSensorFailure 14 }
+
+    lgpConditionCabinetHumiditySensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a cabinet humidity sensor failure."
+        ::= { lgpConditionSensorFailure 15 }
+
+    lgpConditionRoomTempSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a room temperature sensor failure."
+        ::= { lgpConditionSensorFailure 16 }
+
+    lgpConditionBatteryTempSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a battery temperature sensor failure."
+        ::= { lgpConditionSensorFailure 17 }
+
+    lgpConditionAirSensorAFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a failure with air sensor A.  The sensor
+            may have been disconnected or the signal is out of range."
+        ::= { lgpConditionSensorFailure 18 }
+
+    lgpConditionAirSensorBFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a failure with air sensor B.  The sensor
+            may have been disconnected or the signal is out of range."
+        ::= { lgpConditionSensorFailure 19 }
+
+    lgpConditionChilledWaterSupplySensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a failure with the chilled water supply
+            sensor.  The sensor may have been disconnected or the signal is out
+            of range."
+        ::= { lgpConditionSensorFailure 20 }
+
+    lgpConditionRefrigerantSupplySensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a failure with the refrigerant supply
+            sensor.  The sensor may have been disconnected or the signal is out
+            of range."
+        ::= { lgpConditionSensorFailure 21 }
+
+    lgpConditionFluidSupplySensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a failure with the fluid supply
+            sensor.  The sensor may have been disconnected or the signal is out
+            of range."
+        ::= { lgpConditionSensorFailure 22 }
+
+    lgpConditionCompressorLowPressureSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that a compressor low pressure
+            transducer is disconnected or the signal is out of range."
+        ::= { lgpConditionSensorFailure 23 }
+
+        lgpConditionCompressor1LowPressureSensorFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected that compressor 1 low pressure
+                transducer is disconnected or the signal is out of range."
+            ::= { lgpConditionCompressorLowPressureSensorFailure 1 }
+
+    lgpConditionRemoteSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that a remote sensor is disconnected
+            or the signal is out of range."
+        ::= { lgpConditionSensorFailure 24 }
+
+    lgpConditionAirSupplyTempSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that the supply air temperature sensor is
+            disconnected or the signal is out of range."
+        ::= { lgpConditionSensorFailure 25 }
+
+    lgpConditionAirReturnTempSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that the return air temperature sensor is
+            disconnected or the signal is out of range."
+        ::= { lgpConditionSensorFailure 26 }
+
+    lgpConditionCompressorHighPressureSensorFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that a compressor high pressure
+            transducer is disconnected or the signal is out of range."
+        ::= { lgpConditionSensorFailure 27 }
+
+        lgpConditionCompressor2HighPressureSensorFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected that compressor 2 high pressure
+                transducer is disconnected or the signal is out of range."
+            ::= { lgpConditionCompressorHighPressureSensorFailure 2 }
+
+        lgpConditionCompressor3HighPressureSensorFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected that compressor 3 high pressure
+                transducer is disconnected or the signal is out of range."
+            ::= { lgpConditionCompressorHighPressureSensorFailure 3 }
+
+        lgpConditionCompressor4HighPressureSensorFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected that compressor 4 high pressure
+                transducer is disconnected or the signal is out of range."
+            ::= { lgpConditionCompressorHighPressureSensorFailure 4 }
+
+
+lgpConditionInternalCommunicationFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an internal communication failure condition."
+    ::= { lgpConditionsWellKnown 55 }
+
+lgpConditionExternalCommunicationFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an external communication failure condition."
+    ::= { lgpConditionsWellKnown 56 }
+
+lgpConditionSourceGateDriveFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a source gate drive failure condition."
+    ::= { lgpConditionsWellKnown 57 }
+
+    lgpConditionSource1GateDriveFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected a source 1 gate drive failure."
+        ::= { lgpConditionSourceGateDriveFailure 1 }
+
+    lgpConditionSource2GateDriveFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected a source 2 gate drive failure."
+        ::= { lgpConditionSourceGateDriveFailure 2 }
+
+lgpConditionDisconnectFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a disconnect failure condition.
+        A disconnect is a device which disconnects a conductor of a circuit
+        from its supply (ex. circuit breaker, contactor, isolating switch,
+        disconnecting switch, etc.)."
+    ::= { lgpConditionsWellKnown 58 }
+
+    lgpConditionOutputToLoadNeutralDisconnectFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected the output to load neutral disconnect has
+        failed.
+        A disconnect is a device which disconnects a conductor of a circuit
+        from its supply (ex. circuit breaker, contactor, isolating switch,
+        disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnectFailure 1 }
+
+    lgpConditionSource1DisconnectShuntTripFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected a shunt trip failure of a disconnecting device
+        on source 1.
+        A disconnect is a device which disconnects a conductor of a circuit
+        from its supply (ex. circuit breaker, contactor, isolating switch,
+        disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnectFailure 2 }
+
+    lgpConditionSource2DisconnectShuntTripFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected a shunt trip failure of a disconnecting device
+        on source 2.
+        A disconnect is a device which disconnects a conductor of a circuit
+        from its supply (ex. circuit breaker, contactor, isolating switch,
+        disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnectFailure 3 }
+
+    lgpConditionInverterDisconnectFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected an inverter disconnect failure.  A disconnect
+        is a device which disconnects a conductor of a circuit from its
+        supply (ex. circuit breaker, contactor, isolating switch,
+        disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnectFailure 4 }
+
+    lgpConditionBatteryDisconnectFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected a battery disconnect failure.  A disconnect
+        is a device which disconnects a conductor of a circuit from its
+        supply (ex. circuit breaker, contactor, isolating switch,
+        disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnectFailure 5 }
+
+    lgpConditionRectifierDisconnectFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected a rectifier disconnect failure.  A disconnect
+        is a device which disconnects a conductor of a circuit from its
+        supply (ex. circuit breaker, contactor, isolating switch,
+        disconnecting switch, etc.)."
+        ::= { lgpConditionDisconnectFailure 6 }
+
+lgpConditionOverTemperature OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an over temperature condition."
+    ::= { lgpConditionsWellKnown 59 }
+
+    lgpConditionHeatSink1OverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected a heat sink 1 over temperature condition."
+        ::= { lgpConditionOverTemperature 1 }
+
+    lgpConditionAmbient1OverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+        "The system has detected an ambient over temperature condition at
+        location 1."
+        ::= { lgpConditionOverTemperature 2 }
+
+    lgpConditionSystemOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system or a component of the system has detected an over
+            temperature condition.  The temperature measurement has risen
+            above a pre-determined threshold for a device, or system, defined
+            amount of time."
+        ::= { lgpConditionOverTemperature 3 }
+
+    lgpConditionTransformerOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The transformer is experiencing an over temperature condition.
+            The transformer's temperature has exceeded a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverTemperature 4 }
+
+    lgpConditionBatteryOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The battery is experiencing an over temperature condition.
+            The battery's temperature has exceeded a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionOverTemperature 5 }
+
+    lgpConditionRectifierOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a rectifier over temperature condition.
+            The rectifier's temperature has exceeded a pre-determined threshold
+            for a device, or system, defined amount of time."
+        ::= { lgpConditionOverTemperature 6 }
+
+    lgpConditionInverterOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an inverter over temperature condition.
+            The inverter's temperature has exceeded a pre-determined
+            threshold for a device, or system, defined amount of time."
+        ::= { lgpConditionOverTemperature 7 }
+
+    lgpConditionRectifierInductorOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a rectifier inductor over temperature
+            condition.  The rectifier's inductor temperature has exceeded a
+            pre-determined threshold for a device, or system, defined amount
+            of time."
+        ::= { lgpConditionOverTemperature 8 }
+
+    lgpConditionInverterInductorOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an inverter inductor over temperature
+            condition.  The inverter's inductor temperature has exceeded a
+            pre-determined threshold for a device, or system, defined amount
+            of time."
+        ::= { lgpConditionOverTemperature 9 }
+
+    lgpConditionBatteryConverterOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a battery converter over temperature
+            condition.  The battery converter's temperature has exceeded a
+            pre-determined threshold for a device, or system, defined amount
+            of time."
+        ::= { lgpConditionOverTemperature 10 }
+
+    lgpConditionBatteryBalancerInductorOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a battery balancer Inductor over
+            temperature condition.  The battery balancer Inductor's temperature
+            has exceeded a pre-determined threshold for a specified amount of
+            time."
+        ::= { lgpConditionOverTemperature 11 }
+
+    lgpConditionChilledWaterOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a chilled water over temperature
+            condition."
+        ::= { lgpConditionOverTemperature 12 }
+
+    lgpConditionElectricHeatersOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an electric heater over temperature
+            condition."
+        ::= { lgpConditionOverTemperature 13 }
+
+    lgpConditionInletAirOverTemperature OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected an inlet air over temperature condition."
+        ::= { lgpConditionOverTemperature 14 }
+
+    lgpConditionSystemOverTempWarning OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system or a component of the system has detected an over
+            temperature condition.  The temperature measurement has risen
+            above a normal operating range for a device, or system, defined
+            amount of time. The system is still operational but a threshold has
+            been exceeded."
+        ::= { lgpConditionOverTemperature 15 }
+
+    lgpConditionHighTemperatureBattString OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+         "The system has detected a high temperature on a battery string.
+         The temperature has exceeded a specified temperature threshold."
+        ::= { lgpConditionOverTemperature 16 }
+
+lgpConditionLoadOnAlternateSource OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected that the load is being supplied by the
+        alternate source."
+    ::= { lgpConditionsWellKnown 60 }
+
+lgpConditionPhaseRotationError OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a phase rotation error condition."
+    ::= { lgpConditionsWellKnown 61 }
+
+    lgpConditionSource1PhaseRotationError OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a phase rotation error on source 1."
+        ::= { lgpConditionPhaseRotationError 1 }
+
+    lgpConditionSource2PhaseRotationError OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a phase rotation error on source 2."
+        ::= { lgpConditionPhaseRotationError 2 }
+
+    lgpConditionBypassPhaseRotationError OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a phase rotation error on the bypass."
+        ::= { lgpConditionPhaseRotationError 3 }
+
+    lgpConditionInputPhaseRotationError OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a phase rotation error on the input."
+        ::= { lgpConditionPhaseRotationError 4 }
+
+lgpConditionControlModuleFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a control module failure condition."
+    ::= { lgpConditionsWellKnown 62 }
+
+    lgpConditionControlModule1Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a control module 1 failure."
+        ::= { lgpConditionControlModuleFailure 1 }
+
+lgpConditionHistoryLogFull OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the history log is full."
+    ::= { lgpConditionsWellKnown 63 }
+
+lgpConditionConfigurationModified OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the configuration has been modified."
+    ::= { lgpConditionsWellKnown 64 }
+
+lgpConditionPasswordModified OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the password has been modified."
+    ::= { lgpConditionsWellKnown 65 }
+
+lgpConditionTimeModified OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the time has been modified."
+    ::= { lgpConditionsWellKnown 66 }
+
+lgpConditionDateModified OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the date has been modified."
+    ::= { lgpConditionsWellKnown 67 }
+
+lgpConditionEventLogCleared OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the event log has been cleared."
+    ::= { lgpConditionsWellKnown 68 }
+
+lgpConditionHistoryLogCleared OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the history log has been cleared."
+    ::= { lgpConditionsWellKnown 69 }
+
+lgpConditionUtilityFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a utility failure."
+    ::= { lgpConditionsWellKnown 70 }
+
+lgpConditionBatteryTestInProgress OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is performing a battery test at this time."
+    ::= { lgpConditionsWellKnown 71 }
+
+lgpConditionLoadOnBattery OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system load is being supported by the battery."
+    ::= { lgpConditionsWellKnown 72 }
+
+lgpConditionReplaceBattery OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the batteries are due to be replaced."
+    ::= { lgpConditionsWellKnown 74 }
+
+lgpConditionUpsShutdownPending OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is in a shutdown pending condition."
+    ::= { lgpConditionsWellKnown 75 }
+
+lgpConditionBatteryChargerFailed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the battery charger has failed."
+    ::= { lgpConditionsWellKnown 76 }
+
+lgpConditionBypassVoltageUnqualified OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the bypass voltage is unqualified.
+        The voltage measurement is outside a pre-determined threshold range for
+        a specified amount of time."
+    ::= { lgpConditionsWellKnown 77 }
+
+lgpConditionCheckAirFilter OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected it is time to check the air filter."
+    ::= { lgpConditionsWellKnown 78 }
+
+lgpConditionBrownOut OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a brown out condition."
+    ::= { lgpConditionsWellKnown 79 }
+
+lgpConditionMultipleTransferLockout OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has locked out transfers to bypass.  Too many transfers
+        have occurred over a specified amount of time."
+    ::= { lgpConditionsWellKnown 80 }
+
+lgpConditionBypassPhaseLost OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected one or more bypass phases are missing."
+    ::= { lgpConditionsWellKnown 81 }
+
+lgpConditionMaintenceBypassInhibited OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is preventing a transfer of the load to maintenance bypass."
+    ::= { lgpConditionsWellKnown 82 }
+
+lgpConditionLoadLockedOnBypass OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "An error has been detected requiring the system to be put into a
+        'locked on bypass' state."
+    ::= { lgpConditionsWellKnown 83 }
+
+lgpConditionOutputToLoadShort OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an output to load short circuit condition."
+    ::= { lgpConditionsWellKnown 84 }
+
+lgpConditionEmergencyTransferToInverter OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an emergency transfer of the load to
+        inverter."
+    ::= { lgpConditionsWellKnown 85 }
+
+lgpConditonEmergencyPowerOff OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an Emergency Power Off (EPO) condition.
+        An external EPO switch has cut off the power source to the system."
+    ::= { lgpConditionsWellKnown 86 }
+
+lgpConditionInverterBackFeed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an inverter back-feed condition.  The inverter
+        is feeding power through the bypass back to the input."
+    ::= { lgpConditionsWellKnown 87 }
+
+lgpConditionDcGroundFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a DC ground fault."
+    ::= { lgpConditionsWellKnown 88 }
+
+    lgpConditionDcGroundFaultPos OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Ground fault current has been detected in the positive DC link to
+            ground."
+        ::= { lgpConditionDcGroundFault 1 }
+
+    lgpConditionDcGroundFaultNeg OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Ground fault current has been detected in the negative DC link to
+            ground."
+        ::= { lgpConditionDcGroundFault 2 }
+
+lgpConditionStaticTransferSwitchInhibited
+ OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is preventing the use of the static transfer switch."
+    ::= { lgpConditionsWellKnown 89 }
+
+lgpConditionBatteryLogFullWarning
+ OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the battery log is approaching the maximum
+        record limit."
+    ::= { lgpConditionsWellKnown 90 }
+
+lgpConditionInputCurrentUnbalanced
+ OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an unbalanced input current condition.
+        The currents of input phases are out of tolerance."
+    ::= { lgpConditionsWellKnown 91 }
+
+lgpConditionSelfTestFailed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a self-test failure."
+    ::= { lgpConditionsWellKnown 92 }
+
+lgpConditionInverterOutOfSynchronization
+ OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an Inverter out of sync condition."
+    ::= { lgpConditionsWellKnown 93 }
+
+lgpConditionModuleAlarm  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected an alarm within the multi-module system."
+    ::= { lgpConditionsWellKnown 94 }
+
+    lgpConditioniModuleUnit1Alarm OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The multi-module system has detected an alarm condition on
+            unit 1."
+        ::= { lgpConditionModuleAlarm 1 }
+
+    lgpConditioniModuleUnit2Alarm OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The multi-module system has detected an alarm condition on
+            unit 2."
+        ::= { lgpConditionModuleAlarm 2 }
+
+    lgpConditioniModuleUnit3Alarm OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The multi-module system has detected an alarm condition on
+            unit 3."
+        ::= { lgpConditionModuleAlarm 3 }
+
+    lgpConditioniModuleUnit4Alarm OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The multi-module system has detected an alarm condition on
+            unit 4."
+        ::= { lgpConditionModuleAlarm 4 }
+
+    lgpConditioniModuleUnit5Alarm OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The multi-module system has detected an alarm condition on
+            unit 5."
+        ::= { lgpConditionModuleAlarm 5 }
+
+    lgpConditioniModuleUnit6Alarm OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The multi-module system has detected an alarm condition on
+            unit 6."
+        ::= { lgpConditionModuleAlarm 6 }
+
+    lgpConditioniModuleUnit7Alarm OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The multi-module system has detected an alarm condition on
+            unit 7."
+        ::= { lgpConditionModuleAlarm 7 }
+
+    lgpConditioniModuleUnit8Alarm OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The multi-module system has detected an alarm condition on
+            unit 8."
+        ::= { lgpConditionModuleAlarm 8 }
+
+lgpConditionActiveModuleAlarm OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an active alarm in one, or more, of the
+        sub-modules of the multi-module system."
+    ::= { lgpConditionsWellKnown 95 }
+
+lgpConditionControlFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a control failure condition."
+    ::= { lgpConditionsWellKnown 96 }
+
+        lgpConditionMainControlFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a main control failure condition."
+        ::= { lgpConditionControlFailure 1 }
+
+        lgpConditionRedundantControlFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a redundant control failure condition."
+        ::= { lgpConditionControlFailure 2 }
+
+        lgpConditionParallelSysControlFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The parallel system has detected a control failure condition with
+            one of the controls."
+        ::= { lgpConditionControlFailure 3 }
+
+        lgpConditionMainControlCommFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "One or more communications failures have occurred in the main
+            control."
+        ::= { lgpConditionControlFailure 4 }
+
+        lgpConditionControlBoardFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a control board failure."
+        ::= { lgpConditionControlFailure 5 }
+
+            lgpConditionHumidifierControlBdFailure OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Humidifier control board is required to be connected,
+                but no signal is detected."
+            ::= { lgpConditionControlBoardFailure 1 }
+
+lgpConditionControlWarning OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This system has detected a control warning conditions."
+    ::= { lgpConditionsWellKnown 97 }
+
+    lgpConditionMainControlWarning OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a main control warning condition."
+        ::= { lgpConditionControlWarning 1 }
+
+    lgpConditionRedundantControlWarning OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a redundant control warning condition."
+        ::= { lgpConditionControlWarning 2 }
+
+lgpConditionUserInterfaceFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a user interface control failure condition."
+    ::= { lgpConditionsWellKnown 98 }
+
+lgpConditionLostPowerRedundancy OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the number of redundant power modules has
+        fallen below the minimum redundant power module setting."
+    ::= { lgpConditionsWellKnown 99 }
+
+lgpConditionPowerModuleFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a power module failure condition in the
+        system."
+    ::= { lgpConditionsWellKnown 100 }
+
+lgpConditionBatteryModuleFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a battery module failure condition in the
+        system."
+    ::= { lgpConditionsWellKnown 101 }
+
+lgpConditionOutputToLoadOff OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected that there is no power being supplied to the
+        load."
+    ::= { lgpConditionsWellKnown 102 }
+
+lgpConditionSystemOff OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is off."
+    ::= { lgpConditionsWellKnown 103 }
+
+lgpConditionRectifierStartupFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a rectifier under voltage start-up failure
+        condition."
+    ::= { lgpConditionsWellKnown 104 }
+
+lgpConditionRectifierFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a rectifier fault condition."
+    ::= { lgpConditionsWellKnown 105 }
+
+lgpConditionInverterShutdownLowDc OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has shutdown the inverter due to a DC bus under voltage."
+    ::= { lgpConditionsWellKnown 106 }
+
+lgpConditionInverterFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an inverter fault condition."
+    ::= { lgpConditionsWellKnown 107 }
+
+lgpConditionInverterDcOffsetOverrun OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an over run of the inverter DC offset
+        voltage."
+    ::= { lgpConditionsWellKnown 108 }
+
+lgpConditionParallelSysLowBatteryWarning OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The parallel system has detected a low battery warning condition."
+    ::= { lgpConditionsWellKnown 109 }
+
+lgpConditionParallelSysLoadShareFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The parallel system has detected a load share fault condition."
+    ::= { lgpConditionsWellKnown 110 }
+
+lgpConditionBatteryFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a battery fault condition.  The battery
+        conductors are either reversed or disconnected."
+    ::= { lgpConditionsWellKnown 111 }
+
+lgpConditionBatteryConverterFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a battery converter failure condition."
+    ::= { lgpConditionsWellKnown 112 }
+
+lgpConditionBatteryBalancerFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a battery balancer fault condition."
+    ::= { lgpConditionsWellKnown 113 }
+
+lgpConditionpsUpsOperationFault OBJECT-IDENTITY
+    STATUS deprecated
+    DESCRIPTION
+        "The system has detected an operation fault.  The UPS attempted to
+        transfer to maintenance bypass without following the proper sequence."
+    ::= { lgpConditionsWellKnown 114 }
+
+lgpConditionOutputToLoadOnJointMode OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system load is being supported by both the battery and rectifier."
+    ::= { lgpConditionsWellKnown 115 }
+
+lgpConditionInputNeutralLost OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system had detected the main input neutral is disconnected."
+    ::= { lgpConditionsWellKnown 116 }
+
+lgpConditionLowBatteryWarning OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The battery's remaining charge is less than or equal to the
+        configured low threshold."
+    ::= { lgpConditionsWellKnown 117 }
+
+lgpConditionInternalFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an internal fault."
+    ::= { lgpConditionsWellKnown 118 }
+
+lgpConditionBatteryTestFailed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a battery self-test failure."
+    ::= { lgpConditionsWellKnown 119 }
+
+lgpConditionPowerModuleWarning OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an alarm condition on one, or more,
+        power modules."
+    ::= { lgpConditionsWellKnown 120 }
+
+lgpConditionBatteryModuleWarning OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an alarm condition on one, or more,
+        battery modules."
+    ::= { lgpConditionsWellKnown 121 }
+
+lgpConditionControlModuleWarning OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a control module warning."
+    ::= { lgpConditionsWellKnown 122 }
+
+lgpConditionUpsOperationFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an operation fault.  The UPS attempted to
+        transfer to maintenance bypass without following the proper sequence."
+    ::= { lgpConditionsWellKnown 123 }
+
+lgpConditionActiveAlarm OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an alarm condition."
+    ::= { lgpConditionsWellKnown 124 }
+
+lgpConditionRectifierCommunicationFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an internal communication failure
+        condition with the rectifier."
+    ::= { lgpConditionsWellKnown 125 }
+
+lgpConditionInverterCommunicationFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an internal communication failure
+        condition with the inverter."
+    ::= { lgpConditionsWellKnown 126 }
+
+lgpConditionParallelSysConnectionFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The parallel system has detected a connection fault.
+        One or more of the devices are not properly connected."
+    ::= { lgpConditionsWellKnown 127 }
+
+lgpConditionParallelSysCommunicationFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The parallel system has detected a communication failure."
+    ::= { lgpConditionsWellKnown 128 }
+
+lgpConditionLostBatteryRedundancy OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the number of redundant battery modules has
+        fallen below the configured redundant battery module threshold."
+    ::= { lgpConditionsWellKnown 129 }
+
+lgpConditionCompPumpDownFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected that a compressor has failed to pump down."
+    ::= { lgpConditionsWellKnown 130 }
+
+    lgpConditionComp1PumpDownFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that compressor 1 has failed to pump
+            down."
+        ::= { lgpConditionCompPumpDownFailure 1 }
+
+    lgpConditionComp2PumpDownFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that compressor 2 has failed to pump
+            down."
+        ::= { lgpConditionCompPumpDownFailure 2 }
+
+    lgpConditionComp3PumpDownFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that compressor 3 has failed to pump
+            down."
+        ::= { lgpConditionCompPumpDownFailure 3 }
+
+    lgpConditionComp4PumpDownFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that compressor 4 has failed to pump
+            down."
+        ::= { lgpConditionCompPumpDownFailure 4 }
+
+lgpConditionChilledWaterLowWaterFlow OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a chilled water low water flow condition."
+    ::= { lgpConditionsWellKnown 131 }
+
+    lgpConditionChilledWaterLowWaterFlowCircuit2 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a chilled water low water flow condition for circuit 2."
+        ::= { lgpConditionChilledWaterLowWaterFlow 2 }
+
+lgpConditionAirFilterClogged OBJECT-IDENTITY
+    STATUS deprecated
+    DESCRIPTION
+        "The system has detected a air filter clogged condition."
+    ::= { lgpConditionsWellKnown 132 }
+
+lgpConditionHumidifierFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a humidifier failure condition."
+    ::= { lgpConditionsWellKnown 133 }
+
+lgpConditionRunHoursExceeded OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a pre-determined run hours threshold has been
+        exceeded."
+    ::= { lgpConditionsWellKnown 134 }
+
+    lgpConditionUnitRunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the system run hours has exceeded the
+            pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 1 }
+
+    lgpConditionComp1RunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the compressor 1 run hours has exceeded
+            the pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 2 }
+
+    lgpConditionComp2RunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the compressor 2 run hours has exceeded
+            the pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 3 }
+
+    lgpConditionFreeCoolRunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the free cooling run hours has exceeded
+            the pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 4 }
+
+    lgpConditionElectricalHeater1RunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the electrical heater's run hours have
+            exceeded the pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 5 }
+
+    lgpConditionElectricalHeater2RunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the electrical heater's run hours have
+            exceeded the pre-determined limit."
+        ::= { lgpConditionRunHoursExceeded 6 }
+
+    lgpConditionElectricalHeater3RunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the electrical heater's run hours have
+            exceeded the pre-determined limit."
+        ::= { lgpConditionRunHoursExceeded 7 }
+
+    lgpConditionHotWaterRunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the hot water run hours have exceeded
+            the pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 8 }
+
+    lgpConditionHotGasRunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the hot gas run hours have exceeded the
+            pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 9 }
+
+    lgpConditionHumidifierRunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the humidifier run hours have exceeded
+            the pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 10 }
+
+    lgpConditionDehumidiferRunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the dehumidifier run hours have exceeded
+            the pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 11 }
+
+    lgpConditionFanRunHrsExceeded OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the unit blower fan run hours have
+            exceeded the pre-determined threshold."
+        ::= { lgpConditionRunHoursExceeded 12 }
+
+lgpConditionCommWarning OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a loss of communications with another
+        module."
+    ::= { lgpConditionsWellKnown 135 }
+
+    lgpConditionCommWarningUnit1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 1."
+        ::= { lgpConditionCommWarning 1 }
+
+    lgpConditionCommWarningUnit2 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 2."
+        ::= { lgpConditionCommWarning 2 }
+
+    lgpConditionCommWarningUnit3 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 3."
+        ::= { lgpConditionCommWarning 3 }
+
+    lgpConditionCommWarningUnit4 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 4."
+        ::= { lgpConditionCommWarning 4 }
+
+    lgpConditionCommWarningUnit5 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 5."
+        ::= { lgpConditionCommWarning 5 }
+
+    lgpConditionCommWarningUnit6 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 6."
+        ::= { lgpConditionCommWarning 6 }
+
+    lgpConditionCommWarningUnit7 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 7."
+        ::= { lgpConditionCommWarning 7 }
+
+    lgpConditionCommWarningUnit8 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 8."
+        ::= { lgpConditionCommWarning 8 }
+
+    lgpConditionCommWarningUnit9 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 9."
+        ::= { lgpConditionCommWarning 9 }
+
+    lgpConditionCommWarningUnit10 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 10."
+        ::= { lgpConditionCommWarning 10 }
+
+    lgpConditionCommWarningUnit11 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 11."
+        ::= { lgpConditionCommWarning 11 }
+
+    lgpConditionCommWarningUnit12 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 12."
+        ::= { lgpConditionCommWarning 12 }
+
+    lgpConditionCommWarningUnit13 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 13."
+        ::= { lgpConditionCommWarning 13 }
+
+    lgpConditionCommWarningUnit14 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 14."
+        ::= { lgpConditionCommWarning 14 }
+
+    lgpConditionCommWarningUnit15 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 15."
+        ::= { lgpConditionCommWarning 15 }
+
+    lgpConditionCommWarningUnit16 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of communications with unit 16."
+        ::= { lgpConditionCommWarning 16 }
+
+lgpConditionUnitOn OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The unit is on."
+    ::= { lgpConditionsWellKnown 136 }
+
+lgpConditionUnitOff OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The unit is off."
+    ::= { lgpConditionsWellKnown 137 }
+
+lgpConditionSleepModeOff OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system sleep mode operation has been turned off."
+    ::= { lgpConditionsWellKnown 138 }
+
+lgpConditionPowerOn OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system power is on."
+    ::= { lgpConditionsWellKnown 139 }
+
+lgpConditionSystemOnStanby OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is on standby."
+    ::= { lgpConditionsWellKnown 140 }
+
+lgpConditionPowerOff OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system power is off."
+    ::= { lgpConditionsWellKnown 141 }
+
+lgpConditionHighTemperatureGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a high temperature condition.  This group
+        contains various high temperature conditions."
+    ::= { lgpConditionsWellKnown 142 }
+
+    lgpConditionHighTemperatureSensor1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature has exceeded the high temperature threshold
+            for sensor 1."
+        ::= { lgpConditionHighTemperatureGroup 1 }
+
+    lgpConditionHighTemperatureDigitalScroll1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a high temperature event on Digital
+            Scroll Compressor 1.  The temperature has exceeded a specified
+            temperature threshold."
+        ::= { lgpConditionHighTemperatureGroup 2 }
+
+    lgpConditionHighTemperatureDigitalScroll2 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a high temperature event on Digital
+            Scroll Compressor 2.  The temperature has exceeded a specified
+            temperature threshold."
+        ::= { lgpConditionHighTemperatureGroup 3 }
+
+    lgpConditionHighTemperatureUser1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+         "The temperature has exceeded the high temperature threshold
+         for user configured temperature sensor 1."
+        ::= { lgpConditionHighTemperatureGroup 4 }
+
+    lgpConditionHighTemperatureInternal OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+         "The system has detected a high internal temperature condition.
+         The temperature has exceeded a specified temperature threshold."
+        ::= { lgpConditionHighTemperatureGroup 5 }
+
+    lgpConditionHighTemperatureExternalAirSensorA OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature has exceeded the high temperature threshold
+            for external air sensor A."
+        ::= { lgpConditionHighTemperatureGroup 6 }
+
+    lgpConditionHighTemperatureExternalAirSensorB OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature has exceeded the high temperature threshold
+            for external air sensor B."
+        ::= { lgpConditionHighTemperatureGroup 7 }
+
+    lgpConditionHighTemperatureRefrigerantSupply OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature has exceeded the high temperature threshold
+            for the refrigerant supply."
+        ::= { lgpConditionHighTemperatureGroup 8 }
+
+    lgpConditionHighTemperatureFluidSupply OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature has exceeded the high temperature threshold
+            for the fluid supply."
+        ::= { lgpConditionHighTemperatureGroup 9 }
+
+    lgpConditionHighTemperatureSupplyAir OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature has exceeded the high temperature threshold
+            for the supply air."
+        ::= { lgpConditionHighTemperatureGroup 10 }
+
+    lgpConditionHighTemperatureReturnAir OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature has exceeded the high temperature threshold
+            for the return air."
+        ::= { lgpConditionHighTemperatureGroup 11 }
+
+lgpConditionLowTemperatureGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a low temperature condition.  This group
+        contains various low temperature conditions."
+    ::= { lgpConditionsWellKnown 143 }
+
+    lgpConditionLowTemperatureSensor1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature is below the low temperature threshold for
+            sensor 1."
+        ::= { lgpConditionLowTemperatureGroup 1 }
+
+    lgpConditionLowTemperatureInternal OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+         "The system has detected a low internal temperature condition.
+         The temperature is below a specified temperature threshold."
+        ::= { lgpConditionLowTemperatureGroup 2 }
+
+    lgpConditionLowTemperatureExternalAirSensorA OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature is below the low temperature threshold for
+            external air sensor A."
+        ::= { lgpConditionLowTemperatureGroup 3 }
+
+    lgpConditionLowTemperatureExternalAirSensorB OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature is below the low temperature threshold for
+            external air sensor B."
+        ::= { lgpConditionLowTemperatureGroup 4 }
+
+    lgpConditionLowTemperatureRefrigerantSupply OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature is below the low temperature threshold for
+            the refrigerant supply."
+        ::= { lgpConditionLowTemperatureGroup 5 }
+
+    lgpConditionLowTemperatureFluidSupply OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature is below the low temperature threshold for
+            the fluid supply."
+        ::= { lgpConditionLowTemperatureGroup 6 }
+
+    lgpConditionLowTemperatureSupplyAir OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The temperature is below the low temperature threshold for
+            the supply air."
+        ::= { lgpConditionLowTemperatureGroup 7  }
+
+lgpConditionHighHumidityGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a high humidity condition.  This group
+        contains various high humidity conditions."
+    ::= { lgpConditionsWellKnown 144 }
+
+    lgpConditionHighHumiditySensor1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The humidity has exceeded the high humidity threshold for
+            sensor 1."
+        ::= { lgpConditionHighHumidityGroup 1 }
+
+    lgpConditionHighHumidityReturnAir OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The humidity has exceeded the high humidity threshold for
+            the return air."
+        ::= { lgpConditionHighHumidityGroup 2 }
+
+lgpConditionLowHumidityGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a low humidity condition.  This group
+        contains various high humidity conditions."
+    ::= { lgpConditionsWellKnown 145 }
+
+    lgpConditionLowHumiditySensor1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The humidity is below the low humidity threshold for sensor 1."
+        ::= { lgpConditionLowHumidityGroup 1 }
+
+    lgpConditionLowHumidityReturnAir OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The humidity is below the low humidity threshold for the return
+            air."
+        ::= { lgpConditionLowHumidityGroup 2 }
+
+lgpConditionPeerNetworkNoMaster OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is unable to communicate with the master on the peer to
+        peer network."
+    ::= { lgpConditionsWellKnown 146 }
+
+lgpConditionNoOnOffPermissions OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system lacks the permissions to execute the on/off operation."
+    ::= { lgpConditionsWellKnown 147 }
+
+lgpConditionPeerNetworkFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a communication failure on the peer to
+        peer network."
+    ::= { lgpConditionsWellKnown 148 }
+
+lgpConditionUnitDisabled OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The unit is disabled."
+    ::= { lgpConditionsWellKnown 149 }
+
+lgpConditionUnitShutdown OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has shutdown."
+    ::= { lgpConditionsWellKnown 150 }
+
+lgpConditionPeerNetworkDiscovered OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has established communications on the peer to peer
+        network."
+    ::= { lgpConditionsWellKnown 151 }
+
+lgpConditionLossOfWaterFlow OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a loss of water flow condition."
+    ::= { lgpConditionsWellKnown 152 }
+
+lgpConditionCondensatePumpHighWater OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected high water in the condensate pump."
+    ::= { lgpConditionsWellKnown 153 }
+
+lgpConditionGeneralAlarm OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a general alarm condition."
+    ::= { lgpConditionsWellKnown 154 }
+
+lgpConditionProductSpecific OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a product specific condition.  This condition
+        is not currently available via the agent card."
+    ::= { lgpConditionsWellKnown 155 }
+
+lgpConditionReheatLockout OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+     "The system has locked out the electrical reheat operation for a
+     specified amount of time."
+    ::= { lgpConditionsWellKnown 156 }
+
+lgpConditionHumidifierLockout OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+     "The system has locked out the humidifier operation for a
+     specified amount of time."
+    ::= { lgpConditionsWellKnown 157 }
+
+lgpConditionCompressorsLockout OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+     "The system has locked out compressor operation for a specified amount
+     of time."
+    ::= { lgpConditionsWellKnown 158 }
+
+lgpConditionCallService OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+     "The system has detected a condition that requires a service
+     representative be contacted."
+    ::= { lgpConditionsWellKnown 159 }
+
+lgpConditionLowMemoryGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains various low memory conditions."
+    ::= { lgpConditionsWellKnown 160 }
+
+    lgpConditionLowMemory1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+         "The system has detected a low memory condition.  The control
+         board is low in memory resources."
+        ::= { lgpConditionLowMemoryGroup 1 }
+
+lgpConditionMemoryFailureGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains various memory device failure conditions."
+    ::= { lgpConditionsWellKnown 161 }
+
+    lgpConditionMemory1Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+         "The system has detected a memory 1 module failure."
+        ::= { lgpConditionMemoryFailureGroup 1 }
+
+    lgpConditionMemory2Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+         "The system has detected a memory 2 module failure."
+        ::= { lgpConditionMemoryFailureGroup 2 }
+
+lgpConditionUnitCodeErrorGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains various memory device failure conditions."
+    ::= { lgpConditionsWellKnown 162 }
+
+    lgpConditionUnitCodeNotConfigured OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the unit code is not configured.  The unit
+            code must be configured before system start-up."
+        ::= { lgpConditionUnitCodeErrorGroup 1 }
+
+    lgpConditionUnitCode01OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 2 }
+
+    lgpConditionUnitCode02OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 3 }
+
+    lgpConditionUnitCode03OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 4 }
+
+    lgpConditionUnitCode04OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 5 }
+
+    lgpConditionUnitCode05OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 6 }
+
+    lgpConditionUnitCode06OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 7 }
+
+    lgpConditionUnitCode07OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 8 }
+
+    lgpConditionUnitCode08OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 9 }
+
+    lgpConditionUnitCode09OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 10 }
+
+    lgpConditionUnitCode10OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 11 }
+
+    lgpConditionUnitCode11OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 12 }
+
+    lgpConditionUnitCode12OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 13 }
+
+    lgpConditionUnitCode13OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 14 }
+
+    lgpConditionUnitCode14OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 15 }
+
+    lgpConditionUnitCode15OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 16 }
+
+    lgpConditionUnitCode16OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 17 }
+
+    lgpConditionUnitCode17OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 18 }
+
+    lgpConditionUnitCode18OutOfRange OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a unit code error.  This digit of the unit
+            code value is out of range."
+        ::= { lgpConditionUnitCodeErrorGroup 19 }
+
+lgpConditionHighExternalDewPoint OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a high external dew point condition.
+        The room dew point has exceeded the specified threshold."
+    ::= { lgpConditionsWellKnown 163 }
+
+lgpConditionHcbDisconnected OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+           "The system has detected the humidifier control board is disconnected
+     or not installed."
+    ::= { lgpConditionsWellKnown 164 }
+
+lgpConditionBmsResetTimerExpired OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The BMS fan speed control reset counter has timed out."
+    ::= { lgpConditionsWellKnown 165 }
+
+lgpConditionAgentFirmwareCorrupt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The firmware update to the agent card has failed and the firmware is now
+        corrupt."
+    ::= { lgpConditionsWellKnown 166 }
+
+lgpConditionSystemAccessGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains various system access conditions.  An examples is
+        an open access panel."
+    ::= { lgpConditionsWellKnown 175 }
+
+    lgpConditionFrontAccessOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the front access panel/door is open."
+        ::= { lgpConditionSystemAccessGroup 1 }
+
+    lgpConditionRearAccessOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected the rear access panel/door is open."
+        ::= { lgpConditionSystemAccessGroup 2 }
+
+lgpConditionsDamperFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains various damper failure conditions."
+    ::= { lgpConditionsWellKnown 176 }
+
+    lgpConditionEmergencyDamperFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an emergency damper failure.  The damper is
+        in the wrong position."
+    ::= { lgpConditionsDamperFailure 1 }
+
+lgpConditionRemoteShutdown OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A remote shutdown occurred."
+    ::= { lgpConditionsWellKnown 177 }
+
+lgpConditionFireAlarm OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Fire Alarm."
+    ::= { lgpConditionsWellKnown 178 }
+
+lgpConditionHeatersOverheated OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Heaters Overheated."
+    ::= { lgpConditionsWellKnown 179 }
+
+lgpConditionCondenserFailureGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+     "This group contains condenser failure conditions."
+    ::= { lgpConditionsWellKnown 180 }
+
+    lgpConditionCondenser1Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Condenser 1 Failure."
+        ::= { lgpConditionCondenserFailureGroup 1 }
+
+    lgpConditionCondenser2Failure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Condenser 2 Failure."
+        ::= { lgpConditionCondenserFailureGroup 2 }
+
+    lgpConditionCondenserTVSSFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The condenser Transient Voltage Surge Suppressor or Surge
+            Protection Device has failed."
+        ::= { lgpConditionCondenserFailureGroup 3 }
+
+lgpConditionHumidifierCyclinderWorn OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected the humidifier cylinder is worn."
+    ::= { lgpConditionsWellKnown 181 }
+
+lgpConditionUnderCurrent OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a low current condition.  The current of
+        one or more sources in the system has fallen below a threshold for
+        a specified amount of time.  The threshold and time that triggered
+        this condition is system dependent."
+    ::= { lgpConditionsWellKnown 182 }
+
+    lgpConditionHumidifierUnderCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a low current condition on the
+            humidifier. The current of the humidifier has fallen below
+            a pre-determined threshold for a defined amount of time."
+        ::= { lgpConditionUnderCurrent 1 }
+
+    lgpConditionInputUnderCurrent OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "There is a low current condition on the input power source. The
+             current of the input power source has fallen below a
+             pre-determined threshold for a defined amount of time."
+        ::= { lgpConditionUnderCurrent 2 }
+
+lgpConditionHeatRejectorGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains failure conditions for the heat rejection unit."
+    ::= { lgpConditionsWellKnown 183 }
+
+    lgpConditionHeatRejectorFanFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The heat rejecter fan has failed."
+        ::= { lgpConditionHeatRejectorGroup 1 }
+
+    lgpConditionHeatRejectorVoltageSuppressionFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The heat rejecter voltage suppression has failed and is no longer
+             able to protect the unit from power fluctuations."
+        ::= { lgpConditionHeatRejectorGroup 2 }
+
+lgpConditionFreeCoolLockout OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The free cooling capability has been disabled."
+    ::= { lgpConditionsWellKnown 184 }
+
+lgpConditionWaterLeakSensorFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The sensor used to detect water leaks is not connected or has failed."
+    ::= { lgpConditionsWellKnown 185 }
+
+lgpConditionNoLoadDetectedWarning OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "There is no load detected on the output.  This can be an indication
+         that the output is being powered by an external bypass source and has
+         inadvertently been left on external bypass.  This warning is triggered
+         after a delay.  The delay is specified by the object
+         'lgpPwrNoLoadWarningDelay'.  The alarm is triggered when the output
+         current falls below a certain threshold specified by the object
+         'lgpPwrNoLoadWarningLimit'"
+    ::= { lgpConditionsWellKnown 186 }
+
+lgpConditionFirmwareGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Grouping level for firmware related conditions."
+    ::= { lgpConditionsWellKnown 187 }
+
+    lgpConditionFirmwareUpdateRequired OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The firmware on the system or one or more components of the
+            system must be updated.  This typically indicates that one or more
+            components of the system contain corrupted firmware or the
+            firmware on one or more components are incompatible with one
+            another.  When this condition is active the system may not be able
+            to function to its full capacity or may not be able to function at
+            all."
+        ::= { lgpConditionFirmwareGroup 3 }
+
+lgpConditionTestGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Objects in this group of conditions are related to testing or test
+         events.  This object is never active."
+    ::= { lgpConditionsWellKnown 188 }
+
+    lgpConditionTest01 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "This is a 'test' condition.  It is a generic test event that can
+            be utilized to evaluate system handling of events.  Some products
+            will support the activation of this event upon user request so that
+            user management stations can execute end-to-end event handling
+            tests."
+        ::= { lgpConditionTestGroup 5 }
+
+lgpConditionReceptacleBranchGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Grouping level for receptacle branch conditions."
+    ::= { lgpConditionsWellKnown 190 }
+
+    lgpConditionRcpBranchFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The receptacle branch module or control system has failed.
+             Service is required."
+        ::= { lgpConditionReceptacleBranchGroup 5 }
+
+    lgpConditionRcpBranchBreakerOpen OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The receptacle branch breaker is open."
+        ::= { lgpConditionReceptacleBranchGroup 10 }
+
+lgpConditionInputUnqualified OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The input is not qualified to provide power to the system.  This may
+        be due to system input over-voltage, system input under-voltage,
+        system input frequency out of range, or other similar issues."
+    ::= { lgpConditionsWellKnown 192 }
+
+lgpConditionBypassUnavailable OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This summary event is asserted when the bypass is not available.
+        Possible causes include: Bypass Sync Error, Bypass Line Fail, Bypass
+        Overvoltage, Bypass Undervoltage, Bypass Phase Rotation Error, or
+        other similar causes."
+    ::= { lgpConditionsWellKnown 193 }
+
+lgpConditionAutoTransferFailed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is failing to automatically transfer the load to the
+        alternate source."
+    ::= { lgpConditionsWellKnown 194 }
+
+lgpConditionSBSUnavailable OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A Static Bypass Switch (SBS) Failure has been detected. Possible
+        causes include: SBS Phase Open, SBS SCR (Silicon Controlled Rectifier)
+        Shorted, SBS Overload Exceeded, Bypass Power Supply
+        Fail, Static Bypass Switch Fuse Failure, or other similar causes."
+    ::= { lgpConditionsWellKnown 195 }
+
+lgpConditionSBSOverload OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "On at least one phase of the static bypass switch (SBS), the power
+        dissipation limit has been exceeded."
+    ::= { lgpConditionsWellKnown 196 }
+
+lgpConditionExcessPulseParallel OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has performed too many pulse parallel operations within
+        the specified time interval.  A pulse parallel operation is a
+        momentary operation of the static bypass switch (SBS) in parallel with
+        the inverter."
+    ::= { lgpConditionsWellKnown 197 }
+
+lgpConditionRemoteBypassSwitchOffExt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The static bypass switch is off due to the state of an external
+        signal."
+    ::= { lgpConditionsWellKnown 198 }
+
+lgpConditionManTransferInhibited OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Manual transfer from inverter to bypass is inhibited.  Bypass is not
+        qualified."
+    ::= { lgpConditionsWellKnown 199 }
+
+lgpConditionManReTransferInhibited OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Manual retransfer from bypass to inverter is inhibited."
+    ::= { lgpConditionsWellKnown 200 }
+
+lgpConditionBatteryChargeError OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The battery is not charging properly. Some reasons for this condition
+        include, but are not limited to: battery charger failure,
+        battery failure, etc."
+    ::= { lgpConditionsWellKnown 201 }
+
+lgpConditionBatteryAutoTestInhibited OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Automatic (scheduled) battery tests are inhibited."
+    ::= { lgpConditionsWellKnown 202 }
+
+lgpConditionBatteryChargeReducedExt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A reduced battery charging algorithm is being used due to an external
+        signal."
+    ::= { lgpConditionsWellKnown 203 }
+
+lgpConditionBatteryCapacityLow OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The battery capacity is low. Some reasons for this condition include,
+        but are not limited to: a battery is offline, the battery age has
+        reduced its capabilities, etc."
+    ::= { lgpConditionsWellKnown 204 }
+
+lgpConditionBatteryTempImbalance OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The temperature difference between two batteries in the system
+        exceeds the predefined threshold."
+    ::= { lgpConditionsWellKnown 205 }
+
+lgpConditionBatteryEqualize OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The rectifier output voltage has been increased to equalize the battery
+        voltage level."
+    ::= { lgpConditionsWellKnown 206 }
+
+lgpConditionBatteryChargeInhibitedExt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Battery charging is inhibited due to an external inhibit signal."
+    ::= { lgpConditionsWellKnown 207 }
+
+lgpConditionServiceExtBatteryMonitorGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains battery monitor service conditions."
+    ::= { lgpConditionsWellKnown 208 }
+
+    lgpConditionServiceExtBatteryMonitor1 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "External battery monitor 1 indicates battery maintenance is
+            required."
+        ::= { lgpConditionServiceExtBatteryMonitorGroup 1 }
+
+    lgpConditionServiceExtBatteryMonitor2 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "External battery monitor 2 indicates battery maintenance is
+            required."
+        ::= { lgpConditionServiceExtBatteryMonitorGroup 2 }
+
+lgpConditionBatteryGroundFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Battery system ground fault amperage exceeds the threshold."
+    ::= { lgpConditionsWellKnown 209 }
+
+lgpConditionBatteryLowShutdown OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "With the battery breaker closed, the battery voltage has dropped
+        below the calculated End-Of-Discharge (EOD) limit."
+    ::= { lgpConditionsWellKnown 210 }
+
+lgpConditionEmergencyPowerOffLocal OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an Emergency Power Off (EPO) condition.
+        The local EPO switch has cut off the power source to the system."
+    ::= { lgpConditionsWellKnown 211 }
+
+lgpConditionOutputLowPFLagging OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a lagging output power factor below the
+        threshold, resulting in reduced load capacity."
+    ::= { lgpConditionsWellKnown 212 }
+
+lgpConditionOutputLowPFLeading OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a leading output power factor below the
+        threshold, resulting in reduced load capacity."
+    ::= { lgpConditionsWellKnown 213 }
+
+lgpConditionOutputToLoadFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an output to load fault.  This could be
+        caused by over or under voltage, or by over or under frequency."
+    ::= { lgpConditionsWellKnown 214 }
+
+lgpConditionInvRestartInhibitedExt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Restart of the inverter is inhibited by an external signal."
+    ::= { lgpConditionsWellKnown 215 }
+
+lgpConditionInverterShutdownOverload OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has shutdown the inverter due to a sustained overload.
+        This event does not indicate if the load has been dropped or
+        transferred to bypass.  At least one phase of the inverter power
+        dissipation limit has been exceeded."
+    ::= { lgpConditionsWellKnown 216 }
+
+lgpConditionInverterOffExt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The inverter is off due to the state of an external signal."
+    ::= { lgpConditionsWellKnown 217 }
+
+lgpConditionInputContactGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an active input contact."
+    ::= { lgpConditionsWellKnown 218 }
+
+    lgpConditionInputContact01 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 1 is active."
+        ::= { lgpConditionInputContactGroup 1 }
+
+    lgpConditionInputContact02 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 2 is active."
+        ::= { lgpConditionInputContactGroup 2 }
+
+    lgpConditionInputContact03 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 3 is active."
+        ::= { lgpConditionInputContactGroup 3 }
+
+    lgpConditionInputContact04 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 4 is active."
+        ::= { lgpConditionInputContactGroup 4 }
+
+    lgpConditionInputContact05 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 5 is active."
+        ::= { lgpConditionInputContactGroup 5 }
+
+    lgpConditionInputContact06 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 6 is active."
+        ::= { lgpConditionInputContactGroup 6 }
+
+    lgpConditionInputContact07 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 7 is active."
+        ::= { lgpConditionInputContactGroup 7 }
+
+    lgpConditionInputContact08 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 8 is active."
+        ::= { lgpConditionInputContactGroup 8 }
+
+    lgpConditionInputContact09 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 9 is active."
+        ::= { lgpConditionInputContactGroup 9 }
+
+    lgpConditionInputContact10 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 10 is active."
+        ::= { lgpConditionInputContactGroup 10 }
+
+    lgpConditionInputContact11 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 11 is active."
+        ::= { lgpConditionInputContactGroup 11 }
+
+    lgpConditionInputContact12 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 12 is active."
+        ::= { lgpConditionInputContactGroup 12 }
+
+    lgpConditionInputContact13 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 13 is active."
+        ::= { lgpConditionInputContactGroup 13 }
+
+    lgpConditionInputContact14 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 14 is active."
+        ::= { lgpConditionInputContactGroup 14 }
+
+    lgpConditionInputContact15 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 15 is active."
+        ::= { lgpConditionInputContactGroup 15 }
+
+    lgpConditionInputContact16 OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected that input contact 16 is active."
+        ::= { lgpConditionInputContactGroup 16 }
+
+lgpConditionRectifierOperInhibited
+ OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The operation of the rectifier is inhibited by an external signal."
+    ::= { lgpConditionsWellKnown 219 }
+
+lgpConditionBypassBackFeedBrkrOpen OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The bypass backfeed breaker is in the open position."
+    ::= { lgpConditionsWellKnown 220 }
+
+lgpConditionAutoRestartInProgress OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Auto restart is in progress.  Becomes inactive when auto restart
+        completes or fails."
+    ::= { lgpConditionsWellKnown 221 }
+
+lgpConditionAutoRestartInhibitedExt OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Auto restart is inhibited due to an external signal."
+    ::= { lgpConditionsWellKnown 222 }
+
+lgpConditionAutoRestartFailed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Auto restart has failed."
+    ::= { lgpConditionsWellKnown 223 }
+
+lgpConditionInputOnGenerator OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A generator is supplying the power to the system."
+    ::= { lgpConditionsWellKnown 224 }
+
+lgpConditionInputFilterCycleLock OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The input filter disconnect has opened too many times within a given
+        period of time."
+    ::= { lgpConditionsWellKnown 225 }
+
+lgpConditionServiceCodeActive OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system is in an operational mode intended for testing.  In normal
+        operating conditions, the system should not be in this state."
+    ::= { lgpConditionsWellKnown 226 }
+
+lgpConditionLoadBusSyncActive OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Load Bus Sync Operation is active.  This synchronizes the UPS output
+        with the output of another UPS."
+    ::= { lgpConditionsWellKnown 227 }
+
+lgpConditionLoadBusSyncInhibited OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected that conditions to perform Load Bus Sync
+        Operation are not satisfied."
+    ::= { lgpConditionsWellKnown 228 }
+
+lgpConditionControlsResetRequired OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A controls reset is required because one or more critical settings
+        have changed."
+    ::= { lgpConditionsWellKnown 229 }
+
+lgpConditionEquipTempSensorFailed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A temperature sensor is reporting a value outside the bounds of a
+        properly operating sensor."
+    ::= { lgpConditionsWellKnown 230 }
+
+lgpConditionInputCurrentImbalance OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The current on one input phase is much greater or lower than the
+         average current of all the phases. This may indicate improper operation
+         of the rectifier or input filter."
+    ::= { lgpConditionsWellKnown 231 }
+
+lgpConditionPumpGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an alarm with one of the pumps."
+    ::= { lgpConditionsWellKnown 232 }
+
+    lgpConditionPumpFlowLoss OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a loss of flow with one or more pumps."
+        ::= { lgpConditionPumpGroup 1 }
+
+        lgpConditionPump1FlowLoss OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected a loss of flow with pump 1."
+            ::= { lgpConditionPumpFlowLoss 1 }
+
+        lgpConditionPump2FlowLoss OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected a loss of flow with pump 2."
+            ::= { lgpConditionPumpFlowLoss 2 }
+
+    lgpConditionPumpShortCycle OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short cycling of the pumps.  One or more
+            of the pumps has been turned on and off a number of times within a
+            specified time period."
+        ::= { lgpConditionPumpGroup 2 }
+
+    lgpConditionPumpInverterShortCycle OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a short cycling of one or more pump
+            inverters and has temporarily locked out further pump operation
+            to protect from thermal overload.  A short cycle is defined as
+            powering on and off a number of times over a set time period."
+        ::= { lgpConditionPumpGroup 3 }
+
+        lgpConditionPump1InverterShortCycle OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected a short cycling of the inverter for
+                pump 1 and has temporarily locked out further pump operation
+                to protect from thermal overload.  A short cycle is defined as
+                powering on and off a number of times over a set time period."
+            ::= { lgpConditionPumpInverterShortCycle 1 }
+
+        lgpConditionPump2InverterShortCycle OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "The system has detected a short cycling of the inverter for
+                pump 2 and has temporarily locked out further pump operation
+                to protect from thermal overload.  A short cycle is defined as
+                powering on and off a number of times over a set time period."
+            ::= { lgpConditionPumpInverterShortCycle 2 }
+
+lgpConditionValveGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected an alarm with one of the valves."
+    ::= { lgpConditionsWellKnown 233 }
+
+    lgpConditionChilledWaterValvePosition OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system has detected a problem with the chilled water valve
+            position.  The position of the chilled water control valve does not
+            match an expected value."
+        ::= { lgpConditionValveGroup 1 }
+
+lgpConditionCondensationDetected OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected condensation."
+    ::= { lgpConditionsWellKnown 234 }
+
+lgpConditionMaintenanceGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a maintenance condition.  This group
+        contains various maintenance conditions."
+    ::= { lgpConditionsWellKnown 235 }
+
+    lgpConditionMaintenanceDue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "System is due for maintenance."
+        ::= { lgpConditionMaintenanceGroup 1 }
+
+    lgpConditionMaintenanceComplete OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The system maintenance has been completed."
+        ::= { lgpConditionMaintenanceGroup 2 }
+
+lgpConditionExternalEventSignalGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains various conditions signalled by external inputs.
+        Each event is deactivated when the signal is inactive."
+    ::= { lgpConditionsWellKnown 236 }
+
+    lgpConditionExternalFireDetect OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Fire detected, as indicated by an external input signal."
+        ::= { lgpConditionExternalEventSignalGroup 1 }
+
+    lgpConditionExternalFlowLoss OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Loss of flow is detected, as indicated by an external input signal."
+        ::= { lgpConditionExternalEventSignalGroup 2 }
+
+    lgpConditionExternalReheatLockout OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The reheater is shut down and disabled by an external input signal."
+        ::= { lgpConditionExternalEventSignalGroup 3 }
+
+    lgpConditionExternalOverTemp OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "A temperature has exceeded its threshold, as indicated by an
+            external input signal."
+        ::= { lgpConditionExternalEventSignalGroup 4 }
+
+    lgpConditionExternalCompLockout OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The compressor is shut down and disabled by an external input signal."
+        ::= { lgpConditionExternalEventSignalGroup 5 }
+
+    lgpConditionExternalHumidifierLockout OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "The humidifier is shut down and disabled by an external input signal."
+        ::= { lgpConditionExternalEventSignalGroup 6 }
+
+lgpConditionComponentShutdownGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains conditions signaling shutdown of various system
+        components."
+    ::= { lgpConditionsWellKnown 237 }
+
+    lgpConditionComponentShutdownPartial OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "An event has occurred requiring some system components to be
+            shutdown and disabled."
+        ::= { lgpConditionComponentShutdownGroup 1 }
+
+    lgpConditionComponentShutdownHighPower OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Supply to high power components has been shutdown."
+        ::= { lgpConditionComponentShutdownGroup 2 }
+
+lgpConditionCondenserProblemGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+     "This group contains condenser conditions."
+    ::= { lgpConditionsWellKnown 238 }
+
+    lgpConditionCondenser1Problem OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Condenser 1 is not operating within its normal parameters."
+        ::= { lgpConditionCondenserProblemGroup 1 }
+
+lgpConditionHumidityOutOfPropBand OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The system has detected a humidity reading that remained outside of
+        the proportional control band for an extended period of time."
+    ::= { lgpConditionsWellKnown 239 }
+
+lgpConditionEnvRemoteSensorGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains remote sensors."
+    ::= { lgpConditionsWellKnown 240 }
+
+    lgpConditionEnvRemoteSensor1Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 1 }
+
+    lgpConditionEnvRemoteSensor2Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 2 }
+
+    lgpConditionEnvRemoteSensor3Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 3 }
+
+    lgpConditionEnvRemoteSensor4Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 4 }
+
+    lgpConditionEnvRemoteSensor5Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 5 }
+
+    lgpConditionEnvRemoteSensor6Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 6 }
+
+    lgpConditionEnvRemoteSensor7Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 7 }
+
+    lgpConditionEnvRemoteSensor8Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 8 }
+
+    lgpConditionEnvRemoteSensor9Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 9 }
+
+    lgpConditionEnvRemoteSensor10Issue OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Remote sensor is disconnected or the signal is out of range.  The
+             event is deactivated when sensor signal is re-established."
+        ::= { lgpConditionEnvRemoteSensorGroup 10 }
+
+lgpConditionNeutralSnubberBoardCommFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The Neutral Snubber board has stopped communicating."
+    ::= { lgpConditionsWellKnown 241 }
+
+lgpConditionRedundantChargerFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The redundant charger has failed."
+    ::= { lgpConditionsWellKnown 242 }
+
+lgpConditionBoardInputContactorPowerFailure OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Board input contactor power failure."
+    ::= { lgpConditionsWellKnown 243 }
+
+    lgpConditionBoard1InputContactorPowerFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Board1 input contactor power failure."
+        ::= { lgpConditionBoardInputContactorPowerFailure 1 }
+
+    lgpConditionBoard2InputContactorPowerFailure OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "Board2 input contactor power failure."
+        ::= { lgpConditionBoardInputContactorPowerFailure 2 }
+
+lgpConditionTooManySensors OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The number of sensors installed on the device has exceeded the
+	     pre-determined limit."
+    ::= { lgpConditionsWellKnown 5423 }
+
+lgpConditionDoorSwitchOpen OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "An open door has been detected."
+    ::= { lgpConditionsWellKnown 5471 }
+
+lgpConditionContactClosureOpen OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "An open circuit has been detected."
+    ::= { lgpConditionsWellKnown 5479 }
+
+lgpConditionContactClosureClosed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A closed circuit has been detected."
+    ::= { lgpConditionsWellKnown 5480 }
+
+lgpConditionSensorsNotDisplayed OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The number of sensors that can be displayed (monitored) on the
+        device has exceeded the pre-determined limit.  Note this condition
+        differs from the lgpConditionTooManySensors in that the system may
+        currently have less than the maximum of installed sensors present but
+        one or more of those sensors can not be displayed because the display
+        order table (lgpPduAuxMeasOrderTable) contains entries for sensors
+        that are not currently installed.  This condition effectively
+        prevents one or more installed sensors from being presented in the
+        lgpPduAuxMeasTable.  It is possible for both this condition and the
+        lgpConditionTooManySensors condition to be active at the same time."
+    ::= { lgpConditionsWellKnown 6119 }
+
+END
+

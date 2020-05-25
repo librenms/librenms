@@ -1,0 +1,273 @@
+-- ****************************************************************************
+--  COLUBRIS-VIRTUAL-AP-MIB definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Networks Virtual Access Point MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-VIRTUAL-AP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32
+        FROM    SNMPv2-SMI
+    TruthValue
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    ifIndex
+        FROM    IF-MIB
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisSSID, ColubrisUsersAuthenticationMode,
+    ColubrisProfileIndexOrZero, ColubrisSecurity,
+    ColubrisPriorityQueue
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisVirtualApMIB   MODULE-IDENTITY
+    LAST-UPDATED    "200607250000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Networks Virtual Access Point MIB."
+
+    ::= { colubrisMgmtV2 11 }
+
+
+-- colubrisVirtualApMIB definition
+colubrisVirtualApMIBObjects OBJECT IDENTIFIER ::= { colubrisVirtualApMIB 1 }
+
+-- colubris Virtual Access Point groups
+coVirtualApConfig    OBJECT IDENTIFIER ::= { colubrisVirtualApMIBObjects 1 }
+
+
+-- The Virtual Access Point Address Configuration Group
+coVirtualAccessPointConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoVirtualAccessPointConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "VSC  configuration attributes. In tabular form to
+                 allow for multiple instances."
+    ::= { coVirtualApConfig 1 }
+
+coVirtualAccessPointConfigEntry OBJECT-TYPE
+    SYNTAX      CoVirtualAccessPointConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coVirtualAccessPointConfigTable.
+                 ifIndex - Each 802.11 interface is represented by an ifEntry.
+                           Interface tables in this MIB module are indexed by
+                           ifIndex.
+                 coVirtualWlanProfileIndex - Uniquely access a profile for this
+                                             particular 802.11 interface."
+    INDEX       { ifIndex, coVirtualApWlanProfileIndex }
+    ::= { coVirtualAccessPointConfigTable 1 }
+
+CoVirtualAccessPointConfigEntry ::= SEQUENCE
+{
+    coVirtualApWlanProfileIndex                  Integer32,
+    coVirtualApSSID                              ColubrisSSID,
+    coVirtualApBroadcastSSID                     TruthValue,
+    coVirtualApMaximumNumberOfUsers              Integer32,
+    coVirtualApDefaultVLAN                       Integer32,
+    coVirtualApSecurity                          ColubrisSecurity,
+    coVirtualApAuthenMode                        ColubrisUsersAuthenticationMode,
+    coVirtualApAuthenProfileIndex                ColubrisProfileIndexOrZero,
+    coVirtualApUserAccountingEnabled             INTEGER,
+    coVirtualApUserAccountingProfileIndex        ColubrisProfileIndexOrZero,
+    coVirtualApDefaultUserRateLimitationEnabled  TruthValue,
+    coVirtualApDefaultUserMaxTransmitRate        Integer32,
+    coVirtualApDefaultUserMaxReceiveRate         Integer32,
+    coVirtualApDefaultUserBandwidthLevel         ColubrisPriorityQueue,
+    coVirtualApOperState                         INTEGER
+}
+
+coVirtualApWlanProfileIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the index of the VSC profile."
+    ::= { coVirtualAccessPointConfigEntry 1 }
+
+coVirtualApSSID OBJECT-TYPE
+    SYNTAX      ColubrisSSID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Service Set ID assigned to the VSC. This value must be 
+                 unique per radio interface."
+    ::= { coVirtualAccessPointConfigEntry 2 }
+
+coVirtualApBroadcastSSID OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if the SSID is included in beacon frames.
+                 On Intersil hardware, only the first profile is
+                 manageable. Reading this attribute shall always return
+                 'false' for the other profiles. Writing into this attribute
+                 for the other profiles will return an error."
+    ::= { coVirtualAccessPointConfigEntry 3 }
+
+coVirtualApMaximumNumberOfUsers OBJECT-TYPE
+    SYNTAX      Integer32 (1..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the maximum number of concurrent users that this
+                 profile can accept."
+    ::= { coVirtualAccessPointConfigEntry 4 }
+
+coVirtualApDefaultVLAN OBJECT-TYPE
+    SYNTAX      Integer32 (0..4094)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies the default VLAN to use for this profile
+                 when no radius authentication has taken place.
+                 The value 0 is used when no VLAN has been assigned to this 
+                 profile. Writing to this object is only available on
+                 satellite devices."
+    ::= { coVirtualAccessPointConfigEntry 5 }
+
+coVirtualApSecurity OBJECT-TYPE
+    SYNTAX      ColubrisSecurity
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Identifies all supported authentication/encryption algorithms."
+    ::= { coVirtualAccessPointConfigEntry 6 }
+
+coVirtualApAuthenMode OBJECT-TYPE
+    SYNTAX      ColubrisUsersAuthenticationMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies if user authentication is performed locally or via
+                 an AAA server."
+    ::= { coVirtualAccessPointConfigEntry 7 }
+
+coVirtualApAuthenProfileIndex OBJECT-TYPE
+    SYNTAX      ColubrisProfileIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the AAA server profile to use for user authentication. 
+                 This parameter only applies when the coVirtualApSecurity
+                 is set to 'wpa' or 'ieee802dot1x' or 'ieee802dot1xWithWep' and
+                 the coVirtualApAuthenMode set to 'profile' or
+                 'localAndProfile'. When set to Zero, no AAA server profile 
+                 is selected or on a public satellite device it could represent
+                 a pre-configured AAA profile."
+    ::= { coVirtualAccessPointConfigEntry 8 }
+
+coVirtualApUserAccountingEnabled OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if accounting information is generated by the
+                 device and sent to the AAA server for users connecting to
+                 this profile. Accounting information will be generated only 
+                 if a valid AAA server profile is configured for the
+                 coVirtualApAccountingProfileIndex attribute."
+    ::= { coVirtualAccessPointConfigEntry 9 }
+
+coVirtualApUserAccountingProfileIndex OBJECT-TYPE
+    SYNTAX      ColubrisProfileIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Identifies the AAA server profile to be used for accounting
+                 information. The special value Zero indicates that no accounting
+                 profile is selected."
+    ::= { coVirtualAccessPointConfigEntry 10 }
+
+coVirtualApDefaultUserRateLimitationEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the default user rate limitation is enabled." 
+    ::= { coVirtualAccessPointConfigEntry 11 }
+
+coVirtualApDefaultUserMaxTransmitRate OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Identifies the default user maximum transmit rate." 
+    ::= { coVirtualAccessPointConfigEntry 12 }
+
+coVirtualApDefaultUserMaxReceiveRate OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Identifies the default user maximum receive rate." 
+    ::= { coVirtualAccessPointConfigEntry 13 }
+
+coVirtualApDefaultUserBandwidthLevel OBJECT-TYPE
+    SYNTAX      ColubrisPriorityQueue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Identifies the default user bandwidth level." 
+    ::= { coVirtualAccessPointConfigEntry 14 }
+
+coVirtualApOperState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enable(1),
+                    disable(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Activate/Deactivate the Virtual Service Community in
+                 the radio."
+    ::= { coVirtualAccessPointConfigEntry 15 }
+
+
+-- conformance information
+colubrisVirtualApMIBConformance OBJECT IDENTIFIER ::= { colubrisVirtualApMIB 2 }
+colubrisVirtualApMIBCompliances OBJECT IDENTIFIER ::= { colubrisVirtualApMIBConformance 1 }
+colubrisVirtualApMIBGroups      OBJECT IDENTIFIER ::= { colubrisVirtualApMIBConformance 2 }
+
+
+-- compliance statements
+colubrisVirtualApMIBCompliance MODULE-COMPLIANCE
+    STATUS      current 
+    DESCRIPTION "The compliance statement for the Virtual Access Point MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisVirtualApMIBGroup
+                    }
+    ::= { colubrisVirtualApMIBCompliances 1 }
+
+-- units of conformance
+colubrisVirtualApMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coVirtualApSSID,
+                    coVirtualApBroadcastSSID,
+                    coVirtualApMaximumNumberOfUsers,
+                    coVirtualApDefaultVLAN,
+                    coVirtualApSecurity,
+                    coVirtualApAuthenMode,
+                    coVirtualApAuthenProfileIndex,
+                    coVirtualApUserAccountingEnabled,
+                    coVirtualApUserAccountingProfileIndex,
+                    coVirtualApDefaultUserRateLimitationEnabled,
+                    coVirtualApDefaultUserMaxTransmitRate,
+                    coVirtualApDefaultUserMaxReceiveRate,
+                    coVirtualApDefaultUserBandwidthLevel,
+                    coVirtualApOperState
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for use with Virtual Access Points."
+    ::= { colubrisVirtualApMIBGroups 1 }
+
+END

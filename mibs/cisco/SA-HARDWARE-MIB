@@ -1,0 +1,591 @@
+--**************************************************************************
+--                                                                          
+--    Copyright 2015 Cisco Systems, Inc.                                   
+--    All Rights Reserved                                                   
+--    No portions of this material may be reproduced in any
+--    form without the written permission of:                                                
+--             Cisco Systems Inc.                                           
+--             170 West Tasman Dr.                                    
+--             San Jose, CA 95134                                    
+--             USA                                                                                           
+--**************************************************************************
+
+SA-HARDWARE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, 
+        OBJECT-TYPE,
+        enterprises 
+                FROM SNMPv2-SMI
+        SnmpAdminString 
+                FROM SNMP-FRAMEWORK-MIB;
+
+sa           OBJECT IDENTIFIER ::= { enterprises 1429 }
+saVoip       OBJECT IDENTIFIER ::= { sa 78 }
+                
+saHardware   MODULE-IDENTITY
+        LAST-UPDATED    "201505110000Z"
+        ORGANIZATION    "Cisco Systems Inc."
+        CONTACT-INFO    "http://support.cisco.com"
+        DESCRIPTION
+            "This tree can be read from any IP in a device."   
+    
+    REVISION "201505110000Z"
+    DESCRIPTION "Add europe-5-85 to saHwDescrDiplexer. More details added to the current available options"
+				 
+    REVISION "201504130000Z"
+    DESCRIPTION "Changed le9562 to le9652(13) in saHwDescrSlic
+	             Corrected UTC dates that give compile warnings"
+	
+    REVISION "201504030000Z"
+    DESCRIPTION "Added le9562 (13) to saHwDescrSlic
+    	         Added en2810 (8) to saHwDescrMocaType"
+	
+    REVISION 	"201501140000Z"
+    DESCRIPTION "Updated MIB Copyright Banner"
+    
+    REVISION "0112150000Z"
+    DESCRIPTION "Added clr240-cl2330 to saHwDescrWirelessChip
+    			 Added usb30wBCM to saHwDescrUsbType
+    			 Added moca20wBCM to saHwDescrMocaType
+    			 Added internalBCM to saHwDescrEthSwitch
+    			 Added  bcm33843E(22),
+						bcm3385(23),
+        				puma6-D(24),
+        				puma6MG-D(25)
+ 				to saHwDescrMainProcessor"
+    
+    REVISION "201411200000Z"
+    DESCRIPTION "Added two new fields (mxl265d (11) and mxl267d (12)) to saHwDescrTuner"
+            
+    REVISION "201407310000Z"
+    DESCRIPTION "Added le9541d(12) to saHwDescrSlic"
+
+    REVISION "0406140000Z"
+    DESCRIPTION "Moving bcm43228hp-5ghz(22) to (32) and changing bcm43217-bcm4360hp(32) to (22)"
+
+        -- History     
+    REVISION "1402110000Z"
+    DESCRIPTION
+    	"Add bcm3384 to saHwDescrMainProcessor"
+          
+        
+    REVISION "201401130000Z"
+    DESCRIPTION
+    	"Remove ath9880-ath9580 from saHwDescrWirelessChip as it is not being used and replace (32) with bcm43217-bcm4360hp"
+
+    
+    REVISION "201401100000Z"
+    DESCRIPTION
+    	"Changed 3 lines: north-america-85/108(5) to north-america-85-108(5)puma6_B2(19), to puma6-B2(19), puma6MG_B2(20) to puma6MG-B2(20)"
+
+		REVISION "1310170000Z"
+    DESCRIPTION
+    	"Updated saHwDescrMainProcessor for B2 chipset from Intel;  updated saHwDescrDiplexer to include high US split"  
+   		
+    REVISION "1307040000Z"
+    DESCRIPTION
+    	"Added bcm33843 to saHwDescrMainProcessor, Added bcm6803 and ad9965 to saHwDescrMocaType, Added ath9880-ath9580 to saHwDescrWirelessChip"  
+   
+	REVISION    "1306070000Z"
+    DESCRIPTION
+        "Updated saHwDescrWirelessType to reflect dual wifi card combination, changed saHwDescrWirelessChip combo bcm4331sp-bcm4360sp(19) to bcm4331sp-bcm4360hp(19)"
+	
+	REVISION    "1305300000Z"
+    DESCRIPTION
+        "Updated for Puma6MG:  saHwDescrMainProcessor, saHwDescrTuner, saHwDescrWirelessType, saHwDescrWirelessChip, saHwDescrUsbType" 
+		
+    REVISION    "1302060000Z"
+    DESCRIPTION
+        "Updated saHwDescrWirelessChip due to compilation issues" 
+
+    REVISION    "1212050000Z"
+    DESCRIPTION
+        "Updated saHwDescrWirelessChip description and values" 
+ 
+    REVISION    "1211280000Z"
+    DESCRIPTION
+        "Updated saHwDescrTuner and saHwDescrMocaType for the USGv2 products"  
+
+	REVISION    "1211070000Z"
+    DESCRIPTION
+        "Updated saHwDescrWirelessChip for the 3383-based products"  
+
+    REVISION	"1208230000Z"
+	DESCRIPTION
+		" Updated saHwDescrWirelessChip (13) to ath9381 from ath9380 as instructed by HW team"			
+		
+    REVISION	"1205080000Z"
+	DESCRIPTION
+		"Updated HW nonvols for USGv2 based products: 
+		saHwDescrMainProcessor, saHwDescrTuner, saHwDescrSlic, saHwDescrWirelessChip
+                saHwDescrUsbType, saHwDescrEthSwitch"		
+		
+    REVISION	"1204100000Z"
+	DESCRIPTION
+		"Updated HW nonvols for 3383 based products - CR 19170
+		bcm53125 was changed to 53124 and bcm43227 was changed to bcm43217"
+		     
+    REVISION	"1109020000Z"
+	DESCRIPTION
+		"Updated le9531d for D2R2 SL products"
+		
+	REVISION	"1108190000Z"
+	DESCRIPTION
+		"Updated  Ethernet switch type with bcm53101e and bcm53125s. Corrected ar8316 from ar3816."
+    
+	REVISION	"1106130000Z"
+	DESCRIPTION
+		"Updated MainProcessor Type, Wireless Chip Type, SlicType, MocaType and Ethernet switch type
+		 for new products"
+
+	REVISION	"1011160000Z"
+	DESCRIPTION
+		"Added le9520S for single line DPC2420"
+	REVISION	"1010260000Z"
+	DESCRIPTION
+		"Added le9500s new slictype for DPC2203"
+	REVISION	"1010180000Z"
+	DESCRIPTION
+		"Added bcm3382 to the MainProcessor object"
+
+	REVISION	"1004270000Z"
+	DESCRIPTION
+		"Added usb203380G(5) value to saHwUsbType"
+
+        REVISION		"1004070000Z"
+       DESCRIPTION
+       		"Added tipuma5Tc4800 for saHwDescrMainProcessor"
+       		     
+       REVISION		"0911050000Z"
+       DESCRIPTION
+       		"Added singleBand and dualBand names to 
+       		 WirelessChip type"
+       
+        REVISION     "0910050000Z"
+        DESCRIPTION
+        	"Added items for 
+        		Ethernet Switch type
+        		Wireless chip type
+        		diplexer type ( korea)
+        		main processor ( 3380)
+        		tuner type
+        	 modified usb type"
+
+        REVISION     "0801170000Z"
+        DESCRIPTION
+        	"Added items for DOCSIS3.0 products
+                 Added DMS tree"
+               
+        REVISION     "0709200000Z"
+        DESCRIPTION
+            "Added le9520ddtc to saHwDescrSlic (1868)"
+
+        REVISION     "0707160000Z"
+        DESCRIPTION
+            "Added saHwDescrDmsType (1637)
+             Added saHwDescrMocaType (1637)
+             Added saHwDescrEthSwitch (1637)"
+
+        REVISION     "0609110000Z"
+        DESCRIPTION
+            "Added bcm3349ipbg to saHwDescrMainProcessor
+             Added bcm3420iml to saHwDescrTuner
+             Added bcm4318 to saHwDescrWirelessChip
+             Added saHwDescrFactoryId (928)"
+
+        REVISION     "0608070000Z"
+        DESCRIPTION
+            "Added bcm3381A1 and bcm3381A2 to saHwDescrMainProcessor
+             Added bcm3420x3 to saHwDescrTuner
+             Added usb20w3381 to saHwDescrUsbType
+             Changed usb20 to usb20wPLX in saHwDescrUsbType"
+
+        REVISION     "0512020000Z"
+        DESCRIPTION
+            "Initial release"
+
+        ::= { saVoip 4 }
+
+
+saHwDescr  OBJECT IDENTIFIER ::= { saHardware 1 }
+
+saHwDescrModel OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 1 }
+
+saHwDescrHardwareVersion OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 2 }
+
+saHwDescrSerialNumber OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 3 }
+
+saHwDescrCmMacAddress OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 4 }
+
+saHwDescrManufactureDate OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 5 }
+
+saHwDescrPowerSupply OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        internal-switching(1),
+        external(2)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 6 }
+
+saHwDescrDiplexer OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        north-america-5-42(1),
+        europe-5-65(2),
+        japan(3),
+        korea(4),
+        north-america-85-108(5),
+		europe-5-85(6)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 7 }
+
+saHwDescrMainProcessor OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        bcm3349(1),
+        bcm3349kfb(2),
+        bcm3368(3),
+        bcm3381A1(4),
+        bcm3381A2(5),
+        bcm3349ipbg(6),
+        tipuma5(7),
+        bcm3361(8),
+        bcm3378(9),
+        bcm3380(10),
+        tipuma5Tc4800(11),
+        bcm3382(12),
+        bcm3371(13),
+        bcm3379(14),
+        bcm3383(15),
+        puma6(16),
+        puma6MG(17),
+        bcm33843Z(18),
+        puma6-B2(19),
+        puma6MG-B2(20),
+        bcm3384(21),
+        bcm33843E(22),
+		bcm3385(23),
+		puma6-D(24),
+        puma6MG-D(25),
+        bcm3384ZU(26)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "tipuma5Tc4800(11) value will represent TI chips 4800zdw, 4800zdwg, 4800zdwgu.   
+        and original tipuma5(7)value will represent TI chips 4830zdw,  4830zdwg and 4830zdwgu "
+    ::= { saHwDescr 8 }
+
+saHwDescrTuner OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        bcm3419(1),
+        bcm3420(2),
+        bcm3420x3(3),
+        bcm3420iml(4),
+        mt2170(5),
+        bcm3421(6),
+        bcmInternal(7),
+        mxl265(8),
+		mxl265v2(9),
+		mxl267 (10),
+		mxl265d (11),
+		mxl267d (12)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 9 }
+
+saHwDescrSlic OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        le9500b(1),
+        le9500c(2),
+        le9500d(3),
+        le9520ddtc(4),
+        le88276(5),
+        le9530d(6),
+	le9500s(7),
+	le9520s(8),
+	le9540d(9),
+	le9531d(10),
+	zl88702(11),
+	le9541d(12),
+	le9652 (13)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 10 }
+
+saHwDescrMemoryMain OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS "Megabytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 11 }
+
+saHwDescrMemoryFlash OBJECT-TYPE
+    SYNTAX INTEGER
+    UNITS "Megabytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 12 }
+
+saHwDescrWirelessType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        ieee80211b(1),
+        ieee80211g(2),
+        ieee80211n(3),
+	ieee80211ac(4),
+	ieee80211n-ieee80211ac(5)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 13 }
+
+saHwDescrWirelessChip OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        bcm4306(1),
+        bcm4318(2),
+        bcm4318E(3),
+        bcm4322(4),
+        bcm43224-dualBand(5),
+        bcm43225-singleBand(6),
+        bcm4313(7),
+        bcm43217(8),
+        bcm43228(9),
+        bcm43217sp-bcm43228sp(10),
+        ath9380(11),
+        ath9580(12),
+        ath9381sp-ath9580sp(13),
+    	bcm43228sp-5ghz(14),
+    	bcm4331sp(15),
+    	bcm43217sp-bcm4331sp(16),
+    	bcm4331sp-bcm4331sp(17),
+    	bcm43217sp-bcm4360sp(18),
+    	bcm4331sp-bcm4360hp(19),
+    	bcm43217hp(20),
+    	bcm43228hp(21),  
+    	bcm43217-bcm4360hp (22), -- moved bcm43228hp-5ghz to (32)
+    	bcm43217hp-bcm4331sp(23),
+    	bcm43217hp-bcm4360sp(24),
+    	bcm4331hp-bcm43217sp(25),
+    	bcm4331hp-bcm43228sp(26),
+    	bcm4331hp-bcm4331sp(27),
+    	bcm4331hp-bcm4331hp(28),
+    	bcm4331hp-bcm4360sp(29),
+    	bcm4331hp-bcm4360hp(30),
+		ath9381sp-qca9880(31),
+		bcm43228hp-5ghz(32),    -- removed ath9880-ath9580(32) and replace with bcm43217-bcm4360hp, moved 43217+4360hp to (22)
+		clr240-cl2330(33)
+		}
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Wireless chip hardware configuration.
+		SP stands for Standard Power
+		HP stands for High Power
+		For two-chip configurations, the chip on the left is 2.4GHz, the other is 5 GHz.
+    		The following chips are dual-band capable: 4331, 43224, 43228.
+    		The following chips are 5GHz capable: 4360.
+                The following chips support up to 3x3: 9380, 9580, 9381, 4331.
+		The following chips support up to 2x2: 43224, 43225, 43217, 43228."
+    ::= { saHwDescr 14 }
+
+saHwDescrDectType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        north-america(1),
+        europe(2)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 15 }
+
+saHwDescrUsbType OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        none(0),
+        usb11(1),
+        usb20wPLX(2),
+        usb20w3381(3),
+        usb20wPuma5(4),
+	    usb203380G(5),
+	    usb20wPuma6(6),
+		usb20wPuma6MG(7),
+		usb30wBCM(8)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 16 }
+
+saHwDescrFactoryId OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 17 }
+
+saHwDescrDmsType OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        dms1(1)
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 18 }
+
+saHwDescrMocaType OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        en2210(1),
+        en2510(2),
+        en2710(3),
+		vxc1030(4),
+		bcm6803(5),
+		ad9965(6),
+		moca20wBCM(7),
+		en2810 (8)
+		}
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 19 }
+
+saHwDescrEthSwitch OBJECT-TYPE
+    SYNTAX INTEGER {
+        none(0),
+        bcm5325m(1),
+        marv6095f(2),
+        bcm5325e(3),
+        bcm53115s(4),
+        ar8316(5),
+	    bcm53101e(6),
+	    bcm53124s(7),
+        marv6172(8),
+        internalBCM(9)		
+        }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescr 20 }
+
+
+
+saHwDescrIntCount OBJECT IDENTIFIER ::= { saHwDescr 101 }
+
+saHwDescrIntCountEthernet OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescrIntCount 1 }
+
+saHwDescrIntCountUsb OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescrIntCount 2 }
+
+saHwDescrIntCountPhoneLine OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescrIntCount 3 }
+
+saHwDescrIntCountMaxBattery OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescrIntCount 4 }
+
+saHwDescrIntCountWireless OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescrIntCount 5 }
+
+saHwDescrIntCountDect OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        ""
+    ::= { saHwDescrIntCount 6 }
+
+END

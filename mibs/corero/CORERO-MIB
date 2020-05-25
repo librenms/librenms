@@ -1,0 +1,38 @@
+CORERO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+corero MODULE-IDENTITY
+    LAST-UPDATED "201706160000Z"
+    ORGANIZATION "Corero Network Security"
+    CONTACT-INFO
+            "        Corero Support
+             E-mail: support.portal@corero.com"
+    DESCRIPTION
+            "Corero Management Server MIB."
+    REVISION      "201706160000Z"
+    DESCRIPTION
+        "Updated contact info."
+
+    REVISION      "201404240000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { enterprises 41036 }
+
+coreroRegistrations OBJECT-IDENTITY
+    STATUS       current
+    DESCRIPTION
+        "This module defines the enterprises OID for Corero Network Security."
+    ::= { corero 1 }
+
+coreroProducts OBJECT-IDENTITY
+    STATUS       current
+    DESCRIPTION
+        "A registration point under which all Corero AGENT-CAPABILIITES
+         definitions (and therefore values of sysObjectId) are defined."
+    ::= { corero 2 }
+
+END
+

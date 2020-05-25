@@ -1,0 +1,344 @@
+-- ****************************************************************************
+--  COLUBRIS-CLIENT-TRACKING-MIB definitions
+--
+--  Copyright (c) 2005, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Client Tracking MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-CLIENT-TRACKING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM    SNMPv2-SMI
+    DisplayString
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisNotificationEnable
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisClientTrackingMIB MODULE-IDENTITY
+    LAST-UPDATED    "200502250000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Networks Client Tracking module."
+
+    ::= { colubrisMgmtV2 19 }
+
+
+-- colubrisClientTrackingMIBObjects definition
+colubrisClientTrackingMIBObjects OBJECT IDENTIFIER ::= { colubrisClientTrackingMIB 1 }
+
+-- Firmware Distribution groups
+clientTrackingConfig OBJECT IDENTIFIER ::=  { colubrisClientTrackingMIBObjects 1 }
+clientTrackingInfo OBJECT IDENTIFIER ::=  { colubrisClientTrackingMIBObjects 2 }
+
+
+-- The clientTrackingConfig group controls the process parameters
+
+clientTrackingSuccessfulAssociationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingSuccessfulAssociation notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 1 }
+
+clientTrackingAssociationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingAssociationFailure notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 2 }
+
+clientTrackingSuccessfulReAssociationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingSuccessfulReAssociation
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 3 }
+
+clientTrackingReAssociationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingReAssociationFailure notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 4 }
+
+clientTrackingSuccessfulAuthenticationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingSuccessfulAuthentication
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 5 }
+
+clientTrackingAuthenticationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingAuthenticationFailure
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 6 }
+
+clientTrackingSuccessfulDisAssociationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingSuccessfulDisAssociation notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 7 }
+
+clientTrackingDisAssociationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingDisAssociationFailure notifications
+                 are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 8 }
+
+clientTrackingSuccessfulDeAuthenticationNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingSuccessfulDeAuthentication
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 9 }
+
+clientTrackingDeAuthenticationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if clientTrackingDeAuthenticationFailure
+                 notifications are generated."
+    DEFVAL      { disable }
+    ::= { clientTrackingConfig 10 }
+
+
+-- The clientTrackingInfo group contains information and statuses about
+-- the client tracking feature.
+
+clientTrackingEventInformation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "Gives a detailed description of an event in the system."
+    ::= { clientTrackingInfo 1 }
+
+
+-- Client tracking notifications
+colubrisClientTrackingMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisClientTrackingMIB 2 }
+colubrisClientTrackingMIBNotifications OBJECT IDENTIFIER ::= { colubrisClientTrackingMIBNotificationPrefix 0 }
+
+clientTrackingSuccessfulAssociation NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user is successfully associated with the AP."
+  --#SUMMARY "Successful Association event (status: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 1 }
+
+clientTrackingAssociationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user has failed to associate with the AP."
+  --#SUMMARY "Association Failure event (cause: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 2 }
+
+clientTrackingSuccessfulReAssociation NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user is successfully reassociated with the AP."
+  --#SUMMARY "Successful ReAssociation event (status: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 3 }
+
+clientTrackingReAssociationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user has failed to reassociate with the AP."
+  --#SUMMARY "ReAssociation Failure event (cause: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 4 }
+
+clientTrackingSuccessfulAuthentication NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user is successfully authenticated."
+  --#SUMMARY "Successful Authentication event (status: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 5 }
+
+clientTrackingAuthenticationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user has failed to authenticate."
+  --#SUMMARY "Authentication Failure event (cause: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 6 }
+
+clientTrackingSuccessfulDisAssociation NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user is successfully disassociated from the AP."
+  --#SUMMARY "Successful DisAssociation event (status: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 7 }
+
+clientTrackingDisAssociationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user has failed to disassociate from the AP."
+  --#SUMMARY "DisAssociation Failure event (cause: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 8 }
+
+clientTrackingSuccessfulDeAuthentication NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user is successfully deauthenticated."
+  --#SUMMARY "Successful DeAuthentication event (status: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 9 }
+
+clientTrackingDeAuthenticationFailure NOTIFICATION-TYPE
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "Sent when a user has failed to deauthenticate."
+  --#SUMMARY "DeAuthentication Failure event (cause: %s)"
+  --#ARGUMENTS { 0 }
+  --#SEVERITY INFORMATIONAL
+  --#CATEGORY "Colubris Networks Alarms"
+    ::= { colubrisClientTrackingMIBNotifications 10 }
+
+
+-- conformance information
+colubrisClientTrackingMIBConformance OBJECT IDENTIFIER ::= { colubrisClientTrackingMIB 3 }
+colubrisClientTrackingMIBCompliances OBJECT IDENTIFIER ::= { colubrisClientTrackingMIBConformance 1 }
+colubrisClientTrackingMIBGroups      OBJECT IDENTIFIER ::= { colubrisClientTrackingMIBConformance 2 }
+
+-- compliance statements
+colubrisClientTrackingMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for entities which implement
+                 the Colubris Networks Tools MIB."
+    MODULE      MANDATORY-GROUPS
+                {
+                    colubrisClientTrackingConfigMIBGroup,
+                    colubrisClientTrackingInfoMIBGroup,
+                    colubrisClientTrackingNotificationGroup
+                }
+    ::= { colubrisClientTrackingMIBCompliances 1 }
+
+-- units of conformance
+colubrisClientTrackingConfigMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    clientTrackingSuccessfulAssociationNotificationEnabled,
+                    clientTrackingAssociationFailureNotificationEnabled,
+                    clientTrackingSuccessfulReAssociationNotificationEnabled,
+                    clientTrackingReAssociationFailureNotificationEnabled,
+                    clientTrackingSuccessfulAuthenticationNotificationEnabled,
+                    clientTrackingAuthenticationFailureNotificationEnabled,
+                    clientTrackingSuccessfulDisAssociationNotificationEnabled,
+                    clientTrackingDisAssociationFailureNotificationEnabled,
+                    clientTrackingSuccessfulDeAuthenticationNotificationEnabled,
+                    clientTrackingDeAuthenticationFailureNotificationEnabled
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing control over the client
+                 tracking MIB capability."
+    ::= { colubrisClientTrackingMIBGroups 1 }
+
+colubrisClientTrackingInfoMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    clientTrackingEventInformation
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects providing information over the
+                 client tracking MIB capability."
+    ::= { colubrisClientTrackingMIBGroups 2 }
+
+colubrisClientTrackingNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        clientTrackingSuccessfulAssociation,
+                        clientTrackingAssociationFailure,
+                        clientTrackingSuccessfulReAssociation,
+                        clientTrackingReAssociationFailure,
+                        clientTrackingSuccessfulAuthentication,
+                        clientTrackingAuthenticationFailure,
+                        clientTrackingSuccessfulDisAssociation,
+                        clientTrackingDisAssociationFailure,
+                        clientTrackingSuccessfulDeAuthentication,
+                        clientTrackingDeAuthenticationFailure
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported notifications."
+    ::= { colubrisClientTrackingMIBGroups 3 }
+
+END

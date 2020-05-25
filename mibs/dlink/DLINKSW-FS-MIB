@@ -1,0 +1,378 @@
+--  *****************************************************************
+--  DLINKSW-FS-MIB.mib : File System MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- -----------------------------------------------------------------------------
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+-- Version 2.01, 2013/06/14, Eric Liu
+-- Description:
+--  [Modification]
+--  1. Change the DisplayString SIZE of dFsDriveInfoLabel
+--     from 32 to 11.
+--  *****************************************************************
+DLINKSW-FS-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,        
+        Unsigned32
+                FROM SNMPv2-SMI
+        RowStatus, TruthValue, DisplayString, DateAndTime
+                FROM SNMPv2-TC
+        OBJECT-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF              
+        dlinkIndustrialCommon
+                FROM DLINK-ID-REC-MIB;
+       
+
+    dlinkSwFsMIB MODULE-IDENTITY
+        LAST-UPDATED "201306140000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for File System (FS)."
+        REVISION "201304170000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file."
+    ::= { dlinkIndustrialCommon 18 }
+
+-- -----------------------------------------------------------------------------
+    dFsNotifications    OBJECT IDENTIFIER ::= { dlinkSwFsMIB 0 }
+    dFsObjects          OBJECT IDENTIFIER ::= { dlinkSwFsMIB 1 }
+    dFsConformance      OBJECT IDENTIFIER ::= { dlinkSwFsMIB 2 }
+    
+-- -----------------------------------------------------------------------------
+    dFsBasicInfoCtrlStatus OBJECT-TYPE
+		SYNTAX	        DisplayString
+		MAX-ACCESS      read-only
+		STATUS          current
+		DESCRIPTION
+			"This object indicates the result for file operation, e.g. deleting
+            files, making directories, deleting directories and renaming files. 
+            "
+        ::= { dFsObjects 1 }
+
+-- -----------------------------------------------------------------------------
+    dFsBasicOperation          OBJECT IDENTIFIER ::= { dFsObjects 2 }
+
+    dFsCurrentDirUrl        OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE (0..799))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the URL of current directory.           
+            "
+        ::= { dFsBasicOperation 1 }    
+
+    dFsCurrentDirectoryTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DFsCurrentDirectoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of directories or files in 
+            the current directory. 
+            This table takes the advantage of RowStatus textual convention to
+            delete a file or add/delete a directory (mkdir/rmdir)."
+        ::= { dFsBasicOperation 2 }
+
+    dFsCurrentDirectoryEntry OBJECT-TYPE
+        SYNTAX          DFsCurrentDirectoryEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry indicates the information for a file or directory
+            at current directory."
+        INDEX    { 
+            dFsCurrentDirItemName
+            }
+        ::= { dFsCurrentDirectoryTable 1 }
+
+    DFsCurrentDirectoryEntry ::=         SEQUENCE {                    
+       dFsCurrentDirItemName             DisplayString,           
+       dFsCurrentDirItemMode             BITS,
+       dFsCurrentDirItemSize             Unsigned32,
+       dFsCurrentDirItemTime             DateAndTime,
+       dFsCurrentDirItemRawStatus        RowStatus
+    }
+        
+    dFsCurrentDirItemName        OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of file or directory."
+        ::= { dFsCurrentDirectoryEntry 1 }
+    
+    dFsCurrentDirItemMode  OBJECT-TYPE
+        SYNTAX          BITS { 
+            directory(0),
+            readable(1),
+            writeable(2)
+        } 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+        "This object indicates the mode of the entry.       
+        " 
+    ::= { dFsCurrentDirectoryEntry 2 }
+                
+    dFsCurrentDirItemSize        OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "bytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the file size (in bytes).
+            If the entry is a directory, the value is 0.
+            "
+        ::= { dFsCurrentDirectoryEntry 3 }
+        
+    dFsCurrentDirItemTime        OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the time of creation or modification of
+            this file or directory."
+        ::= { dFsCurrentDirectoryEntry 4 }
+        
+    dFsCurrentDirItemRawStatus        OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dFsCurrentDirectoryEntry 5 }
+        
+-- -----------------------------------------------------------------------------
+    dFsFileRenameCtrl	OBJECT IDENTIFIER ::= { dFsBasicOperation 3 }
+
+	dFsFileRenameSourceUrl	OBJECT-TYPE
+		SYNTAX          OCTET STRING (SIZE (0..799))
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION	
+          "This object indicates the URL for the file to be renamed."
+		::= { dFsFileRenameCtrl 1 }
+
+	dFsFileRenameTargetUrl	OBJECT-TYPE
+		SYNTAX          OCTET STRING (SIZE (0..799))
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION	
+            "This object indicates the URL after file renaming."
+		::= { dFsFileRenameCtrl 2 }
+
+	dFsFileRenameActivity	OBJECT-TYPE
+		SYNTAX INTEGER  {
+			rename(1),
+			noOp(2)
+        }
+		MAX-ACCESS      read-write
+		STATUS          current
+		DESCRIPTION			
+            "This object renames the file indicated by dFsFileRenameSourceUrl, 
+            when set to 'rename'. 
+            The object dFsBasicInfoCtrlStatus indicates the processing result.            
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+		::= { dFsFileRenameCtrl 3 }
+
+-- -----------------------------------------------------------------------------        
+    dFsDriveCtrl          OBJECT IDENTIFIER ::= { dFsObjects 3 }
+    
+    dFsDriveInfoTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DFsDriveInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list the information of the storage media
+            available on the system."
+        ::= { dFsDriveCtrl 1 }
+
+    dFsDriveInfoEntry OBJECT-TYPE
+        SYNTAX          DFsDriveInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The entry indicates the information for a drive."
+        INDEX    { 
+            dFsDriveInfoUnitID, 
+            dFsDriveInfoDriveID
+        }
+        ::= { dFsDriveInfoTable 1 }
+
+    DFsDriveInfoEntry ::=         SEQUENCE {
+        dFsDriveInfoUnitID           Unsigned32,
+        dFsDriveInfoDriveID          INTEGER,
+        dFsDriveInfoMediaType        DisplayString,
+        dFsDriveInfoSize             Unsigned32,
+        dFsDriveInfoFsType           INTEGER,
+        dFsDriveInfoLabel            DisplayString,
+        dFsDriveInfoFormatDrive      INTEGER
+    }          
+     
+    dFsDriveInfoUnitID      OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the unit (stacking device) or slot (chassis
+            device) ID.
+            "
+        ::= { dFsDriveInfoEntry 1 }
+        
+    dFsDriveInfoDriveID      OBJECT-TYPE
+        SYNTAX  INTEGER {
+            a(1),
+            b(2),
+            c(3),
+            d(4),
+            e(5),
+            f(6),
+            g(7),
+            h(8),
+            i(9),
+            j(10),
+            k(11),
+            l(12),
+            m(13),
+            n(14),
+            o(15),
+            p(16),
+            q(17),
+            r(18),
+            s(19),
+            t(20),
+            u(21),
+            v(22),
+            w(23),
+            x(24),
+            y(25),
+            z(26)
+        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the drive ID of the entry."
+        ::= { dFsDriveInfoEntry 2 }
+        
+    dFsDriveInfoMediaType        OBJECT-TYPE
+        SYNTAX          DisplayString 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the media type of drive."
+        ::= { dFsDriveInfoEntry 3 }
+        
+    dFsDriveInfoSize        OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "Mbytes"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the total size (in MBytes) of the drive."
+        ::= { dFsDriveInfoEntry 4 }
+
+    dFsDriveInfoFsType        OBJECT-TYPE
+        SYNTAX      INTEGER {
+            other(0),
+            ffs(1),
+            fat16(2),
+            fat32(3)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the FS type on the drive.
+            The special value of 'other' indicates this drive has not be formated.
+            "
+        ::= { dFsDriveInfoEntry 5 }
+        
+    dFsDriveInfoLabel        OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..11))
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicates the label of drive.
+            This object cannot be modified after a drive is formated.
+            "
+        ::= { dFsDriveInfoEntry 6 }
+        
+    dFsDriveInfoFormatDrive        OBJECT-TYPE
+        SYNTAX      INTEGER {
+            format(1),
+            noOp(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object formats the drive of the entry. 
+           The object dFsBasicInfoCtrlStatus indicates the processing result.                     
+           No action is taken if this object is set to 'noOp'.
+           When read, the value 'noOp' is returned.                         
+           "
+        ::= { dFsDriveInfoEntry 7 }
+        
+    
+-- -----------------------------------------------------------------------------
+-- Conformance
+-- -----------------------------------------------------------------------------   
+    dFsCompliances      OBJECT IDENTIFIER ::= { dFsConformance 1 }
+
+    dFsGroups       OBJECT IDENTIFIER ::= { dFsConformance 2 }        
+       
+       
+   dFsMIBCompliance MODULE-COMPLIANCE
+        STATUS   current
+        DESCRIPTION
+                "The compliance statement for entities which
+                 implement the DLINKSW-FS-MIB."
+        MODULE MANDATORY-GROUPS { 
+                 dFsBasicGroup,
+                 dFsDriveGroup
+        }
+        
+        ::= { dFsCompliances 1 }
+
+    dFsBasicGroup OBJECT-GROUP
+        OBJECTS 
+        {   dFsBasicInfoCtrlStatus,
+            dFsCurrentDirUrl,
+            dFsCurrentDirItemMode,      
+            dFsCurrentDirItemSize,      
+            dFsCurrentDirItemTime,      
+            dFsCurrentDirItemRawStatus,
+            dFsFileRenameSourceUrl,
+            dFsFileRenameTargetUrl,
+            dFsFileRenameActivity
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects executes basic operation of FS."
+        ::= { dFsGroups 1 }
+    
+    dFsDriveGroup OBJECT-GROUP
+        OBJECTS         {   
+            dFsDriveInfoMediaType,  
+            dFsDriveInfoSize,
+            dFsDriveInfoFsType,
+            dFsDriveInfoLabel,
+            dFsDriveInfoFormatDrive
+        }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects executes drive operation of FS."
+        ::= { dFsGroups 2 }
+                 
+END

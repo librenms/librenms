@@ -1,0 +1,1039 @@
+NETGEAR-BGP-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Inc Border Gateway Protocol Package MIB
+-- Copyright Netgear Inc (2002-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Gauge32, Counter32, IpAddress, TimeTicks
+                                        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue      FROM SNMPv2-TC
+    lb6m                            FROM QUANTA-LB6M-REF-MIB
+    DisplayString                       FROM RFC1213-MIB;
+
+    fastPathBGP MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions for Border Gateway Protocol Flex package."
+
+        -- Revision history.
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200303282030Z"
+        DESCRIPTION
+          "Initial revision."
+
+    ::= { lb6m 5 }
+
+    --****************************************************************
+    -- agentBGPQueueGroup
+    --
+    --****************************************************************
+    agentBGPQueueGroup       OBJECT IDENTIFIER ::= { fastPathBGP 1 }
+
+    --**********************************************************
+    -- BGP work queues table. The BGP protocol executes on a single
+    -- thread, doing work received on several work queues.
+    --
+    --**********************************************************
+
+    agentBGPQueueTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AgentBGPQueueEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                   "Table lists information about BGP work queue utilization."
+
+        ::= { agentBGPQueueGroup 1 }
+
+    agentBGPQueueEntry OBJECT-TYPE
+        SYNTAX      AgentBGPQueueEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "Information on a specific BGP work queue."
+        INDEX       { agentBGPQueueIndex }
+        ::= { agentBGPQueueTable  1 }
+
+    AgentBGPQueueEntry ::= SEQUENCE {
+        agentBGPQueueIndex
+            Unsigned32,
+        agentBGPQueueName
+            DisplayString,
+        agentBGPQueueLength
+            Gauge32,
+        agentBGPQueueHigh
+            Gauge32,
+        agentBGPQueueDrops
+            Counter32,
+        agentBGPQueueLimit
+            Unsigned32
+        }
+
+    agentBGPQueueIndex OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+          "Index value for this work queue."
+        ::= { agentBGPQueueEntry 1 }
+
+    agentBGPQueueName OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "Name of an BGP work queue."
+        ::= { agentBGPQueueEntry 2 }
+
+    agentBGPQueueLength OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The number of items currently in the work queue."
+        ::= { agentBGPQueueEntry 3 }
+
+    agentBGPQueueHigh OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The high water mark of the number of items in the work queue."
+        ::= { agentBGPQueueEntry 4 }
+
+    agentBGPQueueDrops OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The number of items dropped because the work queue was full."
+        ::= { agentBGPQueueEntry 5 }
+
+    agentBGPQueueLimit OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The maximum number of items this queue can hold."
+        ::= { agentBGPQueueEntry 6 }
+
+    --****************************************************************
+    -- BGP global counters table. Global counts of messages sent and
+    -- received of each message type.
+    --
+    --****************************************************************
+    agentBGPMessageStatsGroup    OBJECT IDENTIFIER ::= { fastPathBGP 2 }
+
+    agentBGPCountersCleared OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The time since BGP counters were last cleared, in seconds."
+        ::= { agentBGPMessageStatsGroup 1 }
+
+    agentBGPInOpens OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP OPEN messages received since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 2 }
+
+    agentBGPOutOpens OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP OPEN messages transmitted since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 3 }
+
+    agentBGPInUpdates OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP UPDATE messages received since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 4 }
+
+    agentBGPOutUpdates OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP UPDATE messages transmitted since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 5 }
+
+    agentBGPInNotifications OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP NOTIFICATION messages received since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 6 }
+
+    agentBGPOutNotifications OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP NOTIFICATION messages transmitted since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 7 }
+
+    agentBGPInKeepalives OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP KEEPALIVE messages received since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 8 }
+
+    agentBGPOutKeepalives OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP KEEPALIVE messages transmitted since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 9 }
+
+    agentBGPInRouteRefreshes OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP ROUTE REFRESH messages received since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 10 }
+
+    agentBGPOutRouteRefreshes OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The total number of BGP ROUTE REFRESH messages transmitted since BGP counters were last cleared."
+        ::= { agentBGPMessageStatsGroup 11 }
+
+    agentBGPInUpdatesMax OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The maximum rate of BGP UPDATE messages received. The rate is given in
+          packets per second."
+        ::= { agentBGPMessageStatsGroup 12 }
+
+    agentBGPOutUpdatesMax OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+          "The maximum rate of BGP UPDATE messages transmitted. The rate is
+          given in packets per second."
+        ::= { agentBGPMessageStatsGroup 13 }
+
+
+    --****************************************************************
+    -- BGP Decision process table
+    --
+    --************************************************************
+
+    agentBGPDecProcTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AgentBGPDecProcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "This table contains information about the twenty most recent
+                     executions of any of the three decision process phases.
+                     The most recent information is at the end of the table.
+                     This table is applicable to IPv4 address family only."
+        ::= { fastPathBGP 3}
+
+    agentBGPDecProcEntry OBJECT-TYPE
+        SYNTAX      AgentBGPDecProcEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "Information about execution of a single decision process phase."
+        INDEX       { agentBGPDecProcIndex }
+        ::= { agentBGPDecProcTable 1 }
+
+    AgentBGPDecProcEntry ::= SEQUENCE {
+        agentBGPDecProcIndex
+            Counter32,
+        agentBGPDecProcDeltaT
+            Unsigned32,
+        agentBGPDecProcPhase
+            Unsigned32,
+        agentBGPDecProcUpdateGroup
+            Unsigned32,
+        agentBGPDecProcGenId
+            Unsigned32,
+        agentBGPDecProcReason
+            DisplayString,
+        agentBGPDecProcPeer
+            IpAddress,
+        agentBGPDecProcDuration
+            Gauge32,
+        agentBGPDecProcAdds
+            Gauge32,
+        agentBGPDecProcMods
+            Gauge32,
+        agentBGPDecProcDels
+            Gauge32
+        }
+
+    agentBGPDecProcIndex OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "Integer that uniquely identifies a decision process run.
+                     This value is incremented each time BGP runs one phase of the decision process."
+        ::= { agentBGPDecProcEntry 1 }
+
+    agentBGPDecProcDeltaT OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "How long since this decision process ran. The time is
+                    given in seconds."
+        ::= { agentBGPDecProcEntry 2 }
+
+    agentBGPDecProcPhase OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..3)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Which of the three decision process phases was run."
+        ::= { agentBGPDecProcEntry 3 }
+
+    agentBGPDecProcUpdateGroup OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "This variable is only valid when agentBGPDecProcPhase is 3. When the phase is 3,
+                     this variable identifies the outbound update group for which phase 3 was run.
+                     When the variable has a value of 65535 then it means that the corresponding
+                     agentBGPDecProcEntry does not belong to any outbound update group"
+        ::= { agentBGPDecProcEntry 4 }
+
+    agentBGPDecProcGenId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "The global generation ID when the decision process ran."
+        ::= { agentBGPDecProcEntry 5 }
+
+    agentBGPDecProcReason OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Reason why the decision process was run."
+        ::= { agentBGPDecProcEntry 6 }
+
+    agentBGPDecProcPeer OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "This variable is only valid when phase 1 is run for a single peer.
+                     In this case, this variable is the IP address of the peer for which phase 1 was run."
+        ::= { agentBGPDecProcEntry 7 }
+
+    agentBGPDecProcDuration OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "How long the decision process ran. Milliseconds."
+        ::= { agentBGPDecProcEntry 8 }
+
+    agentBGPDecProcAdds OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Number of prefixes added during the decision process. For phase 1,
+                     this is the number of prefixes that pass inbound policy. For phase 2,
+                     this is the number of prefixes added to the BGP routing table.
+                     For phase 3, this is the number of prefixes added to the Adj-RIB-Out."
+        ::= { agentBGPDecProcEntry 9 }
+
+    agentBGPDecProcMods OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Number of prefixes modified during the decision process. For phase 1,
+                     this is the number of prefixes that pass inbound policy. For phase 2,
+                     this is the number of routes modified. For phase 3,
+                     this is the number of routes modified in the Adj-RIB-Out."
+        ::= { agentBGPDecProcEntry 10 }
+
+    agentBGPDecProcDels OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Number of prefixes deleted during the decision process. For phase 1,
+                     this is the number of prefixes that previously passed inbound policy
+                     but no longer pass. For phase 2, this is the number of prefixes removed
+                     from the BGP routing table. For phase 3, this is the number of prefixes
+                     removed from the Adj-RIB-Out."
+        ::= { agentBGPDecProcEntry 11 }
+
+    agentBGPDecProcIPv6Table OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AgentBGPDecProcIPv6Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "This table contains information about the twenty most recent
+                     executions of any of the three decision process phases.
+                     The most recent information is at the end of the table.
+                     This table is applicable to IPv6 address family only."
+        ::= { fastPathBGP 5}
+
+    agentBGPDecProcIPv6Entry OBJECT-TYPE
+        SYNTAX      AgentBGPDecProcIPv6Entry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "Information about execution of a single decision process phase."
+        INDEX       { agentBGPDecProcIPv6Index }
+        ::= { agentBGPDecProcIPv6Table 1 }
+
+    AgentBGPDecProcIPv6Entry ::= SEQUENCE {
+        agentBGPDecProcIPv6Index
+            Counter32,
+        agentBGPDecProcDeltaTIPv6
+            Unsigned32,
+        agentBGPDecProcPhaseIPv6
+            Unsigned32,
+        agentBGPDecProcUpdateGroupIPv6
+            Unsigned32,
+        agentBGPDecProcGenIdIPv6
+            Unsigned32,
+        agentBGPDecProcReasonIPv6
+            DisplayString,
+        agentBGPDecProcPeerIPv6
+            IpAddress,
+        agentBGPDecProcDurationIPv6
+            Gauge32,
+        agentBGPDecProcAddsIPv6
+            Gauge32,
+        agentBGPDecProcModsIPv6
+            Gauge32,
+        agentBGPDecProcDelsIPv6
+            Gauge32
+        }
+
+    agentBGPDecProcIPv6Index OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                    "Integer that uniquely identifies a decision process run.
+                     This value is incremented each time BGP runs one phase of the decision process."
+        ::= { agentBGPDecProcIPv6Entry 1 }
+
+    agentBGPDecProcDeltaTIPv6 OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "How long since this decision process ran. The time is
+                    given in seconds."
+        ::= { agentBGPDecProcIPv6Entry 2 }
+
+    agentBGPDecProcPhaseIPv6 OBJECT-TYPE
+        SYNTAX      Unsigned32 (1..3)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Which of the three decision process phases was run."
+        ::= { agentBGPDecProcIPv6Entry 3 }
+
+    agentBGPDecProcUpdateGroupIPv6 OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "This variable is only valid when agentBGPDecProcPhase is 3. When the phase is 3,
+                     this variable identifies the outbound update group for which phase 3 was run.
+                     When the variable has a value of 65535 then it means that the corresponding
+                     agentBGPDecProcIPv6Entry does not belong to any outbound update group"
+        ::= { agentBGPDecProcIPv6Entry 4 }
+
+    agentBGPDecProcGenIdIPv6 OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "The global generation ID when the decision process ran."
+        ::= { agentBGPDecProcIPv6Entry 5 }
+
+    agentBGPDecProcReasonIPv6 OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Reason why the decision process was run."
+        ::= { agentBGPDecProcIPv6Entry 6 }
+
+    agentBGPDecProcPeerIPv6 OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "This variable is only valid when phase 1 is run for a single peer.
+                     In this case, this variable is the IP address of the peer for which phase 1 was run."
+        ::= { agentBGPDecProcIPv6Entry 7 }
+
+    agentBGPDecProcDurationIPv6 OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "How long the decision process ran. Milliseconds."
+        ::= { agentBGPDecProcIPv6Entry 8 }
+
+    agentBGPDecProcAddsIPv6 OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Number of prefixes added during the decision process. For phase 1,
+                     this is the number of prefixes that pass inbound policy. For phase 2,
+                     this is the number of prefixes added to the BGP routing table.
+                     For phase 3, this is the number of prefixes added to the Adj-RIB-Out."
+        ::= { agentBGPDecProcIPv6Entry 9 }
+
+    agentBGPDecProcModsIPv6 OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Number of prefixes modified during the decision process. For phase 1,
+                     this is the number of prefixes that pass inbound policy. For phase 2,
+                     this is the number of routes modified. For phase 3,
+                     this is the number of routes modified in the Adj-RIB-Out."
+        ::= { agentBGPDecProcIPv6Entry 10 }
+
+    agentBGPDecProcDelsIPv6 OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                    "Number of prefixes deleted during the decision process. For phase 1,
+                     this is the number of prefixes that previously passed inbound policy
+                     but no longer pass. For phase 2, this is the number of prefixes removed
+                     from the BGP routing table. For phase 3, this is the number of prefixes
+                     removed from the Adj-RIB-Out."
+        ::= { agentBGPDecProcIPv6Entry 11 }
+
+    --****************************************************************
+    -- BGP peer table. Augments the peer table in the standard MIB.
+    --
+    --************************************************************
+
+    agentBGPPeerTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF AgentBGPPeerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "BGP peer table.  This table contains,
+                 one entry per BGP peer, information about
+                 connections with BGP peers."
+        ::= { fastPathBGP 4 }
+
+    agentBGPPeerEntry OBJECT-TYPE
+        SYNTAX     AgentBGPPeerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+                "Entry containing information about the
+                 connection with a BGP peer."
+        INDEX { agentBGPPeerRemoteAddr }
+        ::= { agentBGPPeerTable 1 }
+
+    AgentBGPPeerEntry ::= SEQUENCE {
+            agentBGPPeerRemoteAddr
+                IpAddress,
+            agentBGPPeerInOpens
+                Counter32,
+            agentBGPPeerOutOpens
+                Counter32,
+            agentBGPPeerInUpdates
+                Counter32,
+            agentBGPPeerOutUpdates
+                Counter32,
+            agentBGPPeerInNotifications
+                Counter32,
+            agentBGPPeerOutNotifications
+                Counter32,
+            agentBGPPeerInKeepalives
+                Counter32,
+            agentBGPPeerOutKeepalives
+                Counter32,
+            agentBGPPeerInRouteRefreshes
+                Counter32,
+            agentBGPPeerOutRouteRefreshes
+                Counter32,
+            agentBGPPeerInTotalMessages
+                Counter32,
+            agentBGPPeerOutTotalMessages
+                Counter32,
+            agentBGPPeerUpdateQueueLen
+                Gauge32,
+            agentBGPPeerUpdateQueueHigh
+                Gauge32,
+            agentBGPPeerUpdateQueueLimit
+                Unsigned32,
+            agentBGPPeerUpdateQueueDrops
+                Counter32,
+            agentBGPPeerInPfxAdv
+                Counter32,
+            agentBGPPeerOutPfxAdv
+                Counter32,
+            agentBGPPeerInPfxWithdrawn
+                Counter32,
+            agentBGPPeerOutPfxWithdrawn
+                Counter32,
+            agentBGPPeerInPfxCurrent
+                Gauge32,
+            agentBGPPeerOutPfxCurrent
+                Gauge32,
+            agentBGPPeerInPfxAccepted
+                Gauge32,
+            agentBGPPeerInPfxRejected
+                Gauge32,
+            agentBGPPeerInMaxNlriPerUpdate
+                Gauge32,
+            agentBGPPeerOutMaxNlriPerUpdate
+                Gauge32,
+            agentBGPPeerInMinNlriPerUpdate
+                Gauge32,
+            agentBGPPeerOutMinNlriPerUpdate
+                Gauge32,
+            agentBGPPeerInPfxAdvIPv6
+                Counter32,
+            agentBGPPeerOutPfxAdvIPv6
+                Counter32,
+            agentBGPPeerInPfxWithdrawnIPv6
+                Counter32,
+            agentBGPPeerOutPfxWithdrawnIPv6
+                Counter32,
+            agentBGPPeerInPfxCurrentIPv6
+                Gauge32,
+            agentBGPPeerOutPfxCurrentIPv6
+                Gauge32,
+            agentBGPPeerInPfxAcceptedIPv6
+                Gauge32,
+            agentBGPPeerInPfxRejectedIPv6
+                Gauge32,
+            agentBGPPeerInMaxNlriPerUpdateIPv6
+                Gauge32,
+            agentBGPPeerOutMaxNlriPerUpdateIPv6
+                Gauge32,
+            agentBGPPeerInMinNlriPerUpdateIPv6
+                Gauge32,
+            agentBGPPeerOutMinNlriPerUpdateIPv6
+                Gauge32
+        }
+
+    agentBGPPeerRemoteAddr OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The remote IP address of this entry's BGP
+                 peer."
+        ::= { agentBGPPeerEntry 1 }
+
+    agentBGPPeerInOpens OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP OPEN messages received from
+                 this peer."
+        ::= { agentBGPPeerEntry 2 }
+
+    agentBGPPeerOutOpens OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP OPEN messages transmitted to
+                 this peer."
+        ::= { agentBGPPeerEntry 3 }
+
+    agentBGPPeerInUpdates OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP UPDATE messages
+                 received from this peer."
+        ::= { agentBGPPeerEntry 4 }
+
+    agentBGPPeerOutUpdates OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP UPDATE messages
+                 transmitted to this peer."
+        ::= { agentBGPPeerEntry 5 }
+
+    agentBGPPeerInNotifications OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP NOTIFICATION messages
+                 received from this peer."
+        ::= { agentBGPPeerEntry 6 }
+
+    agentBGPPeerOutNotifications OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP NOTIFICATION messages
+                 transmitted to this peer."
+        ::= { agentBGPPeerEntry 7 }
+
+    agentBGPPeerInKeepalives OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP KEEPALIVE messages
+                 received from this peer."
+        ::= { agentBGPPeerEntry 8 }
+
+    agentBGPPeerOutKeepalives OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP KEEPALIVE messages
+                 transmitted to this peer."
+        ::= { agentBGPPeerEntry 9 }
+
+    agentBGPPeerInRouteRefreshes OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP ROUTE REFRESH messages
+                 received from this peer."
+        ::= { agentBGPPeerEntry 10 }
+
+    agentBGPPeerOutRouteRefreshes OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of BGP ROUTE REFRESH messages
+                 transmitted to this peer."
+        ::= { agentBGPPeerEntry 11 }
+
+    agentBGPPeerInTotalMessages OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The total number of BGP messages of all types
+                 received from this peer."
+        ::= { agentBGPPeerEntry 12 }
+
+    agentBGPPeerOutTotalMessages OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+            DESCRIPTION
+                    "The total number of BGP messages of all types
+                     transmitted to this peer."
+        ::= { agentBGPPeerEntry 13 }
+
+    agentBGPPeerUpdateQueueLen OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "After receiving a BGP UPDATE message, BGP places each UPDATE on a per-neighbor
+                 queue before processing the UPDATE. This variable gives the current length
+                 of this peer's UPDATE queue, in bytes."
+        ::= { agentBGPPeerEntry 14 }
+
+    agentBGPPeerUpdateQueueHigh OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The maximum length (or high water mark) of this peer.s UPDATE queue, in bytes."
+        ::= { agentBGPPeerEntry 15 }
+
+    agentBGPPeerUpdateQueueLimit OBJECT-TYPE
+        SYNTAX     Unsigned32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The maximum number of bytes of received UPDATE messages that may be queued for this peer at any given time."
+        ::= { agentBGPPeerEntry 16 }
+
+    agentBGPPeerUpdateQueueDrops OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of UPDATE messages from this peer that could not be added to
+                 the UPDATE queue because the queue was full."
+        ::= { agentBGPPeerEntry 17 }
+
+    agentBGPPeerInPfxAdv OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv4 prefixes received from this peer."
+        ::= { agentBGPPeerEntry 18 }
+
+    agentBGPPeerOutPfxAdv OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv4 prefixes advertised to this peer."
+        ::= { agentBGPPeerEntry 19 }
+
+    agentBGPPeerInPfxWithdrawn OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv4 prefixes this peer has withdrawn."
+        ::= { agentBGPPeerEntry 20 }
+
+    agentBGPPeerOutPfxWithdrawn OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                    "The number of IPv4 prefixes this router has withdrawn in UPDATE messages to this peer."
+        ::= { agentBGPPeerEntry 21 }
+
+    agentBGPPeerInPfxCurrent OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv4 prefixes this peer is currently advertising to this
+                 router and that have passed inbound policy."
+        ::= { agentBGPPeerEntry 22 }
+
+    agentBGPPeerOutPfxCurrent OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv4 prefixes this router is currently advertising to this peer."
+        ::= { agentBGPPeerEntry 23 }
+
+    agentBGPPeerInPfxAccepted OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv4 prefixes received from this peer that may be considered to be
+                 included in the BGP route table. This includes all current prefixes whose
+                 path does not have an AS path loop and whose BGP NEXT HOP is resolved."
+        ::= { agentBGPPeerEntry 24 }
+
+    agentBGPPeerInPfxRejected OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv4 prefixes from this peer that did not pass inbound policy."
+        ::= { agentBGPPeerEntry 25 }
+
+    agentBGPPeerInMaxNlriPerUpdate OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The maximum number of IPv4 prefixes in any single UPDATE message from this peer."
+        ::= { agentBGPPeerEntry 26 }
+
+    agentBGPPeerOutMaxNlriPerUpdate OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The maximum number of IPv4 prefixes in any single UPDATE message sent to this peer."
+        ::= { agentBGPPeerEntry 27 }
+
+    agentBGPPeerInMinNlriPerUpdate OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The minimum number of IPv4 prefixes in any single UPDATE message from this peer."
+        ::= { agentBGPPeerEntry 28 }
+
+    agentBGPPeerOutMinNlriPerUpdate OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The minimum number of IPv4 prefixes in any single UPDATE message sent to this peer."
+        ::= { agentBGPPeerEntry 29 }
+
+       agentBGPPeerInPfxAdvIPv6 OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv6 prefixes received from this peer."
+        ::= { agentBGPPeerEntry 30 }
+
+    agentBGPPeerOutPfxAdvIPv6 OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv6 prefixes advertised to this peer."
+        ::= { agentBGPPeerEntry 31 }
+
+    agentBGPPeerInPfxWithdrawnIPv6 OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv6 prefixes this peer has withdrawn."
+        ::= { agentBGPPeerEntry 32 }
+
+    agentBGPPeerOutPfxWithdrawnIPv6 OBJECT-TYPE
+        SYNTAX     Counter32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                    "The number of IPv6 prefixes this router has withdrawn in UPDATE messages to this peer."
+        ::= { agentBGPPeerEntry 33 }
+
+    agentBGPPeerInPfxCurrentIPv6 OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv6 prefixes this peer is currently advertising to this
+                 router and that have passed inbound policy."
+        ::= { agentBGPPeerEntry 34 }
+
+    agentBGPPeerOutPfxCurrentIPv6 OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv6 prefixes this router is currently advertising to this peer."
+        ::= { agentBGPPeerEntry 35 }
+
+    agentBGPPeerInPfxAcceptedIPv6 OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv6 prefixes received from this peer that may be considered to be
+                 included in the BGP route table. This includes all current prefixes whose
+                 path does not have an AS path loop and whose BGP NEXT HOP is resolved."
+        ::= { agentBGPPeerEntry 36 }
+
+    agentBGPPeerInPfxRejectedIPv6 OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The number of IPv6 prefixes from this peer that did not pass inbound policy."
+        ::= { agentBGPPeerEntry 37 }
+
+    agentBGPPeerInMaxNlriPerUpdateIPv6 OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The maximum number of IPv6 prefixes in any single UPDATE message from this peer."
+        ::= { agentBGPPeerEntry 38 }
+
+    agentBGPPeerOutMaxNlriPerUpdateIPv6 OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The maximum number of IPv6 prefixes in any single UPDATE message sent to this peer."
+        ::= { agentBGPPeerEntry 39 }
+
+    agentBGPPeerInMinNlriPerUpdateIPv6 OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The minimum number of IPv6 prefixes in any single UPDATE message from this peer."
+        ::= { agentBGPPeerEntry 40 }
+
+    agentBGPPeerOutMinNlriPerUpdateIPv6 OBJECT-TYPE
+        SYNTAX     Gauge32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The minimum number of IPv6 prefixes in any single UPDATE message sent to this peer."
+        ::= { agentBGPPeerEntry 41 }
+
+
+    --**************************************************************************************
+    -- agentBGPSnmpTrapFlagsConfigGroup
+    --
+    --**************************************************************************************
+
+    agentBGPSnmpTrapFlagsConfigGroup       OBJECT IDENTIFIER ::= { fastPathBGP 6  }
+
+    agentBGPSnmpAllTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION "Enable standard traps defined in RFC 4273."
+         ::= { agentBGPSnmpTrapFlagsConfigGroup 1 }
+
+END

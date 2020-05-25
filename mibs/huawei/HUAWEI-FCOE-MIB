@@ -1,0 +1,367 @@
+-- ===================================================================
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: FCoE MIB
+-- Reference:
+-- Version: V1.05
+-- ===================================================================
+
+
+    HUAWEI-FCOE-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS                                            
+            SnmpAdminString            
+                FROM SNMP-FRAMEWORK-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            BITS, DisplayString, RowStatus, TEXTUAL-CONVENTION                        
+                FROM SNMPv2-TC
+            TimeTicks, Integer32, Unsigned32, IpAddress, Counter32, Counter64, OBJECT-TYPE, 
+            MODULE-IDENTITY, NOTIFICATION-TYPE          
+                FROM SNMPv2-SMI
+            hwDatacomm            
+                FROM HUAWEI-MIB;
+    
+        hwFCoEMIB MODULE-IDENTITY 
+            LAST-UPDATED "201702201425Z"        
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+  Bantian, Longgang
+   Shenzhen 518129
+   People's Republic of China
+   Website: http://www.huawei.com
+   Email: support@huawei.com
+ "
+            DESCRIPTION 
+                "The MIB contains objects of DC FCOE features ." 
+
+            REVISION    "201702201425Z"   
+            DESCRIPTION "Add type ResetFlag and mib node hwDcbPfcFrameStatisticsObjects."    
+
+            REVISION    "201008111600Z"   
+            DESCRIPTION "V1.00, initial version."
+         
+            REVISION    "201412111600Z"   
+            DESCRIPTION "Add type hwFCoEPortResource, hwTNPortVlan."
+
+            REVISION    "201412231904Z"   
+            DESCRIPTION "Add type hwFCoEFcfVlan, hwFCoEVFPortNum, hwFCoEVNPortNum, hwFCoEInstName, hwSysMacNum, hwFCoEVsId ."
+
+            REVISION    "201501041804Z"   
+            DESCRIPTION "Modify type hwFCoEVsId and other description ."
+  
+            ::= { hwDatacomm 303 }
+
+-- 
+-- Textual conventions
+-- 
+-- 
+-- type definitions in the interface queue
+-- 
+-- HWResetFlag 
+    HWResetFlag ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "Reset Flag:                               
+            DISABLE (0)
+            RESET   (1)
+            ENABLE  (2)           
+            "
+        SYNTAX INTEGER
+            {
+            disable(0),
+            reset(1),
+            enable(2)
+            }
+
+--HWCosType 
+   HWCosType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "
+            BE(1)
+            AF1(2)
+            AF2(3)
+            AF3(4)
+            AF4(5)
+            EF(6)
+            CS6(7)
+            CS7(8)
+
+            "
+        SYNTAX INTEGER
+            {
+            be(1),
+            af1(2),
+            af2(3),
+            af3(4),
+            af4(5),
+            ef(6),
+            cs6(7),
+            cs7(8)
+            }
+
+    -- FCOE Trap Objects Definitions
+    -- 1.3.6.1.4.1.2011.5.25.303.1
+    hwFCoEMIBTrapObjects      OBJECT IDENTIFIER ::= { hwFCoEMIB 1 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.1.1
+    hwFCoEIfName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This FCoE interface name is sent from device."
+            ::= { hwFCoEMIBTrapObjects 1 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.1.2
+    hwFCoEVlan OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This VLAN is sent from device."
+            ::= { hwFCoEMIBTrapObjects 2 }  
+    -- 1.3.6.1.4.1.2011.5.25.303.1.3
+    hwFCoEPortResource OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This FCoE port resource is reach max limit."
+            ::= { hwFCoEMIBTrapObjects 3}
+    -- 1.3.6.1.4.1.2011.5.25.303.1.4
+    hwTNPortVlan OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The detect vlan is different from the configued vlan."
+            ::= { hwFCoEMIBTrapObjects 4 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.1.5
+    hwFCoEFcfVlan OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The Fcf vlan is different from the configued vlan."
+            ::= { hwFCoEMIBTrapObjects 5 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.1.6
+    hwFCoEVFPortNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The FCoE VF Port number."
+            ::= { hwFCoEMIBTrapObjects 6 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.1.7
+    hwFCoEVNPortNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The FCoE VN Port number."
+            ::= { hwFCoEMIBTrapObjects 7 } 
+      -- 1.3.6.1.4.1.2011.5.25.303.1.8
+    hwFCoEInstName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The FCoe instance name."
+            ::= { hwFCoEMIBTrapObjects 8 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.1.9
+    hwSysMacNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The system mac-address number."
+            ::= { hwFCoEMIBTrapObjects 9 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.1.10
+    hwFCoEVsId OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The Fcoe-port Index."
+            ::= { hwFCoEMIBTrapObjects 10 } 
+
+    -- FCOE Trap Definitions
+    -- 1.3.6.1.4.1.2011.5.25.303.2
+    hwFCoEMIBTraps      OBJECT IDENTIFIER ::= { hwFCoEMIB 2 }
+    -- 1.3.6.1.4.1.2011.5.25.303.2.1
+    hwFCoEPortLoseVlan NOTIFICATION-TYPE    
+        OBJECTS {hwFCoEIfName , hwFCoEVlan}
+        STATUS current
+        DESCRIPTION
+            "When the device receives a FIP Notification packet,it gets VLANs from the packet, and compares with
+            configuration at the inputing-port, if it's not same, exports warning."
+       ::= { hwFCoEMIBTraps 1 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.2.2
+    hwFCoEVLanError NOTIFICATION-TYPE     
+        OBJECTS {hwFCoEIfName , hwFCoEVlan}
+        STATUS             current
+        DESCRIPTION
+            "When the device receives a FIP Notification packet,it gets VLANs from the packet, and lookup at the
+            configuration , if it's not exist, exports warning."
+       ::= { hwFCoEMIBTraps 2 }
+    -- 1.3.6.1.4.1.2011.5.25.303.2.3
+    hwFCoEConnectVfNum NOTIFICATION-TYPE     
+        OBJECTS {hwFCoEPortResource}
+        STATUS             current
+        DESCRIPTION
+            "The number of vf-port has reached max limits 64."
+       ::= { hwFCoEMIBTraps 3 }
+    -- 1.3.6.1.4.1.2011.5.25.303.2.4
+    hwFCoELoginVnNum NOTIFICATION-TYPE     
+        OBJECTS {hwFCoEInstName, hwFCoEVFPortNum, hwFCoEVNPortNum}
+        STATUS             current
+        DESCRIPTION
+            "The number of online vn-ports has reached max limits 256."
+       ::= { hwFCoEMIBTraps 4 }
+    -- 1.3.6.1.4.1.2011.5.25.303.2.5
+    hwFCoETnNum NOTIFICATION-TYPE     
+        OBJECTS {hwFCoEVsId, hwSysMacNum, hwFCoEVNPortNum} 
+         STATUS             current 
+        DESCRIPTION
+            "The number of VN_Ports that belong to the same NPV instance exceeds the number of MAC addresses."
+         ::= { hwFCoEMIBTraps 5 } 
+    -- 1.3.6.1.4.1.2011.5.25.303.2.6
+    hwFCoETnPortVlan NOTIFICATION-TYPE     
+        OBJECTS {hwFCoEInstName, hwTNPortVlan, hwFCoEFcfVlan}
+        STATUS             current
+        DESCRIPTION
+            "The requested vlan is different from the configued NPV vlan."
+       ::= { hwFCoEMIBTraps 6 }
+
+
+
+    -- FCOE Group Definitions        
+    -- 1.3.6.1.4.1.2011.5.25.303.3
+        hwFCoEConformance OBJECT IDENTIFIER ::= { hwFCoEMIB 3 }
+
+    -- 1.3.6.1.4.1.2011.5.25.303.3.1
+        hwFCoECompliances OBJECT IDENTIFIER ::= { hwFCoEConformance 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.303.3.1.1
+        hwFCoECompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+            "The compliance statement for SNMP entities which implement
+            the HUAWEI-FCOE-MIB."
+            MODULE 
+                MANDATORY-GROUPS { hwFCoEMIBTrapGroup, hwDcbPfcFrameGroup }
+            ::= { hwFCoECompliances 1 }
+
+    -- 1.3.6.1.4.1.2011.5.25.303.3.2
+        hwFCoEGroups OBJECT IDENTIFIER ::= { hwFCoEConformance 2 }
+    -- 1.3.6.1.4.1.2011.5.25.303.3.2.1
+	hwFCoEMIBTrapObjectGroup OBJECT-GROUP
+		OBJECTS { hwFCoEIfName, hwFCoEVlan, hwFCoEPortResource, hwTNPortVlan, hwFCoEFcfVlan, hwFCoEVFPortNum, hwFCoEVNPortNum, hwFCoEInstName, hwSysMacNum, hwFCoEVsId}
+		STATUS current
+		DESCRIPTION 
+			"Group for FCoE trap objects."
+		::= { hwFCoEGroups 1 }
+    -- 1.3.6.1.4.1.2011.5.25.303.3.2.2
+        hwFCoEMIBTrapGroup NOTIFICATION-GROUP
+		NOTIFICATIONS { hwFCoEPortLoseVlan, hwFCoEVLanError, hwFCoEConnectVfNum, hwFCoELoginVnNum, hwFCoETnNum, hwFCoETnPortVlan }
+		STATUS current
+		DESCRIPTION 
+			"Group for FCoE trap."
+		::= { hwFCoEGroups 2 }
+ 
+   -- 1.3.6.1.4.1.2011.5.25.303.4.1.1
+    hwDcbPfcFrameGroup OBJECT-GROUP
+        OBJECTS { hwDcbPfcIfIndex, hwDcbPfcQueueID, hwDcbPfcRxFrames, hwDcbPfcTxFrames, hwDcbPfcResetFlag }
+        STATUS      current
+        DESCRIPTION
+        "Group for dcb pfc frame  statistics."
+        ::= { hwFCoEGroups 3 }
+
+    --DCB Statistics Objects Definitions	
+    -- 1.3.6.1.4.1.2011.5.25.303.4
+    hwDcbPfcFrameStatisticsObjects OBJECT IDENTIFIER ::= { hwFCoEMIB 4 }
+
+    --1.3.6.1.4.1.2011.5.25.303.4.1
+    hwDcbPfcFrameStatisticsTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDcbPfcFrameStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of dcb pfc frame statistics for queue on the interface."
+        ::= { hwDcbPfcFrameStatisticsObjects 1 }
+   
+    --1.3.6.1.4.1.2011.5.25.303.4.1.1
+    hwDcbPfcFrameStatisticsEntry OBJECT-TYPE
+        SYNTAX HwDcbPfcFrameStatisticsEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "dcb pfc frame statistics entry."
+        INDEX { hwDcbPfcIfIndex, hwDcbPfcQueueID }
+        ::= { hwDcbPfcFrameStatisticsTable 1 }
+
+   HwDcbPfcFrameStatisticsEntry ::=
+        SEQUENCE { 
+            hwDcbPfcIfIndex
+                Integer32,
+            hwDcbPfcQueueID
+                HWCosType, 
+            hwDcbPfcRxFrames
+                Counter64,
+            hwDcbPfcTxFrames
+                Counter64,
+            hwDcbPfcResetFlag
+                HWResetFlag
+         }
+
+    --1.3.6.1.4.1.2011.5.25.303.4.1.1.1
+    hwDcbPfcIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of this object identifies the interface index."
+        ::= { hwDcbPfcFrameStatisticsEntry 1 }
+   
+     --1.3.6.1.4.1.2011.5.25.303.4.1.1.2
+    hwDcbPfcQueueID OBJECT-TYPE
+        SYNTAX HWCosType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+          "The value of this object identifies the queue index."
+        ::= { hwDcbPfcFrameStatisticsEntry  2 }
+
+    --1.3.6.1.4.1.2011.5.25.303.4.1.1.3
+    hwDcbPfcRxFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of pfc frames received by the queue."
+        ::= { hwDcbPfcFrameStatisticsEntry 3 }
+
+    --1.3.6.1.4.1.2011.5.25.303.4.1.1.4
+    hwDcbPfcTxFrames OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates the number of pfc frames sent by the queue."
+        ::= { hwDcbPfcFrameStatisticsEntry 4 }
+
+    --1.3.6.1.4.1.2011.5.25.303.4.1.1.5
+    hwDcbPfcResetFlag OBJECT-TYPE
+        SYNTAX HWResetFlag
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reset dcb pfc frame statistics information."
+        ::= { hwDcbPfcFrameStatisticsEntry 5 }
+		
+END
+
+--
+-- HUAWEI-FCOE-MIB.mib
+--

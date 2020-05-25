@@ -1,0 +1,1099 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-AP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlAlarmState,
+    MwlLedMode,
+    MwlOnOffSwitch,
+    MwlPowerSupply,
+    MwlApIndoorOutdoorType,
+    MwlApIpAssignmentType,
+    MwlDiscoveryOrder,
+    MwlApDiscoveryState,
+    MwlEnableDisableOption,
+    MwlVpnMode,
+    MwlVpnAuthenticationType,
+    MwlOperationalState,
+    MwlAvailabilityStatus,
+    MwlApHwType,
+    MwlCertificateStatus,
+    MwlCertRequestStatus,
+    MwlVpnConnectivityStatus,
+    MwlVpnAuthenticationStatus
+        FROM MERU-TC;
+
+  mwConfigAp  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         AP Configuration infrastructure"
+    ::= { mwConfiguration 2 } 
+  
+    
+  
+  mwApTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Table "
+    ::= { mwConfigAp 1 }
+
+  mwApEntry  OBJECT-TYPE
+    SYNTAX MwApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Table "
+    INDEX {  mwApTableIndex  }
+    ::= { mwApTable 1 }
+
+  MwApEntry  ::=  SEQUENCE { 
+       mwApTableIndex                                              Integer32, 
+       mwApDescr                                                   DisplayString(SIZE (1..63)),
+       mwApFloor                                                   DisplayString(SIZE (0..64)),
+       mwApNodeId                                                  Unsigned32,
+       mwApContact                                                 DisplayString(SIZE (0..64)),
+       mwApLedMode                                                 MwlLedMode,
+       mwApLocation                                                DisplayString(SIZE (0..64)),
+       mwApBuilding                                                DisplayString(SIZE (0..64)),
+       mwApParentId                                                Unsigned32,
+       mwApInitScript                                              DisplayString(SIZE (0..64)),
+       mwApEncryption                                              MwlOnOffSwitch,
+       mwApSerialNumber                                            MacAddress,
+       mwApIndoorOutdoor                                           MwlApIndoorOutdoorType,
+       mwApPowerSupplyType                                         MwlPowerSupply,
+       mwApKeepAliveTimeout                                        Integer32(1..1800),
+       mwApLinkProbingDuration                                     Unsigned32,
+       mwApUpTime                                                  TimeTicks,
+       mwApHwRev                                                   DisplayString,
+       mwApHwType                                                  MwlApHwType,
+       mwApVlanName                                                DisplayString,
+       mwApParentMac                                               MacAddress,
+       mwApAlarmState                                              MwlAlarmState,
+       mwApBootVersion                                             DisplayString,
+       mwApFPGAVersion                                             DisplayString,
+       mwApIpAddress                                               IpAddress,
+       mwApRuntimeVersion                                          DisplayString,
+       mwApOperationalState                                        MwlOperationalState,
+       mwApAvailabilityStatus                                      MwlAvailabilityStatus,
+       mwApRuntimeDiscoveryOrder                                   MwlApDiscoveryState,
+       mwApRowStatus                                               RowStatus 
+  }
+   
+   
+  mwApTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApEntry 1 }
+
+  mwApDescr  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..63))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwApEntry    2 }
+
+  mwApFloor  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Floor"
+    ::= { mwApEntry    3 }
+
+  mwApNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwApEntry    4 }
+
+  mwApContact  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Contact"
+    ::= { mwApEntry    6 }
+
+  mwApLedMode  OBJECT-TYPE
+    SYNTAX MwlLedMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes LED Mode"
+    ::= { mwApEntry    7 }
+
+  mwApLocation  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Location"
+    ::= { mwApEntry    8 }
+
+  mwApBuilding  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Building"
+    ::= { mwApEntry    9 }
+
+  mwApParentId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Parent AP ID"
+    ::= { mwApEntry   10 }
+
+  mwApInitScript  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Init Script"
+    ::= { mwApEntry   11 }
+
+  mwApEncryption  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Dataplane Encryption"
+    ::= { mwApEntry   12 }
+
+  mwApSerialNumber  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwApEntry   13 }
+
+  mwApIndoorOutdoor  OBJECT-TYPE
+    SYNTAX MwlApIndoorOutdoorType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Indoor/Outdoor type"
+    ::= { mwApEntry   14 }
+
+  mwApLinkProbingDuration  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Link Probing Duration"
+    ::= { mwApEntry   16 }
+
+  mwApUpTime  OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Uptime"
+    ::= { mwApEntry   17 }
+
+  mwApHwRev  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Hardware Revision"
+    ::= { mwApEntry   18 }
+
+  mwApHwType  OBJECT-TYPE
+    SYNTAX MwlApHwType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Model"
+    ::= { mwApEntry   19 }
+
+  mwApParentMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Parent MAC Address"
+    ::= { mwApEntry   20 }
+
+  mwApAlarmState  OBJECT-TYPE
+    SYNTAX MwlAlarmState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Alarm State"
+    ::= { mwApEntry   21 }
+
+  mwApBootVersion  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Boot Image Version"
+    ::= { mwApEntry   22 }
+
+  mwApFPGAVersion  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes FPGA Version"
+    ::= { mwApEntry   23 }
+
+  mwApRuntimeVersion  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Runtime Image Version"
+    ::= { mwApEntry   24 }
+
+  mwApOperationalState  OBJECT-TYPE
+    SYNTAX MwlOperationalState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operational State"
+    ::= { mwApEntry   26 }
+
+  mwApAvailabilityStatus  OBJECT-TYPE
+    SYNTAX MwlAvailabilityStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Availability Status"
+    ::= { mwApEntry   27 }
+
+  mwApRuntimeDiscoveryOrder  OBJECT-TYPE
+    SYNTAX MwlApDiscoveryState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Connectivity Layer"
+    ::= { mwApEntry   28 }
+
+  mwApPowerSupplyType  OBJECT-TYPE
+    SYNTAX MwlPowerSupply
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Power Supply Type"
+    ::= { mwApEntry   29 }
+
+  mwApKeepAliveTimeout  OBJECT-TYPE
+    SYNTAX Integer32(1..1800)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes KeepAlive Timeout(seconds)"
+    ::= { mwApEntry   30 }
+
+  mwApVlanName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Name"
+    ::= { mwApEntry   38 }
+
+  mwApIpAddress  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP IP Address for L3"
+    ::= { mwApEntry   39 }
+
+  mwApRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwApEntry 56 }
+
+  mwAp2controllerMapTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwAp2controllerMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assignments of APs to Controllers "
+    ::= { mwConfigAp 2 }
+
+  mwAp2controllerMapEntry  OBJECT-TYPE
+    SYNTAX MwAp2controllerMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assignments of APs to Controllers "
+    INDEX {  mwAp2controllerMapTableIndex  }
+    ::= { mwAp2controllerMapTable 1 }
+
+  MwAp2controllerMapEntry  ::=  SEQUENCE { 
+       mwAp2controllerMapTableIndex                                Integer32, 
+       mwAp2controllerMapApMac                                     MacAddress,
+       mwAp2controllerMapDestinationController                     DisplayString,
+       mwAp2controllerMapRowStatus                                 RowStatus 
+  }
+   
+   
+  mwAp2controllerMapTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwAp2controllerMapEntry 1 }
+
+  mwAp2controllerMapApMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP MAC Address"
+    ::= { mwAp2controllerMapEntry    2 }
+
+  mwAp2controllerMapDestinationController  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination Controller"
+    ::= { mwAp2controllerMapEntry    3 }
+
+  mwAp2controllerMapRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwAp2controllerMapEntry 4 }
+
+  mwApip2controllerMapTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApip2controllerMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assignments of AP subnet to Controllers "
+    ::= { mwConfigAp 3 }
+
+  mwApip2controllerMapEntry  OBJECT-TYPE
+    SYNTAX MwApip2controllerMapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assignments of AP subnet to Controllers "
+    INDEX {  mwApip2controllerMapTableIndex  }
+    ::= { mwApip2controllerMapTable 1 }
+
+  MwApip2controllerMapEntry  ::=  SEQUENCE { 
+       mwApip2controllerMapTableIndex                              Integer32, 
+       mwApip2controllerMapApSubnetIp                              IpAddress,
+       mwApip2controllerMapApSubnetMask                            IpAddress,
+       mwApip2controllerMapDestinationController                   DisplayString,
+       mwApip2controllerMapRowStatus                               RowStatus 
+  }
+   
+   
+  mwApip2controllerMapTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApip2controllerMapEntry 1 }
+
+  mwApip2controllerMapApSubnetIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP IP Subnet"
+    ::= { mwApip2controllerMapEntry    2 }
+
+  mwApip2controllerMapApSubnetMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Netmask"
+    ::= { mwApip2controllerMapEntry    3 }
+
+  mwApip2controllerMapDestinationController  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Destination Controller"
+    ::= { mwApip2controllerMapEntry    4 }
+
+  mwApip2controllerMapRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwApip2controllerMapEntry 5 }
+
+  mwApSwapTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApSwapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Replacement Table "
+    ::= { mwConfigAp 4 }
+
+  mwApSwapEntry  OBJECT-TYPE
+    SYNTAX MwApSwapEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Replacement Table "
+    INDEX {  mwApSwapTableIndex  }
+    ::= { mwApSwapTable 1 }
+
+  MwApSwapEntry  ::=  SEQUENCE { 
+       mwApSwapTableIndex                                          Integer32, 
+       mwApSwapNewApMac                                            MacAddress,
+       mwApSwapCurrentApMac                                        MacAddress,
+       mwApSwapRowStatus                                           RowStatus 
+  }
+   
+   
+  mwApSwapTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApSwapEntry 1 }
+
+  mwApSwapNewApMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes New AP MAC Address"
+    ::= { mwApSwapEntry    2 }
+
+  mwApSwapCurrentApMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP MAC Address"
+    ::= { mwApSwapEntry    3 }
+
+  mwApSwapRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwApSwapEntry 4 }
+
+  mwApConnectivityTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApConnectivityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Network Connectivity configuration "
+    ::= { mwConfigAp 5 }
+
+  mwApConnectivityEntry  OBJECT-TYPE
+    SYNTAX MwApConnectivityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Network Connectivity configuration "
+    INDEX {  mwApConnectivityTableIndex  }
+    ::= { mwApConnectivityTable 1 }
+
+  MwApConnectivityEntry  ::=  SEQUENCE { 
+       mwApConnectivityTableIndex                                  Integer32, 
+       mwApConnectivityWncIp                                       IpAddress,
+       mwApConnectivityHostName                                    DisplayString(SIZE (0..63)),
+       mwApConnectivityPrimaryDns                                  IpAddress,
+       mwApConnectivityWncHostName                                 DisplayString(SIZE (0..63)),
+       mwApConnectivityAssignedType                                MwlApIpAssignmentType,
+       mwApConnectivitySecondaryDns                                IpAddress,
+       mwApConnectivityWncDomainName                               DisplayString,
+       mwApConnectivityConfigureIpAddr                             IpAddress,
+       mwApConnectivityConfigureNetMask                            IpAddress,
+       mwApConnectivityConfigureGatewayAddr                        IpAddress,
+       mwApConnectivityConfiguredDiscoveryOrder                    MwlDiscoveryOrder,
+       mwApConnectivityNodeId                                      Integer32,
+       mwApConnectivityNodeName                                    DisplayString,
+       mwApConnectivityVPNState                                    MwlEnableDisableOption,
+       mwApConnectivityVPNStatus                                   MwlVpnMode,
+       mwApConnectivityDomainName                                  DisplayString,
+       mwApConnectivityVpnServerIp                                 IpAddress,
+       mwApConnectivityWncTunnelIp                                 IpAddress,
+       mwApConnectivityRuntimeDns1                                 IpAddress,
+       mwApConnectivityRuntimeDns2                                 IpAddress,
+       mwApConnectivityRuntimeDns3                                 IpAddress,
+       mwApConnectivityRuntimeDns4                                 IpAddress,
+       mwApConnectivityRuntimeDns5                                 IpAddress,
+       mwApConnectivityRuntimeDns6                                 IpAddress,
+       mwApConnectivityRuntimeDns7                                 IpAddress,
+       mwApConnectivityRuntimeDns8                                 IpAddress,
+       mwApConnectivityVpnServerPort                               Unsigned32,
+       mwApConnectivityRuntimeIpAddr                               IpAddress,
+       mwApConnectivityVPNAuthMethod                               MwlVpnAuthenticationType,
+       mwApConnectivityRuntimeNetMask                              IpAddress,
+       mwApConnectivityVpnServerHostName                           DisplayString(SIZE (0..63)),
+       mwApConnectivityRuntimeGatewayAddr                          IpAddress,
+       mwApConnectivityRuntimeTunnelIpAddr                         IpAddress,
+       mwApConnectivityRuntimeDiscoveryState                       MwlApDiscoveryState 
+  }
+   
+   
+  mwApConnectivityTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApConnectivityEntry 1 }
+
+  mwApConnectivityWncIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Address"
+    ::= { mwApConnectivityEntry    2 }
+
+  mwApConnectivityHostName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..63))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Host Name"
+    ::= { mwApConnectivityEntry    3 }
+
+  mwApConnectivityPrimaryDns  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary DNS Server"
+    ::= { mwApConnectivityEntry    4 }
+
+  mwApConnectivityWncHostName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..63))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Host Name"
+    ::= { mwApConnectivityEntry    5 }
+
+  mwApConnectivityAssignedType  OBJECT-TYPE
+    SYNTAX MwlApIpAssignmentType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Type"
+    ::= { mwApConnectivityEntry    6 }
+
+  mwApConnectivitySecondaryDns  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secondary DNS Server "
+    ::= { mwApConnectivityEntry    7 }
+
+  mwApConnectivityWncDomainName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Domain Name"
+    ::= { mwApConnectivityEntry    8 }
+
+  mwApConnectivityConfigureIpAddr  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Static IP Address"
+    ::= { mwApConnectivityEntry    9 }
+
+  mwApConnectivityConfigureNetMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Static IP Netmask"
+    ::= { mwApConnectivityEntry   10 }
+
+  mwApConnectivityConfigureGatewayAddr  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Static Default Gateway"
+    ::= { mwApConnectivityEntry   11 }
+
+  mwApConnectivityConfiguredDiscoveryOrder  OBJECT-TYPE
+    SYNTAX MwlDiscoveryOrder
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Discovery Protocol"
+    ::= { mwApConnectivityEntry   12 }
+
+  mwApConnectivityNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwApConnectivityEntry   13 }
+
+  mwApConnectivityNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwApConnectivityEntry   14 }
+
+  mwApConnectivityDomainName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Domain Name"
+    ::= { mwApConnectivityEntry   15 }
+
+  mwApConnectivityRuntimeDns1  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server 1"
+    ::= { mwApConnectivityEntry   16 }
+
+  mwApConnectivityRuntimeDns2  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server 2"
+    ::= { mwApConnectivityEntry   17 }
+
+  mwApConnectivityRuntimeDns3  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server 3"
+    ::= { mwApConnectivityEntry   18 }
+
+  mwApConnectivityRuntimeDns4  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server 4"
+    ::= { mwApConnectivityEntry   19 }
+
+  mwApConnectivityRuntimeDns5  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server 5"
+    ::= { mwApConnectivityEntry   20 }
+
+  mwApConnectivityRuntimeDns6  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server 6"
+    ::= { mwApConnectivityEntry   21 }
+
+  mwApConnectivityRuntimeDns7  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server 7"
+    ::= { mwApConnectivityEntry   22 }
+
+  mwApConnectivityRuntimeDns8  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DNS Server 8"
+    ::= { mwApConnectivityEntry   23 }
+
+  mwApConnectivityRuntimeIpAddr  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Address "
+    ::= { mwApConnectivityEntry   24 }
+
+  mwApConnectivityRuntimeNetMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes NetMask"
+    ::= { mwApConnectivityEntry   25 }
+
+  mwApConnectivityRuntimeGatewayAddr  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Gateway"
+    ::= { mwApConnectivityEntry   26 }
+
+  mwApConnectivityRuntimeDiscoveryState  OBJECT-TYPE
+    SYNTAX MwlApDiscoveryState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Connectivity Layer"
+    ::= { mwApConnectivityEntry   27 }
+
+  mwApConnectivityVPNState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN"
+    ::= { mwApConnectivityEntry   28 }
+
+  mwApConnectivityVPNAuthMethod  OBJECT-TYPE
+    SYNTAX MwlVpnAuthenticationType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Authentication Method"
+    ::= { mwApConnectivityEntry   29 }
+
+  mwApConnectivityWncTunnelIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Tunnel IP Address"
+    ::= { mwApConnectivityEntry   30 }
+
+  mwApConnectivityRuntimeTunnelIpAddr  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tunnel IP "
+    ::= { mwApConnectivityEntry   31 }
+
+  mwApConnectivityVpnServerIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Server IP"
+    ::= { mwApConnectivityEntry   32 }
+
+  mwApConnectivityVpnServerHostName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Server Host Name"
+    ::= { mwApConnectivityEntry   33 }
+
+  mwApConnectivityVpnServerPort  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Server Port"
+    ::= { mwApConnectivityEntry   34 }
+
+  mwApConnectivityVPNStatus  OBJECT-TYPE
+    SYNTAX MwlVpnMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Connectivity Mode"
+    ::= { mwApConnectivityEntry   35 }
+
+  mwApCertificateTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApCertificateEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Certificate configuration "
+    ::= { mwConfigAp 6 }
+
+  mwApCertificateEntry  OBJECT-TYPE
+    SYNTAX MwApCertificateEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Certificate configuration "
+    INDEX {  mwApCertificateTableIndex  }
+    ::= { mwApCertificateTable 1 }
+
+  MwApCertificateEntry  ::=  SEQUENCE { 
+       mwApCertificateTableIndex                                   Integer32, 
+       mwApCertificateNodeId                                       Integer32,
+       mwApCertificateNodeName                                     DisplayString,
+       mwApCertificateApHwType                                     MwlApHwType,
+       mwApCertificateValidity                                     DateAndTime,
+       mwApCertificateSerialNumber                                 MacAddress,
+       mwApCertificateApCertReqStatus                              MwlCertRequestStatus,
+       mwApCertificateOperationalState                             MwlOperationalState,
+       mwApCertificateAvailabilityStatus                           MwlAvailabilityStatus,
+       mwApCertificateStatus                                       MwlCertificateStatus,
+       mwApCertificateCertificateAuthority                         DisplayString,
+       mwApCertificateRowStatus                                    RowStatus 
+  }
+   
+   
+  mwApCertificateTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApCertificateEntry 1 }
+
+  mwApCertificateNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwApCertificateEntry    2 }
+
+  mwApCertificateNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwApCertificateEntry    3 }
+
+  mwApCertificateSerialNumber  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwApCertificateEntry    4 }
+
+  mwApCertificateOperationalState  OBJECT-TYPE
+    SYNTAX MwlOperationalState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operational State"
+    ::= { mwApCertificateEntry    5 }
+
+  mwApCertificateAvailabilityStatus  OBJECT-TYPE
+    SYNTAX MwlAvailabilityStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Availability Status"
+    ::= { mwApCertificateEntry    6 }
+
+  mwApCertificateStatus  OBJECT-TYPE
+    SYNTAX MwlCertificateStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Certificate Status"
+    ::= { mwApCertificateEntry    7 }
+
+  mwApCertificateApCertReqStatus  OBJECT-TYPE
+    SYNTAX MwlCertRequestStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes User Req Status"
+    ::= { mwApCertificateEntry    8 }
+
+  mwApCertificateCertificateAuthority  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes CA"
+    ::= { mwApCertificateEntry    9 }
+
+  mwApCertificateValidity  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Validity (MM/DD/YYYY)"
+    ::= { mwApCertificateEntry   10 }
+
+  mwApCertificateApHwType  OBJECT-TYPE
+    SYNTAX MwlApHwType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Model"
+    ::= { mwApCertificateEntry   11 }
+
+  mwApCertificateRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwApCertificateEntry 20 }
+
+  mwApVpnClientInfoTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApVpnClientInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VPN Clients Info "
+    ::= { mwConfigAp 7 }
+
+  mwApVpnClientInfoEntry  OBJECT-TYPE
+    SYNTAX MwApVpnClientInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VPN Clients Info "
+    INDEX {  mwApVpnClientInfoTableIndex  }
+    ::= { mwApVpnClientInfoTable 1 }
+
+  MwApVpnClientInfoEntry  ::=  SEQUENCE { 
+       mwApVpnClientInfoTableIndex                                 Integer32, 
+       mwApVpnClientInfoApMac                                      MacAddress,
+       mwApVpnClientInfoNodeId                                     Integer32,
+       mwApVpnClientInfoNodeName                                   DisplayString,
+       mwApVpnClientInfoRealIpAddr                                 IpAddress,
+       mwApVpnClientInfoTunnelIpAddr                               IpAddress,
+       mwApVpnClientInfoVpnConnectivityStatus                      MwlVpnConnectivityStatus,
+       mwApVpnClientInfoVpnAuthenticationStatus                    MwlVpnAuthenticationStatus 
+  }
+   
+   
+  mwApVpnClientInfoTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApVpnClientInfoEntry 1 }
+
+  mwApVpnClientInfoNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwApVpnClientInfoEntry    2 }
+
+  mwApVpnClientInfoNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwApVpnClientInfoEntry    3 }
+
+  mwApVpnClientInfoApMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP MAC"
+    ::= { mwApVpnClientInfoEntry    4 }
+
+  mwApVpnClientInfoTunnelIpAddr  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN IP Address "
+    ::= { mwApVpnClientInfoEntry    5 }
+
+  mwApVpnClientInfoRealIpAddr  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Real IP Address "
+    ::= { mwApVpnClientInfoEntry    6 }
+
+  mwApVpnClientInfoVpnConnectivityStatus  OBJECT-TYPE
+    SYNTAX MwlVpnConnectivityStatus
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Connectivity Status"
+    ::= { mwApVpnClientInfoEntry    7 }
+
+  mwApVpnClientInfoVpnAuthenticationStatus  OBJECT-TYPE
+    SYNTAX MwlVpnAuthenticationStatus
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes VPN Authentication Status"
+    ::= { mwApVpnClientInfoEntry    8 }
+
+  
+END
+   

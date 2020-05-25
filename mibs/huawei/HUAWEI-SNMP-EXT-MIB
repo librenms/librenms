@@ -1,0 +1,295 @@
+-- =================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: HUAWEI Private Extended SNMP MIB
+-- 
+-- Reference:
+-- Version:     V2.05
+-- History:
+-- 
+-- =================================================================
+
+    HUAWEI-SNMP-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS           
+            hwDatacomm            
+                FROM HUAWEI-MIB
+            ifIndex, ifDescr          
+                FROM RFC1213-MIB
+            DisplayString,TruthValue
+                FROM SNMPv2-TC     
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF  
+            EnabledStatus            
+                FROM P-BRIDGE-MIB         
+            OBJECT-TYPE,  OBJECT-IDENTITY, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+                FROM SNMPv2-SMI
+            InetAddressType, InetAddress
+                   FROM INET-ADDRESS-MIB; 
+
+    
+        hwSnmpExtMIB MODULE-IDENTITY 
+            LAST-UPDATED "201612071056Z"          --Dec. 07, 2016 at 10:56 GMT
+            ORGANIZATION
+                 "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                 "Huawei Industrial Base
+                   Bantian, Longgang
+                    Shenzhen 518129
+                    People's Republic of China
+                    Website: http://www.huawei.com
+                    Email: support@huawei.com
+                  "
+            DESCRIPTION 
+                "
+                Some attribute of SNMP extended content.
+                "
+           REVISION    "201612071056Z"          --Dec. 07, 2016 at 10:56 GMT 
+           DESCRIPTION  "revision 2.0.5"  
+           REVISION     "201302280000Z"         -- 28 February 2013
+           DESCRIPTION
+           "Registration point for protocols used in Huawei 
+                extended SNMP MIB"
+             REVISION    "201307091300Z"          --July 07, 2013 at 12:30 GMT
+            DESCRIPTION  "revision 2.0.2" 
+             REVISION    "201310111603Z"          --Oct. 11, 2013 at 16:02 GMT
+            DESCRIPTION  "revision 2.0.3"
+  	     REVISION    "201402141603Z"          --Feb. 14, 2014 at 16:02 GMT 
+      DESCRIPTION  "revision 2.0.3"  
+             
+       ::= { hwDatacomm 164 }  
+       
+        hwSnmpExtMIBObjects OBJECT IDENTIFIER ::= { hwSnmpExtMIB 1 }
+        
+        hwSnmpExtErrorCodeEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enabled or disabled SNMP extended error status. 
+                 The default value is disabled."
+            ::= { hwSnmpExtMIBObjects 1 }       
+            
+        hwSnmpRemoteIpAddressType OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The type of the remote netmanager IP address."
+            ::= { hwSnmpExtMIBObjects 2 }             
+            
+        hwSnmpRemoteIpAddress OBJECT-TYPE
+            SYNTAX InetAddress (SIZE (0|4|8|16|20))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The Ip address of the remote netmanager."
+            ::= { hwSnmpExtMIBObjects 3 } 
+        
+        hwSnmpGlobalObjects OBJECT IDENTIFIER ::= { hwSnmpExtMIBObjects 4 }
+            
+        hwSnmpListenPort OBJECT-TYPE
+            SYNTAX Integer32 (161 | 1025..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The listening UDP port of SNMP."
+            ::= { hwSnmpGlobalObjects 1 }
+
+         hwSnmpRaisingThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS  accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The raising threshold of the lock queue."
+            ::= { hwSnmpGlobalObjects 2 }
+
+        
+           hwSnmpFallingThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS  accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The falling threshold of the lock queue."
+            ::= { hwSnmpGlobalObjects 3 }
+            
+        hwSnmpFrameworkAdmin OBJECT IDENTIFIER ::= { hwSnmpExtMIBObjects 5 }     
+				
+        hwSnmpAuthProtocols OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION 
+                "Registration point for authentication protocols used in Huawei 
+                extended SNMP MIB. Definitions of Object Identities needed
+                for the use of AES by SNMP's User-based Security Model
+                "
+             ::= { hwSnmpFrameworkAdmin 1 }
+        hwUsmHMACSHA256AuthProtocol OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION 
+                "The HMAC SHA2 256 Digest Authentication Protocol."
+            REFERENCE 
+                "- Data Encryption Standard, National Institute of
+                    Standards and Technology.  Federal Information
+                    Processing Standard (FIPS) Publication 46-1.
+                    Supersedes FIPS Publication 46"
+            ::= { hwSnmpAuthProtocols 1 }
+				
+        hwSnmpPrivProtocols OBJECT-IDENTITY
+             STATUS   current
+             DESCRIPTION  
+                "Registration point for privacy protocols used in Huawei 
+                extended SNMP MIB. Definitions of Object Identities needed
+                for the use of AES by SNMP's User-based Security Model
+                "
+             ::= { hwSnmpFrameworkAdmin 2 }
+
+        --
+        -- 3DES Privacy Protocol for SNMPv3 USM security model 
+        --	  
+								      
+        hwUsm3DESEDEPrivProtocol OBJECT-IDENTITY
+	          STATUS       current
+            DESCRIPTION  "The 3DES-EDE Symmetric Encryption Protocol."
+            REFERENCE    "- Data Encryption Standard, National Institute of
+                          Standards and Technology.  Federal Information
+                          Processing Standard (FIPS) Publication 46-3,
+                          (1999, pending approval).  Will supersede FIPS
+                          Publication 46-2.
+
+                        - Data Encryption Algorithm, American National
+                          Standards Institute.  ANSI X3.92-1981,
+                          (December, 1980).
+
+                        - DES Modes of Operation, National Institute of
+                          Standards and Technology.  Federal Information
+                          Processing Standard (FIPS) Publication 81,
+                          (December, 1980).
+
+                        - Data Encryption Algorithm - Modes of Operation,
+                          American National Standards Institute.
+                          ANSI X3.106-1983, (May 1983).
+                       "
+	          ::= { hwSnmpPrivProtocols 1 }
+				
+				--
+				-- AES Privacy Protocols for SNMPv3 USM security model 
+				--
+        hwUsmAESCfb192PrivProtocol OBJECT-IDENTITY
+            STATUS       current 
+            DESCRIPTION  "The CFB128-AES-192 Privacy Protocol." 
+            REFERENCE    "- Specification for the ADVANCED ENCRYPTION 
+		                     STANDARD (DRAFT). Federal Information Processing  
+		                     Standard (FIPS) Publication 197. 
+		                     (November 2001). 
+    
+		                     - Dworkin, M., NIST Recommendation for Block  
+		                       Cipher Modes of Operation, Methods and  
+		                       Techniques (DRAFT).  
+		                       NIST Special Publication 800-38A 
+		                       (December 2001). 
+		                     " 	
+	           ::= { hwSnmpPrivProtocols 2 } 
+				
+        hwUsmAESCfb256PrivProtocol OBJECT-IDENTITY
+	          STATUS       current 
+            DESCRIPTION  "The CFB128-AES-256 Privacy Protocol." 
+            REFERENCE    "- Specification for the ADVANCED ENCRYPTION 
+	                       STANDARD (DRAFT). Federal Information Processing  
+	                       Standard (FIPS) Publication 197 
+	                       (November 2001). 
+    
+	                     	- Dworkin, M., NIST Recommendation for Block  
+	                       Cipher Modes of Operation, Methods and  
+	                       Techniques (DRAFT).  
+	                       NIST Special Publication 800-38A 
+	                       (December 2001). 
+                      	" 	
+	           ::= { hwSnmpPrivProtocols 3 } 
+           
+	hwSnmpNotification      OBJECT IDENTIFIER ::= { hwSnmpExtMIBObjects 6 }
+
+	hwNmsPingTrap NOTIFICATION-TYPE
+    		STATUS  current
+   		 DESCRIPTION
+            		"SNMP Test trap."
+    		::= { hwSnmpNotification 1 }
+	
+	hwNmsHeartBeatTrap NOTIFICATION-TYPE
+    		STATUS  current
+   		 DESCRIPTION
+            		"SNMP Test trap."
+    		::= { hwSnmpNotification 2 }
+    		
+			-- Module compliance.
+        hwSnmpExtConformance OBJECT IDENTIFIER ::= { hwSnmpExtMIB 2 }
+        hwSnmpExtGroups
+            OBJECT IDENTIFIER ::= { hwSnmpExtConformance 1 }
+			
+        hwSnmpExtRuleGroup OBJECT-GROUP
+            OBJECTS {
+			                hwSnmpExtErrorCodeEnable, hwSnmpListenPort, hwSnmpRemoteIpAddress, hwSnmpRemoteIpAddressType, hwSnmpFallingThreshold, hwSnmpRaisingThreshold
+			              }
+            STATUS current
+            DESCRIPTION
+			     "Collection of objects needed for SNMP extended configuration."
+			
+            ::= { hwSnmpExtGroups 1 }
+			          
+        hwSnmpExtTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwSNMPLockThreshold, hwSNMPLockThresholdResume, hwSNMPReset }
+            STATUS current
+            DESCRIPTION 
+                "SNMP extend trap nodes."
+          ::= { hwSnmpExtGroups 2 }
+			 
+        hwSnmpExtCompliances
+            OBJECT IDENTIFIER ::= { hwSnmpExtConformance 2 }
+			
+        hwSnmpExtCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+			     "The compliance statement for implementing
+			      the Huawei extended SNMP MIB."
+            MODULE
+			      MANDATORY-GROUPS {  
+			      hwSnmpExtRuleGroup, hwSnmpExtTrapGroup
+			      } 			          
+			      ::= { hwSnmpExtCompliances 1 }
+                  
+hwSnmpAlarmGroups OBJECT IDENTIFIER ::= { hwSnmpNotification 3 }
+                  
+		hwSnmpAlarmGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwNmsPingTrap, hwNmsHeartBeatTrap }
+			STATUS current
+			DESCRIPTION 
+				"Alarm trap nodes."
+			::= { hwSnmpAlarmGroups 1 }
+
+	
+			-- Module trap.
+        hwSnmpExtNotifications OBJECT IDENTIFIER ::= { hwSnmpExtMIB 3 }
+     
+        hwSNMPLockThreshold NOTIFICATION-TYPE
+            OBJECTS { hwSnmpFallingThreshold, hwSnmpRaisingThreshold }
+            STATUS current
+            DESCRIPTION 
+                "The trap will be triggered when the number of unauthorized users reaches the upper threshold of the lock queue."   
+            ::= { hwSnmpExtNotifications 1 }
+     
+        hwSNMPLockThresholdResume NOTIFICATION-TYPE
+            OBJECTS { hwSnmpFallingThreshold, hwSnmpRaisingThreshold }
+            STATUS current    
+            DESCRIPTION 
+                "The trap will be triggered when the number of unauthorized users falls back to the lower threshold of the lock queue."
+            ::= { hwSnmpExtNotifications 2 }
+
+        hwSNMPReset NOTIFICATION-TYPE
+            STATUS current    
+            DESCRIPTION 
+                "After the SNMP process is restarted or a master/slave main control board switchover is performed on a device, this trap is sent to notify the NMS of SNMP entity restart, enabling the NMS to synchronize alarms from the device."
+            ::= { hwSnmpExtNotifications 3 }	
+
+        END
+			--
+			-- HUAWEI-SNMP-EXT-MIB.mib
+			--

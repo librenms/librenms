@@ -1,0 +1,11 @@
+os: 'ibm-i'
+text: 'IBM i'
+type: server
+icon: ibmos
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.2.6.11

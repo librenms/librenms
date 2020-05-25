@@ -1,0 +1,444 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-EGRESS-COUNTERS-MIB
+-- ** Project: Ethernet Local Management Interface
+ -- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-EGRESS-COUNTERS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32, Integer32, Gauge32,IpAddress
+                FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+                FROM SNMPv2-CONF
+        TEXTUAL-CONVENTION, TruthValue, RowStatus, StorageType, TimeStamp
+                FROM SNMPv2-TC
+        NOTIFICATION-TYPE
+                FROM SNMPv2-SMI                    -- [RFC2578]
+        InterfaceIndex, ifIndex
+                FROM IF-MIB
+        switch 
+                FROM PRVT-SWITCH-MIB; 
+
+-- The EGRESS COUNTER MIB
+prvtEgressCounterMib MODULE-IDENTITY
+        LAST-UPDATED "201005210000Z"
+        ORGANIZATION "BATM Advanced Communication"
+        CONTACT-INFO
+                "BATM/Telco Systems Support team
+                Email: 
+                For North America: techsupport@telco.com
+                For North Europe: support@batm.de, info@batm.de
+                For the rest of the world: techsupport@telco.com"
+        DESCRIPTION
+                "This MIB provides the egress counters for specific boards, refer to documentation for more details."
+        REVISION "201005210000Z"
+        DESCRIPTION
+                "Initial version." 
+        ::= { switch 160 }
+
+
+prvtEgressCntNotifications OBJECT IDENTIFIER    ::= { prvtEgressCounterMib 0 }
+prvtEgressCntObjects OBJECT IDENTIFIER          ::= { prvtEgressCounterMib 1 }
+prvtEgressCntConformance OBJECT IDENTIFIER      ::= { prvtEgressCounterMib 2 }
+
+
+--------------------------------------------------------------
+--EgressCounter objects
+--------------------------------------------------------------
+
+
+prvtEgressCntCounterSetTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PrvtEgressCntCounterSetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "This table contains objects for the counters set. Available only for specific boards, refer to documentation for more details."
+        ::= { prvtEgressCntObjects 1 }
+  
+  
+prvtEgressCntCounterSetEntry OBJECT-TYPE
+        SYNTAX PrvtEgressCntCounterSetEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "prvtEgressCntCounterSetEntry"
+        INDEX  { prvtEgressCntCounterSetID }
+        ::= { prvtEgressCntCounterSetTable 1 }
+
+PrvtEgressCntCounterSetEntry ::=  SEQUENCE{
+        prvtEgressCntCounterSetID               Unsigned32,
+        prvtEgressCntAllPriorities              TruthValue,
+        prvtEgressCntPriority                   Unsigned32,
+        prvtEgressCntAllDropLevels              TruthValue,
+        prvtEgressCntDropLevelMode              INTEGER,
+        prvtEgressCntAllVlans                   TruthValue,
+        prvtEgressCntVlan                       Unsigned32,
+        prvtEgressCntAllInterfaces              TruthValue,
+        prvtEgressCntInterfaces                 InterfaceIndex,
+        prvtEgressCntPort                       INTEGER,
+        prvtEgressCntClearCounterSet            INTEGER,
+        prvtEgressCntCounterSetRowStatus        RowStatus
+}
+
+prvtEgressCntCounterSetID OBJECT-TYPE
+        SYNTAX Unsigned32 (1..2)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "The counters set ID. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCounterSetEntry 1 }
+
+
+prvtEgressCntAllPriorities  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Shows if all priorities are set. Available only for specific boards, refer to documentation for more details."
+        ::= { prvtEgressCntCounterSetEntry 2 }
+
+prvtEgressCntPriority OBJECT-TYPE
+        SYNTAX Unsigned32 (0..7)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "Priority definition. If prvtAllPriorities object is true then prvtPriority object is irrelevant. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCounterSetEntry 3 }
+
+prvtEgressCntAllDropLevels OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Shows if all drop levels are set. Available only for specific boards, refer to documentation for more details."
+        ::= { prvtEgressCntCounterSetEntry 4 }
+
+prvtEgressCntDropLevelMode  OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        green (1),
+        yellow (2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                " Drop level definition. If prvtAllDropLevels object is true then prvtDropLevelMode object is irrelevant. Available only for specific boards, refer to documentation for more details." 
+        ::= { prvtEgressCntCounterSetEntry 5 }
+
+prvtEgressCntAllVlans  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Shows if all vlans are set. Available only for specific boards, refer to documentation for more details."
+        ::= { prvtEgressCntCounterSetEntry 6 }
+
+
+prvtEgressCntVlan OBJECT-TYPE
+        SYNTAX Unsigned32 (1..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "The vlan ID. If prvtAllVlans object is true then prvtVlan object is irrelevant. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCounterSetEntry 7 }
+
+
+prvtEgressCntAllInterfaces OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-only
+        STATUS current
+        DESCRIPTION
+                "Shows if all interfaces are set. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCounterSetEntry 8 }
+
+prvtEgressCntInterfaces OBJECT-TYPE
+        SYNTAX InterfaceIndex
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                "The interface definition. If prvtAllInterfaces object is true then prvtInterfaces object is irrelevant. Available only for specific boards, refer to documentation for more details."
+        ::= { prvtEgressCntCounterSetEntry 9 }
+
+prvtEgressCntPort OBJECT-TYPE
+        SYNTAX INTEGER {
+        none ( 0 ),
+        set ( 1 )
+        }
+        MAX-ACCESS  read-write
+        STATUS current
+        DESCRIPTION
+                "CPU port. Available only for specific boards, refer to documentation for more details. "
+        DEFVAL { none }
+        ::= { prvtEgressCntCounterSetEntry 10 }
+
+
+prvtEgressCntClearCounterSet OBJECT-TYPE
+        SYNTAX INTEGER {
+        none ( 0 ),
+        clear ( 1 )
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Deletes a specified set of egress counters. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCounterSetEntry 11 }
+
+prvtEgressCntCounterSetRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS read-create
+        STATUS current   
+        DESCRIPTION
+                "Counter set  rowStatus. Supported only NotInService/Active. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCounterSetEntry 12 }
+
+prvtEgressCntCountersTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PrvtEgressCntCountersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "This table contains the counters. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntObjects 2 }
+  
+  
+prvtEgressCntCountersEntry OBJECT-TYPE
+        SYNTAX PrvtEgressCntCountersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "prvtEgressCntCountersEntry"
+                INDEX  { prvtEgressCntCounterSetID }
+        ::= { prvtEgressCntCountersTable 1 }
+
+PrvtEgressCntCountersEntry ::=  SEQUENCE{
+        prvtEgressCntOutBcFrames        Unsigned32,
+        prvtEgressCntOutNUcFrames       Unsigned32,
+        prvtEgressCntOutUcFrames        Unsigned32,
+        prvtEgressCntEgrFilterDisc      Unsigned32,
+        prvtEgressCntTxqFilterDisc      Unsigned32,
+        prvtEgressCntOutCtrlFrames      Unsigned32,
+        prvtEgressCntEgrFrwFilterDisc   Unsigned32,
+        prvtEgressCntClearCounters      INTEGER
+}
+
+
+prvtEgressCntOutBcFrames OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Broadcast packet counter. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCountersEntry 1 }
+
+prvtEgressCntOutNUcFrames OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Multicast packet counter . Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCountersEntry 2 }
+
+prvtEgressCntOutUcFrames OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Unicast packet counter. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCountersEntry 3 }
+
+prvtEgressCntEgrFilterDisc OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Egress filtered packet counter. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCountersEntry 4 }
+
+prvtEgressCntTxqFilterDisc OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Tail dropped packet counter. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCountersEntry 5 }
+
+prvtEgressCntOutCtrlFrames OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Control packet counter. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCountersEntry 6 }
+
+prvtEgressCntEgrFrwFilterDisc OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Egress forwarding restriction packet counter. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntCountersEntry 7 }
+
+prvtEgressCntClearCounters OBJECT-TYPE
+        SYNTAX INTEGER {
+        none ( 0 ),
+        clear ( 1 )
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION 
+                "Clears a counter set statistics. Available only for specific boards, refer to documentation for more details."
+        ::= { prvtEgressCntCountersEntry 8 }
+
+
+prvtEgressCntQosCountersTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PrvtEgressCntQosCountersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "This table contains objects for counters which count number of packets dropped due to congestions. Available only for specific boards, refer to documentation for more details."
+        ::= { prvtEgressCntObjects 3 }
+  
+  
+prvtEgressCntQosCountersEntry OBJECT-TYPE
+        SYNTAX PrvtEgressCntQosCountersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+                "prvtEgressCntQosCountersEntry"
+        INDEX { ifIndex }
+        ::= { prvtEgressCntQosCountersTable 1 }
+
+PrvtEgressCntQosCountersEntry ::=  SEQUENCE{
+        prvtEgressCntQosYellowPacketCounters    Unsigned32,
+        prvtEgressCntQosRedPacketCounters       Unsigned32,
+        prvtEgressCntQosMaximumRateReached      TruthValue
+}
+
+prvtEgressCntQosYellowPacketCounters OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Congestion color yellow dropped packet. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntQosCountersEntry 1 }
+
+prvtEgressCntQosRedPacketCounters OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Congestion color red dropped packet. Available only for specific boards, refer to documentation for more details. "
+        ::= { prvtEgressCntQosCountersEntry 2 }
+
+prvtEgressCntQosMaximumRateReached  OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "Checks if port egress maximum rate has been reached. Available only for specific boards, refer to documentation for more details."
+        ::= { prvtEgressCntQosCountersEntry 3 }
+
+prvtEgressCntCompliances OBJECT IDENTIFIER ::= { prvtEgressCntConformance 1 }
+prvtEgressCntGroups      OBJECT IDENTIFIER ::= { prvtEgressCntConformance 2 }
+
+-- ******************************************************************
+-- Units of conformance
+-- ******************************************************************
+
+prvtEgressCntCounterSetGroup OBJECT-GROUP
+        OBJECTS {
+                prvtEgressCntAllPriorities,
+                prvtEgressCntPriority,
+                prvtEgressCntAllDropLevels,
+                prvtEgressCntDropLevelMode,
+                prvtEgressCntAllVlans,
+                prvtEgressCntVlan,
+                prvtEgressCntAllInterfaces,
+                prvtEgressCntInterfaces,
+                prvtEgressCntPort,
+                prvtEgressCntClearCounterSet,
+                prvtEgressCntCounterSetRowStatus
+        }
+        STATUS current
+        DESCRIPTION
+                "Objects for the egress counter set group."
+        ::= { prvtEgressCntGroups 1 }
+
+prvtEgressCntCountersGroup OBJECT-GROUP
+        OBJECTS {
+                prvtEgressCntOutBcFrames,
+                prvtEgressCntOutNUcFrames,
+                prvtEgressCntOutUcFrames,
+                prvtEgressCntEgrFilterDisc,
+                prvtEgressCntTxqFilterDisc,
+                prvtEgressCntOutCtrlFrames,
+                prvtEgressCntEgrFrwFilterDisc,
+                prvtEgressCntClearCounters
+        }
+        STATUS      current
+        DESCRIPTION
+                "Objects for the egress counters group."
+        ::= { prvtEgressCntGroups 2 }
+    
+prvtEgressCntQosCountersGroup OBJECT-GROUP
+        OBJECTS {
+                prvtEgressCntQosYellowPacketCounters,
+                prvtEgressCntQosRedPacketCounters,
+                prvtEgressCntQosMaximumRateReached
+        }
+        STATUS      current
+        DESCRIPTION
+                "Objects for the qos egress counters."
+        ::= { prvtEgressCntGroups 3 }
+
+prvtEgressCntCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+                "The compliance statement for support of the egress counters MIB module."
+        MODULE
+        MANDATORY-GROUPS {
+                prvtEgressCntCounterSetGroup,
+                prvtEgressCntCountersGroup,
+                prvtEgressCntQosCountersGroup
+        }
+
+        ::= { prvtEgressCntCompliances 1 }
+
+
+END
+
+
+ 

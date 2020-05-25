@@ -1,0 +1,308 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: Huawei Ethernet ND MIB
+-- Reference: HUAWEI Enterprise MIB
+-- Version: V1.03
+-- History:
+-- gaoning , 2014-06-27, add nodes for ND.
+-- =================================================================
+
+    HUAWEI-ND-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS        
+            hwDatacomm
+                FROM HUAWEI-MIB
+            OBJECT-TYPE, MODULE-IDENTITY, OBJECT-TYPE, IpAddress, Counter32, Integer32, Unsigned32, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            PhysAddress, DisplayString, RowStatus            
+                FROM SNMPv2-TC   
+            NOTIFICATION-GROUP, OBJECT-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF
+            ifIndex, ifName, InterfaceIndex,InterfaceIndexOrZero,ifAdminStatus,ifOperStatus,ifDescr          
+                FROM IF-MIB
+            PhysicalIndex, entPhysicalIndex, entPhysicalName
+                FROM ENTITY-MIB;        
+            
+        hwNDMIB MODULE-IDENTITY 
+            LAST-UPDATED "201708171600Z"        
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+                   Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                  "
+            DESCRIPTION 
+                "Please provide the descritpion."
+
+			REVISION    "201708171600Z"   
+            DESCRIPTION "V1.02, Modify description of hwNDSlotThresholdExceedValue and hwNDIntfThresholdExceedValue at 2017-07-04"
+
+			REVISION    "201707041600Z"   
+            DESCRIPTION "V1.02, Modify description of hwSlotNDThresholdExceedAlarm at 2017-07-04."
+
+			
+			REVISION    "201407011600Z"   
+            DESCRIPTION "V1.01, initial version."
+			
+			REVISION    "201008111600Z"   
+            DESCRIPTION "V1.00, initial version."
+    
+            ::= { hwDatacomm 332 }
+            
+	hwNDObjects OBJECT IDENTIFIER ::= { hwNDMIB 1 } 
+ 
+-- =================================================================
+-- 1th slot nd entries alarm
+-- =================================================================           
+hwNDStatisticsPerSlotTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwNDStatisticsPerSlotEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This object indicates the threshold of the alarm generated in slot."
+	::= { hwNDObjects 1 }  
+	
+	hwNDStatisticsPerSlotEntry  OBJECT-TYPE
+	   SYNTAX HwNDStatisticsPerSlotEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This object indicates the threshold of the alarm generated in slot."
+	INDEX {hwNDSlotPhysicalIndex}
+	::= { hwNDStatisticsPerSlotTable 1 }                                                
+									
+	HwNDStatisticsPerSlotEntry ::=
+	SEQUENCE {
+		hwNDSlotPhysicalIndex  Unsigned32 ,		
+		hwNDSlotThresholdExceedValue   Unsigned32 ,
+		hwNDSlotThresholdResumeValue   Unsigned32  ,
+		hwNDSlotDynamicNumber   Unsigned32  ,
+		hwNDSlotStaticNumber   Unsigned32 ,
+		hwNDSlotTotalNumber    Unsigned32				
+	 }      
+
+	hwNDSlotPhysicalIndex  OBJECT-TYPE
+		SYNTAX Unsigned32(0..4294967294)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The slot of alarm generated."
+	::= { hwNDStatisticsPerSlotEntry 1 } 
+   
+	hwNDSlotThresholdExceedValue  OBJECT-TYPE
+	   SYNTAX Unsigned32(1..100)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"This object indicates an ND entry alarm threshold on a board. An ND entry threshold-exceeding alarm is generated when the ratio of the number of ND entries on a board to the maximum number allowed is greater than or equal to the alarm threshold."
+	::= { hwNDStatisticsPerSlotEntry 2 }  
+	
+	hwNDSlotThresholdResumeValue  OBJECT-TYPE
+	   SYNTAX Unsigned32(1..100)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"This object indicates an ND entry clear alarm threshold on a board. An ND entry clear alarm is generated when the ratio of the number of ND entries on a board to the maximum number allowed is less than or equal to the clear alarm threshold."
+	::= { hwNDStatisticsPerSlotEntry 3 }  
+				
+	hwNDSlotDynamicNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Current dynamic ND entries in slot."
+	::= { hwNDStatisticsPerSlotEntry 4 }  
+				
+	hwNDSlotStaticNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Current static ND entries in slot."
+	::= { hwNDStatisticsPerSlotEntry 5 }  									
+				
+	hwNDSlotTotalNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Maximum ND entries number for slot."
+	::= { hwNDStatisticsPerSlotEntry 6 }  
+										
+-- =================================================================
+-- 2th interface nd entries alarm
+-- =================================================================           
+hwNDStatisticsPerIfTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HwNDStatisticsPerIfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This object indicates the threshold of the alarm generated in interface."
+	::= { hwNDObjects 2 }  
+	
+	hwNDStatisticsPerIfEntry  OBJECT-TYPE
+	   SYNTAX HwNDStatisticsPerIfEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This object indicates the threshold of the alarm generated in interface."
+	INDEX {hwNDIntfIndex}
+	::= { hwNDStatisticsPerIfTable 1 }                                                
+									
+	HwNDStatisticsPerIfEntry ::=
+	SEQUENCE {
+		hwNDIntfIndex  Unsigned32 ,		
+		hwNDIntfThresholdExceedValue   Unsigned32 ,
+		hwNDIntfThresholdResumeValue   Unsigned32  ,
+		hwNDIntfDynamicNumber   Unsigned32  ,
+		hwNDIntfStaticNumber   Unsigned32 ,
+		hwNDIntfTotalNumber    Unsigned32				
+	 }      
+
+	hwNDIntfIndex  OBJECT-TYPE
+		SYNTAX Unsigned32(0..4294967294)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The interface of alarm generated."
+	::= { hwNDStatisticsPerIfEntry 1 } 
+   
+	hwNDIntfThresholdExceedValue  OBJECT-TYPE
+	   SYNTAX Unsigned32(1..100)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"This object indicates an ND entry alarm threshold on an interface. An ND entry threshold-exceeding alarm is generated when the ratio of the number of ND entries on an interface to the maximum number allowed is greater than or equal to the alarm threshold."
+	::= { hwNDStatisticsPerIfEntry 2 }  
+	
+	hwNDIntfThresholdResumeValue  OBJECT-TYPE
+	   SYNTAX Unsigned32(1..100)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"This object indicates an ND entry clear alarm threshold on an interface. An ND entry clear alarm is generated when the ratio of the number of ND entries on an interface to the maximum number allowed is less than or equal to the clear alarm threshold."
+	::= { hwNDStatisticsPerIfEntry 3 }  
+				
+	hwNDIntfDynamicNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Current dynamic ND entries in interface."
+	::= { hwNDStatisticsPerIfEntry 4 }  
+				
+	hwNDIntfStaticNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Current static ND entries in interface."
+	::= { hwNDStatisticsPerIfEntry 5 }  									
+				
+	hwNDIntfTotalNumber  OBJECT-TYPE
+	   SYNTAX Unsigned32(0..4294967294)
+	   MAX-ACCESS read-only
+	   STATUS current
+	   DESCRIPTION
+		"Maximum ND entries number for interface."
+	::= { hwNDStatisticsPerIfEntry 6 }  		
+								
+                                                                                          
+--  Notifications(trap) Definitions
+
+    hwNDNotifications OBJECT IDENTIFIER ::= { hwNDMIB 2 } 	
+            
+    hwSlotNDThresholdExceedAlarm NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName, hwNDSlotThresholdExceedValue,hwNDSlotDynamicNumber,hwNDSlotStaticNumber } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the ratio of the number of ND entries on a board to the maximum number of ND entries supported on the board is greater than or equal to the 80% threshold."
+            ::= { hwNDNotifications 1 }    
+			
+    hwSlotNDThresholdResumeAlarm NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName,hwNDSlotThresholdResumeValue,hwNDSlotDynamicNumber,hwNDSlotStaticNumber } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the ratio of the number of ND entries on a board to the maximum number of ND entries supported on the board is less than or equal to the 70% threshold."
+            ::= { hwNDNotifications 2 }    
+			
+    hwInterfaceNDThresholdExceedAlarm NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName,ifDescr,hwNDIntfThresholdExceedValue,hwNDIntfDynamicNumber,hwNDIntfStaticNumber } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that an alarm is generated when the ratio of the number of ND entries on an interface to the maximum number of ND entries supported on the interface is greater than or equal to the 80% threshold."
+            ::= { hwNDNotifications 3 }    
+            
+    hwInterfaceNDThresholdResumeAlarm NOTIFICATION-TYPE
+            OBJECTS { entPhysicalName,ifDescr,hwNDIntfThresholdResumeValue,hwNDIntfDynamicNumber,hwNDIntfStaticNumber } 
+            STATUS current     
+            DESCRIPTION 
+                "This object indicates that a clear alarm is generated when the ratio of the number of ND entries on an interface to the maximum number of ND entries supported on the interface is less than or equal to the 70% threshold."
+            ::= { hwNDNotifications 4 } 
+ 
+-- Conformance information
+
+  hwNDConformance OBJECT IDENTIFIER ::= { hwNDMIB 3 }
+  
+  hwNDGroups OBJECT IDENTIFIER ::= { hwNDConformance 1 }
+  
+  hwNDCompliances OBJECT IDENTIFIER ::= { hwNDConformance 2 }
+
+  hwNDSlotGroup OBJECT-GROUP
+    OBJECTS {
+		hwNDSlotPhysicalIndex,		
+		hwNDSlotThresholdExceedValue,
+		hwNDSlotThresholdResumeValue,
+		hwNDSlotDynamicNumber,
+		hwNDSlotStaticNumber,
+		hwNDSlotTotalNumber	
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for ND threshold alarm in interface."
+    ::= { hwNDGroups 1 }		    	
+
+    hwNDIntfGroup OBJECT-GROUP
+    OBJECTS {
+		hwNDIntfIndex,		
+		hwNDIntfThresholdExceedValue,
+		hwNDIntfThresholdResumeValue,
+		hwNDIntfDynamicNumber,
+		hwNDIntfStaticNumber,
+		hwNDIntfTotalNumber	
+    }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects for ND threshold alarm in slot."
+    ::= { hwNDGroups  2 }	
+     hwNDNotificationsGroup NOTIFICATION-GROUP   
+        NOTIFICATIONS{ hwSlotNDThresholdExceedAlarm, hwSlotNDThresholdResumeAlarm, hwInterfaceNDThresholdExceedAlarm, hwInterfaceNDThresholdResumeAlarm}
+        STATUS current
+        DESCRIPTION
+                 "notification Group."   
+     ::= { hwNDGroups 3 }	
+		
+	hwNDCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "The compliance statement for ND thre."
+    MODULE
+        MANDATORY-GROUPS {
+            hwNDSlotGroup,
+            hwNDIntfGroup
+        }  
+      
+   ::= { hwNDCompliances 1 }                                   
+
+-- =================================================================
+-- units of conformance
+-- ================================================================= 
+
+             
+            
+END

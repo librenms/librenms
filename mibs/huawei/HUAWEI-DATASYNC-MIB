@@ -1,0 +1,398 @@
+--==================================================================
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI DATASYNC MIB
+-- Reference:
+-- Version: V2.02
+-- History:
+-- <author>,  <date>,  <contents>
+-- fengchong   2009-03-17
+-- ==================================================================
+
+-- ==================================================================
+-- 
+-- Variables and types are imported
+--
+-- ==================================================================
+
+    HUAWEI-DATASYNC-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm          
+                FROM HUAWEI-MIB         
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP         
+                FROM SNMPv2-CONF            
+            TimeTicks, Integer32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY, 
+            NOTIFICATION-TYPE           
+                FROM SNMPv2-SMI         
+            DisplayString, RowStatus, TEXTUAL-CONVENTION           
+                FROM SNMPv2-TC;
+    
+        hwDataSync MODULE-IDENTITY 
+            LAST-UPDATED "201507161349Z"        
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                "
+              DESCRIPTION 
+                "Modified hwCfgChgTerminalID."
+                        REVISION "201507161349Z"         
+            DESCRIPTION 
+                "Add hwCfgLastSaveFailNotify ."
+                        REVISION "201409041710Z"               
+            DESCRIPTION 
+                "The MIB module for Data sync between host and netmanager."
+                        REVISION "200903171027Z"        
+            DESCRIPTION 
+                "The initial revision of this MIB module ."
+            ::= { hwDatacomm 191 }
+
+        DateAndTime ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT "2d-1d-1d,1d:1d:1d.1d,1a1d:1d"
+            STATUS       current
+            DESCRIPTION
+            "A date-time specification.
+
+            field  octets  contents                  range
+            -----  ------  --------                  -----
+              1      1-2   year*                     0..65536
+              2       3    month                     1..12
+              3       4    day                       1..31
+              4       5    hour                      0..23
+              5       6    minutes                   0..59
+              6       7    seconds                   0..60
+                           (use 60 for leap-second)
+              7       8    deci-seconds              0..9
+              8       9    direction from UTC        '+' / '-'
+              9      10    hours from UTC*           0..13
+             10      11    minutes from UTC          0..59
+
+            * Notes:
+            - the value of year is in network-byte order
+            - daylight saving time in New Zealand is +13
+
+            For example, Tuesday May 26, 1992 at 1:30:15 PM EDT would be
+            displayed as:
+
+                             1992-5-26,13:30:15.0,-4:0
+            Note that if only local time is known, then timezone
+            information (fields 8-10) is not present."
+            SYNTAX       OCTET STRING (SIZE (8 | 11))
+--
+-- Node definitions
+--
+    
+--  ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ==================================================================  
+        hwDataSyncScalarObjects OBJECT IDENTIFIER ::= { hwDataSync 1 }
+        hwDataSyncTableObjects OBJECT IDENTIFIER ::= { hwDataSync 2 }
+        hwDataSyncNotifications OBJECT IDENTIFIER ::= { hwDataSync 3 }
+        hwDataSyncConformance OBJECT IDENTIFIER ::= { hwDataSync 4 }
+        
+        hwCurrentCfgChgSeqID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the ID of the current configuration change. 
+                The value ranges from 0 to 65535. After the ID of the configuration change reaches
+                the maximum value, the value of the ID starts from 1 again. 
+                After the device is restarted, the value of the ID becomes 0."
+            ::= { hwDataSyncScalarObjects 1 }
+            
+        hwCfgChgSeqIDReveralCount OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the cycle count of the index of configuration change table."
+            ::= { hwDataSyncScalarObjects 2 }            
+         
+         hwCfgChgTableMaxItem OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the maximum number of entries in hwCfgChgTable. "
+            ::= { hwDataSyncScalarObjects 3 }   
+            
+            
+        hwCfgBaselineTime OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..20))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Specifies the time of system confiuration was baseline."
+            ::= { hwDataSyncScalarObjects 4 }
+  
+        hwDataSyncGroups OBJECT IDENTIFIER ::= { hwDataSyncConformance 1 }
+      
+        hwDataSyncScalarObjectsGroup OBJECT-GROUP
+            OBJECTS { hwCurrentCfgChgSeqID, hwCfgChgSeqIDReveralCount, hwCfgChgTableMaxItem, hwCfgBaselineTime}
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on DataSync ScalarObjects Information."
+            ::= { hwDataSyncGroups 1 }          
+        
+        hwCfgChgNotifyGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwCfgChgNotify}
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on Configuration Change Information."
+            ::= { hwDataSyncGroups 2 }        
+
+        hwDataSyncNotifyGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwCfgLastSaveFailNotify }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on synchronization Configuration Notify Information."
+            ::= { hwDataSyncGroups 3 }            
+                  
+        hwDataSyncCompliances OBJECT IDENTIFIER ::= { hwDataSyncConformance 2 }
+       
+        hwDataSyncCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for 
+                entities that support the huawei DataSync MIB."
+            MODULE      -- this module
+            ::= { hwDataSyncCompliances 1 }     
+	    
+        hwCfgChgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCfgChgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to record configuration changes. 
+                In this table, you can find the configuration change based on the specific index."
+            ::= { hwDataSyncTableObjects 1 }
+
+
+        hwCfgChgEntry OBJECT-TYPE
+            SYNTAX HwCfgChgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwCfgChgTable."
+            INDEX { hwCfgChgSeqID }
+            ::= { hwCfgChgTable 1 }
+
+        
+        HwCfgChgEntry::=
+            SEQUENCE { 
+                hwCfgChgSeqID
+                    Integer32,
+                hwCfgChgTime
+                    DateAndTime,
+                hwCfgChgTerminalType
+                    INTEGER,
+                hwCfgChgTerminalID
+                    Integer32,
+                hwCfgChgType
+                    INTEGER,
+                hwCfgChgViewName
+                    OCTET STRING,
+                hwCfgChgCmdID
+                    Integer32,
+                hwCfgChgDetailInfo
+                    OCTET STRING
+             }
+
+
+        hwCfgChgSeqID OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the configuration change ID. 
+                When configuration is changed, the sequence id will plus 1."
+            ::= { hwCfgChgEntry 1 }
+        
+        hwCfgChgTime OBJECT-TYPE
+            SYNTAX DateAndTime 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration change time."
+            ::= { hwCfgChgEntry 2 }
+
+        hwCfgChgTerminalType OBJECT-TYPE
+            SYNTAX INTEGER {snmp(1),telnet(2),netconf(3)} 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of the terminal."
+            ::= { hwCfgChgEntry 3 }
+         
+        hwCfgChgTerminalID OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647) 
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the terminal ID."
+            ::= { hwCfgChgEntry 4 }           
+ 
+        hwCfgChgType OBJECT-TYPE
+            SYNTAX INTEGER {create(1),modify(2),delete(3)}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the configuration change type."
+            ::= { hwCfgChgEntry 5 }  
+            
+        hwCfgChgViewName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the view in which the configuration change occurs.
+                For the command operation, the object is the name of the view in which the command is run.
+                For the SNMP operation, the object is the OID of the MIB table or the scalar object."
+            ::= { hwCfgChgEntry 6 }  
+            
+
+        hwCfgChgCmdID OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the ID of the configuration change command.
+                For the SNMP operation, the value is 0."
+            ::= { hwCfgChgEntry 7 }  
+        
+        hwCfgChgDetailInfo OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates detailed configuration change information.
+                For the command operation, the object is the command line.
+                For the SNMP operation, the object is the index of the MIB table.
+                When there are multiple indexes, the format of index1.index2.index3 is adopted."
+            ::= { hwCfgChgEntry 8 }     
+            
+        hwCollectTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwCollectEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to enable the NMS to send the collecting script to the device to trigger the collection, 
+                and then monitor the collection status."
+            ::= { hwDataSyncTableObjects 2 }
+
+        hwCollectEntry OBJECT-TYPE
+            SYNTAX HwCollectEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwCollectTable."
+            INDEX { hwCollectIndex }
+            ::= { hwCollectTable 1 }        
+        
+        HwCollectEntry ::=
+            SEQUENCE { 
+                    hwCollectIndex
+                        Integer32,
+                    hwCollectNetManageId
+                        Integer32,
+                    hwCollectOperation
+                        INTEGER,
+                    hwCollectInScriptFile
+                        OCTET STRING,
+                    hwCollectInResultFile
+                        OCTET STRING,
+                    hwCollectState
+                        INTEGER,
+                    hwCollectRowStatus
+                        RowStatus
+                     }  
+
+        hwCollectIndex OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the collection index."
+            ::= { hwCollectEntry 1 }    
+
+        hwCollectNetManageId OBJECT-TYPE
+            SYNTAX Integer32 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the NMS ID."
+            ::= { hwCollectEntry 2 }               
+
+        hwCollectOperation OBJECT-TYPE
+            SYNTAX INTEGER {begin(1),stop(2)}
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the instruction for the collection operation.
+                Default value is stop." 
+            ::= { hwCollectEntry 3 } 
+            
+        hwCollectInScriptFile OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the script file. T
+                he length of the file name ranges from 1 character to 255 characters."  
+            ::= { hwCollectEntry 4 } 
+            
+        hwCollectInResultFile OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the result file. 
+                The length of the file name ranges from 1 character to 255 characters."
+            ::= { hwCollectEntry 5 } 
+              
+
+        hwCollectState OBJECT-TYPE
+            SYNTAX INTEGER {idle(1),collecting(2)}
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the collection status."
+            ::= { hwCollectEntry 6 } 
+ 
+         hwCollectRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status."
+            ::= { hwCollectEntry 7 }     
+        
+        hwCfgChgNotify NOTIFICATION-TYPE
+        OBJECTS {hwCurrentCfgChgSeqID, hwCfgChgSeqIDReveralCount, hwCfgChgTableMaxItem, hwCfgBaselineTime}
+        STATUS current
+        DESCRIPTION 
+            "This trap is generated when a configuration change occurs 
+            on the device within a specified period."
+        ::= { hwDataSyncNotifications 1 }      
+        
+        hwCfgLastSaveFailNotify NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "The last save operation failed, please check the configuration."
+        ::= { hwDataSyncNotifications 2 } 
+
+                    
+    END
+
+--
+-- HUAWEI-BULKSTAT-MIB.mib
+--

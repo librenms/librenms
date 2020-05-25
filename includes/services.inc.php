@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Device;
+use LibreNMS\Config;
+use LibreNMS\RRD\RrdDefinition;
+
 function get_service_status($device = null)
 {
     $sql_query = "SELECT service_status, count(service_status) as count FROM services WHERE";
@@ -32,7 +36,7 @@ function get_service_status($device = null)
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ignore = 0)
+function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ignore = 0, $disabled = 0)
 {
 
     if (!is_array($device)) {
@@ -40,10 +44,10 @@ function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ign
     }
 
     if (empty($ip)) {
-        $ip = $device['hostname'];
+        $ip = Device::pollerTarget($device['hostname']);
     }
 
-    $insert = array('device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked');
+    $insert = array('device_id' => $device['device_id'], 'service_ip' => $ip, 'service_type' => $type, 'service_changed' => array('UNIX_TIMESTAMP(NOW())'), 'service_desc' => $desc, 'service_param' => $param, 'service_ignore' => $ignore, 'service_status' => 3, 'service_message' => 'Service not yet checked', 'service_ds' => '{}', 'service_disabled' => $disabled);
     return dbInsert($insert, 'services');
 }
 
@@ -105,7 +109,7 @@ function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', array($service, $device['device_id']))) {
         add_service($device, $service, "(Auto discovered) $service");
-        log_event('Autodiscovered service: type '.mres($service), $device, 'service');
+        log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
         echo '+';
     }
     echo "$service ";
@@ -113,21 +117,19 @@ function discover_service($device, $service)
 
 function poll_service($service)
 {
-    global $config;
-
     $update = array();
     $old_status = $service['service_status'];
     $check_cmd = "";
 
     // if we have a script for this check, use it.
-    $check_script = $config['install_dir'].'/includes/services/check_'.strtolower($service['service_type']).'.inc.php';
+    $check_script = Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
     if (is_file($check_script)) {
         include $check_script;
     }
 
     // If we do not have a cmd from the check script, build one.
     if ($check_cmd == "") {
-        $check_cmd = $config['nagios_plugins'] . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
+        $check_cmd = Config::get('nagios_plugins') . "/check_" . $service['service_type'] . " -H " . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
         $check_cmd .= " " . $service['service_param'];
     }
 
@@ -135,9 +137,6 @@ function poll_service($service)
     // Some debugging
     d_echo("\nNagios Service - $service_id\n");
     // the check_service function runs $check_cmd through escapeshellcmd, so
-    // echo the command as it will be run after being escaped
-    $escaped_check_cmd = escapeshellcmd($check_cmd);
-    d_echo("Request:  $escaped_check_cmd\n");
     list($new_status, $msg, $perf) = check_service($check_cmd);
     d_echo("Response: $msg\n");
 
@@ -152,19 +151,19 @@ function poll_service($service)
             $DS[$k] = $v['uom'];
         }
         d_echo("Service DS: "._json_encode($DS)."\n");
-        if ($service['service_ds'] == "") {
+        if (($service['service_ds'] == "{}") || ($service['service_ds'] == "")) {
             $update['service_ds'] = json_encode($DS);
         }
 
         // rrd definition
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
         foreach ($perf as $k => $v) {
             if (($v['uom'] == 'c') && !(preg_match('/[Uu]ptime/', $k))) {
                 // This is a counter, create the DS as such
-                $rrd_def[] = "DS:".$k.":COUNTER:600:0:U";
+                $rrd_def->addDataset($k, 'COUNTER', 0);
             } else {
                 // Not a counter, must be a gauge
-                $rrd_def[] = "DS:".$k.":GAUGE:600:0:U";
+                $rrd_def->addDataset($k, 'GAUGE', 0);
             }
         }
 
@@ -184,6 +183,19 @@ function poll_service($service)
         $update['service_changed'] = time();
         $update['service_status'] = $new_status;
         $update['service_message'] = $msg;
+
+        // TODO: Put the 3 lines below in a function getStatus(int) ?
+        $status_text = array(0 => 'OK', 1 => 'Warning', 3 => 'Unknown');
+        $old_status_text = isset($status_text[$old_status]) ? $status_text[$old_status] : 'Critical';
+        $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
+
+        log_event(
+            "Service '{$service['service_type']}' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
+            $service['device_id'],
+            'service',
+            4,
+            $service['service_id']
+        );
     }
 
     if ($service['service_message'] != $msg) {
@@ -206,10 +218,16 @@ function check_service($command)
     $valid_uom = array ('us', 'ms', 'KB', 'MB', 'GB', 'TB', 'c', 's', '%', 'B');
 
     // Make our command safe.
-    $command = 'LC_NUMERIC="C" '. escapeshellcmd($command);
+    $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($command));
+    $safe_command = implode(' ', array_map(function ($part) {
+        $trimmed = preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
+        return escapeshellarg($trimmed);
+    }, $parts));
+
+    d_echo("Request:  $safe_command\n");
 
     // Run the command and return its response.
-    exec($command, $response_array, $status);
+    exec('LC_NUMERIC="C" ' . $safe_command, $response_array, $status);
 
     // exec returns an array, lets implode it back to a string.
     $response_string = implode("\n", $response_array);
@@ -298,4 +316,20 @@ function check_service($command)
     }
 
     return array ($status, $response, $metrics);
+}
+
+/**
+ * List all available services from nagios plugins directory
+ *
+ * @return array
+ */
+function list_available_services()
+{
+    $services = array();
+    foreach (scandir(Config::get('nagios_plugins')) as $file) {
+        if (substr($file, 0, 6) === 'check_') {
+            $services[] = substr($file, 6);
+        }
+    }
+    return $services;
 }

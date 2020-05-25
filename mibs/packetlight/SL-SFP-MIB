@@ -1,0 +1,1909 @@
+-- *****************************************************************
+-- SFP MIB
+-- *****************************************************************
+
+SL-SFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, Integer32, TimeTicks
+					 			     	FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	TimeStamp					  		FROM SNMPv2-TC
+    SnmpAdminString						FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	CleiCode							FROM SL-ENTITY-MIB
+	sitelight				      		FROM SL-NE-MIB;
+
+slSfp MODULE-IDENTITY
+	LAST-UPDATED "200501250000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the SFP Modules"
+	::= { sitelight 10 }
+
+--	The SFP MIB consists of the following groups:
+--		SFP Configuration Table
+--		SFP Diagnostic Table
+--		SFP Traps
+
+sfpConf		OBJECT IDENTIFIER ::= { slSfp 1 }
+sfpDiag		OBJECT IDENTIFIER ::= { slSfp 2 }
+sfpTraps	OBJECT IDENTIFIER ::= { slSfp 3 }
+
+-- Textual Conventions
+
+
+
+-- ----------------------------------------------------
+--
+-- The SFP Configuration Table
+--
+-- ----------------------------------------------------
+
+sfpConfigTable	 OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SfpConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The SFP configuration table. 
+		The table defines the configuration of the SFP-1310 and
+		the SFP-WDM modules."
+	::= { sfpConf 1 }
+
+sfpConfigEntry OBJECT-TYPE
+	SYNTAX  SfpConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the SFP configuration table.
+		The index to this table is the same as the ifIndex of the SFP.
+		The SFP Config Table contain and entry for each
+		module of a type SFP."
+	INDEX   { sfpConfigInterface }
+	::= { sfpConfigTable 1 }
+
+SfpConfigEntry ::=
+	SEQUENCE {
+		sfpConfigInterface				InterfaceIndex,
+
+		-- Base ID Fields
+		sfpConfigXcvrId					INTEGER,
+		sfpConfig1310ExtXcvrId			INTEGER,	-- 1310
+		sfpConfigWdmExtXcvrId			INTEGER,	-- 15xy
+		sfpConfigConnectorCode			INTEGER,
+		sfpConfigInfibandCompliance		INTEGER,
+		sfpConfigEsconCompliance		INTEGER,
+		sfpConfigSonetCompliance		INTEGER,
+		sfpConfigGbeCompliance			INTEGER,
+		sfpConfigFcCompliance			INTEGER,
+		sfpConfigEncodingCode			INTEGER,
+		sfpConfigNominalBitRate			INTEGER,
+		sfpConfigLength9mKm				INTEGER,
+		sfpConfigLength9m100m			INTEGER,	-- 1310
+		sfpConfigLength50m10m			INTEGER,	-- 1310
+		sfpConfigLength62m10m			INTEGER,	-- 1310
+		sfpConfigLengthCopper1m			INTEGER,	-- 1310
+		sfpConfigMaxTemp				INTEGER,  	-- 15xy 
+		sfpConfigMinTemp				INTEGER,	-- 15xy 
+		sfpConfigMaxSupplyCurrent		INTEGER,	-- 15xy 
+		sfpConfigChannelSpacing			INTEGER,	-- 15xy 
+		sfpConfigVendorName				SnmpAdminString,
+		sfpConfigOptionalWdm			INTEGER,	-- 15xy
+		sfpConfigVendorOUI				INTEGER,
+		sfpConfigVendorPN				SnmpAdminString,
+		sfpConfigVendorRev				SnmpAdminString,
+		sfpConfigWaveLength				INTEGER,   -- 15xy only
+
+		-- Extended ID Fields
+		sfpConfigExtendedOptions		INTEGER,
+		sfpConfigMaxBitRate				INTEGER,
+		sfpConfigMinBitRate				INTEGER,
+		sfpConfigVendorSN				SnmpAdminString,
+		sfpConfigDateCode				SnmpAdminString,
+		sfpConfigDiagnosticMonitoring	INTEGER,
+		sfpConfigEnhanceOptions			INTEGER,
+		sfpConfig8472Compliance			INTEGER,
+
+		sfpConfigTunableWaveLength		INTEGER,	-- 15xy
+		sfpConfigVoaControl				INTEGER,	-- 15xy
+		sfpConfigVdtControl				INTEGER,	-- 15xy
+		sfpConfigPilotToneModulation	INTEGER,		-- 15xy
+
+		-- Non standard Fields
+		sfpConfigCleiCode				DisplayString,
+		
+		-- XFP standard Fields
+		sfpConfigXfpExtXcvrId			INTEGER,
+		sfpConfigXfpEncodingCode		INTEGER,
+		sfpConfigXfpMinBitRate			INTEGER,
+		sfpConfigXfpMaxBitRate			INTEGER,
+		sfpConfig10GSonetCompliance		INTEGER,
+		sfpConfig10GbeCompliance		INTEGER,
+		sfpConfig10GFcCompliance		INTEGER,
+		sfpConfigXfpDeviceTech			INTEGER,
+		
+		-- XFP SFP-8477 Extended Fields (Tuning and Dither)
+		sfpConfigXfpTuningSupported			INTEGER,
+		sfpConfigXfpDesiredWl				INTEGER,
+		sfpConfigXfpWlError					INTEGER,
+		sfpConfigXfpDesiredChannel			INTEGER,
+		sfpConfigXfpDesiredFreq				INTEGER,
+		sfpConfigXfpFreqError				INTEGER,
+		sfpConfigXfpDitherSupported			TruthValue,
+		sfpConfigXfpDitherAdmin				INTEGER,
+		sfpConfigXfpCapFreqFirstThz			INTEGER,
+		sfpConfigXfpCapFreqFirst10Ghz		INTEGER,
+		sfpConfigXfpCapFreqLastThz			INTEGER,
+		sfpConfigXfpCapFreqLast10Ghz		INTEGER,
+		sfpConfigXfpCapMaxSpacing10Ghz		INTEGER
+	}
+
+sfpConfigInterface OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The Interface Index of the SFP (type=196)."
+	::= { sfpConfigEntry 1 }
+
+-- Base ID Fields
+
+sfpConfigXcvrId OBJECT-TYPE
+	SYNTAX         INTEGER {
+		unknone(0),		-- Unknown or unspecified
+		gbic(1),		-- GBIC
+		module(2),		-- Module/connector soldered to motherboard
+		sfp1310(3),		-- 1310 SFP
+		xfp(6),			-- XFP
+		sfpDwdm(11)		-- DWDM SFP
+	}
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The identifier value specifies the physical device described by the serial information.
+		This value shall be included in the serial data. The defined identifier values are:
+			00h - Unknown or unspecified
+			01h - GBIC
+			02h - Module/connector soldered to motherboard
+			03h - 1310 SFP 
+			04-0Ah - Reserved for XFP and other platforms
+			0Bh - DWDM SFP 
+			80-FFh - Vendor specific."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.2, 
+    			SFP-8472 Table 3.1 and 3.2"
+	::= { sfpConfigEntry 2 }
+
+sfpConfig1310ExtXcvrId OBJECT-TYPE
+	SYNTAX         INTEGER {
+		modDef0(0),		-- GBIC definition is not specified or not compliant with a defined MOD_DEF
+		modDef1(1),		-- GBIC is compliant with MOD_DEF 1
+		modDef2(2),		-- GBIC is compliant with MOD_DEF 2
+		modDef3(3),		-- GBIC is compliant with MOD_DEF 3
+		modDef4(4),		-- GBIC/SFP function is defined by serial ID only
+		modDef5(5),		-- GBIC is compliant with MOD_DEF 5
+		modDef6(6),		-- GBIC is compliant with MOD_DEF 6
+		modDef7(7)		-- GBIC is compliant with MOD_DEF 7
+	}
+	MAX-ACCESS  read-only
+	STATUS  	current          -- 1310
+	DESCRIPTION
+		"The extended identifier value provides additional information about the 1310 transceiver.
+		 The defined identifier values are:
+			00h GBIC definition is not specified or the GBIC
+					definition is not compliant with a defined
+					MOD_DEF. See product specification for details.
+			01h GBIC is compliant with MOD_DEF 1
+			02h GBIC is compliant with MOD_DEF 2
+			03h GBIC is compliant with MOD_DEF 3
+			04h GBIC/SFP function is defined by serial ID only
+			05h GBIC is compliant with MOD_DEF 5
+			06h GBIC is compliant with MOD_DEF 6
+			07h GBIC is compliant with MOD_DEF 7
+			08-FFh Reserved"
+    REFERENCE   "SFP-8472 Table 3.1 and 3.3"
+	::= { sfpConfigEntry 3 }
+
+sfpConfigWdmExtXcvrId OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current          -- 15xy
+	DESCRIPTION
+		"This field is used to distinguish between different types of DWDM transceivers and
+		different power and environmental classes. The defined identifier values are:
+			Bits 7..6: Reserved
+			Bits 5..4: Class of WDM
+				00: no WDM
+				01: CWDM
+				10: DWDM
+			Bits 3..2: Class of power
+				00: P<1W
+				01: [1W,1.5W]
+				10: P>1.5W
+				11: reserved
+			Bits 3..2: Class of temp
+				00: [-5, 70C]
+				01: [1W,1.5W]
+				10: reserved
+				11: Defined by Bytes 15 - 16."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.3"
+	::= { sfpConfigEntry 4 }
+
+sfpConfigConnectorCode OBJECT-TYPE
+	SYNTAX         INTEGER {
+		conUnknown(0),			-- Unknown or unspecified
+		conSc(1),				-- SC
+		conFcCopper1(2),		-- Fibre Channel Style 1 copper connector
+		conFcCopper2(3),		-- Fibre Channel Style 2 copper connector
+		conBncTnc(4),			-- BNC/TNC
+		conFcCoaxial(5),		-- Fibre Channel coaxial headers
+		conFiberJack(6),		-- FiberJack
+		conLc(7),				-- LC
+		conMtRj(8),				-- MT-RJ
+		conMu(9),				-- MU
+		comSg(10),				-- SG
+		conOpticalPigtail(11),	-- Optical pigtail
+		conHssdc2(32),			-- HSSDC II
+		conCopperPigtail(33)	-- Optical pigtail
+	}
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The identifier value specifies the physical device described by the serial information.
+		This value shall be included in the serial data. The defined identifier values are:
+			00h - Unknown or unspecified
+			01h - SC
+			02h - Fibre Channel Style 1 copper connector
+			03h - Fibre Channel Style 2 copper connector 
+			04h - BNC/TNC
+			05h - Fibre Channel coaxial headers 
+			06h - FiberJack 
+			07h - LC 
+			08h - MT-RJ 
+			09h - MU 
+			0Ah - SG 
+			0Bh - Optical pigtail
+			0Ch - 1Fh - Reserved 
+			20h - HSSDC II 
+			21h - Copper Pigtail
+			22h - 7Fh - Reserved 
+			80-FFh - Vendor specific."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.4, 
+    			SFP-8472 Table 3.1 and 3.4."
+	::= { sfpConfigEntry 5 }
+
+sfpConfigInfibandCompliance OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the Infiband interfaces 
+		that are supported by the transceiver. The defined identifier values are:
+			Bits 0: 1X SX
+			Bits 1: 1X LX
+			Bits 2: 1X Copper Active
+			Bits 3: 1X Copper Passive."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.5, 
+    			SFP-8472 Table 3.1 and 3.5."
+	::= { sfpConfigEntry 6 }
+
+sfpConfigEsconCompliance OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only		-- 1310
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the ESCON interfaces 
+		that are supported by the transceiver. The defined identifier values are:
+			Bits 0: ESCON MMF, 1310nm LED
+			Bits 1: ESCON SMF, 1310nm Laser"
+    REFERENCE   "SFP-8472 Table 3.1 and 3.5."
+	::= { sfpConfigEntry 7 }
+
+sfpConfigSonetCompliance OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the SONET interfaces 
+		that are supported by the transceiver. The defined identifier values are:
+			Bits 0: SONET reach specifier bit 1
+			Bits 1: SONET reach specifier bit 2
+			Where: 
+				00 speed OC-3/OC-12/OC-48 Short        reach - SONET SR compliant
+				10 speed OC-3/OC-12/OC-48 Short        reach - SONET SR-1 compliant
+				10 speed OC-3/OC-12/OC-48 Intermediate reach - SONET IR-1 compliant
+				01 speed OC-3/OC-12/OC-48 Intermediate reach - SONET IR-2 compliant
+				10 speed OC-3/OC-12/OC-48 Long         reach - SONET LR-1 compliant
+				01 speed OC-3/OC-12/OC-48 Long         reach - SONET LR-2 compliant
+				11 speed OC-3/OC-12/OC-48 Long         reach - SONET LR-3 compliant
+			Bits 2: OC-48, single mode long reach
+			Bits 3: OC-48, single mode inter. reach
+			Bits 4: OC-48, multi-mode short reach
+			Bits 5: OC-12, single mode long reach
+			Bits 6: OC-12, single mode inter. reach
+			Bits 7: OC-12 multi-mode short reach
+			Bits 8: OC-3, single mode long reach
+			Bits 9: OC-3, single mode inter. reach
+			Bits 10: OC-3, multi-mode short reach."
+    REFERENCE   "DWDM MSA Table 2.3.1, 2.3.5 and 2.3.5a, 
+    			SFP-8472 Table 3.1, 3.5 and 3.5a."
+	::= { sfpConfigEntry 8 }
+
+sfpConfigGbeCompliance OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the Infiband interfaces 
+		that are supported by the transceiver. The defined identifier values are:
+			Bits 0: 1000BASE-T
+			Bits 1: 1000BASE-CX
+			Bits 2: 1000BASE-LX
+			Bits 3: 1000BASE-SX
+			Bits 4: 100BASE-LX/LX10        -- 1310
+			Bits 5: 100BASE-FX             -- 1310
+			Bits 6: BASE-BX10              -- 1310
+			Bits 7: BASE-PX."              -- 1310
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.5, 
+    			SFP-8472 Table 3.1 and 3.5"
+	::= { sfpConfigEntry 9 }
+
+sfpConfigFcCompliance OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the FC interfaces 
+		that are supported by the transceiver. The defined identifier values are:
+			- Fibre Channel link length:
+			Bits  0: very long distance (V)
+			Bits  1: short distance (S)
+			Bits  2: intermediate distance (I)
+			Bits  3: long distance (L)
+			- Fibre Channel transmitter technology
+			Bits  4: Longwave laser (LC)
+			Bits  5: Electrical inter-enclosure (EL)
+			Bits  6: Electrical intra-enclosure (EL)
+			Bits  7: Shortwave laser w/o OFC (SN)
+			Bits  8: Shortwave laser w/ OFC (SL)
+			Bits  9: Longwave laser (LL)
+			Bits 10: Copper Active          -- 1310
+			Bits 11: Copper Passive         -- 1310
+			- Fibre Channel transmission media
+			Bits 12: Twin Axial Pair (TW)
+			Bits 13: Shielded Twisted Pair (TP)
+			Bits 14: Miniature Coax (MI)
+			Bits 15: Video Coax (TV)
+			Bits 16: Multi-mode, 62.5m (M6)
+			Bits 17: Multi-mode, 50 m (M5)
+			Bits 18: Single Mode (SM)
+			- Fibre Channel speed
+			Bits 19: 800 MBytes/Sec          -- 1310
+			Bits 20: 400 MBytes/Sec
+			Bits 21: 200 MBytes./Sec
+			Bits 22: 100 MBytes/Sec."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.5,
+    			SFP-8472 Table 3.1 and 3.5"
+	::= { sfpConfigEntry 10 }
+
+sfpConfigEncodingCode OBJECT-TYPE
+	SYNTAX         INTEGER {
+		encUnspecified(0),			-- Unspecified
+		enc8B10B(1),			-- 8B10B
+		enc4B5B(2),				-- 4B5B
+		encNrz(3),				-- NRZ
+		encManchester(4),		-- Manchester
+		encSonet(5),			-- SONET Scrambled
+		enc64B66B(6)			-- 64B/66B
+	}
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The encoding value indicates the serial encoding mechanism that is the 
+		nominal design target of the particular transceiver. 
+		The value shall be contained in the serial data. 
+		The	defined encoding values are:
+			00h: Unspecified
+			01h: 8B10B
+			02h: 4B5B
+			03h: NRZ
+			04h: Manchester
+			05h: SONET Scrambled
+			06h -FFh: Reserved."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.6,
+    			SFP-8472 Table 3.1 and 3.6"
+	::= { sfpConfigEntry 11 }
+
+sfpConfigNominalBitRate OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The nominal bit rate (BR, nominal) is specified in units of 100 Megabits 
+		per second, rounded off to the nearest 100 Megabits per second. 
+		The bit rate includes those bits necessary to encode and delimit the 
+		signal as well as those bits carrying data information. 
+		A value of 0 indicates that the bit rate is not specified and must be
+		determined from the transceiver technology. 
+		The actual information transfer rate will depend on the encoding of the data, 
+		as defined by the encoding value."
+    REFERENCE   "DWDM MSA Table 2.3.1."
+	::= { sfpConfigEntry 12 }
+
+sfpConfigLength9mKm OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Addition to EEPROM data from original GBIC definition. 
+		This value specifies the link length that is supported by the transceiver while 
+		operating in compliance with the applicable standards using single mode fiber. 
+		A value of zero means that the transceiver does not support single mode 
+		fiber or that the length information must be determined from the transceiver 
+		technology."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 13 }
+
+sfpConfigLength9m100m OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current      -- 1310
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver 
+		while operating in compliance with the applicable standards using 
+		single mode fiber. 
+		The value is in units of 100 meters. A value of 255 means that the transceiver 
+		supports a link length greater than 25.4 km.
+		A value of zero means that the transceiver does not support single mode 
+		fiber or that the length information must be determined from the transceiver 
+		technology."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 14 }
+
+sfpConfigLength50m10m OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current      -- 1310
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver 
+		while operating in compliance with the applicable standards using 50 micron 
+		multi-mode fiber. 
+		The value is in units of 10 meters. A value of 255 means that the transceiver 
+		supports a link length greater than 2.54 km.
+		A value of zero means that the transceiver does not support 50 micron 
+		multimode fiber or that the length information must be determined from the 
+		transceiver technology."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 15 }
+
+sfpConfigLength62m10m OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current      -- 1310
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver 
+		while operating in compliance with the applicable standards using 62.5 micron 
+		multi-mode fiber. 
+		The value is in units of 10 meters. A value of 255 means that the transceiver 
+		supports a link length greater than 2.54 km.
+		A value of zero means that the transceiver does not support 50 micron 
+		multimode fiber or that the length information must be determined from the 
+		transceiver technology.
+		It is common for the transceiver to support both 50 micron and 62.5 micron 
+		fiber."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 16 }
+
+sfpConfigLengthCopper1m OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current      -- 1310
+	DESCRIPTION
+		"This value specifies the link length that is supported by the transceiver 
+		while operating in compliance with the applicable standards using copper cable. 
+		The value is in units of 1 meter. A value of 255 means that the transceiver 
+		supports a link length greater than 254 meters.
+		A value of zero means that the transceiver does not support copper cables 
+		or that the length information must be determined from the 
+		transceiver technology."
+    REFERENCE   "SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 17 }
+
+sfpConfigMaxTemp OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current		-- 15xy
+	DESCRIPTION
+		"This field defines the maximum operating case temperature the module is 
+		rated for. The maximum case temperature is encoded as a signed two’s 
+		complement value in ºC, yielding a total range of –128C to +127ºC. 
+		This field should be used even if a standard operating temperature class 
+		is indicated in the Extended Indentifier Byte (Byte 1)."
+    REFERENCE   "DWDM MSA Table 2.3.1."
+	::= { sfpConfigEntry 18 }
+
+sfpConfigMinTemp OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current		-- 15xy
+	DESCRIPTION
+		"This field defines the minimum operating case temperature the module is 
+		rated for. The maximum case temperature is encoded as a signed two’s 
+		complement value in ºC, yielding a total range of –128C to +127ºC. 
+		This field should be used even if a standard operating temperature class 
+		is indicated in the Extended Indentifier Byte."
+    REFERENCE   "DWDM MSA Table 2.3.1."
+	::= { sfpConfigEntry 19 }
+
+sfpConfigMaxSupplyCurrent OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current		-- 15xy
+	DESCRIPTION
+		"This field defines the maximum supply current the module will consume 
+		under worst case conditions. The maximum current is the byte value * 4mA."
+    REFERENCE   "DWDM MSA Table 2.3.1."
+	::= { sfpConfigEntry 20 }
+
+sfpConfigChannelSpacing OBJECT-TYPE
+	SYNTAX  	INTEGER   
+	MAX-ACCESS  read-only
+	STATUS  	current		-- 15xy
+	DESCRIPTION
+		"In the case of SFP: 
+		This bit field value identifies the densest channel spacing 
+		the module is compatible with and the number of channels over which the 
+		module may be tuned by user command. 
+		If not tunable, the number of channels is entered as 1.
+		The bit fields are:
+		Bits 7..6: Channel Spacing
+			00: 200 GHz (DWDM)
+			01: 100 GHz (DWDM)
+			10:  50 Ghz (DWDM)
+			11: Reserved
+		Bits 5..0: Number of channels (1 – 63).
+		In the case of XFP:
+		The value of this field is equal to the guaranteed range of laser 
+		wavelength (+/- value) from Nominal wavelength.
+		(Wavelength Tol. = value/200 in nm)"
+    REFERENCE   "DWDM MSA Table 2.3.1 and Table 2.3.7. XFP INF-8077i Section 5.34."
+	::= { sfpConfigEntry 21 }
+
+sfpConfigVendorName OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The vendor name is a 16 character field that contains ASCII characters, 
+		left-aligned and padded on the right with ASCII spaces (20h). 
+		The vendor name shall be the full name of the corporation, 
+		a commonly accepted abbreviation of the name of the corporation, 
+		the SCSI company code for the corporation, or the stock exchange code 
+		for the corporation.
+		At least one of the vendor name or the vendor OUI fields shall contain 
+		valid serial data."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 22 }
+
+sfpConfigOptionalWdm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"The bits in the option field shall specify the options implemented 
+		in the transceiver. The following bits are defined:
+            Bits 7: Optional Interrupt Pin Functionality Supported (1 if supported)
+            Bits 6..4: Pilot Tone Functionality
+				000b: No Pilot Tone Functionality
+				001b: Pilot Tone Detection Only
+				010b: Pilot Tone Injection Only
+				011b: Pilot Tone Injection and Detection
+				100b: Enhanched Pilot Tone Functionality
+				101b-111b: Reserved
+			Bits 3: Variable Optical Attenuator Implemented (1 if implemented)
+			Bits 2: Extended Transmit Power Monitoring
+				0: Default (SFF-8472) TX Power Monitoring
+				1: Extended TX Power Monitoring (+18.2 dBm max)
+			Bits 1: Wavelength Monitor Type in A2 Byte 106-107
+				0: Monitor is Wavelength
+				1: Monitor is Laser Temperature
+			Bits 0: Variable Decision Threshold (1 if implemented)"
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.8."
+	::= { sfpConfigEntry 23 }
+
+sfpConfigVendorOUI OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The vendor organizationally unique identifier field (vendor OUI) 
+		is a 3-byte field that contains the IEEE Company Identifier for the 
+		vendor. A value of all zero in the 3-byte field indicates that 
+		the Vendor OUI is unspecified."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 24 }
+
+sfpConfigVendorPN OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The vendor part number (vendor PN) is a 16-byte field that contains 
+		ASCII characters, left-aligned and padded on the right with ASCII 
+		spaces (20h), defining the vendor part number or product name. 
+		A value of all zero in the 16-byte field indicates that the
+		vendor PN is unspecified."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 25 }
+
+sfpConfigVendorRev OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE (0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The vendor revision number (vendor rev) is a 4-byte field that 
+		contains ASCII characters, left-aligned and padded on the right with 
+		ASCII spaces (20h), defining the vendor’s product revision number. 
+		A value of all zero in the 4-byte field indicates that
+		the vendor PN is unspecified."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 26 }
+
+sfpConfigWaveLength OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"In the case of DWDM:
+		Nominal transmitter output wavelength in units of 0.01nm.
+		As an example, a wavelength of 1550.51nm would be encoded as: 155051.
+		In the case of 1310:
+		The laser wavelength is equal to the the integer value in nm with 00 at
+		the end.
+		As an example, a wavelength of 1310 would be encoded as: 131000."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 27 }
+
+-- Extended ID Fields
+
+sfpConfigExtendedOptions OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Specify the bitmap options implemented in the transceiver as described in.
+		The bits definition is:
+			5 RATE_SELECT is implemented
+				NOTE: Lack of implemention does not indicate lack of
+				simultaneous compliance with multiple standard rates.
+				Compliance with particular standards should be determined
+				from Transceiver Code.
+			4 TX_DISABLE is implemented and disables the serial output.
+			3 TX_FAULT signal implemented. (See SFP MSA)
+			2 Loss of Signal implemented, signal inverted from standard
+				definition in SFP MSA.
+				NOTE: This is not standard SFP/GBIC behavior and should
+				be avoided, since non-interoperable behavior results.
+			1 Loss of Signal implemented, signal as defined in SFP MSA."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.9, SFP-8472 Table 3.1 and 3.7."
+	::= { sfpConfigEntry 28 }
+
+sfpConfigMaxBitRate OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The upper bit rate limit at which the transceiver will still meet its 
+		specifications (BR, max) is specified in units of 1% above the nominal 
+		bit rate. 
+		A value of zero indicates that this field is not specified."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 29 }
+
+sfpConfigMinBitRate OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The lower bit rate limit at which the transceiver will still meet its 
+		specifications (BR, min) is specified in units of 1% below the nominal 
+		bit rate. 
+		A value of zero indicates that this field is not specified."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 30 }
+
+sfpConfigVendorSN OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE (0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The vendor serial number (vendor SN) is a 16 character field that 
+		contains ASCII characters, left-aligned and padded on the right with 
+		ASCII spaces (20h), defining thevendor’s serial number for the transceiver. 
+		A value of all zero in the 16-byte field indicates that the vendor PN is 
+		unspecified."
+    REFERENCE   "DWDM MSA Table 2.3.1, SFP-8472 Table 3.1."
+	::= { sfpConfigEntry 31 }
+
+sfpConfigDateCode OBJECT-TYPE
+    SYNTAX      SnmpAdminString  (SIZE (6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The date code is an 6-byte field that contains the vendor’s date 
+		code in ASCII characters. The date code is mandatory. 
+		The date code shall be in the format: <yy><mm><dd>."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.10, SFP-8472 Table 3.1 and 3.8."
+	::= { sfpConfigEntry 32 }
+
+sfpConfigDiagnosticMonitoring OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"A field with 8 single bit indicators which describe the
+		optional digital diagnostic features implemented in the transceiver. 
+		Since transceivers will not necessarily implement all optional 
+		features described in this document, the “Enhanced Options” bit field 
+		allows the host system to determine which functions are
+		available over the 2 wire serial bus.
+		The bits assignment is:
+			7 Reserved for legacy diagnostic implementations. 
+				Must be ‘0’ for compilance with this document.
+			6 Digital diagnostic monitoring implemented (described in this document). 
+				Must be ‘1’ for compliance with this document.
+			5 Internally Calibrated
+			4 Externally Calibrated
+			3 Received power measurement type 0 = OMA, 1 = Average Power
+			2 Address change required."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.11, SFP-8472 Table 3.1 and 3.9."
+	::= { sfpConfigEntry 33 }
+
+sfpConfigEnhanceOptions OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"A field with 6 single bit indicators which describe the
+		optional digital diagnostic features implemented in the transceiver. 
+		Since transceivers will not necessarily implement all optional features 
+		described in this document, the “Enhanced Options” bit field allows the 
+		host system to determine which functions are available over the 2 wire 
+		serial bus. A ‘1’ indicates that the particular function is
+		implemented in the transceiver..
+		The bits assignment is:
+			Bits 7: Optional Alarm/warning flags implemented for all monitored quantities
+			Bits 6: Optional Soft TX_DISABLE control and monitoring implemented
+			Bits 5: Optional Soft TX_FAULT monitoring implemented
+			Bits 4: Optional Soft RX_LOS monitoring implemented
+			Bits 3: Option not enabled in DWDM.
+					8472- Optional Soft RATE_SELECT control and monitoring implemented
+			Bits 2: Option not enabled in DWDM.
+					8472- Optional Application Select control implemented per SFF-8079"
+    REFERENCE   "DWDM MSA Table 2.3.1 and Table 2.3.12, SFP-8472 Table 3.1 and 3.10."
+	::= { sfpConfigEntry 34 }
+
+sfpConfig8472Compliance OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	noDiag(0),
+    	rev93(1),
+    	rev94(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"An unsigned integer that indicates which feature set(s) are
+		implemented in the transceiver.
+		The defined values are:
+			0 - Digital diagnostic functionality not included or undefined.
+			1 - Includes functionality described in Rev 9.3 SFF-8472.
+			2 - Includes functionality described in Rev 9.4 SFF-8472."
+    REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.14, SFP-8472 Table 3.1 and 3.12."
+	::= { sfpConfigEntry 35 }
+
+sfpConfigTunableWaveLength  OBJECT-TYPE
+	SYNTAX      INTEGER 
+	MAX-ACCESS  read-write
+	STATUS      current		-- 15xy
+	DESCRIPTION
+		"Wavelength Tuning Control.
+		The availability of this function is indicated in the object sfpConfigChannelSpacing, 
+		where number of channels greater than 1 indicates tunability. 
+		The wavelength is set to the channel number written to this byte. 
+		For a value of 0, channel 1 is selected. For values greater than the maximum channel number, 
+		the maximum channel number is selected.
+		The object value is defaults to 1 on power-up."
+    REFERENCE   "DWDM MSA Table 2.3.27."
+	::= { sfpConfigEntry 36 }
+
+sfpConfigVoaControl  OBJECT-TYPE
+	SYNTAX      INTEGER 
+	MAX-ACCESS  read-write
+	STATUS      current		-- 15xy
+	DESCRIPTION
+		"Variable Optical Attenuator Control.
+		Used to control the wavelength in tunable modules.
+		The availability of this function is indicated in Bit 3 of sfpConfigOptionalWdm.
+		The amount of attenuation set is given by the Byte value * 0.1 dB,
+		and thus ranges from 0 to 25.6 dB. 
+		The object value defaults to 0 on power-up."
+    REFERENCE   "DWDM MSA Table 2.3.28."
+	::= { sfpConfigEntry 37 }
+
+sfpConfigVdtControl  OBJECT-TYPE
+	SYNTAX      INTEGER 
+	MAX-ACCESS  read-write
+	STATUS      current		-- 15xy
+	DESCRIPTION
+		"Variable Decision Threshold Control.
+		Used to control the variable decision threshold function.
+		The availability of this function is indicated in Bit 0 of sfpConfigOptionalWdm.
+		The object value is a 2’s complement 7 bit value (-128 - +127).
+		The decision threshold set is given by:
+			Decision Threshold = 50% + [VAL/256]*100%
+		The object value defaults to 0 on power-up corresponding to 50%."
+    REFERENCE   "DWDM MSA Table 2.3.29."
+	::= { sfpConfigEntry 38 }
+
+sfpConfigPilotToneModulation  OBJECT-TYPE
+	SYNTAX      INTEGER 
+	MAX-ACCESS  read-write
+	STATUS      current		-- 15xy
+	DESCRIPTION
+		"Pilot Tone Injection Modulation Depth.
+		When basic MSA pilot tone injection functionality is implemented 
+		(as indicated in the Serial ID fields by bits 4-6 of of sfpConfigOptionalWdm) 
+		Tjis object may be used by the vendor to indicate modulation 
+		depth per unit control swing on pin 7.
+		The modulation depth per control swing is given by:
+			Modulation Depth = 0.2% * VAL / Vpp(pin7)
+		A value of 0 indicates that the modulation depth per input swing 
+		is within the range"
+    REFERENCE   "DWDM MSA Table 2.3.30."
+	::= { sfpConfigEntry 39 }
+
+sfpConfigCleiCode OBJECT-TYPE
+    SYNTAX      DisplayString  (SIZE (10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The COMMON LANGUAGE Equipment Code.
+            The CLEI code contains an intelligent 
+            ten-character code that identifies the 
+            telecommunications equipment.
+            The Clei Code resides in the SEEP of the SFP."
+    REFERENCE
+            "GR-383-CORE"
+	::= { sfpConfigEntry 40 }
+
+sfpConfigXfpExtXcvrId OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current          -- xfp
+	DESCRIPTION
+		"This field is used to distinguish between different types of DWDM transceivers and
+		different power and environmental classes. The defined identifier values are:
+			Bits 7..6: 
+				00: Power Level 1 Module (1.5 W max. power dissipation.)
+				01: Power Level 2 Module (2.5W Max)
+				10: Power Level 3 Module (3.5W max. power dissipation.)
+				11: Power Level 4 Module (>3.5W max. power dissipation.)
+			Bit 5: CDR exist
+				0: Module with CDR function
+				1: Non-CDR version of XFP
+			Bits 5: TX ref clock is required
+				0: TX Ref Clock Input Required
+				1: TX Ref Clock Input Not Required
+			Bits 3: CLEI code is present
+				0: No CLEI code present in Table 02h
+				1: CLEI code present in Table 02h
+			Bits 2..0: Resesrved"
+    REFERENCE   "XFP INF-8077i Table 47."
+	::= { sfpConfigEntry 41 }
+
+sfpConfigXfpEncodingCode OBJECT-TYPE
+	SYNTAX         INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The encoding value indicates the serial encoding mechanism that is the 
+		nominal design target of the particular transceiver. 
+		The value shall be contained in the serial data. 
+		The	defined encoding values are:
+			Bit 7: 64B/66B
+			Bit 6: 8B/10B
+			Bit 5: SONET scrambled
+			Bit 4: NRZ
+			Bit 3: RZ
+			Bits 2-0: Reserved."
+    REFERENCE   "XFP INF-8077i Table 50."
+	::= { sfpConfigEntry 42 }
+
+sfpConfigXfpMinBitRate OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The minimum bit rate (BR, minimum) is specified in units of 100 Megabits
+		per second, rounded off to the nearest 100 Megabits per second. The bit
+		rate includes those bits necessary to encode and delimit the signal as well
+		as those bits carrying data information. A value of 0 indicates that the minimum
+		bit rate is not specified andmust be determined from the transceiver
+		technology. The actual information transfer rate will depend on the encoding
+		of the data, as defined by the encoding value. Specific CDR rate
+		support is indicated in Byte 164."
+    REFERENCE   "XFP INF-8077i Section 5.20."
+	::= { sfpConfigEntry 43 }
+
+sfpConfigXfpMaxBitRate OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The maximum bit rate (BR, maximum) is specified in units of 100 Megabits
+		per second, rounded off to the nearest 100 Megabits per second. The
+		bit rate includes those bits necessary to encode and delimit the signal as
+		well as those bits carrying data information. A value of 0 indicates that the
+		maximum bit rate is not specified and must be determined from the transceiver
+		technology. The actual information transfer rate will depend on the
+		encoding of the data, as defined by the encoding value. Specific CDR rate
+		support is indicated in Byte 164."
+    REFERENCE   "XFP INF-8077i Section 5.21."
+	::= { sfpConfigEntry 44 }
+
+sfpConfig10GSonetCompliance OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the SONET interfaces 
+		that are supported by the transceiver. The defined identifier values are:
+			Bits 0-1: Reserved
+			Bits 2: I-64.5 - 1550 nm, 25 km, SM, IO
+			Bits 3: I-64.3 - 1550 nm, 25 km, SM, IO
+			Bits 4: I-64.2 - 1550 nm, 25 km, SM, IO
+			Bits 5: I-64.2r - 1550 nm, 2 km, SM, VSR
+			Bits 6: I-64.1/VSR2000-2R1/P1I1-2D1 - 1310 nm, 2 km, SM, VSR
+			Bits 7: I-64.1r/VSR600-2R1 - 1310 nm, 0.6 km, Laser-MM Fibre-SM, VSR
+			Bits 8: Reserved
+			Bits 9: S-64.5b - 1550 nm, 40 km, SH
+			Bits 10: S-64.5a - 1550 nm, 40 km, SH
+			Bits 11: S-64.3b
+			Bits 12: S-64.3a - 1550 nm, 40 km, SM, SH
+			Bits 13: S-64.2b - 1550 nm, 40 km, SM, SH
+			Bits 14: S-64.2a - 1550 nm, 40 km, SM, SH
+			Bits 15: S-64.1 - 1310 nm, 20 km, IO
+			Bits 16-17: Reserved
+			Bits 18: G.959.1 P1L1-2D2 - 1550 nm, SM, 80 km, LH
+			Bits 19: L-64.3 - 1550 nm, 80 km, LH
+			Bits 20: L-64.2c - 1550 nm, 80 km, LH
+			Bits 21: L-64.2b - 1550 nm, 80 km, LH
+			Bits 22: L-64.2a - 1550 nm, 80 km, LH
+			Bits 23: L-64.1 - 1310 nm, SM, 40 km, SH
+			Bits 24-28: Reserved
+			Bits 29: V-64.3 - 1550 nm, SM, 120 km, VL 
+			Bits 30: V-64.2b - 1550 nm, SM, 120 km, VL
+			Bits 31: V-64.2a - 1550 nm, SM, 120 km, VL."
+    REFERENCE   "XFP MSA Table 49."
+	::= { sfpConfigEntry 45 }
+
+sfpConfig10GbeCompliance OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the 10GbE interfaces 
+		that are supported by the transceiver. The defined identifier values are:
+			Bits  0: Reserved
+			Bits  1: 10GBASE-EW - WAN, 1550 nm, SM, ER
+			Bits  2: 10GBASE-LW - WAN, 1310 nm, SM, LR
+			Bits  3: 10GBASE-SW - WAN, 850 nm, MM, SR
+			Bits  4: 10GBASE-LRM (Long reach Multimode) - LAN, 1310 nm, MM, SR fiber, 0.2 km, SR
+			Bits  5: 10GBASE-ER (extended range) -  LAN, 1550 nm, SM, 40 km, ER
+			Bits  6: 10GBASE-LR (Long Range) - LAN, 1310 nm, SM, 10 km, LR
+			Bits  7: 10GBASE-SR - LAN, 850 nm, MM, 0.3 km, SR."
+    REFERENCE   "XFP MSA Table 49."
+	::= { sfpConfigEntry 46 }
+
+sfpConfig10GFcCompliance OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the 10GFC interfaces 
+		that are supported by the transceiver. The defined identifier values are:
+			- Fibre Channel link length:
+			Bits  0-3: Reserved
+			Bits  4: Intermediate Reach 1300 nm FP - 1310 nm, SM, IR
+			Bits  5: Extended Reach 1550 nm - 1550 nm, SM, ER
+			Bits  6: 1200-SM-LL-L - 1310 nm, SM, LR
+			Bits  7: 1200-MX-SN-I - 850 nm, MM, IR."
+    REFERENCE   "XFP MSA Table 49."
+	::= { sfpConfigEntry 47 }
+
+sfpConfigXfpDeviceTech OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The following bit significant indicators define the XFP device technology:
+			Bits  0: 0-Transmitter not Tunable 1-Transmitter Tunable
+			Bits  1: Detector Type: 0-PIN detector 1-APD detector
+			Bits  2: Cooled transmitter
+			Bits  3: Wavelength control: 0-No wavelength control 1-Active wavelength control
+			Bits  4-7: Transmitter technology:
+				0000b 850 nm VCSEL
+				0001b 1310 nm VCSEL
+				0010b 1550 nm VCSEL
+				0011b 1310 nm FP
+				0100b 1310 nm DFB
+				0101b 1550 nm DFB
+				0110b 1310 nm EML
+				0111b 1550 nm EML
+				1000b Copper or others   
+				1001b 1550 nm tunable
+				1111b-1001b Reserved."
+    REFERENCE   "XFP MSA Table 51 and Table 52."
+	::= { sfpConfigEntry 48 }    
+
+sfpConfigXfpTuningSupported OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Indicate the XFP tuning support:
+		 Bit1: wavelenght  (Tunable DWDM - selection in 50 pm steps)
+		 Bit2: frequency   (Tunable DWDM - selection by channel number)
+		 For exmaple the value 0 means no support, and 3 means both."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 49 }    
+
+sfpConfigXfpDesiredChannel OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"User input of channel number, which is an integer 1 to N (N=Number of Channels)."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 50 }    
+
+sfpConfigXfpDesiredWl OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"User input of Wavelength setpoint (in units of 50 picometers)."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 51 }    
+
+sfpConfigXfpWlError OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Monitor of Current Wavelength Error(in units of 5 picometers)."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 52 }    
+
+sfpConfigXfpDesiredFreq OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"User input of channel number, which is an integer to N (N=Number of Channels)."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 53 }    
+
+sfpConfigXfpFreqError OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Frequency error reported in 16 bit signed integer with LSB=0.1 GHz."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 54 }    
+
+sfpConfigXfpDitherSupported OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Tx Dither Supported."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 55 }    
+
+sfpConfigXfpDitherAdmin OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	up(1),       -- enable 
+    	down(2)      -- disable
+    }
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Enable/Disable the dithering function."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 56 }    
+
+sfpConfigXfpCapFreqFirstThz OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lasers First Frequency (THz) capability."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 57 }    
+
+sfpConfigXfpCapFreqFirst10Ghz OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lasers First Frequency (GHz*10) capability.
+		 This value should be added to sfpConfigXfpCapFreqFirstThz."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 58 }    
+
+sfpConfigXfpCapFreqLastThz OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lasers Last Frequency (THz) capability."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 59 }    
+
+sfpConfigXfpCapFreqLast10Ghz OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lasers Last Frequency (GHz*10) capability.
+		 This value should be added to sfpConfigXfpCapFreqLastThz."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 60 }    
+
+sfpConfigXfpCapMaxSpacing10Ghz OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lasers maximum supported grid spacing (GHz*10) capability."
+    REFERENCE   "SFP-8477."
+	::= { sfpConfigEntry 61 }    
+	
+
+-- ----------------------------------------------------
+--
+-- The SFP Diagnostic Table
+--
+-- ----------------------------------------------------
+
+sfpDiagTable	 OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SfpDiagEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"The SFP diagnostic table. 
+		The table defines the status and control of the alarms and warnings
+		of the SFP-1310 and the DWDM SFP-15xy modules."
+	::= { sfpDiag 1 }
+
+sfpDiagEntry OBJECT-TYPE
+	SYNTAX  SfpDiagEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the SFP diagnostic table.
+		The index to this table is the same as the ifIndex of the SFP.
+		The SFP Diagnostic Table contain and entry for each
+		SFP module."
+	INDEX   { sfpDiagInterface }
+	::= { sfpDiagTable 1 }
+
+SfpDiagEntry ::=
+	SEQUENCE {
+		sfpDiagInterface					InterfaceIndex,
+
+		-- Alarms and Warnings Thresholds
+		sfpDiagHighTempAlmThreshold			INTEGER,
+		sfpDiagLowTempAlmThreshold			INTEGER,
+		sfpDiagHighTempWrnThreshold			INTEGER,
+		sfpDiagLowTempWrnThreshold			INTEGER,
+		sfpDiagHighVoltAlmThreshold			INTEGER,
+		sfpDiagLowVoltAlmThreshold			INTEGER,
+		sfpDiagHighVoltWrnThreshold			INTEGER,
+		sfpDiagLowVoltWrnThreshold			INTEGER,
+		sfpDiagHighTxBiasAlmThreshold		INTEGER,
+		sfpDiagLowTxBiasAlmThreshold		INTEGER,
+		sfpDiagHighTxBiasWrnThreshold		INTEGER,
+		sfpDiagLowTxBiasWrnThreshold		INTEGER,
+		sfpDiagHighTxPowerAlmThreshold		INTEGER,
+		sfpDiagLowTxPowerAlmThreshold		INTEGER,
+		sfpDiagHighTxPowerWrnThreshold		INTEGER,
+		sfpDiagLowTxPowerWrnThreshold		INTEGER,
+		sfpDiagHighRxPowerAlmThreshold		INTEGER,
+		sfpDiagLowRxPowerAlmThreshold		INTEGER,
+		sfpDiagHighRxPowerWrnThreshold		INTEGER,
+		sfpDiagLowRxPowerWrnThreshold		INTEGER,
+		sfpDiagHighLaserTempAlmThreshold	INTEGER,	-- 15xy
+		sfpDiagLowLaserTempAlmThreshold		INTEGER,	-- 15xy
+		sfpDiagHighLaserTempWrnThreshold	INTEGER,	-- 15xy
+		sfpDiagLowLaserTempWrnThreshold		INTEGER,	-- 15xy
+		sfpDiagHighWaveLenAlmThreshold		INTEGER,	-- 15xy
+		sfpDiagLowWaveLenAlmThreshold		INTEGER,	-- 15xy
+		sfpDiagHighWaveLenWrnThreshold		INTEGER,	-- 15xy
+		sfpDiagLowWaveLenWrnThreshold		INTEGER,	-- 15xy
+		sfpDiagHighTecCurrAlmThreshold		INTEGER,	-- 15xy
+		sfpDiagLowTecCurrAlmThreshold		INTEGER,	-- 15xy
+		sfpDiagHighTecCurrWrnThreshold		INTEGER,	-- 15xy
+		sfpDiagLowTecCurrWrnThreshold		INTEGER,	-- 15xy
+		
+        -- Measured Values
+		sfpDiagModuleTemperature			INTEGER,
+		sfpDiagSupplyVoltage				INTEGER,
+		sfpDiagTxBias						INTEGER,
+		sfpDiagTxOutputPower				INTEGER,
+		sfpDiagRxInputPower					INTEGER,
+		sfpDiagRxLaserTemperature			INTEGER,	-- 15xy
+		sfpDiagRxMeasuredWavelength			INTEGER,	-- 15xy
+		sfpDiagRxTecCurrent					INTEGER,    -- 15xy
+
+		-- Status and Control
+		sfpDiagAlarms						INTEGER,
+		sfpDiagAlarmsMask					INTEGER,
+		sfpDiagWarnings						INTEGER,
+		sfpDiagWarningsMask					INTEGER,
+		sfpDiagConfLowRxPowerAlmThreshold	INTEGER
+	}
+
+sfpDiagInterface OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The Interface Index of the SFP (type=196)."
+	::= { sfpDiagEntry 1 }
+-- Alarms and Warnings Thresholds
+
+sfpDiagHighTempAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high temperature alarm. The value 0
+		means -128 Celsuis. An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 2 }
+
+sfpDiagLowTempAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low temperature alarm. The value 0
+		means -128 Celsuis. An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius.."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 3 }
+
+sfpDiagHighTempWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high temperature warning. The value 0
+		means -128 Celsuis. An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 4 }
+
+sfpDiagLowTempWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low temperature warning. The value 0
+		means -128 Celsuis. An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius.."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 5 }
+
+sfpDiagHighVoltAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high voltage alarm. The value 0
+		means 0 Volts. An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 6 }
+
+sfpDiagLowVoltAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low voltage alarm. The value 0
+		means 0 Volts. An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 7 }
+
+sfpDiagHighVoltWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high voltage warning. The value 0
+		means 0 Volts. An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 8 }
+
+sfpDiagLowVoltWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low voltage warning. The value 0
+		means 0 Volts. An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 9 }
+
+sfpDiagHighTxBiasAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high voltage alarm. The value 0
+		means 0 Volt. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 10 }
+
+sfpDiagLowTxBiasAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low voltage alarm. The value 0
+		means 0 Volts. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 11 }
+
+sfpDiagHighTxBiasWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high voltage warning. The value 0
+		means 0 Volt. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 12 }
+
+sfpDiagLowTxBiasWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low voltage warning. The value 0
+		means 0 Volts. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 13 }
+
+sfpDiagHighTxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high TX power alarm. The value 0
+		means 0 Volt. An increment on one is equivalent to 1 uW,
+		yielding a total range of 0 to 65.535 mW."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 14 }
+
+sfpDiagLowTxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low TX power alarm. The value 0
+		means 0 Watts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 65.535 mW."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 15 }
+
+sfpDiagHighTxPowerWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high TX power warning. The value 0
+		means 0 Volt. An increment on one is equivalent to 1 uW,
+		yielding a total range of 0 to 65.535 mW."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 16 }
+
+sfpDiagLowTxPowerWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low TX power warning. The value 0
+		means 0 Watts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 65.535 mW."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 17 }
+
+sfpDiagHighRxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high RX power alarm. The value 0
+		means 0 Watts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 18 }
+
+sfpDiagLowRxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low RX power alarm. The value 0
+		means 0 Volt. An increment on one is equivalent to 1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 19 }
+
+sfpDiagHighRxPowerWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high RX power warning. The value 0
+		means 0 Watts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 20 }
+
+sfpDiagLowRxPowerWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low RX power warning. The value 0
+		means 0 Volt. An increment on one is equivalent to 1 uW,
+		yielding a total range of 0 to 6.5535 mW."
+    REFERENCE   "DWDM MSA Table 2.3.19, SFP-8472 Table 3.15."
+	::= { sfpDiagEntry 21 }
+
+sfpDiagHighLaserTempAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write		-- 15xy
+    STATUS      current
+    DESCRIPTION
+		"For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The threshold value for high laser temperature alarm. The value 0
+		means -128 Celsuis. An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 22 }
+
+sfpDiagLowLaserTempAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The threshold value for low laser temperature alarm. The value 0
+		means -128 Celsuis. An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 23 }
+
+sfpDiagHighLaserTempWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The threshold value for high laser temperature warning. The value 0
+		means -128 Celsuis. An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 24 }
+
+sfpDiagLowLaserTempWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write		-- 15xy
+    STATUS      current
+    DESCRIPTION
+		"For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The threshold value for low laser temperature warning. The value 0
+		means -128 Celsuis. An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 25 }
+
+sfpDiagHighWaveLenAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The threshold value for high laser temperature alarm.
+		The reportable wavelength range is 1000.00 – 1655.35nm with a resolution 
+		of 0.01nm."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 26 }
+
+sfpDiagLowWaveLenAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The threshold value for low laser temperature alarm.
+		The reportable wavelength range is 1000.00 – 1655.35nm with a resolution 
+		of 0.01nm."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 27 }
+
+sfpDiagHighWaveLenWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The threshold value for high laser temperature warning.
+		The reportable wavelength range is 1000.00 – 1655.35nm with a resolution 
+		of 0.01nm."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 28 }
+
+sfpDiagLowWaveLenWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The threshold value for low laser temperature warning.
+		The reportable wavelength range is 1000.00 – 1655.35nm with a resolution 
+		of 0.01nm."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 29 }
+
+sfpDiagHighTecCurrAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"The threshold value for high TEC current alarm. 
+		The reported TEC current is defined as a positive number for cooling and 
+		a negative number for heating starting at -3276.8.
+		The increments are of 0.1 steps yielding a total range of -3276.8 to +3276.7."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 30 }
+
+sfpDiagLowTecCurrAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"The threshold value for low TEC current alarm. 
+		The reported TEC current is defined as a positive number for cooling and 
+		a negative number for heating starting at -3276.8.
+		The increments are of 0.1 steps yielding a total range of -3276.8 to +3276.7."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 31 }
+
+sfpDiagHighTecCurrWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"The threshold value for high TEC current warning. 
+		The reported TEC current is defined as a positive number for cooling and 
+		a negative number for heating starting at -3276.8.
+		The increments are of 0.1 steps yielding a total range of -3276.8 to +3276.7."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 32 }
+
+sfpDiagLowTecCurrWrnThreshold OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-write
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"The threshold value for low TEC current warning. 
+		The reported TEC current is defined as a positive number for cooling and 
+		a negative number for heating starting at -3276.8.
+		The increments are of 0.1 steps yielding a total range of -3276.8 to +3276.7."
+    REFERENCE   "DWDM MSA Table 2.3.19."
+	::= { sfpDiagEntry 33 }
+
+-- Diagnostics Measured Values
+
+sfpDiagModuleTemperature OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Internally measured module temperature. The value 0 means -128 Celsuis. 
+		An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius. 
+		Temperature accuracy is vendor specific but must be better than ±3
+		degrees Celsius over specified operating temperature and voltage."
+    REFERENCE   "DWDM MSA Table 2.3.21, SFP-8472 Table 3.17."
+	::= { sfpDiagEntry 34 }
+
+sfpDiagSupplyVoltage OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Internally measured supply voltage in transceiver. The value 0 means 0 Volts. 
+		An increment on one is equivalent to 100 uVolt,
+		yielding a total range of +6.55 Volts.
+		Accuracy is vendor specific but must be better than ±3% of the
+		manufacturer’s nominal value over specified operating temperature and voltage."
+    REFERENCE   "DWDM MSA Table 2.3.21, SFP-8472 Table 3.17."
+	::= { sfpDiagEntry 35 }
+
+sfpDiagTxBias OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Internally measured TX Bias Current. The value 0
+		means 0 Volt. An increment on one is equivalent to 2 uA,
+		yielding a total range of 0 to 131 mA.
+		Accuracy is vendor specific but must be better than ±3dB over specified 
+		temperature and voltage. Data is not valid when the transmitter is disabled."
+    REFERENCE   "DWDM MSA Table 2.3.21, SFP-8472 Table 3.17."
+	::= { sfpDiagEntry 36 }
+
+sfpDiagTxOutputPower OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Measured TX output power. The value 0
+		means 0 Watts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW.
+		For the vendor specified wavelength, accuracy shall be better than ±3dB 
+		over specified temperature and voltage."
+    REFERENCE   "DWDM MSA Table 2.3.21, SFP-8472 Table 3.17."
+	::= { sfpDiagEntry 37 }
+
+sfpDiagRxInputPower OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current         
+    DESCRIPTION
+		"Measured RX input power. The value 0
+		means 0 Watts. An increment on one is equivalent to 0.1 uW,
+		yielding a total range of 0 to 6.5535 mW.
+		For the vendor specified wavelength, accuracy shall be better than ±3dB 
+		over specified temperature and voltage."
+    REFERENCE   "DWDM MSA Table 2.3.21, SFP-8472 Table 3.17."
+	::= { sfpDiagEntry 38 }
+
+sfpDiagRxLaserTemperature OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"Measured Laser Temperature. 
+		For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The value 0 means -128 Celsuis. An increment on one is equivalent 
+		to 1/256 degree, yielding a total range of -128 to +128 Celsius. 
+		Temperature accuracy is vendor specific but must be better than ± 0.2
+		degrees Celsius over specified operating temperature and voltage."
+    REFERENCE   "DWDM MSA Table 2.3.21."
+	::= { sfpDiagEntry 39 }
+
+sfpDiagRxMeasuredWavelength OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"Measured Laser Wavelength. 
+		For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The wavelength is defined as:
+			Wavelength = 1000nm + 0.01nm * 16 bit value.
+		Thus, the reportable wavelength range is 1000.00 – 1655.35nm with a 
+		resolution of 0.01nm."
+    REFERENCE   "DWDM MSA Table 2.3.21."
+	::= { sfpDiagEntry 40 }
+
+sfpDiagRxTecCurrent OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current		-- 15xy
+    DESCRIPTION
+		"Measured Laser Temperature or Wavelength. 
+		For DWDM applications, the diagnostic interface report either laser 
+		wavelength or temperature, with a given module’s reporting defined 
+		by bit 1 of the object sfpConfigOptionalWdm.
+		The reported TEC current is defined as a positive number for cooling and 
+		a negative number for heating starting at -3276.8.
+		The increments are of 0.1 steps yielding a total range of -3276.8 to +3276.7, 
+		The accuracy of the TEC current monitor is vendor specific but must be 
+		better than ±15% of the maximum TEC current as stored in the TEC Current 
+		High Alarm Threshold"
+    REFERENCE   "DWDM MSA Table 2.3.21."
+	::= { sfpDiagEntry 41 }
+
+-- Status and Control
+
+sfpDiagAlarms OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current       
+	DESCRIPTION
+		"This object indicates the Alarms of the SFP module.  
+		The sfpDiagAlarms is a bit map represented as a sum, therefore, 
+		it can represent multiple failures (alarms) simultaneously.
+	    The various bit positions are:
+		0	Temp High Alarm Set when internal temperature exceeds high alarm level.
+		1	Temp Low Alarm Set when internal temperature is below low alarm level.
+		2	Vcc High Alarm Set when internal supply voltage exceeds high alarm level.
+		3	Vcc Low Alarm Set when internal supply voltage is below low alarm level.
+		4	TX Bias High Alarm Set when TX Bias current exceeds high alarm level.
+		5	TX Bias Low Alarm Set when TX Bias current is below low alarm level.
+		6	TX Power High Alarm Set when TX output power exceeds high alarm level.
+		7	TX Power Low Alarm Set when TX output power is below low alarm level.
+		8	RX Power High Alarm Set when Received Power exceeds high alarm level.
+		9	RX Power Low Alarm Set when Received Power is below low alarm level.
+		10	(15xy) Laser T/W High Alarm Set when laser temperature or wavelength exceeds high alarm level.
+		11	(15xy) Laser T/W Low Alarm Set when laser temperature or wavelength is below low alarm level.
+		12	(15xy) TEC Current High Alarm Set when TEC current exceeds high alarm level.
+		13	(15xy) TEC Current Low Alarm Set when TEC current is below low alarm level.
+		14	Retimer Loss Of Lock
+		15	Removed SFP
+		16	Rx Signal Detect alarm
+		17	Laser End of Life
+		18  Laser Tx Failure Indication."
+    REFERENCE   "DWDM MSA Table 2.3.22, SFP-8472 Table 3.18."
+     ::= { sfpDiagEntry 42 }
+
+sfpDiagAlarmsMask OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+	STATUS  current       
+	DESCRIPTION
+		"This object indicates the Masking of the Alarms of the SFP module.  
+		The sfpDiagAlarmsMask is a bit map. Any of the alarm and warning flags can 
+		be masked by writing a 1 to the corresponding bits.
+	    The various bit positions are:
+		0	Temp High Wanring Set when internal temperature exceeds high warning level.
+		1	Temp Low Wanring Set when internal temperature is below low warning level.
+		2	Vcc High Wanring Set when internal supply voltage exceeds high warning level.
+		3	Vcc Low Wanring Set when internal supply voltage is below low warning level.
+		4	TX Bias High Wanring Set when TX Bias current exceeds high warning level.
+		5	TX Bias Low Wanring Set when TX Bias current is below low warning level.
+		6	TX Power High Wanring Set when TX output power exceeds high warning level.
+		7	TX Power Low Wanring Set when TX output power is below low warning level.
+		8	RX Power High Wanring Set when Received Power exceeds high warning level.
+		9	RX Power Low Wanring Set when Received Power is below low warning level.
+		10	(15xy) Laser T/W High Wanring Set when laser temperature or wavelength exceeds high warning level.
+		11	(15xy) Laser T/W Low Wanring Set when laser temperature or wavelength is below low warning level.
+		12	(15xy) TEC Current High Wanring Set when TEC current exceeds high warning level.
+		13	(15xy) TEC Current Low Wanring Set when TEC current is below low warning level."
+    REFERENCE   "DWDM MSA Table 2.3.22, SFP-8472 Table 3.18."
+     ::= { sfpDiagEntry 43 }
+
+sfpDiagWarnings OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  current       
+	DESCRIPTION
+		"This object indicates the Warnings of the SFP module.  
+		The sfpDiagWarnings is a bit map represented as a sum, therefore, 
+		it can represent multiple failures (alarms) simultaneously.
+	    The various bit positions are:
+		0	Temp High Warning Set when internal temperature exceeds high warning level.
+		1	Temp Low Warning Set when internal temperature is below low warning level.
+		2	Vcc High Warning Set when internal supply voltage exceeds high warning level.
+		3	Vcc Low Warning Set when internal supply voltage is below low warning level.
+		4	TX Bias High Warning Set when TX Bias current exceeds high warning level.
+		5	TX Bias Low Warning Set when TX Bias current is below low warning level.
+		6	TX Power High Warning Set when TX output power exceeds high warning level.
+		7	TX Power Low Warning Set when TX output power is below low warning level.
+		8	RX Power High Warning Set when Received Power exceeds high warning level.
+		9	RX Power Low Warning Set when Received Power is below low warning level.
+		10	Laser T/W High Warning Set when laser temperature or wavelength exceeds high warning level.
+		11	Laser T/W Low Warning Set when laser temperature or wavelength is below low warning level.
+		12	TEC Current High Warning Set when TEC current exceeds high warning level.
+		13	TEC Current Low Warning Set when TEC current is below low warning level."
+    REFERENCE   "DWDM MSA Table 2.3.22, SFP-8472 Table 3.18."
+     ::= { sfpDiagEntry 44 }
+
+sfpDiagWarningsMask OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+	STATUS  current       
+	DESCRIPTION
+		"This object indicates the Masking of the Warnings of the SFP module.  
+		The sfpDiagWarningsMask is a bit map. Any of the alarm and warning flags can 
+		be masked by writing a 1 to the corresponding bits.
+	    The various bit positions are:
+		0	Temp High Warning Set when internal temperature exceeds high warning level.
+		1	Temp Low Warning Set when internal temperature is below low warning level.
+		2	Vcc High Warning Set when internal supply voltage exceeds high warning level.
+		3	Vcc Low Warning Set when internal supply voltage is below low warning level.
+		4	TX Bias High Warning Set when TX Bias current exceeds high warning level.
+		5	TX Bias Low Warning Set when TX Bias current is below low warning level.
+		6	TX Power High Warning Set when TX output power exceeds high warning level.
+		7	TX Power Low Warning Set when TX output power is below low warning level.
+		8	RX Power High Warning Set when Received Power exceeds high warning level.
+		9	RX Power Low Warning Set when Received Power is below low warning level.
+		10	Laser T/W High Warning Set when laser temperature or wavelength exceeds high warning level.
+		11	Laser T/W Low Warning Set when laser temperature or wavelength is below low warning level.
+		12	TEC Current High Warning Set when TEC current exceeds high warning level.
+		13	TEC Current Low Warning Set when TEC current is below low warning level."
+    REFERENCE   "DWDM MSA Table 2.3.22, SFP-8472 Table 3.18."
+     ::= { sfpDiagEntry 45 }
+
+sfpDiagConfLowRxPowerAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+		"Configured threshold value for low RX power alarm.
+		Changing this value doen't affect the SFP and is implemented by software. 
+		The threshold level specified in 0.1 dBm units.
+		The range starts with -50.0 dBm."
+	::= { sfpDiagEntry 46 }
+
+
+-- ----------------------------------------------------
+--
+-- The SFP Traps
+--
+-- ----------------------------------------------------
+
+sfpConfigChangeTrap NOTIFICATION-TYPE
+	OBJECTS { sfpConfigInterface }
+	STATUS  current
+	DESCRIPTION
+		"A sfpTrapsChangeTrap trap is sent when the
+		content of an instance sfpConfigEntry changes. It
+		can be utilized by an NMS to trigger polls."
+	::= { sfpTraps 1 }
+
+END

@@ -1,0 +1,59 @@
+mib: CHECKPOINT-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: procUsage
+                  num_oid: '.1.3.6.1.4.1.2620.1.6.7.2.4.{{ $index }}'
+                  type: splat-cpu
+    sensors:
+        fanspeed:
+            data:
+                -
+                    oid: fanSpeedSensorTable
+                    value: fanSpeedSensorValue
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.3.{{ $index }}'
+                    descr: '{{ $fanSpeedSensorName }}'
+                    index: 'fanSpeedSensorValue.{{ $index }}'
+        load:
+            data:
+               -
+                   oid: procUsage
+                   num_oid: '.1.3.6.1.4.1.2620.1.6.7.2.4.{{ $index }}'
+                   descr: Overall CPU utilization
+               -
+                   oid: multiProcUsage
+                   num_oid: '.1.3.6.1.4.1.2620.1.6.7.5.1.5.{{ $index }}'
+                   descr: CPU {{ $index }}
+                   index: 'multiProcUsage.{{ $index }}.0'
+
+        state:
+            data:
+                -
+                    oid: fanSpeedSensorTable
+                    value: fanSpeedSensorStatus
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.2.1.6.{{ $index }}'
+                    descr: '{{ $fanSpeedSensorName }}'
+                    index: 'fanSpeedSensorValue.{{ $index }}'
+                    state_name: fanSpeedSensor
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: OK }
+                        - { value: 1, generic: 1, graph: 0, descr: Warning }
+                        - { value: 2, generic: 3, graph: 0, descr: Unknown }
+                -
+                    oid: haStatCode
+                    num_oid: '.1.3.6.1.4.1.2620.1.5.101.{{ $index }}'
+                    descr: HA Status
+                    state_name: haSensor
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: OK }
+                        - { value: 1, generic: 1, graph: 0, descr: 'Needs Atention' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'HA Down' }
+        temperature:
+            data:
+                -
+                    oid: tempertureSensorTable
+                    value: tempertureSensorValue
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.8.1.1.3.{{ $index }}'
+                    descr: '{{ $tempertureSensorName }}'
+                    index: 'tempertureSensorValue.{{ $index }}'

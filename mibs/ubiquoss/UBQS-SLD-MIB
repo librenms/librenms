@@ -1,0 +1,322 @@
+-- *****************************************************************
+-- UBQS-SLD-MIB
+--   
+-- July 2011,  Park Hyung Eun
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+--   
+-- All rights reserved.
+-- ***************************************************************
+
+UBQS-SLD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Gauge32,
+    Unsigned32,
+    Integer32,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF     
+    RowStatus,
+    TruthValue,                                             
+    TimeStamp,
+    DisplayString,
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ifIndex,
+    ifName,
+    ifType,
+    ifAdminStatus,
+    ifOperStatus
+        FROM IF-MIB 
+    ubiMgmtv2
+        FROM UBQS-SMI;
+
+
+ubiSldMIB MODULE-IDENTITY
+        LAST-UPDATED    "201107190000Z"
+        ORGANIZATION 	"Ubiquoss Corp."
+	    CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"   
+    DESCRIPTION
+        "The UBQS-SLD-MIB is used for getting 
+ 		 the information about self loop detect(SLD)."
+     ::= { ubiMgmtv2 25 }
+
+
+
+-- ***********************************************************
+-- Textual Conventions
+-- ***********************************************************          
+ 				 
+-- ***************************************************************
+--   ubiInterfaceMIB
+-- ***************************************************************
+ubiSldMIBNotificationPrefix  		OBJECT IDENTIFIER		::= { ubiSldMIB 0 } 
+ubiSldMIBObjects  					OBJECT IDENTIFIER		::= { ubiSldMIB 1 }     
+ubiSldMIBConformance  				OBJECT IDENTIFIER		::= { ubiSldMIB 2 }
+
+ubiSldGlobal              			OBJECT IDENTIFIER		::= { ubiSldMIBObjects 1 }  
+                                                                                             
+-- ***********************************************************
+-- ubiSldMIBNotificationPrefix
+-- ***********************************************************        					
+	ubiSelfLoopDetectStateChange	NOTIFICATION-TYPE
+   		OBJECTS
+   		{
+   			ifDescr,
+   	        ubiSldIfState,  
+   	        ubiSldIfRecoveryMethod
+   		}
+		STATUS		current
+		DESCRIPTION
+			"When SLD status is changed, this notification is occured."             
+		::= { ubiSldMIBNotificationPrefix 1 }           
+		
+  
+-- ***********************************************************                 
+-- ubiSldMIBObjects
+-- ***********************************************************
+
+	ubiSldEnabled		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"It is enable function of SLD."
+		::= { ubiSldGlobal 1 }   		
+   	    				 
+	ubiSldHelloInterval		OBJECT-TYPE
+		SYNTAX		Integer32   
+		UNITS		"seconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Global SLD hello interval."             
+		::= { ubiSldGlobal 2 }   
+
+	ubiSldRecoveryTime		OBJECT-TYPE
+		SYNTAX		Integer32 {         
+			disable(0)
+		}                        
+		UNITS		"minutes"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"Global SLD Recovery time."            
+		::= { ubiSldGlobal 3 }   
+
+	ubiSldNotifyOnlyEnbaled		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"It is enable Global function of
+			only notification without SLD."
+		::= { ubiSldGlobal 4 }   
+
+	ubiSldPortCheckEnabled		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"It is enable global configuration of 
+			SLD without checking port."
+		::= { ubiSldGlobal 5 }   
+
+	ubiSldIfStateChangeEnabled		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"It is enable to sending SLD SNMP trap message"
+		::= { ubiSldGlobal 6 }   
+
+
+-- ***********************************************************  
+-- ubiSldIfTable
+-- ***********************************************************
+                           
+	ubiSldIfTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE OF UbiSldIfEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			""
+		::= { ubiSldMIBObjects 2 }
+		
+	ubiSldIfEntry	OBJECT-TYPE
+		SYNTAX		UbiSldIfEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			""
+		INDEX	{ ifIndex }
+		::= { ubiSldIfTable 1 }
+		
+	UbiSldIfEntry ::= SEQUENCE
+	{
+		ubiSldIfEnabled					TruthValue,
+		ubiSldIfHelloInterval			Integer32,
+		ubiSldIfRecoveryTime			Integer32,
+		ubiSldIfNotifyOnlyEnabled		TruthValue,
+		ubiSldIfPortCheckEnabled		TruthValue,
+		ubiSldIfState					INTEGER,   
+		ubiSldIfRecoveryMethod			INTEGER,
+		ubiSldIfLastStateChangeTime		TimeStamp,       
+		ubiSldIfErrorDisabledCount		Integer32,
+		ubiSldIfStateReset				INTEGER
+	}
+	
+	ubiSldIfEnabled		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"It is enable to transmit SLD hello PDU in interface."
+		::= { ubiSldIfEntry 1 }
+		
+	ubiSldIfHelloInterval		OBJECT-TYPE
+		SYNTAX		Integer32
+		UNITS		"seconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"It is changed SLD hello interval."
+		::= { ubiSldIfEntry 2 }
+		
+	ubiSldIfRecoveryTime		OBJECT-TYPE
+		SYNTAX		Integer32 {      
+			disable(0)
+		}       
+		UNITS		"minutes"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"When it is configured, if interface is disabled by SLD,
+			interface automatically recover after recovery time."
+		::= { ubiSldIfEntry 3 }   		
+
+	ubiSldIfNotifyOnlyEnabled		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"When it is configured, if self-loop is detected,
+			only notification is occured without disable interface."
+		::= { ubiSldIfEntry 4 }      	    				 
+
+	ubiSldIfPortCheckEnabled		OBJECT-TYPE
+		SYNTAX		TruthValue
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"When it is enabled, if it receive SLD hello PDU 
+			of anothor interface, it regards SLD."
+		::= { ubiSldIfEntry 5 }       
+
+	ubiSldIfState		OBJECT-TYPE
+		SYNTAX		INTEGER {
+		 	enable(1),
+		 	errDisable(2)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Current interface status
+			   enable(1)     : interface is active
+			   errDisable(2) : interface is disable by SLD."
+		::= { ubiSldIfEntry 6 }       
+
+
+	ubiSldIfRecoveryMethod		OBJECT-TYPE
+		SYNTAX		INTEGER {
+		 	none(1),
+		 	autoRecovery(2),
+		 	manualRecovery(3)
+		}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Last Recorvery status
+			   none(1)          : none
+			   autoRecovery(2)  : Auto recovery
+			   manualRecovery(3): Manual recoery"
+		::= { ubiSldIfEntry 7 } 
+		
+	ubiSldIfLastStateChangeTime		OBJECT-TYPE
+		SYNTAX		TimeStamp
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"Last time of changing interface status by SLD."
+		::= { ubiSldIfEntry 8 }    
+
+
+	ubiSldIfErrorDisabledCount		OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION
+			"The number of occurence self-loop detection."
+		::= { ubiSldIfEntry 9 }          
+
+
+	ubiSldIfStateReset		OBJECT-TYPE
+		SYNTAX		INTEGER {
+		 	none(0),
+		 	reset(1)
+		}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION
+			"It manually clear interface status by SLD.
+			  none(0)  : Do nothing
+			  reset(1) : Clear interface."
+		::= { ubiSldIfEntry 10 }    		
+ 
+-- ***********************************************************
+-- ubiSldMIBConformance
+-- ***********************************************************
+ubiSldMIBCompliances  	OBJECT IDENTIFIER			::= { ubiSldMIBConformance 1 }
+ubiSldMIBGroups  	 	OBJECT IDENTIFIER			::= { ubiSldMIBConformance 2 }
+-- Compliance
+
+	ubiSldMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"The compliance statement for entities which
+        	implement the UBQS-SLD-MIB"
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {              
+                        ubiSldGroup
+        } 
+    	::= { ubiSldMIBCompliances 1 }
+
+
+	ubiSldGroup OBJECT-GROUP
+    	OBJECTS         {    
+				
+        }   
+
+    	STATUS          current
+    	DESCRIPTION
+        	"A collection of objects containing
+        	information about self loop detect."
+    	::= { ubiSldMIBGroups 1 }
+    	
+END

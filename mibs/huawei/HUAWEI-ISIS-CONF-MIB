@@ -1,0 +1,4151 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI-ISIS-CONF-MIB provides information about ISIS
+-- Reference:
+-- Version: V2.26
+-- History:
+-- <author>,   <date>,  <contents>
+--  HUAWEI   2009-08-03  ISIS private MIB
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types are imported
+-- 
+-- ==================================================================
+
+    HUAWEI-ISIS-CONF-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB           
+           OBJECT-GROUP, NOTIFICATION-GROUP,MODULE-COMPLIANCE            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            ifName
+                FROM IF-MIB
+            isisSysInstance, isisSysLevelIndex, isisCircIfIndex, isisPduLspId, isisAdjState
+                FROM ISIS-MIB 
+            TruthValue, RowStatus, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC; 
+    
+    
+        -- 1.3.6.1.4.1.2011.5.25.24
+        hwISIS MODULE-IDENTITY 
+            LAST-UPDATED "201708172029Z"        -- Aug 17, 2017 at 20:29 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "
+                The HUAWEI PRIVATE MIB contains objects belonging to processes of the IS-IS protocol existing on the system. 
+                It defines the model used to represent data that exists elsewhere in the system and on peripheral devices. 
+                There are no constraints on this MIB."
+
+            REVISION "201708172029Z"
+            DESCRIPTION  "modify hwIsisAdjChangeReason,hwisisSysInstance,hwisisSysLevelIndex,hwIsisOwnSysID,hwIsisAdjSysID,hwIsisPeerFlappingSuppressStatus,hwIsisSystemID,hwIsisSystemID1,hwIsisSystemID2,hwIsisSystemID3,hwIsisSystemIdConflict discription"
+
+            REVISION "201705051632Z"
+            DESCRIPTION  "revision 2.2.5"
+            REVISION "201611071720Z"
+            DESCRIPTION  "revision 2.2.4"
+            REVISION "201609261500Z"
+            DESCRIPTION  "revision 2.2.3"
+            REVISION "201607231600Z"
+            DESCRIPTION  "revision 2.2.2"
+            REVISION "201606131600Z"
+            DESCRIPTION  "revision 2.2.1"
+            REVISION "201602041100Z"
+            DESCRIPTION  "revision 2.2.0"
+            REVISION "201511301100Z"
+            DESCRIPTION  "revision 2.1.9"
+            REVISION "201510151100Z"
+            DESCRIPTION  "revision 2.1.8"
+            REVISION "201508271900Z"
+            DESCRIPTION  "revision 2.1.7"
+            REVISION "201504081147Z"
+            DESCRIPTION  "revision 2.1.6"
+            REVISION "201503130900Z"
+            DESCRIPTION  "revision 2.1.5"
+            REVISION "201411061518Z"
+            DESCRIPTION  "revision 2.1.4"
+            REVISION "201401151710Z"
+            DESCRIPTION  "revision 2.1.3"
+            REVISION "201308081131Z"
+            DESCRIPTION  "revision 2.1.2"
+            REVISION "201304011153Z" 
+            DESCRIPTION  "revision 2.1.1" 
+            REVISION "200308111200Z"
+            DESCRIPTION  "init"
+
+            ::= { hwDatacomm 24 }
+
+        
+ -- Type definitions
+
+    SystemID ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "A system ID."
+        SYNTAX OCTET STRING (SIZE(6))   
+--
+-- Textual conventions
+--
+    
+        InetAddress ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "Denotes a generic Internet address.
+                
+                An InetAddress value is always interpreted within the context
+                of an InetAddressType value.  Every usage of the InetAddress
+                textual convention is required to specify the InetAddressType
+                object that provides the context.  It is suggested that the
+                InetAddressType object be logically registered before the
+                object(s) that use the InetAddress textual convention, if
+                they appear in the same logical row.
+                
+                The value of an InetAddress object must always be
+                consistent with the value of the associated InetAddressType
+                object.  Attempts to set an InetAddress object to a value
+                inconsistent with the associated InetAddressType
+                must fail with an inconsistentValue error.
+                
+                When this textual convention is used as the syntax of an
+                index object, there may be issues with the limit of 128
+                sub-identifiers specified in SMIv2, STD 58.  In this case,
+                the object definition MUST include a 'SIZE' clause to
+                limit the number of potential instance sub-identifiers;
+                otherwise the applicable constraints MUST be stated in
+                the appropriate conceptual row DESCRIPTION clauses, or
+                in the surrounding documentation if there is no single
+                DESCRIPTION clause that is appropriate."
+            SYNTAX OCTET STRING (SIZE (0..255))
+
+        InetAddressType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION 
+                "A value that represents a type of Internet address.
+                
+                unknown(0)  An unknown address type.  This value MUST
+                            be used if the value of the corresponding
+                            InetAddress object is a zero-length string.
+                            It may also be used to indicate an IP address
+                            that is not in one of the formats defined
+                            below.
+                
+                ipv4(1)     An IPv4 address as defined by the
+                            InetAddressIPv4 textual convention.
+                
+                ipv6(2)     An IPv6 address as defined by the
+                            InetAddressIPv6 textual convention.
+                
+                ipv4z(3)    A non-global IPv4 address including a zone
+                            index as defined by the InetAddressIPv4z
+                            textual convention.
+                
+                ipv6z(4)    A non-global IPv6 address including a zone
+                            index as defined by the InetAddressIPv6z
+                            textual convention.
+                
+                dns(16)     A DNS domain name as defined by the
+                            InetAddressDNS textual convention.
+                
+                Each definition of a concrete InetAddressType value must be
+                accompanied by a definition of a textual convention for use
+                with that InetAddressType.
+                
+                To support future extensions, the InetAddressType textual
+                convention SHOULD NOT be sub-typed in object type definitions.
+                It MAY be sub-typed in compliance statements in order to
+                require only a subset of these address types for a compliant
+                implementation.
+                
+                Implementations must ensure that InetAddressType objects
+                and any dependent objects (e.g., InetAddress objects) are
+                consistent.  An inconsistentValue error must be generated
+                if an attempt to change an InetAddressType object would,
+                for example, lead to an undefined InetAddress value.  In
+                
+                
+                
+                --                  [Page 6]
+                
+                
+                
+                particular, InetAddressType/InetAddress pairs must be
+                changed together if the address type changes (e.g., from
+                ipv6(2) to ipv4(1))."
+            SYNTAX INTEGER
+                {
+                unknown(0),
+                ipv4(1),
+                ipv6(2),
+                ipv4z(3),
+                ipv6z(4),
+                dns(16)
+                }
+
+        InetAddressPrefixLength ::= TEXTUAL-CONVENTION
+            DISPLAY-HINT 
+                "d"
+            STATUS current
+            DESCRIPTION 
+                "Denotes the length of a generic Internet network address
+                prefix.  A value of n corresponds to an IP address mask
+                that has n contiguous 1-bits from the most significant
+                bit (MSB), with all other bits set to 0.
+                
+                An InetAddressPrefixLength value is always interpreted within
+                the context of an InetAddressType value.  Every usage of the
+                InetAddressPrefixLength textual convention is required to
+                specify the InetAddressType object that provides the
+                context.  It is suggested that the InetAddressType object be
+                logically registered before the object(s) that use the
+                InetAddressPrefixLength textual convention, if they appear
+                in the same logical row.
+                
+                InetAddressPrefixLength values larger than
+                the maximum length of an IP address for a specific
+                InetAddressType are treated as the maximum significant
+                value applicable for the InetAddressType.  The maximum
+                significant value is 32 for the InetAddressType
+                'ipv4(1)' and 'ipv4z(3)' and 128 for the InetAddressType
+                'ipv6(2)' and 'ipv6z(4)'.  The maximum significant value
+                for the InetAddressType 'dns(16)' is 0.
+                
+                The value zero is object-specific and must be defined as
+                part of the description of any object that uses this
+                syntax.  Examples of the usage of zero might include
+                situations where the Internet network address prefix
+                is unknown or does not apply.
+                
+                The upper bound of the prefix length has been chosen to
+                be consistent with the maximum size of an InetAddress."
+            SYNTAX Unsigned32 (0..2040)
+
+    
+--
+-- Node definitions
+--
+    
+        -- 1.3.6.1.4.1.2011.5.25.24.2
+        hwIsisConf OBJECT IDENTIFIER ::= { hwISIS 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1
+        hwIsisMIBObjects OBJECT IDENTIFIER ::= { hwIsisConf 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1
+        hwIsisProcBaseTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisProcBaseEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The set of commands of the Integrated IS-IS protocol existing on the system."
+            ::= { hwIsisMIBObjects 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1
+        hwIsisProcBaseEntry OBJECT-TYPE
+            SYNTAX HwIsisProcBaseEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each row defines some commmands to a single process of the IS-IS protocol existing on the system. 
+                These commands belong to the IS-IS process."
+            INDEX { hwIsisProcIdIndex }
+            ::= { hwIsisProcBaseTable 1 }
+
+        
+        HwIsisProcBaseEntry ::=
+            SEQUENCE { 
+                hwIsisProcIdIndex
+                    Integer32,
+                hwIsisProcVpnName
+                    OCTET STRING,
+                hwIsisProcVpn6Name
+                    OCTET STRING,
+                hwIsisProcAreaAuthType
+                    INTEGER,
+                hwIsisProcAreaAuthPasswordName
+                    OCTET STRING,
+                hwIsisProcAreaAuthPacketAuthMode
+                    INTEGER,
+                hwIsisProcAreaAuthCode
+                    INTEGER,
+                hwIsisProcDomainAuthType
+                    INTEGER,
+                hwIsisProcDomainAuthPasswordName
+                    OCTET STRING,
+                hwIsisProcDomainAuthPacketAuthMode
+                    INTEGER,
+                hwIsisProcDomainAuthCode
+                    INTEGER,
+                hwIsisProcLevel
+                    INTEGER,
+                hwIsisProcL1FlashFloodCount
+                    Integer32,
+                hwIsisProcL1FlashFloodInterval
+                    Integer32,
+                hwIsisProcL2FlashFloodCount
+                    Integer32,
+                hwIsisProcL2FlashFloodInterval
+                    Integer32,
+                hwIsisProcLogPeerChange
+                    INTEGER,
+                hwIsisProcTimerRefresh
+                    Integer32,
+                hwIsisProcTimerMaxAge
+                    Integer32,
+                hwIsisProcL1TimerLspGenMaxInterval
+                    Integer32,
+                hwIsisProcL1TimerLspGenInitInterval
+                    Integer32,
+                hwIsisProcL1TimerLspGenIncrInterval
+                    Integer32,
+                hwIsisProcL2TimerLspGenMaxInterval
+                    Integer32,
+                hwIsisProcL2TimerLspGenInitInterval
+                    Integer32,
+                hwIsisProcL2TimerLspGenIncrInterval
+                    Integer32,
+                hwIsisProcTimerSPFMaxInterval
+                    Integer32,
+                hwIsisProcTimerSPFInitInterval
+                    Integer32,
+                hwIsisProcTimerSPFIncrInterval
+                    Integer32,
+                hwIsisProcCostStyle
+                    INTEGER,
+                hwIsisProcDynamicName
+                    OCTET STRING,
+                hwIsisProcGREnabled
+                    TruthValue,
+                hwIsisProcGRInterval
+                    Integer32,
+                hwIsisProcGRSuppresSAEnabled
+                    TruthValue,
+                hwIsisProcTEEnableLevel
+                    INTEGER,
+                hwIsisProcBFDEnabled
+                    TruthValue,
+                hwIsisProcBFDFrrBindEnabled
+                    TruthValue,
+                hwIsisProcBFDMinTxInterval
+                    Integer32,
+                hwIsisProcBFDMinRecvInteval
+                    Integer32,
+                hwIsisProcBFDMultiplier
+                    Integer32,
+                hwIsisProcIPv6EnableTopologyType
+                    INTEGER,
+                hwIsisProcRowStatus
+                    RowStatus,
+                hwIsisProcOptionalChecksumEnabled
+                    TruthValue,
+		hwisisProcLsdbMaxLimit
+					Unsigned32,
+                hwIsisProcLsdbUpperThreshold
+					Unsigned32,
+                hwIsisProcLsdbLowerThreshold
+					Unsigned32,
+                hwIsisProcLsdbTotal
+					Unsigned32,					
+                hwIsisProcAreaAuthKeychainName
+                    OCTET STRING,
+                hwIsisProcDomainAuthKeychainName
+                    OCTET STRING
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.1
+        hwIsisProcIdIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the IS-IS process ID. The value ranges from 1 to 65535."
+            ::= { hwIsisProcBaseEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.2
+        hwIsisProcVpnName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the name of the IPv4 VPN instance bound to the IS-IS process. The value ranges from 0 to 31."
+            DEFVAL { "" }
+            ::= { hwIsisProcBaseEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.3
+        hwIsisProcVpn6Name OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS read-create
+            STATUS obsolete
+            DESCRIPTION
+                "The value of this object identifies the name of the IPv6 VPN instance bound to the IS-IS process. The value ranges from 0 to 31.
+                "
+            DEFVAL { "" }
+            ::= { hwIsisProcBaseEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.4
+        hwIsisProcAreaAuthType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                md5(1),
+                simple(2),
+                keychain(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the type of IS-IS area authentication.
+                null (0): Area authentication is not configured.
+                md5 (1): The password is sent after being encrypted through MD5.
+                simple (2): The password is sent in the form of simple text.
+                keychain (3): The key chain table that changes with time is sent after being encrypted through MD5.
+                By default, area authentication is not configured.
+                "
+            DEFVAL { 0 }
+            ::= { hwIsisProcBaseEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.5
+        hwIsisProcAreaAuthPasswordName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..392))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the password of IS-IS area authentication. The password is a string of characters.
+                If the IS-IS area authentication mode is simple, the password is a string of 0 to 16 characters.
+                If the IS-IS area authentication mode is MD5, the password is a string of 0 to 392 characters.
+                If the IS-IS area authentication mode is keychain, the name is a string of 0 to 47 characters.
+                The length 0 indicates that no IS-IS area authentication password is configured.
+                When read, it always returns length 0."
+            DEFVAL { "" }
+            ::= { hwIsisProcBaseEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.6
+        hwIsisProcAreaAuthPacketAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                authenticateall(1),
+                allsendonly(2),
+                snppacketauthenticationavoid(3),
+                snppacketsendonly(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the packet authentication mode of IS-IS area authentication:
+                none (0): Authentication mode is not configured.
+                authenticateall (1): Encapsulates authentication information for both transmitted and received LSPs and SNPs.
+                allsendonly (2): Encapsulates authentication information for both generated LSPs and SNPs; does not authenticate received LSPs or SNPs.
+                snppacketauthenticationavoid (3): Encapsulates authentication information for only generated LSPs and authenticates received LSPs.
+                snppacketsendonly (4): Encapsulates authentication information for generated LSPs and SNPs; authenticates only received LSPs but does not authenticate received SNPs.
+                By default, authentication is not configured.
+                "
+            DEFVAL { none }
+            ::= { hwIsisProcBaseEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.7
+        hwIsisProcAreaAuthCode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                osi(10),
+                ip(133)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the code of area authentication.
+                none (0): The authentication code is not configured.
+                osi (10): indicates OSI authentication.
+                ip (133): indicates IP authentication."
+            DEFVAL { osi }
+            ::= { hwIsisProcBaseEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.8
+        hwIsisProcDomainAuthType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                md5(1),
+                simple(2),
+                keychain(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the type of IS-IS router domain authentication.
+                null (0): Domain authentication is not configured.
+                md5 (1): The password is sent after being encrypted through MD5.
+                simple (2): The password is sent in the form of simple text.
+                keychain (3): The key chain table that changes with time is sent after being encrypted through MD5.
+                By default, IS-IS route domain authentication is disabled.
+                "
+            DEFVAL { 0 }
+            ::= { hwIsisProcBaseEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.9
+        hwIsisProcDomainAuthPasswordName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..392))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the password of IS-IS routing domain authentication. The password is a string of characters.
+                If the IS-IS routing domain authentication mode is simple, the password is a string of 0 to 16 characters.
+                If the IS-IS routing domain authentication mode is MD5, the password is a string of 0 to 392 characters.
+                If the IS-IS routing domain authentication mode is keychain, the name is a string of 0 to 47 characters.
+                The length 0 indicates that the password of IS-IS routing domain authentication is not configured.
+                When read, it always returns length 0."
+            DEFVAL { "" }
+            ::= { hwIsisProcBaseEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.10
+        hwIsisProcDomainAuthPacketAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                authenticateall(1),
+                allsendonly(2),
+                snppacketauthenticationavoid(3),
+                snppacketsendonly(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the packet authentication mode of IS-IS route domain authentication.
+                none (0): Authentication mode is not configured.
+                authenticateall (1): Encapsulates authentication information for both transmitted and received LSPs and SNPs.
+                allsendonly (2): Encapsulates authentication information for both generated LSPs and SNPs; does not authenticate received LSPs or SNPs.
+                snppacketauthenticationavoid (3): Encapsulates authentication information for only generated LSPs and authenticates received LSPs.
+                snppacketsendonly (4): Encapsulates authentication information for generated LSPs and SNPs; authenticates only received LSPs but does not authenticate received SNPs.
+                By default, authentication is not configured.
+                "
+            DEFVAL { none }
+            ::= { hwIsisProcBaseEntry 10 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.11
+        hwIsisProcDomainAuthCode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                osi(10),
+                ip(133)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the code of domain authentication.
+                none (0): The authentication code is not configured.
+                osi (10): indicates OSI authentication.
+                ip (133): indicates IP authentication."
+            DEFVAL { osi }
+            ::= { hwIsisProcBaseEntry 11 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.12
+        hwIsisProcLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the level of the IS-IS process.
+                level1 (1): indicates level 1.
+                level2 (2): indicates level 2.
+                level12 (3): indicates level 1-2.
+                By default, the level of an IS-IS process is level-1-2.
+                "
+            DEFVAL { level12 }
+            ::= { hwIsisProcBaseEntry 12 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.13
+        hwIsisProcL1FlashFloodCount OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the counter of level-1 LSPs on the interface. 
+                The value is an integer ranging from 0 to 15. The value 0 indicates that no counter is configured. The default value is 5.
+                "
+            DEFVAL { 5 }
+            ::= { hwIsisProcBaseEntry 13 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.14
+        hwIsisProcL1FlashFloodInterval OBJECT-TYPE
+            SYNTAX Integer32 (0 | 10..50000)
+            UNITS "millionseconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the intervals for level-1 LSP flooding. 
+                The value ranges from 10 to 50000, in milliseconds. The default value is 10 ms.
+                "
+            DEFVAL { 10 }
+            ::= { hwIsisProcBaseEntry 14 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.15
+        hwIsisProcL2FlashFloodCount OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the counter of level-2 LSPs on the interface. 
+                The value is an integer ranging from 0 to 15. The value 0 indicates that no counter is configured. The default value is 5.
+                "
+            DEFVAL { 5 }
+            ::= { hwIsisProcBaseEntry 15 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.16
+        hwIsisProcL2FlashFloodInterval OBJECT-TYPE
+            SYNTAX Integer32 (0 | 10..50000)
+            UNITS "millionseconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the intervals for level-2 LSP flooding. 
+                The value ranges from 10 to 50000 in milliseconds. The default value is 10ms.
+                "
+            DEFVAL { 10 }
+            ::= { hwIsisProcBaseEntry 16 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.17
+        hwIsisProcLogPeerChange OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                enabledwithouttopology(1),
+                enabledwithtopology(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Generates a log when the status of the peer changes.
+                null (0): not configured
+                enabledwithouttopology (1): IPv4 topology
+                enabledwithtopology (2): IPv6 topology"
+            DEFVAL { null }
+            ::= { hwIsisProcBaseEntry 17 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.18
+        hwIsisProcTimerRefresh OBJECT-TYPE
+            SYNTAX Integer32 (1..65534)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the timer of LSP refreshing. The value ranges from 1 to 65534, in seconds. The default value is 900s.
+                "
+            DEFVAL { 900 }
+            ::= { hwIsisProcBaseEntry 18 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.19
+        hwIsisProcTimerMaxAge OBJECT-TYPE
+            SYNTAX Integer32 (2..65535)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the maximum Keepalive time of the LSP. The value ranges from 2 to 65535, in seconds. The default value is 1200s.
+                "
+            DEFVAL { 1200 }
+            ::= { hwIsisProcBaseEntry 19 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.20
+        hwIsisProcL1TimerLspGenMaxInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..120)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the timer for the maximum delay of level-1 LSPs with the same LSP ID. 
+                The value ranges from 1 to 120, in seconds. By default, the value is 2s.
+                "
+            DEFVAL { 2 }
+            ::= { hwIsisProcBaseEntry 20 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.21
+        hwIsisProcL1TimerLspGenInitInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..60000)
+            UNITS "millionseconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the delay timer that initially triggers a level-1 LSP. 
+                The value ranges from 0 to 60000, in milliseconds.
+                By default, the value is 0.
+                "
+            ::= { hwIsisProcBaseEntry 21 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.22
+        hwIsisProcL1TimerLspGenIncrInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..60000)
+            UNITS "millionseconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the delay timer for generating two level-1 LSPs with the same LSP ID. 
+                The value ranges from 1 to 60000, in milliseconds.
+                By default, the value is 0.
+                "
+            DEFVAL { 0 }
+            ::= { hwIsisProcBaseEntry 22 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.23
+        hwIsisProcL2TimerLspGenMaxInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..120)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the timer for the maximum delay of Level-2 LSPs with the same LSP ID. 
+                The value ranges from 1 to 120, in seconds. By default, the value is 2s."
+            DEFVAL { 2 }
+            ::= { hwIsisProcBaseEntry 23 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.24
+        hwIsisProcL2TimerLspGenInitInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..60000)
+            UNITS "millionseconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the delay timer that initially triggers a Level-2 LSP. The value ranges from 1 to 60000, in milliseconds.
+                By default, the value is 0.
+                "
+            DEFVAL { 0 }
+            ::= { hwIsisProcBaseEntry 24 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.25
+        hwIsisProcL2TimerLspGenIncrInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..60000)
+            UNITS "millionseconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the delay timer for generating two Level-2 LSPs with the same LSP ID. 
+                The value ranges from 1 to 60000, in milliseconds.
+                By default, the value is 0.
+                "
+            DEFVAL { 0 }
+            ::= { hwIsisProcBaseEntry 25 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.26
+        hwIsisProcTimerSPFMaxInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..120)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the maximum intervals for SPF calculation. 
+                The value ranges from 1 to 120, in seconds. By default, the value is 5s.
+                "
+            DEFVAL { 5 }
+            ::= { hwIsisProcBaseEntry 26 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.27
+        hwIsisProcTimerSPFInitInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..60000)
+            UNITS "millionseconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the delay timer for initial SPF calculation. 
+                The value ranges from 1 to 60000, in milliseconds. By default, the interval is 50ms.
+                "
+            DEFVAL { 50 }
+            ::= { hwIsisProcBaseEntry 27 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.28
+        hwIsisProcTimerSPFIncrInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..60000)
+            UNITS "millionseconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the incremental delay timer for two SPF calculations. 
+                The value ranges from 1 to 60000, in milliseconds. By default, the interval is 200ms."
+            DEFVAL { 200 }
+            ::= { hwIsisProcBaseEntry 28 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.29
+        hwIsisProcCostStyle OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                narrow(1),
+                narrowcompatible(2),
+                compatible(3),
+                wide(4),
+                widecompatible(5),
+                narrowcompatiblerelax(6),
+                compatiblerelax(7)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Configures the cost type of the IS-IS process:
+                narrow (1): the narrow type
+                narrowcompatible (2): the narrow-compatible type
+                compatible (3): compatible type
+                wide (4): wide type
+                widecompatible (5): wide-compatible type
+                narrowcompatiblerelax (6): narrow-compatible relax-spf-limit type
+                compatible-relax (7): compatible relax-spf-limit type
+                By default, the cost type of an IS-IS process is narrow.
+                "
+            DEFVAL { narrow }
+            ::= { hwIsisProcBaseEntry 29 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.30
+        hwIsisProcDynamicName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Configures the name of the IS-IS dynamic host. The value is a string of 1 to 64 characters.
+                When the length is 0, the configured IS-IS dynamic host name is deleted."
+            DEFVAL { "" }
+            ::= { hwIsisProcBaseEntry 30 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.31
+        hwIsisProcGREnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Whether to enable IS-IS GR.
+                true (1): enables IS-IS GR.
+                false (2): does not enable IS-IS GR.
+                By default, IS-IS GR is disabled."
+            ::= { hwIsisProcBaseEntry 31 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.32
+        hwIsisProcGRInterval OBJECT-TYPE
+            SYNTAX Integer32 (0 | 30..1800)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the maximum intervals for enabling GR. 
+                The value ranges from 0 to 1800, in seconds. By default, the value is 300 seconds.
+                The value 0 indicates that GR is not configured.
+                "
+            DEFVAL { 300 }
+            ::= { hwIsisProcBaseEntry 32 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.33
+        hwIsisProcGRSuppresSAEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the SA bit in the sent Hello packet is set to 1 after the GR-enabled device is started:
+                true (1): enables this function.
+                false (2): disables this function.
+                By default, IS-IS does not suppress Hello PDUs from carrying SA bits.
+                "
+            DEFVAL { false }
+            ::= { hwIsisProcBaseEntry 33 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.34
+        hwIsisProcTEEnableLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Enables IS-IS TE.
+                none (0): does not enable IS-IS TE.
+                level1 (1): enables level-1 TE.
+                level2 (2): enables level-2 TE.
+                level12 (3): enables level-1-2 TE.
+                By default, IS-IS TE is disabled.
+                "
+            DEFVAL { none }
+            ::= { hwIsisProcBaseEntry 34 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.35
+        hwIsisProcBFDEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Whether to enable BFD on each interface.
+                true (1): enables BFD on each interface.
+                false (2): does not enable BFD on each interface.
+                By default, BFD is disabled on each interface.
+                "
+            DEFVAL { false }
+            ::= { hwIsisProcBaseEntry 35 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.36
+        hwIsisProcBFDFrrBindEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Enables BFD-FRR binding on each interface.
+                true (1): enables BFD-FRR binding on each interface.
+                false (2): does not enable BFD-FRR binding on each interface.
+                By default, BFD-FRR binding is disabled on each interface.
+                "
+            DEFVAL { false }
+            ::= { hwIsisProcBaseEntry 36 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.37
+        hwIsisProcBFDMinTxInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the minimum interval for sending BFD packets.
+                 If isis binding to vpn and ipv4-family not enable, The value is zero.
+                "
+            ::= { hwIsisProcBaseEntry 37 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.38
+        hwIsisProcBFDMinRecvInteval OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the minimum interval for receiving BFD packets.
+                 If isis binding to vpn and ipv4-family not enable, The value is zero."
+            ::= { hwIsisProcBaseEntry 38 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.39
+        hwIsisProcBFDMultiplier OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the local detection multiplier. The value ranges from 1 to 255.
+                 If isis binding to vpn and ipv4-family not enable, The value is zero.
+                "
+            ::= { hwIsisProcBaseEntry 39 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.40
+        hwIsisProcIPv6EnableTopologyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                disable(0),
+                standard(1),
+                ipv6(2),
+                compatible(3),
+                compatibleenablemtspf(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This objects indicates whether the IPv6 topology is enabled for the IS-IS process:
+                disable(0): disables the IPv6 topology of the IS-IS process.
+                standard(1): specifies the topology type as the standard mode.
+                ipv6(2): enables IPv6 for the IS-IS process in the IPv6 topology.
+                compatible(3): specifies the topology type as the compatible mode.
+                compatibleenablemtspf(4): indicates that SPF calculation is performed in the IPv6 topology in compatible mode.
+                By default, the IPv6 topology is not enabled for the IS-IS process.
+                "
+            DEFVAL { none }
+            ::= { hwIsisProcBaseEntry 40 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.41
+        hwIsisProcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object supports settings of two values.
+                createAndGo(4): A row is created.
+                destroy(6): A row is deleted."
+            ::= { hwIsisProcBaseEntry 41 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.42
+        hwIsisProcOptionalChecksumEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Enables BFD-FRR binding on each interface.
+                true (1): enables optional checksum for CSNP,PSNP and IIH PDU.
+                false (2): disables optional checksum for CSNP,PSNP and IIH PDU.
+                By default, optional checksum is disabled.
+                "
+            DEFVAL { false }
+            ::= { hwIsisProcBaseEntry 42 }
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.43
+		hwisisProcLsdbMaxLimit OBJECT-TYPE
+			SYNTAX Unsigned32 (0..500000)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This object is used to set the maximum limit number of IS-IS LSPs. 
+				The value range is from 0 to 500000. 
+				The default value 0 means no limit."
+			DEFVAL { 0 }
+			::= { hwIsisProcBaseEntry 43 }	
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.44
+		hwIsisProcLsdbUpperThreshold OBJECT-TYPE
+			SYNTAX Unsigned32 (1..100)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This object is used to set the upper threshold value of LSPs limit. 
+				The value range is from 1 to 100. 
+				The default means 80."
+			DEFVAL { 80 }
+			::= { hwIsisProcBaseEntry 44 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.45
+		hwIsisProcLsdbLowerThreshold OBJECT-TYPE
+			SYNTAX Unsigned32 (1..100)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This object is used to set the lower threshold value of LSPs limit. 
+				The value range is from 1 to 100. 
+				The default means 70."
+			DEFVAL { 70 }
+			::= { hwIsisProcBaseEntry 45 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.46
+		hwIsisProcLsdbTotal OBJECT-TYPE
+			SYNTAX Unsigned32 (0..4294967295)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object is used to get the number of IS-IS LSPs."
+			::= { hwIsisProcBaseEntry 46 }	
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.47
+        hwIsisProcAreaAuthKeychainName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..47))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the keychain name of IS-IS area authentication. The name is a string of characters.
+                The name is a string of 0 to 47 characters. The length 0 indicates that no IS-IS area authentication keychain name is configured.
+                When read, it returns the keychain name."
+            DEFVAL { "" }
+            ::= { hwIsisProcBaseEntry 47 }
+            
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.1.1.48
+        hwIsisProcDomainAuthKeychainName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..47))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the keychain name of IS-IS domain authentication. The name is a string of characters.
+                The name is a string of 0 to 47 characters. The length 0 indicates that no IS-IS domain authentication keychain name is configured.
+                When read, it returns the keychain name."
+            DEFVAL { "" }
+            ::= { hwIsisProcBaseEntry 48 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.2
+        hwIsisNETTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisNETEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of network entities of process."
+            ::= { hwIsisMIBObjects 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.2.1
+        hwIsisNETEntry OBJECT-TYPE
+            SYNTAX HwIsisNETEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each row means one network entity of the process."
+            INDEX { hwIsisProcIdIndex, hwIsisNETIndex }
+            ::= { hwIsisNETTable 1 }
+
+        
+        HwIsisNETEntry ::=
+            SEQUENCE { 
+                hwIsisNETIndex
+                    OCTET STRING,
+                hwIsisNETStatus
+                    RowStatus
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.2.1.1
+        hwIsisNETIndex OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (8..20))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the NET index. It is a string of 8 to 20 bytes."
+            ::= { hwIsisNETEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.2.1.2
+        hwIsisNETStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the status of the NET table.
+                createAndGo(4): A row is created.
+                destroy(6): A row is deleted."
+            ::= { hwIsisNETEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3
+        hwIsisProcMTExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisProcMTExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of commands of the integrated IS-IS protocol existing on the system, 
+                which are different for IP type and MT.
+                "
+            ::= { hwIsisMIBObjects 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1
+        hwIsisProcMTExtEntry OBJECT-TYPE
+            SYNTAX HwIsisProcMTExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each row defines some commands specific to a single process of the IS-IS protocol existing on the system. 
+                These commands are different from ProcBaseTable for IP type and MT."
+            INDEX { hwIsisProcIdIndex, hwIsisIpTypeIndex, hwIsisMTIdIndex }
+            ::= { hwIsisProcMTExtTable 1 }
+
+        
+        HwIsisProcMTExtEntry ::=
+            SEQUENCE { 
+                hwIsisIpTypeIndex
+                    InetAddressType,
+                hwIsisMTIdIndex
+                    Integer32,
+                hwIsisMTName
+                    OCTET STRING,
+                hwIsisProcDefRoutAdvType
+                    INTEGER,
+                hwIsisProcDefRoutAdvPolicyName
+                    OCTET STRING,
+                hwIsisProcDefRoutAdvCost
+                    Unsigned32,
+                hwIsisProcDefRoutAdvTag
+                    Unsigned32,
+                hwIsisProcDefRoutAdvLevel
+                    INTEGER,
+                hwIsisProcDefRoutAdvAvoidLearnEnabled
+                    TruthValue,
+                hwIsisProcL1CircuitCost
+                    Integer32,
+                hwIsisProcL2CircuitCost
+                    Integer32,
+                hwIsisProcPrefValue
+                    Integer32,
+                hwIsisProcPrefPolicyName
+                    OCTET STRING,
+                hwIsisProcMaxLoadBalance
+                    Integer32,
+                hwIsisProcL1CircuitDefaultTag
+                    Unsigned32,
+                hwIsisProcL2CircuitDefaultTag
+                    Unsigned32,
+                hwIsisProcBandWidthReference
+                    Unsigned32,
+                hwIsisProcAutoCostEnabled
+                    TruthValue,
+                hwIsisProcSetOverLoad
+                    INTEGER,
+                hwIsisProcSetOverLoadAllowRoute
+                    INTEGER,
+                hwIsisProcOnStartInterval
+                    Integer32,
+                hwIsisProcOnStartStartFromPeer
+                    OCTET STRING,
+                hwIsisProcOnStartFromPeerInterval
+                    Integer32,
+                hwIsisProcOnStartWaitForBgpEnabled
+                    TruthValue,
+                hwIsisProcMTStatus
+                    RowStatus,
+                hwIsisProcL1RedistMaxLimit
+                    Unsigned32,
+                hwIsisProcL2RedistMaxLimit
+                    Unsigned32,
+                hwIsisProcL1UpperRedistThreshold
+                    Unsigned32,
+                hwIsisProcL2UpperRedistThreshold
+                    Unsigned32,
+                hwIsisProcL1LowerRedistThreshold
+                    Unsigned32,
+                hwIsisProcL2LowerRedistThreshold
+                    Unsigned32,
+                hwIsisProcL1TotalRedist 
+                    Unsigned32,
+                hwIsisProcL2TotalRedist       
+                    Unsigned32   
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.1
+        hwIsisIpTypeIndex OBJECT-TYPE
+            SYNTAX InetAddressType
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP protocol type:
+                ipv4(1): indicates IPv4.
+                ipv6(2): indicates IPv6."
+            ::= { hwIsisProcMTExtEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.2
+        hwIsisMTIdIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the MT ID.
+                "
+            ::= { hwIsisProcMTExtEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.3
+        hwIsisMTName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the topology to be bound to an IS-IS process. The value is a string of 1 to 31 characters."
+            ::= { hwIsisProcMTExtEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.4
+        hwIsisProcDefRoutAdvType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                always(1),
+                matchdefault(2),
+                routepolicy(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the mode in which default routes are advertised:
+                null(0): indicates that default routes are not advertised.
+                always(1): indicates that default routes are always advertised.
+                matchdefault(2): If there is the default route that is generated by another routing protocol or another IS-IS process in the routing table, this default route is advertised in an LSP. If this default route is deleted from the routing table, this default route is not advertised in the LSP.
+                routepolicy(3): indicates that default routes are advertised according to the routing policy."
+            DEFVAL { null }
+            ::= { hwIsisProcMTExtEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.5
+        hwIsisProcDefRoutAdvPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..40))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the routing policy name. 
+                The name is a string of 0 to 40 characters."
+            DEFVAL { "" }
+            ::= { hwIsisProcMTExtEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.6
+        hwIsisProcDefRoutAdvCost OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the cost of a default route."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.7
+        hwIsisProcDefRoutAdvTag OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the administrative tag of a default route."
+            ::= { hwIsisProcMTExtEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.8
+        hwIsisProcDefRoutAdvLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the level of a default route:
+                level1(1): indicates Level-1.
+                level2(2): indicates Level-2.
+                level12(3): indicates Level-1-2.
+                By default, the level of a default route is Level-2.
+                "
+            DEFVAL { level2 }
+            ::= { hwIsisProcMTExtEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.9
+        hwIsisProcDefRoutAdvAvoidLearnEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether an IS-IS process is prevented from learning default routes or adding them to the routing table:
+                true(1): indicates that an IS-IS process is prevented from learning default routes or adding them to the routing table.
+                false(2): indicates that an IS-IS process can learn default routes and then add them to the routing table.
+                By default, an IS-IS process can learn default routes and then add them to the routing table.
+                "
+            DEFVAL { false }
+            ::= { hwIsisProcMTExtEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.10
+        hwIsisProcL1CircuitCost OBJECT-TYPE
+            SYNTAX Integer32 (1..16777215)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Global level-1 cost for all the interfaces. 
+                If the costStyle of the process is wide or widecompatible, the range of this value is from 1 to 16777215, else the range of this value is from 1 to 63."
+            DEFVAL { 10 }
+            ::= { hwIsisProcMTExtEntry 10 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.11
+        hwIsisProcL2CircuitCost OBJECT-TYPE
+            SYNTAX Integer32 (1..16777215)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Global level-2 cost for all the interfaces.
+                If the costStyle of the process is wide or widecompatible, the range of this value is from 1 to 16777215, else the range of this value is from 1 to 63."
+            DEFVAL { 10 }
+            ::= { hwIsisProcMTExtEntry 11 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.12
+        hwIsisProcPrefValue OBJECT-TYPE
+            SYNTAX Integer32 (0..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the preference of an IS-IS route. The value ranges from 1 to 255, and the default value is 15.
+                 If isis binding to vpn and ip-family not enable, The value is zero."
+            DEFVAL { 15 }
+            ::= { hwIsisProcMTExtEntry 12 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.13
+        hwIsisProcPrefPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..40))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the routing policy used for route filtering. The name is a string of 0 to 40 characters.
+                Zero-length means no configuration."
+            DEFVAL { "" }
+            ::= { hwIsisProcMTExtEntry 13 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.14
+        hwIsisProcMaxLoadBalance OBJECT-TYPE
+            SYNTAX Integer32 (0..32)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the number of equal-cost routes. 
+                 The range and the default value depend on license.
+                 If isis binding to vpn and ip-family not enable, The value is zero."
+            ::= { hwIsisProcMTExtEntry 14 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.15
+        hwIsisProcL1CircuitDefaultTag OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the default administrative tag of an IS-IS Level-1 route."
+            ::= { hwIsisProcMTExtEntry 15 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.16
+        hwIsisProcL2CircuitDefaultTag OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the default administrative tag of an IS-IS Level-2 route."
+            ::= { hwIsisProcMTExtEntry 16 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.17
+        hwIsisProcBandWidthReference OBJECT-TYPE
+            SYNTAX Unsigned32 (1..2147483648)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the reference bandwidth."
+            DEFVAL { 100 }
+            ::= { hwIsisProcMTExtEntry 17 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.18
+        hwIsisProcAutoCostEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether automatic interface cost calculation is enabled:
+                true(1): indicates that automatic interface cost calculation is enabled.
+                false(2): indicates that automatic interface cost calculation is disabled.
+                By default, automatic interface cost calculation is disabled.
+                "
+            DEFVAL { false }
+            ::= { hwIsisProcMTExtEntry 18 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.19
+        hwIsisProcSetOverLoad OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                disable(0),
+                enable(1),
+                onstartup(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether a device is enabled to notify its neighbors that its status is Overload:
+                disable (0): indicates that a device is disabled from notifying its neighbors that its status is Overload.
+                enable(1): indicates that a device is enabled to notify its neighbors that its status is Overload.
+                onstartup(2): When a device is restarted or becomes faulty, it notifies its neighbors that its status is Overload."
+            DEFVAL { disable }
+            ::= { hwIsisProcMTExtEntry 19 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.20
+        hwIsisProcSetOverLoadAllowRoute OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                external(1),
+                interlevel(2),
+                externalandinterlevel(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the type of routes to be advertised when a device is in the Overload state:
+                null(0): indicates that no route type is specified.
+                external(1): indicates the imported external routes.
+                interlevel(2): indicates the leak routes.
+                externalandinterlevel(3): indicates the imported external and leak routes."
+            DEFVAL { null }
+            ::= { hwIsisProcMTExtEntry 20 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.21
+        hwIsisProcOnStartInterval OBJECT-TYPE
+            SYNTAX Integer32 (0 | 5..86400)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the interval for waiting to clear the overload bit after the system is started. 
+                The value ranges from 5 to 86400, in seconds. The default value is 600s."
+            DEFVAL { 600 }
+            ::= { hwIsisProcMTExtEntry 21 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.22
+        hwIsisProcOnStartStartFromPeer OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0 | 12..14))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the system ID of a neighbor."
+            ::= { hwIsisProcMTExtEntry 22 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.23
+        hwIsisProcOnStartFromPeerInterval OBJECT-TYPE
+            SYNTAX Integer32 (0 | 5..86400)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the maximum interval for waiting to clear the
+                overload bit after the system is started and the neighbor relationship is established. 
+                The value ranges of set is from 5 to 86400, in seconds. The default value is 1200s. 
+                0 means no configuration.
+                "
+            DEFVAL { 1200 }
+            ::= { hwIsisProcMTExtEntry 23 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.24
+        hwIsisProcOnStartWaitForBgpEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the function of waiting for BGP convergence is enabled:
+                true(1): indicates that the function of waiting for BGP convergence is enabled.
+                false(2): indicates that the function of waiting for BGP convergence is disabled.
+                By default, the function of waiting for BGP convergence is disabled.
+                "
+            DEFVAL { false }
+            ::= { hwIsisProcMTExtEntry 24 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.25
+        hwIsisProcMTStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status of this table:
+                createAndGo(4): indicates that a row is created.
+                destroy(6): indicates that a row is deleted."
+            ::= { hwIsisProcMTExtEntry 25 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.26
+        hwIsisProcL1RedistMaxLimit OBJECT-TYPE
+            SYNTAX Unsigned32 (0..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the maximum limit number of IS-IS Level-1 redistribute routes advertised in LSPs. 
+                The value range is from 0 to 10000000. 
+                The default value 0 means no limit."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 26 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.27
+        hwIsisProcL2RedistMaxLimit OBJECT-TYPE
+            SYNTAX Unsigned32 (0..10000000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the maximum limit number of IS-IS Level-2 redistribute routes advertised in LSPs. 
+                The value range is from 0 to 10000000. 
+                The default value 0 means no limit."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 27 }
+ 
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.28
+        hwIsisProcL1UpperRedistThreshold OBJECT-TYPE
+            SYNTAX Unsigned32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the upper threshold value of level-1 import limit. 
+                The value range is from 1 to 100. 
+                The default means 80."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 28 }
+  
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.29
+        hwIsisProcL2UpperRedistThreshold OBJECT-TYPE
+            SYNTAX Unsigned32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the upper threshold value of level-2 import limit. 
+                The value range is from 1 to 100. 
+                The default means 80."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 29 }
+ 
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.30
+        hwIsisProcL1LowerRedistThreshold OBJECT-TYPE
+            SYNTAX Unsigned32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the lower threshold value of level-1 import limit. 
+                The value range is from 1 to 100. 
+                The default means 70."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 30 }
+  
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.31
+        hwIsisProcL2LowerRedistThreshold OBJECT-TYPE
+            SYNTAX Unsigned32 (1..100)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to set the lower threshold value of level-2 import limit. 
+                The value range is from 1 to 100 
+                The default means 70."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 31 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.32
+        hwIsisProcL1TotalRedist OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object is used to get the number of level-1 import routes."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 32 }
+ 
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.3.1.33
+        hwIsisProcL2TotalRedist OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4294967295)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object is used to get the number of level-2 import routes."
+            DEFVAL { 0 }
+            ::= { hwIsisProcMTExtEntry 33 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4
+        hwIsisPrefixPriorityTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisPrefixPriorityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of commands of priority-based convergence."
+            ::= { hwIsisMIBObjects 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4.1
+        hwIsisPrefixPriorityEntry OBJECT-TYPE
+            SYNTAX HwIsisPrefixPriorityEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of priority-based convergence, each entry means one priority-based command for IS-IS process."
+            INDEX { hwIsisProcIdIndex, hwIsisIpTypeIndex, hwIsisMTIdIndex, hwIsisPrefixPriorityTypeIndex }
+            ::= { hwIsisPrefixPriorityTable 1 }
+
+        
+        HwIsisPrefixPriorityEntry ::=
+            SEQUENCE { 
+                hwIsisPrefixPriorityTypeIndex
+                    INTEGER,
+                hwIsisPrefixPriorityL1PolicyType
+                    INTEGER,
+                hwIsisPrefixPriorityL2PolicyType
+                    INTEGER,
+                hwIsisPrefixPriorityL1IpPrefixName
+                    OCTET STRING,
+                hwIsisPrefixPriorityL2IpPrefixName
+                    OCTET STRING,
+                hwIsisPrefixPriorityL1TagValue
+                    Unsigned32,
+                hwIsisPrefixPriorityL2TagValue
+                    Unsigned32
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4.1.1
+        hwIsisPrefixPriorityTypeIndex OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                medium(1),
+                high(2),
+                critical(3)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the preference of a route:
+                medium(1): indicates medium.
+                high(2): indicates high.
+                critical(3): indicates critical."
+            ::= { hwIsisPrefixPriorityEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4.1.2
+        hwIsisPrefixPriorityL1PolicyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                prefix(1),
+                tag(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of a Level-1 route preference policy:
+                none(0): indicates that no policy type is specified.
+                prefix(1): indicates the IP prefix policy.
+                tag(2): indicates the administrative tag policy."
+            DEFVAL { none }
+            ::= { hwIsisPrefixPriorityEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4.1.3
+        hwIsisPrefixPriorityL2PolicyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                prefix(1),
+                tag(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of a Level-2 route preference policy:
+                none(0): indicates that no policy type is specified.
+                prefix(1): indicates the IP prefix policy.
+                tag(2): indicates the administrative tag policy."
+            ::= { hwIsisPrefixPriorityEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4.1.4
+        hwIsisPrefixPriorityL1IpPrefixName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..169))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of a Level-1 IP prefix policy. 
+                The name is a string of 0 to 169 characters.
+                Zero-length means no configuration."
+            ::= { hwIsisPrefixPriorityEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4.1.5
+        hwIsisPrefixPriorityL2IpPrefixName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..169))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of a Level-2 IP prefix policy. 
+                The name is a string of 0 to 169 characters.
+                Zero-length means no configuration."
+            ::= { hwIsisPrefixPriorityEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4.1.6
+        hwIsisPrefixPriorityL1TagValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the administrative tag of the Level-1 route preference."
+            ::= { hwIsisPrefixPriorityEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.4.1.7
+        hwIsisPrefixPriorityL2TagValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the administrative tag of the Level-2 route preference."
+            ::= { hwIsisPrefixPriorityEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5
+        hwIsisSummaryTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisSummaryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of IP summary addresses to use."
+            ::= { hwIsisMIBObjects 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5.1
+        hwIsisSummaryEntry OBJECT-TYPE
+            SYNTAX HwIsisSummaryEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each entry contains one IP summary address."
+            INDEX { hwIsisProcIdIndex, hwIsisIpTypeIndex, hwIsisMTIdIndex, hwIsisSummaryIPIndex, hwIsisSummaryMaskIndex
+                 }
+            ::= { hwIsisSummaryTable 1 }
+
+        
+        HwIsisSummaryEntry ::=
+            SEQUENCE { 
+                hwIsisSummaryIPIndex
+                    InetAddress,
+                hwIsisSummaryMaskIndex
+                    InetAddressPrefixLength,
+                hwIsisSummaryAvoidFeedBackEnabled
+                    TruthValue,
+                hwIsisSummaryGenNull0RouteEnabled
+                    TruthValue,
+                hwIsisSummaryLevel
+                    INTEGER,
+                hwIsisSummaryTag
+                    Unsigned32,
+                hwIsisSummaryStatus
+                    RowStatus
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5.1.1
+        hwIsisSummaryIPIndex OBJECT-TYPE
+            SYNTAX InetAddress (SIZE (4 | 16))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the summarized route."
+            ::= { hwIsisSummaryEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5.1.2
+        hwIsisSummaryMaskIndex OBJECT-TYPE
+            SYNTAX InetAddressPrefixLength (0..128)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the subnet mask of the summarized route."
+            ::= { hwIsisSummaryEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5.1.3
+        hwIsisSummaryAvoidFeedBackEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the function of avoiding learning the summarized routes through SPF calculation is enabled:
+                true(1): indicates that the function is enabled.
+                false(2): indicates that the function is disabled.
+                By default, the summarized routes can be learned through SPF calculation.
+                "
+            DEFVAL { false }
+            ::= { hwIsisSummaryEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5.1.4
+        hwIsisSummaryGenNull0RouteEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the function of generating Null0 routes during route summarization is enabled:
+                true(1): indicates that the function is enabled.
+                false(2): indicates that the function is disabled.
+                By default, the function of generating Null0 routes during route summarization is disabled.
+                "
+            DEFVAL { false }
+            ::= { hwIsisSummaryEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5.1.5
+        hwIsisSummaryLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the level of the summarized route:
+                level1(1): indicates Level-1.
+                level2(2): indicates Level-2.
+                level12(3): indicates Level-1-2."
+            DEFVAL { 2 }
+            ::= { hwIsisSummaryEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5.1.6
+        hwIsisSummaryTag OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the administrative tag of the summarized route.
+                "
+            ::= { hwIsisSummaryEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.5.1.7
+        hwIsisSummaryStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status of this table:
+                createAndGo(4): indicates that a row is created.
+                destroy(6): indicates that a row is deleted."
+            ::= { hwIsisSummaryEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6
+        hwIsisImportRouteTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisImportRouteEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of import route command."
+            ::= { hwIsisMIBObjects 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1
+        hwIsisImportRouteEntry OBJECT-TYPE
+            SYNTAX HwIsisImportRouteEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of import route command."
+            INDEX { hwIsisProcIdIndex, hwIsisIpTypeIndex, hwIsisMTIdIndex, hwIsisImportProtocolIndex, hwIsisImportProcessIdIndex
+                 }
+            ::= { hwIsisImportRouteTable 1 }
+
+        
+        HwIsisImportRouteEntry ::=
+            SEQUENCE { 
+                hwIsisImportProtocolIndex
+                    INTEGER,
+                hwIsisImportProcessIdIndex
+                    Integer32,
+                hwIsisImportInheritCostEnabled
+                    TruthValue,
+                hwIsisImportCost
+                    Unsigned32,
+                hwIsisImportCostType
+                    INTEGER,
+                hwIsisImportLevel
+                    INTEGER,
+                hwIsisImportTag
+                    Unsigned32,
+                hwIsisImportPolicyName
+                    OCTET STRING,
+                hwIsisImportRouteStatus
+                    RowStatus
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.1
+        hwIsisImportProtocolIndex OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                direct(1),
+                static(2),
+                rip(3),
+                ospf(4),
+                isis(5),
+                bgp(6),
+                ospfv3(7),
+                ripng(8),
+                bgpIbgp(9)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the routing protocol of the imported routes:
+                direct(1): indicates direct.
+                static(2): indicates static.
+                rip(3): indicates RIP.
+                ospf(4): indicates OSPF
+                isis(5): indicates IS-IS.
+                bgp(6): For VPN instance, indicates EBGP and IBGP, otherwise indicates EBGP.
+                ospfv3(7): indicates OSPFv3.
+                ripng(8): indicates RIPng.
+                bgpIbgp(9): For VPN instance, this is unusable, otherwise indicates IBGP and EBGP."
+            ::= { hwIsisImportRouteEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.2
+        hwIsisImportProcessIdIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Process ID of the route protocols. The range is from 1 to 65535. 
+                If the protocol is direct, static or bgp, this value can only be 1."
+            ::= { hwIsisImportRouteEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.3
+        hwIsisImportInheritCostEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether the original cost of the source route is inherited:
+                true(1): indicates that the original cost of the source route is inherited.
+                false(2): indicates that the original cost of the source route is not inherited."
+            DEFVAL { false }
+            ::= { hwIsisImportRouteEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.4
+        hwIsisImportCost OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4261412864)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Cost of the imported routes. 
+                If the costStyle of the process is wide or widecompatible,
+                the range of this value is from 0 to 4261412864, 
+                else the range of this value is from 0 to 63. 0 means no configuration."
+            DEFVAL { 0 }
+            ::= { hwIsisImportRouteEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.5
+        hwIsisImportCostType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                internal(1),
+                external(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the cost type of the imported external route. This object does not apply to IPv6.
+                internal(1): indicates internal.
+                external(2): indicates external.
+                This node is invalid for IPv6. By default, the cost type of the imported external route is external."
+            ::= { hwIsisImportRouteEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.6
+        hwIsisImportLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the local IS-IS level of the imported route:
+                level1(1): indicates Level-1.
+                level2(2): indicates Level-2.
+                level12(3): indicates Level-1-2."
+            ::= { hwIsisImportRouteEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.7
+        hwIsisImportTag OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the administrative tag assigned to an imported route.
+                If this object is not configured, the value will be 0."
+            DEFVAL { 0 }
+            ::= { hwIsisImportRouteEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.8
+        hwIsisImportPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..40))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the routing policy used to import routes. 
+                The name is a string of 0 to 40 characters. 
+                The length 0 indicates that no name is configured for the routing policy used to import routes.
+                "
+            ::= { hwIsisImportRouteEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.6.1.9
+        hwIsisImportRouteStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status of this table:
+                createAndGo(4): indicates that a row is created.
+                destroy(6): indicates that a row is deleted."
+            ::= { hwIsisImportRouteEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.7
+        hwIsisRouteLeakTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisRouteLeakEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of route leak commands."
+            ::= { hwIsisMIBObjects 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.7.1
+        hwIsisRouteLeakEntry OBJECT-TYPE
+            SYNTAX HwIsisRouteLeakEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of route leak commands."
+            INDEX { hwIsisProcIdIndex, hwIsisIpTypeIndex, hwIsisMTIdIndex, hwIsisRouteLeakTypeIndex }
+            ::= { hwIsisRouteLeakTable 1 }
+
+        
+        HwIsisRouteLeakEntry ::=
+            SEQUENCE { 
+                hwIsisRouteLeakTypeIndex
+                    INTEGER,
+                hwIsisRouteLeakTag
+                    Unsigned32,
+                hwIsisRouteLeakFilterPolicyType
+                    INTEGER,
+                hwIsisRouteLeakFilterPolicyBasicAcl
+                    Integer32,
+                hwIsisRouteLeakFilterPolicyPolicyName
+                    OCTET STRING,
+                hwIsisRouteLeakStatus
+                    RowStatus
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.7.1.1
+        hwIsisRouteLeakTypeIndex OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                level1intolevel2(1),
+                level2intolevel1(2)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates the index of the route leaking type:
+                level1intolevel2(1): indicates that Level-1 routes are leaked to Level-2.
+                level2intolevel1(2): indicates that Level-2 routes are leaked to Level-1."
+            ::= { hwIsisRouteLeakEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.7.1.2
+        hwIsisRouteLeakTag OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the tag of route leaking.
+                If the tag is not configured, the reading value will be 0."
+            ::= { hwIsisRouteLeakEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.7.1.3
+        hwIsisRouteLeakFilterPolicyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                basicAcl(1),
+                aclName(2),
+                ipPrefix(3),
+                routePolicy(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the type of the policy used for route leaking:
+                none(0): indicates that no policy type is specified.
+                basicAcl(1): indicates the number of a basic ACL.
+                aclName(2): indicates the ACL name.
+                ipPrefix(3): indicates the IPv4 prefix.
+                routePolicy(4): indicates the routing policy."
+            DEFVAL { none }
+            ::= { hwIsisRouteLeakEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.7.1.4
+        hwIsisRouteLeakFilterPolicyBasicAcl OBJECT-TYPE
+            SYNTAX Integer32 (0 | 2000..2999)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the number of a basic ACL. 
+                The value ranges from 2000 to 2999.
+                0 means no configuration, The range of this value is from 2000 to 2999.
+                "
+            ::= { hwIsisRouteLeakEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.7.1.5
+        hwIsisRouteLeakFilterPolicyPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..169))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The policy name of route leak. If policy type is aclName, the length of this value is from 1 to 32. 
+                If policy type is ipPrefix 
+                the length of this value is from 1 to 169. 
+                If policy type is routePolicy, the length of this value is from 1 to 40.
+                The default length is 0."
+            ::= { hwIsisRouteLeakEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.7.1.6
+        hwIsisRouteLeakStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status of this table:
+                createAndGo(4): indicates that a row is created.
+                destroy(6): indicates that a row is deleted."
+            ::= { hwIsisRouteLeakEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.8
+        hwIsisFrrTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisFrrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of Frr commands."
+            ::= { hwIsisMIBObjects 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.8.1
+        hwIsisFrrEntry OBJECT-TYPE
+            SYNTAX HwIsisFrrEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of frr commands for the specific MT of process."
+            INDEX { hwIsisProcIdIndex, hwIsisIpTypeIndex, hwIsisMTIdIndex }
+            ::= { hwIsisFrrTable 1 }
+
+        
+        HwIsisFrrEntry ::=
+            SEQUENCE { 
+                hwIsisFrrPolicyName
+                    OCTET STRING,
+                hwIsisFrrLoopFreeAltLevel
+                    INTEGER,
+                hwIsisFrrEnabled
+                    TruthValue
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.8.1.1
+        hwIsisFrrPolicyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..40))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the FRR policy name. 
+                The value is a string of 1 to 40 characters. Value 0 indicates that the FRR policy is deleted."
+            ::= { hwIsisFrrEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.8.1.2
+        hwIsisFrrLoopFreeAltLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the level of the FRR LFA algorithm.
+                null(0): cancels the operation of the LFA algorithm.
+                level1(1): indicates Level-1.
+                level2(2): indicates Level-2.
+                level12(3): indicates Level-1-2."
+            DEFVAL { null }
+            ::= { hwIsisFrrEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.8.1.3
+        hwIsisFrrEnabled OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the status of FRR:
+                enable(1): enables FRR.
+                disable(2): disables FRR.
+                By default, FRR is disabled.
+                "
+            ::= { hwIsisFrrEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21
+        hwIsisIntfBaseTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisIntfBaseEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of commands on interface of the Integrated IS-IS protocol existing on the system."
+            ::= { hwIsisMIBObjects 21 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1
+        hwIsisIntfBaseEntry OBJECT-TYPE
+            SYNTAX HwIsisIntfBaseEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each row defines some commands to a single interface of the IS-IS protocol existing on the system."
+            INDEX { hwIsisProcIdIndex, hwIsisInterfaceIndex }
+            ::= { hwIsisIntfBaseTable 1 }
+
+        
+        HwIsisIntfBaseEntry ::=
+            SEQUENCE { 
+                hwIsisInterfaceIndex
+                    Unsigned32,
+                hwIsisEnableIPProtocol
+                    INTEGER,
+                hwIsisEnableIPv6Protocol
+                    INTEGER,
+                hwIsisCircLevel
+                    INTEGER,
+                hwIsisCircSimulation
+                    INTEGER,
+                hwIsisCircL1HelloInterval
+                    Integer32,
+                hwIsisCircL2HelloInterval
+                    Integer32,
+                hwIsisCircL1HelloMultiplier
+                    Integer32,
+                hwIsisCircL2HelloMultiplier
+                    Integer32,
+                hwIsisCircL1AuthMode
+                    INTEGER,
+                hwIsisCircL1AuthText
+                    OCTET STRING,
+                hwIsisCircL1AuthSendOnly
+                    INTEGER,
+                hwIsisCircL1AuthCode
+                    INTEGER,
+                hwIsisCircL2AuthMode
+                    INTEGER,
+                hwIsisCircL2AuthText
+                    OCTET STRING,
+                hwIsisCircL2AuthSendOnly
+                    INTEGER,
+                hwIsisCircL2AuthCode
+                    INTEGER,
+                hwIsisCircLdpSync
+                    INTEGER,
+                hwIsisCircLdpSyncHoldDown
+                    Integer32,
+                hwIsisCircLdpHldMaxCost
+                    Integer32,
+                hwIsisCircSmallHello
+                    INTEGER,
+                hwIsisCircIpIgnore
+                    INTEGER,
+                hwIsisCircSenseRpr
+                    INTEGER,
+                hwIsisCircPadHello
+                    INTEGER,
+                hwIsisCircLspRetransInterval
+                    Integer32,
+                hwIsisL1CsnpTimerValue
+                    Integer32,
+                hwIsisL2CsnpTimerValue
+                    Integer32,
+                hwIsisLspThrottleInterval
+                    Integer32,
+                hwIsisLspThrottleCount
+                    Integer32,
+                hwIsisCircL1DisPriority
+                    Integer32,
+                hwIsisCircL2DisPriority
+                    Integer32,
+                hwIsisCircSilent
+                    INTEGER,
+                hwIsisCircMeshGroup
+                    Unsigned32,
+                hwIsisCircMeshBlock
+                    INTEGER,
+                hwIsisCircDisName
+                    OCTET STRING,
+                hwIsisCircPppNego
+                    INTEGER,
+                hwIsisCircPppOsicpCheck
+                    INTEGER,
+                hwIsisIntfRowStatus
+                    RowStatus,
+                hwIsisCircL1AuthKeychainName
+                    OCTET STRING,
+                hwIsisCircL2AuthKeychainName
+                    OCTET STRING,
+                hwIsisCircStrictSnpaCheckEnable
+                    INTEGER
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.1
+        hwIsisInterfaceIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the interface index. "
+            ::= { hwIsisIntfBaseEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.2
+        hwIsisEnableIPProtocol OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the status of IPv4 IS-IS on an interface:
+                enable(1): enables IPv4 IS-IS.
+                disable(2): disables IPv4 IS-IS."
+            ::= { hwIsisIntfBaseEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.3
+        hwIsisEnableIPv6Protocol OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the status of IPv6 IS-IS on an interface: 
+                enable(1): enables IPv6 IS-IS. 
+                disable(2): disables IPv6 IS-IS."
+            ::= { hwIsisIntfBaseEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.4
+        hwIsisCircLevel OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the level of an interface:
+                level1(1): indicates Level-1.
+                level2(2): indicates Level-2.
+                level12(3): indicates Level-1-2.
+                By default, the interface is at Level-1-2."
+            ::= { hwIsisIntfBaseEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.5
+        hwIsisCircSimulation OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the broadcast interface is simulated as a P2P interface:
+                enable(1): indicates that the broadcast interface is simulated as a P2P interface.
+                disable(2): indicates that the broadcast interface is not simulated as a P2P interface.
+                By default, broadcast interfaces are not simulated as P2P interfaces.
+                "
+            DEFVAL { disable }
+            ::= { hwIsisIntfBaseEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.6
+        hwIsisCircL1HelloInterval OBJECT-TYPE
+            SYNTAX Integer32 (3..255)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the interval for sending Level-1 Hello PDUs. 
+                The value ranges from 3 to 255, in seconds. By default, the value is 10s.
+                "
+            DEFVAL { 10 }
+            ::= { hwIsisIntfBaseEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.7
+        hwIsisCircL2HelloInterval OBJECT-TYPE
+            SYNTAX Integer32 (3..255)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the interval for sending Level-2 Hello PDUs. 
+                The value ranges from 3 to 255, in seconds. By default, the value is 10s.
+                "
+            DEFVAL { 10 }
+            ::= { hwIsisIntfBaseEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.8
+        hwIsisCircL1HelloMultiplier OBJECT-TYPE
+            SYNTAX Integer32 (3..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the number of Level-1 Hello PDUs that fail to received from the IS-IS neighbor before the neighbor declared Down. 
+                The value ranges from 3 to 1000. By default, the value is 3."
+            DEFVAL { 3 }
+            ::= { hwIsisIntfBaseEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.9
+        hwIsisCircL2HelloMultiplier OBJECT-TYPE
+            SYNTAX Integer32 (3..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the number of Level-2 Hello PDUs that fail to received from the IS-IS neighbor before the neighbor declared Down. 
+                The value ranges from 3 to 1000. By default, the value is 3."
+            DEFVAL { 3 }
+            ::= { hwIsisIntfBaseEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.10
+        hwIsisCircL1AuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                md5(1),
+                simple(2),
+                keychain(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the mode of authenticating Level-1 Hello PDUs:
+                null(0): indicates that area-based authentication is not configured.
+                md5(1): indicates that the password is encrypted through MD5 and then sent.
+                simple(2): indicates that the password is sent in plaintext.
+                keychain(3): indicates that the key-chain that varies with the time is encrypted through MD5 and then sent.
+                By default, area-based authentication is not configured.
+                "
+            DEFVAL { 0 }
+            ::= { hwIsisIntfBaseEntry 10 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.11
+        hwIsisCircL1AuthText OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..392))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the authentication password of Level-1 Hello packets. The password is a string of characters.
+                If the packet authentication mode is simple, the password is a string of 0 to 16 characters.
+                If the packet authentication mode is MD5, the password is a string of 0 to 392 characters.
+                If the packet authentication mode is keychain, the name is a string of 0 to 47 characters.
+                The length 0 indicates that the authentication password of Level-1 Hello packets is not configured.
+                When read, it always returns length 0."
+            ::= { hwIsisIntfBaseEntry 11 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.12
+        hwIsisCircL1AuthSendOnly OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the mode of sending the authentication password of Level-1 Hello PDUs:
+                true(1): indicates that the passwords in only the sent PDUs are authenticated but not in the received PDUs.
+                false(2): indicates that the passwords in both sent and received PDUs are authenticated.
+                By default, the passwords in both sent and received PDUs are authenticated."
+            ::= { hwIsisIntfBaseEntry 12 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.13
+        hwIsisCircL1AuthCode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                osi(10),
+                ip(133)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the authentication code of Level-1 Hello PDUs:
+                none(0): indicates that no authentication is configured.
+                osi(10): indicates OSI authentication.
+                ip(133): indicates IP authentication."
+            DEFVAL { osi }
+            ::= { hwIsisIntfBaseEntry 13 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.14
+        hwIsisCircL2AuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                md5(1),
+                simple(2),
+                keychain(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the mode of authenticating Level-2 Hello PDUs:
+                null(0): indicates that area-based authentication is not configured.
+                md5(1): indicates that password is encrypted through MD5 and then sent.
+                simple(2): indicates that the password is sent in plaintext.
+                keychain(3): indicates that the key-chain that varies with the time is encrypted through MD5 and then sent.
+                By default, area-based authentication is not configured.
+                "
+            DEFVAL { 0 }
+            ::= { hwIsisIntfBaseEntry 14 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.15
+        hwIsisCircL2AuthText OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..392))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the authentication password of Level-2 Hello packets. The password is a string of characters.
+                If the packet authentication mode is simple, the password is a string of 0 to 16 characters.
+                If the packet authentication mode is MD5, the password is a string of 0 to 392 characters.
+                If the packet authentication mode is keychain, the name is a string of 0 to 47 characters.
+                The length 0 indicates that the authentication password of Level-2 Hello packets is not configured.
+                When read, it always returns length 0."
+            ::= { hwIsisIntfBaseEntry 15 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.16
+        hwIsisCircL2AuthSendOnly OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the mode of sending the authentication password of Level-2 Hello PDUs:
+                true(1): indicates that the passwords in only the sent PDUs are authenticated but not in the received PDUs.
+                false(2): indicates that the password is authenticated in the PDUs that are both sent and received.
+                By default, the passwords in both sent and received PDUs are authenticated."
+            ::= { hwIsisIntfBaseEntry 16 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.17
+        hwIsisCircL2AuthCode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                osi(10),
+                ip(133)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the authentication code of Level-2 Hello PDUs:
+                none(0): indicates that no authentication is configured.
+                osi(10): indicates OSI authentication.
+                ip(133): indicates IP authentication."
+            DEFVAL { osi }
+            ::= { hwIsisIntfBaseEntry 17 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.18
+        hwIsisCircLdpSync OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the status of synchronization of IS-IS and LDP:
+                enable(1): enables synchronization of IS-IS and LDP.
+                disable(2): disables synchronization of IS-IS and LDP.
+                By default, synchronization of IS-IS and LDP is disabled."
+            ::= { hwIsisIntfBaseEntry 18 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.19
+        hwIsisCircLdpSyncHoldDown OBJECT-TYPE
+            SYNTAX Integer32 (-1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the timeout period of the Holddown time for synchronization of IS-IS and LDP. 
+                The value ranges from 0 to 65535, in seconds. By default, the value is 10s. 0 means to stop Holddown timer.
+                -1 means no configuration."
+            ::= { hwIsisIntfBaseEntry 19 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.20
+        hwIsisCircLdpHldMaxCost OBJECT-TYPE
+            SYNTAX Integer32 (-1..65536)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the timeout period of the Hold-Max-Cost time for synchronization of IS-IS and LDP. 
+                The value ranges from 0 to 65536, in seconds. 
+                By default, the value is 10s. The value of 65536 means infinite. 0 means to stop Hold-Max-Cost timer. -1 means no configuration."
+            ::= { hwIsisIntfBaseEntry 20 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.21
+        hwIsisCircSmallHello OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether IS-IS sends small Hello PDUs without the padding field:
+                enable(1): indicates that IS-IS sends small Hello PDUs without the padding field.
+                disable(2): indicates that IS-IS does not send small Hello PDUs without the padding field.
+                By default, the function is disabled."
+            ::= { hwIsisIntfBaseEntry 21 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.22
+        hwIsisCircIpIgnore OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the segment in an IP address is checked:
+                enable(1): indicates that the segment in an IP address is not checked.
+                disable(2): indicates that the segment in an IP address is checked.
+                By default, the segment in an IP address is checked.
+                This object applies to only P2P interfaces.
+                "
+            ::= { hwIsisIntfBaseEntry 22 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.23
+        hwIsisCircSenseRpr OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether fast RPR loop detection is enabled:
+                enable(1): enables fast RPR loop detection.
+                disable(2): disables fast RPR loop detection.
+                By default, fast RPR loop detection is disabled."
+            ::= { hwIsisIntfBaseEntry 23 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.24
+        hwIsisCircPadHello OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether IS-IS sends standard Hello PDUs with the padding field:
+                enable(1): indicates that IS-IS sends standard Hello PDUs with the padding field.
+                disable(2): indicates that IS-IS does not send standard Hello PDUs with the padding field.
+                By default, the function is disabled."
+            ::= { hwIsisIntfBaseEntry 24 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.25
+        hwIsisCircLspRetransInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..300)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the interval for resending LSPs. 
+                The value ranges from 1 to 300, in seconds. The default value is 5.
+                This object applies to only P2P interfaces.
+                "
+            ::= { hwIsisIntfBaseEntry 25 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.26
+        hwIsisL1CsnpTimerValue OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the interval for sending Level-1 CSNP PDUs on an interface. 
+                The value ranges from 1 to 65535, in seconds. The default value is 10."
+            DEFVAL { 10 }
+            ::= { hwIsisIntfBaseEntry 26 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.27
+        hwIsisL2CsnpTimerValue OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            UNITS "seconds"
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the interval for sending Level-2 CSNP PDUs on an interface. 
+                The value ranges from 1 to 65535, in seconds. The default value is 10."
+            DEFVAL { 10 }
+            ::= { hwIsisIntfBaseEntry 27 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.28
+        hwIsisLspThrottleInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..10000)
+            UNITS "milliseconds."
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the interval for sending batch of LSPs or CSNPs on an interface. The value ranges from 1 to 10000, in milliseconds. 
+                By default, the value is 50."
+            ::= { hwIsisIntfBaseEntry 28 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.29
+        hwIsisLspThrottleCount OBJECT-TYPE
+            SYNTAX Integer32 (1..1000)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the number of a bundle of LSPs. The value ranges from 1 to 1000. 
+                By default, it is 10."
+            ::= { hwIsisIntfBaseEntry 29 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.30
+        hwIsisCircL1DisPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..127)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the priority of the Level-1 DIS, which is valid only on a broadcast interface. 
+                The value ranges from 0 to 127. By default, it is 64.
+                "
+            ::= { hwIsisIntfBaseEntry 30 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.31
+        hwIsisCircL2DisPriority OBJECT-TYPE
+            SYNTAX Integer32 (0..127)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the priority of the Level-2 DIS, which is valid only on a broadcast interface. 
+                The value ranges from 0 to 127. By default, it is 64."
+            ::= { hwIsisIntfBaseEntry 31 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.32
+        hwIsisCircSilent OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the status of an IS-IS interface is set to silent.
+                enable(1): indicates that the status of IS-IS interface is set to silent.
+                disable(2): indicates that the status of IS-IS interface is not set to silent.
+                By default, the function is disabled."
+            ::= { hwIsisIntfBaseEntry 32 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.33
+        hwIsisCircMeshGroup OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the mesh-group ID. The value ranges from 0 to 4294967295. Value 0 indicates that the mesh-group ID is not set."
+            ::= { hwIsisIntfBaseEntry 33 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.34
+        hwIsisCircMeshBlock OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the mesh block function. If this function is configured, the set mesh-group ID is deleted. The value of this object can be:
+                enable(1): enables the mesh block function.
+                disable(2): disables the mesh block function.
+                By default, the function is disabled."
+            ::= { hwIsisIntfBaseEntry 34 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.35
+        hwIsisCircDisName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the DIS name of an interface. 
+                The configuration is applicable to only a broadcast interface. The value is a string of 0 to 64 characters. 
+                Value 0 indicates that the DIS name is not configured."
+            ::= { hwIsisIntfBaseEntry 35 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.36
+        hwIsisCircPppNego OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                twoWay(1),
+                threeWay(2),
+                threeWayOnly(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the mode of negotiating the setup of a neighbor relationship on P2P interfaces:
+                none(0): indicates that the negotiation mode used to establish a neighbor relationship is not specified.
+                twoWay(1): indicates that a neighbor relationship is set up through negotiations in two-way handshake mode.
+                threeWay(2): indicates that a neighbor relationship is set up through negotiations in three-way handshake mode.
+                threeWayOnly(3): indicates that a neighbor relationship is set up through negotiations in three-way handshake mode and the backward compatibility is not supported.
+                By default, a neighbor relationship is set up through negotiations in three-way handshake mode."
+            DEFVAL { three-way }
+            ::= { hwIsisIntfBaseEntry 36 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.37
+        hwIsisCircPppOsicpCheck OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the OSICP check is required:
+                enable(1): enables the OSICP check.
+                disable(2): disables the OSICP check.
+                By default, the function is disabled.
+                This object applies to only P2P interfaces.
+                "
+            ::= { hwIsisIntfBaseEntry 37 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.38
+        hwIsisIntfRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the setting of two values:
+                createAndGo(4): creates one row.
+                destroy(6): deletes one row."
+            ::= { hwIsisIntfBaseEntry 38 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.39
+        hwIsisCircL1AuthKeychainName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..47))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the keychain name of Level-1 Hello packets. The keychain name is a string of characters.
+                The name is a string of 0 to 47 characters. The length 0 indicates that the authentication password of Level-1 Hello packets is not configured.
+                When read, it returns the keychain name."
+            ::= { hwIsisIntfBaseEntry 39 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.40
+        hwIsisCircL2AuthKeychainName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..47))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the keychain name of Level-2 Hello packets. The keychain name is a string of characters.
+                The name is a string of 0 to 47 characters. The length 0 indicates that the authentication password of Level-2 Hello packets is not configured.
+                When read, it returns the keychain name."
+            ::= { hwIsisIntfBaseEntry 40 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.21.1.41
+        hwIsisCircStrictSnpaCheckEnable OBJECT-TYPE
+        SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the snpa check of lsp and snp is required.
+                enable(1): enables the snpa check.
+                disable(2): disables the snpa check.
+                By default, the function is disabled.
+                This object applies to only simulated P2P interfaces.
+                "
+            ::= { hwIsisIntfBaseEntry 41 }
+
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22
+        hwIsisIntfExtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisIntfExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of some specific commands on interface of the Integrated IS-IS protocol existing on the system, which are different of IP type."
+            ::= { hwIsisMIBObjects 22 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22.1
+        hwIsisIntfExtEntry OBJECT-TYPE
+            SYNTAX HwIsisIntfExtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of Some specific commands on interface of the Integrated IS-IS protocol existing on the system, which are different of IP type."
+            INDEX { hwIsisProcIdIndex, hwIsisInterfaceIndex, hwIsisIpTypeIndex, hwIsisMTIdIndex }
+            ::= { hwIsisIntfExtTable 1 }
+
+        
+        HwIsisIntfExtEntry ::=
+            SEQUENCE { 
+                hwIsisCircL1Cost
+                    Integer32,
+                hwIsisCircL2Cost
+                    Integer32,
+                hwIsisL1TagValue
+                    Unsigned32,
+                hwIsisL2TagValue
+                    Unsigned32,
+                hwIsisCircSuppReachablity
+                    INTEGER,
+                hwIsisCircFrrBackup
+                    INTEGER,
+                hwIsisCircMTRowStatus
+                    RowStatus
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22.1.1
+        hwIsisCircL1Cost OBJECT-TYPE
+            SYNTAX Integer32 (0..16777215)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the Level-1 cost of an interface. 
+                If the cost style is wide or widecompatible, the range of this value is from 0 to 16777215, 
+                else the range of this value is from 0 to 63.
+                The value of 0 means undo this configuration, and the cost of the circuit will become the default value."
+            ::= { hwIsisIntfExtEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22.1.2
+        hwIsisCircL2Cost OBJECT-TYPE
+            SYNTAX Integer32 (0..16777215)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the Level-2 cost of an interface. 
+                If the cost style is wide or widecompatible, the range of this value is from 0 to 16777215, 
+                else the range of this value is from 0 to 63.
+                The value of 0 means undo this configuration, and the cost of the circuit will become the default value."
+            ::= { hwIsisIntfExtEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22.1.3
+        hwIsisL1TagValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the tag value of a Level-1 interface.
+                The value ranges from 0 to 4294967295. By default, it is 0, which indicates that the set tag value is deleted.
+                "
+            ::= { hwIsisIntfExtEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22.1.4
+        hwIsisL2TagValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the tag value of a Level-2 interface.
+                The value ranges from 0 to 4294967295. By default, it is 0, which indicates that the set tag value is deleted.
+                "
+            ::= { hwIsisIntfExtEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22.1.5
+        hwIsisCircSuppReachablity OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether the advertisement of the interface address is suppressed:
+                Null(0): indicates that the interface address can be advertised.
+                level1(1): indicates that the advertisement of the Level-1 interface address is suppressed.
+                level2(2): indicates that the advertisement of the Level-2 interface address is suppressed.
+                level12(3): indicates that the advertisement of the Level-1 and Level-2 interface addresses is suppressed.
+                By default, the interface address can be advertised."
+            ::= { hwIsisIntfExtEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22.1.6
+        hwIsisCircFrrBackup OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                null(0),
+                level1(1),
+                level2(2),
+                level12(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies whether an interface is enabled to become a backup interface in Loop Free Alternate (LFA) calculation.
+                Null(0): disables an interface from becoming a backup interface in LFA calculation.
+                level1(1): specifies an interface as a backup interface in Level-1.
+                level2(2): specifies an interface as a backup interface in Level-2.
+                level12(3): specifies an interface as a backup interface in Level-1 and Level-2."
+            ::= { hwIsisIntfExtEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.22.1.7
+        hwIsisCircMTRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the row status of this table:
+                createAndGo(4): indicates that a row is created.
+                destroy(6): indicates that a row is deleted."
+            ::= { hwIsisIntfExtEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.23
+        hwIsisIntfBfdTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwIsisIntfBfdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Set of BFD commands on interface of the Integrated IS-IS protocol existing on the system."
+            ::= { hwIsisMIBObjects 23 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.23.1
+        hwIsisIntfBfdEntry OBJECT-TYPE
+            SYNTAX HwIsisIntfBfdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of BFD commands on interface of the Integrated IS-IS protocol existing on the system."
+            INDEX { hwIsisProcIdIndex, hwIsisInterfaceIndex, hwIsisIpTypeIndex }
+            ::= { hwIsisIntfBfdTable 1 }
+
+        
+        HwIsisIntfBfdEntry ::=
+            SEQUENCE { 
+                hwIsisCircBfdState
+                    INTEGER,
+                hwIsisCircBfdMinTxInterval
+                    Integer32,
+                hwIsisCircBfdMinRxInterval
+                    Integer32,
+                hwIsisCircBfdMultiplier
+                    Integer32,
+                hwIsisCircBfdFrrBinding
+                    INTEGER
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.23.1.1
+        hwIsisCircBfdState OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2),
+                static(3),
+                block(4)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the BFD status:
+                enable(1): enables BFD.
+                disable(2): disables BFD.
+                static(3): configures static BFD.
+                block(4): blocks BFD on an interface.
+                By default, BFD is not enabled."
+            ::= { hwIsisIntfBfdEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.23.1.2
+        hwIsisCircBfdMinTxInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the minimum interval for sending BFD packets. 
+                The value range and default value of this object are determined by the license file."
+            ::= { hwIsisIntfBfdEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.23.1.3
+        hwIsisCircBfdMinRxInterval OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the minimum interval for sending BFD packets. 
+                The value range and default value of this object are determined by the license file."
+            ::= { hwIsisIntfBfdEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.23.1.4
+        hwIsisCircBfdMultiplier OBJECT-TYPE
+            SYNTAX Integer32 (1..255)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the local BFD detection multiplier. 
+                The value range and default value of this object are determined by the license file."
+            ::= { hwIsisIntfBfdEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.1.23.1.5
+        hwIsisCircBfdFrrBinding OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates that the BFD status is bound to IS-IS Auto FRR.
+                enable(1): indicates that BFD is bound to IS-IS Auto FRR.
+                disable(2): indicates that BFD is not bound to IS-IS Auto FRR.
+                By default, the BFD session status is not bound to IS-IS Auto FRR."
+            ::= { hwIsisIntfBfdEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2
+        hwIsisTrapsObjects OBJECT IDENTIFIER ::= { hwIsisConf 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.1
+        hwIsisAdjChangeReason OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                isNbrHoldTimerExpired(1),
+                isNbrPhysicalInterfaceChange(2),
+                isNbrProtocolReason(3),
+                isNbrBfdSessionDown(4),
+                isNbrConfigurationChange(5),
+                isNbrPeerRouterReason(6),
+                isNbrClear(100)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the cause of the neighbor Down event."
+            ::= { hwIsisTrapsObjects 1 }
+          
+       -- 1.3.6.1.4.1.2011.5.25.24.2.2.2   
+        hwisisSysInstance OBJECT-TYPE
+        SYNTAX Integer32 (1..65535)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates the IS-IS process."
+    ::= { hwIsisTrapsObjects 2 }
+    
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.3
+        hwisisSysLevelIndex OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+                level1IS (1),
+                level2IS (2)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "This object indicates an IS-IS level."
+    ::= { hwIsisTrapsObjects 3 }
+    
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.4
+        hwIsisOwnSysID OBJECT-TYPE
+            SYNTAX SystemID
+            
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the system ID of an IS-IS process. The system ID and area address are a major part of a NET."
+            ::= { hwIsisTrapsObjects 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.5
+        hwIsisAdjSysID OBJECT-TYPE
+            SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the system ID of an IS-IS process. The system ID and area address are a major part of a NET."
+            ::= { hwIsisTrapsObjects 5 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.6
+        hwIsisAdjSysName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Configures the name of the IS-IS dynamic host. The value is a string of 1 to 64 characters.
+                When the length is 0, the configured IS-IS dynamic host name is deleted."
+            ::= { hwIsisTrapsObjects 6 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.7
+        hwIsisConflictSystemID OBJECT-TYPE
+            SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ID for this instance of the Integrated IS-IS
+             protocol. This value is appended to each of the
+             area addresses to form the Network Entity Titles.
+             The derivation of a value for this object is
+             implementation-specific.  Some implementations may
+             automatically assign values and not permit an
+             SNMP write, while others may require the value
+             to be set manually."
+            ::= { hwIsisTrapsObjects 7 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.8
+        hwIsisAutoSysId OBJECT-TYPE
+            SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The ID for this instance of the Integrated IS-IS
+             protocol. This value is appended to each of the
+             area addresses to form the Network Entity Titles.
+             The derivation of a value for this object is
+             implementation-specific.  Some implementations may
+             automatically assign values and not permit an
+             SNMP write, while others may require the value
+             to be set manually."
+            ::= { hwIsisTrapsObjects 8 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.9
+        hwIsisLocalIP OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Local IP address."
+            ::= { hwIsisTrapsObjects 9 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.10
+        hwIsisRemoteIP OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of the remote end."
+            ::= { hwIsisTrapsObjects 10 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.11
+        hwIsisAdjIP OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Neighbor IP address."
+            ::= { hwIsisTrapsObjects 11 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.24.2.2.12
+        hwIsisPeerFlappingSuppressStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(1),
+                holddown(2),
+                holdmaxcost(3)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the mode of the IS-IS neighbor relationship flapping suppression.
+none(1): IS-IS neighbor relationship flapping suppression is not started yet.
+holddown(2): IS-IS neighbor relationship flapping suppression works in Hold-down mode.
+holdmaxcost(3): IS-IS neighbor relationship flapping suppression works in Hold-max-cost mode."
+            ::= { hwIsisTrapsObjects 12 }        
+            
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.13
+		hwIsisRemainingLifetime OBJECT-TYPE
+			SYNTAX Unsigned32
+			UNITS "seconds"
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+                "The remaining-lifetime of LSP."
+			DEFVAL { 1200 }
+			::= { hwIsisTrapsObjects 13 }
+
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.14
+		hwIsisHostName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The dynamic host name of IS-IS device."
+			::= { hwIsisTrapsObjects 14 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.15
+        hwIsisHostIpAddress OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of of IS-IS device."
+            ::= { hwIsisTrapsObjects 15 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.16				
+		hwIsisPurgeLspNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The IS-IS device purge the lsp number."
+			::= { hwIsisTrapsObjects 16 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.17		
+		hwIsisAffectedNodeNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The IS-IS device affect the lsp number."
+			::= { hwIsisTrapsObjects 17 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.18		
+		hwIsisTotalNodeNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The IS-IS total node number."
+			::= { hwIsisTrapsObjects 18 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.19		
+		hwIsisInterval OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The statistic interval."
+			::= { hwIsisTrapsObjects 19 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.20		
+		hwIsisRuledOutDeviceNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"The rule out device number."
+			::= { hwIsisTrapsObjects 20 }
+	-- 1.3.6.1.4.1.2011.5.25.24.2.2.21		
+		hwIsisSystemID OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..8))
+                                                       MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The IS-IS System ID."
+			::= { hwIsisTrapsObjects 21 }
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.22
+		hwIsisHostName1 OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates a system ID which is used to uniquely identify a host or router in an area."
+			::= { hwIsisTrapsObjects 22 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.23
+        hwIsisHostIpAddress1 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of of IS-IS device."
+            ::= { hwIsisTrapsObjects 23 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.24		
+		hwIsisSystemID1 OBJECT-TYPE
+			SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates a system ID which is used to uniquely identify a host or router in an area."
+			::= { hwIsisTrapsObjects 24 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.25
+		hwIsisHostName2 OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The dynamic host name of IS-IS device."
+			::= { hwIsisTrapsObjects 25 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.26
+        hwIsisHostIpAddress2 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of of IS-IS device."
+            ::= { hwIsisTrapsObjects 26 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.27		
+		hwIsisSystemID2 OBJECT-TYPE
+			SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates a system ID which is used to uniquely identify a host or router in an area."
+			::= { hwIsisTrapsObjects 27 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.28
+		hwIsisHostName3 OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The dynamic host name of IS-IS device."
+			::= { hwIsisTrapsObjects 28 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.2.29
+        hwIsisHostIpAddress3 OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "IP address of of IS-IS device."
+            ::= { hwIsisTrapsObjects 29 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.2.30		
+		hwIsisSystemID3 OBJECT-TYPE
+			SYNTAX SystemID
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates a system ID which is used to uniquely identify a host or router in an area."
+			::= { hwIsisTrapsObjects 30 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3
+        hwIsisConfConformance OBJECT IDENTIFIER ::= { hwIsisConf 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.1
+        hwIsisCompliances OBJECT IDENTIFIER ::= { hwIsisConfConformance 1 }  
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.1.1
+        hwIsisModuleFullCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for entities implementing
+                the Huawei ISIS MIB"
+            MODULE -- this module
+                MANDATORY-GROUPS { hwIsisProcBaseGroup, hwIsisProcMTExtGroup, hwIsisPrefixPriorityGroup, hwIsisSummaryGroup, hwIsisNETGroup, hwIsisImportRouteGroup, hwIsisRouteLeakGroup, hwIsisFrrGroup,
+                  hwIsisIntfBaseGroup, hwIsisIntfExtGroup, hwIsisIntfBfdGroup, hwIsisTrapsObjectsGroup, hwIsisTrapsGroup}
+            ::= { hwIsisCompliances 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2
+        hwIsisConfGroups OBJECT IDENTIFIER ::= { hwIsisConfConformance 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.1
+        hwIsisProcBaseGroup OBJECT-GROUP
+            OBJECTS { hwIsisProcVpnName, hwIsisProcVpn6Name, hwIsisProcAreaAuthType, hwIsisProcAreaAuthPasswordName, hwIsisProcAreaAuthPacketAuthMode, 
+                hwIsisProcAreaAuthCode, hwIsisProcDomainAuthType, hwIsisProcDomainAuthPasswordName, hwIsisProcDomainAuthPacketAuthMode, hwIsisProcDomainAuthCode, 
+                hwIsisProcLevel, hwIsisProcL1FlashFloodCount, hwIsisProcL1FlashFloodInterval, hwIsisProcL2FlashFloodCount, hwIsisProcL2FlashFloodInterval, 
+                hwIsisProcLogPeerChange, hwIsisProcTimerRefresh, hwIsisProcTimerMaxAge, hwIsisProcL1TimerLspGenMaxInterval, hwIsisProcL1TimerLspGenInitInterval, 
+                hwIsisProcL1TimerLspGenIncrInterval, hwIsisProcL2TimerLspGenMaxInterval, hwIsisProcL2TimerLspGenInitInterval, hwIsisProcL2TimerLspGenIncrInterval, hwIsisProcTimerSPFMaxInterval, 
+                hwIsisProcTimerSPFInitInterval, hwIsisProcTimerSPFIncrInterval, hwIsisProcCostStyle, hwIsisProcDynamicName, hwIsisProcGREnabled, 
+                hwIsisProcGRInterval, hwIsisProcGRSuppresSAEnabled, hwIsisProcTEEnableLevel, hwIsisProcBFDEnabled, hwIsisProcBFDMinTxInterval, 
+                hwIsisProcBFDMinRecvInteval, hwIsisProcBFDMultiplier, hwIsisProcBFDFrrBindEnabled, hwIsisProcIPv6EnableTopologyType, hwIsisProcRowStatus, hwIsisProcOptionalChecksumEnabled , hwisisProcLsdbMaxLimit,
+		hwIsisProcLsdbUpperThreshold, hwIsisProcLsdbLowerThreshold, hwIsisProcLsdbTotal, hwIsisProcAreaAuthKeychainName, hwIsisProcDomainAuthKeychainName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisProcBaseGroup."
+            ::= { hwIsisConfGroups 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.2
+        hwIsisProcMTExtGroup OBJECT-GROUP
+            OBJECTS { hwIsisProcDefRoutAdvType, hwIsisProcDefRoutAdvPolicyName, hwIsisProcDefRoutAdvCost, hwIsisProcDefRoutAdvTag, hwIsisProcDefRoutAdvLevel, 
+                hwIsisProcDefRoutAdvAvoidLearnEnabled, hwIsisProcL1CircuitCost, hwIsisProcL2CircuitCost, hwIsisProcPrefValue, hwIsisProcPrefPolicyName, 
+                hwIsisProcMaxLoadBalance, hwIsisProcL1CircuitDefaultTag, hwIsisProcL2CircuitDefaultTag, hwIsisProcAutoCostEnabled, hwIsisProcSetOverLoad, 
+                hwIsisProcSetOverLoadAllowRoute, hwIsisProcOnStartInterval, hwIsisProcOnStartStartFromPeer, hwIsisProcOnStartFromPeerInterval, hwIsisMTName, 
+                hwIsisProcMTStatus, hwIsisProcL2RedistMaxLimit, hwIsisProcL1RedistMaxLimit, hwIsisProcOnStartWaitForBgpEnabled, hwIsisProcBandWidthReference, hwIsisProcL1UpperRedistThreshold,
+hwIsisProcL2UpperRedistThreshold,  hwIsisProcL1LowerRedistThreshold,
+hwIsisProcL2LowerRedistThreshold, hwIsisProcL1TotalRedist, hwIsisProcL2TotalRedist }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisProcMTExtGroup."
+            ::= { hwIsisConfGroups 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.3
+        hwIsisPrefixPriorityGroup OBJECT-GROUP
+            OBJECTS { hwIsisPrefixPriorityL1PolicyType, hwIsisPrefixPriorityL2PolicyType, hwIsisPrefixPriorityL1IpPrefixName, hwIsisPrefixPriorityL2IpPrefixName, hwIsisPrefixPriorityL1TagValue, 
+                hwIsisPrefixPriorityL2TagValue }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisPrefixPriorityGroup."
+            ::= { hwIsisConfGroups 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.4
+        hwIsisSummaryGroup OBJECT-GROUP
+            OBJECTS { hwIsisSummaryAvoidFeedBackEnabled, hwIsisSummaryGenNull0RouteEnabled, hwIsisSummaryLevel, hwIsisSummaryTag, hwIsisSummaryStatus
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisSummaryGroup."
+            ::= { hwIsisConfGroups 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.5
+        hwIsisNETGroup OBJECT-GROUP
+            OBJECTS { hwIsisNETStatus }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisNETGroup."
+            ::= { hwIsisConfGroups 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.6
+        hwIsisImportRouteGroup OBJECT-GROUP
+            OBJECTS { hwIsisImportInheritCostEnabled, hwIsisImportCost, hwIsisImportCostType, hwIsisImportLevel, hwIsisImportTag, 
+                hwIsisImportPolicyName, hwIsisImportRouteStatus }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisImportRouteGroup."
+            ::= { hwIsisConfGroups 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.7
+        hwIsisRouteLeakGroup OBJECT-GROUP
+            OBJECTS { hwIsisRouteLeakTag, hwIsisRouteLeakFilterPolicyType, hwIsisRouteLeakFilterPolicyBasicAcl, hwIsisRouteLeakFilterPolicyPolicyName, hwIsisRouteLeakStatus
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisRouteLeakGroup."
+            ::= { hwIsisConfGroups 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.8
+        hwIsisFrrGroup OBJECT-GROUP
+            OBJECTS { hwIsisFrrPolicyName, hwIsisFrrLoopFreeAltLevel, hwIsisFrrEnabled }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisFrrGroup."
+            ::= { hwIsisConfGroups 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.21
+        hwIsisIntfBaseGroup OBJECT-GROUP
+            OBJECTS { hwIsisEnableIPProtocol, hwIsisEnableIPv6Protocol, hwIsisCircLevel, hwIsisCircSimulation, hwIsisCircL1HelloInterval, 
+                hwIsisCircL2HelloInterval, hwIsisCircL1HelloMultiplier, hwIsisCircL2HelloMultiplier, hwIsisCircL1AuthMode, hwIsisCircL1AuthText, 
+                hwIsisCircL1AuthSendOnly, hwIsisCircL2AuthMode, hwIsisCircL2AuthText, hwIsisCircL2AuthSendOnly, hwIsisCircLdpSync, 
+                hwIsisCircLdpSyncHoldDown, hwIsisCircLdpHldMaxCost, hwIsisCircSmallHello, hwIsisCircIpIgnore, hwIsisCircSenseRpr, 
+                hwIsisCircPadHello, hwIsisCircLspRetransInterval, hwIsisL1CsnpTimerValue, hwIsisL2CsnpTimerValue, hwIsisLspThrottleInterval, 
+                hwIsisLspThrottleCount, hwIsisCircL1DisPriority, hwIsisCircL2DisPriority, hwIsisCircSilent, hwIsisCircMeshGroup, 
+                hwIsisCircMeshBlock, hwIsisCircDisName, hwIsisCircPppNego, hwIsisCircPppOsicpCheck, hwIsisIntfRowStatus, 
+                hwIsisCircL1AuthCode, hwIsisCircL2AuthCode, hwIsisCircL1AuthKeychainName, hwIsisCircL2AuthKeychainName, 
+                hwIsisCircStrictSnpaCheckEnable }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisIntfBaseGroup."
+            ::= { hwIsisConfGroups 21 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.22
+        hwIsisIntfExtGroup OBJECT-GROUP
+            OBJECTS { hwIsisCircL1Cost, hwIsisCircL2Cost, hwIsisL1TagValue, hwIsisL2TagValue, hwIsisCircSuppReachablity, 
+                hwIsisCircFrrBackup, hwIsisCircMTRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisIntfExtGroup."
+            ::= { hwIsisConfGroups 22 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.23
+        hwIsisIntfBfdGroup OBJECT-GROUP
+            OBJECTS { hwIsisCircBfdMinTxInterval, hwIsisCircBfdMinRxInterval, hwIsisCircBfdMultiplier, hwIsisCircBfdFrrBinding, hwIsisCircBfdState
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The group of hwIsisIntfBfdGroup."
+            ::= { hwIsisConfGroups 23 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.24
+        hwIsisTrapsObjectsGroup OBJECT-GROUP
+            OBJECTS { hwIsisAdjChangeReason, hwisisSysInstance, hwisisSysLevelIndex, hwIsisOwnSysID, hwIsisAdjSysID, hwIsisAdjSysName, 
+                                hwIsisConflictSystemID, hwIsisAutoSysId, hwIsisLocalIP, hwIsisAdjIP, hwIsisRemoteIP }
+            STATUS current
+            DESCRIPTION 
+                "The group of adj change reason."
+            ::= { hwIsisConfGroups 24 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.24.2.3.2.25
+        hwIsisTrapsGroup        NOTIFICATION-GROUP
+            NOTIFICATIONS {
+                hwIsisSystemIdConflict,
+                 hwIsisL1ImportRouteExceedLimit,
+                 hwIsisL1ImportRouteRestoreToLimit,
+                 hwIsisL2ImportRouteExceedLimit,
+                 hwIsisL2ImportRouteRestoreToLimit,
+                 hwIsisL1ImportRouteThresholdReach,
+                 hwIsisL1ImportRouteThresholdReachClear,
+                 hwIsisL2ImportRouteThresholdReach,
+                 hwIsisL2ImportRouteThresholdReachClear,    
+                 hwIsisLsdbThresholdReach,
+                 hwIsisLsdbThresholdReachClear,
+                 hwIsisSystemIdAutoRecover,
+                 hwIsisSeqNumExceedThreshold,
+                 hwIsisSeqNumExceedThresholdClear,
+                 hwIsisAttemptToExceedMaxSequenceClear,
+                 hwIsisPeerFlapSuppStatusChange,
+		 hwIsisDeleteRouteByPurge,
+		 hwIsisDeleteRouteByPurgeClear,
+		 hwIsisRouteBeDeletedByPurgeExact,
+		 hwIsisRouteBeDeletedByPurgeExactClear,
+		 hwIsisRouteBeDeletedByPurgeInexact,
+		 hwIsisRouteBeDeletedByPurgeInexactClear,
+		 hwIsisRouteBeDeletedByPurge,
+		 hwIsisRouteBeDeletedByPurgeClear,
+		 hwIsisThirdPartRouteBeDeletedByPurgeExact,
+		 hwIsisThirdPartRouteBeDeletedByPurgeExactClear,
+		 hwIsisThirdPartRouteBeDeletedByPurgeInexact,
+		 hwIsisThirdPartRouteBeDeletedByPurgeInexactClear,
+		 hwIsisThirdPartRouteBeDeletedByPurge,
+                 hwIsisThirdPartRouteBeDeletedByPurgeClear
+				 
+            }
+        STATUS current
+        DESCRIPTION
+            "The collections of notifications sent by an IS."
+        ::= { hwIsisConfGroups 25 }
+    
+    
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4
+        hwIsisTraps OBJECT IDENTIFIER ::= { hwIsisConf 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.1
+        hwIsisSystemIdConflict NOTIFICATION-TYPE
+            OBJECTS{
+                hwisisSysInstance,
+                hwisisSysLevelIndex,
+                hwIsisOwnSysID,
+                hwIsisProcDynamicName,
+                hwIsisAdjSysID,
+                hwIsisAdjSysName,
+                hwIsisLocalIP,
+                hwIsisAdjIP,
+                hwIsisRemoteIP
+                }
+            STATUS current
+            DESCRIPTION
+                "IS-IS detects a system ID conflict in an area."
+            ::= { hwIsisTraps 1 }       
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.2
+        hwIsisL1ImportRouteExceedLimit NOTIFICATION-TYPE
+            OBJECTS { hwIsisProcL1RedistMaxLimit, hwIsisProcL1TotalRedist }
+            STATUS current
+            DESCRIPTION 
+                "ISIS level-1 number of imported routes has exceeded the maximum limit."
+            ::= { hwIsisTraps 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.3
+        hwIsisL1ImportRouteRestoreToLimit NOTIFICATION-TYPE
+            OBJECTS { hwIsisProcL1RedistMaxLimit, hwIsisProcL1TotalRedist }
+            STATUS current
+            DESCRIPTION 
+                "ISIS level-1 number of imported routes is restored to less than or equal to the maximum limit."
+            ::= { hwIsisTraps 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.4
+        hwIsisL2ImportRouteExceedLimit NOTIFICATION-TYPE
+            OBJECTS { hwIsisProcL2RedistMaxLimit, hwIsisProcL2TotalRedist }
+            STATUS current
+            DESCRIPTION 
+                "ISIS level-2 number of imported routes has exceeded the maximum limit."
+            ::= { hwIsisTraps 4 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.5
+        hwIsisL2ImportRouteRestoreToLimit NOTIFICATION-TYPE
+            OBJECTS { hwIsisProcL2RedistMaxLimit, hwIsisProcL2TotalRedist }
+            STATUS current
+            DESCRIPTION 
+                "ISIS level-2 number of imported routes is restored to less than or equal to the maximum limit."
+            ::= { hwIsisTraps 5 }
+ 
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.6
+        hwIsisL1ImportRouteThresholdReach NOTIFICATION-TYPE
+            OBJECTS { hwIsisProcL1RedistMaxLimit, hwIsisProcL1UpperRedistThreshold,
+                     hwIsisProcL1LowerRedistThreshold, hwIsisProcL1TotalRedist  }
+            STATUS current
+            DESCRIPTION 
+                "ISIS level-1 number of imported routes has reached the threshold value."
+            ::= { hwIsisTraps 6 }
+ 
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.7
+        hwIsisL1ImportRouteThresholdReachClear NOTIFICATION-TYPE
+            OBJECTS { hwIsisProcL1RedistMaxLimit, hwIsisProcL1UpperRedistThreshold, 
+                      hwIsisProcL1LowerRedistThreshold, hwIsisProcL1TotalRedist }
+            STATUS current
+            DESCRIPTION 
+                "ISIS level-1 number of imported routes has been less than the threshold value."
+            ::= { hwIsisTraps 7 }
+ 
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.8
+        hwIsisL2ImportRouteThresholdReach NOTIFICATION-TYPE
+            OBJECTS { hwIsisProcL2RedistMaxLimit, hwIsisProcL2UpperRedistThreshold,  
+                     hwIsisProcL2LowerRedistThreshold, hwIsisProcL2TotalRedist }
+            STATUS current
+            DESCRIPTION 
+                "ISIS level-2 number of imported routes has reached the threshold value."
+            ::= { hwIsisTraps 8 }
+ 
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.9
+        hwIsisL2ImportRouteThresholdReachClear NOTIFICATION-TYPE
+            OBJECTS { hwIsisProcL2RedistMaxLimit, hwIsisProcL2UpperRedistThreshold, 
+                     hwIsisProcL2LowerRedistThreshold, hwIsisProcL2TotalRedist }
+            STATUS current
+            DESCRIPTION 
+                "ISIS level-2 number of imported routes has been less than the threshold value."
+            ::= { hwIsisTraps 9 }
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.10	
+		hwIsisLsdbThresholdReach NOTIFICATION-TYPE
+			OBJECTS{
+				hwisisProcLsdbMaxLimit,
+				hwIsisProcLsdbUpperThreshold,
+				hwIsisProcLsdbLowerThreshold,
+				hwIsisProcLsdbTotal
+			}
+			STATUS current
+			DESCRIPTION
+				"The number of LSP has reached the upper threshold value."
+			::= { hwIsisTraps 10 }
+
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.11	
+		hwIsisLsdbThresholdReachClear NOTIFICATION-TYPE
+			OBJECTS{
+				hwisisProcLsdbMaxLimit,
+				hwIsisProcLsdbUpperThreshold,
+				hwIsisProcLsdbLowerThreshold,
+				hwIsisProcLsdbTotal
+			}
+			STATUS current
+			DESCRIPTION
+				"The number of LSP has been less than the lower threshold value."
+			::= { hwIsisTraps 11 }	
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.12
+                                          hwIsisSystemIdAutoRecover NOTIFICATION-TYPE
+                                                                OBJECTS { hwisisSysInstance,
+                                                                                      hwIsisConflictSystemID,
+                                                                                      hwIsisAutoSysId,
+                                                                                      hwIsisLocalIP,
+                                                                                      hwIsisRemoteIP
+                                                                  }
+                                                                  STATUS current
+                                                                  DESCRIPTION 
+                                                                                       "After a system ID conflict was detected within an IS-IS area, IS-IS changed the system ID automatically."
+                                                                   ::= { hwIsisTraps 12 } 
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.13
+                                          hwIsisAdjacencyChangeClear NOTIFICATION-TYPE
+                                                                OBJECTS {  isisSysInstance,
+                                                                                      isisSysLevelIndex,
+                                                                                      isisCircIfIndex,
+                                                                                      isisPduLspId,
+                                                                                      isisAdjState,
+                                                                                      ifName,
+                                                                                      hwIsisAdjChangeReason
+                                                                  }
+                                                                  STATUS current
+                                                                  DESCRIPTION 
+                                                                                       "The isisAdjacencyChange alarm was cleared."
+                                                                   ::= { hwIsisTraps 13 } 
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.14
+		hwIsisSeqNumExceedThreshold NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisSysLevelIndex, isisPduLspId }
+			STATUS current
+			DESCRIPTION 
+				"The LSP sequence number has exceeded the upper threshold value."
+			::= { hwIsisTraps 14 }		
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.15
+		hwIsisSeqNumExceedThresholdClear NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisSysLevelIndex, isisPduLspId }
+			STATUS current
+			DESCRIPTION 
+				"The LSP sequence number has been less than the upper threshold value."
+			::= { hwIsisTraps 15 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.16
+		hwIsisAttemptToExceedMaxSequenceClear NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisSysLevelIndex, isisPduLspId }
+			STATUS current
+			DESCRIPTION 
+				"The LSP sequence number has been less than the maximum value."
+			::= { hwIsisTraps 16 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.17
+		hwIsisPeerFlapSuppStatusChange NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisCircIfIndex, ifName, hwIsisPeerFlappingSuppressStatus }
+			STATUS current
+			DESCRIPTION 
+				"The object is used to monitor the peer flapping-suppress status of interface in ISIS."
+			::= { hwIsisTraps 17 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.18
+		hwIsisLspRemainingLifetimeRefresh NOTIFICATION-TYPE
+			OBJECTS { isisSysInstance, isisSysLevelIndex, isisCircIfIndex, ifName, hwIsisAdjSysID, 
+				isisPduLspId, hwIsisRemainingLifetime }
+			STATUS current
+			DESCRIPTION 
+				"The object is used to monitor the receiving of LSP with small remaining lifetime."
+			::= { hwIsisTraps 18 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.19
+		hwIsisDeleteRouteByPurge NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval }
+			STATUS current
+			DESCRIPTION 
+				"The local device deleted IS-IS routes advertised by other devices."
+			::= { hwIsisTraps 19 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.20
+		hwIsisDeleteRouteByPurgeClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex }
+			STATUS current
+			DESCRIPTION 
+				"The local device did not delete IS-IS routes advertised by other devices."
+			::= { hwIsisTraps 20 }	
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.21
+		hwIsisRouteBeDeletedByPurgeExact NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were deleted by another device."
+			::= { hwIsisTraps 21 }
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.22
+		hwIsisRouteBeDeletedByPurgeExactClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were not deleted by another device."
+			::= { hwIsisTraps 22 }	
+		
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.23
+		hwIsisRouteBeDeletedByPurgeInexact NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval, hwIsisRuledOutDeviceNum }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were deleted by another device, and the possibly faulty device did not 
+				support IS-IS purge LSP source tracing. Log in to the possibly faulty device. If the device is deleting routes, 
+				reset or isolate it from the network. Otherwise, check other devices. Neither of the devices displayed in the 
+				display isis purge-source-trace analysis-report command output is the faulty device."
+			::= { hwIsisTraps 23 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.24
+		hwIsisRouteBeDeletedByPurgeInexactClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were not deleted by another device."
+			::= { hwIsisTraps 24 }
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.25
+		hwIsisRouteBeDeletedByPurge NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisTotalNodeNum,
+                      hwIsisHostName1, hwIsisHostIpAddress1, hwIsisSystemID1, hwIsisHostName2, hwIsisHostIpAddress2, hwIsisSystemID2,
+                      hwIsisHostName3, hwIsisHostIpAddress3, hwIsisSystemID3 } 
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were deleted by another device. Log in to the possibly faulty device. 
+				 If the device is deleting routes, reset or isolate it from the network. Otherwise, check other devices."
+			::= { hwIsisTraps 25 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.26
+		hwIsisRouteBeDeletedByPurgeClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex } 
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by the local device were not deleted by another device."
+			::= { hwIsisTraps 26 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.27
+		hwIsisThirdPartRouteBeDeletedByPurgeExact NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were deleted. Reset or isolate the faulty device from the network."
+			::= { hwIsisTraps 27 }
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.28
+		hwIsisThirdPartRouteBeDeletedByPurgeExactClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were not deleted."
+			::= { hwIsisTraps 28 }	
+		
+        -- 1.3.6.1.4.1.2011.5.25.24.2.4.29
+		hwIsisThirdPartRouteBeDeletedByPurgeInexact NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisPurgeLspNum, 
+			          hwIsisAffectedNodeNum, hwIsisTotalNodeNum, hwIsisInterval, hwIsisRuledOutDeviceNum }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were deleted, and the possibly faulty device did not support 
+				 IS-IS purge LSP source tracing. Log in to the possibly faulty device. If the device is deleting routes, 
+				 reset or isolate it from the network. Otherwise, check other devices. Neither of the devices displayed 
+				 in the display isis purge-source-trace analysis-report command output is the faulty device."
+			::= { hwIsisTraps 29 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.24.2.4.30
+		hwIsisThirdPartRouteBeDeletedByPurgeInexactClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex }
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were not deleted."
+			::= { hwIsisTraps 30 }
+			
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.31
+		hwIsisThirdPartRouteBeDeletedByPurge NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex, hwIsisTotalNodeNum,
+                      hwIsisHostName1, hwIsisHostIpAddress1, hwIsisSystemID1, hwIsisHostName2, hwIsisHostIpAddress2, hwIsisSystemID2,
+                      hwIsisHostName3, hwIsisHostIpAddress3, hwIsisSystemID3 } 
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were deleted. Log in to the possibly faulty device. 
+				 If the device is deleting routes, reset or isolate it from the network. Otherwise, check other devices."
+			::= { hwIsisTraps 31 }
+		
+	    -- 1.3.6.1.4.1.2011.5.25.24.2.4.32
+		hwIsisThirdPartRouteBeDeletedByPurgeClear NOTIFICATION-TYPE
+			OBJECTS { hwisisSysInstance, hwIsisHostName, hwIsisHostIpAddress, hwIsisSystemID, hwisisSysLevelIndex } 
+			STATUS current
+			DESCRIPTION 
+				"IS-IS routes advertised by another device were not deleted."
+			::= { hwIsisTraps 32 }
+    END
+--   
+
+--
+-- HUAWEI-ISIS-CONF-MIB.my
+--

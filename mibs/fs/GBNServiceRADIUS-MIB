@@ -1,0 +1,229 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : gbnRadius.mib
+--  Description  : Sample admin Radius configuration MIB 
+--  Version      : 1.0  
+--  Date         : July 2, 2002     
+--
+--  Copyright (c) 1999-2000 admin Systems, Inc.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+
+    GBNServiceRADIUS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, IpAddress, 
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+        
+        DisplayString, MacAddress,
+        RowStatus, TruthValue                   FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnServiceAAA                           FROM ADMIN-MASTER-MIB;
+        
+
+    gbnRadiusMib MODULE-IDENTITY
+        LAST-UPDATED    "0008290000Z"
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+        DESCRIPTION     "admin Radius Enterprise MIB definition."
+        REVISION        "0008290000Z"
+        DESCRIPTION     "admin Radius Enterprise MIB definition."
+        ::= { gbnServiceAAA 2 }
+
+------------------------------------------------------------------------------
+--  define groups in admin-RADIUS-MIB
+------------------------------------------------------------------------------
+
+        -------------------------------------------------------------------
+        --Add gbnRadiusConfTable MIB      2002/07/02     ouyangchunbo
+        -------------------------------------------------------------------
+        gbnRadiusConfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF gbnRadiusConfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of Radius configuration table"
+        ::= { gbnRadiusMib 1 }
+
+        gbnRadiusConfEntry OBJECT-TYPE
+        SYNTAX gbnRadiusConfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of radius parameters."
+        INDEX { ServerIndex }
+        ::= { gbnRadiusConfTable 1 }
+
+        gbnRadiusConfEntry ::= SEQUENCE {
+            ServerIndex     Integer32,
+            ServerName      DisplayString,
+            PrimServerIP    DisplayString,
+            PrimAuthPort    Integer32,
+            PrimAcctPort     Integer32,
+            SecServerIP     DisplayString,
+            SecAuthPort      Integer32,
+            SecAcctPort     Integer32,
+            Key             DisplayString,
+            bRadiusUsed     TruthValue,
+            UserNameFormat   TruthValue,
+            RealAcctTime     Integer32,
+            bRealAcct     TruthValue,
+            gbnRadiusClientIp DisplayString,
+            PrimAcctServerIP    DisplayString,
+            SecAcctServerIP     DisplayString,
+            acctKey             DisplayString            
+          }
+
+        ServerIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..1024)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A simple index into 'gbnRadiusConfTable'."
+        ::= { gbnRadiusConfEntry 1 }
+
+        ServerName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple ServerName of gbnRadiusConfEntry."
+        ::= { gbnRadiusConfEntry 2 }
+
+        PrimServerIP OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple PrimServerIP of gbnRadiusConfEntry."
+        ::= { gbnRadiusConfEntry 3 }
+
+        PrimAuthPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 1812:all }
+             The authenticate port of prime radius server"
+        ::= { gbnRadiusConfEntry 4 }
+
+        PrimAcctPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 1813:all }
+             The account port of prime radius server"
+        ::= { gbnRadiusConfEntry 5 }
+
+
+        SecServerIP OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple SecServerIP of gbnRadiusConfEntry."
+        ::= { gbnRadiusConfEntry 6 }
+
+        SecAuthPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 1812:all }
+             The authenticate port of second radius server"
+        ::= { gbnRadiusConfEntry 7 }
+
+        SecAcctPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 1813:all }
+             The account port of second radius server"
+        ::= { gbnRadiusConfEntry 8 }
+
+        Key OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { '' }
+             A simple Key of gbnRadiusConfEntry."
+        ::= { gbnRadiusConfEntry 9 }
+
+        bRadiusUsed OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Status of the current radius server 1-used  2 - unused."
+        ::= { gbnRadiusConfEntry 10 }
+
+        UserNameFormat OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Status of user name format configuration 1-with domain  2-without domain."
+        ::= { gbnRadiusConfEntry 11 }
+
+        RealAcctTime OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The realtime account time of radius server,the value of default is 12 minutes"
+        ::= { gbnRadiusConfEntry 12 }
+
+        bRealAcct OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Status of the realtime account switch 1-used  2 - unused."
+        ::= { gbnRadiusConfEntry 13 }
+
+    gbnRadiusClientIp OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A system IP address for RADIUS client to report who it is to the server."
+        ::= { gbnRadiusConfEntry 14 }
+
+        PrimAcctServerIP OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple PrimAcctServerIP of gbnRadiusConfEntry."
+        ::= { gbnRadiusConfEntry 15 }    
+
+        SecAcctServerIP OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple SecAcctServerIP of gbnRadiusConfEntry."
+        ::= { gbnRadiusConfEntry 16 }        
+
+       acctKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { '' }
+             A simple Key of gbnRadiusConfEntry."
+        ::= { gbnRadiusConfEntry 17 }
+--
+-- END of admin-RADIUS-MIB                
+--
+
+END
+

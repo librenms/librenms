@@ -8,3 +8,7 @@ over:
 discovery:
     - sysDescr:
         - LANIER
+discovery_modules:
+    toner: true
+poller_modules:
+    toner: true

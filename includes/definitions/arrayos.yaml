@@ -1,0 +1,9 @@
+os: arrayos
+text: 'Array Networks'
+type: loadbalancer
+icon: arraynetworks
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.7564
+mib_dir:
+    - arraynetworks

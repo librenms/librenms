@@ -1,0 +1,196 @@
+-- ****************************************************************************
+--  COLUBRIS-BANDWIDTH-CONTROL-MIB definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Networks Bandwidth Control MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-BANDWIDTH-CONTROL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32
+        FROM    SNMPv2-SMI
+    TruthValue
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    ColubrisPriorityQueue
+        FROM    COLUBRIS-TC
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+;
+
+
+colubrisBandwidthControlMIB   MODULE-IDENTITY
+    LAST-UPDATED    "200408170000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Networks Bandwidth Control MIB."
+
+    ::= { colubrisMgmtV2 14 }
+
+
+-- colubrisBandwidthControlMIB definition
+colubrisBandwidthControlMIBObjects OBJECT IDENTIFIER ::= { colubrisBandwidthControlMIB 1 }
+
+-- colubris Bandwidth Control groups
+coBandwidthControlConfig    OBJECT IDENTIFIER ::= { colubrisBandwidthControlMIBObjects 1 }
+
+
+-- The Bandwidth Control Address Configuration Group
+coBandwidthControlEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if bandwidth control is enabled or disabled on the Internet port." 
+    ::= { coBandwidthControlConfig 1 }
+
+coBandwidthControlMaxTransmitRate OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the maximum rate at which data can be transmitted on the 
+                 Internet port. If traffic exceeds this rate for short bursts,
+                 it is buffered. Long overages will result in data being dropped."
+    ::= { coBandwidthControlConfig 2 }
+
+coBandwidthControlMaxReceiveRate OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the maximum rate at which data can be received on the 
+                 Internet port. If traffic exceeds this rate for short bursts
+                 it is buffered. Long overages will result in data being dropped."
+    ::= { coBandwidthControlConfig 3 }
+
+
+coBandwidthControlLevelTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoBandwidthControlLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "A table defining the current bandwidth level settings that are
+                 active on the device."
+    ::= { coBandwidthControlConfig 4 }
+
+coBandwidthControlLevelEntry OBJECT-TYPE
+    SYNTAX      CoBandwidthControlLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coBandwidthControlLevelTable.
+                 coBandwidthControlLevelIndex - Uniquely access a definition for this
+                                                particular bandwidth control level."
+    INDEX       { coBandwidthControlLevelIndex }
+    ::= { coBandwidthControlLevelTable 1 }
+
+CoBandwidthControlLevelEntry ::= SEQUENCE
+{
+    coBandwidthControlLevelIndex                  ColubrisPriorityQueue,
+    coBandwidthControlLevelMinTransmitRate        Integer32,
+    coBandwidthControlLevelMaxTransmitRate        Integer32,
+    coBandwidthControlLevelMinReceiveRate         Integer32,
+    coBandwidthControlLevelMaxReceiveRate         Integer32
+}
+
+coBandwidthControlLevelIndex OBJECT-TYPE
+    SYNTAX      ColubrisPriorityQueue
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the level index. Each index defines a bandwidth level that
+                 traffic can be assigned to. Four indexes are defined (1 to 4) with 
+                 the following meanings: 1-Low, 2-Normal, 3- High, 4-Very High."
+    ::= { coBandwidthControlLevelEntry 1 }
+
+coBandwidthControlLevelMinTransmitRate OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specify the minimum transmit rate for the level
+                 as a percentage of coBandwidthControlMaxTransmitRate. This is the 
+                 minimum amount of bandwidth that will be assigned to a level as 
+                 soon as outgoing traffic is present on the level."
+    ::= { coBandwidthControlLevelEntry 2 }
+
+coBandwidthControlLevelMaxTransmitRate OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specify the maximum transmit rate for the specified level
+                 as a percentage of coBandwidthControlMaxTransmitRate. This is the 
+                 maximum amount of outgoing bandwidth that can be consumed by the 
+                 level. Traffic in excess will be buffered for short bursts, and 
+                 dropped for sustained overages"
+    ::= { coBandwidthControlLevelEntry 3 }
+
+coBandwidthControlLevelMinReceiveRate OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specify the minimum receive rate for the specified level 
+                 as a percentage of coBandwidthControlMaxReceiveRateRate. This is the 
+                 minimum amount of bandwidth that will be assigned to a level as soon 
+                 as incoming traffic is present on the level." 
+    ::= { coBandwidthControlLevelEntry 4 }
+
+coBandwidthControlLevelMaxReceiveRate OBJECT-TYPE
+    SYNTAX      Integer32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specify the maximum receive rate for the specified level 
+                 as a percentage of coBandwidthControlMaxReceiveRateRate. This is the 
+                 maximum amount of incoming bandwidth that can be consumed by the 
+                 level. Traffic in excess will be buffered for short bursts, and 
+                 dropped for sustained overages." 
+    ::= { coBandwidthControlLevelEntry 5 }
+
+-- conformance information
+colubrisBandwidthControlMIBConformance OBJECT IDENTIFIER ::= { colubrisBandwidthControlMIB 2 }
+colubrisBandwidthControlMIBCompliances OBJECT IDENTIFIER ::= { colubrisBandwidthControlMIBConformance 1 }
+colubrisBandwidthControlMIBGroups      OBJECT IDENTIFIER ::= { colubrisBandwidthControlMIBConformance 2 }
+
+
+-- compliance statements
+colubrisBandwidthControlMIBCompliance MODULE-COMPLIANCE
+    STATUS      current 
+    DESCRIPTION "The compliance statement for the Bandwidth Control MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisBandwidthControlMIBGroup,
+                        colubrisBandwidthControlLevelMIBGroup
+                    }
+    ::= { colubrisBandwidthControlMIBCompliances 1 }
+
+-- units of conformance
+colubrisBandwidthControlMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coBandwidthControlEnable,
+                    coBandwidthControlMaxTransmitRate,
+                    coBandwidthControlMaxReceiveRate
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for use with Bandwidth Controls."
+    ::= { colubrisBandwidthControlMIBGroups 1 }
+
+colubrisBandwidthControlLevelMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coBandwidthControlLevelMinTransmitRate,
+                    coBandwidthControlLevelMaxTransmitRate,
+                    coBandwidthControlLevelMinReceiveRate,
+                    coBandwidthControlLevelMaxReceiveRate
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for use with Bandwidth Controls."
+    ::= { colubrisBandwidthControlMIBGroups 2 }
+
+END

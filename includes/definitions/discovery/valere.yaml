@@ -1,0 +1,83 @@
+mib: VALERE-DC-POWER-MIB
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemVoltage
+                    num_oid: '.1.3.6.1.4.1.13858.2.3.2.{{ $index }}'
+                    descr: System Voltage
+                    divisor: 100
+        current:
+            data:
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemCurrent
+                    num_oid: '.1.3.6.1.4.1.13858.2.3.3.{{ $index }}'
+                    descr: System Current
+                -
+                    oid: vpwrSystemIdentTable
+                    value: vpwrModuleCurrent
+                    num_oid: '.1.3.6.1.4.1.13858.2.1.6.1.4.{{ $index }}'
+                    high_limit: vpwrModuleCapacity
+                    divisor: 100
+                    group: 'Shelf {{ $vpwrBayIndex }}'
+                    descr: 'Module {{ $vpwrModuleIndex }} Current'
+                    skip_values:
+                        -   oid: vpwrModuleOID
+                            op: '='
+                            value: 'vpwrDcPowerLvd'
+        temperature:
+            data:
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemInternalTemperature
+                    num_oid: '.1.3.6.1.4.1.13858.2.3.5.{{ $index }}'
+                    descr: Internal Temperature
+                -
+                    oid: vpwrBatteryTempTable
+                    value: vpwrBatteryTemp
+                    num_oid: '.1.3.6.1.4.1.13858.7.1.1.1.3.{{ $index }}'
+                    descr: vpwrBatteryTempName
+                    index: 'battery{{ $index }}'
+                    group: Batteries
+                    skip_value_lt: -125
+        state:
+            data:
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemControllerState
+                    num_oid: '.1.3.6.1.4.1.13858.2.3.4.{{ $index }}'
+                    descr: Controller Status
+                    state_name: vpwrSystemControllerState
+                    states:
+                        - { descr: Unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: Normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: Change, graph: 0, value: 2, generic: 1 }
+                        - { descr: Alarm, graph: 0, value: 3, generic: 2 }
+                        - { descr: Menu, graph: 0, value: 4, generic: 1 }
+                        - { descr: IrActive, graph: 0, value: 5, generic: 1 }
+                -
+                    oid: vpwrSystemParameterGroup
+                    value: vpwrSystemTempCompensationState
+                    num_oid: '.1.3.6.1.4.1.13858.2.3.6.{{ $index }}'
+                    descr: Temperature Compensation
+                    state_name: vpwrSystemTempCompensationState
+                    states:
+                        - { descr: Inactive, graph: 0, value: 0, generic: 0 }
+                        - { descr: Active, graph: 0, value: 1, generic: 1 }
+                -
+                    oid: vpwrSystemIdentTable
+                    value: vpwrModuleOperStatus
+                    num_oid: '.1.3.6.1.4.1.13858.2.1.6.1.5.{{ $index }}'
+                    group: 'Shelf {{ $vpwrBayIndex }}'
+                    descr: 'Module {{ $vpwrModuleIndex }} Status'
+                    state_name: vpwrModuleOperStatus
+                    states:
+                        - { descr: Ok, graph: 0, value: 0, generic: 0 }
+                        - { descr: Alarm, graph: 0, value: 1, generic: 2 }
+                        - { descr: Disabled, graph: 0, value: 2, generic: 3 }
+                        - { descr: RingerAOn, graph: 0, value: 3, generic: 1 }
+                        - { descr: RingerBOn, graph: 0, value: 4, generic: 1 }
+                        - { descr: Unknown, graph: 0, value: 5, generic: 3 }

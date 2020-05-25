@@ -1,0 +1,714 @@
+NIMBLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    enterprises
+        FROM SNMPv2-SMI;
+
+nimble MODULE-IDENTITY
+    LAST-UPDATED    "201208310000Z"
+    ORGANIZATION    "Nimble Storage, Inc."
+    CONTACT-INFO
+            "Nimble Storage
+
+            support@nimblestorage.com"
+    DESCRIPTION
+        "SMI Information for Nimble"
+
+    REVISION    "201208310000Z"
+    DESCRIPTION "Nimble Storage 2.0.3.0 MIB"
+
+    REVISION    "201206120000Z"
+    DESCRIPTION "Nimble Storage 1.3.0.0 MIB"
+
+    REVISION    "201102280000Z"
+    DESCRIPTION "Initial revision"
+    ::= { enterprises 37447 }
+
+--
+-- Nimble Objects (variables and tables)
+--
+
+variables OBJECT IDENTIFIER ::= { nimble 1 }
+
+--
+-- Volume Information
+--
+
+volNumberOfVolumes OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         obsolete
+    DESCRIPTION
+    "This variable has been obsoleted"
+    ::= { variables 1 }
+
+volTable OBJECT-TYPE  -- MUST BE SUFFIXED WITH Table
+    SYNTAX         SEQUENCE OF VolEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "Volume information table."
+    ::= { variables 2 }
+
+volEntry OBJECT-TYPE
+    SYNTAX          VolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of volume information."
+    INDEX { volIndex }
+    ::= { volTable 1 }
+
+VolEntry ::= SEQUENCE {
+    volIndex                    Unsigned32,
+    volID                       Unsigned32,
+    volName                     DisplayString,
+    volSizeLow                  Unsigned32,
+    volSizeHigh                 Unsigned32,
+    volUsageLow                 Unsigned32,
+    volUsageHigh                Unsigned32,
+    volReserveLow               Unsigned32,
+    volReserveHigh              Unsigned32,
+    volOnline                   TruthValue,
+    volNumConnections           Unsigned32,
+    volStatTimeEpochSeconds     Counter64,
+    volIoReads                  Counter64,
+    volIoReadTimeMicrosec       Counter64,
+    volIoReadBytes              Counter64,
+    volIoSeqReads               Counter64,
+    volIoSeqReadBytes           Counter64,
+    volIoNonseqReadTotalHits    Counter64,
+    volIoNonseqReadMemHits      Counter64,
+    volIoNonseqReadSSDHits      Counter64,
+    volIoReadLatency0uTo100u    Counter64,
+    volIoReadLatency100uTo200u  Counter64,
+    volIoReadLatency200uTo500u  Counter64,
+    volIoReadLatency500uTo1m    Counter64,
+    volIoReadLatency1mTo2m      Counter64,
+    volIoReadLatency2mTo5m      Counter64,
+    volIoReadLatency5mTo10m     Counter64,
+    volIoReadLatency10mTo20m    Counter64,
+    volIoReadLatency20mTo50m    Counter64,
+    volIoReadLatency50mTo100m   Counter64,
+    volIoReadLatency100mTo200m  Counter64,
+    volIoReadLatency200mTo500m  Counter64,
+    volIoReadLatency500mTomax   Counter64,
+    volIoWrites                 Counter64,
+    volIoWriteTimeMicrosec      Counter64,
+    volIoWriteBytes             Counter64,
+    volIoSeqWrites              Counter64,
+    volIoSeqWriteBytes          Counter64,
+    volIoWriteLatency0uTo100u   Counter64,
+    volIoWriteLatency100uTo200u Counter64,
+    volIoWriteLatency200uTo500u Counter64,
+    volIoWriteLatency500uTo1m   Counter64,
+    volIoWriteLatency1mTo2m     Counter64,
+    volIoWriteLatency2mTo5m     Counter64,
+    volIoWriteLatency5mTo10m    Counter64,
+    volIoWriteLatency10mTo20m   Counter64,
+    volIoWriteLatency20mTo50m   Counter64,
+    volIoWriteLatency50mTo100m  Counter64,
+    volIoWriteLatency100mTo200m Counter64,
+    volIoWriteLatency200mTo500m Counter64,
+    volIoWriteLatency500mTomax  Counter64,
+    volDiskVolBytesUsedLow      Unsigned32,
+    volDiskVolBytesUsedHigh     Unsigned32,
+    volDiskSnapBytesUsedLow     Unsigned32,
+    volDiskSnapBytesUsedHigh    Unsigned32
+}
+
+volIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Volume Index."
+    ::= { volEntry 1 }
+
+volID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Volume ID."
+    ::= { volEntry 2 }
+
+volName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Volume Name."
+    ::= { volEntry 3 }
+
+volSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Maximum defined size of a volume in bytes - low order bytes."
+    ::= { volEntry 4 }
+
+volSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Maximum defined size of a volume in bytes - high order bytes."
+    ::= { volEntry 5 }
+
+volUsageLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Current number of bytes a volume is using - low order bytes."
+    ::= { volEntry 6 }
+
+volUsageHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Current number of bytes a volume is using - high order bytes."
+    ::= { volEntry 7 }
+
+volReserveLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of bytes reserved for a volume - low order bytes."
+    ::= { volEntry 8 }
+
+volReserveHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of bytes reserved for a volume - high order bytes."
+    ::= { volEntry 9 }
+
+volOnline OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Volume Online (true or false)."
+    ::= { volEntry 10 }
+
+volNumConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of iSCSI connections to the volume."
+    ::= { volEntry 11 }
+
+volStatTimeEpochSeconds OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Time at which the sample was taken, measured in seconds since UNIX epoch."
+    ::= { volEntry 12 }
+
+volIoReads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Read I/Os (sequential and random)."
+    ::= { volEntry 13 }
+
+volIoReadTimeMicrosec OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative time for Read operation (sequential and random)."
+    ::= { volEntry 14 }
+
+volIoReadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Read I/O bytes (sequential and random)."
+    ::= { volEntry 15 }
+
+volIoSeqReads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total Number of Sequential Read I/O operations."
+    ::= { volEntry 16 }
+
+volIoSeqReadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Read I/O bytes."
+    ::= { volEntry 17 }
+
+volIoNonseqReadTotalHits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of Nonsequential Read I/O hits (to Memory and SSD)."
+    ::= { volEntry 18 }
+
+volIoNonseqReadMemHits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of Nonsequential Read I/O hits to Memory."
+    ::= { volEntry 19 }
+
+volIoNonseqReadSSDHits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of Nonsequential Read I/O hits to SSD."
+    ::= { volEntry 20 }
+
+volIoReadLatency0uTo100u OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 0 and 100 microseconds."
+    ::= { volEntry 21 }
+
+volIoReadLatency100uTo200u OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 100 and 200 microseconds."
+    ::= { volEntry 22 }
+
+volIoReadLatency200uTo500u OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 200 and 500 microseconds."
+    ::= { volEntry 23 }
+
+volIoReadLatency500uTo1m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 1/2 and 1 milliseconds."
+    ::= { volEntry 24 }
+
+volIoReadLatency1mTo2m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 1 and 2 milliseconds."
+    ::= { volEntry 25 }
+
+volIoReadLatency2mTo5m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 2 and 5 milliseconds."
+    ::= { volEntry 26 }
+
+volIoReadLatency5mTo10m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 5 and 10 milliseconds."
+    ::= { volEntry 27 }
+
+volIoReadLatency10mTo20m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 10 and 20 milliseconds."
+    ::= { volEntry 28 }
+
+volIoReadLatency20mTo50m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 20 and 50 milliseconds."
+    ::= { volEntry 29 }
+
+volIoReadLatency50mTo100m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 50 and 100 milliseconds."
+    ::= { volEntry 30 }
+
+volIoReadLatency100mTo200m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 100 and 200 milliseconds."
+    ::= { volEntry 31 }
+
+volIoReadLatency200mTo500m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency between 200 and 500 milliseconds."
+    ::= { volEntry 32 }
+
+volIoReadLatency500mTomax OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Read I/O operations with latency above 500 milliseconds."
+    ::= { volEntry 33 }
+
+volIoWrites OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Write I/Os."
+    ::= { volEntry 34 }
+
+volIoWriteTimeMicrosec OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative time for Write operation (sequential and random)."
+    ::= { volEntry 35 }
+
+volIoWriteBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Write I/O bytes (sequential and random)."
+    ::= { volEntry 36 }
+
+volIoSeqWrites OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total Number of Sequential Write I/O operations."
+    ::= { volEntry 37 }
+
+volIoSeqWriteBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Sequential Write I/O bytes."
+    ::= { volEntry 38 }
+
+volIoWriteLatency0uTo100u OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 0 and 100 microseconds."
+    ::= { volEntry 39 }
+
+volIoWriteLatency100uTo200u OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 100 and 200 microseconds."
+    ::= { volEntry 40 }
+
+volIoWriteLatency200uTo500u OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 200 and 500 microseconds."
+    ::= { volEntry 41 }
+
+volIoWriteLatency500uTo1m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 1/2 and 1 milliseconds."
+    ::= { volEntry 42 }
+
+volIoWriteLatency1mTo2m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 1 and 2 milliseconds."
+    ::= { volEntry 43 }
+
+volIoWriteLatency2mTo5m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 2 and 5 milliseconds."
+    ::= { volEntry 44 }
+
+volIoWriteLatency5mTo10m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 5 and 10 milliseconds."
+    ::= { volEntry 45 }
+
+volIoWriteLatency10mTo20m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 10 and 20 milliseconds."
+    ::= { volEntry 46 }
+
+volIoWriteLatency20mTo50m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 20 and 50 milliseconds."
+    ::= { volEntry 47 }
+
+volIoWriteLatency50mTo100m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 50 and 100 milliseconds."
+    ::= { volEntry 48 }
+
+volIoWriteLatency100mTo200m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 100 and 200 milliseconds."
+    ::= { volEntry 49 }
+
+volIoWriteLatency200mTo500m OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency between 200 and 500 milliseconds."
+    ::= { volEntry 50 }
+
+volIoWriteLatency500mTomax OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of Write I/O operations with latency above 500 milliseconds."
+    ::= { volEntry 51 }
+
+volDiskVolBytesUsedLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for volumes - low order bytes."
+    ::= { volEntry 52 }
+
+volDiskVolBytesUsedHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for volumes - high order bytes."
+    ::= { volEntry 53 }
+
+volDiskSnapBytesUsedLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for snapshots - low order bytes."
+    ::= { volEntry 54 }
+
+volDiskSnapBytesUsedHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for snapshots - high order bytes."
+    ::= { volEntry 55 }
+
+---
+--- Global Stats
+---
+
+globalStats OBJECT IDENTIFIER ::= { variables 3 }
+
+statTimeEpochSeconds OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Time at which the sample was taken, measured in seconds since UNIX epoch."
+    ::= { globalStats 1 }
+
+ioReads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Read I/Os (sequential and random)."
+    ::= { globalStats 2 }
+
+ioSeqReads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Read I/Os."
+    ::= { globalStats 3 }
+
+ioWrites OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Write I/Os."
+    ::= { globalStats 4 }
+
+ioSeqWrites OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Write I/Os."
+    ::= { globalStats 5 }
+
+ioReadTimeMicrosec OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative microseconds the system has spent processing Read I/Os.  This includes system and disk latency, but not any network latency back to the initiator."
+    ::= { globalStats 6 }
+
+ioWriteTimeMicrosec OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative microseconds the system has spent processing Write I/Os.  This includes system and disk latency, but not any network latency back to the initiator."
+    ::= { globalStats 7 }
+
+ioReadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Read I/O bytes (sequential and random)."
+    ::= { globalStats 8 }
+
+ioSeqReadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Read I/O bytes."
+    ::= { globalStats 9 }
+
+ioWriteBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Write I/O bytes (sequential and random)."
+    ::= { globalStats 10 }
+
+ioSeqWriteBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Write I/O bytes."
+    ::= { globalStats 11 }
+
+diskVolBytesUsedLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for volumes - low order bytes."
+    ::= { globalStats 12 }
+
+diskVolBytesUsedHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for volumes - high order bytes."
+    ::= { globalStats 13 }
+
+diskSnapBytesUsedLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for snapshots - low order bytes."
+    ::= { globalStats 14 }
+
+diskSnapBytesUsedHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for snapshots - high order bytes."
+    ::= { globalStats 15 }
+
+ioNonseqReadHits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of cache hits for Non-Sequential Read I/Os."
+    ::= { globalStats 16 }
+
+--
+-- Nimble arrays
+--
+
+arrays OBJECT IDENTIFIER ::= { nimble 3 }
+
+arrayEntry OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Nimble Array."
+    ::= { arrays 1 }
+
+
+END

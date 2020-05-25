@@ -1,56 +1,56 @@
 #!/usr/bin/env php
 <?php
+/**
+ * build-base.php
+ *
+ * Create database structure.
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2017 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
 
-// MYSQL Check - FIXME
-// 1 UNKNOWN
-include 'config.php';
+if (!isset($init_modules)) {
+    $opts = getopt('ldh:u:p:n:t:s:');
 
-if (!isset($sql_file)) {
-    $sql_file = 'build.sql';
-}
+    $map = [
+        'h' => 'DB_HOST',
+        'u' => 'DB_USERNAME',
+        'p' => 'DB_PASSWORD',
+        'n' => 'DB_DATABASE',
+        't' => 'DB_PORT',
+        's' => 'DB_SOCKET',
+    ];
 
-$sql_fh = fopen($sql_file, 'r');
-if ($sql_fh === false) {
-    echo 'ERROR: Cannot open SQL build script '.$sql_file."\n";
-    exit(1);
-}
-
-$database_link = mysqli_connect('p:'.$config['db_host'], $config['db_user'], $config['db_pass']);
-if ($database_link === false) {
-    echo 'ERROR: Cannot connect to database: '.mysqli_error($database_link)."\n";
-    exit(1);
-}
-
-$select = mysqli_select_db($database_link, $config['db_name']);
-if ($select === false) {
-    echo 'ERROR: Cannot select database: '.mysqli_error($database_link)."\n";
-    exit(1);
-}
-
-$limit = 0;
-while (!feof($sql_fh)) {
-    $line = fgetss($sql_fh);
-    if (isset($_SESSION['stage'])) {
-        $limit++;
-        if (isset($_SESSION['offset']) && $limit < $_REQUEST['offset']) {
-            continue;
-        } elseif (time()-$_SESSION['last'] > 45) {
-            $_SESSION['offset'] = $limit;
-            $GLOBALS['refresh'] = '<b>Installing, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
-            return;
-        } else {
-            echo 'Step #'.$limit.' ...'.PHP_EOL;
+    // set env variables
+    foreach ($map as $opt => $env_name) {
+        if (isset($opts[$opt])) {
+            putenv("$env_name=" . $opts[$opt]);
         }
     }
 
-    if (!empty($line)) {
-        $creation = mysqli_query($database_link, $line);
-        if (!$creation) {
-            echo 'WARNING: Cannot execute query ('.$line.'): '.mysqli_error($database_link)."\n";
-        }
-    }
+    $init_modules = ['nodb', 'laravel'];
+    require __DIR__ . '/includes/init.php';
+
+    set_debug(isset($opts['d']));
+
+    $skip_schema_lock = isset($opts['l']);
 }
 
-fclose($sql_fh);
+require __DIR__ . '/includes/sql-schema/update.php';
 
-require 'includes/sql-schema/update.php';
+exit($return);

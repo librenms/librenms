@@ -1,0 +1,36 @@
+os: ciscosce
+group: cisco
+text: 'Cisco SCE'
+type: network
+ifname: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+icon: cisco
+poller_modules:
+    bgp-peers: false
+    cisco-cbqos: false
+    cisco-cef: false
+    cisco-mac-accounting: false
+    cisco-voice: false
+    cisco-remote-access-monitor: false
+    cisco-sla: false
+    cisco-ipsec-flow-monitor: false
+    cipsec-tunnels: false
+    cisco-otv: false
+    ospf: false
+    wireless: false
+discovery_modules:
+    cisco-cef: false
+    cisco-sla: false
+    cisco-mac-accounting: false
+    cisco-otv: false
+    cisco-pw: false
+    vrf: false
+    cisco-vrf-lite: false
+mib_dir:
+    - cisco
+discovery:
+    - sysDescr:
+        - 'Cisco Service Control'

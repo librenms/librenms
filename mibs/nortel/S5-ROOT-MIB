@@ -1,0 +1,77 @@
+
+S5-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY
+            FROM SNMPv2-SMI
+	series5000
+		FROM SYNOPTICS-ROOT-MIB;
+
+s5RootMib MODULE-IDENTITY
+       LAST-UPDATED    "200407200000Z"
+       ORGANIZATION    "Nortel Networks"
+       CONTACT-INFO    "Nortel Networks"
+       DESCRIPTION
+           "5000 Root MIB
+
+            Copyright 1993-2004 Nortel Networks, Inc.
+            All rights reserved.
+            This Nortel Networks SNMP Management Information Base Specification
+            (Specification) embodies Nortel Networks' confidential and
+            proprietary intellectual property. Nortel Networks retains all
+            title and ownership in the Specification, including any
+            revisions.
+
+            This Specification is supplied 'AS IS,' and Nortel Networks makes
+            no warranty, either express or implied, as to the use,
+            operation, condition, or performance of the Specification."
+
+       REVISION "200407200000Z" -- 20 July 2004
+       DESCRIPTION "Version 118:  Conversion to SMIv2"
+
+       ::= { series5000 0 }
+
+-- Branches under "series5000"
+
+-- branch for registration of values for objects
+--   with syntax of OBJECT IDENTIFIER
+  s5reg		OBJECT IDENTIFIER ::= { series5000 1 }
+
+-- Branch for 'Enterprise' field values in traps
+  s5Traps	OBJECT IDENTIFIER ::= { series5000 2 }
+    s5EthTrap	-- Ethernet
+		OBJECT IDENTIFIER ::= { s5Traps 1 }
+    s5TokTrap	-- Token Ring
+		OBJECT IDENTIFIER ::= { s5Traps 2 }
+    s5FddTrap	-- FDDI
+		OBJECT IDENTIFIER ::= { s5Traps 3 }
+    s5ChaTrap	-- Chassis
+		OBJECT IDENTIFIER ::= { s5Traps 4 }
+    s5ComTrap	-- Common
+		OBJECT IDENTIFIER ::= { s5Traps 5 }
+    s5EcellTrap	-- EtherCell
+		OBJECT IDENTIFIER ::= { s5Traps 6 }
+    atmTraps  -- Atm
+                OBJECT IDENTIFIER ::= { s5Traps 7 }
+     remoteLoginTrap    -- Remote Login
+                OBJECT IDENTIFIER ::= { s5Traps 8 }
+     stpChangeTrap    -- STP Topology Change
+                OBJECT IDENTIFIER ::= { s5Traps 9 }
+     
+-- Major 5000 MIB branches
+  s5Chassis	OBJECT IDENTIFIER ::= { series5000 3 }
+  s5Agent	OBJECT IDENTIFIER ::= { series5000 4 }
+  s5Com		OBJECT IDENTIFIER ::= { series5000 5 }
+  s5Eth		OBJECT IDENTIFIER ::= { series5000 6 }
+  s5Tok		OBJECT IDENTIFIER ::= { series5000 7 }
+  s5Fddi	OBJECT IDENTIFIER ::= { series5000 8 }
+  s5EnTop	OBJECT IDENTIFIER ::= { series5000 9 }
+  s5TrTop	OBJECT IDENTIFIER ::= { series5000 10 }
+  s5FdTop	OBJECT IDENTIFIER ::= { series5000 11 }
+  s5EnMsTop	OBJECT IDENTIFIER ::= { series5000 13 }
+  s5AtmTop	OBJECT IDENTIFIER ::= { series5000 14 }
+  s5IfExt	OBJECT IDENTIFIER ::= { series5000 15 }
+  bnLogMsg      OBJECT IDENTIFIER ::= { series5000 16 }
+  s5Tcs         OBJECT IDENTIFIER ::= { series5000 17 }
+
+END

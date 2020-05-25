@@ -1,0 +1,104 @@
+-- LENOVO-PRODUCTS-MIB: Lenovo product object identifier assignments
+-- Copyright (c) 2014-2017 Lenovo Group Ltd.  All rights reserved.
+
+LENOVO-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    lenovoProducts, lenovoModules
+        FROM LENOVO-SMI-MIB;
+
+lenovoProductsMIB MODULE-IDENTITY
+    LAST-UPDATED    "201705010000Z"
+    ORGANIZATION    "Lenovo"
+    CONTACT-INFO
+        "Lenovo
+
+         Postal: 1009 Think Place
+         Morrisville, NC 27560
+		 USA
+
+         Tel: +1 (919) 968-4465
+
+         E-mail: snmp@lenovo.com"
+    DESCRIPTION
+        "This module defines the object identifiers returned as values for
+         sysObjectID for Lenovo hardware."
+        REVISION      "201604200000Z"
+		DESCRIPTION   "Initial version."
+        REVISION      "201705010000Z"
+        DESCRIPTION   "Add sysObjectId for G8332 CNOS product"
+		REVISION      "201705020000Z"
+        DESCRIPTION   "Add sysObjectIDs for NE1032, NE1032T, NE1072, and NE10032 switches."
+
+		    ::= { lenovoModules 1 }
+			
+-- Lenovo Server Products
+lenovoServerProducts OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Root object identifier for Lenovo server products."
+    ::= { lenovoProducts 11 }
+
+-- Lenovo Network Flex Products
+flex OBJECT-IDENTITY   
+    STATUS current
+    DESCRIPTION
+        "Root object identifier for Lenovo Flex network products."  
+    ::= { lenovoProducts 18}	
+
+--Lenovo Flex System SI4091 10Gb System Interconnect Module
+si4091 OBJECT IDENTIFIER ::= { flex 23}
+
+
+-- Lenovo Network RackSwitch (ToR) Products
+tor OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Root object identifier for Lenovo RackSwitch network products."
+   ::= { lenovoProducts 7}
+   
+-- Lenovo RackSwitch G8296
+g8296 OBJECT IDENTIFIER ::= { tor 22}
+
+-- Lenovo RackSwitch G8272
+g8272 OBJECT IDENTIFIER ::= { tor 24}
+
+-- Lenovo RackSwitch G8296 CNOS
+g8296-cnos OBJECT IDENTIFIER ::= { tor 29}
+
+-- Lenovo RackSwitch G8272 CNOS
+g8272-cnos OBJECT IDENTIFIER ::= { tor 30}
+
+-- Lenovo RackSwitch G8332 CNOS
+g8332-cnos OBJECT IDENTIFIER ::= { tor 31}
+
+-- Lenovo ThinkSystem NE1032 RackSwitch
+ne1032 OBJECT IDENTIFIER ::= { tor 32}
+
+-- Lenovo ThinkSystem NE1032T RackSwitch
+ne1032t OBJECT IDENTIFIER ::= { tor 33}
+
+-- Lenovo ThinkSystem NE1072T RackSwitch
+ne1072t OBJECT IDENTIFIER ::= { tor 34}
+
+-- Lenovo ThinkSystem NE10032 RackSwitch
+ne10032 OBJECT IDENTIFIER ::= { tor 36}
+
+-- Lenovo ThinkSystem NE2572 RackSwitch 
+ne2572 OBJECT IDENTIFIER ::= { tor 41}
+
+-- Lenovo CE0128T Switch
+ce0128t OBJECT IDENTIFIER ::= { tor 37}
+
+-- Lenovo CE0128P Switch
+ce0128p OBJECT IDENTIFIER ::= { tor 38}
+
+-- Lenovo CE0152T Switch
+ce0152t OBJECT IDENTIFIER ::= { tor 39}
+
+-- Lenovo ThinkSystem NE2572 RackSwitch 
+ne2572 OBJECT IDENTIFIER ::= { tor 41}
+
+END

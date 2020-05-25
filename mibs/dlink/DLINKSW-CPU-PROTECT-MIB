@@ -1,0 +1,484 @@
+
+
+--  *****************************************************************
+--  DLINKSW-CPU-PROTECT-MIB.mib : CPU Protection MIB
+-- 
+--  Copyright (c) 2012 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+	DLINKSW-CPU-PROTECT-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS					
+			OBJECT-GROUP, MODULE-COMPLIANCE			
+				FROM SNMPv2-CONF			
+			Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI						
+			TEXTUAL-CONVENTION			
+				FROM SNMPv2-TC
+			dlinkIndustrialCommon			
+				FROM DLINK-ID-REC-MIB;		
+	
+	
+		dlinkSwCpuProtectMIB MODULE-IDENTITY 
+			LAST-UPDATED "201208080000Z"		
+            ORGANIZATION "D-Link Corp."
+            CONTACT-INFO
+                "        D-Link Corporation
+
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:     +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+                "
+			DESCRIPTION 
+				"The MIB module for managing CPU protection."
+			REVISION        "201208080000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."	
+			::= { dlinkIndustrialCommon 19 }
+
+		
+	
+--
+-- Textual conventions
+--
+	
+		CpuProtectProtocolType ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"Represents a protocol type.
+				Note that a particular agent may support only certain protocol
+				types. Thus, the valid values of this object are project
+				dependent.
+				An agent may respond with an error (e.g., 'inconsistentValue ')
+				to a management SET operation which attempts to modify
+				the value to one which is not supported by the managed device. 
+				arp(1)          indicates IP Address Resolution Protocol (ARP). 
+				bgp(2)          indicates Border Gateway Protocol.
+				dhcp(3)         indicates Dynamic Host Configuration Protocol.
+				dhcpv6(4)       indicates Dynamic Host Configuration Protocol for IPv6.
+				dns(5)          indicates Domain Name Services.                      
+				dot1x(6)        indicates IEEE 802.1X (Port Based Network Access Control).
+				dvmrp(7)        indicates Distance Vector Multicast Routing Protocol.
+				gvrp(8)         indicates GARP VLAN Registration Protocol.           
+				icmp(9)         indicates IPv4 Internet Control Message Protocol.    
+				icmpv6Ndp(10)   indicates IPv6 ICMP Neighbor Discover Protocol (NS/NA/RS/RA).
+				icmpv6Other(11) indicates IPv6 ICMP except NDP NS/NA/RS/RA.
+				igmp(12)        indicates Internet Group Management Protocol.   
+				lacp(13),       indicates Link Aggregation Control Protocol.    
+				ntp(14),        indicates Network Time Protocol.                
+				ospf(15),       indicates Open Shortest Path First.             
+				ospfv3(16),     indicates OSPF for IPv6.
+				pim(17),        indicates Protocol Independent Multicast.         
+				pppoe(18),      indicates Point-to-Point Protocol over Ethernet.  
+				rip(19),        indicates Routing Information Protocol.           
+				ripng(20),      indicates Routing Information Protocol for IPv6.
+				snmp(21),       indicates Simple Network Management Protocol.    
+				ssh(22),        indicates Secured shell.                          
+				stp(23),        indicates Spanning Tree Protocol (IEEE 802.1D).        
+				telnet(24),     indicates Telnet.                                 
+				tftp(25),       indicates Trivial File Transfer Protocol.         
+				vrrp(26),       indicates Virtual Router Redundancy Protocol.     
+				web(27)         indicates HTTP and HTTPS.      				                
+				"
+			SYNTAX INTEGER
+				{
+				arp(1),
+				bgp(2),
+				dhcp(3),
+				dhcpv6(4),
+				dns(5),
+				dot1x(6),
+				dvmrp(7),
+				gvrp(8),
+				icmp(9),
+				icmpv6Ndp(10),
+				icmpv6Other(11),
+				igmp(12),
+				lacp(13),
+				ntp(14),
+				ospf(15),
+				ospfv3(16),
+				pim(17),
+				pppoe(18),
+				rip(19),
+				ripng(20),
+				snmp(21),
+				ssh(22),
+				stp(23),
+				telnet(24),
+				tftp(25),
+				vrrp(26),
+				web(27)
+				}
+
+		MaxRate ::= TEXTUAL-CONVENTION		
+		 	STATUS current
+			DESCRIPTION 
+				"The range for configuring rate-limit in packet per second (pps).
+				Note that a particular agent may support different rate range.
+				Thus, the valid values are project dependent.
+				An agent may respond with an error (e.g., 'inconsistentValue ')
+				to a management SET operation which attempts to modify
+				the value to one which is not supported by the managed device.
+				The value -1 has a special meaning. When this object is
+                set to -1, there is no rate-limit of the entry."
+			SYNTAX Integer32 (-1 | 0..65535)
+
+		UnitID ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the slot (for a chassis device) or 
+				unit number (for stacking device).				
+				For a standalone device, 0 is used for UnitID.
+				Note that a particular agent may support different range
+				of unit/slot ID.
+				Thus, the valid values are project dependent.
+				An agent may respond with an error (e.g., 'inconsistentValue ')
+				to a management SET operation which attempts to modify
+				the value to one which is not supported by the managed device.				 
+				"
+			SYNTAX Integer32 (0 | 1..64)
+
+	
+--
+-- Node definitions
+--
+	
+		dCpuProtectMIBNotifications OBJECT IDENTIFIER ::= { dlinkSwCpuProtectMIB 0 }		
+		dCpuProtectMIBObjects       OBJECT IDENTIFIER ::= { dlinkSwCpuProtectMIB 1 }
+        dCpuProtectMIBConformance   OBJECT IDENTIFIER ::= { dlinkSwCpuProtectMIB 2 }
+
+									
+		dCpuProtectMIBObjectsCtrl OBJECT IDENTIFIER ::= { dCpuProtectMIBObjects 2 }
+				
+--  ***************************************************************************
+--  dCpuProtectProtoRateLimitTable
+--  ***************************************************************************      
+		dCpuProtectProtoRateLimitTable OBJECT-TYPE
+			SYNTAX      SEQUENCE OF DCpuProtectProtoRateLimitEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"The object configure the rate-limit of traffic destined to CPU 
+				based on protocol type."
+			::= { dCpuProtectMIBObjectsCtrl 1 }
+		
+		dCpuProtectProtoRateLimitEntry OBJECT-TYPE
+			SYNTAX      DCpuProtectProtoRateLimitEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"The object configures rate-limit control based on a specific
+				protocol type."
+			INDEX { dCpuProtectProtoRLType }
+			::= { dCpuProtectProtoRateLimitTable 1 }
+		
+		DCpuProtectProtoRateLimitEntry ::=
+			SEQUENCE { 
+				dCpuProtectProtoRLType          CpuProtectProtocolType,
+				dCpuProtectProtoRLRate			MaxRate,
+				dCpuProtectProtoRLClearCounter	INTEGER				
+			}
+
+		dCpuProtectProtoRLType OBJECT-TYPE
+			SYNTAX      CpuProtectProtocolType
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the protocol type."
+			::= { dCpuProtectProtoRateLimitEntry 1 }
+		
+		dCpuProtectProtoRLRate OBJECT-TYPE
+			SYNTAX      MaxRate
+			MAX-ACCESS  read-create
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the rate-limit of the specific 
+				protocol type.
+				The value of -1 has the special meaning of identifying 
+				that there is no rate-limit of the specific protocol type."
+			DEFVAL      { -1 }	
+			::= { dCpuProtectProtoRateLimitEntry 2 }
+
+		
+		dCpuProtectProtoRLClearCounter OBJECT-TYPE
+			SYNTAX      INTEGER
+				{   clear(1),
+				    noOp(2)
+				}
+			MAX-ACCESS  read-create
+			STATUS current
+			DESCRIPTION
+				"This object is used to reset the counter of the specific 
+				protocol type when set to 'clear'.
+				No action is taken if this object is set to 'noOp'.
+				When read, the value 'noOp' is returned."
+			DEFVAL      { noOp }	
+			::= { dCpuProtectProtoRateLimitEntry 3 }
+				
+
+		
+--  ***************************************************************************
+--  dCpuProtectSubIntfRLTable
+--  ***************************************************************************
+		dCpuProtectSubIntfRLTable OBJECT-TYPE
+			SYNTAX      SEQUENCE OF DCpuProtectSubIntfRLEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This table consists of the rate-limit information of the 
+				sub-interface."
+			::= { dCpuProtectMIBObjectsCtrl 2 }
+		
+		dCpuProtectSubIntfRLEntry OBJECT-TYPE
+			SYNTAX      DCpuProtectSubIntfRLEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"The object configure rate-limit control based on a specific 
+				sub-interface."
+			INDEX { dCpuProtectSubIntfRLType }
+			::= { dCpuProtectSubIntfRLTable 1 }
+		
+		DCpuProtectSubIntfRLEntry ::=
+			SEQUENCE { 
+				dCpuProtectSubIntfRLType 				INTEGER,
+				dCpuProtectSubIntfRLRate				MaxRate,
+				dCpuProtectSubIntfRLClearCounter		INTEGER
+			 }
+
+		dCpuProtectSubIntfRLType OBJECT-TYPE
+			SYNTAX      INTEGER
+				{   manage(1),
+				    protocol(2),
+				    route(3)
+				}
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the type of sub-interface."
+			::= { dCpuProtectSubIntfRLEntry 1 }
+		
+		dCpuProtectSubIntfRLRate OBJECT-TYPE
+			SYNTAX      MaxRate
+			MAX-ACCESS  read-create
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the rate-limit of the specific 
+				sub-interface.
+				The value of -1 has the special meaning of identifying 
+				that there is no rate-limit of the specific sub-interface."	
+			DEFVAL      { -1 }				
+			::= { dCpuProtectSubIntfRLEntry 2 }
+		
+		dCpuProtectSubIntfRLClearCounter OBJECT-TYPE
+			SYNTAX      INTEGER
+				{   clear(1),
+				    noOp(2)
+				}
+			MAX-ACCESS  read-create
+			STATUS      current
+			DESCRIPTION
+				"This object is used to reset the counter of the specific 
+				sub-interface when set to 'clear'.
+				No action is taken if this object is set to 'noOp'.
+				When read, the value 'noOp' is returned."
+		    DEFVAL      { noOp }
+			::= { dCpuProtectSubIntfRLEntry 3 }
+				
+		dCpuProtectMIBObjectsCounters OBJECT IDENTIFIER 
+		::= { dCpuProtectMIBObjects 3 }
+		
+--  ***************************************************************************
+--  dCpuProtectProtoRLCntTable
+--  ***************************************************************************
+		dCpuProtectProtoRLCntTable OBJECT-TYPE
+			SYNTAX      SEQUENCE OF DCpuProtectProtoRLCntEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This table consists of the traffic statistics by protocol type."
+			::= { dCpuProtectMIBObjectsCounters 1 }
+		
+		dCpuProtectProtoRLCntEntry OBJECT-TYPE
+			SYNTAX      DCpuProtectProtoRLCntEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"The per unit/slot traffic statistics about a protocol type.				
+				Objects in	this table are read-only and appear
+				automatically whenever the value of dCpuProtectProtoRLRate of a row 
+				in the dCpuProtectProtoRateLimitTable is not -1 (no-limit)."
+			INDEX { dCpuProtectProtoRLCntType, dCpuProtectProtoRLCntUnitID }
+			::= { dCpuProtectProtoRLCntTable 1 }
+		
+		DCpuProtectProtoRLCntEntry ::=
+			SEQUENCE { 
+				dCpuProtectProtoRLCntType       CpuProtectProtocolType,
+				dCpuProtectProtoRLCntUnitID	    UnitID,
+				dCpuProtectProtoRLCntTotalCnt   Counter64,
+				dCpuProtectProtoRLCntDropCnt    Counter64
+			 }
+
+		dCpuProtectProtoRLCntType OBJECT-TYPE
+			SYNTAX      CpuProtectProtocolType
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the Protocol type."
+			::= { dCpuProtectProtoRLCntEntry 1 }
+                       		
+		dCpuProtectProtoRLCntUnitID OBJECT-TYPE
+			SYNTAX      UnitID
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the unit/slot ID (for a chassis device) 
+				or unit number (for stacking device). For a standalone device, 
+				0 is used for UnitID."
+			::= { dCpuProtectProtoRLCntEntry 2 }
+		
+		dCpuProtectProtoRLCntTotalCnt OBJECT-TYPE
+			SYNTAX      Counter64
+			MAX-ACCESS  read-only
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the counter which counts the packets
+				received by CPU (per unit/slot) for the protocol type."
+			::= { dCpuProtectProtoRLCntEntry 3 }
+		
+		dCpuProtectProtoRLCntDropCnt OBJECT-TYPE
+			SYNTAX      Counter64
+			MAX-ACCESS  read-only
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the counter which counts the dropped
+				packets due to exceeding the configured rate-limit."
+			::= { dCpuProtectProtoRLCntEntry 4 }
+		
+--  ***************************************************************************
+--  dCpuProtectSubIntfRLCounterTable
+--  ***************************************************************************
+		dCpuProtectSubIntfRLCounterTable OBJECT-TYPE
+			SYNTAX      SEQUENCE OF DCpuProtectSubIntfRLCounterEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This table consists of the traffic statistics by sub-interface."
+			::= { dCpuProtectMIBObjectsCounters 2 }
+		
+		dCpuProtectSubIntfRLCounterEntry OBJECT-TYPE
+			SYNTAX DCpuProtectSubIntfRLCounterEntry
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"The per unit traffic statistics about a sub-interface.				
+				Objects in	this table are read-only and appear
+				automatically whenever the value of dCpuProtectSubIntfRLRate of a row 
+				in the dCpuProtectSubIntfRLTable is not -1 (no-limit)."								
+			INDEX { dCpuProtectSubIntfRLCntType, dCpuProtectSubIntfRLCntUnitID }
+			::= { dCpuProtectSubIntfRLCounterTable 1 }
+		
+		DCpuProtectSubIntfRLCounterEntry ::=
+			SEQUENCE { 
+				dCpuProtectSubIntfRLCntType       INTEGER,
+				dCpuProtectSubIntfRLCntUnitID     UnitID,
+				dCpuProtectSubIntfRLCntTotalCnt   Counter64,
+				dCpuProtectSubIntfRLCntDropCnt    Counter64
+			 }
+
+		dCpuProtectSubIntfRLCntType OBJECT-TYPE
+			SYNTAX      INTEGER
+				{   manage(1),
+				    protocol(2),
+				    route(3)
+				}
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the type of sub-interface."
+			::= { dCpuProtectSubIntfRLCounterEntry 1 }
+		
+		dCpuProtectSubIntfRLCntUnitID OBJECT-TYPE
+			SYNTAX      UnitID
+			MAX-ACCESS  not-accessible
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the slot (for a chassis device) or 
+				unit number (for stacking device). For a standalone device, 
+				0 is used for UnitID."
+			::= { dCpuProtectSubIntfRLCounterEntry 2 }
+		
+		dCpuProtectSubIntfRLCntTotalCnt OBJECT-TYPE
+			SYNTAX      Counter64
+			MAX-ACCESS  read-only
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the counter which counts the packets
+				 received by CPU (per unit/slot) for the subinterface."
+			::= { dCpuProtectSubIntfRLCounterEntry 3 }
+		
+		dCpuProtectSubIntfRLCntDropCnt OBJECT-TYPE
+			SYNTAX      Counter64
+			MAX-ACCESS  read-only
+			STATUS      current
+			DESCRIPTION
+				"This object indicates the counter which counts the dropped
+				packets due to exceeding the configured rate-limit."
+			::= { dCpuProtectSubIntfRLCounterEntry 4 }
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************		
+	    		
+	    dCpuProtectMIBCompliances OBJECT IDENTIFIER ::= { dCpuProtectMIBConformance 1 }
+	
+	    dCpuProtectMIBCompliance MODULE-COMPLIANCE
+	        STATUS      current
+		    DESCRIPTION 
+			    "The compliance statement for entities which implement the 
+			    DLINKSW-CPU-PROTECT-MIB."
+		    MODULE -- this module
+		    MANDATORY-GROUPS { dCpuProtectProtoGroup }
+		    
+		    GROUP dCpuProtectSubIntfGroup
+		    DESCRIPTION 
+		        "This group is required only if the agent implements                
+			    the rate-limit for traffic destined to CPU by sub-interface type."				
+		    ::= { dCpuProtectMIBCompliances 1 }
+
+		
+        dCpuProtectMIBGroups OBJECT IDENTIFIER ::= { dCpuProtectMIBConformance 2 }
+                
+		dCpuProtectProtoGroup OBJECT-GROUP
+		    OBJECTS 
+		        {   dCpuProtectProtoRLRate, 
+		            dCpuProtectProtoRLClearCounter, 		             
+				    dCpuProtectProtoRLCntTotalCnt, 
+			    	dCpuProtectProtoRLCntDropCnt 
+				}
+		    STATUS      current
+		    DESCRIPTION 
+			    "A collection of objects providing the configuration or 
+			    statistics about the rate-limit of traffic destined to 
+			    CPU by protocol type."
+		    ::= { dCpuProtectMIBGroups 1 }
+		
+		dCpuProtectSubIntfGroup OBJECT-GROUP
+		    OBJECTS 
+		        {   dCpuProtectSubIntfRLRate, 
+		            dCpuProtectSubIntfRLClearCounter, 
+			        dCpuProtectSubIntfRLCntTotalCnt, 
+			        dCpuProtectSubIntfRLCntDropCnt 
+			    }
+		    STATUS      current
+			DESCRIPTION 
+				"A collection of objects providing the configuration or 
+				statistics about the rate-limit of traffic destined to 
+				CPU by sub-interface type."
+			::= { dCpuProtectMIBGroups 2 }			    
+	   	
+	END
+

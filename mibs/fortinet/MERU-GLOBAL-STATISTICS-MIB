@@ -1,0 +1,4035 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-GLOBAL-STATISTICS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwStatistics
+        FROM MERU-SMI
+    MwlNodeType,
+    MwlOnOffSwitch,
+    MwlBandType
+        FROM MERU-TC;
+
+  mwGlobalStatistics  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Global Statistics infrastructure"
+    ::= { mwStatistics 1 } 
+  
+    mwAuthStats                              OBJECT IDENTIFIER ::= { mwGlobalStatistics 3 }
+    mwQosStats                               OBJECT IDENTIFIER ::= { mwGlobalStatistics 4 }
+    mwSystemGeneral                          OBJECT IDENTIFIER ::= { mwGlobalStatistics 13 }
+    mwSystemResource                         OBJECT IDENTIFIER ::= { mwGlobalStatistics 14 }
+    mwSystemStation                          OBJECT IDENTIFIER ::= { mwGlobalStatistics 15 }
+    mwSystemThruput                          OBJECT IDENTIFIER ::= { mwGlobalStatistics 16 }
+    
+  
+  mwIf80211StatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwIf80211StatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Wireless (802.11) Statistics "
+    ::= { mwGlobalStatistics 1 }
+
+  mwIf80211StatsEntry  OBJECT-TYPE
+    SYNTAX MwIf80211StatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Wireless (802.11) Statistics "
+    INDEX {  mwIf80211StatsTableIndex  }
+    ::= { mwIf80211StatsTable 1 }
+
+  MwIf80211StatsEntry  ::=  SEQUENCE { 
+       mwIf80211StatsTableIndex                                    Integer32, 
+       mwIf80211StatsNodeId                                        Unsigned32,
+       mwIf80211StatsIfIndex                                       Integer32,
+       mwIf80211StatsChannel                                       Unsigned32,
+       mwIf80211StatsNodeName                                      DisplayString,
+       mwIf80211StatsThroughput                                    Counter64,
+       mwIf80211StatsNoiseLevel                                    Integer32,
+       mwIf80211StatsFailedCount                                   Counter64,
+       mwIf80211StatsTxFragCount                                   Counter64,
+       mwIf80211StatsRxByteCount                                   Counter64,
+       mwIf80211StatsTxByteCount                                   Counter64,
+       mwIf80211StatsIfRetryCount                                  Counter64,
+       mwIf80211StatsTxFrameCount                                  Counter64,
+       mwIf80211StatsRcvFragCount                                  Counter64,
+       mwIf80211StatsTxAMSDUCount                                  Counter64,
+       mwIf80211StatsRxAMSDUCount                                  Counter64,
+       mwIf80211StatsTxAMPDUCount                                  Counter64,
+       mwIf80211StatsRxAMPDUCount                                  Counter64,
+       mwIf80211StatsFrameDupCount                                 Counter64,
+       mwIf80211StatsFcsErrorCount                                 Counter64,
+       mwIf80211StatsPlcpErrorCount                                Counter64,
+       mwIf80211StatsLossPercentage                                Integer32,
+       mwIf80211StatsBeaconOverhead                                Integer32,
+       mwIf80211StatsRtsSuccessCount                               Counter64,
+       mwIf80211StatsRtsFailureCount                               Counter64,
+       mwIf80211StatsAckFailureCount                               Counter64,
+       mwIf80211StatsRetryAMSDUCount                               Counter64,
+       mwIf80211StatsTxRetryCountBAR                               Counter64,
+       mwIf80211StatsRetryPercentage                               Integer32,
+       mwIf80211StatsFailedAMSDUCount                              Counter64,
+       mwIf80211StatsPSMPSuccessCount                              Counter64,
+       mwIf80211StatsPSMPFailureCount                              Counter64,
+       mwIf80211StatsBeamformingCount                              Counter64,
+       mwIf80211StatsRfBarrierActions                              Counter64,
+       mwIf80211StatsMcastTxFrameCount                             Counter64,
+       mwIf80211StatsQosCFPollsRxCount                             Counter64,
+       mwIf80211StatsAMSDUAckFailCount                             Counter64,
+       mwIf80211StatsFrame20MhzTxCount                             Counter64,
+       mwIf80211StatsFrame40MhzTxCount                             Counter64,
+       mwIf80211StatsFrame20MhzRxCount                             Counter64,
+       mwIf80211StatsFrame40MhzRxCount                             Counter64,
+       mwIf80211StatsGrantRDGUsedCount                             Counter64,
+       mwIf80211StatsTotalRxMgmtFrames                             Unsigned32,
+       mwIf80211StatsMultipleRetryCount                            Counter64,
+       mwIf80211StatsMcastRcvFrameCount                            Counter64,
+       mwIf80211StatsChannelUtilization                            Counter64,
+       mwIf80211StatsTxMPDUInAMPDUCount                            Counter64,
+       mwIf80211StatsMPDUInRxAMPDUCount                            Counter64,
+       mwIf80211StatsTxRetryCountUnaggr                            Counter64,
+       mwIf80211StatsRxRetriedFrameCount                           Counter64,
+       mwIf80211StatsRxUnicastFrameCount                           Counter64,
+       mwIf80211StatsQosCFPollsLostCount                           Counter64,
+       mwIf80211StatsGrantRDGUnusedCount                           Counter64,
+       mwIf80211StatsDualCTSSuccessCount                           Counter64,
+       mwIf80211StatsDualCTSFailureCount                           Counter64,
+       mwIf80211StatsSTBCCTSSuccessCount                           Counter64,
+       mwIf80211StatsSTBCCTSFailureCount                           Counter64,
+       mwIf80211StatsRTSLSIGSuccessCount                           Counter64,
+       mwIf80211StatsRTSLSIGFailureCount                           Counter64,
+       mwIf80211StatsTxUnicastFrameCount                           Counter64,
+       mwIf80211StatsRxAllDataFrameCount                           Counter64,
+       mwIf80211StatsNeighborhoodCounter                           Unsigned32,
+       mwIf80211StatsAssignedStationCount                          Counter64,
+       mwIf80211StatsMultiRetryAMSDUCount                          Counter64,
+       mwIf80211StatsTxOctetsInAMSDUCount                          Counter64,
+       mwIf80211StatsRxOctetsInAMSDUCount                          Counter64,
+       mwIf80211StatsTxOctetsInAMPDUCount                          Counter64,
+       mwIf80211StatsRxOctetsInAMPDUCount                          Counter64,
+       mwIf80211StatsImplicitBARFailCount                          Counter64,
+       mwIf80211StatsExplicitBARFailCount                          Counter64,
+       mwIf80211StatsChanWidthSwitchCount                          Counter64,
+       mwIf80211StatsTxMultiRetryCountBAR                          Counter64,
+       mwIf80211StatsTotalRxControlFrames                          Unsigned32,
+       mwIf80211StatsProbeReqRespOverhead                          Integer32,
+       mwIf80211StatsWepUndecryptableCount                         Counter64,
+       mwIf80211StatsQosDiscardedFragCount                         Counter64,
+       mwIf80211StatsQosCFPollsUnusedCount                         Counter64,
+       mwIf80211StatsAMPDUDelCRCErrorCount                         Counter64,
+       mwIf80211StatsTxRetryCountSubfrAggr                         Counter64,
+       mwIf80211StatsProfileBeaconDataRate                         DisplayString,
+       mwIf80211StatsAssociatedStationCount                        Counter64,
+       mwIf80211StatsDiscoveredStationCount                        Counter64,
+       mwIf80211StatsTxFrameInGrantRDGCount                        Counter64,
+       mwIf80211StatsTxOctetInGrantRDGCount                        Counter64,
+       mwIf80211StatsNonSTBCCTSSuccessCount                        Counter64,
+       mwIf80211StatsNonSTBCCTSFailureCount                        Counter64,
+       mwIf80211StatsTxRetryLimitExCountBAR                        Counter64,
+       mwIf80211StatsQosCFPollsUnusableCount                       Counter64,
+       mwIf80211StatsTxRetryLimitExCountAggr                       Counter64,
+       mwIf80211StatsTxMultiRetryCountUnaggr                       Counter64,
+       mwIf80211StatsTxFailedHwRetryExceeded                       Counter64,
+       mwIf80211StatsTxRetryLimitExCountUnaggr                     Counter64,
+       mwIf80211StatsRxDataForAssignedStations                     Unsigned32,
+       mwIf80211StatsTxMultiRetryCountSubfrAggr                    Counter64,
+       mwIf80211StatsMgmtFrameOverheadInAirtime                    Unsigned32,
+       mwIf80211StatsTxRetryLimitExCountSubfrAggr                  Counter64,
+       mwIf80211StatsUnicastBeaconLossThrExceeded                  Counter64,
+       mwIf80211StatsRxMgmtFramesForAssignedStations               Unsigned32,
+       mwIf80211StatsPotentialBeaconCollisionCounter               Unsigned32,
+       mwIf80211StatsRowStatus                                     RowStatus 
+  }
+   
+   
+  mwIf80211StatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwIf80211StatsEntry 1 }
+
+  mwIf80211StatsNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwIf80211StatsEntry    2 }
+
+  mwIf80211StatsIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwIf80211StatsEntry    3 }
+
+  mwIf80211StatsNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwIf80211StatsEntry    4 }
+
+  mwIf80211StatsThroughput  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Average throughput"
+    ::= { mwIf80211StatsEntry    5 }
+
+  mwIf80211StatsNoiseLevel  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current Noise Level"
+    ::= { mwIf80211StatsEntry    6 }
+
+  mwIf80211StatsFailedCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Failed Count"
+    ::= { mwIf80211StatsEntry    7 }
+
+  mwIf80211StatsTxFragCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Fragment Count"
+    ::= { mwIf80211StatsEntry    8 }
+
+  mwIf80211StatsRxByteCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of bytes received"
+    ::= { mwIf80211StatsEntry    9 }
+
+  mwIf80211StatsTxByteCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of bytes transmitted"
+    ::= { mwIf80211StatsEntry   10 }
+
+  mwIf80211StatsIfRetryCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Retry Count"
+    ::= { mwIf80211StatsEntry   11 }
+
+  mwIf80211StatsTxFrameCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Frame Count"
+    ::= { mwIf80211StatsEntry   12 }
+
+  mwIf80211StatsRcvFragCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received Fragment Count"
+    ::= { mwIf80211StatsEntry   13 }
+
+  mwIf80211StatsTxAMSDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit AMSDU Count"
+    ::= { mwIf80211StatsEntry   14 }
+
+  mwIf80211StatsRxAMSDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received AMSDU Count"
+    ::= { mwIf80211StatsEntry   15 }
+
+  mwIf80211StatsTxAMPDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit AMPDU Count"
+    ::= { mwIf80211StatsEntry   16 }
+
+  mwIf80211StatsRxAMPDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received AMPDU Count"
+    ::= { mwIf80211StatsEntry   17 }
+
+  mwIf80211StatsFrameDupCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Frame Duplicate Count"
+    ::= { mwIf80211StatsEntry   18 }
+
+  mwIf80211StatsFcsErrorCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes FCS Error Count"
+    ::= { mwIf80211StatsEntry   19 }
+
+  mwIf80211StatsPlcpErrorCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes PLCP Error Count"
+    ::= { mwIf80211StatsEntry   20 }
+
+  mwIf80211StatsLossPercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Loss Percentage"
+    ::= { mwIf80211StatsEntry   21 }
+
+  mwIf80211StatsRtsSuccessCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes RTS Success Count"
+    ::= { mwIf80211StatsEntry   22 }
+
+  mwIf80211StatsRtsFailureCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes RTS Failure Count"
+    ::= { mwIf80211StatsEntry   23 }
+
+  mwIf80211StatsAckFailureCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ACK Failure Count"
+    ::= { mwIf80211StatsEntry   24 }
+
+  mwIf80211StatsRetryAMSDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Retry AMSDU Count"
+    ::= { mwIf80211StatsEntry   25 }
+
+  mwIf80211StatsTxRetryCountBAR  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Retry Count BAR"
+    ::= { mwIf80211StatsEntry   26 }
+
+  mwIf80211StatsFailedAMSDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Failed AMSDU Count"
+    ::= { mwIf80211StatsEntry   27 }
+
+  mwIf80211StatsPSMPSuccessCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes PSMP Success Count"
+    ::= { mwIf80211StatsEntry   28 }
+
+  mwIf80211StatsPSMPFailureCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes PSMP Failure Count"
+    ::= { mwIf80211StatsEntry   29 }
+
+  mwIf80211StatsBeamformingCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Beamforming Count"
+    ::= { mwIf80211StatsEntry   30 }
+
+  mwIf80211StatsMcastTxFrameCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Multicast Transmit Frame Count"
+    ::= { mwIf80211StatsEntry   31 }
+
+  mwIf80211StatsQosCFPollsRxCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Qos CF Polls Rx Count"
+    ::= { mwIf80211StatsEntry   32 }
+
+  mwIf80211StatsAMSDUAckFailCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AMSDU Ack Failure Count"
+    ::= { mwIf80211StatsEntry   33 }
+
+  mwIf80211StatsFrame20MhzTxCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Frame 20 Mhz Transmit Count"
+    ::= { mwIf80211StatsEntry   34 }
+
+  mwIf80211StatsFrame40MhzTxCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Frame 40 Mhz Transmit Count"
+    ::= { mwIf80211StatsEntry   35 }
+
+  mwIf80211StatsFrame20MhzRxCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Frame 20 Mhz Received Count"
+    ::= { mwIf80211StatsEntry   36 }
+
+  mwIf80211StatsFrame40MhzRxCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Frame 40 Mhz Received Count"
+    ::= { mwIf80211StatsEntry   37 }
+
+  mwIf80211StatsGrantRDGUsedCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Granted RDG Used Count"
+    ::= { mwIf80211StatsEntry   38 }
+
+  mwIf80211StatsMultipleRetryCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Multiple Retry Count"
+    ::= { mwIf80211StatsEntry   39 }
+
+  mwIf80211StatsMcastRcvFrameCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Multicast Received Frame Count"
+    ::= { mwIf80211StatsEntry   40 }
+
+  mwIf80211StatsChannelUtilization  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel Utilization"
+    ::= { mwIf80211StatsEntry   41 }
+
+  mwIf80211StatsTxMPDUInAMPDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit MPDUs in AMPDU Count"
+    ::= { mwIf80211StatsEntry   42 }
+
+  mwIf80211StatsMPDUInRxAMPDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes MPDUs in Received AMPDU Count"
+    ::= { mwIf80211StatsEntry   43 }
+
+  mwIf80211StatsTxRetryCountUnaggr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Retry Count Unaggr"
+    ::= { mwIf80211StatsEntry   44 }
+
+  mwIf80211StatsRxRetriedFrameCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received Retried frame Count"
+    ::= { mwIf80211StatsEntry   45 }
+
+  mwIf80211StatsRxUnicastFrameCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received Unicast frame Count"
+    ::= { mwIf80211StatsEntry   46 }
+
+  mwIf80211StatsQosCFPollsLostCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Qos CF Polls Lost Count"
+    ::= { mwIf80211StatsEntry   47 }
+
+  mwIf80211StatsGrantRDGUnusedCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Granted RDG Unused Count"
+    ::= { mwIf80211StatsEntry   48 }
+
+  mwIf80211StatsDualCTSSuccessCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Dual CTS Success Count"
+    ::= { mwIf80211StatsEntry   49 }
+
+  mwIf80211StatsDualCTSFailureCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Dual CTS Failure Count"
+    ::= { mwIf80211StatsEntry   50 }
+
+  mwIf80211StatsSTBCCTSSuccessCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes STBCCTS Success Count"
+    ::= { mwIf80211StatsEntry   51 }
+
+  mwIf80211StatsSTBCCTSFailureCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes STBCCTS Failure Count"
+    ::= { mwIf80211StatsEntry   52 }
+
+  mwIf80211StatsRTSLSIGSuccessCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes RTSLSIG Success Count"
+    ::= { mwIf80211StatsEntry   53 }
+
+  mwIf80211StatsRTSLSIGFailureCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes RTSLSIG Failure Count"
+    ::= { mwIf80211StatsEntry   54 }
+
+  mwIf80211StatsAssignedStationCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Assigned Station Count"
+    ::= { mwIf80211StatsEntry   55 }
+
+  mwIf80211StatsMultiRetryAMSDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Multiple Retry AMSDU Count"
+    ::= { mwIf80211StatsEntry   56 }
+
+  mwIf80211StatsTxOctetsInAMSDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Octets In AMSDU Count"
+    ::= { mwIf80211StatsEntry   57 }
+
+  mwIf80211StatsRxOctetsInAMSDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received Octets In AMSDU Count"
+    ::= { mwIf80211StatsEntry   58 }
+
+  mwIf80211StatsTxOctetsInAMPDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Octets In AMPDU Count"
+    ::= { mwIf80211StatsEntry   59 }
+
+  mwIf80211StatsRxOctetsInAMPDUCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received Octets In AMPDU Count"
+    ::= { mwIf80211StatsEntry   60 }
+
+  mwIf80211StatsImplicitBARFailCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Implicit BAR Failure Count"
+    ::= { mwIf80211StatsEntry   61 }
+
+  mwIf80211StatsExplicitBARFailCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Explicit BAR Failure Count"
+    ::= { mwIf80211StatsEntry   62 }
+
+  mwIf80211StatsChanWidthSwitchCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel Width Switch Count"
+    ::= { mwIf80211StatsEntry   63 }
+
+  mwIf80211StatsTxMultiRetryCountBAR  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Multiple Retry Count BAR"
+    ::= { mwIf80211StatsEntry   64 }
+
+  mwIf80211StatsWepUndecryptableCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes WEP Undecryptable Count"
+    ::= { mwIf80211StatsEntry   65 }
+
+  mwIf80211StatsQosDiscardedFragCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Qos Discarded Fragment Count"
+    ::= { mwIf80211StatsEntry   66 }
+
+  mwIf80211StatsQosCFPollsUnusedCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Qos CF Polls Unused Count"
+    ::= { mwIf80211StatsEntry   67 }
+
+  mwIf80211StatsAMPDUDelCRCErrorCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AMPDU Delimeter CRC Error Count"
+    ::= { mwIf80211StatsEntry   68 }
+
+  mwIf80211StatsTxRetryCountSubfrAggr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Retry Count Subframe in Aggr"
+    ::= { mwIf80211StatsEntry   69 }
+
+  mwIf80211StatsAssociatedStationCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated Station Count"
+    ::= { mwIf80211StatsEntry   70 }
+
+  mwIf80211StatsDiscoveredStationCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Discovered Station Count"
+    ::= { mwIf80211StatsEntry   71 }
+
+  mwIf80211StatsTxFrameInGrantRDGCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Frames in Granted RDG Count"
+    ::= { mwIf80211StatsEntry   72 }
+
+  mwIf80211StatsTxOctetInGrantRDGCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Octets in Granted RDG Count"
+    ::= { mwIf80211StatsEntry   73 }
+
+  mwIf80211StatsNonSTBCCTSSuccessCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Non STBCCTS Success Count"
+    ::= { mwIf80211StatsEntry   74 }
+
+  mwIf80211StatsNonSTBCCTSFailureCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Non STBCCTS Failure Count"
+    ::= { mwIf80211StatsEntry   75 }
+
+  mwIf80211StatsTxRetryLimitExCountBAR  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Retry Limit Exceed Count BAR"
+    ::= { mwIf80211StatsEntry   76 }
+
+  mwIf80211StatsQosCFPollsUnusableCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Qos CF Polls Unusable Count"
+    ::= { mwIf80211StatsEntry   77 }
+
+  mwIf80211StatsTxRetryLimitExCountAggr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Retry Limit Exceed Count Aggr"
+    ::= { mwIf80211StatsEntry   78 }
+
+  mwIf80211StatsTxMultiRetryCountUnaggr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Multiple Retry Count Unaggr"
+    ::= { mwIf80211StatsEntry   79 }
+
+  mwIf80211StatsTxRetryLimitExCountUnaggr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Retry Limit Exceed Count Unaggr"
+    ::= { mwIf80211StatsEntry   81 }
+
+  mwIf80211StatsTxMultiRetryCountSubfrAggr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Multiple Retry Count Subframe in Aggr"
+    ::= { mwIf80211StatsEntry   82 }
+
+  mwIf80211StatsTxRetryLimitExCountSubfrAggr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Retry Limit Exceed Count Subframe in Aggr"
+    ::= { mwIf80211StatsEntry   83 }
+
+  mwIf80211StatsUnicastBeaconLossThrExceeded  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Unicast Beacon Loss Threshold Exceeded"
+    ::= { mwIf80211StatsEntry   84 }
+
+  mwIf80211StatsTxFailedHwRetryExceeded  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Failed Count by Hardware Retry Exceed"
+    ::= { mwIf80211StatsEntry   85 }
+
+  mwIf80211StatsRxDataForAssignedStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Data for Assigned Stations"
+    ::= { mwIf80211StatsEntry   86 }
+
+  mwIf80211StatsRxMgmtFramesForAssignedStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Management Frames"
+    ::= { mwIf80211StatsEntry   87 }
+
+  mwIf80211StatsTotalRxMgmtFrames  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Rx Management Frames"
+    ::= { mwIf80211StatsEntry   88 }
+
+  mwIf80211StatsTotalRxControlFrames  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Rx Control Frames"
+    ::= { mwIf80211StatsEntry   89 }
+
+  mwIf80211StatsMgmtFrameOverheadInAirtime  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Management Frame Overhead"
+    ::= { mwIf80211StatsEntry   90 }
+
+  mwIf80211StatsTxUnicastFrameCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmitted Unicast Frame Count"
+    ::= { mwIf80211StatsEntry   91 }
+
+  mwIf80211StatsRxAllDataFrameCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Received All Data Frame Count"
+    ::= { mwIf80211StatsEntry   92 }
+
+  mwIf80211StatsRfBarrierActions  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Frames blocked by RF-barrier"
+    ::= { mwIf80211StatsEntry   93 }
+
+  mwIf80211StatsBeaconOverhead  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Beacon Overhead"
+    ::= { mwIf80211StatsEntry   94 }
+
+  mwIf80211StatsProbeReqRespOverhead  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Probe Request and Response Overhead"
+    ::= { mwIf80211StatsEntry   95 }
+
+  mwIf80211StatsNeighborhoodCounter  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Neighborhood Counter"
+    ::= { mwIf80211StatsEntry   96 }
+
+  mwIf80211StatsPotentialBeaconCollisionCounter  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Potential Beacon Collision Counter"
+    ::= { mwIf80211StatsEntry   97 }
+
+  mwIf80211StatsProfileBeaconDataRate  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Profile of Beacon Data Rate"
+    ::= { mwIf80211StatsEntry   98 }
+
+  mwIf80211StatsRetryPercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Retry Percentage"
+    ::= { mwIf80211StatsEntry   99 }
+
+  mwIf80211StatsChannel  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel"
+    ::= { mwIf80211StatsEntry  100 }
+
+  mwIf80211StatsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwIf80211StatsEntry 103 }
+
+  mwIfStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Ethernet Statistics "
+    ::= { mwGlobalStatistics 2 }
+
+  mwIfStatsEntry  OBJECT-TYPE
+    SYNTAX MwIfStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Ethernet Statistics "
+    INDEX {  mwIfStatsTableIndex  }
+    ::= { mwIfStatsTable 1 }
+
+  MwIfStatsEntry  ::=  SEQUENCE { 
+       mwIfStatsTableIndex                                         Integer32, 
+       mwIfStatsIfDescr                                            DisplayString,
+       mwIfStatsIfNodeId                                           Integer32,
+       mwIfStatsIfOutQLen                                          Counter64,
+       mwIfStatsIfIndexStr                                         DisplayString,
+       mwIfStatsIfNodeName                                         DisplayString,
+       mwIfStatsIfNodeType                                         MwlNodeType,
+       mwIfStatsIfInOctets                                         Counter64,
+       mwIfStatsIfInErrors                                         Counter64,
+       mwIfStatsIfOutOctets                                        Counter64,
+       mwIfStatsIfOutErrors                                        Counter64,
+       mwIfStatsIfInDiscards                                       Counter64,
+       mwIfStatsIfInUcastPkts                                      Counter64,
+       mwIfStatsIfOutDiscards                                      Counter64,
+       mwIfStatsIfInNUcastPkts                                     Counter64,
+       mwIfStatsIfOutUcastPkts                                     Counter64,
+       mwIfStatsIfOutNUcastPkts                                    Counter64,
+       mwIfStatsIfInUnknownProtos                                  Counter64,
+       mwIfStatsRowStatus                                          RowStatus 
+  }
+   
+   
+  mwIfStatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwIfStatsEntry 1 }
+
+  mwIfStatsIfDescr  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Description"
+    ::= { mwIfStatsEntry    3 }
+
+  mwIfStatsIfNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Node ID"
+    ::= { mwIfStatsEntry    4 }
+
+  mwIfStatsIfOutQLen  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Out Queue Length"
+    ::= { mwIfStatsEntry    5 }
+
+  mwIfStatsIfNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Node Name"
+    ::= { mwIfStatsEntry    6 }
+
+  mwIfStatsIfNodeType  OBJECT-TYPE
+    SYNTAX MwlNodeType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Node Type"
+    ::= { mwIfStatsEntry    7 }
+
+  mwIfStatsIfInOctets  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes In Octets"
+    ::= { mwIfStatsEntry    8 }
+
+  mwIfStatsIfInErrors  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes In Errors"
+    ::= { mwIfStatsEntry    9 }
+
+  mwIfStatsIfOutOctets  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Out Octets"
+    ::= { mwIfStatsEntry   10 }
+
+  mwIfStatsIfOutErrors  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Out Errors"
+    ::= { mwIfStatsEntry   11 }
+
+  mwIfStatsIfInDiscards  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes In Discards"
+    ::= { mwIfStatsEntry   12 }
+
+  mwIfStatsIfInUcastPkts  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes In Unicast Packets"
+    ::= { mwIfStatsEntry   13 }
+
+  mwIfStatsIfOutDiscards  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Out Discards"
+    ::= { mwIfStatsEntry   14 }
+
+  mwIfStatsIfInNUcastPkts  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes In Non-Unicast Packets"
+    ::= { mwIfStatsEntry   15 }
+
+  mwIfStatsIfOutUcastPkts  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Out Unicast Packets"
+    ::= { mwIfStatsEntry   16 }
+
+  mwIfStatsIfOutNUcastPkts  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Out Non-Unicast Packets"
+    ::= { mwIfStatsEntry   17 }
+
+  mwIfStatsIfInUnknownProtos  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes In Unknown Protocols"
+    ::= { mwIfStatsEntry   18 }
+
+  mwIfStatsIfIndexStr  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwIfStatsEntry   22 }
+
+  mwIfStatsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwIfStatsEntry 20 }
+
+  mwAuthStatsAuth8021xRequestCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.1x Authentication Request Count"
+    ::= { mwAuthStats    1 }
+
+  mwAuthStatsAuth8021xSuccessCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.1x Authentication Success Count"
+    ::= { mwAuthStats    2 }
+
+  mwAuthStatsAuth8021xFailureCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.1x Authentication Failure Count"
+    ::= { mwAuthStats    3 }
+
+  mwAuthStatsAuth8021xStationCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.1x Authentication Station Count"
+    ::= { mwAuthStats    4 }
+
+  mwQosStatsSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Session Count"
+    ::= { mwQosStats    1 }
+
+  mwQosStatsH323SessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes H.323 Session Count"
+    ::= { mwQosStats    2 }
+
+  mwQosStatsSipSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SIP Session Count"
+    ::= { mwQosStats    3 }
+
+  mwQosStatsSccpSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SCCP Session Count"
+    ::= { mwQosStats    4 }
+
+  mwQosStatsRejectedSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rejected Session Count"
+    ::= { mwQosStats    5 }
+
+  mwQosStatsRejectedH323SessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rejected H.323 Session Count"
+    ::= { mwQosStats    6 }
+
+  mwQosStatsRejectedSipSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rejected SIP Session Count"
+    ::= { mwQosStats    7 }
+
+  mwQosStatsRejectedSccpSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rejected SCCP Session Count"
+    ::= { mwQosStats    8 }
+
+  mwQosStatsPendingSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Pending Session Count"
+    ::= { mwQosStats    9 }
+
+  mwQosStatsH323PendingSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Pending H.323 Session Count"
+    ::= { mwQosStats   10 }
+
+  mwQosStatsSipPendingSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Pending SIP Session Count"
+    ::= { mwQosStats   11 }
+
+  mwQosStatsSccpPendingSessionCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Pending SCCP Session Count"
+    ::= { mwQosStats   12 }
+
+  mwQosStatsQosActiveFlowCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Active Flows"
+    ::= { mwQosStats   13 }
+
+  mwQosStatsQosPendingFlowCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Pending Flows"
+    ::= { mwQosStats   14 }
+
+  mwStationStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwStationStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Statistics "
+    ::= { mwGlobalStatistics 6 }
+
+  mwStationStatsEntry  OBJECT-TYPE
+    SYNTAX MwStationStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Statistics "
+    INDEX {  mwStationStatsTableIndex  }
+    ::= { mwStationStatsTable 1 }
+
+  MwStationStatsEntry  ::=  SEQUENCE { 
+       mwStationStatsTableIndex                                    Integer32, 
+       mwStationStatsMacAddress                                    MacAddress,
+       mwStationStatsRssiReportCount                               Unsigned32,
+       mwStationStatsDhcpRequestCount                              Counter64,
+       mwStationStatsBssidReportCount                              Unsigned32,
+       mwStationStatsSipVideoBandwidth                             Counter64,
+       mwStationStatsSipVideoFlowCount                             Counter64,
+       mwStationStatsSipAudioBandwidth                             Counter64,
+       mwStationStatsSipAudioFlowCount                             Counter64,
+       mwStationStatsAddressChangeCount                            Counter64,
+       mwStationStatsQosActiveFlowCount                            Counter64,
+       mwStationStatsH323VideoBandwidth                            Counter64,
+       mwStationStatsH323VideoFlowCount                            Counter64,
+       mwStationStatsH323AudioBandwidth                            Counter64,
+       mwStationStatsH323AudioFlowCount                            Counter64,
+       mwStationStatsSccpVideoBandwidth                            Unsigned32,
+       mwStationStatsSccpVideoFlowCount                            Unsigned32,
+       mwStationStatsSccpAudioBandwidth                            Unsigned32,
+       mwStationStatsSccpAudioFlowCount                            Unsigned32,
+       mwStationStatsQosPendingFlowCount                           Counter64,
+       mwStationStatsSipVideoRsvBandwidth                          Counter64,
+       mwStationStatsSipAudioRsvBandwidth                          Counter64,
+       mwStationStatsVoluntaryHandoffCount                         Counter64,
+       mwStationStatsH323VideoRsvBandwidth                         Counter64,
+       mwStationStatsH323AudioRsvBandwidth                         Counter64,
+       mwStationStatsSccpVideoRsvBandwidth                         Unsigned32,
+       mwStationStatsSccpAudioRsvBandwidth                         Unsigned32,
+       mwStationStatsInvoluntaryHandoffCount                       Counter64 
+  }
+   
+   
+  mwStationStatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwStationStatsEntry 1 }
+
+  mwStationStatsMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MAC Address"
+    ::= { mwStationStatsEntry    2 }
+
+  mwStationStatsDhcpRequestCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes DHCP Request Count"
+    ::= { mwStationStatsEntry    3 }
+
+  mwStationStatsSipVideoBandwidth  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SIP Video Bandwidth"
+    ::= { mwStationStatsEntry    4 }
+
+  mwStationStatsSipVideoFlowCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SIP Video Flow Count"
+    ::= { mwStationStatsEntry    5 }
+
+  mwStationStatsSipAudioBandwidth  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SIP Audio Bandwidth"
+    ::= { mwStationStatsEntry    6 }
+
+  mwStationStatsSipAudioFlowCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SIP Audio Flow Count"
+    ::= { mwStationStatsEntry    7 }
+
+  mwStationStatsAddressChangeCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Address Change Count"
+    ::= { mwStationStatsEntry    8 }
+
+  mwStationStatsQosActiveFlowCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes QoS Active Flow Count"
+    ::= { mwStationStatsEntry    9 }
+
+  mwStationStatsH323VideoBandwidth  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes H.323 Video Bandwidth"
+    ::= { mwStationStatsEntry   10 }
+
+  mwStationStatsH323VideoFlowCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes H.323 Video Flow Count"
+    ::= { mwStationStatsEntry   11 }
+
+  mwStationStatsH323AudioBandwidth  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes H.323 Audio Bandwidth"
+    ::= { mwStationStatsEntry   12 }
+
+  mwStationStatsH323AudioFlowCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes H.323 Audio Flow Count"
+    ::= { mwStationStatsEntry   13 }
+
+  mwStationStatsSccpVideoBandwidth  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SCCP Video Bandwidth"
+    ::= { mwStationStatsEntry   14 }
+
+  mwStationStatsSccpVideoFlowCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SCCP Video Flow Count"
+    ::= { mwStationStatsEntry   15 }
+
+  mwStationStatsSccpAudioBandwidth  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SCCP Audio Bandwidth"
+    ::= { mwStationStatsEntry   16 }
+
+  mwStationStatsSccpAudioFlowCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SCCP Audio Flow Count"
+    ::= { mwStationStatsEntry   17 }
+
+  mwStationStatsQosPendingFlowCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes QoS Pending Flow Count"
+    ::= { mwStationStatsEntry   18 }
+
+  mwStationStatsSipVideoRsvBandwidth  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SIP Video Reserved Bandwidth"
+    ::= { mwStationStatsEntry   19 }
+
+  mwStationStatsSipAudioRsvBandwidth  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SIP Audio Reserved Bandwidth"
+    ::= { mwStationStatsEntry   20 }
+
+  mwStationStatsVoluntaryHandoffCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Voluntary Handoff Count"
+    ::= { mwStationStatsEntry   21 }
+
+  mwStationStatsH323VideoRsvBandwidth  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes H.323 Video Reserved Bandwidth"
+    ::= { mwStationStatsEntry   22 }
+
+  mwStationStatsH323AudioRsvBandwidth  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes H.323 Audio Reserved Bandwidth"
+    ::= { mwStationStatsEntry   23 }
+
+  mwStationStatsSccpVideoRsvBandwidth  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SCCP Video Reserved Bandwidth"
+    ::= { mwStationStatsEntry   24 }
+
+  mwStationStatsSccpAudioRsvBandwidth  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SCCP Audio Reserved Bandwidth"
+    ::= { mwStationStatsEntry   25 }
+
+  mwStationStatsInvoluntaryHandoffCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Involuntary Handoff Count"
+    ::= { mwStationStatsEntry   26 }
+
+  mwStationStatsRssiReportCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rssi Report Count"
+    ::= { mwStationStatsEntry   27 }
+
+  mwStationStatsBssidReportCount  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Bssid Report Count"
+    ::= { mwStationStatsEntry   28 }
+
+  mwApStationStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwApStationStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Per AP Statistics "
+    ::= { mwGlobalStatistics 7 }
+
+  mwApStationStatsEntry  OBJECT-TYPE
+    SYNTAX MwApStationStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Per AP Statistics "
+    INDEX {  mwApStationStatsTableIndex  }
+    ::= { mwApStationStatsTable 1 }
+
+  MwApStationStatsEntry  ::=  SEQUENCE { 
+       mwApStationStatsTableIndex                                  Integer32, 
+       mwApStationStatsEssId                                       DisplayString,
+       mwApStationStatsBssId                                       MacAddress,
+       mwApStationStatsApName                                      DisplayString,
+       mwApStationStatsIfIndex                                     Integer32,
+       mwApStationStatsWepErrors                                   Counter64,
+       mwApStationStatsRxDataRate                                  Counter64,
+       mwApStationStatsTxDataRate                                  Counter64,
+       mwApStationStatsNmsApNodeId                                 Integer32,
+       mwApStationStatsRxByteCount                                 Counter64,
+       mwApStationStatsTxByteCount                                 Counter64,
+       mwApStationStatsRxPacketCount                               Counter64,
+       mwApStationStatsTxPacketCount                               Counter64,
+       mwApStationStatsTxAckMissCount                              Counter64,
+       mwApStationStatsDhcpErrorCount                              Counter64,
+       mwApStationStatsLRUSwapCounter                              Counter64,
+       mwApStationStatsRxFcsErrorCount                             Counter64,
+       mwApStationStatsStationIPAddress                            Ipv6Address,
+       mwApStationStatsRxDuplicateCount                            Counter64,
+       mwApStationStatsDhcpRequestCount                            Counter64,
+       mwApStationStatsSUBeamFormerSupp                            MwlOnOffSwitch,
+       mwApStationStatsSUBeamFormeeSupp                            MwlOnOffSwitch,
+       mwApStationStatsMUBeamFormeeSupp                            MwlOnOffSwitch,
+       mwApStationStatsStationMacAddress                           MacAddress,
+       mwApStationStatsStationIPv4Address                          IpAddress,
+       mwApStationStatsChannelUtilization                          Counter64,
+       mwApStationStatsSoundingFrameCount                          Integer32,
+       mwApStationStatsRxRetriedFrameCount                         Counter64,
+       mwApStationStatsRxAverageAggrLength                         Counter64,
+       mwApStationStatsTxAverageAggrLength                         Counter64,
+       mwApStationStatsPSPollFramesRxCount                         Counter64,
+       mwApStationStatsStationQueueOverflow                        Counter64,
+       mwApStationStatsPowerSaveQueueOverflow                      Counter64,
+       mwApStationStatsSWEncryptionFramesCount                     Counter64,
+       mwApStationStatsSWDecryptionFramesCount                     Counter64,
+       mwApStationStatsTxFailedHwRetryExceeded                     Counter64,
+       mwApStationStatsTotalPowerSaveTransitions                   Counter64 
+  }
+   
+   
+  mwApStationStatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwApStationStatsEntry 1 }
+
+  mwApStationStatsEssId  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SSID"
+    ::= { mwApStationStatsEntry    2 }
+
+  mwApStationStatsBssId  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSS ID"
+    ::= { mwApStationStatsEntry    3 }
+
+  mwApStationStatsApName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwApStationStatsEntry    4 }
+
+  mwApStationStatsIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwApStationStatsEntry    5 }
+
+  mwApStationStatsWepErrors  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Encryption error count"
+    ::= { mwApStationStatsEntry    6 }
+
+  mwApStationStatsRxDataRate  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Data received rate"
+    ::= { mwApStationStatsEntry    7 }
+
+  mwApStationStatsTxDataRate  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Data transmitted rate"
+    ::= { mwApStationStatsEntry    8 }
+
+  mwApStationStatsNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwApStationStatsEntry    9 }
+
+  mwApStationStatsRxByteCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of bytes received"
+    ::= { mwApStationStatsEntry   10 }
+
+  mwApStationStatsTxByteCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of bytes transmitted"
+    ::= { mwApStationStatsEntry   11 }
+
+  mwApStationStatsRxPacketCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx packet count"
+    ::= { mwApStationStatsEntry   12 }
+
+  mwApStationStatsTxPacketCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx packet count"
+    ::= { mwApStationStatsEntry   13 }
+
+  mwApStationStatsTxAckMissCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Missed Transmit Ack count"
+    ::= { mwApStationStatsEntry   14 }
+
+  mwApStationStatsDhcpErrorCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes DHCP error count"
+    ::= { mwApStationStatsEntry   15 }
+
+  mwApStationStatsRxFcsErrorCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Receive FCS error count"
+    ::= { mwApStationStatsEntry   16 }
+
+  mwApStationStatsStationIPAddress  OBJECT-TYPE
+    SYNTAX Ipv6Address
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwApStationStatsEntry   17 }
+
+  mwApStationStatsRxDuplicateCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Duplicates received"
+    ::= { mwApStationStatsEntry   18 }
+
+  mwApStationStatsDhcpRequestCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes DHCP request count"
+    ::= { mwApStationStatsEntry   19 }
+
+  mwApStationStatsStationMacAddress  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station MAC Address"
+    ::= { mwApStationStatsEntry   20 }
+
+  mwApStationStatsChannelUtilization  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel Utilization"
+    ::= { mwApStationStatsEntry   21 }
+
+  mwApStationStatsRxRetriedFrameCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Receive retries count"
+    ::= { mwApStationStatsEntry   22 }
+
+  mwApStationStatsRxAverageAggrLength  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Avg Aggregated Length"
+    ::= { mwApStationStatsEntry   23 }
+
+  mwApStationStatsTxAverageAggrLength  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Avg Aggregated Length"
+    ::= { mwApStationStatsEntry   24 }
+
+  mwApStationStatsTotalPowerSaveTransitions  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of Power Save transitions"
+    ::= { mwApStationStatsEntry   25 }
+
+  mwApStationStatsStationQueueOverflow  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station Q Overflow Count"
+    ::= { mwApStationStatsEntry   26 }
+
+  mwApStationStatsPowerSaveQueueOverflow  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Power Save Q Overflow Count"
+    ::= { mwApStationStatsEntry   27 }
+
+  mwApStationStatsPSPollFramesRxCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Power Save Poll Frames Received Count"
+    ::= { mwApStationStatsEntry   28 }
+
+  mwApStationStatsSWEncryptionFramesCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SW Encryption Frames Count"
+    ::= { mwApStationStatsEntry   29 }
+
+  mwApStationStatsSWDecryptionFramesCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SW Decryption Frames Count"
+    ::= { mwApStationStatsEntry   30 }
+
+  mwApStationStatsLRUSwapCounter  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes LRU Swap Count"
+    ::= { mwApStationStatsEntry   31 }
+
+  mwApStationStatsTxFailedHwRetryExceeded  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Failed Count by Hardware Retry Exceed"
+    ::= { mwApStationStatsEntry   32 }
+
+  mwApStationStatsSUBeamFormerSupp  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SU Beamformer support"
+    ::= { mwApStationStatsEntry   38 }
+
+  mwApStationStatsSUBeamFormeeSupp  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SU Beamformee support"
+    ::= { mwApStationStatsEntry   39 }
+
+  mwApStationStatsSoundingFrameCount  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SU/MU Sounding Frame Count"
+    ::= { mwApStationStatsEntry   40 }
+
+  mwApStationStatsStationIPv4Address  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Station IP Address"
+    ::= { mwApStationStatsEntry   41 }
+
+  mwApStationStatsMUBeamFormeeSupp  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes MU Beamformee support"
+    ::= { mwApStationStatsEntry   42 }
+
+  mwCacApStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwCacApStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Call Admission Control AP Statistics "
+    ::= { mwGlobalStatistics 8 }
+
+  mwCacApStatsEntry  OBJECT-TYPE
+    SYNTAX MwCacApStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Call Admission Control AP Statistics "
+    INDEX {  mwCacApStatsTableIndex  }
+    ::= { mwCacApStatsTable 1 }
+
+  MwCacApStatsEntry  ::=  SEQUENCE { 
+       mwCacApStatsTableIndex                                      Integer32, 
+       mwCacApStatsNmsApNodeId                                     Integer32,
+       mwCacApStatsCurrentCalls                                    Unsigned32,
+       mwCacApStatsRejectedCalls                                   Unsigned32 
+  }
+   
+   
+  mwCacApStatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwCacApStatsEntry 1 }
+
+  mwCacApStatsNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwCacApStatsEntry    2 }
+
+  mwCacApStatsCurrentCalls  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current Calls"
+    ::= { mwCacApStatsEntry    3 }
+
+  mwCacApStatsRejectedCalls  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Cumulative Rejected Calls"
+    ::= { mwCacApStatsEntry    4 }
+
+  mwCacBssStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwCacBssStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Call Admission Control BSS Statistics "
+    ::= { mwGlobalStatistics 9 }
+
+  mwCacBssStatsEntry  OBJECT-TYPE
+    SYNTAX MwCacBssStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Call Admission Control BSS Statistics "
+    INDEX {  mwCacBssStatsTableIndex  }
+    ::= { mwCacBssStatsTable 1 }
+
+  MwCacBssStatsEntry  ::=  SEQUENCE { 
+       mwCacBssStatsTableIndex                                     Integer32, 
+       mwCacBssStatsBssId                                          MacAddress,
+       mwCacBssStatsCurrentCalls                                   Unsigned32,
+       mwCacBssStatsRejectedCalls                                  Unsigned32 
+  }
+   
+   
+  mwCacBssStatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwCacBssStatsEntry 1 }
+
+  mwCacBssStatsBssId  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSSID"
+    ::= { mwCacBssStatsEntry    2 }
+
+  mwCacBssStatsCurrentCalls  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current Calls"
+    ::= { mwCacBssStatsEntry    3 }
+
+  mwCacBssStatsRejectedCalls  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Cumulative Rejected Calls"
+    ::= { mwCacBssStatsEntry    4 }
+
+  mwRf6DiagStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwRf6DiagStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP300 Diagnostic Statistics "
+    ::= { mwGlobalStatistics 10 }
+
+  mwRf6DiagStatsEntry  OBJECT-TYPE
+    SYNTAX MwRf6DiagStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP300 Diagnostic Statistics "
+    INDEX {  mwRf6DiagStatsTableIndex  }
+    ::= { mwRf6DiagStatsTable 1 }
+
+  MwRf6DiagStatsEntry  ::=  SEQUENCE { 
+       mwRf6DiagStatsTableIndex                                    Integer32, 
+       mwRf6DiagStatsNodeId                                        Unsigned32,
+       mwRf6DiagStatsIfIndex                                       Integer32,
+       mwRf6DiagStatsNodeName                                      DisplayString,
+       mwRf6DiagStatsRxEolINTs                                     Counter64,
+       mwRf6DiagStatsTxTimeoutINTs                                 Counter64,
+       mwRf6DiagStatsRxOverrunINTs                                 Counter64,
+       mwRf6DiagStatsTxUnderrunINTs                                Counter64,
+       mwRf6DiagStatsBeaconMissCount                               Counter64,
+       mwRf6DiagStatsFatalHwErrorINTs                              Counter64,
+       mwRf6DiagStatsTotalTidResetCnt                              Counter64,
+       mwRf6DiagStatsIsSlamTxNoAckAddr                             Counter64,
+       mwRf6DiagStatsRadioResetTPScale                             Counter64,
+       mwRf6DiagStatsRadioResetRxChain                             Counter64,
+       mwRf6DiagStatsTxAggrDataUnderrun                            Counter64,
+       mwRf6DiagStatsTotalRadioResetCnt                            Counter64,
+       mwRf6DiagStatsNoSkBufferForBeacon                           Counter64,
+       mwRf6DiagStatsRxPacketsBadVersion                           Counter64,
+       mwRf6DiagStatsRadioResetCalibrate                           Counter64,
+       mwRf6DiagStatsTxFailedByNoTxBuffer                          Counter64,
+       mwRf6DiagStatsRadioResetNoTxFrames                          Counter64,
+       mwRf6DiagStatsBeaconBufferNullCount                         Counter64,
+       mwRf6DiagStatsRadioResetBeaconStuck                         Counter64,
+       mwRf6DiagStatsTxFailedByFIFOUnderrun                        Counter64,
+       mwRf6DiagStatsRadioResetFatalTasklet                        Counter64,
+       mwRf6DiagStatsRadioResetRxornTasklet                        Counter64,
+       mwRf6DiagStatsTxAggrDelimiterUnderrun                       Counter64,
+       mwRf6DiagStatsCarrierSenseTimeoutINTs                       Counter64,
+       mwRf6DiagStatsRadioResetTxAntennaSwitch                     Counter64,
+       mwRf6DiagStatsTxAggrDescriptorConfigError                   Counter64,
+       mwRf6DiagStatsRowStatus                                     RowStatus 
+  }
+   
+   
+  mwRf6DiagStatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwRf6DiagStatsEntry 1 }
+
+  mwRf6DiagStatsNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwRf6DiagStatsEntry    2 }
+
+  mwRf6DiagStatsIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwRf6DiagStatsEntry    3 }
+
+  mwRf6DiagStatsNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwRf6DiagStatsEntry    4 }
+
+  mwRf6DiagStatsFatalHwErrorINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Fatal Hardware Interrupt Count"
+    ::= { mwRf6DiagStatsEntry    5 }
+
+  mwRf6DiagStatsBeaconMissCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Beacon Miss Count"
+    ::= { mwRf6DiagStatsEntry    6 }
+
+  mwRf6DiagStatsBeaconBufferNullCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Beacon Buffer Null Count"
+    ::= { mwRf6DiagStatsEntry    7 }
+
+  mwRf6DiagStatsNoSkBufferForBeacon  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes No Sk Buffer Avail Count for Beacon"
+    ::= { mwRf6DiagStatsEntry    8 }
+
+  mwRf6DiagStatsTxUnderrunINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Underrun Interrupt Count"
+    ::= { mwRf6DiagStatsEntry    9 }
+
+  mwRf6DiagStatsTxTimeoutINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Timeout Interrupt Count"
+    ::= { mwRf6DiagStatsEntry   10 }
+
+  mwRf6DiagStatsTxFailedByNoTxBuffer  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Failed Count by no Tx Buffer"
+    ::= { mwRf6DiagStatsEntry   11 }
+
+  mwRf6DiagStatsTxFailedByFIFOUnderrun  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Failed Count by FIFO Underrun"
+    ::= { mwRf6DiagStatsEntry   12 }
+
+  mwRf6DiagStatsTxAggrDescriptorConfigError  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Aggregate Descriptor Config Error"
+    ::= { mwRf6DiagStatsEntry   13 }
+
+  mwRf6DiagStatsTxAggrDataUnderrun  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Aggregate Data Underrun Count"
+    ::= { mwRf6DiagStatsEntry   14 }
+
+  mwRf6DiagStatsTxAggrDelimiterUnderrun  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Aggregate Delimiter Underrun Count"
+    ::= { mwRf6DiagStatsEntry   15 }
+
+  mwRf6DiagStatsTotalTidResetCnt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total TID Reset Count"
+    ::= { mwRf6DiagStatsEntry   16 }
+
+  mwRf6DiagStatsCarrierSenseTimeoutINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Carrier Sense Timeout Count"
+    ::= { mwRf6DiagStatsEntry   17 }
+
+  mwRf6DiagStatsIsSlamTxNoAckAddr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx No Ack Addr Count"
+    ::= { mwRf6DiagStatsEntry   18 }
+
+  mwRf6DiagStatsRxOverrunINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Overrun Interrupt Count"
+    ::= { mwRf6DiagStatsEntry   19 }
+
+  mwRf6DiagStatsRxEolINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx EOL Interrupt Count"
+    ::= { mwRf6DiagStatsEntry   20 }
+
+  mwRf6DiagStatsRxPacketsBadVersion  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Packet Count with Bad Version"
+    ::= { mwRf6DiagStatsEntry   21 }
+
+  mwRf6DiagStatsRadioResetBeaconStuck  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by BeaconStuck"
+    ::= { mwRf6DiagStatsEntry   22 }
+
+  mwRf6DiagStatsRadioResetTPScale  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by TP Scale"
+    ::= { mwRf6DiagStatsEntry   23 }
+
+  mwRf6DiagStatsRadioResetFatalTasklet  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Fatal Tasklet"
+    ::= { mwRf6DiagStatsEntry   24 }
+
+  mwRf6DiagStatsRadioResetRxornTasklet  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Rx Orn Tasklet"
+    ::= { mwRf6DiagStatsEntry   25 }
+
+  mwRf6DiagStatsRadioResetCalibrate  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Calibrate"
+    ::= { mwRf6DiagStatsEntry   26 }
+
+  mwRf6DiagStatsRadioResetTxAntennaSwitch  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Tx ANT Switch"
+    ::= { mwRf6DiagStatsEntry   27 }
+
+  mwRf6DiagStatsRadioResetRxChain  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Rx Chain"
+    ::= { mwRf6DiagStatsEntry   28 }
+
+  mwRf6DiagStatsRadioResetNoTxFrames  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by No Tx Frame"
+    ::= { mwRf6DiagStatsEntry   29 }
+
+  mwRf6DiagStatsTotalRadioResetCnt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Radio Reset Count"
+    ::= { mwRf6DiagStatsEntry   30 }
+
+  mwRf6DiagStatsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwRf6DiagStatsEntry 31 }
+
+  mwAp1000DiagStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwAp1000DiagStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP1000 Diagnostic Statistics "
+    ::= { mwGlobalStatistics 11 }
+
+  mwAp1000DiagStatsEntry  OBJECT-TYPE
+    SYNTAX MwAp1000DiagStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP1000 Diagnostic Statistics "
+    INDEX {  mwAp1000DiagStatsTableIndex  }
+    ::= { mwAp1000DiagStatsTable 1 }
+
+  MwAp1000DiagStatsEntry  ::=  SEQUENCE { 
+       mwAp1000DiagStatsTableIndex                                 Integer32, 
+       mwAp1000DiagStatsDmaDE                                      Counter64,
+       mwAp1000DiagStatsDmaDA                                      Counter64,
+       mwAp1000DiagStatsNodeId                                     Unsigned32,
+       mwAp1000DiagStatsTxDrop                                     Counter64,
+       mwAp1000DiagStatsIfIndex                                    Integer32,
+       mwAp1000DiagStatsRxNoBuf                                    Counter64,
+       mwAp1000DiagStatsTxError                                    Counter64,
+       mwAp1000DiagStatsRxStuck                                    Counter64,
+       mwAp1000DiagStatsRxError                                    Counter64,
+       mwAp1000DiagStatsNodeName                                   DisplayString,
+       mwAp1000DiagStatsRxEolINTs                                  Counter64,
+       mwAp1000DiagStatsTxChanRej                                  Counter64,
+       mwAp1000DiagStatsTxTplunfl                                  Counter64,
+       mwAp1000DiagStatsTxFfiFull                                  Counter64,
+       mwAp1000DiagStatsRxCgprqrm                                  Counter64,
+       mwAp1000DiagStatsTxPhyError                                 Counter64,
+       mwAp1000DiagStatsBcnTxFailed                                Counter64,
+       mwAp1000DiagStatsTxqOverflow                                Counter64,
+       mwAp1000DiagStatsPmgOverflow                                Counter64,
+       mwAp1000DiagStatsTxTimeoutINTs                              Counter64,
+       mwAp1000DiagStatsRxOverrunINTs                              Counter64,
+       mwAp1000DiagStatsTxUnderrunINTs                             Counter64,
+       mwAp1000DiagStatsBeaconMissCount                            Counter64,
+       mwAp1000DiagStatsFatalHwErrorINTs                           Counter64,
+       mwAp1000DiagStatsTotalTidResetCnt                           Counter64,
+       mwAp1000DiagStatsTotalRadioResetCnt                         Counter64,
+       mwAp1000DiagStatsRxPacketsBadVersion                        Counter64,
+       mwAp1000DiagStatsTxFailedByNoTxBuffer                       Counter64,
+       mwAp1000DiagStatsTxFailedByFIFOUnderrun                     Counter64,
+       mwAp1000DiagStatsRowStatus                                  RowStatus 
+  }
+   
+   
+  mwAp1000DiagStatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwAp1000DiagStatsEntry 1 }
+
+  mwAp1000DiagStatsNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwAp1000DiagStatsEntry    2 }
+
+  mwAp1000DiagStatsIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwAp1000DiagStatsEntry    3 }
+
+  mwAp1000DiagStatsNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwAp1000DiagStatsEntry    4 }
+
+  mwAp1000DiagStatsFatalHwErrorINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Fatal Hardware Interrupt Count"
+    ::= { mwAp1000DiagStatsEntry    5 }
+
+  mwAp1000DiagStatsBeaconMissCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Beacon Miss Count"
+    ::= { mwAp1000DiagStatsEntry    6 }
+
+  mwAp1000DiagStatsTxUnderrunINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Underrun Interrupt Count"
+    ::= { mwAp1000DiagStatsEntry    7 }
+
+  mwAp1000DiagStatsTxTimeoutINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Timeout Interrupt Count"
+    ::= { mwAp1000DiagStatsEntry    8 }
+
+  mwAp1000DiagStatsTxFailedByNoTxBuffer  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Failed Count by no Tx Buffer"
+    ::= { mwAp1000DiagStatsEntry    9 }
+
+  mwAp1000DiagStatsTxFailedByFIFOUnderrun  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Failed Count by FIFO Underrun"
+    ::= { mwAp1000DiagStatsEntry   10 }
+
+  mwAp1000DiagStatsTotalTidResetCnt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total TID Reset Count"
+    ::= { mwAp1000DiagStatsEntry   11 }
+
+  mwAp1000DiagStatsRxOverrunINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Overrun Interrupt Count"
+    ::= { mwAp1000DiagStatsEntry   12 }
+
+  mwAp1000DiagStatsRxEolINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx EOL Interrupt Count"
+    ::= { mwAp1000DiagStatsEntry   13 }
+
+  mwAp1000DiagStatsRxPacketsBadVersion  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Packet Count with Bad Version"
+    ::= { mwAp1000DiagStatsEntry   14 }
+
+  mwAp1000DiagStatsTotalRadioResetCnt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Radio Reset Count"
+    ::= { mwAp1000DiagStatsEntry   15 }
+
+  mwAp1000DiagStatsTxPhyError  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Physical Error Count"
+    ::= { mwAp1000DiagStatsEntry   16 }
+
+  mwAp1000DiagStatsRxNoBuf  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Out of Buffer Errors"
+    ::= { mwAp1000DiagStatsEntry   17 }
+
+  mwAp1000DiagStatsTxChanRej  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Frames Suppressed due to Channel Rejection"
+    ::= { mwAp1000DiagStatsEntry   18 }
+
+  mwAp1000DiagStatsDmaDE  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx/Rx Dma Descriptor Errors"
+    ::= { mwAp1000DiagStatsEntry   19 }
+
+  mwAp1000DiagStatsDmaDA  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx/Rx Dma Data Errors"
+    ::= { mwAp1000DiagStatsEntry   20 }
+
+  mwAp1000DiagStatsTxTplunfl  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Template Underflows"
+    ::= { mwAp1000DiagStatsEntry   21 }
+
+  mwAp1000DiagStatsBcnTxFailed  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Failed to Tx Beacon Frame"
+    ::= { mwAp1000DiagStatsEntry   22 }
+
+  mwAp1000DiagStatsTxError  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Data Errors"
+    ::= { mwAp1000DiagStatsEntry   23 }
+
+  mwAp1000DiagStatsRxStuck  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Watchdog Bailout for Stuck State"
+    ::= { mwAp1000DiagStatsEntry   24 }
+
+  mwAp1000DiagStatsRxError  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Data Errors"
+    ::= { mwAp1000DiagStatsEntry   25 }
+
+  mwAp1000DiagStatsTxFfiFull  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Release Ampdu due to Insufficient Tx Descriptors"
+    ::= { mwAp1000DiagStatsEntry   26 }
+
+  mwAp1000DiagStatsTxDrop  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Ampdu Tx Dropped Packets"
+    ::= { mwAp1000DiagStatsEntry   27 }
+
+  mwAp1000DiagStatsTxqOverflow  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes TxQ Overflows Count"
+    ::= { mwAp1000DiagStatsEntry   28 }
+
+  mwAp1000DiagStatsPmgOverflow  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes PmQ Overflows Count"
+    ::= { mwAp1000DiagStatsEntry   29 }
+
+  mwAp1000DiagStatsRxCgprqrm  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Probe Request Queue Overflow in AP"
+    ::= { mwAp1000DiagStatsEntry   30 }
+
+  mwAp1000DiagStatsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwAp1000DiagStatsEntry 31 }
+
+  mwAp400DiagStatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwAp400DiagStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP400 Diagnostic Statistics "
+    ::= { mwGlobalStatistics 12 }
+
+  mwAp400DiagStatsEntry  OBJECT-TYPE
+    SYNTAX MwAp400DiagStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP400 Diagnostic Statistics "
+    INDEX {  mwAp400DiagStatsTableIndex  }
+    ::= { mwAp400DiagStatsTable 1 }
+
+  MwAp400DiagStatsEntry  ::=  SEQUENCE { 
+       mwAp400DiagStatsTableIndex                                  Integer32, 
+       mwAp400DiagStatsNodeId                                      Unsigned32,
+       mwAp400DiagStatsIfIndex                                     Integer32,
+       mwAp400DiagStatsNodeName                                    DisplayString,
+       mwAp400DiagStatsRxEolINTs                                   Counter64,
+       mwAp400DiagStatsRxPhyError                                  Counter64,
+       mwAp400DiagStatsTxTimeoutINTs                               Counter64,
+       mwAp400DiagStatsRxOverrunINTs                               Counter64,
+       mwAp400DiagStatsTxUnderrunINTs                              Counter64,
+       mwAp400DiagStatsBeaconMissCount                             Counter64,
+       mwAp400DiagStatsFatalHwErrorINTs                            Counter64,
+       mwAp400DiagStatsTotalTidResetCnt                            Counter64,
+       mwAp400DiagStatsIsSlamTxNoAckAddr                           Counter64,
+       mwAp400DiagStatsRadioResetTPScale                           Counter64,
+       mwAp400DiagStatsRadioResetRxChain                           Counter64,
+       mwAp400DiagStatsTxAggrDataUnderrun                          Counter64,
+       mwAp400DiagStatsTotalRadioResetCnt                          Counter64,
+       mwAp400DiagStatsNoSkBufferForBeacon                         Counter64,
+       mwAp400DiagStatsRxPacketsBadVersion                         Counter64,
+       mwAp400DiagStatsRadioResetCalibrate                         Counter64,
+       mwAp400DiagStatsTxFailedByNoTxBuffer                        Counter64,
+       mwAp400DiagStatsRadioResetNoTxFrames                        Counter64,
+       mwAp400DiagStatsBeaconBufferNullCount                       Counter64,
+       mwAp400DiagStatsRadioResetBeaconStuck                       Counter64,
+       mwAp400DiagStatsTxFailedByFIFOUnderrun                      Counter64,
+       mwAp400DiagStatsRadioResetFatalTasklet                      Counter64,
+       mwAp400DiagStatsRadioResetRxornTasklet                      Counter64,
+       mwAp400DiagStatsTxAggrDelimiterUnderrun                     Counter64,
+       mwAp400DiagStatsCarrierSenseTimeoutINTs                     Counter64,
+       mwAp400DiagStatsRadioResetTxAntennaSwitch                   Counter64,
+       mwAp400DiagStatsTxAggrDescriptorConfigError                 Counter64,
+       mwAp400DiagStatsRowStatus                                   RowStatus 
+  }
+   
+   
+  mwAp400DiagStatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwAp400DiagStatsEntry 1 }
+
+  mwAp400DiagStatsNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwAp400DiagStatsEntry    2 }
+
+  mwAp400DiagStatsIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwAp400DiagStatsEntry    3 }
+
+  mwAp400DiagStatsNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwAp400DiagStatsEntry    4 }
+
+  mwAp400DiagStatsFatalHwErrorINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Fatal Hardware Interrupt Count"
+    ::= { mwAp400DiagStatsEntry    5 }
+
+  mwAp400DiagStatsBeaconMissCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Beacon Miss Count"
+    ::= { mwAp400DiagStatsEntry    6 }
+
+  mwAp400DiagStatsBeaconBufferNullCount  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Beacon Buffer Null Count"
+    ::= { mwAp400DiagStatsEntry    7 }
+
+  mwAp400DiagStatsNoSkBufferForBeacon  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes No Sk Buffer Avail Count for Beacon"
+    ::= { mwAp400DiagStatsEntry    8 }
+
+  mwAp400DiagStatsTxUnderrunINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Underrun Interrupt Count"
+    ::= { mwAp400DiagStatsEntry    9 }
+
+  mwAp400DiagStatsTxTimeoutINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Timeout Interrupt Count"
+    ::= { mwAp400DiagStatsEntry   10 }
+
+  mwAp400DiagStatsTxFailedByNoTxBuffer  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Failed Count by no Tx Buffer"
+    ::= { mwAp400DiagStatsEntry   11 }
+
+  mwAp400DiagStatsTxFailedByFIFOUnderrun  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Failed Count by FIFO Underrun"
+    ::= { mwAp400DiagStatsEntry   12 }
+
+  mwAp400DiagStatsTxAggrDescriptorConfigError  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Aggregate Descriptor Config Error"
+    ::= { mwAp400DiagStatsEntry   13 }
+
+  mwAp400DiagStatsTxAggrDataUnderrun  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Aggregate Data Underrun Count"
+    ::= { mwAp400DiagStatsEntry   14 }
+
+  mwAp400DiagStatsTxAggrDelimiterUnderrun  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx Aggregate Delimiter Underrun Count"
+    ::= { mwAp400DiagStatsEntry   15 }
+
+  mwAp400DiagStatsTotalTidResetCnt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total TID Reset Count"
+    ::= { mwAp400DiagStatsEntry   16 }
+
+  mwAp400DiagStatsCarrierSenseTimeoutINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Carrier Sense Timeout Count"
+    ::= { mwAp400DiagStatsEntry   17 }
+
+  mwAp400DiagStatsIsSlamTxNoAckAddr  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tx No Ack Addr Count"
+    ::= { mwAp400DiagStatsEntry   18 }
+
+  mwAp400DiagStatsRxOverrunINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Overrun Interrupt Count"
+    ::= { mwAp400DiagStatsEntry   19 }
+
+  mwAp400DiagStatsRxEolINTs  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx EOL Interrupt Count"
+    ::= { mwAp400DiagStatsEntry   20 }
+
+  mwAp400DiagStatsRxPacketsBadVersion  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Packet Count with Bad Version"
+    ::= { mwAp400DiagStatsEntry   21 }
+
+  mwAp400DiagStatsRadioResetBeaconStuck  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by BeaconStuck"
+    ::= { mwAp400DiagStatsEntry   22 }
+
+  mwAp400DiagStatsRadioResetTPScale  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by TP Scale"
+    ::= { mwAp400DiagStatsEntry   23 }
+
+  mwAp400DiagStatsRadioResetFatalTasklet  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Fatal Tasklet"
+    ::= { mwAp400DiagStatsEntry   24 }
+
+  mwAp400DiagStatsRadioResetRxornTasklet  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Rx Orn Tasklet"
+    ::= { mwAp400DiagStatsEntry   25 }
+
+  mwAp400DiagStatsRadioResetCalibrate  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Calibrate"
+    ::= { mwAp400DiagStatsEntry   26 }
+
+  mwAp400DiagStatsRadioResetTxAntennaSwitch  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Tx ANT Switch"
+    ::= { mwAp400DiagStatsEntry   27 }
+
+  mwAp400DiagStatsRadioResetRxChain  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by Rx Chain"
+    ::= { mwAp400DiagStatsEntry   28 }
+
+  mwAp400DiagStatsRadioResetNoTxFrames  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Reset Count by No Tx Frame"
+    ::= { mwAp400DiagStatsEntry   29 }
+
+  mwAp400DiagStatsTotalRadioResetCnt  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Radio Reset Count"
+    ::= { mwAp400DiagStatsEntry   30 }
+
+  mwAp400DiagStatsRxPhyError  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rx Phy Error Count"
+    ::= { mwAp400DiagStatsEntry   31 }
+
+  mwAp400DiagStatsRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwAp400DiagStatsEntry 32 }
+
+  mwSystemGeneralName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller's Hostname"
+    ::= { mwSystemGeneral    1 }
+
+  mwSystemGeneralModel  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller's Model Name"
+    ::= { mwSystemGeneral    2 }
+
+  mwSystemGeneralVersion  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller's Version"
+    ::= { mwSystemGeneral    3 }
+
+  mwSystemGeneralUptime  OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller's Uptime"
+    ::= { mwSystemGeneral    4 }
+
+  mwSystemGeneralMaxApLimit  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Access Point Limit"
+    ::= { mwSystemGeneral    5 }
+
+  mwSystemGeneralMaxClientLimit  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Client(s)"
+    ::= { mwSystemGeneral    6 }
+
+  mwSystemGeneralInstalledApLicenses  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Installed Access Point License Count"
+    ::= { mwSystemGeneral    7 }
+
+  mwSystemGeneralInUseApLicenses  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes In-Use Access Point License Count"
+    ::= { mwSystemGeneral    8 }
+
+  mwSystemGeneralTotalOnlineAps  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Online Access Point Count"
+    ::= { mwSystemGeneral    9 }
+
+  mwSystemGeneralTotalOfflineAps  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Offline Access Point Count"
+    ::= { mwSystemGeneral   10 }
+
+  mwSystemGeneralTotalWirelessStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Wireless Station Count"
+    ::= { mwSystemGeneral   11 }
+
+  mwSystemGeneralTotal24GStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 2.4GHz Station Count"
+    ::= { mwSystemGeneral   12 }
+
+  mwSystemGeneralTotal5GStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 5GHz Station Count"
+    ::= { mwSystemGeneral   13 }
+
+  mwSystemGeneralTotalWiredStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Wired Station Count"
+    ::= { mwSystemGeneral   14 }
+
+  mwSystemGeneralTotalAlarms  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Alarm Count"
+    ::= { mwSystemGeneral   15 }
+
+  mwSystemGeneralTotalCritAlarms  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Critical Alarm Count"
+    ::= { mwSystemGeneral   16 }
+
+  mwSystemGeneralTotalMajorAlarms  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Major Alarm Count"
+    ::= { mwSystemGeneral   17 }
+
+  mwSystemGeneralTotalMinorAlarms  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Minor Alarm Count"
+    ::= { mwSystemGeneral   18 }
+
+  mwSystemGeneralTotalRogueAps  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue Access Point Count"
+    ::= { mwSystemGeneral   19 }
+
+  mwSystemGeneralTotalRogueStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue Station Count"
+    ::= { mwSystemGeneral   20 }
+
+  mwSystemGeneralTotalRogueUnknownDevices  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Unknown Rogue Device Count"
+    ::= { mwSystemGeneral   21 }
+
+  mwSystemGeneralTotalClearEssProfiles  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Clear ESS Profile Count"
+    ::= { mwSystemGeneral   22 }
+
+  mwSystemGeneralTotalSecureEssProfiles  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secure ESS Profile Count"
+    ::= { mwSystemGeneral   23 }
+
+  mwSystemGeneralTotalCaptivePortalEssProfiles  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Captive Portal ESS Profile Count"
+    ::= { mwSystemGeneral   24 }
+
+  mwSystemResourceCpuUsagePercentageUser  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes CPU Usage User[%]"
+    ::= { mwSystemResource    1 }
+
+  mwSystemResourceCpuUsagePercentageSystem  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes CPU Usage System[%]"
+    ::= { mwSystemResource    2 }
+
+  mwSystemResourceCpuUsagePercentageIdle  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes CPU Usage Idle[%]"
+    ::= { mwSystemResource    3 }
+
+  mwSystemResourceMemoryTotalSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Memory Size Total[K]"
+    ::= { mwSystemResource    4 }
+
+  mwSystemResourceMemoryUsedSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Memory Size Used[K]"
+    ::= { mwSystemResource    5 }
+
+  mwSystemResourceMemoryFreeSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Memory Size Free[K]"
+    ::= { mwSystemResource    6 }
+
+  mwSystemResourceRootFileSystemTotalSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Root File System Size Total[K]"
+    ::= { mwSystemResource    7 }
+
+  mwSystemResourceRootFileSystemUsedSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Root File System Size Used[K]"
+    ::= { mwSystemResource    8 }
+
+  mwSystemResourceRootFileSystemAvailSize  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Root File System Size Available[K]"
+    ::= { mwSystemResource    9 }
+
+  mwSystemResourceRootFileSystemUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Root File System Usage[%]"
+    ::= { mwSystemResource   10 }
+
+  mwSystemResourceHighCpuUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes High CPU Usage [%]"
+    ::= { mwSystemResource   11 }
+
+  mwSystemResourceAvgCpuUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Average CPU Usage [%]"
+    ::= { mwSystemResource   12 }
+
+  mwSystemResourceCurCpuUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current CPU Usage [%]"
+    ::= { mwSystemResource   13 }
+
+  mwSystemResourceHighMemUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes High Memory Usage [%]"
+    ::= { mwSystemResource   14 }
+
+  mwSystemResourceAvgMemUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Average Memory Usage [%]"
+    ::= { mwSystemResource   15 }
+
+  mwSystemResourceCurMemUsagePercentage  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Current Memory Usage [%]"
+    ::= { mwSystemResource   16 }
+
+  mwSystemStationTotal11aStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11a Station Count"
+    ::= { mwSystemStation    1 }
+
+  mwSystemStationTotal11an1Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11an1stream Station Count"
+    ::= { mwSystemStation    2 }
+
+  mwSystemStationTotal11an2Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11an2stream Station Count"
+    ::= { mwSystemStation    3 }
+
+  mwSystemStationTotal11an3Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11an3stream Station Count"
+    ::= { mwSystemStation    4 }
+
+  mwSystemStationTotal11bStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11b Station Count"
+    ::= { mwSystemStation    5 }
+
+  mwSystemStationTotal11bgStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11bg Station Count"
+    ::= { mwSystemStation    6 }
+
+  mwSystemStationTotal11gn1Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11gn1stream Station Count"
+    ::= { mwSystemStation    7 }
+
+  mwSystemStationTotal11gn2Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11gn2stream Station Count"
+    ::= { mwSystemStation    8 }
+
+  mwSystemStationTotal11gn3Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11gn3stream Station Count"
+    ::= { mwSystemStation    9 }
+
+  mwSystemStationTotalDataStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated Data Station Count"
+    ::= { mwSystemStation   10 }
+
+  mwSystemStationTotalPhoneStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated Phone Station Count"
+    ::= { mwSystemStation   11 }
+
+  mwSystemStationTotalWiredStations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated Wired Station Count"
+    ::= { mwSystemStation   12 }
+
+  mwSystemStationTotal11ac1Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac1stream Station Count"
+    ::= { mwSystemStation   13 }
+
+  mwSystemStationTotal11ac2Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac2stream Station Count"
+    ::= { mwSystemStation   14 }
+
+  mwSystemStationTotal11ac3Stations  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac3stream Station Count"
+    ::= { mwSystemStation   15 }
+
+  mwSystemStationUnknown  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Unknown rf band station count"
+    ::= { mwSystemStation   16 }
+
+  mwSystemThruputTotalControllerRxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Total Rx Bytes"
+    ::= { mwSystemThruput    1 }
+
+  mwSystemThruputTotalControllerTxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Total Tx Bytes"
+    ::= { mwSystemThruput    2 }
+
+  mwSystemThruputControllerRxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Rx Throughput[bps]"
+    ::= { mwSystemThruput    3 }
+
+  mwSystemThruputControllerTxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Controller Tx Throughput[bps]"
+    ::= { mwSystemThruput    4 }
+
+  mwSystemThruputTotalWlanSystemRxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes WLAN Total Rx Bytes"
+    ::= { mwSystemThruput    5 }
+
+  mwSystemThruputTotalWlanSystemTxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes WLAN Total Tx Bytes"
+    ::= { mwSystemThruput    6 }
+
+  mwSystemThruputWlanRxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes WLAN Rx Throughput[bps]"
+    ::= { mwSystemThruput    7 }
+
+  mwSystemThruputWlanTxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes WLAN Tx Throughput[bps]"
+    ::= { mwSystemThruput    8 }
+
+  mwPerEss80211StatsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwPerEss80211StatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Statistics "
+    ::= { mwGlobalStatistics 17 }
+
+  mwPerEss80211StatsEntry  OBJECT-TYPE
+    SYNTAX MwPerEss80211StatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Statistics "
+    INDEX {  mwPerEss80211StatsTableIndex  }
+    ::= { mwPerEss80211StatsTable 1 }
+
+  MwPerEss80211StatsEntry  ::=  SEQUENCE { 
+       mwPerEss80211StatsTableIndex                                Integer32, 
+       mwPerEss80211StatsEssId                                     DisplayString(SIZE (0..32)),
+       mwPerEss80211StatsBssid                                     MacAddress,
+       mwPerEss80211StatsNodeId                                    Unsigned32,
+       mwPerEss80211StatsIfIndex                                   Integer32,
+       mwPerEss80211StatsRxThroughput                              Unsigned32,
+       mwPerEss80211StatsTxThroughput                              Unsigned32,
+       mwPerEss80211StatsTotalRxBytes                              Counter64,
+       mwPerEss80211StatsTotalTxBytes                              Counter64,
+       mwPerEss80211StatsUnknownStation                            Integer32,
+       mwPerEss80211StatsTotalThroughput                           Unsigned32,
+       mwPerEss80211StatsTotalVideoRxBytes                         Counter64,
+       mwPerEss80211StatsTotalVideoTxBytes                         Counter64,
+       mwPerEss80211StatsTotalVoiceRxBytes                         Counter64,
+       mwPerEss80211StatsTotalVoiceTxBytes                         Counter64,
+       mwPerEss80211StatsTotalUnicastRxBytes                       Counter64,
+       mwPerEss80211StatsTotalUnicastTxBytes                       Counter64,
+       mwPerEss80211StatsAssociatedStationNum                      Integer32,
+       mwPerEss80211StatsTotalBestEffortRxBytes                    Counter64,
+       mwPerEss80211StatsTotalBestEffortTxBytes                    Counter64,
+       mwPerEss80211StatsTotalBackgroundRxBytes                    Counter64,
+       mwPerEss80211StatsTotalBackgroundTxBytes                    Counter64,
+       mwPerEss80211StatsTotalBroadcastDataBytes                   Counter64,
+       mwPerEss80211StatsTotalMulticastDataBytes                   Counter64,
+       mwPerEss80211StatsAssociated11bStationNum                   Integer32,
+       mwPerEss80211StatsAssociated11aStationNum                   Integer32,
+       mwPerEss80211StatsAssociated11bgStationNum                  Integer32,
+       mwPerEss80211StatsAssociated11an1StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11an2StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11an3StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11ac1StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11ac2StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11ac3StationNum                 Integer32,
+       mwPerEss80211StatsAssociated11bgn1StationNum                Integer32,
+       mwPerEss80211StatsAssociated11bgn2StationNum                Integer32,
+       mwPerEss80211StatsAssociated11bgn3StationNum                Integer32 
+  }
+   
+   
+  mwPerEss80211StatsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwPerEss80211StatsEntry 1 }
+
+  mwPerEss80211StatsNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwPerEss80211StatsEntry    2 }
+
+  mwPerEss80211StatsIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwPerEss80211StatsEntry    3 }
+
+  mwPerEss80211StatsEssId  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESSID"
+    ::= { mwPerEss80211StatsEntry    4 }
+
+  mwPerEss80211StatsBssid  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSSID"
+    ::= { mwPerEss80211StatsEntry    5 }
+
+  mwPerEss80211StatsRxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Rx Throughput[bps]"
+    ::= { mwPerEss80211StatsEntry    6 }
+
+  mwPerEss80211StatsTxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Tx Throughput[bps]"
+    ::= { mwPerEss80211StatsEntry    7 }
+
+  mwPerEss80211StatsTotalThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Total Throughput[bps]"
+    ::= { mwPerEss80211StatsEntry    8 }
+
+  mwPerEss80211StatsTotalRxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Rx bytes Count"
+    ::= { mwPerEss80211StatsEntry   11 }
+
+  mwPerEss80211StatsTotalTxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Tx bytes Count"
+    ::= { mwPerEss80211StatsEntry   12 }
+
+  mwPerEss80211StatsTotalVideoRxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Video Rx bytes Count"
+    ::= { mwPerEss80211StatsEntry   13 }
+
+  mwPerEss80211StatsTotalVideoTxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Video Tx bytes Count"
+    ::= { mwPerEss80211StatsEntry   14 }
+
+  mwPerEss80211StatsTotalVoiceRxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Voice Rx bytes Count"
+    ::= { mwPerEss80211StatsEntry   15 }
+
+  mwPerEss80211StatsTotalVoiceTxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Voice Tx bytes Count"
+    ::= { mwPerEss80211StatsEntry   16 }
+
+  mwPerEss80211StatsTotalBestEffortRxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total BestEffort Rx bytes Count"
+    ::= { mwPerEss80211StatsEntry   17 }
+
+  mwPerEss80211StatsTotalBestEffortTxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total BestEffort Tx bytes Count"
+    ::= { mwPerEss80211StatsEntry   18 }
+
+  mwPerEss80211StatsTotalBackgroundRxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Background Rx bytes Count"
+    ::= { mwPerEss80211StatsEntry   19 }
+
+  mwPerEss80211StatsTotalBackgroundTxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Background Tx bytes Count"
+    ::= { mwPerEss80211StatsEntry   20 }
+
+  mwPerEss80211StatsTotalUnicastRxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Unicast Rx bytes Count"
+    ::= { mwPerEss80211StatsEntry   21 }
+
+  mwPerEss80211StatsTotalUnicastTxBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Unicast Tx bytes Count"
+    ::= { mwPerEss80211StatsEntry   22 }
+
+  mwPerEss80211StatsTotalBroadcastDataBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Broadcast Data bytes Count"
+    ::= { mwPerEss80211StatsEntry   23 }
+
+  mwPerEss80211StatsTotalMulticastDataBytes  OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Multicast Data bytes Count"
+    ::= { mwPerEss80211StatsEntry   24 }
+
+  mwPerEss80211StatsAssociatedStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated station count"
+    ::= { mwPerEss80211StatsEntry   39 }
+
+  mwPerEss80211StatsAssociated11bStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11b station count"
+    ::= { mwPerEss80211StatsEntry   40 }
+
+  mwPerEss80211StatsAssociated11bgStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11bg station count"
+    ::= { mwPerEss80211StatsEntry   41 }
+
+  mwPerEss80211StatsAssociated11bgn1StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11bgn1stream station count"
+    ::= { mwPerEss80211StatsEntry   42 }
+
+  mwPerEss80211StatsAssociated11bgn2StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11bgn2stream station count"
+    ::= { mwPerEss80211StatsEntry   43 }
+
+  mwPerEss80211StatsAssociated11bgn3StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11bgn3stream station count"
+    ::= { mwPerEss80211StatsEntry   44 }
+
+  mwPerEss80211StatsAssociated11aStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11a station count"
+    ::= { mwPerEss80211StatsEntry   45 }
+
+  mwPerEss80211StatsAssociated11an1StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11an1stream station count"
+    ::= { mwPerEss80211StatsEntry   46 }
+
+  mwPerEss80211StatsAssociated11an2StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11an2stream station count"
+    ::= { mwPerEss80211StatsEntry   47 }
+
+  mwPerEss80211StatsAssociated11an3StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11an3stream station count"
+    ::= { mwPerEss80211StatsEntry   48 }
+
+  mwPerEss80211StatsAssociated11ac1StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11ac1stream station count"
+    ::= { mwPerEss80211StatsEntry   49 }
+
+  mwPerEss80211StatsAssociated11ac2StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11ac2stream station count"
+    ::= { mwPerEss80211StatsEntry   50 }
+
+  mwPerEss80211StatsAssociated11ac3StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated 802.11ac3stream station count"
+    ::= { mwPerEss80211StatsEntry   51 }
+
+  mwPerEss80211StatsUnknownStation  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Unknown station count"
+    ::= { mwPerEss80211StatsEntry   52 }
+
+  mwEssStatsSummaryTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwEssStatsSummaryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Statistics Summary "
+    ::= { mwGlobalStatistics 18 }
+
+  mwEssStatsSummaryEntry  OBJECT-TYPE
+    SYNTAX MwEssStatsSummaryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Statistics Summary "
+    INDEX {  mwEssStatsSummaryTableIndex  }
+    ::= { mwEssStatsSummaryTable 1 }
+
+  MwEssStatsSummaryEntry  ::=  SEQUENCE { 
+       mwEssStatsSummaryTableIndex                                 Integer32, 
+       mwEssStatsSummaryRFBand                                     MwlBandType,
+       mwEssStatsSummaryEssId                                      DisplayString(SIZE (0..32)),
+       mwEssStatsSummaryRadioCount                                 Integer32,
+       mwEssStatsSummaryBStationNum                                Integer32,
+       mwEssStatsSummaryAStationNum                                Integer32,
+       mwEssStatsSummaryRxThroughput                               Unsigned32,
+       mwEssStatsSummaryTxThroughput                               Unsigned32,
+       mwEssStatsSummaryBGStationNum                               Integer32,
+       mwEssStatsSummaryGN1StationNum                              Integer32,
+       mwEssStatsSummaryGN2StationNum                              Integer32,
+       mwEssStatsSummaryGN3StationNum                              Integer32,
+       mwEssStatsSummaryAN1StationNum                              Integer32,
+       mwEssStatsSummaryAN2StationNum                              Integer32,
+       mwEssStatsSummaryAN3StationNum                              Integer32,
+       mwEssStatsSummaryAC1StationNum                              Integer32,
+       mwEssStatsSummaryAC2StationNum                              Integer32,
+       mwEssStatsSummaryAC3StationNum                              Integer32,
+       mwEssStatsSummaryTotalThroughput                            Unsigned32,
+       mwEssStatsSummaryTotalStationNum                            Integer32,
+       mwEssStatsSummaryUnknownStationNum                          Integer32 
+  }
+   
+   
+  mwEssStatsSummaryTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwEssStatsSummaryEntry 1 }
+
+  mwEssStatsSummaryEssId  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESSID"
+    ::= { mwEssStatsSummaryEntry    2 }
+
+  mwEssStatsSummaryRFBand  OBJECT-TYPE
+    SYNTAX MwlBandType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Band"
+    ::= { mwEssStatsSummaryEntry    3 }
+
+  mwEssStatsSummaryRadioCount  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Total Radio Count"
+    ::= { mwEssStatsSummaryEntry    4 }
+
+  mwEssStatsSummaryRxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Rx Throughput[bps]"
+    ::= { mwEssStatsSummaryEntry    5 }
+
+  mwEssStatsSummaryTxThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Tx Throughput[bps]"
+    ::= { mwEssStatsSummaryEntry    6 }
+
+  mwEssStatsSummaryTotalThroughput  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Total Throughput[bps]"
+    ::= { mwEssStatsSummaryEntry    7 }
+
+  mwEssStatsSummaryTotalStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Associated station count"
+    ::= { mwEssStatsSummaryEntry   10 }
+
+  mwEssStatsSummaryBStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11b station count"
+    ::= { mwEssStatsSummaryEntry   11 }
+
+  mwEssStatsSummaryBGStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11bg station count"
+    ::= { mwEssStatsSummaryEntry   12 }
+
+  mwEssStatsSummaryGN1StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11gn1stream station count"
+    ::= { mwEssStatsSummaryEntry   13 }
+
+  mwEssStatsSummaryGN2StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11gn2stream station count"
+    ::= { mwEssStatsSummaryEntry   14 }
+
+  mwEssStatsSummaryGN3StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11gn3stream station count"
+    ::= { mwEssStatsSummaryEntry   15 }
+
+  mwEssStatsSummaryAStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11a station count"
+    ::= { mwEssStatsSummaryEntry   16 }
+
+  mwEssStatsSummaryAN1StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11an1stream station count"
+    ::= { mwEssStatsSummaryEntry   17 }
+
+  mwEssStatsSummaryAN2StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11an2stream station count"
+    ::= { mwEssStatsSummaryEntry   18 }
+
+  mwEssStatsSummaryAN3StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11an3stream station count"
+    ::= { mwEssStatsSummaryEntry   19 }
+
+  mwEssStatsSummaryAC1StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac1stream station count"
+    ::= { mwEssStatsSummaryEntry   20 }
+
+  mwEssStatsSummaryAC2StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac2stream station count"
+    ::= { mwEssStatsSummaryEntry   21 }
+
+  mwEssStatsSummaryAC3StationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11ac3stream station count"
+    ::= { mwEssStatsSummaryEntry   22 }
+
+  mwEssStatsSummaryUnknownStationNum  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Unknown station count"
+    ::= { mwEssStatsSummaryEntry   23 }
+
+  
+END
+   

@@ -16,4 +16,4 @@ register_mibs:
     diskStatus: IOMEGANAS-MIB
 discovery:
     - sysDescr:
-        - EMC SOHO-NAS Storage.
+        - 'EMC SOHO-NAS Storage.'

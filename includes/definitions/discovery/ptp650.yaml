@@ -1,0 +1,21 @@
+mib: CAMBIUM-PTP650-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: tDDSynchronizationStatus
+                    num_oid: '.1.3.6.1.4.1.17713.7.13.11.{{ $index }}'
+                    index: 0
+                    descr: Sync Status
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: locked }
+                        - { value: 1, generic: 0, graph: 1, descr: holdover }
+                        - { value: 2, generic: 1, graph: 1, descr: holdoverNoGPSSyncIn }
+                        - { value: 3, generic: 2, graph: 1, descr: notSynchronized }
+                        - { value: 4, generic: 2, graph: 1, descr: notSynchronizedNoGPSSyncIn }
+                        - { value: 5, generic: 0, graph: 1, descr: pTPSYNCNotConnected }
+                        - { value: 6, generic: 0, graph: 1, descr: initialising }
+                        - { value: 7, generic: 0, graph: 1, descr: clusterTimingMaster }
+                        - { value: 8, generic: 0, graph: 1, descr: acquiringLock }
+                        - { value: 9, generic: 0, graph: 1, descr: inactive }

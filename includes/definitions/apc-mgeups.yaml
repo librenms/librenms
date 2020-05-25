@@ -1,0 +1,21 @@
+os: apc-mgeups
+text: 'APC MGE UPS'
+group: ups
+type: power
+icon: apc
+rfc1628_compat: true
+mib_dir:
+    - mge
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_load, text: Load }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.705.1
+        sysDescr_regex:
+            - '/^Galaxy/'
+            - '/^GALAXY/'
+            - '/^MGE Galaxy/'
+            # Upsilon too (no data)

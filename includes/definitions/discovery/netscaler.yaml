@@ -1,0 +1,63 @@
+mib: NS-ROOT-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: nsCPUTable
+                  value: nsCPUusage
+                  num_oid: '.1.3.6.1.4.1.5951.4.1.1.41.6.1.2."{{ $index }}"'
+                  index: nsCPUname
+                  descr: nsCPUname
+    sensors:
+          state:
+              data:
+                  -
+                      oid: haCurStatus
+                      num_oid: '.1.3.6.1.4.1.5951.4.1.1.23.23.{{ $index }}'
+                      index: 'haCurStatus.{{ $index }}'
+                      descr: Configured for HA
+                      state_name: haCurStatus
+                      states:
+                          - { value: 0, generic: 0, graph: 1, descr: no }
+                          - { value: 1, generic: 0, graph: 1, descr: yes }
+                  -
+                      oid: sysHighAvailabilityMode
+                      num_oid: '.1.3.6.1.4.1.5951.4.1.1.6.{{ $index }}'
+                      index: 'sysHighAvailabilityMode.{{ $index }}'
+                      descr: Current HA mode
+                      state_name: sysHighAvailabilityMode
+                      states:
+                          - { value: 0, generic: 0, graph: 1, descr: standalone }
+                          - { value: 1, generic: 0, graph: 1, descr: primary }
+                          - { value: 2, generic: 0, graph: 1, descr: secondary }
+                          - { value: 3, generic: 3, graph: 1, descr: unknown }
+                  -
+                      oid: haCurState
+                      num_oid: '.1.3.6.1.4.1.5951.4.1.1.23.24.{{ $index }}'
+                      index: 'haCurState.{{ $index }}'
+                      descr: Current HA state
+                      state_name: haCurState
+                      states:
+                          - { value: 0, generic: 3, graph: 1, descr: UNKNOWN }
+                          - { value: 1, generic: 1, graph: 1, descr: INIT }
+                          - { value: 2, generic: 2, graph: 1, descr: DOWN }
+                          - { value: 3, generic: 0, graph: 1, descr: UP }
+                          - { value: 4, generic: 2, graph: 1, descr: PARTIALFAIL }
+                          - { value: 5, generic: 2, graph: 1, descr: MONITORFAIL }
+                          - { value: 6, generic: 0, graph: 1, descr: MONITOROK }
+                          - { value: 7, generic: 2, graph: 1, descr: COMPLETEFAIL }
+                          - { value: 8, generic: 1, graph: 1, descr: DUMB }
+                          - { value: 9, generic: 1, graph: 1, descr: DISABLED }
+                          - { value: 10, generic: 2, graph: 1, descr: PARTIALFAILSSL }
+                          - { value: 11, generic: 2, graph: 1, descr: ROUTEMONITORFAIL }
+                  -
+                      oid: haPeerState
+                      num_oid: '.1.3.6.1.4.1.5951.4.1.1.23.3.{{ $index }}'
+                      index: 'haPeerState.{{ $index }}'
+                      descr: Peer HA mode
+                      state_name: haPeerState
+                      states:
+                          - { value: 0, generic: 3, graph: 1, descr: standalone }
+                          - { value: 1, generic: 0, graph: 1, descr: primary }
+                          - { value: 2, generic: 0, graph: 1, descr: secondary }
+                          - { value: 3, generic: 3, graph: 1, descr: unknown }

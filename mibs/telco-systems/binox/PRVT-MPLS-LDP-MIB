@@ -1,0 +1,898 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-MPLS-LDP-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-MPLS-LDP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddressType
+        FROM INET-ADDRESS-MIB
+    prvtcrldpPmIndex, prvtcrldpSigIndex
+        FROM PRVT-CR-LDP-MIB
+    mpls
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtMplsLdpMIB MODULE-IDENTITY
+    LAST-UPDATED "200911260000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "This MIB contains managed object definitions for the
+         'Multiprotocol Label Switching, Label Distribution
+         Protocol, LDP'."
+    REVISION    "200911260000Z"
+    DESCRIPTION 
+        "Created MplsLdpIdentifier TC."
+    REVISION    "200606030000Z"
+    DESCRIPTION 
+        "Initial version published as part of RFC 3815."
+    ::= { mpls 1 }
+
+
+MplsRetentionMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The label retention mode which specifies whether
+         an LSR maintains a label binding for a FEC
+         learned from a neighbor that is not its next hop
+         for the FEC.
+         
+         If the value is conservative(1) then advertised
+         label mappings are retained only if they will be
+         used to forward packets, i.e., if label came from
+         a valid next hop.
+         
+         If the value is liberal(2) then all advertised
+         label mappings are retained whether they are from
+         a valid next hop or not."
+    REFERENCE   
+        "Multiprotocol Label Switching Architecture,
+         RFC3031.
+         
+         LDP Specification, RFC3036, Section 2.6.2."
+    SYNTAX      INTEGER { conservative(1), liberal(2) }
+
+MplsLdpLabelType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The Layer 2 label types which are defined for MPLS
+         LDP and/or CR-LDP are generic(1), atm(2), or
+         frameRelay(3)."
+    SYNTAX      INTEGER { generic(1), atm(2), frameRelay(3) }
+
+MplsLabelDistributionMethod ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "The label distribution method which is also called
+         the label advertisement mode [RFC3036].
+         Each interface on an LSR is configured to operate
+         in either Downstream Unsolicited or Downstream
+         on Demand."
+    REFERENCE   
+        "Multiprotocol Label Switching Architecture,
+         RFC3031.
+         
+         LDP Specification, RFC3036, Section 2.6.3."
+    SYNTAX      INTEGER { downstreamOnDemand(1), 
+                    downstreamUnsolicited(2) }
+
+PrvtMplsLdpIdentifier ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "255a"
+    STATUS      current
+    DESCRIPTION 
+        "The LDP identifier is used to identify a
+         Label Switching Router (LSR) label space.
+         
+         The format is an ASCII representation of
+         a string in the form A.B.C.D:S,
+         where A,B,C,D identify the LSR and must
+         be a globally unique value, such as a 32-bit
+         router ID assigned to the LSR,
+         and S identifies a specific label space
+         within the LSR."
+    SYNTAX      OCTET STRING (SIZE(10..20))
+
+MplsIndexType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "This is an octet string that can be used as a table
+         index in cases where a large addressable space is
+         required such as on an LSR where many applications
+         may be provisioning labels.
+         
+         Note that the string containing the single octet with
+         the value 0x00 is a reserved value used to represent
+         special cases. When this TEXTUAL-CONVENTION is used
+         as the SYNTAX of an object, the DESCRIPTION clause
+         MUST specify if this special value is valid and if so
+         what the special meaning is.
+         
+         In systems that provide write access to the MPLS-LSR-STD
+         MIB, mplsIndexType SHOULD be used as a simple multi-digit
+         integer encoded as an octet string.
+         No further overloading of the meaning of an index SHOULD
+         be made.
+         
+         In systems that do not offer write access to the MPLS-LSR-STD
+         MIB, the mplsIndexType may contain implicit formatting that is
+         specific to the implementation to convey additional
+         information such as interface index, physical card or
+         device, or application id. The interpretation of this
+         additional formatting is implementation dependent and
+         not covered in this document. Such formatting MUST
+         NOT impact the basic functionality of read-only access
+         to the MPLS-LSR-STD MIB by management applications that are
+         not aware of the formatting rules.
+         
+         The MIB is implemented in PRVT-LMGR with write-access.
+         As specified above, PRVT-LMGR treats the index values of this type
+         as simple integer types.
+         
+         In order to reduce the effort required to upgrade from earlier
+         versions of the MIB, and to simplify management of static LSPs,
+         this type is mapped on to an Integer32 in this implementation."
+    SYNTAX      Integer32 (0..2147483647)
+
+PrvtMplsLdpInetAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x "
+    STATUS      current
+    DESCRIPTION 
+        "Same as InetAddress from INET-ADDRESS-MIB except restricted
+         to IPv4 or IPv6 addresses."
+    SYNTAX      OCTET STRING (SIZE(4 | 16))
+
+PrvtMplsLdpTimeStamp ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Same as TimeStamp from SNMPv2-TC, but has syntax Integer32"
+    SYNTAX      Integer32
+
+PrvtMplsLdpTimeInterval ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Same as TimeInterval from SNMPv2-TC, but has syntax Integer32"
+    SYNTAX      Integer32
+
+mplsLdpObjects OBJECT IDENTIFIER
+    ::= { prvtMplsLdpMIB 1 }
+
+mplsLdpEntityTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains information about the
+         MPLS Label Distribution Protocol Entities which
+         exist on this Label Switching Router (LSR)
+         or Label Edge Router (LER)."
+    ::= { mplsLdpObjects 1 }
+
+mplsLdpEntityEntry OBJECT-TYPE
+    SYNTAX      MplsLdpEntityEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in this table represents an LDP entity.
+         An entry can be created by a network administrator
+         or by an SNMP agent as instructed by LDP."
+    INDEX       { prvtcrldpSigIndex, mplsLdpEntityLdpId, 
+                  mplsLdpEntityIndex }
+    ::= { mplsLdpEntityTable 1 }
+
+MplsLdpEntityEntry ::= SEQUENCE {
+    mplsLdpEntityLdpId                  PrvtMplsLdpIdentifier,
+    mplsLdpEntityIndex                  Unsigned32,
+    mplsLdpEntityRowStatus              RowStatus,
+    mplsLdpEntityAdminStatus            INTEGER,
+    mplsLdpEntityOperStatus             INTEGER,
+    mplsLdpEntityMaxPduLength           Unsigned32,
+    mplsLdpEntityKeepAliveHoldTimer     Unsigned32,
+    mplsLdpEntityHelloHoldTimer         Unsigned32,
+    mplsLdpEntityTargetPeer             TruthValue,
+    mplsLdpEntityTargetPeerAddrType     InetAddressType,
+    mplsLdpEntityTargetPeerAddr         PrvtMplsLdpInetAddress
+}
+
+mplsLdpEntityLdpId OBJECT-TYPE
+    SYNTAX      PrvtMplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The LDP identifier. The first four octets encode an IP
+         address assigned to the LSR, and the last two octets
+         identify a specific label space within the LSR."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section on LDP Identifiers."
+    ::= { mplsLdpEntityEntry 1 }
+
+mplsLdpEntityIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This index is used as a secondary index to uniquely
+         identify this row.
+         
+         A secondary index (this object) is meaningful to some
+         but not all, LDP implementations. For example
+         an LDP implementation which uses PPP would
+         use this index to differentiate PPP sub-links.
+         
+         Another way to use this index is to give this the
+         value of ifIndex. However, this is dependant
+         on the implementation.
+         
+         This field is deprecated in the following tables provided
+         by PRVT-CR-LDP Session Controller.
+         
+         - mplsLdpEntityTable.
+         - mplsLdpPeerTable.
+         
+         In these tables the value of the Entity Index will always
+         be filled in to be 1."
+    ::= { mplsLdpEntityEntry 2 }
+
+mplsLdpEntityRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "An object that allows entries in this table to
+         be created and deleted using the
+         RowStatus convention.
+         
+         Once the 'mplsLdpEntityAdminStatus' object has
+         the value of 'up' and this object has the value
+         of 'active' then the Entity will atttempt to
+         contact an LDP Peer. If the value of this object
+         is changed to 'notInService', then the Entity looses
+         contact with the LDP Peer and all information related
+         to that Peer must be removed from the MIB. This has
+         the same effect as changing 'mplsLdpEntityAdminStatus'
+         from 'enable' to 'disable'.
+         
+         When this object is set to 'active' and the value of
+         the 'mplsLdpEntityAdminStatus' is 'enable' then
+         this Entity will attempt to contact the Peer and
+         establish new sessions."
+    ::= { mplsLdpEntityEntry 3 }
+
+mplsLdpEntityAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER { enable(1), disable(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The administrative status of this LDP Entity.
+         If this object is changed from 'enable' to 'disable'
+         and this entity has already attempted to establish
+         contact with a Peer (which implies that the
+         'mplsLdpEntityRowStatus' object has been set to
+         'active'), then all contact with that
+         Peer is lost and all information from that Peer
+         needs to be removed from the MIB. (This implies
+         that the network management subsystem should clean
+         up any related entry in the mplsLdpPeerTable. This
+         further implies that a 'tear-down' for that session
+         is issued and the session and all information related
+         to that session cease to exist).
+         
+         At this point the user is able to change values
+         which are related to this entity.
+         
+         When the admin status is set back to 'enable', then
+         this Entity will attempt to establish a new session
+         with the Peer."
+    ::= { mplsLdpEntityEntry 4 }
+
+mplsLdpEntityOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER { unknown(1), enabled(2), disabled(3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The operational status of this LDP Entity.
+         
+         The value of unknown(1) indicates that the
+         operational status cannot be determined at
+         this time. The value of unknown should be
+         a transient condition before changing
+         to enabled(2) or disabled(3)."
+    ::= { mplsLdpEntityEntry 5 }
+
+mplsLdpEntityMaxPduLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The maximum PDU Length that is sent in
+         the Common Session Parameters of an Initialization
+         Message. According to the LDP Specification [RFC3036]
+         a value of 255 or less specifies the
+         default maximum length of 4096 octets.
+         
+         The receiving LSR MUST calculate the maximum PDU
+         length for the session by using the smaller of its and
+         its peer's proposals for Max PDU Length."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section 3.5.3.
+         Initialization Message."
+    ::= { mplsLdpEntityEntry 6 }
+
+mplsLdpEntityKeepAliveHoldTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The 16-bit integer value which is the proposed keep
+         alive hold timer for this LDP Entity."
+    ::= { mplsLdpEntityEntry 7 }
+
+mplsLdpEntityHelloHoldTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The 16-bit integer value which is the proposed Hello
+         hold timer for this LDP Entity. The Hello Hold time
+         in seconds.
+         
+         An LSR maintains a record of Hellos received
+         from potential peers. This object represents
+         the Hold Time in the Common Hello Parameters TLV of
+         the Hello Message.
+         
+         A value of 0 is a default value and should be
+         interpretted in conjunction with the
+         mplsLdpEntityTargetPeer object.
+         
+         If the value of this object is 0: if the value of the
+         mplsLdpEntityTargetPeer object is false(2), then this
+         specifies that the Hold Time's actual default value is
+         15 seconds (i.e., the default Hold time for Link Hellos
+         is 15 seconds). Otherwise if the value of the
+         mplsLdpEntityTargetPeer object is true(1), then this
+         specifies that the Hold Time's actual default value is
+         45 seconds (i.e., the default Hold time for Targeted
+         Hellos is 45 seconds).
+         
+         A value of 65535 means infinite (i.e., wait forever).
+         
+         All other values represent the amount of time in
+         seconds to wait for a Hello Message. Setting the
+         hold time to a value smaller than 15 is not
+         recommended, although not forbidden according
+         to RFC3036.
+         
+         For auto-created entities that use the global label space
+         (and therefore might correspond to more than one
+         adjacency over more than one interface), this value will
+         only be meaningful if all interfaces that correspond to
+         this entity are configured to use the same hello hold
+         time, since this property can be configured on a per
+         interface basis.
+         
+         If the interfaces have differing configurations, the
+         value returned on a MIB Get will be 0."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section 3.5.2.,
+         Hello Message."
+    ::= { mplsLdpEntityEntry 8 }
+
+mplsLdpEntityTargetPeer OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "If this LDP entity uses targeted peer then set
+         this to true."
+    ::= { mplsLdpEntityEntry 9 }
+
+mplsLdpEntityTargetPeerAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The type of the internetwork layer address used for
+         the Extended Discovery. This object indicates how
+         the value of mplsLdpEntityTargetPeerAddr is to
+         be interpreted."
+    ::= { mplsLdpEntityEntry 10 }
+
+mplsLdpEntityTargetPeerAddr OBJECT-TYPE
+    SYNTAX      PrvtMplsLdpInetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value of the internetwork layer address
+         used for the Extended Discovery. The value of
+         mplsLdpEntityTargetPeerAddrType specifies how
+         this address is to be interpreted."
+    ::= { mplsLdpEntityEntry 11 }
+
+mplsLdpPeerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about LDP peers known by Entities in
+         the mplsLdpEntityTable. The information in this table
+         is based on information from the Entity-Peer interaction
+         during session initialization but is not appropriate
+         for the mplsLdpSessionTable, because objects in this
+         table may or may not be used in session establishment."
+    ::= { mplsLdpObjects 2 }
+
+mplsLdpPeerEntry OBJECT-TYPE
+    SYNTAX      MplsLdpPeerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a single Peer which is related
+         to a Session. NOTE: this table is used to
+         augment the mplsLdpSessionTable."
+    INDEX       { prvtcrldpPmIndex, mplsLdpEntityLdpId, 
+                  mplsLdpEntityIndex, mplsLdpPeerLdpId }
+    ::= { mplsLdpPeerTable 1 }
+
+MplsLdpPeerEntry ::= SEQUENCE {
+    mplsLdpPeerLdpId                PrvtMplsLdpIdentifier,
+    mplsLdpPeerLabelDistMethod      MplsLabelDistributionMethod,
+    mplsLdpPeerTransportAddrType    InetAddressType,
+    mplsLdpPeerTransportAddr        PrvtMplsLdpInetAddress
+}
+
+mplsLdpPeerLdpId OBJECT-TYPE
+    SYNTAX      PrvtMplsLdpIdentifier
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The LDP identifier of this LDP Peer."
+    ::= { mplsLdpPeerEntry 1 }
+
+mplsLdpPeerLabelDistMethod OBJECT-TYPE
+    SYNTAX      MplsLabelDistributionMethod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "For any given LDP session, the method of
+         label distribution must be specified."
+    ::= { mplsLdpPeerEntry 2 }
+
+mplsLdpPeerTransportAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The type of the Internet address for the
+         mplsLdpPeerTransportAddr object. The LDP
+         specification describes this as being either
+         an IPv4 Transport Address or IPv6 Transport
+         Address which is used in opening the LDP session's
+         TCP connection, or if the optional TLV is not
+         present, then this is the IPv4/IPv6 source
+         address for the UPD packet carrying the Hellos.
+         
+         This object specifies how the value of the
+         mplsLdpPeerTransportAddr object should be
+         interpreted."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section 2.5.2
+         Transport Connection Establishment and
+         Section 3.5.2.1 Hello Message Procedures."
+    ::= { mplsLdpPeerEntry 3 }
+
+mplsLdpPeerTransportAddr OBJECT-TYPE
+    SYNTAX      PrvtMplsLdpInetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Internet address advertised by the peer
+         in the Hello Message or the Hello source address.
+         
+         The type of this address is specified by the
+         value of the mplsLdpPeerTransportAddrType
+         object."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section 2.5.2
+         Transport Connection Establishment and
+         Section 3.5.2.1 Hello Message Procedures."
+    ::= { mplsLdpPeerEntry 4 }
+
+mplsLdpSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table of Sessions between the LDP Entities
+         and LDP Peers. Each row in this table
+         represents a single session."
+    ::= { mplsLdpObjects 3 }
+
+mplsLdpSessionEntry OBJECT-TYPE
+    SYNTAX      MplsLdpSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in this table represents information on a
+         single session between an LDP Entity and LDP Peer.
+         The information contained in a row is read-only.
+         
+         Please note: the Path Vector Limit for the
+         Session is the value which is configured in
+         the corresponding mplsLdpEntityEntry. The
+         Peer's Path Vector Limit is in the
+         mplsLdpPeerPathVectorLimit object in the
+         mplsLdpPeerTable.
+         
+         Values which may differ from those configured are
+         noted in the objects of this table. A value will
+         differ if it was negotiated between the
+         Entity and the Peer. Values may or may not
+         be negotiated. For example, if the values
+         are the same then no negotiation takes place.
+         If they are negotiated, then they may differ."
+    INDEX       { prvtcrldpSigIndex, mplsLdpEntityLdpId, 
+                  mplsLdpEntityIndex, mplsLdpPeerLdpId }
+    ::= { mplsLdpSessionTable 1 }
+
+MplsLdpSessionEntry ::= SEQUENCE {
+    mplsLdpSessionStateLastChange               PrvtMplsLdpTimeStamp,
+    mplsLdpSessionState                         INTEGER,
+    mplsLdpSessionKeepAliveHoldTimeRemaining    PrvtMplsLdpTimeInterval,
+    mplsLdpSessionKeepAliveTime                 Unsigned32,
+    mplsLdpSessionMaxPduLength                  Unsigned32,
+    mplsLdpSessionConfiguredHoldTime            Unsigned32,
+    mplsLdpSessionPeerHoldTime                  Unsigned32,
+    mplsLdpSessionHoldTimeInUse                 Unsigned32
+}
+
+mplsLdpSessionStateLastChange OBJECT-TYPE
+    SYNTAX      PrvtMplsLdpTimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of sysUpTime at the time this
+         Session entered its current state as
+         denoted by the mplsLdpSessionState
+         object."
+    ::= { mplsLdpSessionEntry 1 }
+
+mplsLdpSessionState OBJECT-TYPE
+    SYNTAX      INTEGER { nonexistent(1), initialized(2), openrec(3), 
+                    opensent(4), operational(5) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The current state of the session, all of the
+         states 1 - 5 are based on the state machine
+         for session negotiation behavior."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section 2.5.4,
+         Initialization State Machine."
+    ::= { mplsLdpSessionEntry 2 }
+
+mplsLdpSessionKeepAliveHoldTimeRemaining OBJECT-TYPE
+    SYNTAX      PrvtMplsLdpTimeInterval
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The keep alive hold time remaining for this session in
+         units of hundredths of a second. This interval will
+         change when the 'next' Keep Alive message which
+         corresponds to this session is received. A value of zero
+         indicates that the keep alive hold timer is not running."
+    ::= { mplsLdpSessionEntry 3 }
+
+mplsLdpSessionKeepAliveTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The negotiated KeepAlive Time which
+         represents the amount of seconds between
+         keep alive messages. The
+         mplsLdpEntityKeepAliveHoldTimer
+         related to this Session is the
+         value that was proposed as the
+         KeepAlive Time for this session.
+         
+         This value is negotiated during
+         session initialization between
+         the entity's proposed value
+         (i.e., the value configured in
+         mplsLdpEntityKeepAliveHoldTimer)
+         and the peer's proposed
+         KeepAlive Hold Timer value.
+         This value is the smaller
+         of the two proposed values."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section 3.5.3,
+         Initialization Message."
+    ::= { mplsLdpSessionEntry 4 }
+
+mplsLdpSessionMaxPduLength OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The value of maximum allowable length for LDP PDUs for
+         this session. This value may have been negotiated
+         during the Session Initialization. This object is
+         related to the mplsLdpEntityMaxPduLength object. The
+         mplsLdpEntityMaxPduLength object specifies the requested
+         LDP PDU length, and this object reflects the negotiated
+         LDP PDU length between the Entity and
+         the Peer."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section 3.5.3,
+         Initialization Message."
+    ::= { mplsLdpSessionEntry 5 }
+
+mplsLdpSessionConfiguredHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The locally configured keepalive hold time for this
+         session, in seconds. Note that the value of this field
+         reflects configuration at the time of session
+         initialization; this may differ from the configuration
+         that would apply to a new session, if configuration has
+         changed since this session was initialized."
+    ::= { mplsLdpSessionEntry 6 }
+
+mplsLdpSessionPeerHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The peer's advertised keepalive hold time for this session
+         in seconds. Note that the value of this field reflects
+         the peer's configuration at the time of session
+         initialization; this may differ from the configuration
+         that would apply to a new session, if the peer's
+         configuration has changed since this session was
+         initialized."
+    ::= { mplsLdpSessionEntry 7 }
+
+mplsLdpSessionHoldTimeInUse OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The keepalive hold time that is currently in use for this
+         session, in seconds."
+    ::= { mplsLdpSessionEntry 8 }
+
+mplsLdpHelloAdjacencyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table of Hello Adjacencies for Sessions."
+    ::= { mplsLdpObjects 4 }
+
+mplsLdpHelloAdjacencyEntry OBJECT-TYPE
+    SYNTAX      MplsLdpHelloAdjacencyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row represents a single LDP Hello Adjacency.
+         An LDP Session can have one or more Hello adjacencies."
+    INDEX       { prvtcrldpSigIndex, mplsLdpEntityLdpId, 
+                  mplsLdpEntityIndex, mplsLdpPeerLdpId, 
+                  mplsLdpHelloAdjacencyIndex }
+    ::= { mplsLdpHelloAdjacencyTable 1 }
+
+MplsLdpHelloAdjacencyEntry ::= SEQUENCE {
+    mplsLdpHelloAdjacencyIndex                  Unsigned32,
+    mplsLdpHelloAdjacencyHoldTimeRemaining      PrvtMplsLdpTimeInterval,
+    mplsLdpHelloAdjacencyHoldTime               Unsigned32,
+    mplsLdpHelloAdjacencyType                   INTEGER,
+    mplsLdpHelloAdjacencyConfiguredHoldTime     Unsigned32,
+    mplsLdpHelloAdjacencyPeerHoldTime           Unsigned32
+}
+
+mplsLdpHelloAdjacencyIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An identifier for this specific adjacency."
+    ::= { mplsLdpHelloAdjacencyEntry 1 }
+
+mplsLdpHelloAdjacencyHoldTimeRemaining OBJECT-TYPE
+    SYNTAX      PrvtMplsLdpTimeInterval
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "If the value of this object is 65535,
+         this means that the hold time is infinite
+         (i.e., wait forever).
+         
+         Otherwise, the time remaining for
+         this Hello Adjacency to receive its
+         next Hello Message.
+         
+         This interval will change when the 'next'
+         Hello Message which corresponds to this
+         Hello Adjacency is received unless it
+         is infinite."
+    ::= { mplsLdpHelloAdjacencyEntry 2 }
+
+mplsLdpHelloAdjacencyHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The Hello hold time which is negotiated between
+         the Entity and the Peer. The entity associated
+         with this Hello Adjacency issues a proposed
+         Hello Hold Time value in the
+         mplsLdpEntityHelloHoldTimer object. The peer
+         also proposes a value and this object represents
+         the negotiated value.
+         
+         A value of 0 means the default,
+         which is 15 seconds for Link Hellos
+         and 45 seconds for Targeted Hellos.
+         A value of 65535 indicates an
+         infinite hold time."
+    REFERENCE   
+        "RFC3036, LDP Specification, Section 3.5.2 Hello Message"
+    ::= { mplsLdpHelloAdjacencyEntry 3 }
+
+mplsLdpHelloAdjacencyType OBJECT-TYPE
+    SYNTAX      INTEGER { link(1), targeted(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This adjacency is the result of a 'link'
+         hello if the value of this object is link(1).
+         Otherwise, it is a result of a 'targeted'
+         hello, targeted(2)."
+    ::= { mplsLdpHelloAdjacencyEntry 4 }
+
+mplsLdpHelloAdjacencyConfiguredHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The locally configured hello hold time for this adjacency,
+         in seconds."
+    ::= { mplsLdpHelloAdjacencyEntry 5 }
+
+mplsLdpHelloAdjacencyPeerHoldTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The peer's advertised hello hold time for this adjacency,
+         in seconds."
+    ::= { mplsLdpHelloAdjacencyEntry 6 }
+
+mplsLdpSessionPeerAddrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MplsLdpSessionPeerAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table 'extends' the mplsLdpSessionTable.
+         This table is used to store Label Address Information
+         from Label Address Messages received by this LSR from
+         Peers. This table is read-only and should be updated
+         when Label Withdraw Address Messages are received, i.e.,
+         Rows should be deleted as appropriate.
+         
+         NOTE: since more than one address may be contained
+         in a Label Address Message, this table 'sparse augments',
+         the mplsLdpSessionTable's information."
+    ::= { mplsLdpObjects 5 }
+
+mplsLdpSessionPeerAddrEntry OBJECT-TYPE
+    SYNTAX      MplsLdpSessionPeerAddrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in this table represents information on
+         a session's single next hop address which was
+         advertised in an Address Message from the LDP peer.
+         The information contained in a row is read-only."
+    INDEX       { prvtcrldpPmIndex, mplsLdpEntityLdpId, 
+                  mplsLdpEntityIndex, mplsLdpPeerLdpId, 
+                  mplsLdpSessionPeerAddrIndex }
+    ::= { mplsLdpSessionPeerAddrTable 1 }
+
+MplsLdpSessionPeerAddrEntry ::= SEQUENCE {
+    mplsLdpSessionPeerAddrIndex         Unsigned32,
+    mplsLdpSessionPeerNextHopAddrType   InetAddressType,
+    mplsLdpSessionPeerNextHopAddr       PrvtMplsLdpInetAddress
+}
+
+mplsLdpSessionPeerAddrIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index which uniquely identifies this entry within
+         a given session."
+    ::= { mplsLdpSessionPeerAddrEntry 1 }
+
+mplsLdpSessionPeerNextHopAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The internetwork layer address type of this Next Hop
+         Address as specified in the Label Address Message
+         associated with this Session. The value of this
+         object indicates how to interpret the value of
+         mplsLdpSessionPeerNextHopAddr."
+    ::= { mplsLdpSessionPeerAddrEntry 2 }
+
+mplsLdpSessionPeerNextHopAddr OBJECT-TYPE
+    SYNTAX      PrvtMplsLdpInetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The next hop address. The type of this address
+         is specified by the value of the
+         mplsLdpSessionPeerNextHopAddrType."
+    REFERENCE   
+        "RFC3036, Section 2.7. LDP Identifiers
+         and Next Hop Addresses"
+    ::= { mplsLdpSessionPeerAddrEntry 3 }
+
+END -- end of module PRVT-MPLS-LDP-MIB.

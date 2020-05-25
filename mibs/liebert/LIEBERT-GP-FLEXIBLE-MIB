@@ -1,0 +1,409 @@
+LIEBERT-GP-FLEXIBLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString
+        FROM SNMPv2-TC
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    OBJECT-TYPE,
+    Integer32, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    lgpFlexible,
+    liebertFlexibleModuleReg
+        FROM LIEBERT-GP-REGISTRATION-MIB
+    ;
+
+-- =============================================================================
+-- Module Identification and Registration
+-- =============================================================================
+
+liebertGlobalProductsFlexibleModule MODULE-IDENTITY
+  LAST-UPDATED "201305140000Z"
+  ORGANIZATION "Liebert Corporation"
+  CONTACT-INFO
+      "Contact:   Technical Support
+
+      Postal:
+      Liebert Corporation
+      1050 Dearborn Drive
+      P.O. Box 29186
+      Columbus OH, 43229
+      US
+
+      Tel: +1 (800) 222-5877
+
+      E-mail: liebert.monitoring@vertivco.com
+      Web:    www.vertivco.com
+
+      Author:  Phil Ulrich"
+
+   DESCRIPTION
+      "The MIB module used to register Liebert Flexible related SNMP OIDs.
+
+      Copyright 2013 Liebert Corporation. All rights reserved.
+      Reproduction of this document is authorized on the condition
+      that the forgoing copyright notice is included.
+
+      This Specification is supplied 'AS IS' and Liebert Corporation
+      makes no warranty, either express or implied, as to the use,
+      operation, condition, or performance of the Specification."
+
+   REVISION "201305140000Z"
+   DESCRIPTION
+    "Initial Version"
+
+   ::= { liebertFlexibleModuleReg 1 }
+
+-- =============================================================================
+--  lgpFlexible - Liebert Flexible Registrations
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+
+-- Flexible Basic Table
+
+-- -----------------------------------------------------------------------------
+
+lgpFlexibleTableCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the number of entries in the lgpFlexibleBasicTable."
+    ::= { lgpFlexible 10 }
+
+lgpFlexibleBasicTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpFlexibleBasicEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains data points supported by the managed device. The 
+         data in this table is formatted in string form. This data is also 
+         available in numerical form in the augmented 
+         lgpFlexibleExtendedTable.
+
+         In this table, the row indexing is not necessarily sequential and 
+         leads to a sparsely populated table."
+    ::= { lgpFlexible 20 }
+
+    lgpFlexibleBasicEntry OBJECT-TYPE
+        SYNTAX      LgpFlexibleBasicEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the columns to be populated in the
+             'lgpFlexibleBasicTable'."
+        INDEX
+        { 
+            IMPLIED lgpFlexibleEntryIndex
+        }
+        ::= { lgpFlexibleBasicTable 1 }
+
+    LgpFlexibleBasicEntry ::= SEQUENCE 
+    {
+            lgpFlexibleEntryIndex               OBJECT IDENTIFIER,
+            lgpFlexibleEntryDataLabel           DisplayString,
+            lgpFlexibleEntryValue               DisplayString,
+            lgpFlexibleEntryUnitsOfMeasure      DisplayString
+    }
+
+    lgpFlexibleEntryIndex OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index which defines a specific row in the 
+             lgpFlexibleBasicTable.  Each row index is associated with a unique
+             data point ID which fixes the data point to its permanent location
+             in the table."
+        ::= { lgpFlexibleBasicEntry 1 }
+
+    lgpFlexibleEntryDataLabel OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A short description of the data reported in this row."
+        ::= { lgpFlexibleBasicEntry 10 }
+
+    lgpFlexibleEntryValue OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "A string representation of any data available.  This is the
+             preferred method of data access, since this will give fully
+             scaled data for both integer and floating point data, in addition
+             to textual data.  If this string column cannot be used, then 
+             columns in the lgpFlexibleExtendedTable must be used in order 
+             to get a fully scaled version of integer data."
+        ::= { lgpFlexibleBasicEntry 20 }
+
+    lgpFlexibleEntryUnitsOfMeasure OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The unit of measure that the value will be presented in.  This is
+             not populated when the data does not have a unit of measure
+             associated with it."
+        ::= { lgpFlexibleBasicEntry 30 }
+
+-- -----------------------------------------------------------------------------
+
+-- Flexible Extended Table
+
+-- -----------------------------------------------------------------------------
+
+lgpFlexibleExtendedTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpFlexibleExtendedEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains data points supported by the managed device.  This
+         table augments the lgpFlexibleBasicTable, providing additional
+         information that may be relevant to advanced users.  Values presented 
+         in string format in the lgpFlexibleBasicTable table are also available in 
+         numeric form in this table.
+
+         Since the lgpFlexibleBasicTable and this table are both indexed by 
+         lgpFlexibleEntryIndex, data applicable to a specific data point can be 
+         found in both tables at the same index."
+    ::= { lgpFlexible 30 }
+
+    lgpFlexibleExtendedEntry OBJECT-TYPE
+        SYNTAX      LgpFlexibleExtendedEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the columns to be populated in the
+             'lgpFlexibleExtendedTable'."
+        AUGMENTS { lgpFlexibleBasicEntry }
+        ::= { lgpFlexibleExtendedTable 1 }
+
+    LgpFlexibleExtendedEntry ::= SEQUENCE 
+    {
+            lgpFlexibleEntryIntegerValue          Integer32,
+            lgpFlexibleEntryUnsignedIntegerValue  Unsigned32,
+            lgpFlexibleEntryDecimalPosition       Unsigned32,
+            lgpFlexibleEntryDataType              INTEGER,
+            lgpFlexibleEntryAccessibility         INTEGER,
+            lgpFlexibleEntryUnitsOfMeasureEnum    INTEGER,
+            lgpFlexibleEntryDataDescription       DisplayString
+    }
+
+    lgpFlexibleEntryIntegerValue OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the data point value formatted as a signed integer. This 
+             column is populated only for numerical data points whose type 
+             requires a signed value.
+
+             To convert this value to the units indicated in the units of 
+             measure columns (lgpFlexibleEntryUnitsOfMeasure or 
+             lgpFlexibleEntryUnitsOfMeasureEnum), divide this value 
+             by 10^n, where n is the value from the 
+             lgpFlexibleEntryDecimalPosition column.
+
+             For data points that are writable (as designated by the
+             lgpFlexibleEntryAccessibility column), the inverse
+             calculation must done.  The desired value must be multiplied by
+             10^n before it is written to this column, where n is the value 
+             from the lgpFlexibleEntryDecimalPosition column."
+        ::= { lgpFlexibleExtendedEntry 10 }
+
+    lgpFlexibleEntryUnsignedIntegerValue OBJECT-TYPE
+        SYNTAX      Unsigned32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the data point value formatted as an unsigned integer. This 
+             column is populated only for numerical data points whose type 
+             does not require a signed value.
+
+             To convert this value to the units indicated in the units of 
+             measure columns (lgpFlexibleEntryUnitsOfMeasure or 
+             lgpFlexibleEntryUnitsOfMeasureEnum), divide this value 
+             by 10^n, where n is the value from the 
+             lgpFlexibleEntryDecimalPosition column.
+
+             For data points that are writable (as designated by the
+             lgpFlexibleEntryAccessibility column), the inverse
+             calculation must done.  The desired value must be multiplied by
+             10^n before it is written to this column, where n is the value 
+             from the lgpFlexibleEntryDecimalPosition column."
+        ::= { lgpFlexibleExtendedEntry 20 }
+
+    lgpFlexibleEntryDecimalPosition OBJECT-TYPE
+        SYNTAX      Unsigned32 
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is a power of ten divider needed to convert values from the 
+             signed and unsigned integer columns 
+             (lgpFlexibleEntryIntegerValue or 
+             lgpFlexibleEntryUnsignedIntegerValue) to floating 
+             point values. This essentially tells how many positions to move 
+             the decimal point to the left.
+
+             To convert the integer values to the units indicated in the units 
+             of measure columns (lgpFlexibleEntryUnitsOfMeasure or 
+             lgpFlexibleEntryUnitsOfMeasureEnum), divide the 
+             integer value by 10^n, where n is the value from this column.
+
+             For data points that are writable (as designated by the
+             lgpFlexibleEntryAccessibility column), the inverse
+             calculation must done. The desired value must be multiplied by
+             10^n before it is written to the signed or unsigned integer 
+             columns."
+        ::= { lgpFlexibleExtendedEntry 30 }
+
+    lgpFlexibleEntryDataType OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            not-specified(0),
+            int16(1),
+            uint16(2),
+            int32(3),
+            uint32(4),
+            text(5),
+            enum(6),
+            event16(7),
+            event32(8),
+            ipv4(9),
+            time32(10)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The format that the data will appear as.  This can be used to
+             determine which field the numerical data will appear in.  Data of 
+             type int16 and int32 will appear in the column
+             lgpFlexibleEntryIntegerValue.  Data of type uint16, 
+             uint32, and enum, will appear in the column
+             lgpFlexibleEntryUnsignedIntegerValue."
+        ::= { lgpFlexibleExtendedEntry 40 }
+
+    lgpFlexibleEntryAccessibility OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            not-specified(0),
+            readonly(1),
+            writeonly(2),
+            readwrite(3)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This describes the read/write access that is available for the 
+             data in the row."
+        ::= { lgpFlexibleExtendedEntry 50 }
+
+    lgpFlexibleEntryUnitsOfMeasureEnum OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            not-specified(0),
+            milliSeconds(4096),
+            seconds(4097),
+            minutes(4098),
+            hours(4099),
+            voltsAcRms(4100),
+            milliVoltsAcRms(4101),
+            voltsDc(4102),
+            milliVoltsDc(4103),
+            voltsPeak(4104),
+            voltsPeakToPeak(4105),
+            ampsAcRms(4106),
+            milliAmpsAcRms(4107),
+            ampsDc(4108),
+            milliAmpsDc(4109),
+            voltAmps(4110),
+            kiloVoltAmps(4111),
+            voltAmpsReactive(4112),
+            kVAReactive(4113),
+            watts(4114),
+            kiloWatts(4115),
+            wattHours(4116),
+            kiloWattHour(4117),
+            ampDcHours(4118),
+            hertz(4119),
+            milliHertz(4120),
+            kiloHertz(4121),
+            megaHertz(4122),
+            gigaHertz(4123),
+            percent(4124),
+            degC(4125),
+            degCDelta(4126),
+            degF(4127),
+            degFDelta(4128),
+            psi(4129),
+            pascal(4130),
+            psia(4131),
+            relativeHumidity(4132),
+            thd(4133),
+            days(4134),
+            phase(4135),
+            microOhms(4136),
+            milliOhms(4137),
+            ohms(4138),
+            kiloOhms(4139),
+            megaOhms(4140),
+            bars(4141),
+            rpm(4142),
+            bytes(4143),
+            kilobytes(4144),
+            megabytes(4145),
+            gigabytes(4146),
+            terabytes(4147),
+            voltAmpHours(4148),
+            kiloVoltAmpHours(4149),
+            vaReactiveHours(4150),
+            kVAReactiveHours(4151),
+            meter(4152),
+            feet(4153),
+            cms(4154),
+            cmh(4155),
+            cfs(4156),
+            cfm(4157),
+            lpm(4158),
+            gpmUk(4159),
+            gpmUs(4160),
+            absoluteHumidity(4161),
+            kilograms(4162),
+            cubicMeters(4163),
+            btu(4164),
+            torrs(4165),
+            millitorrs(4166),
+            pounds(4167),
+            mps(4168),
+            fpm(4169),
+            liter(4170),
+            gallonUs(4171),
+            gallonUk(4172),
+            lps(4173),
+			mho(4174),
+			siemensCm(4175),
+			weeks(4176),
+			inWC(4177),
+			btuHours(4178)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The unit of measurement that the value will be in."
+        ::= { lgpFlexibleExtendedEntry 60 }
+
+    lgpFlexibleEntryDataDescription OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A description of the data reported in this row.  This is generally 
+             longer and more thorough than the simple label described by 
+             lgpFlexibleEntryDataLabel."
+        ::= { lgpFlexibleExtendedEntry 70 }
+END

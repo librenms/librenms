@@ -1,0 +1,9 @@
+os: vubiq
+text: 'Vubiq Networks'
+type: network
+icon: vubiq
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.46330.1

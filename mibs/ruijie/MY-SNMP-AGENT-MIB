@@ -1,0 +1,324 @@
+-- *****************************************************************
+-- MY-SNMP-AGENT-MIB.mib:  My Snmp Agent MIB file
+--
+-- $Copyright$
+-- 
+-- *****************************************************************
+--
+
+MY-SNMP-AGENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Counter32
+                FROM SNMPv2-SMI
+        TruthValue,
+        DisplayString,
+        RowStatus
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP,
+        NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+        ConfigStatus,
+        MyTrapType       
+                FROM MY-TC
+        EnabledStatus 
+                FROM P-BRIDGE-MIB
+        myMgmt
+                FROM MY-SMI;
+
+mySnmpAgentMIB MODULE-IDENTITY
+        LAST-UPDATED "200203200000Z"
+        ORGANIZATION "$Company$"
+        CONTACT-INFO
+                " 
+                Tel: $Telephone$ 
+
+                E-mail: $E-mail$"
+        DESCRIPTION
+                "This module defines my SNMP agent mibs."
+        REVISION      "200203200000Z"
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { myMgmt 5}
+
+mySnmpAgentMIBObjects OBJECT IDENTIFIER ::= { mySnmpAgentMIB 1 }
+
+mySnmpCommunityObjects OBJECT IDENTIFIER ::= { mySnmpAgentMIBObjects 1 }
+
+mySnmpTrapObjects OBJECT IDENTIFIER ::= { mySnmpAgentMIBObjects 2 }
+
+Community ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "community string for the implementation, maximum length of 
+        community strings limited to 32 octets."
+    SYNTAX DisplayString (SIZE (1..32))
+
+--
+--  snmp community
+--
+myCommunityMaxNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of Max of communities which the SNMP Agent support."
+        ::= { mySnmpCommunityObjects 1 }
+
+myCommunityTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyCommunityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of SNMP Community configurations."
+        ::= { mySnmpCommunityObjects 2 }
+        
+myCommunityEntry OBJECT-TYPE
+        SYNTAX MyCommunityEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Obtain information of SNMP Community configuration."
+        INDEX { myCommunityName }
+        ::= { myCommunityTable 1 }
+        
+MyCommunityEntry ::= 
+        SEQUENCE {
+           myCommunityName  Community,
+           myCommunityWritable INTEGER,
+           myCommunityUserIpAddr IpAddress,
+           myCommunityEnableIpAddrAuthen EnabledStatus,
+           myCommunityStatus RowStatus
+        }
+        
+myCommunityName OBJECT-TYPE
+        SYNTAX Community
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Community used by this entry.This value is unique for every entry.
+            When this string be used as an index,Value of a sub-identifier equal 
+            ASCII value of corresponding character(first sub-identifier corresponds
+            first character of string). The number of sub-identifiers of this string
+            must be 32,If length of string is less than 32 the sub-identifier(0x0) 
+            will be filled in tail."
+        ::= { myCommunityEntry 1 }
+    
+myCommunityWritable OBJECT-TYPE
+        SYNTAX INTEGER{
+               readonly(1),
+               writable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Authority of this community"
+        DEFVAL{ readonly }
+        ::= { myCommunityEntry 2 }
+        
+myCommunityUserIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "IP address use for the authentication of a user, if the associated object
+        myCommunityEnableIpAddrAuthen status is enable(1), the all messages
+            send to the agent will be authened by community and this IP address. messages
+            that can't pass the authentication will be discarded."
+        ::= { myCommunityEntry 3 }
+        
+myCommunityEnableIpAddrAuthen OBJECT-TYPE
+        SYNTAX EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "this object offer the means to enable of disable the IP authentications of 
+            SNMP message."
+        ::= { myCommunityEntry 4 }
+            
+myCommunityStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "entry status of this entry. and the means in this enviraments can
+            reffer to the text-convention definition of the RowStatus."
+        ::= { myCommunityEntry 5 }
+
+--
+--trap destination table
+--
+ 
+myTrapDstMaxNumber OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Number of destination address table entries."
+        ::= { mySnmpTrapObjects 1 }
+                        
+myTrapDstTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyTrapDstEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "table of destination hosts that the trap will be sent to."
+        ::= { mySnmpTrapObjects 2 }
+    
+myTrapDstEntry OBJECT-TYPE
+        SYNTAX MyTrapDstEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "list of hosts."
+        INDEX { myTrapDstAddr }
+        ::= { myTrapDstTable 1 }
+    
+MyTrapDstEntry ::= 
+        SEQUENCE {
+           myTrapDstAddr IpAddress,
+           myTrapDstCommunity Community,
+           myTrapDstSendTrapClass INTEGER,
+           myTrapDstEntryStatus RowStatus
+        }
+        
+myTrapDstAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "the destination address of a host the trap will be sent to."
+        ::= { myTrapDstEntry 1 }
+                
+myTrapDstCommunity OBJECT-TYPE
+        SYNTAX Community
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "the destination host's SNMP Client wish to receive the community in
+            the trap send by agent."
+        DEFVAL { "public" }
+        ::= { myTrapDstEntry 2 }
+
+myTrapDstSendTrapClass OBJECT-TYPE
+    SYNTAX      INTEGER { snmpv1-Trap(1), snmpv2c-Trap(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Indicates that the SNMP entity will send which kind of trap 
+            SNMPv1-Trap and SNMPv2-Trap"
+    DEFVAL { snmpv1-Trap }
+    ::= { myTrapDstEntry 3 }
+        
+myTrapDstEntryStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "entry status of this entry. and the means in this enviraments can
+            reffer to the text-convention definition of the RowStatus."
+        ::= { myTrapDstEntry 4 }
+
+
+myTrapActionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MyTrapActionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table of the trap's action."
+        ::= { mySnmpTrapObjects 3 }
+
+myTrapActionEntry OBJECT-TYPE
+        SYNTAX MyTrapActionEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "List of of the trap's action."
+        INDEX { myTrapType }
+        ::= { myTrapActionTable 1 }
+    
+MyTrapActionEntry ::=
+        SEQUENCE {
+           myTrapType MyTrapType,
+           myTrapAction INTEGER
+        }
+        
+myTrapType OBJECT-TYPE
+        SYNTAX MyTrapType 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Trap type identifier, every kind of trap which the system support
+             will has one entry in this table."
+        ::= { myTrapActionEntry 1 }
+        
+myTrapAction OBJECT-TYPE
+        SYNTAX INTEGER {
+            none(1),       -- do nothing
+            sendtrap(2)    -- send trap
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value decide how to deal with when this type trap has happened."
+        ::= { myTrapActionEntry 2 }
+
+
+
+mySnmpAgentMIBConformance OBJECT IDENTIFIER ::= { mySnmpAgentMIB 2 }
+mySnmpAgentMIBCompliances OBJECT IDENTIFIER ::= { mySnmpAgentMIBConformance 1 }
+mySnmpAgentMIBGroups      OBJECT IDENTIFIER ::= { mySnmpAgentMIBConformance 2 }
+
+
+-- compliance statements
+
+mySnmpAgentMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the My SnmpAgent MIB"
+        MODULE  -- this module
+                MANDATORY-GROUPS { myCommunityMIBGroup,
+                                   mySnmpTrapMIBGroup
+                 }
+        ::= { mySnmpAgentMIBCompliances 1 }
+                
+-- units of conformance
+
+myCommunityMIBGroup OBJECT-GROUP
+        OBJECTS {
+           myCommunityMaxNum,
+           myCommunityName,
+           myCommunityWritable,
+           myCommunityUserIpAddr,
+           myCommunityEnableIpAddrAuthen,
+           myCommunityStatus
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing community management to a
+                My agent."
+        ::= { mySnmpAgentMIBGroups 1 }         
+        
+mySnmpTrapMIBGroup OBJECT-GROUP
+        OBJECTS {
+           myTrapDstSendTrapClass,
+           myTrapDstMaxNumber,
+           myTrapDstAddr,
+           myTrapDstCommunity,
+           myTrapDstEntryStatus,
+           myTrapType,
+           myTrapAction
+        }
+        STATUS  current
+        DESCRIPTION
+                "A collection of objects providing trap information to a
+                My agent."
+        ::= { mySnmpAgentMIBGroups 2 }                 
+        
+END

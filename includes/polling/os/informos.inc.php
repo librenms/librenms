@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-if (preg_match('/^HP_3PAR (.*), ID: (.*), Serial number: (.*), InForm OS version: (.*)/', $poll_device['sysDescr'], $regexp_result)) {
+if (preg_match('/^HP_3PAR (.*), ID: (.*), Serial number: (.*), InForm OS version: (.*)/', $device['sysDescr'], $regexp_result)) {
     $hardware = 'HP 3Par '.$regexp_result[1];
     $serial = $regexp_result[3];
     $version  = $regexp_result[4];

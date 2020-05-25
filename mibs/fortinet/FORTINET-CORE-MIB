@@ -1,0 +1,465 @@
+--
+-- FORTINET-CORE-MIB.mib: Main MIB for Fortinet enterprise OID tree
+--
+-- MODULE-IDENTITY
+--  OrgName
+--     Fortinet Technologies, Inc.
+--  ContactInfo
+--     Technical Support
+--     e-mail: support@fortinet.com
+--     http://www.fortinet.com
+--
+
+
+FORTINET-CORE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    InetAddress, InetAddressPrefixLength, InetAddressType
+        FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    sysName
+        FROM SNMPv2-MIB
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    enterprises
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+fortinet MODULE-IDENTITY
+    LAST-UPDATED "201501140000Z"
+    ORGANIZATION 
+        "Fortinet Technologies, Inc."
+    CONTACT-INFO 
+        "Technical Support
+         email: support@fortinet.com
+         http://www.fortinet.com
+        "
+    DESCRIPTION
+        "Registered FortiWANMib OIDs"
+    REVISION    "201501140000Z"
+    DESCRIPTION
+        "Registered and updated FortiAuthenticatorMib/FortiRecorderMib/FortiVoiceMib/FortiBridgeMib/FortiDirectorMib OIDs"
+    REVISION    "201412100000Z"
+    DESCRIPTION
+        "Registered FortiVoiceMib OID"
+    REVISION    "201404100000Z"
+    DESCRIPTION
+        "Registered FortiADCMib OID"
+    REVISION    "201403220000Z"
+    DESCRIPTION
+        "Added fan failure and AMC bypass traps"
+    REVISION    "201205090000Z"
+    DESCRIPTION
+        "Registered FortiDDoSMib OID"
+    REVISION    "201204230000Z"
+    DESCRIPTION
+        "Registered FortiDNSMib OID"
+    REVISION    "201112230000Z"
+    DESCRIPTION
+        "Registered FortiCacheMib OID"
+    REVISION    "201104250000Z"
+    DESCRIPTION
+        "Supporting portuguese language"
+    REVISION    "201005140000Z"
+    DESCRIPTION
+        "Registered FortiScanMib OID"
+    REVISION    "200905200000Z"
+    DESCRIPTION 
+        "MIB module for Fortinet network devices."
+    REVISION    "200811190000Z"
+    DESCRIPTION 
+        "Registered FortiWebMib OID"
+    REVISION    "200810210000Z"
+    DESCRIPTION 
+        "Added SMI comments"
+    REVISION    "200806250000Z"
+    DESCRIPTION 
+        "Adjusted fnAdmin tree to start at .1"
+    REVISION    "200806160000Z"
+    DESCRIPTION 
+        "Spelling corrections."
+    REVISION    "200804170000Z"
+    DESCRIPTION 
+        "Initial version of fortinet core MIB."
+    ::= { enterprises 12356 }  -- assigned by IANA
+
+
+--
+-- Fortinet MIB Textual Conventions (TC)
+--
+
+FnBoolState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Boolean data type representing enabled/disabled"
+    SYNTAX      INTEGER {
+        disabled (1),
+        enabled (2)
+    }
+
+FnLanguage ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Enumerated type for user interface languages"
+    SYNTAX      INTEGER {
+        english (1),
+        simplifiedChinese (2),
+        japanese (3),
+        korean (4),
+        spanish (5),
+        traditionalChinese (6),
+        french (7),
+        portuguese (8),
+        undefined (255)
+    }
+
+FnIndex ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "Data type for table index values"
+    SYNTAX      Integer32 (0..2147483647)
+
+FnSessionProto ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Data type for session protocols"
+    SYNTAX      INTEGER {
+        ip (0),
+        icmp (1),
+        igmp (2),
+        ipip (4),
+        tcp (6),
+        egp (8),
+        pup (12),
+        udp (17),
+        idp (22),
+        ipv6 (41),
+        rsvp (46),
+        gre (47),
+        esp (50),
+        ah (51),
+        ospf (89),
+        pim (103),
+        comp (108),
+        raw (255)
+    }
+
+--
+-- Fortinet Enterprise Structure of Management Information (SMI)
+--
+
+fnCoreMib OBJECT IDENTIFIER ::= { fortinet 100 }
+
+--
+-- Fortinet Product Family MIB Object Identifier Assignments
+--
+-- fnFortiGateMib     OBJECT IDENTIFIER ::= { fortinet 101 }
+-- fnFortiAnalyzerMib OBJECT IDENTIFIER ::= { fortinet 102 }
+-- fnFortiManagerMib  OBJECT IDENTIFIER ::= { fortinet 103 }
+-- fnFortiDefenderMib OBJECT IDENTIFIER ::= { fortinet 104 }
+-- fnFortiMailMib     OBJECT IDENTIFIER ::= { fortinet 105 }
+-- fnFortiSwitchMib   OBJECT IDENTIFIER ::= { fortinet 106 }
+-- fnFortiWebMib      OBJECT IDENTIFIER ::= { fortinet 107 }
+-- fnFortiScanMib     OBJECT IDENTIFIER ::= { fortinet 108 }
+-- fnFortiCacheMib    OBJECT IDENTIFIER ::= { fortinet 109 }
+-- fnFortiDNSMib      OBJECT IDENTIFIER ::= { fortinet 110 }
+-- fnFortiDDoSMib     OBJECT IDENTIFIER ::= { fortinet 111 }
+-- fnFortiADCMib      OBJECT IDENTIFIER ::= { fortinet 112 }
+-- fnFortiAuthenticatorMib    OBJECT IDENTIFIER ::= { fortinet 113 }
+-- fnFortiRecorderMib OBJECT IDENTIFIER ::= { fortinet 114 }
+-- fnFortiVoiceMib    OBJECT IDENTIFIER ::= { fortinet 115 }
+-- fnFortiBridgeMib   OBJECT IDENTIFIER ::= { fortinet 116 }
+-- fnFortiDirectorMib OBJECT IDENTIFIER ::= { fortinet 117 }
+-- fnFortiWANMib      OBJECT IDENTIFIER ::= { fortinet 118 }
+--
+
+--
+-- fnCoreMib.fnCommon
+--
+fnCommon OBJECT IDENTIFIER ::= { fnCoreMib 1 }
+
+--
+-- fnCoreMib.fnCommon.fnSystem
+--
+fnSystem OBJECT IDENTIFIER ::= { fnCommon 1 }
+
+fnSysSerial OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Device serial number. This is the same serial number as given
+        in the ENTITY-MIB tables for the base entity."
+    ::= { fnSystem 1 }
+
+--
+-- fnCoreMib.fnCommon.fnMgmt
+--
+fnMgmt OBJECT IDENTIFIER ::= { fnCommon 2 }
+
+fnMgmtLanguage OBJECT-TYPE
+    SYNTAX      FnLanguage
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Language used for administration interfaces"
+    ::= { fnMgmt 1 }
+
+fnAdmin OBJECT IDENTIFIER ::= { fnMgmt 100 }
+
+fnAdminNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of admin accounts in fnAdminTable"
+    ::= { fnAdmin 1 }
+
+fnAdminTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FnAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table of administrator accounts on the device. This table is
+        intended to be extended with platform specific information."
+    ::= { fnAdmin 2 }
+
+fnAdminEntry OBJECT-TYPE
+    SYNTAX      FnAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry containing information applicable to a particular admin account"
+    INDEX       { fnAdminIndex }
+    ::= { fnAdminTable 1 }
+
+FnAdminEntry ::= SEQUENCE {
+    fnAdminIndex        Integer32,
+    fnAdminName         DisplayString,
+    fnAdminAddrType     InetAddressType,
+    fnAdminAddr         InetAddress,
+    fnAdminMask         InetAddressPrefixLength
+}
+
+fnAdminIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An index uniquely defining an administrator account within the fnAdminTable"
+    ::= { fnAdminEntry 1 }
+
+fnAdminName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The user-name of the specified administrator account"
+    ::= { fnAdminEntry 2 }
+
+fnAdminAddrType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The type of address stored in fnAdminAddr, in compliance with INET-ADDRESS-MIB"
+    ::= { fnAdminEntry 3 }
+
+fnAdminAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The address prefix identifying where the administrator account can
+        be used from, typically an IPv4 address. The address type/format is
+        determined by fnAdminAddrType."
+    ::= { fnAdminEntry 4 }
+
+fnAdminMask OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The address prefix length (or network mask) applied to the fgAdminAddr
+        to determine the subnet or host the administrator can access the device from"
+    ::= { fnAdminEntry 5 }
+
+--
+-- fnCoreMib.fnCommon.fnTraps
+--
+fnTraps OBJECT IDENTIFIER ::= { fnCommon 3 }
+
+fnTrapsPrefix OBJECT IDENTIFIER ::= { fnTraps 0 }
+
+fnTrapObjects OBJECT IDENTIFIER ::= { fnTraps 1 }
+
+fnGenTrapMsg OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Generic message associated with an event. The content will
+        depend on the nature of the trap."
+    ::= { fnTrapObjects 1 }
+
+fnTrapCpuThreshold NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Indicates that the CPU usage has exceeded the configured threshold."
+    ::= { fnTrapsPrefix 101 }
+
+fnTrapMemThreshold NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Indicates memory usage has exceeded the configured threshold."
+    ::= { fnTrapsPrefix 102 }
+
+fnTrapLogDiskThreshold NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Log disk usage has exceeded the configured threshold. Only available
+        on devices with log disks."
+    ::= { fnTrapsPrefix 103 }
+
+fnTrapTempHigh NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "A temperature sensor on the device has exceeded its threshold.
+        Not all devices have thermal sensors. See manual for specifications."
+    ::= { fnTrapsPrefix 104 }
+
+fnTrapVoltageOutOfRange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Power levels have fluctuated outside of normal levels. Not all devices
+        have voltage monitoring instrumentation. See manual for specifications."
+    ::= { fnTrapsPrefix 105 }
+
+fnTrapPowerSupplyFailure NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Power supply failure detected. Not available on all models. Available
+        on some devices which support redundant power supplies. See manual
+        for specifications."
+    ::= { fnTrapsPrefix 106 }
+
+fnTrapAmcIfBypassMode NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "An AMC interface entered bypass mode. Available on models with an AMC
+        expansion slot. Used with the ASM-CX4 and ASM-FX2 cards."
+    ::= { fnTrapsPrefix 107 }
+
+fnTrapFanFailure NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "A fan failure has been detected. Not all devices have fan sensors.
+        See manual for specifications."
+    ::= { fnTrapsPrefix 108 }
+
+fnTrapIpChange NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName, ifIndex }
+    STATUS      current
+    DESCRIPTION 
+        "Indicates that the IP address of the specified interface has been changed."
+    ::= { fnTrapsPrefix 201 }
+
+fnTrapTest NOTIFICATION-TYPE
+    OBJECTS     { fnSysSerial, sysName }
+    STATUS      current
+    DESCRIPTION 
+        "Trap sent for diagnostic purposes by an administrator."
+    ::= { fnTrapsPrefix 999 }
+
+--
+-- fnCoreMib.fnCommon.fnMIBConformance
+--
+fnMIBConformance OBJECT IDENTIFIER ::= { fnCoreMib 10 }
+
+fnSystemComplianceGroup OBJECT-GROUP
+    OBJECTS     { fnSysSerial }
+    STATUS      current
+    DESCRIPTION 
+        "Objects relating to the physical device."
+    ::= { fnMIBConformance 1 }
+
+fnMgmtComplianceGroup OBJECT-GROUP
+    OBJECTS     { fnMgmtLanguage }
+    STATUS      current
+    DESCRIPTION 
+        "Objects relating the management of a device."
+    ::= { fnMIBConformance 2 }
+
+fnAdminComplianceGroup OBJECT-GROUP
+    OBJECTS     { fnAdminNumber, fnAdminName, fnAdminAddrType, 
+                  fnAdminAddr, fnAdminMask }
+    STATUS      current
+    DESCRIPTION 
+        "Administration access control objects."
+    ::= { fnMIBConformance 3 }
+
+fnTrapsComplianceGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { fnTrapCpuThreshold, fnTrapMemThreshold, 
+                  fnTrapLogDiskThreshold, fnTrapTempHigh, 
+                  fnTrapVoltageOutOfRange, fnTrapPowerSupplyFailure, 
+                  fnTrapAmcIfBypassMode, fnTrapFanFailure,
+                  fnTrapIpChange, fnTrapTest }
+    STATUS      current
+    DESCRIPTION 
+        "Event notifications"
+    ::= { fnMIBConformance 4 }
+
+fnNotifObjectsComplianceGroup OBJECT-GROUP
+    OBJECTS     { fnGenTrapMsg }
+    STATUS      current
+    DESCRIPTION 
+        "Object identifiers used in notifications"
+    ::= { fnMIBConformance 5 }
+
+fnMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "The compliance statement for the application MIB."
+
+    MODULE      -- this module
+
+        GROUP   fnSystemComplianceGroup
+        DESCRIPTION   
+              "This group is mandatory for all Fortinet network appliances
+              supporting this MIB."
+
+        GROUP   fnMgmtComplianceGroup
+        DESCRIPTION   
+              "This group is optional for devices that do not support common
+              management interface options such as multiple languages."
+
+        GROUP   fnAdminComplianceGroup
+        DESCRIPTION   
+              "This group should be accessible on any device supporting
+              administrator authentication."
+
+        GROUP   fnTrapsComplianceGroup
+        DESCRIPTION   
+              "Traps are optional. Not all models support all traps. Consult
+              product literature to see which traps are supported."
+
+        GROUP   fnNotifObjectsComplianceGroup
+        DESCRIPTION   
+              "Object identifiers used in notifications. Objects are required
+              if their containing trap is implemented."
+
+    ::= { fnMIBConformance 100 }
+
+END

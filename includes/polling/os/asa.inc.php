@@ -11,24 +11,28 @@
  * the source code distribution for details.
  */
 
-$oids = 'entPhysicalModelName.1 entPhysicalSoftwareRev.1 entPhysicalSerialNum.1 entPhysicalModelName.4 entPhysicalSoftwareRev.4';
+use Illuminate\Support\Str;
 
-$data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
+if (!Str::endsWith($device['hardware'], 'sc')) {
+    $oids = ['entPhysicalModelName.1', 'entPhysicalSoftwareRev.1', 'entPhysicalSerialNum.1', 'entPhysicalModelName.4', 'entPhysicalSoftwareRev.4'];
 
-if (isset($data[1]['entPhysicalSoftwareRev']) && $data[1]['entPhysicalSoftwareRev'] != '') {
-    $version = $data[1]['entPhysicalSoftwareRev'];
-} elseif (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftwareRev'] != '') {
-    $version = $data[4]['entPhysicalSoftwareRev'];
-}
+    $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
 
-if (isset($data[1]['entPhysicalModelName']) && $data[1]['entPhysicalModelName'] != '') {
-    $hardware = $data[1]['entPhysicalModelName'];
-} elseif (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftwareRev'] != '') {
-    $hardware = $data[4]['entPhysicalModelName'];
-}
+    if (isset($data[1]['entPhysicalSoftwareRev']) && $data[1]['entPhysicalSoftwareRev'] != '') {
+        $version = $data[1]['entPhysicalSoftwareRev'];
+    } elseif (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftwareRev'] != '') {
+        $version = $data[4]['entPhysicalSoftwareRev'];
+    }
 
-if (isset($data[1]['entPhysicalSerialNum']) && $data[1]['entPhysicalSerialNum'] != '') {
-    $serial = $data[1]['entPhysicalSerialNum'];
+    if (isset($data[1]['entPhysicalModelName']) && $data[1]['entPhysicalModelName'] != '') {
+        $hardware = $data[1]['entPhysicalModelName'];
+    } elseif (isset($data[4]['entPhysicalSoftwareRev']) && $data[4]['entPhysicalSoftwareRev'] != '') {
+        $hardware = $data[4]['entPhysicalModelName'];
+    }
+
+    if (isset($data[1]['entPhysicalSerialNum']) && $data[1]['entPhysicalSerialNum'] != '') {
+        $serial = $data[1]['entPhysicalSerialNum'];
+    }
 }
 
 if (empty($hardware)) {
@@ -36,6 +40,6 @@ if (empty($hardware)) {
 }
 
 if (empty($version)) {
-    $explodeddata = explode(" ", $poll_device['sysDescr']);
+    $explodeddata = explode(" ", $device['sysDescr']);
     $version = $explodeddata['5'];
 }

@@ -1,0 +1,150 @@
+-- This module defines enterprise MIBs for NS web setting
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-WEB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetWebMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor 
+         NS web setting"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311120000Z" -- November 12, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 12 }
+
+NsSetWebUICfgEntry ::= SEQUENCE
+{
+    nsSetWebVsys           Integer32,
+    nsSetWebIdleTimeout    INTEGER,
+    nsSetWebTimeout        Integer32,
+    nsSetWebPort           Integer32,
+    nsSetWebSSLPort        Integer32,
+    nsSetWebSSLCertificate DisplayString,
+    nsSetWebSSLCipher      INTEGER
+}
+
+nsSetWebUI OBJECT IDENTIFIER ::= { netscreenSetting 12 }
+
+nsSetWebUICfgTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsSetWebUICfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen devices provide WebUI for easy administration. This
+         table collects admin settings relating to WebUI."
+    ::= { nsSetWebUI 1 }
+
+nsSetWebUICfgEntry OBJECT-TYPE
+    SYNTAX        NsSetWebUICfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry containing WebUI admin configuration."
+    INDEX
+        { nsSetWebVsys }
+    ::= { nsSetWebUICfgTable 1 }
+
+nsSetWebVsys OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Virtual system name the configuration belongs to. Also used as
+         table index."
+    ::= { nsSetWebUICfgEntry 1 }
+
+nsSetWebIdleTimeout OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable Web Management Idle Timeout"
+    ::= { nsSetWebUICfgEntry 2 }
+
+nsSetWebTimeout OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Web Management Idle Timeout Setting"
+    ::= { nsSetWebUICfgEntry 3 }
+
+nsSetWebPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Web Management Http port number setting."
+    ::= { nsSetWebUICfgEntry 4 }
+
+nsSetWebSSLPort OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Web Management http ssl port number setting."
+    ::= { nsSetWebUICfgEntry 5 }
+
+nsSetWebSSLCertificate OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "SSL certificate web management."
+    ::= { nsSetWebUICfgEntry 6 }
+
+nsSetWebSSLCipher OBJECT-TYPE
+    SYNTAX        INTEGER {
+        rc4-md5(0),
+        rc4-40-md5(1),
+        des-sha(2),
+        triple-des-sha(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Web Management via SSL cipher algorithm"
+    ::= { nsSetWebUICfgEntry 7 }
+
+END
+
+

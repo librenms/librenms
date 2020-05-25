@@ -1,0 +1,294 @@
+mib: NBS-CMMC-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - nbsCmmcChassisTable
+                    - nbsCmmcSlotTable
+                    - nbsCmmcPortTable
+        dbm:
+            options:
+                divisor: 1000
+                skip_values: -2147483648
+            data:
+                -
+                    oid: nbsCmmcPortTable
+                    value: nbsCmmcPortRxPower
+                    num_oid: '.1.3.6.1.4.1.629.200.8.1.1.32.{{ $index }}'
+                    descr: 'Port {{ $index }} Rx Power'
+                    index: 'nbsCmmcPortRxPower.{{ $index }}'
+                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}32'
+                -
+                    oid: nbsCmmcPortTable
+                    value: nbsCmmcPortTxPower
+                    num_oid: '.1.3.6.1.4.1.629.200.8.1.1.31.{{ $index }}'
+                    descr: 'Port {{ $index }} Tx Power'
+                    index: 'nbsCmmcPortTxPower.{{ $index }}'
+                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}31'
+        current:
+            options:
+                divisor: 1000000
+                skip_values: -1
+            data:
+                -
+                    oid: nbsCmmcPortTable
+                    value: nbsCmmcPortBiasAmps
+                    num_oid: '.1.3.6.1.4.1.629.200.8.1.1.33.{{ $index }}'
+                    descr: 'Port {{ $index }} Tx Bias Current'
+                    index: 'nbsCmmcPortBiasAmps.{{ $index }}'
+                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}33'
+        voltage:
+            options:
+                divisor: 1000
+                skip_values: -1
+            data:
+                -
+                    oid: nbsCmmcPortTable
+                    value: nbsCmmcPortSupplyVolts
+                    num_oid: '.1.3.6.1.4.1.629.200.8.1.1.34.{{ $index }}'
+                    descr: 'Port {{ $index }} Tx Supply Voltage'
+                    index: 'nbsCmmcPortSupplyVolts.{{ $index }}'
+                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}34'
+        temperature:
+            options:
+                skip_values: -2147483648
+            data:
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisTemperature
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.15.{{ $index }}'
+                    low_limit: nbsCmmcChassisTemperatureMin
+                    high_limit: nbsCmmcChassisTemperatureLimit
+                    descr: 'Chassis {{ $index }} Temperature'
+                    index: 'nbsCmmcChassisTemperature.{{ $index }}'
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}15'
+                -
+                    oid: nbsCmmcSlotTable
+                    value: nbsCmmcSlotTemperature
+                    num_oid: '.1.3.6.1.4.1.629.200.7.1.1.34.{{ $index }}'
+                    low_limit: nbsCmmcSlotTemperatureMin
+                    high_limit: nbsCmmcSlotTemperatureLimit
+                    descr: 'Slot {{ $index }} Temperature'
+                    index: 'nbsCmmcSlotTemperature.{{ $index }}'
+                    entPhysicalIndex: '{{ $nbsCmmcSlotIfIndex }}34'
+                -
+                    oid: nbsCmmcPortTable
+                    value: nbsCmmcPortTemperature
+                    num_oid: '.1.3.6.1.4.1.629.200.8.1.1.30.{{ $index }}'
+                    descr: 'Port {{ $index }} Temperature'
+                    index: 'nbsCmmcPortTemperature.{{ $index }}'
+                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}30'
+        state:
+            data:
+                -
+                    oid: nbsCmmcPortTable
+                    value: nbsCmmcPortDigitalDiags
+                    num_oid: '.1.3.6.1.4.1.629.200.8.1.1.38.{{ $index }}'
+                    descr: 'Port {{ $index }} Overall DigiDiags State'
+                    index: 'nbsCmmcPortDigitalDiags.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcPortIfIndex }}38'
+                    state_name: nbsCmmcPortDigitalDiags
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: diagsOk, graph: 0, generic: 0 }
+                        - { value: 3, descr: diagsWarning, graph: 1, generic: 1 }
+                        - { value: 4, descr: diagsAlarm, graph: 2, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisPowerStatus
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.51.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Power Budget Status'
+                    index: 'nbsCmmcChassisPowerStatus.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}51'
+                    state_name: nbsCmmcChassisPowerStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: sufficient, graph: 1, generic: 0 }
+                        - { value: 3, descr: insufficient, graph: -1, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisPS1Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.7.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Power Supply 1'
+                    index: 'nbsCmmcChassisPS1Status.{{ $index }}'
+                    skip_values: 6
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}7'
+                    state_name: nbsCmmcChassisPSStatus
+                    states:
+                        - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 2, descr: acBad, graph: -1, generic: 2 }
+                        - { value: 3, descr: dcBad, graph: -1, generic: 2 }
+                        - { value: 4, descr: acGood, graph: 1, generic: 0 }
+                        - { value: 5, descr: dcGood, graph: 1, generic: 0 }
+                        - { value: 6, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 7, descr: good, graph: 1, generic: 0 }
+                        - { value: 8, descr: bad, graph: -1, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisPS2Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.8.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Power Supply 2'
+                    index: 'nbsCmmcChassisPS2Status.{{ $index }}'
+                    skip_values: 6
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}8'
+                    state_name: nbsCmmcChassisPSStatus
+                    states:
+                        - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 2, descr: acBad, graph: -1, generic: 2 }
+                        - { value: 3, descr: dcBad, graph: -1, generic: 2 }
+                        - { value: 4, descr: acGood, graph: 1, generic: 0 }
+                        - { value: 5, descr: dcGood, graph: 1, generic: 0 }
+                        - { value: 6, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 7, descr: good, graph: 1, generic: 0 }
+                        - { value: 8, descr: bad, graph: -1, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisPS3Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.9.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Power Supply 3'
+                    index: 'nbsCmmcChassisPS3Status.{{ $index }}'
+                    skip_values: 6
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}9'
+                    state_name: nbsCmmcChassisPSStatus
+                    states:
+                        - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 2, descr: acBad, graph: -1, generic: 2 }
+                        - { value: 3, descr: dcBad, graph: -1, generic: 2 }
+                        - { value: 4, descr: acGood, graph: 1, generic: 0 }
+                        - { value: 5, descr: dcGood, graph: 1, generic: 0 }
+                        - { value: 6, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 7, descr: good, graph: 1, generic: 0 }
+                        - { value: 8, descr: bad, graph: -1, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisPS4Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.10.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Power Supply 4'
+                    index: 'nbsCmmcChassisPS4Status.{{ $index }}'
+                    skip_values: 6
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}10'
+                    state_name: nbsCmmcChassisPSStatus
+                    states:
+                        - { value: 1, descr: notInstalled, graph: 0, generic: 2 }
+                        - { value: 2, descr: acBad, graph: -1, generic: 2 }
+                        - { value: 3, descr: dcBad, graph: -1, generic: 2 }
+                        - { value: 4, descr: acGood, graph: 1, generic: 0 }
+                        - { value: 5, descr: dcGood, graph: 1, generic: 0 }
+                        - { value: 6, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 7, descr: good, graph: 1, generic: 0 }
+                        - { value: 8, descr: bad, graph: -1, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisFan1Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.11.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Fan 1'
+                    index: 'nbsCmmcChassisFan1Status.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}11'
+                    state_name: nbsCmmcChassisFanStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: bad, graph: -1, generic: 2 }
+                        - { value: 3, descr: good, graph: 1, generic: 0 }
+                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisFan2Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.12.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Fan 2'
+                    index: 'nbsCmmcChassisFan2Status.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}12'
+                    state_name: nbsCmmcChassisFanStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: bad, graph: -1, generic: 2 }
+                        - { value: 3, descr: good, graph: 1, generic: 0 }
+                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisFan3Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.13.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Fan 3'
+                    index: 'nbsCmmcChassisFan3Status.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}13'
+                    state_name: nbsCmmcChassisFanStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: bad, graph: -1, generic: 2 }
+                        - { value: 3, descr: good, graph: 1, generic: 0 }
+                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisFan4Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.14.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Fan 4'
+                    index: 'nbsCmmcChassisFan4Status.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}14'
+                    state_name: nbsCmmcChassisFanStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: bad, graph: -1, generic: 2 }
+                        - { value: 3, descr: good, graph: 1, generic: 0 }
+                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisFan5Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.36.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Fan 5'
+                    index: 'nbsCmmcChassisFan5Status.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}36'
+                    state_name: nbsCmmcChassisFanStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: bad, graph: -1, generic: 2 }
+                        - { value: 3, descr: good, graph: 1, generic: 0 }
+                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisFan6Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.37.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Fan 6'
+                    index: 'nbsCmmcChassisFan6Status.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}37'
+                    state_name: nbsCmmcChassisFanStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: bad, graph: -1, generic: 2 }
+                        - { value: 3, descr: good, graph: 1, generic: 0 }
+                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisFan7Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.38.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Fan 7'
+                    index: 'nbsCmmcChassisFan7Status.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}38'
+                    state_name: nbsCmmcChassisFanStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: bad, graph: -1, generic: 2 }
+                        - { value: 3, descr: good, graph: 1, generic: 0 }
+                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }
+                -
+                    oid: nbsCmmcChassisTable
+                    value: nbsCmmcChassisFan8Status
+                    num_oid: '.1.3.6.1.4.1.629.200.6.1.1.39.{{ $index }}'
+                    descr: 'Chassis {{ $index }} Fan 8'
+                    index: 'nbsCmmcChassisFan8Status.{{ $index }}'
+                    skip_values: 1
+                    entPhysicalIndex: '{{ $nbsCmmcChassisIfIndex }}39'
+                    state_name: nbsCmmcChassisFanStatus
+                    states:
+                        - { value: 1, descr: notSupported, graph: 0, generic: 3 }
+                        - { value: 2, descr: bad, graph: -1, generic: 2 }
+                        - { value: 3, descr: good, graph: 1, generic: 0 }
+                        - { value: 4, descr: notInstalled, graph: 0, generic: 2 }

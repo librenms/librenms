@@ -1,0 +1,1012 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-MST-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-MST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+Counter32,
+Integer32,
+NOTIFICATION-TYPE
+FROM SNMPv2-SMI
+
+MODULE-COMPLIANCE,
+OBJECT-GROUP,
+NOTIFICATION-GROUP
+FROM SNMPv2-CONF
+
+TruthValue,
+TimeStamp,
+DisplayString
+FROM SNMPv2-TC
+
+dot1dStpPortEntry,
+Timeout,
+BridgeId,
+dot1dBasePort
+FROM BRIDGE-MIB
+
+switch
+FROM PRVT-SWITCH-MIB;
+
+prvtMSTMib MODULE-IDENTITY
+LAST-UPDATED "200502160000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+" BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+DESCRIPTION
+"The MIB module for managing 802.1s
+Multiple Spanning Tree Protocol (MSTP)."
+
+-- revision history
+REVISION "200502160000Z"
+DESCRIPTION
+"Fixed spelling errors and changed the contact info."
+
+::= { switch 107 }
+
+prvtMSTNotifications OBJECT IDENTIFIER ::= { prvtMSTMib 0 }
+prvtMSTObjects OBJECT IDENTIFIER ::= { prvtMSTMib 1 }
+
+mSTRegion OBJECT IDENTIFIER ::= { prvtMSTObjects 1 }
+mSTBridgeParams OBJECT IDENTIFIER ::= { prvtMSTObjects 2 }
+mSTTimers OBJECT IDENTIFIER ::= { prvtMSTObjects 3 }
+mSTPort OBJECT IDENTIFIER ::= { prvtMSTObjects 4 }
+
+--
+-- Multiple Spanning Tree region objects
+--
+mSTRegionEditControl OBJECT IDENTIFIER ::= { mSTRegion 1 }
+mSTRegionParameters OBJECT IDENTIFIER ::= { mSTRegion 2 }
+
+mSTRegionEditBufferStatus OBJECT-TYPE
+SYNTAX INTEGER {
+released(1),
+acquiredBySnmp(2),
+acquiredByNonSnmp(3)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Indicates the current ownership status of the unique
+Region Config Edit Buffer.
+
+released -- the Edit Buffer can be acquired by any of
+the SNMP management stations.
+
+acquiredBySnmp -- the Edit Buffer is acquired by
+any of the SNMP management stations.
+
+acquiredByNonSnmp -- the Edit Buffer is acquired by the
+non-SNMP users managing the device."
+::= { mSTRegionEditControl 1 }
+
+mSTRegionEditBufferOperation OBJECT-TYPE
+SYNTAX INTEGER {
+other(1), -- read-only
+acquire(2),
+releaseWithForce(3),
+commit(4),
+rollBack(5)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Indicates the operation that is performed on the Region
+Config Edit Buffer.
+
+other -- none of the following operations.
+
+acquire -- acquire the Edit Buffer. This operation can
+only be performed when the mSTRegionEditBufferStatus
+object has the value of
+released(1). After the successful execution of
+this action, the mSTRegionEditBufferStatus object
+will be changed to acquiredBySnmp(2).
+
+releaseWithForce -- release the Edit Buffer acquired by
+non-SNMP users with force and discard the changes
+in the Edit Buffer. This operation can only be
+performed when the mSTRegionEditBufferStatus object
+has the value of acquiredByNonSnmp(2).
+
+commit -- commit the changes in the Edit Buffer
+and release the Edit Buffer. The successful
+execution of this action will make the changes
+in the Edit Buffer effective on the device.
+This operation can only be performed when the
+mSTRegionEditBufferStatus object has the
+value of acquiredBySnmp(3).
+
+rollBack -- discard the changes in the Edit Buffer
+and release the Edit Buffer. This operation can
+only be performed when the mSTRegionEditBufferStatus
+object has the value of acquiredBySnmp(3).
+
+This object always returns other(1) when it is read."
+::= { mSTRegionEditControl 2 }
+
+mSTRegionName OBJECT-TYPE
+SYNTAX DisplayString (SIZE(0..32))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The operational MST region name."
+::= { mSTRegionParameters 1}
+
+mSTRegionEditName OBJECT-TYPE
+SYNTAX DisplayString (SIZE(0..32))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The MST region name in the Edit Buffer.
+
+This object is only instantiated when the
+mSTRegionEditBufferStatus object has the value of
+acquiredBySnmp(2)."
+::= { mSTRegionParameters 2 }
+
+mSTRegionRevision OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The operational MST region version."
+::= { mSTRegionParameters 3 }
+
+mSTRegionEditRevision OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The MST region version in the Edit Buffer. This object is
+only instantiated when the mSTRegionEditBufferStatus object
+has the value of acquiredBySnmp(2)."
+::= { mSTRegionParameters 4 }
+
+mSTInstanceVlanTable OBJECT-TYPE
+SYNTAX SEQUENCE OF MSTInstanceVlanEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains MST instance information with
+one entry for each MST instance numbered from 0
+to mSTMaxInstanceNumber."
+::= {mSTRegionParameters 5 }
+
+mSTInstanceVlanEntry OBJECT-TYPE
+SYNTAX MSTInstanceVlanEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A conceptual row containing the MST instance
+information."
+INDEX { mSTInstanceIndex }
+::= { mSTInstanceVlanTable 1 }
+
+MSTInstanceVlanEntry ::= SEQUENCE {
+mSTInstanceIndex Integer32,
+mSTInstanceVlansMapped OCTET STRING,
+mSTInstanceVlansMapped2k OCTET STRING,
+mSTInstanceVlansMapped3k OCTET STRING,
+mSTInstanceVlansMapped4k OCTET STRING
+}
+
+mSTInstanceIndex OBJECT-TYPE
+SYNTAX Integer32 (0..256)
+MAX-ACCESS accessible-for-notify
+STATUS current
+DESCRIPTION
+"An integer that uniquely identifies an MST instance
+from 0 to the object value of mSTMaxInstanceNumber."
+::= {mSTInstanceVlanEntry 1 }
+
+mSTInstanceVlansMapped OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..128))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"A string of octets containing one bit per VLAN. The
+first octet corresponds to VLANs with VlanIndex values
+of 0 through 7; the second octet to VLANs 8 through
+15; etc. The least significant bit of each octet
+corresponds to the lowest value VlanIndex in that octet.
+
+For each VLAN, if it is mapped to this MST instance,
+then the bit corresponding to that VLAN is set to '1'."
+::= {mSTInstanceVlanEntry 2 }
+
+mSTInstanceVlansMapped2k OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..128))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"A string of octets containing one bit per VLAN for
+VLANs with VlanIndex values of 1024 through 2047. The
+first octet corresponds to VLANs with VlanIndex values
+of 1024 through 1031; the second octet to VLANs 1032
+through 1039; etc. The least significant bit of each
+octet corresponds to the lowest value VlanIndex in that
+octet.
+
+For each VLAN, if it is mapped to this MST instance,
+then the bit corresponding to that VLAN is set to '1'."
+::= {mSTInstanceVlanEntry 3 }
+
+mSTInstanceVlansMapped3k OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..128))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"A string of octets containing one bit per VLAN for
+VLANs with VlanIndex values of 2048 through 3071. The
+first octet corresponds to VLANs with VlanIndex values
+of 2048 through 2055; the second octet to VLANs 2056
+through 2063; etc. The least significant bit of each
+octet corresponds to the lowest value VlanIndex in that
+octet.
+
+For each VLAN, if it is mapped to this MST instance,
+then the bit corresponding to that VLAN is set to '1'."
+::= {mSTInstanceVlanEntry 4 }
+
+mSTInstanceVlansMapped4k OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..128))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"A string of octets containing one bit per VLAN for
+VLANs with VlanIndex values of 3072 through 4095. The
+first octet corresponds to VLANs with VlanIndex values
+of 3072 through 3079; the second octet to VLANs 3080
+through 3087; etc. The least significant bit of each
+octet corresponds to the lowest value VlanIndex in that
+octet.
+
+For each VLAN, if it is mapped to this MST instance,
+then the bit corresponding to that VLAN is set to '1'."
+::= {mSTInstanceVlanEntry 5 }
+
+mSTInstanceVlanEditTable OBJECT-TYPE
+SYNTAX SEQUENCE OF MSTInstanceVlanEditEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains MST instance information in the
+Edit Buffer with one entry for each MST
+instance numbered from 0 to mSTMaxInstanceNumber.
+
+This table is only instantiated when the
+mSTRegionEditBufferStatus object has the value of
+acquiredBySnmp(2)."
+::= { mSTRegionParameters 6 }
+
+mSTInstanceVlanEditEntry OBJECT-TYPE
+SYNTAX MSTInstanceVlanEditEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A conceptual row containing MST instance information
+in the Edit Buffer."
+INDEX { mSTInstanceIndex }
+::= { mSTInstanceVlanEditTable 1 }
+
+MSTInstanceVlanEditEntry ::= SEQUENCE {
+mSTInstanceEditVlansMap OCTET STRING,
+mSTInstanceEditVlansMap2k OCTET STRING,
+mSTInstanceEditVlansMap3k OCTET STRING,
+mSTInstanceEditVlansMap4k OCTET STRING
+}
+
+mSTInstanceEditVlansMap OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..128))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A string of octets containing one bit per VLAN. The
+first octet corresponds to VLANs with VlanIndex values
+of 0 through 7; the second octet to VLANs 8 through
+15; etc. The least significant bit of each octet
+corresponds to the lowest value VlanIndex in that octet.
+
+For each VLAN, if it is mapped to this MST instance,
+then the bit corresponding to that VLAN is set to
+'1'. Each VLAN can only be mapped to one unique MST
+instance in the range from 1 to mSTMaxInstanceNumber.
+If the bit corresponding to a VLAN is changed from '1'
+to '0', then that VLAN will be automatically mapped to
+MST instance 0 by the device."
+::= {mSTInstanceVlanEditEntry 1 }
+
+mSTInstanceEditVlansMap2k OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..128))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A string of octets containing one bit per VLAN for
+VLANs with VlanIndex values of 1024 through 2047.
+The first octet corresponds to VLANs with VlanIndex values
+of 1024 through 1031; the second octet to VLANs 1032 through 1039; etc.
+The least significant bit of each
+octet corresponds to the lowest value VlanIndex in that
+octet.
+
+For each VLAN, if it is mapped to this MST instance,
+then the bit corresponding to that VLAN is set to
+'1'. Each VLAN can only be mapped to one unique MST
+instance in the range from 1 to mSTMaxInstanceNumber.
+If the bit corresponding to a VLAN is changed from '1'
+to '0', then that VLAN will be automatically mapped to
+MST instance 0 by the device."
+::= {mSTInstanceVlanEditEntry 2 }
+
+mSTInstanceEditVlansMap3k OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..128))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A string of octets containing one bit per VLAN for
+VLANs with VlanIndex values of 2048 through 3071. The
+first octet corresponds to VLANs with VlanIndex values
+of 2048 through 2055; the second octet to VLANs 2056
+through 2063; etc. The least significant bit of each
+octet corresponds to the lowest value VlanIndex in that
+octet.
+
+For each VLAN, if it is mapped to this MST instance,
+then the bit corresponding to that VLAN is set to
+'1'. Each VLAN can only be mapped to one unique MST
+instance in the range from 1 to mSTMaxInstanceNumber.
+If the bit corresponding to a VLAN is changed from '1'
+to '0', then that VLAN will be automatically mapped to
+MST instance 0 by the device."
+::= {mSTInstanceVlanEditEntry 3 }
+
+mSTInstanceEditVlansMap4k OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (0..128))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"A string of octets containing one bit per VLAN for
+VLANs with VlanIndex values of 3072 through 4095. The
+first octet corresponds to VLANs with VlanIndex values
+of 3072 through 3079; the second octet to VLANs 3080
+through 3087; etc. The least significant bit of each
+octet corresponds to the lowest value VlanIndex in that
+octet.
+
+For each VLAN, if it is mapped to this MST instance,
+then the bit corresponding to that VLAN is set to
+'1'. Each VLAN can only be mapped to one unique MST
+instance in the range from 1 to mSTMaxInstanceNumber.
+If the bit corresponding to a VLAN is changed from '1'
+to '0', then that VLAN will be automatically mapped to
+MST instance 0 by the device."
+::= {mSTInstanceVlanEditEntry 4 }
+
+--
+-- Multiple Spanning Tree bridge parametrs
+--
+mSTMaxHopCount OBJECT-TYPE
+SYNTAX Integer32 (1..40)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The maximum number of hops for the MST region."
+::= { mSTBridgeParams 1 }
+
+mSTMaxInstanceNumber OBJECT-TYPE
+SYNTAX Integer32 (1..256)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The maximum MST (Multiple Spanning Tree) instance IDs
+that are supported by the device for the MST Protocol."
+::= { mSTBridgeParams 2 }
+
+mSTInstanceTable OBJECT-TYPE
+SYNTAX SEQUENCE OF MSTInstanceEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table contains MST instance information with
+one entry for each MST instance numbered from 0
+to mSTMaxInstanceNumber."
+::= {mSTBridgeParams 3 }
+
+mSTInstanceEntry OBJECT-TYPE
+SYNTAX MSTInstanceEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A conceptual row containing the MST instance
+information."
+INDEX { mSTInstanceIndex }
+::= { mSTInstanceTable 1 }
+
+MSTInstanceEntry ::= SEQUENCE {
+mSTInstanceDesignatedRoot BridgeId,
+mSTInstanceRootCost Integer32,
+mSTInstanceRootPort Integer32,
+mSTInstanceDesignatedBridge BridgeId,
+mSTInstanceRootPriority Integer32,
+mSTInstanceRemainingHopCount Integer32,
+mSTInstancePriority Integer32
+}
+
+mSTInstanceDesignatedRoot OBJECT-TYPE
+SYNTAX BridgeId
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The unique MST Bridge Identifier of the Bridge
+recorded as the Root in the Configuration BPDUs
+transmitted by the Designated Bridge for the
+segment to which the port is attached."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.4"
+::= { mSTInstanceEntry 1 }
+
+mSTInstanceRootCost OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The path cost of the root Port of this MST. This value is
+compared to the Root Path Cost field in received
+bridge PDUs."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.5"
+::= { mSTInstanceEntry 2 }
+
+mSTInstanceRootPort OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The root port of this MST."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.6"
+::= { mSTInstanceEntry 3 }
+
+
+mSTInstanceDesignatedBridge OBJECT-TYPE
+SYNTAX BridgeId
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The unique MST Designated Bridge Identifier. "
+
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.4"
+::= { mSTInstanceEntry 4}
+
+mSTInstanceRootPriority OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The MST root priority."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.5"
+::= { mSTInstanceEntry 5 }
+
+mSTInstanceRemainingHopCount OBJECT-TYPE
+SYNTAX Integer32 (0..40)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The remaining hop count for this MST instance."
+
+::= {mSTInstanceEntry 6 }
+
+mSTInstancePriority OBJECT-TYPE
+SYNTAX Integer32 (0..61440)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"MSTI priority, in steps of 4096."
+DEFVAL { 32768 }
+::= {mSTInstanceEntry 7 }
+
+--
+-- Multiple Spanning Tree timers
+--
+mSTMigrationTimer OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"MST (Multiple Spanning Tree) migration timer .
+Determines timeout migration in seconds"
+::= { mSTTimers 1}
+
+
+mSTTxHoldCount OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"MST (Multiple Spanning Tree) Tx Hold Counter"
+::= { mSTTimers 2}
+
+
+mSTMaxAge OBJECT-TYPE
+SYNTAX Timeout (600..4000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The maximum age of Multiple Spanning Tree Protocol
+information learned from the network on any port
+before it is discarded, in units of hundredths of
+a second. This is the actual value that this
+bridge is currently using."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.3.4"
+::= { mSTTimers 3 }
+
+mSTHelloTime OBJECT-TYPE
+SYNTAX Timeout (100..1000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The time between the transmissions of
+Configuration bridge PDUs by this node on any port
+when the port is the root of the spanning tree or trying
+to become so, in units of hundredths of a second.
+This is the actual value that this bridge is
+currently using."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.3.5"
+::= { mSTTimers 4 }
+
+mSTForwardDelay OBJECT-TYPE
+SYNTAX Timeout (400..3000)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This time value, measured in units of hundredths
+of a second, controls how fast a port changes its
+spanning state when moving toward the Forwarding
+state. The value determines how long the port
+stays in each of the Listening and Learning
+states, which precede the Forwarding state. This
+value is also used, when a topology change has
+been detected and is underway, to age all dynamic
+entries in the Forwarding Database. Note that
+this value is the one that this bridge is
+currently using, in contrast to
+mSTBridgeForwardDelay which is the value that
+this bridge and all others would start using
+if/when this bridge were to become the root."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.3.6"
+::= { mSTTimers 5 }
+
+
+mSTBridgeMaxAge OBJECT-TYPE
+SYNTAX Timeout (600..4000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The value that all bridges use for MaxAge when
+this bridge is acting as the root. Note that
+802.1D-1990 specifies that the range for this
+parameter is related to the value of
+mSTBridgeHelloTime. The granularity of this
+timer is specified by 802.1D-1990 to be 1 second.
+An agent may return a badValue error if a set operation is
+attempted with a value that is not a whole number
+of seconds."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.3.8"
+::= { mSTTimers 6 }
+
+mSTBridgeHelloTime OBJECT-TYPE
+SYNTAX Timeout (100..1000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The value that all bridges use for HelloTime when
+this bridge is acting as the root. The
+granularity of this timer is specified by 802.1D-
+1990 to be 1 second. An agent may return a badValue error if a set operation is
+attempted with a value that is not a whole number
+of seconds."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.3.9"
+::= { mSTTimers 7 }
+
+mSTBridgeForwardDelay OBJECT-TYPE
+SYNTAX Timeout (400..3000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The value that all bridges use for ForwardDelay
+when this bridge is acting as the root. Note that
+802.1D-1990 specifies that the range for this
+parameter is related to the value of
+mSTBridgeMaxAge. The granularity of this
+timer is specified by 802.1D-1990 to be 1 second.
+An agent may return a badValue error if a set operation is
+attempted with a value that is not a whole number
+of seconds."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.3.10"
+::= { mSTTimers 8 }
+
+
+--
+-- Multiple Spanning Tree bridge ports
+--
+mSTPortTable OBJECT-TYPE
+SYNTAX SEQUENCE OF MSTPortEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A table containing port information for the MST
+Protocol on all the bridge ports existing on the
+system."
+::= { mSTPort 1 }
+
+mSTPortEntry OBJECT-TYPE
+SYNTAX MSTPortEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry with port information for the MST Protocol
+on a bridge port."
+INDEX { dot1dBasePort }
+::= { mSTPortTable 1 }
+
+MSTPortEntry ::= SEQUENCE {
+mSTPortAdminLinkType INTEGER,
+mSTPortOperLinkType INTEGER,
+mSTPortProtocolMigration TruthValue,
+mSTPortStatus BITS,
+mSTPortAdminEdgePort TruthValue,
+mSTPortOperEdgePort TruthValue,
+mSTPortEnable INTEGER
+
+}
+
+mSTPortAdminLinkType OBJECT-TYPE
+SYNTAX INTEGER {
+pointToPoint(1),
+shared(2),
+auto(3)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Indicates the administrative link type configuration of
+a bridge port for the MST protocol.
+
+pointToPoint -- the port is administratively configured to
+be connected to a point-to-point link.
+
+shared -- the port is administratively configured to be
+connected to a shared medium.
+
+auto -- the administrative configuration of the port's
+link type depends on the duplex mode of the port's link.
+If the port's link is full-duplex, the administrative
+link type configuration on this port will be taken
+as pointTopoint(1). If the port link is half-duplex,
+the administrative link type configuration on this
+port will be taken as shared(2).
+
+This configuration of this object only takes effect when the
+stpxSpanningTreeType is mst(4)."
+::= { mSTPortEntry 1 }
+
+mSTPortOperLinkType OBJECT-TYPE
+SYNTAX INTEGER {
+pointToPoint(1),
+shared(2),
+other(3)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Indicates the operational link type of a bridge port
+for the MST protocol.
+
+pointToPoint -- the port is operationally connected to
+a point-to-point link.
+
+shared -- the port is operationally connected to
+a shared medium.
+
+other -- none of the above.
+
+This object is only instantiated when the value of the
+stpxSpanningTreeType object is mst(4)."
+::= { mSTPortEntry 2 }
+
+mSTPortProtocolMigration OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The protocol migration control on this port. When the
+value of thw stpxSpanningTreeType object is mst(4), setting
+true(1) to this object forces the device to try using
+version 2 BPDUs on this port. When the value of
+the stpxSpanningTreeType object is not mst(4), setting true(1) to
+this object has no effect. Setting false(2) to this object
+has no effect. This object always returns false(2) when read."
+REFERENCE
+"IEEE 802.1w clause 14.8.2.4, 17.26."
+::= { mSTPortEntry 3 }
+
+mSTPortStatus OBJECT-TYPE
+SYNTAX BITS {
+edge(0),
+boundary(1),
+pvst(2),
+stp(3)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Indicates the operational status of the port for the
+MST protocol.
+
+edge -- this port is an edge port for the MST region.
+
+boundary -- this port is a boundary port for the
+MST region.
+
+pvst -- this port is connected to a PVST/PVST+ bridge.
+
+stp -- this port is connected to a Single Spanning
+Tree bridge.
+
+This object is only instantiated when the object value
+of stpxSpanningTreeType is mst(4)."
+::= { mSTPortEntry 4 }
+
+mSTPortAdminEdgePort OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The administrative value of the Edge Port parameter. A
+value of true(1) indicates that this port should be
+assumed as an edge-port and a value of FALSE(2) indicates
+that this port should be assumed as a non-edge-port."
+REFERENCE
+"IEEE 802.1t clause 14.8.2, 18.3.3"
+::= { mSTPortEntry 5 }
+
+mSTPortOperEdgePort OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The operational value of the Edge Port parameter. The
+object is initialized to the value of
+dot1dStpPortAdminEdgePort and is set false(2) on reception of
+a BPDU."
+REFERENCE
+"IEEE 802.1t clause 14.8.2, 18.3.4"
+::= { mSTPortEntry 6 }
+
+mSTPortEnable OBJECT-TYPE
+SYNTAX INTEGER {
+enabled(1),
+disabled(2)
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The enabled/disabled status of the port."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.2"
+::= { mSTPortEntry 7 }
+
+mSTPortPerMstTable OBJECT-TYPE
+SYNTAX SEQUENCE OF MSTPortPerMstEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A table containing a list of the bridge ports for a
+particular MST instance. This table holds the
+settings."
+::= { mSTPort 2 }
+
+mSTPortPerMstEntry OBJECT-TYPE
+SYNTAX MSTPortPerMstEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry containing the port information for the MST
+protocol on a port for a particular MST instance."
+INDEX { mSTInstanceIndex,
+dot1dBasePort }
+::= { mSTPortPerMstTable 1 }
+
+MSTPortPerMstEntry ::= SEQUENCE {
+mSTPortPerMstRoleValue INTEGER,
+mSTPortPerMstPriority INTEGER,
+mSTPortPerMstState INTEGER,
+mSTPortPerMstPathCost INTEGER,
+mSTPortPerMstDesignatedCost Integer32,
+mSTPortPerMstDesignatedBridge BridgeId,
+mSTPortPerMstDesignatedPort OCTET STRING
+
+}
+
+mSTPortPerMstRoleValue OBJECT-TYPE
+SYNTAX INTEGER {
+disabled(1),
+root(2),
+designated(3),
+alternate(4),
+backUp(5),
+boundary(6)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Indicates the port role on a particular MST instance
+for the MST protocol.
+
+disabled -- this port has no role on this MST instance.
+
+root -- this port has the role of root port on this MST
+instance.
+
+designated -- this port has the role of designated
+port on this MST instance.
+
+alternate -- this port has the role of alternate port
+on this MST instance.
+
+backUp -- this port has the role of backup port on this
+MST instance.
+
+boundary -- this port has the role of boundary port on
+this MST instance."
+::= { mSTPortPerMstEntry 1 }
+
+mSTPortPerMstPriority OBJECT-TYPE
+SYNTAX INTEGER (0..255)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The value of the priority field which is
+contained in the first (in network byte order)
+octet of the (2 octet long) Port ID. The other
+octet of the Port ID is given by the value of
+mSTPort."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.1"
+::= { mSTPortPerMstEntry 2 }
+
+mSTPortPerMstState OBJECT-TYPE
+SYNTAX INTEGER {
+disabled(1),
+blocking(2),
+listening(3),
+learning(4),
+forwarding(5),
+broken(6)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The port's current state as defined by
+application of the Spanning Tree Protocol. This
+state controls what action a port takes on
+reception of a frame. If the bridge has detected
+a port that is malfunctioning it will place that
+port into the broken(6) state. For ports that
+are disabled (see mSTPortEnable), this object
+will have a value of disabled(1)."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.2"
+::= { mSTPortPerMstEntry 3 }
+
+
+mSTPortPerMstPathCost OBJECT-TYPE
+SYNTAX INTEGER (1..200000000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The contribution of this port to the path cost of
+paths toward the spanning tree root that include
+this port. 802.1D-1990 recommends that the
+default value of this parameter be in inverse
+proportion to the speed of the attached LAN."
+REFERENCE
+"IEEE 802.1D-1990: Section 4.5.5.3"
+::= { mSTPortPerMstEntry 4 }
+
+mSTPortPerMstDesignatedCost OBJECT-TYPE
+SYNTAX Integer32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+REFERENCE
+""
+::= { mSTPortPerMstEntry 5 }
+
+mSTPortPerMstDesignatedBridge OBJECT-TYPE
+SYNTAX BridgeId
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+""
+REFERENCE
+""
+::= { mSTPortPerMstEntry 6 }
+
+mSTPortPerMstDesignatedPort OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (2))
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The Port Identifier of the port on the MST Instance Designated Bridge for this port's segment."
+::= { mSTPortPerMstEntry 7 }
+
+mstpNewRoot NOTIFICATION-TYPE
+OBJECTS { mSTInstanceIndex }
+STATUS current
+DESCRIPTION
+"This notification is the MSTP equivalent of the standard STP newRoot notification."
+::= {prvtMSTNotifications 1}
+
+mstpTopologyChange NOTIFICATION-TYPE
+OBJECTS { mSTInstanceIndex }
+STATUS current
+DESCRIPTION
+"This notification is the MSTP equivalent of the standard STP topologyChange notification."
+::= {prvtMSTNotifications 2}
+
+
+END
+

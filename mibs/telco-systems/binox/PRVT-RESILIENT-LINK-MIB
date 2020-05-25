@@ -1,0 +1,173 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-RESILIENT-LINK-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-RESILIENT-LINK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    switch
+        FROM PRVT-SWITCH-MIB
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC;
+
+prvtResilientLinkMIB MODULE-IDENTITY
+    LAST-UPDATED "201005170000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The Resilient Link MIB module for managing switch or ipSwitch
+         resilient link"
+    REVISION    "201005170000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 4 }
+
+
+prvtResilientLinkNotifications OBJECT IDENTIFIER
+    ::= { prvtResilientLinkMIB 0 }
+
+prvtResilientLinkObjects OBJECT IDENTIFIER
+    ::= { prvtResilientLinkMIB 1 }
+
+prvtResilientLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtResilientLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains config and status information for resilient links."
+    ::= { prvtResilientLinkObjects 1 }
+
+prvtResilientLinkEntry OBJECT-TYPE
+    SYNTAX      PrvtResilientLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtResilientLinkTable."
+    INDEX       { prvtResilientLinkIndex }
+    ::= { prvtResilientLinkTable 1 }
+
+PrvtResilientLinkEntry ::= SEQUENCE {
+    prvtResilientLinkIndex          Integer32,
+    prvtResilientLinkRowStatus      RowStatus,
+    prvtResilientLinkPrimaryPort    InterfaceIndex,
+    prvtResilientLinkBackupPort     InterfaceIndex,
+    prvtResilientLinkBackupMode     INTEGER,
+    prvtResilientLinkStatusActive   InterfaceIndexOrZero,
+    prvtResilientLinkStatusSwaps    Unsigned32
+}
+
+prvtResilientLinkIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..256)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This object uniquely identifies the resilient link."
+    ::= { prvtResilientLinkEntry 1 }
+
+prvtResilientLinkRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "RowStatus for prvtResilientLinkTable."
+    ::= { prvtResilientLinkEntry 2 }
+
+prvtResilientLinkPrimaryPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The primary port for the resilient link."
+    ::= { prvtResilientLinkEntry 3 }
+
+prvtResilientLinkBackupPort OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The back-up port for the resilient link."
+    ::= { prvtResilientLinkEntry 4 }
+
+prvtResilientLinkBackupMode OBJECT-TYPE
+    SYNTAX      INTEGER { standby(1), shutdown(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configures the behavior of the back-up link."
+    ::= { prvtResilientLinkEntry 5 }
+
+prvtResilientLinkStatusActive OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The currently selected active port.
+         A value of zero indicates that neither port has yet been selected as the active port."
+    ::= { prvtResilientLinkEntry 7 }
+
+prvtResilientLinkStatusSwaps OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of times the resilient link's ports have swapped states.
+         (i.e. the number of times that prvtResilientLinkStatusActive has changed."
+    ::= { prvtResilientLinkEntry 8 }
+
+prvtResilientLinkStatusChange NOTIFICATION-TYPE
+    OBJECTS     { prvtResilientLinkPrimaryPort, 
+                  prvtResilientLinkBackupPort }
+    STATUS      current
+    DESCRIPTION 
+        "The resilientLinkStatusChange trap indicates that 
+         the sending agent monitor detected a change in the status of the
+         resilient link, identified by resilientLinkIndex."
+    ::= { prvtResilientLinkNotifications 1 }
+
+END -- end of module PRVT-RESILIENT-LINK-MIB.

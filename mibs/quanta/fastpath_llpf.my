@@ -1,0 +1,106 @@
+-- Link Local Protocol Filtering (LLPF) MIB overview:
+-- LLPF MIB falls under lb6m MIB node of the private subtree.
+
+NETGEAR-LLPF-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+-- NETGEAR NETGEAR LLPF MIB
+-- Copyright Netgear Inc (2004-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, Integer32               FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    RowStatus, MacAddress               FROM SNMPv2-TC
+    ifIndex                             FROM IF-MIB
+
+    DisplayString		        FROM RFC1213-MIB
+    lb6m                    FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathLlpf MODULE-IDENTITY
+           LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+           ORGANIZATION "Netgear Inc"
+           CONTACT-INFO ""
+ 
+     DESCRIPTION
+          "The Netgear Private MIB for NETGEAR Link Local Protocol Filtering."
+
+     -- Revision history.
+     REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+     DESCRIPTION
+          "Postal address updated."
+     REVISION
+          "200910260000Z" -- 26 Oct 2009 12:00:00 GMT
+     DESCRIPTION
+          "Netgear branding related changes."
+
+      ::= { lb6m 48}
+
+
+    --**************************************************************************************
+    -- agentSwitchLlpfGroup
+    --
+    --**************************************************************************************
+    
+    agentSwitchLlpfGroup          OBJECT IDENTIFIER ::= { fastPathLlpf 1 }
+
+    agentSwitchLlpfPortConfigTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentSwitchLlpfPortConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+         "A table that contains the configuration objects for the
+         with each port."
+
+         ::= { agentSwitchLlpfGroup 1 }
+
+    agentSwitchLlpfPortConfigEntry OBJECT-TYPE
+         SYNTAX      AgentSwitchLlpfPortConfigEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+         "The configuration information for LLPF."
+         INDEX { ifIndex , agentSwitchLlpfProtocolType}
+         ::= { agentSwitchLlpfPortConfigTable 1 }
+
+    AgentSwitchLlpfPortConfigEntry ::=
+         SEQUENCE {
+         agentSwitchLlpfProtocolType Unsigned32,
+         agentSwitchLlpfPortBlockMode INTEGER
+         }
+
+    agentSwitchLlpfProtocolType OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..6)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Port's LLPF protocol Type. It can be one of the following values
+                      isdp,vtp,dtp,udld,pagp,sstp,all."
+         ::= { agentSwitchLlpfPortConfigEntry 1 }
+
+    agentSwitchLlpfPortBlockMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Port's LLPF mode. It can be either enabled or disabled
+                      default will be disable."
+         DEFVAL   { disable }
+         ::= { agentSwitchLlpfPortConfigEntry 2 }
+
+END

@@ -1,0 +1,28 @@
+os: ionos
+text: 'Sagem ADR IONOS'
+type: network
+icon: sagemcom
+group: sagemcom
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.1038
+poller_modules:
+    hr-mib: false
+    ucd-mib: false
+    stp: false
+    ospf: false
+discovery_modules:
+    processors: false
+    mempools: false
+    entity-physical: false
+    storage: false
+    hr-device: false
+    discovery-protocols: false
+    bgp-peers: false
+    ports-stack: false
+    vlans: false
+    ucd-diskio: false
+    stp: false
+    fdb-table: false

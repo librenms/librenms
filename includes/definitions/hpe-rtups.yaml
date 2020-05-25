@@ -1,0 +1,15 @@
+os: hpe-rtups
+text: 'HP UPS'
+group: ups
+type: power
+icon: hpe
+rfc1628_compat: true
+mib_dir:
+    - hp
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_load, text: Load }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.232.165.3

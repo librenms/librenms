@@ -3,7 +3,7 @@
 // FIXME : use db functions properly
 // $device_id_host = @dbFetchCell("SELECT device_id FROM devices WHERE `hostname` = '".mres($entry['host'])."' OR `sysName` = '".mres($entry['host'])."'");
 // $device_id_ip = @dbFetchCell("SELECT device_id FROM ipv4_addresses AS A, ports AS I WHERE A.ipv4_address = '" . $entry['host']."' AND I.port_id = A.port_id");
-
+use LibreNMS\Config;
 
 function get_cache($host, $value)
 {
@@ -33,6 +33,10 @@ function get_cache($host, $value)
                 $dev_cache[$host]['version'] = dbFetchCell('SELECT `version` FROM devices WHERE `device_id`= ?', array(get_cache($host, 'device_id')));
                 break;
 
+            case 'hostname':
+                $dev_cache[$host]['hostname'] = dbFetchCell('SELECT `hostname` FROM devices WHERE `device_id` = ?', array(get_cache($host, 'device_id')));
+                break;
+
             default:
                 return null;
         }//end switch
@@ -44,18 +48,31 @@ function get_cache($host, $value)
 
 function process_syslog($entry, $update)
 {
-    global $config, $dev_cache;
+    global $dev_cache;
 
-    foreach ($config['syslog_filter'] as $bi) {
+    foreach (Config::get('syslog_filter') as $bi) {
         if (strpos($entry['msg'], $bi) !== false) {
             return $entry;
         }
     }
 
     $entry['host'] = preg_replace("/^::ffff:/", "", $entry['host']);
+    if ($new_host = Config::get("syslog_xlate.{$entry['host']}")) {
+        $entry['host'] = $new_host;
+    }
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
     if ($entry['device_id']) {
         $os = get_cache($entry['host'], 'os');
+        $hostname = get_cache($entry['host'], 'hostname');
+
+        if (Config::get('enable_syslog_hooks') && is_array(Config::getOsSetting($os, 'syslog_hook'))) {
+            foreach (Config::getOsSetting($os, 'syslog_hook') as $k => $v) {
+                $syslogprogmsg = $entry['program'].": ".$entry['msg'];
+                if ((isset($v['script'])) && (isset($v['regex'])) && ((preg_match($v['regex'], $syslogprogmsg)))) {
+                    shell_exec(escapeshellcmd($v['script']).' '.escapeshellarg($hostname).' '.escapeshellarg($os).' '.escapeshellarg($syslogprogmsg).' >/dev/null 2>&1 &');
+                }
+            }
+        }
 
         if (in_array($os, array('ios', 'iosxe', 'catos'))) {
             // multipart message
@@ -89,19 +106,19 @@ function process_syslog($entry, $update)
             $matches = array();
             // pam_krb5(sshd:auth): authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
             // pam_krb5[sshd:auth]: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-            if (preg_match('#^(?P<program>([^(:]+\([^)]+\)|[^\[:]+\[[^\]]+\])) ?: ?(?P<msg>.*)$#', $entry['msg'], $matches)) {
+            if (empty($entry['program']) and preg_match('#^(?P<program>([^(:]+\([^)]+\)|[^\[:]+\[[^\]]+\])) ?: ?(?P<msg>.*)$#', $entry['msg'], $matches)) {
                 $entry['msg']     = $matches['msg'];
                 $entry['program'] = $matches['program'];
-            } // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
-            // pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-            // Disabled because broke this:
-            // diskio.c: don't know how to handle 10 request
-            // elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')) {
-            // $entry['program'] = substr($entry['msg'], 0, $pos);
-            // $entry['msg'] = substr($entry['msg'], $pos+1);
-            // }
-            // fallback, better than nothing...
-            elseif (empty($entry['program']) and !empty($entry['facility'])) {
+            } elseif (empty($entry['program']) and !empty($entry['facility'])) {
+                // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
+                // pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
+                // Disabled because broke this:
+                // diskio.c: don't know how to handle 10 request
+                // elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')) {
+                // $entry['program'] = substr($entry['msg'], 0, $pos);
+                // $entry['msg'] = substr($entry['msg'], $pos+1);
+                // }
+                // fallback, better than nothing...
                 $entry['program'] = $entry['facility'];
             }
 
@@ -113,6 +130,18 @@ function process_syslog($entry, $update)
                 $entry['program'] = $matches['program'];
             }
             unset($matches);
+        } elseif ($os == 'zywall') {
+            // Zwwall sends messages without all the fields, so the offset is wrong
+            $msg = preg_replace("/\" /", '";', stripslashes($entry['program'].':'.$entry['msg']));
+            $msg = str_getcsv($msg, ';');
+            $entry['program'] = null;
+            foreach ($msg as $param) {
+                list($var, $val) = explode("=", $param);
+                if ($var == 'cat') {
+                    $entry['program'] = str_replace('"', '', $val);
+                }
+            }
+            $entry['msg'] = join(" ", $msg);
         }//end if
 
         if (!isset($entry['program'])) {

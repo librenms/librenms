@@ -1,0 +1,590 @@
+--==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI LINE MIB
+-- Reference:
+-- Version: V2.11
+-- History:
+-- <author>,  <date>,  <contents>
+-- huxiaolin 2012-12-28 
+-- Wang Feng 2014-04-22 Add nodes for wlan npe trusted host
+-- ==================================================================
+
+
+    HUAWEI-LINE-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm
+                FROM HUAWEI-MIB
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF
+            IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            RowStatus
+                FROM SNMPv2-TC;
+    
+-- July 31, 2009 at 16:24 GMT
+        -- 1.3.6.1.4.1.2011.5.25.207
+        hwLineMIB MODULE-IDENTITY 
+            LAST-UPDATED "201707251639Z"        -- Mar 07, 2016 at 10:43 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "HUAWEI-LINE-MIB is used to configure and query attributes of connections 
+                through management interfaces by users, such as the maximum number of Telnet 
+                connections and login information about users.
+                "
+            REVISION "201707251639Z"        
+            DESCRIPTION 
+                "Modify MAX-ACCESS  of  hwMaxVtyNumber ."
+
+            REVISION "201701181043Z"        
+            DESCRIPTION 
+                "Modify Trap of  hwVtyHostPermitRowState for compile error."
+
+            REVISION "201603311043Z"        
+            DESCRIPTION 
+                "Modify Trap of  hwIpUnLocked and hwIpLocked."
+ 
+            REVISION "201603161043Z"        
+            DESCRIPTION 
+                "New Trap added for hwIpUnLocked."
+
+            REVISION "201603071043Z"        
+            DESCRIPTION 
+                "New Trap added for hwIpLocked."
+
+            REVISION "201507281520Z"        
+            DESCRIPTION 
+                "New Trap added for SSH and Telnet for frequent authentication failure."
+
+            REVISION "201405061624Z"        
+            DESCRIPTION 
+                "New Trap added for SSH login/logout."
+
+            REVISION "201404291624Z"        
+            DESCRIPTION 
+                "VB description updated"
+
+            REVISION "201404251624Z"        
+            DESCRIPTION 
+                "New VBs added in HwLoginUserInfoEntry"
+
+            REVISION "201404221624Z"        
+            DESCRIPTION 
+                "Modified to add nodes for wlan npe trusted host."
+		
+            REVISION "201404081624Z"        
+            DESCRIPTION 
+                "Modified to support Trap in VRP V8R8."
+
+
+            REVISION "200907311624Z"        
+            DESCRIPTION 
+                "The initial revision of this MIB module ."
+            
+            ::= { hwDatacomm 207 }
+
+        
+    
+--
+-- Node definitions
+--
+-- 
+        -- 1.3.6.1.4.1.2011.5.25.207.1
+        hwLineObjects OBJECT IDENTIFIER ::= { hwLineMIB 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.1.1
+        hwTelnetSet OBJECT IDENTIFIER ::= { hwLineObjects 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.1.1.1
+        hwMaxVtyNumber OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the maximum number of Telnet connections. 
+                The value ranges from 0 to 15. The default value is 5."
+            ::= { hwTelnetSet 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2
+        hwLoginUserInfo OBJECT IDENTIFIER ::= { hwLineObjects 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2.1
+        hwLoginUserInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwLoginUserInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to display the user information for login."
+            ::= { hwLoginUserInfo 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2.1.1
+        hwLoginUserInfoEntry OBJECT-TYPE
+            SYNTAX HwLoginUserInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes information about user login."
+            INDEX { hwUserInfoIndex }
+            ::= { hwLoginUserInfoTable 1 }
+
+        
+        HwLoginUserInfoEntry ::=
+            SEQUENCE { 
+                hwUserInfoIndex
+                    Integer32,
+                hwUserInfoName
+                    OCTET STRING,
+                hwUserInfoIpAddr
+                    OCTET STRING,
+                hwUserInfoChannel
+                    OCTET STRING,
+                hwAuthType
+                    OCTET STRING,
+                hwVpnInstName
+                    OCTET STRING
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2.1.1.1
+        hwUserInfoIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the index of the user information for login."
+            ::= { hwLoginUserInfoEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2.1.1.2
+        hwUserInfoName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of the user for login."
+            ::= { hwLoginUserInfoEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2.1.1.3
+        hwUserInfoIpAddr OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..47))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the user for login."
+            ::= { hwLoginUserInfoEntry 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2.1.1.4
+        hwUserInfoChannel OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the channel number of the user for login."
+            ::= { hwLoginUserInfoEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2.1.1.5
+        hwAuthType OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..20))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the authentication method for login."
+            ::= { hwLoginUserInfoEntry 5 }
+            
+        -- 1.3.6.1.4.1.2011.5.25.207.1.2.1.1.6
+        hwVpnInstName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..47))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPN name of the user for login."
+            ::= { hwLoginUserInfoEntry 6 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.3
+        hwUserInterface OBJECT IDENTIFIER ::= { hwLineObjects 3 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.3.1
+        hwUserInterfaceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwUserInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes information about user Interface."
+            ::= { hwUserInterface 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.3.1.1
+        hwUserInterfaceEntry OBJECT-TYPE
+            SYNTAX HwUserInterfaceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table describes information about user Interface."
+            INDEX { hwInterfaceType, hwUserInterfaceIndex }
+            ::= { hwUserInterfaceTable 1 }
+
+        HwUserInterfaceEntry ::=
+            SEQUENCE { 
+                hwInterfaceType
+                    INTEGER,
+                hwUserInterfaceIndex
+                    Integer32,
+                hwAuthenticationMode
+                    INTEGER,
+                hwProtocol
+                    INTEGER,
+                hwUserInterfaceRowStatus
+                    RowStatus
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.3.1.1.1
+        hwInterfaceType OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    vty(1)
+                    }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The type of the user interface."
+            ::= { hwUserInterfaceEntry 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.3.1.1.2
+        hwUserInterfaceIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..20)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the user interface."
+            ::= { hwUserInterfaceEntry 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.3.1.1.3
+        hwAuthenticationMode OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    undefined(0),
+                    none(1),
+                    password(2),
+                    aaa(3)
+                    }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The authentication mode of the user interface."
+            ::= { hwUserInterfaceEntry 3 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.3.1.1.4
+        hwProtocol OBJECT-TYPE
+            SYNTAX INTEGER
+                    {
+                    telnet(1),
+                    ssh(2),
+                    all(3)
+                    }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The protocol of the user interface."
+            ::= { hwUserInterfaceEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.3.1.1.5
+        hwUserInterfaceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "RowStatus for this Table."
+            ::= { hwUserInterfaceEntry 5 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.4
+        hwVtyHostPermit OBJECT IDENTIFIER ::= { hwLineObjects 4 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.207.1.4.1
+        hwVtyHostPermitTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwVtyHostPermitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates trusted host table."
+            ::= { hwVtyHostPermit 1 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.207.1.4.1.1
+        hwVtyHostPermitEntry OBJECT-TYPE
+            SYNTAX HwVtyHostPermitEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This object indicates trusted the entry of trusted host table."
+            INDEX { hwVtyHostPermitIndex }
+            ::= { hwVtyHostPermitTable 1 }
+		
+        HwVtyHostPermitEntry ::=
+            SEQUENCE { 
+                hwVtyHostPermitIndex
+                Integer32,
+                hwVtyHostPermitIpAddress
+                IpAddress,
+                hwVtyHostPermitMaskAddress
+                IpAddress,
+                hwVtyHostPermitInformation
+                OCTET STRING,
+                hwVtyHostPermitRowState
+                RowStatus
+			 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.4.1.1.1
+        hwVtyHostPermitIndex OBJECT-TYPE
+            SYNTAX Integer32 (0..7)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the index of trusted host table."
+            ::= { hwVtyHostPermitEntry 1 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.207.1.4.1.1.2
+        hwVtyHostPermitIpAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies ip address of trusted host."
+            ::= { hwVtyHostPermitEntry 2 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.207.1.4.1.1.3
+        hwVtyHostPermitMaskAddress OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies mask address of trusted host."
+            ::= { hwVtyHostPermitEntry 3 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.207.1.4.1.1.4
+        hwVtyHostPermitInformation OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..127))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the description of trusted host."
+            ::= { hwVtyHostPermitEntry 4 }
+		
+        -- 1.3.6.1.4.1.2011.5.25.207.1.4.1.1.5
+        hwVtyHostPermitRowState OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object identifies the status of a row."
+            ::= { hwVtyHostPermitEntry 5 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.5
+        hwLineMibTrapObjects OBJECT IDENTIFIER ::= { hwLineObjects 5 }
+        -- 1.3.6.1.4.1.2011.5.25.207.1.5.1
+          hwUserInfoLoginFailedTimes OBJECT-TYPE
+                    SYNTAX Integer32
+                    MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Login failed times in the statistic period"
+            ::= { hwLineMibTrapObjects 1 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.1.5.2            
+          hwUserInfoStatisticPeriod OBJECT-TYPE
+                    SYNTAX Integer32
+                    MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Statistic period to count login failed times"
+            ::= { hwLineMibTrapObjects 2 }
+
+       -- 1.3.6.1.4.1.2011.5.25.207.1.5.3 	
+          hwUserInfoIpAddress OBJECT-TYPE
+                    SYNTAX OCTET STRING (SIZE (0..255))
+                    MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the IP address of the user for login."
+            ::= { hwLineMibTrapObjects 3 }
+			
+          -- 1.3.6.1.4.1.2011.5.25.207.1.5.4 	
+          hwUserInfoVpnName OBJECT-TYPE
+                    SYNTAX OCTET STRING (SIZE (0..255))
+                    MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the VPN name of the user for login."
+            ::= { hwLineMibTrapObjects 4 }
+ 
+-- =======================================
+-- HUAWEI-LINE-MIB MIB - Notification Information
+--=======================================
+   
+        -- 1.3.6.1.4.1.2011.5.25.207.2
+        hwLineNotification OBJECT IDENTIFIER ::= { hwLineMIB 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.2.1
+        hwVtyNumExceed NOTIFICATION-TYPE
+            OBJECTS { hwMaxVtyNumber }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the alarm reported when the number of Telnet users reaches 
+                the maximum number of Telnet connections. In addition, the maximum number of 
+                Telnet connections is displayed."
+            ::= { hwLineNotification 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.2.2
+        hwUserLogin NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoName, hwUserInfoIpAddr, hwUserInfoChannel, hwAuthType, hwVpnInstName }
+            STATUS current
+            DESCRIPTION 
+                "When a user logs in through Telnet/Stelnet, the user name, IP address for login, 
+                used tunnel, authentication type and vpn name are reported."
+            ::= { hwLineNotification 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.2.3
+        hwUserLoginFail NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoName, hwUserInfoIpAddr, hwUserInfoChannel, hwAuthType, hwVpnInstName }
+            STATUS current
+            DESCRIPTION 
+                "When a user fails to log in through Telnet/Stelnet, the user name, IP address for login, 
+                used tunnel, authentication type and vpn name are reported."
+            ::= { hwLineNotification 3 }     
+
+        -- 1.3.6.1.4.1.2011.5.25.207.2.4
+        hwUserLogout NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoName, hwUserInfoIpAddr, hwUserInfoChannel, hwAuthType, hwVpnInstName }
+            STATUS current
+            DESCRIPTION 
+                "When a user logs out of the Telnet/Stelnet server, the user name, IP address for logout, 
+                used tunnel, authentication type and vpn name are reported."
+            ::= { hwLineNotification 4 }           
+
+        -- 1.3.6.1.4.1.2011.5.25.207.2.5
+        hwUserSshLogin NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoName, hwUserInfoIpAddr, hwUserInfoChannel, hwAuthType, hwVpnInstName }
+            STATUS current
+            DESCRIPTION 
+                "When a user logs in to SSH server, the user name, IP address for login, 
+                used tunnel, authentication type and vpn name are reported."
+            ::= { hwLineNotification 5 } 
+            
+        -- 1.3.6.1.4.1.2011.5.25.207.2.6
+        hwUserSshLogout NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoName, hwUserInfoIpAddr, hwUserInfoChannel, hwAuthType, hwVpnInstName }
+            STATUS current
+            DESCRIPTION 
+                "When a user logs out of the SSH server, the user name, IP address for logout, 
+                and used tunnel are reported."
+            ::= { hwLineNotification 6 } 
+
+        -- 1.3.6.1.4.1.2011.5.25.207.2.7
+        hwTelnetLoginFailed NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoLoginFailedTimes, hwUserInfoStatisticPeriod }
+            STATUS current
+            DESCRIPTION
+                "When users failed to login telnet server too frequently, login fail times and statistics period are reported."
+            ::= { hwLineNotification 7 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.2.8
+        hwSSHLoginFailed NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoLoginFailedTimes, hwUserInfoStatisticPeriod }
+            STATUS current
+            DESCRIPTION
+                "When users failed to login ssh server too frequently, login fail times and statistics period are reported."
+            ::= { hwLineNotification 8 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.2.9
+        hwTelnetLoginFailedClear NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoLoginFailedTimes, hwUserInfoStatisticPeriod }
+            STATUS current
+            DESCRIPTION
+                "When users failed to login telnet server too frequently, login fail times and statistics period are reported."
+            ::= { hwLineNotification 9 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.2.10
+        hwSSHLoginFailedClear NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoLoginFailedTimes, hwUserInfoStatisticPeriod }
+            STATUS current
+            DESCRIPTION
+                "When users failed to login ssh server too frequently, login fail times and statistics period are reported."
+            ::= { hwLineNotification 10 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.2.11
+        hwIpLocked NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoIpAddress, hwUserInfoVpnName, hwUserInfoStatisticPeriod }
+            STATUS current
+            DESCRIPTION
+                "when the number of user login failures from the same IP address reaches the threshold, the trap of hwIpLocked is reported."
+            ::= { hwLineNotification 11 }
+
+       -- 1.3.6.1.4.1.2011.5.25.207.2.12
+        hwIpUnLocked NOTIFICATION-TYPE
+            OBJECTS { hwUserInfoIpAddress, hwUserInfoVpnName }
+            STATUS current
+            DESCRIPTION
+                "When the IP is unlocked, the trap of hwIpUnLocked is reported."
+            ::= { hwLineNotification 12 }
+-- =========================================
+-- HUAWEI-LINE-MIB MIB - Conformance Information
+-- =========================================
+        -- 1.3.6.1.4.1.2011.5.25.207.3
+        hwLineConformance OBJECT IDENTIFIER ::= { hwLineMIB 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.3.1
+        hwLineCompliances OBJECT IDENTIFIER ::= { hwLineConformance 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.3.1.1
+        hwLineCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for 
+                entities that support the huawei LINE MIB."
+            MODULE      -- this module
+            ::= { hwLineCompliances 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.207.3.2
+        hwLineGroups OBJECT IDENTIFIER ::= { hwLineConformance 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.207.3.2.1
+        hwLineNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwVtyNumExceed, hwUserLogin, hwUserLoginFail, hwUserLogout, hwUserSshLogin, hwUserSshLogout, hwIpLocked, hwIpUnLocked   }
+            STATUS current
+            DESCRIPTION 
+                "The collection of notifications in the module."
+            ::= { hwLineGroups 1 }
+        -- 1.3.6.1.4.1.2011.5.25.207.3.2.2
+        hwLineUserInfoGroup OBJECT-GROUP
+            OBJECTS { hwUserInfoIndex, hwUserInfoName, hwUserInfoIpAddr, hwUserInfoChannel }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on Clock setting level information."
+            ::= { hwLineGroups 2 }
+        -- 1.3.6.1.4.1.2011.5.25.207.3.2.3
+        hwMaxVtyNumberGroup OBJECT-GROUP
+            OBJECTS { hwMaxVtyNumber }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects on vty number information."
+            ::= { hwLineGroups 3 }
+
+    END
+
+--
+-- HUAWEI-LINE-MIB.mib
+--
+   

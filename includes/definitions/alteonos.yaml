@@ -1,0 +1,12 @@
+os: alteonos
+group: radware
+text: AlteonOS
+type: network
+icon: radware
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.1872.1.13.3.5
+    - sysObjectID: .1.3.6.1.4.1.1872.2.

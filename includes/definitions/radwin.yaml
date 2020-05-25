@@ -1,0 +1,11 @@
+os: radwin
+text: RADWIN
+type: wireless
+icon: radwin
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.4458.20.3.
+        - .1.3.6.1.4.1.4458.20.5.
+        - .1.3.6.1.4.1.4458.20.6.

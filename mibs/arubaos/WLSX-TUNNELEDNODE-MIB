@@ -1,0 +1,124 @@
+--- ArubaOS 8.5.0.0_70258
+-- vim:set ts=4 sw=4:
+WLSX-TUNNELEDNODE-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+       
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Unsigned32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB;
+
+   wlsxTunneledNodeMIB MODULE-IDENTITY 
+       LAST-UPDATED "0708060519Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1344 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            information about the Controller Transport Service (Cts) in the 
+			Aruba controller."
+       REVISION        "0708060519Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 17 }
+
+   wlsxTunneledNodeOpGroup     	OBJECT IDENTIFIER ::= { wlsxTunneledNodeMIB 1 }
+
+   wlsxTunneledNodeRequestTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF WlsxTunneledNodeRequestEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"
+		"
+	::= { wlsxTunneledNodeOpGroup 1 }
+
+	wlsxTunneledNodeRequestEntry OBJECT-TYPE
+		SYNTAX WlsxTunneledNodeRequestEntry
+		MAX-ACCESS not-accessible
+		STATUS	current
+		DESCRIPTION
+			""
+		INDEX { wlsxTunneledNodeMAC }
+		::= { wlsxTunneledNodeRequestTable 1 }
+
+	WlsxTunneledNodeRequestEntry ::=
+		SEQUENCE {
+            wlsxTunneledNodeMAC MacAddress,
+			wlsxTunneledNodeIp	IpAddress,
+			wlsxNumTunnels	    Integer32,
+            wlsxTunneledNodeType  Integer32
+		}
+
+    wlsxTunneledNodeMAC OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " 
+            MAC address of the Tunneled Node
+            "
+        ::= { wlsxTunneledNodeRequestEntry 1 }
+
+	wlsxTunneledNodeIp OBJECT-TYPE
+		SYNTAX 	IpAddress
+		MAX-ACCESS read-only
+		STATUS	current
+		DESCRIPTION
+			"
+            IP address of the Tunneled Node
+			"
+		::= { wlsxTunneledNodeRequestEntry 2 }
+
+	wlsxNumTunnels OBJECT-TYPE
+		SYNTAX 	Integer32
+		MAX-ACCESS read-only
+		STATUS	current
+		DESCRIPTION
+			"
+				Number of tunnels originating from Tunneled Node
+			"
+		::= { wlsxTunneledNodeRequestEntry 3 }
+
+     wlsxTunneledNodeType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    others(1),
+                    corvina(2)
+                }
+        MAX-ACCESS read-only
+        STATUS  current
+        DESCRIPTION
+            "
+                Device type of the tunnel
+            "
+        ::= { wlsxTunneledNodeRequestEntry 4 }
+
+
+END

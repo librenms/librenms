@@ -1,0 +1,130 @@
+-- Dot1x Authentication Server MIB overview:
+-- Dot1x Authentication Server MIB falls under lb6m MIB node of the private subtree.
+
+NETGEAR-DOT1X-AUTHENTICATION-SERVER-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Dot1x Authentication Server MIB
+-- Copyright Netgear Inc (2003-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32                           FROM SNMPv2-SMI
+    RowStatus		                FROM SNMPv2-TC
+    DisplayString                       FROM RFC1213-MIB
+    lb6m                            FROM QUANTA-LB6M-REF-MIB;
+
+
+    fastPathdot1xAuthenticationServer MODULE-IDENTITY
+           LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+           ORGANIZATION "Netgear Inc"
+           CONTACT-INFO ""
+
+     DESCRIPTION
+          "The Netgear Private MIB for FastPath Dot1x Authentication Server "
+
+      -- Revision history.
+     REVISION
+          "201101260000Z" -- 26 January 2011 12:00:00 GMT
+     DESCRIPTION
+          "Postal address updated."
+     REVISION
+          "200911120000Z" -- 12 November 2009 12:00:00 GMT
+     DESCRIPTION
+          "Netgear branding related changes."
+
+      ::= { lb6m 49 }
+
+
+--**************************************************************************************
+-- agentDot1xAuthServUserConfigGroup -> Contains MIB objects to configure Dot1x User Database
+--
+--**************************************************************************************
+
+        agentDot1xAuthServUserConfigGroup OBJECT IDENTIFIER ::= { fastPathdot1xAuthenticationServer 1 }
+
+        agentDot1xAuthServUserConfigCreate OBJECT-TYPE
+                 SYNTAX      DisplayString (SIZE(1..64))
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION 
+                             "Create a new user.
+                             When set with a non-empty string, a new user with that name will be created.
+                             This object will only return an empty string.
+                             This string is limited to alpha-numeric strings (including the '-' and '_' characters)."
+                 ::= { agentDot1xAuthServUserConfigGroup 1 }
+
+        agentDot1xAuthServUserConfigTable OBJECT-TYPE
+                SYNTAX      SEQUENCE OF AgentDot1xAuthServUserConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION "A table for dot1x Client details and associated functionality."
+                ::= { agentDot1xAuthServUserConfigGroup 2 }
+
+        agentDot1xAuthServUserConfigEntry OBJECT-TYPE
+                SYNTAX      AgentDot1xAuthServUserConfigEntry
+                MAX-ACCESS  not-accessible
+                STATUS      current
+                DESCRIPTION "Represents entry for port config table."
+                INDEX       { agentDot1xAuthServUserIndex}
+                ::= {agentDot1xAuthServUserConfigTable 1 }
+
+        AgentDot1xAuthServUserConfigEntry ::= SEQUENCE {
+                agentDot1xAuthServUserIndex
+                        Integer32,
+                agentDot1xAuthServUserName
+                        DisplayString,
+                agentDot1xAuthServUserPassword
+                        DisplayString,
+                agentDot1xAuthServUserStatus
+                        RowStatus
+    }
+
+     agentDot1xAuthServUserIndex  OBJECT-TYPE
+                SYNTAX           Integer32 (0..99)
+                MAX-ACCESS       not-accessible
+                STATUS           current
+                DESCRIPTION
+                        "Dot1x user config index. "
+                ::= { agentDot1xAuthServUserConfigEntry 1}
+
+     agentDot1xAuthServUserName OBJECT-TYPE
+                SYNTAX           DisplayString (SIZE(1..64))
+                MAX-ACCESS       read-write
+                STATUS           current
+                DESCRIPTION
+                        "Dot1x user name.
+                         This string is limited to alpha-numeric strings (including '-' and '_'
+                         characters). "
+                ::= { agentDot1xAuthServUserConfigEntry 2}
+
+     agentDot1xAuthServUserPassword OBJECT-TYPE
+                SYNTAX           DisplayString (SIZE(0..64))
+                MAX-ACCESS       read-write
+                STATUS           current
+                DESCRIPTION
+                        "Dot1x user password."
+                ::= { agentDot1xAuthServUserConfigEntry 3}
+
+     agentDot1xAuthServUserStatus OBJECT-TYPE
+                 SYNTAX      RowStatus
+                 MAX-ACCESS  read-write
+                 STATUS      current
+                 DESCRIPTION
+                             "Dot1x User Status.
+                             active(1)  - This user account is active.
+                             destroy(6) - Set to this value to remove this user account."
+                 ::= { agentDot1xAuthServUserConfigEntry 4 }
+
+
+END

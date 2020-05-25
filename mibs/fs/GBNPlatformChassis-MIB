@@ -1,0 +1,541 @@
+------------------------------------------------------------------------------
+--
+--  File           : gbnPlatformChassis-MIB.mi2
+--  Description    : Sample gbn chassis management MIB
+--  Version        : 1.0
+--  Date           : May 4, 2011
+--  Author         : xiaojianfeng
+--  Copyright (c) 2011 admin Systems, Inc.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+  GBNPlatformChassis-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDEntry, OBJECT-TYPE,
+        Integer32, IpAddress,
+        Counter32, Counter64,
+        Unsigned32,
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+        DisplayString                           FROM RFC1213-MIB
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        gbnPlatform                             FROM ADMIN-MASTER-MIB;
+
+
+        gbnPlatformChassis MODULE-IDENTITY
+        LAST-UPDATED    "1105040000Z"  -- May 4, 2011
+        ORGANIZATION    "Admin Systems, Inc."
+        CONTACT-INFO    "Admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Chassis Management Enterprise MIB definition."
+
+        REVISION        "1105040000Z"  -- May 4, 2011
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnPlatform 3 }
+
+------------------------------------------------------------------------------
+--  define groups in GBN-Chassis-MIB
+------------------------------------------------------------------------------
+    gbnChassis          				 OBJECT IDENTIFIER ::= { gbnPlatformChassis 1 }
+    gbnBoard              			 OBJECT IDENTIFIER ::= { gbnPlatformChassis 2 }
+    gbnChassisTrap				 	     OBJECT IDENTIFIER ::= { gbnPlatformChassis 3 }
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+--
+--  gbnChassis
+--
+------------------------------------------------------------------------------
+    chassisVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Chassis version, the format is V3.0."
+            --机架的版本号，格式为V3.0.
+        ::= { gbnChassis 1 }
+
+    chassisSerialNo OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Product Serial Number."
+            --产品序列号.
+        ::= { gbnChassis 2 }
+
+    chassisType OBJECT-TYPE
+        SYNTAX INTEGER {
+               s8600-04(0),
+               s8600-08(1),
+               s8600-16(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Chassis type."
+            --机架类型.
+        ::= { gbnChassis 3 }
+
+    chassisSlotAppTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF ChassisSlotAppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Slots application table，for control board or line board."
+            --槽位用途表，用于主控板还是业务板.
+        ::= { gbnChassis 4 }
+
+    chassisSlotAppEntry OBJECT-TYPE
+        SYNTAX ChassisSlotAppEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Slots application table，for control board or line board."
+            --槽位用途表，用于主控板还是业务板.
+        INDEX { slotNum }
+        ::= { chassisSlotAppTable 1 }
+
+    ChassisSlotAppEntry ::= SEQUENCE {
+        slotNum   INTEGER,
+        slotApp   INTEGER
+    }
+
+    slotNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot number of the chassis."
+            --机架槽位号.
+        ::= { chassisSlotAppEntry 1 }
+
+    slotApp OBJECT-TYPE
+        SYNTAX INTEGER {
+                unknown(0),
+                forLineboard(1),
+                forControlboard(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "slots application, for control board or line board."
+            --槽位用途，用于主控板或业务板.
+        ::= { chassisSlotAppEntry 2 }
+
+	powerTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF PowerEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Power status table."
+		::= { gbnChassis 5 } 
+	
+	powerEntry OBJECT-TYPE 
+		SYNTAX PowerEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION 
+			"Power table entry." 
+		INDEX { powerIndex }
+		::= { powerTable 1 } 
+
+	PowerEntry ::= SEQUENCE { 
+		powerIndex	INTEGER,
+		powerInsertedStaus	INTEGER,
+		powerRunningStatus	INTEGER			
+	}
+		
+	powerIndex OBJECT-TYPE
+		SYNTAX INTEGER {    
+			power0(0),
+			power1(1)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION 
+			"Power index."
+		::= { powerEntry 1 }
+		
+	powerInsertedStaus OBJECT-TYPE
+		SYNTAX INTEGER {
+			empty(0),
+			inserted(1)
+		} 
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Power inserted status."
+		::= { powerEntry 2 }
+	
+	powerRunningStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			notGood(0),
+			good(1)
+		}
+		MAX-ACCESS read-only 
+		STATUS current
+		DESCRIPTION 
+			"Power running status."
+		::= { powerEntry 3 }
+				
+    boardTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BoardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Board table,for board management."
+        ::= { gbnBoard 1 }
+
+    boardEntry OBJECT-TYPE
+        SYNTAX BoardEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "board table entry,for board management."
+        INDEX { boardIndex }
+        ::= { boardTable 1 }
+
+    BoardEntry ::= SEQUENCE {
+        boardIndex                   INTEGER,
+        boardStatus                  INTEGER,
+        boardType                    INTEGER,
+        boardIfNum                   INTEGER,
+        boardProdSerialNo            DisplayString,
+        boardSoftwarePlate           DisplayString,
+        boardSoftwareVersion         DisplayString,
+        boardSoftwareCompiledTime    DisplayString,
+        boardCpuDescription          DisplayString,
+        boardSdramDescription        DisplayString,
+        boardFlashDescription        DisplayString,
+        boardHardwareVersion         DisplayString,
+        boardBootromVersion          DisplayString, 
+        boardCpuIdle                 INTEGER, 
+        boardMemorySize				       INTEGER,
+        boardMemoryIdle              INTEGER,
+        boardSysReset                INTEGER
+    }
+
+    boardIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index of board table,corresponding to slot number."
+        ::= { boardEntry 1 }
+
+    boardStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+               noInsert(0),
+               insertAsMaster(1),
+               insertAsSlave(2),
+               insertButUnconnected(3),
+               insertAndConnected(4)
+        }
+        MAX-ACCESS read-only
+        STATUS	current
+        DESCRIPTION
+            "Status of board；Below four states for control board: 'noInsert(0)', 'insertAsMaster(1)' ,'insertAsSlave(2)' and insertButUnconnected(3).
+             Below three states for line board: 'noInsert(0)', 'insertButUnconnected(3)' and 'insertAndConnected(4)'."
+        ::= { boardEntry 2 }
+
+    boardType OBJECT-TYPE
+        SYNTAX INTEGER{
+               unknown(0),
+               controlboard0(1),
+               lineboard0fiber(2),
+               lineboard1copper(3),
+               lineboard2copper(4),
+               lineboard3fiber(5)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Type of board，or unknown if unavailable."
+        ::= { boardEntry 3 }   
+        
+	boardIfNum OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The number of physical interface in line board,or 0 if unavailable.For a control board ,it's always returned 0."
+        ::= { boardEntry 4 }
+
+
+    boardProdSerialNo OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "serial number of the board,or an empty string if unavailable."
+        ::= { boardEntry 5 }
+
+    boardSoftwarePlate OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software Plate of the board ,or an empty string if unavailable."
+        ::= { boardEntry 6 }
+
+    boardSoftwareVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software Version of the board,the format is V100R001B02D06P03SP3, or an empty string if unavailable."
+        ::= { boardEntry 7 }
+
+    boardSoftwareCompiledTime OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Software CompiledTime of the board,the format is Feburary 17 2003 15:47:00, or an empty string if unavailable."
+        ::= { boardEntry 8 }
+
+    boardCpuDescription OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Cpu description of the board,the format is Mips 32334, 133MHz, or an empty string if unavailable."
+        ::= { boardEntry 9 }
+
+    boardFlashDescription OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Flash description of the board , format is 32M, or an empty string if unavailable."
+        ::= { boardEntry 10 }
+
+    boardHardwareVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Hardware Version of the board,the format is V3.0, or an empty string if unavailable."
+        ::= { boardEntry 11 }
+
+    boardBootromVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Bootrom Version of the board,the format is V2.0, or an empty string if unavailable."
+        ::= { boardEntry 12 }
+
+    boardCpuIdle OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The percentage of free CPU in the board,or 0 if unavailable."
+        ::= { boardEntry 13 }
+
+    boardMemorySize OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The system memory size, unit is byte, or 0 if unavailable."
+        ::= { boardEntry 14 }
+        
+    boardMemoryIdle OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The current system idle memory size, unit is byte, or 0 if unavailable."
+        ::= { boardEntry 15 }
+
+    boardSysReset OBJECT-TYPE
+        SYNTAX INTEGER{
+              noop(1),
+              reset(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Performs a hardware reset of the board.  Use with care.
+             A 'reset(2)' resets the board,and 'noop(1)'does nothing.
+             A value of 'noop(1)' is always returned for a GET operation."
+        ::= { boardEntry 16 }
+
+
+    boardIfIndexTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BoardIfIndexEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Interface index table,show interface index in all connected lineboards."
+        ::= { gbnBoard 2}
+
+    boardIfIndexEntry OBJECT-TYPE
+        SYNTAX BoardIfIndexEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Interface index table,show interface index in all connected lineboards."
+        INDEX { boardNumber, boardPortLocalIndex }
+        ::= { boardIfIndexTable 1 }
+
+    BoardIfIndexEntry ::= SEQUENCE{
+        boardNumber            INTEGER,
+        boardPortLocalIndex    INTEGER,
+        boardIfIndex           INTEGER
+    }
+
+    boardNumber OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "board number, matches boardTable boardIndex."
+        ::= { boardIfIndexEntry 1 }
+
+    boardPortLocalIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Local index of port of the board, from 1 start, end of max port num of the board.
+             For example,the boardPortLocalIndex range of line1copper is 1-24. "
+        ::= { boardIfIndexEntry 2 }
+
+    boardIfIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Board interface system index, matches RFC1213/RFC2233 ifTable IfIndex."
+            --插板端口的系统接口索引，对应于RFC1213/RFC2233 的ifIndex
+        ::= { boardIfIndexEntry 3 }
+
+
+--
+--  gbnChassisTrap - chassis status TRAP
+--
+    powerRemoveTrap NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "Power remove trap."
+        ::= { gbnChassisTrap 1 }
+
+    powerInsertTrap NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "Power insert trap."
+             --电源 插入trap.
+        ::= { gbnChassisTrap 2 }
+
+    fanRemoveTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Fan remove trap."
+        ::= { gbnChassisTrap 3 }
+
+    fanInsertTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Fan remove trap."
+        ::= { gbnChassisTrap 4 }
+
+    boardRemoveTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Board remove trap."
+            -- 插板 拔出trap.
+        ::= { gbnChassisTrap 5 }
+
+    boardInsertTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Board insert trap."
+            -- 插板 插入trap.
+        ::= { gbnChassisTrap 6 }
+
+    boardConnectedTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Line board connnected trap."
+            --业务板 已连接trap.
+        ::= { gbnChassisTrap 7 }
+
+    boardUnconnectedTrap NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "Line board unconnnect trap."
+            --业务板 失去连接trap.
+        ::= { gbnChassisTrap 8 }
+
+    boardRoletoSlaveTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "To-Slave trap. Role of the control board change to slave."
+            --To-slave trap:主控板的主从角色转变为slave.
+        ::= { gbnChassisTrap 9 }
+
+    boardRoletoMasterTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "To-master trap. Role of the control board change to master."
+            --To-master trap:主控板主从角色转变为master.
+        ::= { gbnChassisTrap 10 } 
+     
+	powerRunningNoGoodTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Power running status is no good"
+            --电源运行状态不正常.
+        ::= { gbnChassisTrap 11 }   
+        
+	powerRunningGoodTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "Power running status is good"
+            --电源运行状态正常
+        ::= { gbnChassisTrap 12 }
+    
+    alarmPowerNoInsertTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "A power is not inserted When the system startup is completed."
+            --启动完成时有一个电源没有插入
+        ::= { gbnChassisTrap 13 }
+        
+    alarmControlNoInsertTrap NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION
+            "A control board is not inserted When the system startup is completed."
+            --启动完成时有一块主控板没有插入
+        ::= { gbnChassisTrap 14 }
+     
+------------------------------------------------------------------------------
+--
+--  gbnSwitchOver - chassis Switch over
+--
+------------------------------------------------------------------------------
+	gbnSwitchOver OBJECT-TYPE
+        SYNTAX INTEGER{
+              noop(1),
+              switchover(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Performs switchover of the master control board.  Use with care.
+             A 'switchover(2)' switchover the master board,and 'noop(1)'does nothing.
+             A value of 'noop(1)' is always returned for a GET operation."
+             --主备倒换，请小心使用。'switchover(2)'用于切换主备角色，而'noop(1)'没有任何操作。对于一个get请求，总是返回'noop(1)'的值.
+        ::= { gbnPlatformChassis 4 }     
+        
+--
+-- END of gbnPlatformChassis-MIB
+--
+
+END
+

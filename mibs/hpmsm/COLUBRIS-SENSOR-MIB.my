@@ -1,0 +1,120 @@
+-- ****************************************************************************
+--  COLUBRIS-SENSOR-MIB definitions
+--
+--  Copyright (c) 2006, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Sensor file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-SENSOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM    SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+;
+
+
+colubrisSensorMIB MODULE-IDENTITY
+    LAST-UPDATED    "200606010000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Sensor MIB."
+
+    ::= { colubrisMgmtV2 31 }
+
+
+-- colubrisSendorMIB definition
+colubrisSensorMIBObjects OBJECT IDENTIFIER ::= { colubrisSensorMIB 1 }
+
+-- colubris Sensor groups
+coSensorStatusGroup OBJECT IDENTIFIER ::= { colubrisSensorMIBObjects 1 }
+
+-- The Sensor Status Group
+coSensorOperState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if at least one radio on the access point is
+                 currently in sensor mode."
+    ::= { coSensorStatusGroup 1 }
+
+coSensorConfigMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    shared(1),
+                    dedicated(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates if the sensor uses one radio (shared) or both radios (dedicated)."
+    ::= { coSensorStatusGroup 2 }
+
+coSensorOperMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    unknown(1),
+                    workingNormally(2),
+                    troubleshootingBG(3),
+                    intrusionPreventionBG(4),
+                    troubleshootingA(5),
+                    troubleshootingABG(6),
+                    troubleshootingAIntrusionPreventionBG(7),
+                    intrusionPreventionA(8),
+                    intrusionPreventionATroubleshootingBG(9),
+                    intrusionPreventionABG(10),
+                    upgradingSoftware(11),
+                    noEthernetLink(12),
+                    noIpAddress(13),
+                    noRfManagerServer(14),
+                    notActiveOrStarting(15)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Indicates the current operational mode of the sensor." 
+    ::= { coSensorStatusGroup 3 }
+
+-- conformance information
+colubrisSensorMIBConformance OBJECT IDENTIFIER ::= { colubrisSensorMIB 2 }
+colubrisSensorMIBCompliances OBJECT IDENTIFIER ::= { colubrisSensorMIBConformance 1 }
+colubrisSensorMIBGroups      OBJECT IDENTIFIER ::= { colubrisSensorMIBConformance 2 }
+
+-- compliance statements
+colubrisSensorMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the Sensor MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisSensorStatusMIBGroup
+                    }
+    ::= { colubrisSensorMIBCompliances 1 }
+
+-- units of conformance
+colubrisSensorStatusMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coSensorOperState,
+                    coSensorConfigMode,
+                    coSensorOperMode
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for Sensor status."
+    ::= { colubrisSensorMIBGroups 1 }
+
+END

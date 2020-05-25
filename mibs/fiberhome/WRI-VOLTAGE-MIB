@@ -1,0 +1,205 @@
+WRI-VOLTAGE-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+			MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32,
+			Integer32, TimeTicks, Counter64,enterprises,
+			NOTIFICATION-TYPE,Unsigned32                     
+							FROM SNMPv2-SMI       
+			TEXTUAL-CONVENTION
+							FROM SNMPv2-TC
+			wri,wriProducts			
+							FROM WRI-SMI;
+	
+
+
+	-- voltage monitor
+	
+	msppVoltage			MODULE-IDENTITY
+        LAST-UPDATED    "201001110000Z"
+        ORGANIZATION    "Wuhan FiberHome Networks Co.,Ltd."
+        CONTACT-INFO
+                "  FHN Customer Service
+                   Tel: 027-87693784"
+        DESCRIPTION
+                "The MIB module to describe the monitor for voltage."
+        REVISION        "201001110000Z" 
+        DESCRIPTION
+                "Add description for oid."
+        REVISION        "200901110000Z" 
+        DESCRIPTION
+                "Init version for voltage monitor."
+        ::=   {msppChassis 7}
+
+	mspp         	OBJECT IDENTIFIER ::= { wriProducts 8012 }
+	msppChassis		OBJECT IDENTIFIER ::=   {mspp 1}
+
+	
+	DisplayString ::= TEXTUAL-CONVENTION
+		STATUS current
+		DESCRIPTION
+				"8 bit octet."
+		SYNTAX OCTET STRING 
+	
+--	msppVoltage			OBJECT IDENTIFIER ::=   {msppChassis 7}
+	
+	voltageGeneral			OBJECT IDENTIFIER ::=   {msppVoltage 1}
+	
+		voltageTrapEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable voltage trap or not."
+				::= { voltageGeneral 1 }
+		
+		voltageMonitorEnable OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable voltage monitor or not."
+				::= { voltageGeneral 2 }
+
+		voltageNumber OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						""
+				::= { voltageGeneral 3 }
+		
+		voltageTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF VoltageEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+			         "Voltage information table."
+			::= { msppVoltage 2 }
+
+		voltageEntry OBJECT-TYPE
+			SYNTAX VoltageEntry
+			MAX-ACCESS   not-accessible
+			STATUS  current
+			DESCRIPTION
+		         	"An entry in the voltage table."
+			INDEX {voltageIndex }
+			::= { voltageTable 1 }
+		
+		VoltageEntry ::=
+		    SEQUENCE {
+		    voltageIndex          		Unsigned32,
+		    voltageDescr          		DisplayString,
+		    voltageLThreshold			INTEGER,
+		    voltageHThreshold	       	INTEGER,
+		    voltageValue        		INTEGER,
+		    voltageState		       	INTEGER,
+		    voltageTrapEna				INTEGER,
+		    voltageAllSetting			OCTET STRING,
+			-- xf add 2014-7-2
+			voltageIndexDescr			OCTET STRING
+			}
+		-- The following section describes the components of the table.
+
+			voltageIndex OBJECT-TYPE
+				SYNTAX  Unsigned32
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Unique index for the voltage testpoint."
+				::= { voltageEntry 1 }
+
+			voltageDescr OBJECT-TYPE
+				SYNTAX  DisplayString (SIZE(0..64))
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Description for the voltage testpoint."
+				::= { voltageEntry 2 }
+				
+			voltageLThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The lowest value for the voltage testpoint."
+				::= { voltageEntry 3 }
+				
+			voltageHThreshold OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"The highest value for the voltage testpoint."
+				::= { voltageEntry 4 }
+				
+			voltageValue OBJECT-TYPE
+				SYNTAX  INTEGER
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"The current measurement of the testpoint."
+				::= { voltageEntry 5 }   
+				
+			voltageState OBJECT-TYPE
+				SYNTAX  INTEGER {
+				normal(0),
+		     	lowtrap(1),
+		        hightrap(2)
+		    }
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"voltage state."
+				::= { voltageEntry 6 }
+			voltageTrapEna OBJECT-TYPE
+				SYNTAX  INTEGER{
+					enable(1),
+					disable(2)
+				}
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"Enable voltage trap or not."
+				::= { voltageEntry 7 }	
+				
+		  voltageAllSetting OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-write
+				STATUS  current
+				DESCRIPTION
+						"All oid operation of this table."
+				::= { voltageEntry 8 }
+				
+		  -- xf add 2014-7-2
+			voltageIndexDescr	OBJECT-TYPE
+				SYNTAX  OCTET STRING
+				MAX-ACCESS  read-only
+				STATUS  current
+				DESCRIPTION
+						"Voltage index descrption."
+				::= { voltageEntry 9 }
+	
+		voltageTrap			OBJECT IDENTIFIER ::=   {msppVoltage 3}
+		
+		
+		voltageOk NOTIFICATION-TYPE
+       		OBJECTS {voltageDescr,voltageValue}
+       		STATUS  current
+       		DESCRIPTION
+               	"voltage ok."
+			::= { voltageTrap 1}
+		
+		voltageFault NOTIFICATION-TYPE
+	       	OBJECTS {voltageDescr,voltageValue,voltageLThreshold,voltageHThreshold}
+       		STATUS  current
+       		DESCRIPTION
+               	"voltage fault."
+			::= { voltageTrap 2}
+				
+END
+

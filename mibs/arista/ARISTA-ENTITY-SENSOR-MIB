@@ -1,0 +1,199 @@
+ARISTA-ENTITY-SENSOR-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    NOTIFICATION-TYPE                    FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+    NOTIFICATION-GROUP                   FROM SNMPv2-CONF
+    entPhysicalIndex, entPhysicalDescr   FROM ENTITY-MIB
+    entStateAlarm                        FROM ENTITY-STATE-MIB
+    EntitySensorValue, entPhySensorValue
+                                         FROM ENTITY-SENSOR-MIB
+    SnmpAdminString                      FROM SNMP-FRAMEWORK-MIB
+    aristaMibs                           FROM ARISTA-SMI-MIB;
+
+
+aristaEntSensorMIB   MODULE-IDENTITY
+    LAST-UPDATED  "201408150000Z"
+    ORGANIZATION  "Arista Networks, Inc."
+    CONTACT-INFO
+        "Arista Networks, Inc.
+
+        Postal: 5453 Great America Parkway
+                Santa Clara, CA 95054
+
+        Tel: +1 408 547-5500
+
+        E-mail: snmp@arista.com"
+    DESCRIPTION
+        "This MIB module augments the entPhySensorTable of 
+        ENTITY-SENSOR-MIB to provide threshold information for 
+        various sensors in the system. For example, a given device
+        may have several voltage sensors as well as temperature
+        sensors each with appropriate threshold support to help
+        NMS systems detect and alert appropriately.
+
+        In addition, on systems where it is supported, if the 
+        sensor value crosses the supported threshold value the system
+        can generate appropriate notification as well."
+    REVISION       "201408150000Z"
+    DESCRIPTION    "Updated postal and e-mail addresses."
+    REVISION       "201305090950Z"
+    DESCRIPTION    "Initial version of this MIB module."
+    ::= { aristaMibs 12 }
+
+-- Textual Conventions -- 
+
+ aristaEntSensorMibNotifications OBJECT IDENTIFIER
+    ::= { aristaEntSensorMIB 0 }
+
+aristaEntSensorMibObjects  OBJECT IDENTIFIER
+    ::= { aristaEntSensorMIB 1 }
+
+aristaEntSensorMibConformance  OBJECT IDENTIFIER
+    ::= { aristaEntSensorMIB 2 }
+
+-- entity threshold table --
+
+aristaEntSensorThresholdTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF AristaEntSensorThresholdEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "This table contains threshold information for the 
+        various sensors in the system."
+    ::= { aristaEntSensorMibObjects 1 }
+
+aristaEntSensorThresholdEntry OBJECT-TYPE
+    SYNTAX       AristaEntSensorThresholdEntry
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        "A single row containing threshold information for a
+        sensor. Threshold values are reported using the unit
+        of EntitySensorValue. If a sensor does not support threshold
+        data, then an underflow/overflow value is returned.
+        All the other relevant information for the given sensor can be
+        obtained from the entPhySensorTable itself."
+    INDEX        { entPhysicalIndex } 
+    ::= { aristaEntSensorThresholdTable 1 }
+
+AristaEntSensorThresholdEntry ::= SEQUENCE {
+    aristaEntSensorThresholdLowWarning   EntitySensorValue,
+    aristaEntSensorThresholdLowCritical  EntitySensorValue,
+    aristaEntSensorThresholdHighWarning  EntitySensorValue,
+    aristaEntSensorThresholdHighCritical  EntitySensorValue,
+    aristaEntSensorStatusDescr           SnmpAdminString
+}
+ 
+aristaEntSensorThresholdLowWarning   OBJECT-TYPE
+    SYNTAX        EntitySensorValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "The low thresold value for the given sensor at which point
+        the entity's alarm status is set to warning."
+    ::= { aristaEntSensorThresholdEntry 1 }
+
+aristaEntSensorThresholdLowCritical  OBJECT-TYPE
+    SYNTAX        EntitySensorValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "The low critical value for the given sensor at which point
+        the entity's alarm status is set to critical."
+    ::= { aristaEntSensorThresholdEntry 2 }
+
+aristaEntSensorThresholdHighWarning   OBJECT-TYPE
+    SYNTAX        EntitySensorValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "The high thresold value for the given sensor at which point
+        the entity's alarm status is set to warning."
+    ::= { aristaEntSensorThresholdEntry 3 }
+
+aristaEntSensorThresholdHighCritical  OBJECT-TYPE
+    SYNTAX        EntitySensorValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "The high critical value for the given sensor at which point
+        the entity's alarm status is set to critical."
+    ::= { aristaEntSensorThresholdEntry 4 }
+
+aristaEntSensorStatusDescr            OBJECT-TYPE
+    SYNTAX        SnmpAdminString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION       
+        "A textual description of the current status of the sensor.
+        It serves as a human-readable representation of the operating 
+        status including any threshold alerts."
+    ::= { aristaEntSensorThresholdEntry 5 }
+
+
+-- Notifications --
+
+aristaEntSensorAlarm  NOTIFICATION-TYPE
+    OBJECTS {
+        entPhysicalDescr, entPhySensorValue, entStateAlarm
+    }                      
+    STATUS            current
+    DESCRIPTION
+        "This notification is generated under 2 conditions:
+           a) When the value of the sensor value crosses a supported
+           low or high threshold into warning or critical status.
+           b) If previously the sensor value was in a warning or
+           critical status but returns back to a normal status."
+    ::= { aristaEntSensorMibNotifications 1 }
+
+        
+-- Conformance and Compliance
+
+aristaEntSensorMibCompliances OBJECT IDENTIFIER
+    ::= { aristaEntSensorMibConformance 1 }
+
+aristaEntSensorMibGroups OBJECT IDENTIFIER
+    ::= { aristaEntSensorMibConformance 2 }
+
+aristaEntSensorMibCompliance  MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for Arista switches that implement
+        the ARISTA-ENTITY-SENSOR-MIB."
+    MODULE        -- this module
+    MANDATORY-GROUPS {
+        aristaEntSensorThresholdGroup,
+        aristaEntSensorNotificationsGroup
+    }
+    ::= { aristaEntSensorMibCompliances 1 }
+
+aristaEntSensorThresholdGroup   OBJECT-GROUP
+    OBJECTS  {
+        aristaEntSensorThresholdLowWarning,
+        aristaEntSensorThresholdLowCritical,
+        aristaEntSensorThresholdHighWarning,
+        aristaEntSensorThresholdHighCritical,
+        aristaEntSensorStatusDescr
+    }
+    STATUS   current
+    DESCRIPTION
+        "The collection of objects that provide threshold
+        information for the sensors in the system."
+    ::= { aristaEntSensorMibGroups 1 }
+
+aristaEntSensorNotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        aristaEntSensorAlarm
+    }
+    STATUS   current
+    DESCRIPTION
+        "The collection of notifications generated by the system if
+        sensor(s) change value are not within the acceptable operating
+        range."
+    ::= { aristaEntSensorMibGroups 2 }
+
+END
+        
+        

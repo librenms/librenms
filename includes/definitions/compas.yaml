@@ -1,0 +1,8 @@
+os: compas
+text: Alpha Comp@s
+type: power
+icon: alpha
+group: alpha
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.26854.3.2.1

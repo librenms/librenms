@@ -1,0 +1,3509 @@
+-- *****************************************************************
+-- CERENT-MSDWDM-MIB.mib  
+-- Multi Service DWDM MIB
+--
+-- Copyright (c) 2002 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CERENT-MSDWDM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32,
+    Counter32,
+    Unsigned32,
+    Counter64,
+    MODULE-IDENTITY,
+    OBJECT-TYPE                         FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    TruthValue                          FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP                        FROM SNMPv2-CONF
+    ifIndex                             FROM IF-MIB
+    cerentModules,
+    cerentRequirements,
+    cerentGeneric                       FROM CERENT-GLOBAL-REGISTRY
+    CerentPeriod                        FROM CERENT-TC
+;
+
+cerentMsDwdmMIB MODULE-IDENTITY
+    LAST-UPDATED    "0302150000Z" -- 2003/Feb/15
+    ORGANIZATION   "Cisco Systems, Inc."
+    CONTACT-INFO   "support@Cisco.com
+
+                    Postal:
+                    Cisco Systems
+                    1450 N. McDowell Blvd.
+                    Petaluma, CA 94954
+
+                    Tel: +1-877-323-7368"
+    DESCRIPTION
+        "This MIB module defines the managed objects for physical  
+        layer related interface configurations and objects
+        for the protocol specific error counters for DWDM
+        optical switches.
+
+        This MIB contains four groups.
+  
+        The first group, cerentMsDwdmIfGroup, handles the physical
+        layer related interface configurations.
+         
+        The second group, cerentMsDwdmOtnGroup, provides
+        objects for configuring OTN (G.709) related thresholds and for
+        collecting OTN (G.709) related performance statistics for the
+        current and previous 15 min and 24 hour intervals.
+
+        The third group, cerentMsDwdmFECGroup provides objects for 
+        monitoring FEC (Fault Error Correction) statistics for the 
+        current and previous 15 min and 24 hour intervals.  
+        It also contains objects for configuring FEC error thresholds.
+        
+        The fourth group,cerentMsDwdm8B10BGroup contains 8B10B
+        counters, for the current and previous 15 min and 24 hour
+        intervals for interfaces like Fiber Channel/Gig E."
+        
+    REVISION   "0302150000Z" -- 2003/Feb/15 
+    DESCRIPTION
+        "Added DWDM Network Tables, 8B10B tables."
+        
+    REVISION   "0211110000Z" -- 2002/Nov/11  
+    DESCRIPTION
+        "The initial revision of this MIB."
+        
+    ::= { cerentModules 80 }  
+
+
+-- Textual Conventions
+
+ProtocolType ::= TEXTUAL-CONVENTION
+    STATUS   current
+    DESCRIPTION
+        "An integer value that identifies the protocol used across an
+        interface."
+    SYNTAX   INTEGER {
+        other(1),
+        unknown(2),
+        tenGigEth(4),
+        fibreChOrOneGigEth(5),
+        unframed(7),
+        sonet(8),
+        sdh(9),
+        sysplexIscCompatibility(10),
+        sysplexIscPeer(11),
+        sysplexTimerEtr(12),
+        sysplexTimerClo(13),
+        fastEthernet(14),
+        fddi(15),
+		eightGfc(16),
+		oc768(17),
+		otn(18)
+		
+    }
+
+IntervalType ::= TEXTUAL-CONVENTION
+    STATUS   current
+    DESCRIPTION
+        "This value indicates the time period over which performance 
+        monitoring data has been collected. Valid values are -
+
+        fifteenMin (1)   :  values for the 15 min interval.
+        oneDay  (2)      :  values for the 1  Day interval.
+        "
+    SYNTAX   INTEGER {
+        fifteenMin(1),
+        oneDay(2)
+    }
+
+LocationAndIntervalType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the time period and the location 
+        for which the performace monitoring data has been collected.
+        Valid values are -
+
+        nearEnd15Min  (1)   : nearEnd values for the 15 min interval.
+        nearEndOneDay (2)   : nearEnd values for the 1  Day interval.
+        farEnd15Min   (3)   : farEnd values for the 15 min interval.
+        farEndOneDay  (4)   : farEnd values for the 1  day interval.
+        "
+    SYNTAX   INTEGER {
+        nearEnd15Min(1),
+        nearEndOneDay(2),
+        farEnd15Min(3),
+        farEndOneDay(4)
+    }
+
+MonitorType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the type of performance statistics  
+        being monitored. Valid values are -
+
+        path(1)    : Performance statistics for path    parameters.
+        section(2) : Performance statistics for section parameters.
+        tcm1(3)    : Performance statistics for tandem connection
+                     monitoring 1.
+        tcm2(4)    : Performance statistics for tandem connection 
+                     monitoring 2.
+        "
+    SYNTAX    INTEGER {
+        path(1),
+        section(2),
+        tcm1(3),
+        tcm2(4)
+    }
+
+RingDirection ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the type of directionality in the
+        ring. The directionality is meaning the facing side of
+        the port that is connected to fiber.
+        Valid values are -
+        
+        westEast(1) : the port is facing to west side, continuing
+              to east side
+        eastWest(2) : the port is facing to east side, continuing
+              to west side
+        "
+    SYNTAX    INTEGER {
+        westEast(1),
+        eastWest(2)
+    }
+
+SideIdentifier ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the side in the ring/mesh node
+        e.g. the facing side associated to on optical interface
+        within an up to 8 deg mesh node.
+        Valid values are -
+        
+        unknownSide(0)
+        sideA(1)
+        sideB(2)
+        sideC(3)
+        sideD(4)
+        sideE(5)
+        sideF(6)
+        sideG(7)
+        sideH(8)
+        sideI(9)
+        sideJ(10)
+        sideK(11)
+        sideL(12)
+        sideM(13)
+        sideN(14)
+        sideO(15)
+        sideP(16)
+        sideQ(17)
+        sideR(18)
+        sideS(19)
+        sideT(20)
+        "
+    SYNTAX    INTEGER {
+        unknownSide(0),
+        sideA(1),
+        sideB(2),
+        sideC(3),
+        sideD(4),
+        sideE(5),
+        sideF(6),
+        sideG(7),
+        sideH(8),
+        sideI(9),
+        sideJ(10),
+        sideK(11),
+        sideL(12),
+        sideM(13),
+        sideN(14),
+        sideO(15),
+        sideP(16),
+        sideQ(17),
+        sideR(18),
+        sideS(19),
+        sideT(20)
+    }
+
+OpticalPortRule ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the rule that assumes the optical port.
+        Valid values are -
+
+        inputLine(1)    : this is an input LINE port
+        outputLine(2)    : this is an output LINE port
+        inputCom(3)    : this is an input COM port
+        outputCom(4)    : this is an output COM port
+        inputOsc(5)    : this is an input OSC port
+        outputOsc(6)    : this is an output OSC port
+        inputDc(7)    : this is an input DCU port
+        outputDc(8)    : this is an output DCU port
+        inputExpress(9)     : this is an input EXPress port
+        outputExpress(10)   : this is an output EXPress port
+        add(11)     : this is an band/wavelength ADD port
+        drop(12)    : this is an band/wavelength DROP port
+        inputPassThru(13)   : this is an input Pass Thru port
+     	inputWorking(14)    : the working port that receive the signal in an optical protection unit
+	outputWorking(15)   : the working port that send the signal in an optical protection unit
+	inputProtected(16)  : the protected port that receive the signal in an optical protection unit
+	outputProtected(17) : the protected port that send the signal in an optical protection unit
+	inputRaman(18)      : this is an input RAMAN port
+	outputRaman(19)     : this is an output RAMAN port
+	com(20)     : this is an COM port
+	ead(21)     : this is an Express/Add/Drop port
+	ad(22)     : this is an Add/Drop port
+        "
+    SYNTAX    INTEGER {
+        inputLine(1),
+        outputLine(2),
+        inputCom(3),
+        outputCom(4),
+        inputOsc(5),
+        outputOsc(6),
+        inputDc(7),
+        outputDc(8),
+        inputExpress(9),
+        outputExpress(10),
+        add(11),
+        drop(12),
+	inputPassThru(13),
+     	inputWorking(14),
+	outputWorking(15),
+	inputProtected(16),
+	outputProtected(17),
+        inputRaman(18),
+        outputRaman(19),
+	com(20),
+	ead(21),
+	ad(22)
+    }
+
+LaserStatus ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the working status of the laser.
+        Valid values are -
+
+        on(1) : laser is working
+        off(2) : laser is switched off
+        apr(3) : laser is working in automatic power reduction
+        none(4) : laser is not present
+        "
+    SYNTAX    INTEGER {
+        on(1),
+        off(2),
+        apr(3),
+        none(4)
+    }
+
+OpticalAmplifierMode ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the amplifier working mode
+        Valid values are -
+
+        gain(1)  : gain control mode
+        power(2) : power control mode
+        none(3)  : not an amplifier port
+        fixed-gain(4)  : fixed gain control mode
+        "
+    SYNTAX    INTEGER {
+        gain(1),
+        power(2),
+        none(3),
+        fixed-gain(4)
+    }
+
+OpticalBand ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This value indicates the the wavelength group (band)
+        The following wave lengths group are supported:
+        bn1530d33To1532d68 : are the wavelengths from 1530.33 nm to 1532.68 nm.
+        bn1534d25To1536d61 : are the wavelengths from 1534.25 nm to 1536.61 nm.
+        bn1538d19To1540d56 : are the wavelengths from 1538.19 nm to 1540.56 nm. 
+        bn1542d14To1544d53 : are the wavelengths from 1542.14 nm to 1544.53 nm. 
+        bn1546d12To1548d51 : are the wavelengths from 1546.12 nm to 1548.51 nm.
+        bn1550d12To1552d52 : are the wavelengths from 1550.12 nm to 1552.52 nm.
+        bn1554d13To1556d55 : are the wavelengths from 1554.13 nm to 1556.55 nm.
+        bn1558d17To1560d61 : are the wavelengths from 1558.17 nm to 1560.61 nm.
+        "
+    SYNTAX    INTEGER {
+        unknown(1),
+        bn1530d33To1532d68(5),
+        bn1534d25To1536d61(25),
+        bn1538d19To1540d56(45), 
+        bn1542d14To1544d53(65), 
+        bn1546d12To1548d51(85),
+        bn1550d12To1552d52(105),
+        bn1554d13To1556d55(125),
+        bn1558d17To1560d61(145)
+    }
+
+OpticalWavelength ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "This object allows the management client to configure
+         the wavelength mode of operation to the applicable interfaces.
+         The following wave lengths are supported:
+         wv1529d55 is 1529.55 nm
+         wv1529d94 is 1529.94 nm
+         wv1530d33 is 1530.33 nm
+         wv1530d72 is 1530.72 nm
+         wv1531d12 is 1531.12 nm
+         wv1531d51 is 1531.51 nm
+         wv1531d90 is 1531.90 nm
+         wv1532d29 is 1532.29 nm
+         wv1532d68 is 1532.68 nm
+         wv1533d07 is 1533.07 nm
+         wv1533d47 is 1533.47 nm
+         wv1533d86 is 1533.86 nm
+         wv1534d25 is 1534.25 nm
+         wv1534d64 is 1534.64 nm
+         wv1535d04 is 1535.04 nm
+         wv1535d43 is 1535.43 nm
+         wv1535d82 is 1535.82 nm
+         wv1536d22 is 1536.22 nm
+         wv1536d61 is 1536.61 nm
+         wv1537d00 is 1537.00 nm
+         wv1537d40 is 1537.40 nm
+         wv1537d79 is 1537.79 nm
+         wv1538d19 is 1538.19 nm
+         wv1538d58 is 1538.58 nm
+         wv1538d98 is 1538.98 nm
+         wv1539d37 is 1539.37 nm
+         wv1539d77 is 1539.77 nm
+         wv1540d16 is 1540.16 nm
+         wv1540d56 is 1540.56 nm
+         wv1540d95 is 1540.95 nm
+         wv1541d35 is 1541.35 nm
+         wv1541d75 is 1541.75 nm
+         wv1542d14 is 1542.14 nm
+         wv1542d54 is 1542.54 nm
+         wv1542d94 is 1542.94 nm
+         wv1543d33 is 1543.33 nm
+         wv1543d73 is 1543.73 nm
+         wv1544d13 is 1544.13 nm
+         wv1544d53 is 1544.53 nm
+         wv1544d92 is 1544.92 nm
+         wv1545d32 is 1545.32 nm
+         wv1545d72 is 1545.72 nm
+         wv1546d12 is 1546.12 nm
+         wv1546d52 is 1546.52 nm
+         wv1546d92 is 1546.92 nm
+         wv1547d32 is 1547.32 nm
+         wv1547d72 is 1547.72 nm
+         wv1548d11 is 1548.11 nm
+         wv1548d51 is 1548.51 nm
+         wv1548d91 is 1548.91 nm
+         wv1549d32 is 1549.32 nm
+         wv1549d72 is 1549.72 nm
+         wv1550d12 is 1550.12 nm
+         wv1550d52 is 1550.52 nm
+         wv1550d92 is 1550.92 nm
+         wv1551d32 is 1551.32 nm
+         wv1551d72 is 1551.72 nm
+         wv1552d12 is 1552.12 nm
+         wv1552d52 is 1552.52 nm
+         wv1552d93 is 1552.93 nm
+         wv1553d33 is 1553.33 nm
+         wv1553d73 is 1553.73 nm
+         wv1554d13 is 1554.13 nm
+         wv1554d54 is 1554.54 nm
+         wv1554d94 is 1554.94 nm
+         wv1555d34 is 1555.34 nm
+         wv1555d75 is 1555.75 nm
+         wv1556d15 is 1556.15 nm
+         wv1556d55 is 1556.55 nm
+         wv1556d96 is 1556.96 nm
+         wv1557d36 is 1557.36 nm
+         wv1557d77 is 1557.77 nm
+         wv1558d17 is 1558.17 nm
+         wv1558d58 is 1558.58 nm
+         wv1558d98 is 1558.98 nm
+         wv1559d39 is 1559.39 nm
+         wv1559d79 is 1559.79 nm
+         wv1560d20 is 1560.20 nm
+         wv1560d61 is 1560.61 nm
+         wv1561d01 is 1561.01 nm
+         wv1561d42 is 1561.42 nm
+         wv1561d83 is 1561.83 nm
+  -- L Band
+         wv1570d83 is 1570.83 nm
+         wv1571d24 is 1571.24 nm
+         wv1571d65 is 1571.65 nm
+         wv1572d06 is 1572.06 nm
+         wv1572d48 is 1572.48 nm
+         wv1572d89 is 1572.89 nm
+         wv1573d30 is 1573.30 nm
+         wv1573d71 is 1573.71 nm
+         wv1574d13 is 1574.13 nm
+         wv1574d54 is 1574.54 nm
+         wv1574d95 is 1574.95 nm
+         wv1575d37 is 1575.37 nm
+         wv1575d78 is 1575.78 nm
+         wv1576d20 is 1576.20 nm
+         wv1576d61 is 1576.61 nm
+         wv1577d03 is 1577.03 nm
+         wv1577d44 is 1577.44 nm
+         wv1577d86 is 1577.86 nm
+         wv1578d27 is 1578.27 nm
+         wv1578d69 is 1578.69 nm
+         wv1579d10 is 1579.10 nm
+         wv1579d52 is 1579.52 nm
+         wv1579d93 is 1579.93 nm
+         wv1580d35 is 1580.35 nm
+         wv1580d77 is 1580.77 nm
+         wv1581d18 is 1581.18 nm
+         wv1581d60 is 1581.60 nm
+         wv1582d02 is 1582.02 nm
+         wv1582d44 is 1582.44 nm
+         wv1582d85 is 1582.85 nm
+         wv1583d27 is 1583.27 nm
+         wv1583d69 is 1583.69 nm
+         wv1584d11 is 1584.11 nm
+         wv1584d53 is 1584.53 nm
+         wv1584d95 is 1584.95 nm
+         wv1585d36 is 1585.36 nm
+         wv1585d78 is 1585.78 nm
+         wv1586d20 is 1586.20 nm
+         wv1586d62 is 1586.62 nm
+         wv1587d04 is 1587.04 nm
+         wv1587d46 is 1587.46 nm
+         wv1587d88 is 1587.88 nm
+         wv1588d30 is 1588.30 nm
+         wv1588d73 is 1588.73 nm
+         wv1589d15 is 1589.15 nm
+         wv1589d57 is 1589.57 nm
+         wv1589d99 is 1589.99 nm
+         wv1590d41 is 1590.41 nm
+         wv1590d83 is 1590.83 nm
+         wv1591d26 is 1591.26 nm
+         wv1591d68 is 1591.68 nm
+         wv1592d10 is 1592.10 nm
+         wv1592d52 is 1592.52 nm
+         wv1592d95 is 1592.95 nm
+         wv1593d37 is 1593.37 nm
+         wv1593d79 is 1593.79 nm
+         wv1594d22 is 1594.22 nm
+         wv1594d64 is 1594.64 nm
+         wv1595d06 is 1595.06 nm
+         wv1595d49 is 1595.49 nm
+         wv1595d91 is 1595.91 nm
+         wv1596d34 is 1596.34 nm
+         wv1596d76 is 1596.76 nm
+         wv1597d19 is 1597.19 nm
+         wv1597d62 is 1597.62 nm
+         wv1598d04 is 1598.04 nm
+         wv1598d47 is 1598.47 nm
+         wv1598d89 is 1598.89 nm
+         wv1599d32 is 1599.32 nm
+         wv1599d75 is 1599.75 nm
+         wv1600d17 is 1600.17 nm
+         wv1600d60 is 1600.60 nm
+         wv1601d03 is 1601.03 nm
+         wv1601d46 is 1601.46 nm
+         wv1601d88 is 1601.88 nm
+         wv1602d31 is 1602.31 nm
+         wv1602d74 is 1602.74 nm
+         wv1603d17 is 1603.17 nm
+         wv1603d60 is 1603.60 nm
+         wv1604d03 is 1604.03 nm
+        "
+    SYNTAX    INTEGER {
+        unknown(1),
+ wv1529d55(3),
+ wv1529d94(4),
+        wv1530d33(5),
+ wv1530d72(7),
+        wv1531d12(10),
+ wv1531d51(12),
+        wv1531d90(15),
+ wv1532d29(17),
+        wv1532d68(20),
+ wv1533d07(22),
+ wv1533d47(23),
+ wv1533d86(24),
+        wv1534d25(25),
+ wv1534d64(27),
+        wv1535d04(30),
+ wv1535d43(32),
+        wv1535d82(35),
+ wv1536d22(37),
+        wv1536d61(40),
+ wv1537d00(42),
+ wv1537d40(43),
+ wv1537d79(44),
+        wv1538d19(45),
+ wv1538d58(47),
+        wv1538d98(50),
+ wv1539d37(52),
+        wv1539d77(55),
+ wv1540d16(57),
+        wv1540d56(60),
+ wv1540d95(62),
+ wv1541d35(63),
+ wv1541d75(64),
+        wv1542d14(65),
+		wv1470(66),
+ wv1542d54(67),
+ wv1510(68),
+ wv1590(69),
+        wv1542d94(70),
+		wv850(71),
+ wv1543d33(72),
+ wv1310(73),
+ wv1550(74),
+        wv1543d73(75),
+		wv1490(76),
+ wv1544d13(77),
+ wv1530(78),
+ wv1570(79),
+        wv1544d53(80),
+		wv1610(81),
+ wv1544d92(82),
+ wv1545d32(83),
+ wv1545d72(84),
+        wv1546d12(85),
+ wv1546d52(87),
+        wv1546d92(90),
+ wv1547d32(92),
+        wv1547d72(95),
+ wv1548d11(97),
+        wv1548d51(100),
+ wv1548d91(102),
+ wv1549d32(103),
+ wv1549d72(104),
+        wv1550d12(105),
+        wv1550d52(107),
+        wv1550d92(110),
+        wv1551d32(112),
+        wv1551d72(115),
+        wv1552d12(117),
+        wv1552d52(120),
+        wv1552d93(122),
+        wv1553d33(123),
+        wv1553d73(124),
+        wv1554d13(125),
+        wv1554d54(127),
+        wv1554d94(130),
+        wv1555d34(132),
+        wv1555d75(135),
+        wv1556d15(137),
+        wv1556d55(140),
+        wv1556d96(142),
+        wv1557d36(143),
+        wv1557d77(144),
+        wv1558d17(145),
+        wv1558d58(147),
+        wv1558d98(150),
+        wv1559d39(152),
+        wv1559d79(155),
+        wv1560d20(157),
+        wv1560d61(160),
+        wv1561d01(162),
+        wv1561d42(164),
+        wv1561d83(166),
+	-- L Band
+        wv1570d83(168),
+        wv1571d24(170),
+        wv1571d65(172),
+        wv1572d06(174),
+        wv1572d48(176),
+        wv1572d89(178),
+        wv1573d30(180),
+        wv1573d71(182),
+        wv1574d13(184),
+        wv1574d54(186),
+        wv1574d95(188),
+        wv1575d37(190),
+        wv1575d78(192),
+        wv1576d20(194),
+        wv1576d61(196),
+        wv1577d03(198),
+        wv1577d44(200),
+        wv1577d86(205),
+        wv1578d27(210),
+        wv1578d69(215),
+        wv1579d10(220),
+        wv1579d52(225),
+        wv1579d93(230),
+        wv1580d35(235),
+        wv1580d77(240),
+        wv1581d18(245),
+        wv1581d60(250),
+        wv1582d02(255),
+        wv1582d44(260),
+        wv1582d85(265),
+        wv1583d27(270),
+        wv1583d69(275),
+        wv1584d11(280),
+        wv1584d53(285),
+        wv1584d95(290),
+        wv1585d36(295),
+        wv1585d78(300),
+        wv1586d20(305),
+        wv1586d62(310),
+        wv1587d04(315),
+        wv1587d46(320),
+        wv1587d88(325),
+        wv1588d30(330),
+        wv1588d73(335),
+        wv1589d15(340),
+        wv1589d57(345),
+        wv1589d99(350),
+        wv1590d41(355),
+        wv1590d83(360),
+        wv1591d26(365),
+        wv1591d68(370),
+        wv1592d10(375),
+        wv1592d52(380),
+        wv1592d95(385),
+        wv1593d37(390),
+        wv1593d79(395),
+        wv1594d22(400),
+        wv1594d64(405),
+        wv1595d06(410),
+        wv1595d49(415),
+        wv1595d91(420),
+        wv1596d34(425),
+        wv1596d76(430),
+        wv1597d19(435),
+        wv1597d62(440),
+        wv1598d04(445),
+        wv1598d47(450),
+        wv1598d89(455),
+        wv1599d32(460),
+        wv1599d75(465),
+        wv1600d17(470),
+        wv1600d60(475),
+        wv1601d03(480),
+        wv1601d46(485),
+        wv1601d88(490),
+        wv1602d31(500),
+        wv1602d74(505),
+        wv1603d17(510),
+        wv1603d60(515),
+        wv1604d03(520),
+		firsttunablewv(530),
+		wv1528d77(540)
+    }
+
+OpticalPowerInDbm ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "An integer value that gives the optical power level in 1/10ths
+        of dBm.
+        Example: The value -300 represents a power level of -30.0 dBm.
+
+        The distinguished value of '-1000' indicates that the object
+        has not yet been initialized.
+        "
+    SYNTAX    Integer32 ( -400..250 | -1000 )
+
+
+OpticalAttenInDb ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "An integer value that gives the attenuation level in
+        1/10ths of dB. 
+        Example: The value 80 represents an attenuation
+        level of 8.0 dB.
+        "
+    SYNTAX    Integer32 (0..400)
+
+
+TDCUCompensation ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+	"Enumeration of the possible fine TDCU compensation values
+     	0 ps/nm
+        -45 ps/nm
+        -90 ps/nm
+        -135 ps/nm
+        -180 ps/nm
+        -225 ps/nm
+        -270 ps/nm
+        -315 ps/nm
+        -360 ps/nm
+        -405 ps/nm
+        -450 ps/nm
+        -495 ps/nm
+        -540 ps/nm
+        -585 ps/nm
+        -630 ps/nm
+        -675 ps/nm
+
+	Enumeration of the possible coarse TDCU compensation values
+        0 ps/nm
+        -110 ps/nm
+        -220 ps/nm
+        -330 ps/nm
+        -440 ps/nm
+        -550 ps/nm
+        -660 ps/nm
+        -770 ps/nm
+        -880 ps/nm
+        -990 ps/nm
+        -1100 ps/nm
+        -1210 ps/nm
+        -1320 ps/nm
+        -1430 ps/nm
+        -1540 ps/nm
+        -1650 ps/nm
+	"
+    SYNTAX    INTEGER {
+	psnmNotApplicable(-1),
+        psnm0(0),
+        psnmFineMinus45(1),
+        psnmFineMinus90(2),
+        psnmFineMinus135(3),
+        psnmFineMinus180(4),
+        psnmFineMinus225(5),
+        psnmFineMinus270(6),
+        psnmFineMinus315(7),
+        psnmFineMinus360(8),
+        psnmFineMinus405(9),
+        psnmFineMinus450(10),
+        psnmFineMinus495(11),
+        psnmFineMinus540(12),
+        psnmFineMinus585(13),
+        psnmFineMinus630(14),
+        psnmFineMinus675(15),
+        psnmCoarseMinus110(16),
+        psnmCoarseMinus220(17),
+        psnmCoarseMinus330(18),
+        psnmCoarseMinus440(19),
+        psnmCoarseMinus550(20),
+        psnmCoarseMinus660(21),
+        psnmCoarseMinus770(22),
+        psnmCoarseMinus880(23),
+        psnmCoarseMinus990(24),
+        psnmCoarseMinus1100(25),
+        psnmCoarseMinus1210(26),
+        psnmCoarseMinus1320(27),
+        psnmCoarseMinus1430(28),
+        psnmCoarseMinus1540(29),
+        psnmCoarseMinus1650(30)
+    }
+
+
+-- MIB Object Definitions
+
+cerentMsDwdmMIBObjects    OBJECT IDENTIFIER ::= { cerentGeneric 40 }
+
+-- groups in this MIB module
+
+cerentMsDwdmIf                OBJECT IDENTIFIER  
+                       ::= { cerentMsDwdmMIBObjects 1 }
+cerentMsDwdmOtn               OBJECT IDENTIFIER  
+                       ::= { cerentMsDwdmMIBObjects 2 }
+cerentMsDwdmFEC               OBJECT IDENTIFIER  
+                       ::= { cerentMsDwdmMIBObjects 3 }
+cerentMsDwdm8B10B             OBJECT IDENTIFIER                       
+                       ::= { cerentMsDwdmMIBObjects 4 }
+
+-- cerentMsDwdmIf group
+
+-- This group handles the physical layer related interface   
+-- configurations, like the protocol and rate used across the client  
+-- side interface, monitoring of counters,  and loopback mode   
+-- across client and trunk side interfaces.  
+
+cMsDwdmIfConfigTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmIfConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table allows physical layer related interface
+        configurations on an interface."
+    ::= { cerentMsDwdmIf 1 }
+
+cMsDwdmIfConfigEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmIfConfigEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects for configuration on an
+        interface."
+    INDEX         { ifIndex }
+    ::= { cMsDwdmIfConfigTable 1 }
+
+CMsDwdmIfConfigEntry ::= SEQUENCE {
+    cMsDwdmIfConfigProtocol               ProtocolType,
+    cMsDwdmIfConfigDataRate               INTEGER,
+    cMsDwdmIfConfigLoopback               INTEGER,
+    cMsDwdmIfConfigWavelength             OpticalWavelength,
+    cMsDwdmIfConfigOtnStatus              TruthValue,
+    cMsDwdmIfConfigFECStatus              TruthValue,
+    cMsDwdmIfOpticsValidIntervals         Unsigned32,
+    cMsDwdmIfOTNValidIntervals            Unsigned32,
+    cMsDwdmIfFECValidIntervals            Unsigned32,
+    cMsDwdmIfConfigFECMode		  INTEGER
+}
+
+cMsDwdmIfConfigProtocol OBJECT-TYPE
+    SYNTAX        ProtocolType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the protocol of the data  
+        carried over the interface.
+
+        This object applies to linecards which support a variety of
+        protocols and allow dynamic configuration of the specific
+        protocol to be monitored on the interface. The ifType value
+        for such interfaces remains fixed."
+    ::= { cMsDwdmIfConfigEntry 1 }
+
+cMsDwdmIfConfigDataRate OBJECT-TYPE
+    SYNTAX        INTEGER {
+                    passThru(10),
+                    stm1(20),
+                    stm4(30),
+                    stm16(40),
+                    stm64(50),
+					stm256(55),
+                    gigE(60),
+                    tenGigE(70),
+                    fc(80),
+                    oneGfcFicon(90),
+                    twoGfcFiconIsc3(100),
+                    escon(110),
+                    dv6000(120),
+                    sdiD1Video(130),
+                    hdtv(140),
+                    oc3(150),
+                    oc12(160),
+                    oc48(170),
+                    oc192(180),
+		    fourGfcFicon(190),
+		    tenGfc(200),
+		    isc1(210),
+		    isc3(220),
+		    oneGigIsc3(230),
+		    twoGigIsc3(240),
+		    etrClo(250),
+			infiniBand(280),
+			fe(290),
+			e1t1(300),
+			e3t3(310),
+			oc3Ge(320),
+			eightGfc(330),
+			oc768(340),
+			otu1(350),
+			otu2(360),
+			otu3(370),
+			otu4(380),
+			oneHundredGe(390)			
+    }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object allows the management client to set the
+         data rate across the interface.
+
+         passThru denotes 2R, Reamplification and reshaping.
+         stm1     denotes 3R, Reamp, reshaping and reclocking.
+         stm4     denotes 3R, Reamp, reshaping and reclocking.
+         stm16    denotes 3R, Reamp, reshaping and reclocking.
+         stm64    denotes 3R, Reamp, reshaping and reclocking.
+         gigE     denotes 3R, Reamp, reshaping and reclocking.
+         tenGigE  denotes 3R, Reamp, reshaping and reclocking.
+         fc       denotes 3R, Reamp, reshaping and reclocking.
+         oneGfcFicon denotes 3R, Reamp, reshaping and reclocking.
+         twoGfcFiconIsc3 denotes 3R, Reamp, reshaping and reclocking.
+         escon    denotes 2R, Reamp and reshaping.
+         dv6000   denotes 2R, Reamp and reshaping.
+         sdiD1Video denotes 2R, Reamp and reshaping.
+         hdtv     denotes 2R, Reamp and reshaping.
+         oc3      denotes 3R, Reamp, reshaping and reclocking.
+         oc12     denotes 3R, Reamp, reshaping and reclocking.
+         oc48     denotes 3R, Reamp, reshaping and reclocking.
+         oc192    denotes 3R, Reamp, reshaping and reclocking.
+		 infiniBand	denotes 3R, Reamp, reshaping and reclocking.
+		 fe 	denotes 3R, Reamp, reshaping and reclocking.
+		 e3t3	denotes 3R, Reamp, reshaping and reclocking.
+		 oc3Ge	denotes 3R, Reamp, reshaping and reclocking.
+         "
+    ::= { cMsDwdmIfConfigEntry 2 }
+
+cMsDwdmIfConfigLoopback OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      noLoop(1),
+                      diagnosticLoop(2),
+                      lineLoop(3),
+                      otherLoop(4)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object allows the management client to configure
+        loopback for the client side or trunk side interfaces.
+         
+        'noLoop'         - No Loopback present.
+        'diagnosticLoop' - This is an internal loopback, where the
+                           data stream is looped from the transmit
+                           to receive section. It is used for  
+                           hardware debug, bring-up and diagnostics.
+        'lineLoop'       - In this mode, the receive data stream is
+                           looped back to the transmit side.
+        'otherLoop'      - This indicates loopbacks not defined here.
+
+        The default value of this object will be 'noLoop'."
+    ::= { cMsDwdmIfConfigEntry 3 }
+
+cMsDwdmIfConfigWavelength  OBJECT-TYPE
+    SYNTAX        OpticalWavelength
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object allows the management client to configure
+        the wavelength mode of operation to the applicable interfaces.
+        "
+    ::= { cMsDwdmIfConfigEntry 4 }
+    
+cMsDwdmIfConfigOtnStatus OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object allows the management client to enable  
+        the OTN (G.709) on an applicable interface,by writing a  
+        value of 'true' to this object. To bypass the monitoring 
+        hardware, a value of 'false' is written to this object.
+
+        This object is not applicable to client side interfaces."
+	
+    ::= { cMsDwdmIfConfigEntry 5 }
+
+cMsDwdmIfConfigFECStatus OBJECT-TYPE
+    SYNTAX         TruthValue
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object allows the management client to enable  
+        gathering FEC ( Forward Error Correction ) counters on
+        an applicable interface, by writing a value of 'true'  
+        to this object.To disable FEC, a value of 'false'  
+        must be written to this object.
+
+        This object is not applicable to client side interfaces.
+        
+      	This object is being replaced by cMsDwdmIfConfigFECMode and is 
+	      going to become	obsolete in the future releases."
+     ::= { cMsDwdmIfConfigEntry 6 }    
+
+cMsDwdmIfOpticsValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of contiguous 15 minute
+        intervals for which valid Optical Monitor PM data is available 
+        for the particular interface.
+
+        The value of this object will be n (where n is the maximum
+        number of 15 minute intervals supported at this interface), 
+        unless the measurement was (re-)started within the last
+        (nx15) minutes, in which case the value will be the
+        number of 15 minute intervals for which the agent
+        has some data."
+    ::= { cMsDwdmIfConfigEntry 7 }
+
+cMsDwdmIfOTNValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of contiguous 15 minute 
+        intervals for which valid OTN performance monitoring data is 
+        available for the particular interface.
+
+        The value of this object will be n (where n is the maximum
+        number of 15 minute intervals supported at this interface), 
+        unless the measurement was (re-)started within the last
+        (nx15) minutes, in which case the value will be the
+        number of 15 minute intervals for which the agent
+        has some data.
+        
+        This object reports a value 0, if OTN is turned off."
+    ::= { cMsDwdmIfConfigEntry 8 }
+
+cMsDwdmIfFECValidIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..96)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object gives the number of contiguous 15 minute 
+        intervals for which valid FEC PM data is available 
+        for the particular interface.
+
+        The value of this object will be n (where n is the maximum
+        number of 15 minute intervals supported at this interface), 
+        unless the measurement was (re-)started within the last
+        (nx15) minutes, in which case the value will be the
+        number of 15 minute intervals for which the agent
+        has some data.
+        
+        This object reports a value 0, if FEC is turned off."
+    ::= { cMsDwdmIfConfigEntry 9 }
+
+cMsDwdmIfConfigFECMode OBJECT-TYPE
+    SYNTAX         INTEGER {
+                      disable(1),
+                      enableStandard(2),
+		      enableEnhanced(3),
+		      enableEnhancedI4(4),
+		      enableEnhancedI7(5),
+		      enableEnhanced20(6),
+                      enableHG7(7)
+                  }
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+        "This object allows the management client to enable  
+        gathering FEC ( Forward Error Correction ) counters on
+        an applicable interface, by writing a value of 'enableStandard'  
+        or 'enableEnhanced' to this object. To disable FEC, a value of 
+	'disable' must be written to this object.
+
+        This object is not applicable to client side interfaces."
+     ::= { cMsDwdmIfConfigEntry 10 }    
+
+
+-- DwdmIfTransport Table
+
+cMsDwdmIfTransportTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmIfTransportEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table defines optical transport layer related interface
+        configurations on an interface."
+    ::= { cerentMsDwdmIf 2 }
+
+cMsDwdmIfTransportEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmIfTransportEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects for configuration on an
+        optical transport interface."
+    INDEX         { ifIndex }
+    ::= { cMsDwdmIfTransportTable 1 }
+
+CMsDwdmIfTransportEntry ::= SEQUENCE {
+    cMsDwdmIfTransportRingDirection       RingDirection,
+    cMsDwdmIfTransportPortRule            OpticalPortRule,
+    cMsDwdmIfTransportPower               OpticalPowerInDbm,
+    cMsDwdmIfTransportAddPower            OpticalPowerInDbm,
+    cMsDwdmIfTransportOSCPower            OpticalPowerInDbm,
+    cMsDwdmIfTransportReferencePower      OpticalPowerInDbm,
+    cMsDwdmIfTransportCalibratedPower     OpticalPowerInDbm,
+    cMsDwdmIfTransportInsertionLoss       OpticalAttenInDb,
+    cMsDwdmIfTransportLaserStatus         LaserStatus,
+    cMsDwdmIfTransportAmplifierMode       OpticalAmplifierMode,
+    cMsDwdmIfTransportGain                OpticalAttenInDb,
+    cMsDwdmIfTransportExpectedGain        OpticalAttenInDb,
+    cMsDwdmIfTransportReferenceTilt       OpticalAttenInDb,
+    cMsDwdmIfTransportCalibratedTilt      OpticalAttenInDb,
+    cMsDwdmIfTransportDCULoss             OpticalAttenInDb,
+    cMsDwdmIfTransportOSRI                INTEGER,
+    cMsDwdmIfTransportSideIdentifier      SideIdentifier,
+    cMsDwdmIfTransportTDCUCompensation    TDCUCompensation
+}
+
+cMsDwdmIfTransportRingDirection OBJECT-TYPE
+    SYNTAX        RingDirection
+    MAX-ACCESS    not-accessible
+    STATUS        obsolete -- Unsupported on 15454 starting from rel. 8.0
+    DESCRIPTION
+        "This object is used to specify the ring directionality of
+	the port.
+	
+	The ring directionality gives the configuration of the 
+	facing side: facing sides can be east going to west and 
+	west going to east."
+    ::= { cMsDwdmIfTransportEntry 1 }
+
+cMsDwdmIfTransportPortRule OBJECT-TYPE
+    SYNTAX        OpticalPortRule
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the type of the optical
+	port.
+	
+	A transport optical port can assume one of the following
+	values:
+		input(1)
+		input-express(2)
+		output(3)
+		output-express(4)."
+    ::= { cMsDwdmIfTransportEntry 2 }
+
+cMsDwdmIfTransportPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical power read at
+	the photodiode of the port.
+	
+	The distinguished value of '-1000' indicates that the power
+	cannot be read due to unavaible HW resource."
+    ::= { cMsDwdmIfTransportEntry 3 }
+
+cMsDwdmIfTransportReferencePower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical transport
+        reference power. This is the value of power the network 
+        element will expect on the photodiode.
+        In case the user wants to refine this value the
+        'cMsDwdmIfTransportCalibratedPower' can be used to add
+        an offset to the network element setup value."
+    ::= { cMsDwdmIfTransportEntry 4 }
+
+cMsDwdmIfTransportCalibratedPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical transport
+        calibration power. This is the power offset that user 
+        contribute in case the 'reference' value setup by 
+        network element would be modified.
+        "
+    DEFVAL        { 0 }
+    ::= { cMsDwdmIfTransportEntry 5 }
+
+cMsDwdmIfTransportInsertionLoss OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of Insertion
+        Loss of the optical port.
+        "
+    ::= { cMsDwdmIfTransportEntry 6 }
+
+cMsDwdmIfTransportLaserStatus OBJECT-TYPE
+    SYNTAX        LaserStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the status of the laser.
+        "
+    ::= { cMsDwdmIfTransportEntry 7 }
+
+cMsDwdmIfTransportAmplifierMode OBJECT-TYPE
+    SYNTAX        OpticalAmplifierMode
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the working amplifier
+        mode.
+        "
+    ::= { cMsDwdmIfTransportEntry 8 }
+
+cMsDwdmIfTransportGain OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of the gain
+        of an amplifier
+        "
+    ::= { cMsDwdmIfTransportEntry 9 }
+
+cMsDwdmIfTransportReferenceTilt OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the amplifier tilt value
+        calculated by the network element."
+    ::= { cMsDwdmIfTransportEntry 10 }
+
+cMsDwdmIfTransportCalibratedTilt OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the amplifier tilt offset
+        added as offset by user in order to tune the network element
+        calculated ('reference') value
+        "
+    DEFVAL        { 0 }
+    ::= { cMsDwdmIfTransportEntry 11 }
+
+cMsDwdmIfTransportDCULoss OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of Insertion
+        Loss measured for the Dispersion Compensation Unit 
+        "
+    ::= { cMsDwdmIfTransportEntry 12 }
+
+cMsDwdmIfTransportOSRI OBJECT-TYPE
+    SYNTAX    INTEGER {
+        enable(1),
+        disable(2),
+        none(3)
+    }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This value indicates the status of the Optical Safety Remote Interlock
+        Valid values are -
+
+        enable(1) 	: the OSRI is enable
+        disable(2)	: the OSRI is disable
+        none(3)		: the OSRI functionality is not present
+        "
+    DEFVAL        { enable }
+    ::= { cMsDwdmIfTransportEntry 13 }
+
+cMsDwdmIfTransportExpectedGain OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of the expected gain
+        of an amplifier
+        "
+    ::= { cMsDwdmIfTransportEntry 14 }
+
+cMsDwdmIfTransportSideIdentifier OBJECT-TYPE
+    SYNTAX        SideIdentifier
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the facing side of the optical
+	port.
+        "
+    ::= { cMsDwdmIfTransportEntry 15 }
+
+cMsDwdmIfTransportTDCUCompensation OBJECT-TYPE
+    SYNTAX        TDCUCompensation
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+	"This object is used to specify the TDCU Compensation value
+	of the optical port belong to a TDCU card.
+	"
+    ::= { cMsDwdmIfTransportEntry 18 }
+
+cMsDwdmIfTransportAddPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the ADD optical power read at
+	the photodiode of the port.
+	
+	The distinguished value of '-1000' indicates that the power
+	cannot be read due to unavaible HW resource."
+    ::= { cMsDwdmIfTransportEntry 16 }
+
+cMsDwdmIfTransportOSCPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the OSC optical power read at
+        the photodiode of the port.
+
+        The distinguished value of '-1000' indicates that the power
+        cannot be read due to unavaible HW resource."
+    ::= { cMsDwdmIfTransportEntry 17 }
+
+-- DwdmIfMultiplexSection Table
+
+cMsDwdmIfMultiplexSectionTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmIfMultiplexSectionEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table defines optical multiplex section (band) layer 
+        related interface configurations on an interface."
+    ::= { cerentMsDwdmIf 3 }
+
+cMsDwdmIfMultiplexSectionEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmIfMultiplexSectionEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects for configuration on an
+        optical multiplex section (band) interface."
+    INDEX         { ifIndex }
+    ::= { cMsDwdmIfMultiplexSectionTable 1 }
+
+CMsDwdmIfMultiplexSectionEntry ::= SEQUENCE {
+    cMsDwdmIfMultiplexSectionRingDirection       RingDirection,
+    cMsDwdmIfMultiplexSectionPortRule            OpticalPortRule,
+    cMsDwdmIfMultiplexSectionPower               OpticalPowerInDbm,
+    cMsDwdmIfMultiplexSectionReferencePower      OpticalPowerInDbm,
+    cMsDwdmIfMultiplexSectionCalibratedPower     OpticalPowerInDbm,
+    cMsDwdmIfMultiplexSectionInsertionLoss       OpticalAttenInDb,
+    cMsDwdmIfMultiplexSectionActualBand          OpticalBand,
+    cMsDwdmIfMultiplexSectionExpectedBand        OpticalBand,
+    cMsDwdmIfMultiplexSectionSideIdentifier      SideIdentifier
+}
+
+cMsDwdmIfMultiplexSectionRingDirection OBJECT-TYPE
+    SYNTAX        RingDirection
+    MAX-ACCESS    not-accessible
+    STATUS        obsolete -- Unsupported on 15454 starting from rel. 8.0
+    DESCRIPTION
+        "This object is used to specify the ring directionality of
+        the port.
+        
+        The ring directionality gives the configuration of the 
+        facing side: facing sides can be east going to west and 
+        west going to east."
+    ::= { cMsDwdmIfMultiplexSectionEntry 1 }
+
+cMsDwdmIfMultiplexSectionPortRule OBJECT-TYPE
+    SYNTAX        OpticalPortRule
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the type of the optical
+        port.
+        
+        A Multiplex Section optical port can assume one of the following
+        values:
+			add(5)
+			drop(6)."
+    ::= { cMsDwdmIfMultiplexSectionEntry 2 }
+
+cMsDwdmIfMultiplexSectionPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical power read at
+        the photodiode of the port.
+        
+        The distinguished value of '-1000' indicates that the power
+        cannot be read due to unavaible HW resource."
+    ::= { cMsDwdmIfMultiplexSectionEntry 3 }
+
+cMsDwdmIfMultiplexSectionReferencePower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical Multiplex Section
+        reference power. This is the value of power the network 
+        element will expect on the photodiode.
+        In case the user wants to refine this value the
+        'cMsDwdmIfMultiplexSectionCalibratedPower' can be used to add
+        an offset to the network element setup value."
+    ::= { cMsDwdmIfMultiplexSectionEntry 4 }
+
+cMsDwdmIfMultiplexSectionCalibratedPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical MultiplexSection
+        calibration power. This is the power offset that user 
+        contribute in case the 'reference' value setup by 
+        network element would be modified.
+        "
+    DEFVAL        { 0 }
+    ::= { cMsDwdmIfMultiplexSectionEntry 5 }
+
+cMsDwdmIfMultiplexSectionInsertionLoss OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of Insertion
+        Loss of the optical port.
+        "
+    ::= { cMsDwdmIfMultiplexSectionEntry 6 }
+
+cMsDwdmIfMultiplexSectionActualBand OBJECT-TYPE
+    SYNTAX        OpticalBand
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of Wavelength
+        group which is tuned the optical port.
+        "
+    ::= { cMsDwdmIfMultiplexSectionEntry 7 }
+
+cMsDwdmIfMultiplexSectionExpectedBand OBJECT-TYPE
+    SYNTAX        OpticalBand
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of Wavelength
+        group that the user expects the optical port will assume.
+        "
+    ::= { cMsDwdmIfMultiplexSectionEntry 8 }
+
+cMsDwdmIfMultiplexSectionSideIdentifier OBJECT-TYPE
+    SYNTAX        SideIdentifier
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the facing side of the optical
+        port.
+        "
+    ::= { cMsDwdmIfMultiplexSectionEntry 9 }
+
+
+-- DwdmIfChannel Table
+
+cMsDwdmIfChannelTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmIfChannelEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table defines optical channel layer 
+        related interface configurations on an interface."
+    ::= { cerentMsDwdmIf 4 }
+
+cMsDwdmIfChannelEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmIfChannelEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects for configuration on an
+        optical channel interface."
+    INDEX         { ifIndex }
+    ::= { cMsDwdmIfChannelTable 1 }
+
+CMsDwdmIfChannelEntry ::= SEQUENCE {
+    cMsDwdmIfChannelRingDirection       RingDirection,
+    cMsDwdmIfChannelPortRule            OpticalPortRule,
+    cMsDwdmIfChannelPower               OpticalPowerInDbm,
+    cMsDwdmIfChannelReferencePower      OpticalPowerInDbm,
+    cMsDwdmIfChannelCalibratedPower     OpticalPowerInDbm,
+    cMsDwdmIfChannelInsertionLoss       OpticalAttenInDb,
+    cMsDwdmIfChannelActualWavelength    OpticalWavelength,
+    cMsDwdmIfChannelExpectedWavelength  OpticalWavelength,
+    cMsDwdmIfChannelSideIdentifier      SideIdentifier
+}
+
+cMsDwdmIfChannelRingDirection OBJECT-TYPE
+    SYNTAX        RingDirection
+    MAX-ACCESS    not-accessible
+    STATUS        obsolete -- Unsupported on 15454 starting from rel. 8.0
+    DESCRIPTION
+        "This object is used to specify the ring directionality of
+        the port.
+        
+        The ring directionality gives the configuration of the 
+        facing side: facing sides can be east going to west and 
+        west going to east."
+    ::= { cMsDwdmIfChannelEntry 1 }
+
+cMsDwdmIfChannelPortRule OBJECT-TYPE
+    SYNTAX        OpticalPortRule
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the type of the optical
+        port.
+        
+        A Multiplex Section optical port can assume one of the following
+        values:
+			add(5)
+			drop(6)."
+    ::= { cMsDwdmIfChannelEntry 2 }
+
+cMsDwdmIfChannelPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical power read at
+        the photodiode of the port.
+        
+        The distinguished value of '-1000' indicates that the power
+        cannot be read due to unavaible HW resource."
+    ::= { cMsDwdmIfChannelEntry 3 }
+
+cMsDwdmIfChannelReferencePower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical Multiplex Section
+        reference power. This is the value of power the network 
+        element will expect on the photodiode.
+        In case the user wants to refine this value the
+        'cMsDwdmIfChannelCalibratedPower' can be used to add
+        an offset to the network element setup value."
+    ::= { cMsDwdmIfChannelEntry 4 }
+
+cMsDwdmIfChannelCalibratedPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the optical Channel
+        calibration power. This is the power offset that user 
+        contribute in case the 'reference' value setup by 
+        network element would be modified.
+        "
+    DEFVAL        { 0 }
+    ::= { cMsDwdmIfChannelEntry 5 }
+
+cMsDwdmIfChannelInsertionLoss OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of Insertion
+        Loss of the optical port.
+        "
+    ::= { cMsDwdmIfChannelEntry 6 }
+
+cMsDwdmIfChannelActualWavelength OBJECT-TYPE
+    SYNTAX        OpticalWavelength
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of Wavelength
+        that is tuned the optical port.
+        "
+    ::= { cMsDwdmIfChannelEntry 7 }
+
+cMsDwdmIfChannelExpectedWavelength OBJECT-TYPE
+    SYNTAX        OpticalWavelength
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the value of Wavelength
+        that the user expects the optical port will assume.
+        "
+    ::= { cMsDwdmIfChannelEntry 8 }
+
+cMsDwdmIfChannelSideIdentifier OBJECT-TYPE
+    SYNTAX        SideIdentifier
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object is used to specify the facing side of the optical
+        port.
+        "
+    ::= { cMsDwdmIfChannelEntry 9 }
+
+
+-- cerentMsDwdmOtn group
+-- This group contains error counters and thresholds
+-- for the interfaces with OTN ( G.709 ) monitoring enabled.
+
+-- OtnThresholds Table
+
+cMsDwdmOtnThresholdsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmOtnThresholdsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table provides objects for configuring OTN ( G.709 )
+        thresholds on trunk side interfaces."
+    ::= { cerentMsDwdmOtn 1 }
+
+cMsDwdmOtnThresholdsEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmOtnThresholdsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the cMsDwdmOtnThresholdsTable."
+         
+    INDEX         { ifIndex, cMsDwdmOtnThreshMonType,
+                    cMsDwdmOtnThreshIntervalType }
+
+    ::= { cMsDwdmOtnThresholdsTable 1 }
+
+CMsDwdmOtnThresholdsEntry ::= SEQUENCE {
+    cMsDwdmOtnThreshMonType        MonitorType,
+    cMsDwdmOtnThreshIntervalType   LocationAndIntervalType,  
+    cMsDwdmOtnThreshFC             Unsigned32,
+    cMsDwdmOtnThreshES             Unsigned32,
+    cMsDwdmOtnThreshSES            Unsigned32,
+    cMsDwdmOtnThreshUAS            Unsigned32,
+    cMsDwdmOtnThreshBBE            Unsigned32
+}  
+
+cMsDwdmOtnThreshMonType OBJECT-TYPE
+    SYNTAX        MonitorType
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the cMsDwdmOtnThresholdsTable.
+         It is used to specify the type of monitoring threshold 
+         being set on an interface for OTN ( G.709 ) statistics."
+    ::= { cMsDwdmOtnThresholdsEntry 1 }
+
+cMsDwdmOtnThreshIntervalType OBJECT-TYPE
+    SYNTAX        LocationAndIntervalType
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the cMsDwdmOtnThresholdsTable.
+         It specifies the interval type and monitoring location for 
+         the performance statistics."
+    ::= { cMsDwdmOtnThresholdsEntry 2 }
+
+cMsDwdmOtnThreshFC OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to set the threshold for the number of 
+        failure counts on applicable trunk side interfaces."
+    ::= { cMsDwdmOtnThresholdsEntry 3 }
+
+
+cMsDwdmOtnThreshES OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to set the threshold for the number of 
+        Errored Seconds on applicable trunk side interfaces." 
+    ::= { cMsDwdmOtnThresholdsEntry 4 }
+     
+cMsDwdmOtnThreshSES OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to set the threshold for the number of 
+        Severely Errored Seconds on applicable trunk side 
+        interfaces."
+    ::= { cMsDwdmOtnThresholdsEntry 5 }
+
+
+cMsDwdmOtnThreshUAS OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to set the threshold for the number of 
+        Unavailable Seconds on applicable trunk side interfaces." 
+    ::= { cMsDwdmOtnThresholdsEntry 6 }
+
+cMsDwdmOtnThreshBBE OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to set the threshold for the number of 
+        Bit Block Errors on applicable trunk side interfaces."
+    ::= { cMsDwdmOtnThresholdsEntry 7 }
+
+
+-- OTN Current Table
+-- used to gather PM stats for OTN (G.709) enabled interfaces.
+
+cMsDwdmOtnCurrentTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmOtnCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION  
+        "This table contains the cumulative OTN (G.709) PM stats    
+         for the trunk side interfaces.
+        "
+    ::= { cerentMsDwdmOtn 2 }
+
+cMsDwdmOtnCurrentEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmOtnCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the cMsDwdmOtnCurrentTable."  
+    INDEX         { ifIndex,
+                    cMsDwdmOtnCurrentMonType,
+                    cMsDwdmOtnCurIntervalType }
+    ::= { cMsDwdmOtnCurrentTable 1 }
+
+CMsDwdmOtnCurrentEntry ::= SEQUENCE {
+    cMsDwdmOtnCurrentMonType   MonitorType,
+    cMsDwdmOtnCurIntervalType  LocationAndIntervalType,  
+    cMsDwdmOtnCurrentFC        Counter32,
+    cMsDwdmOtnCurrentES        Counter32,
+    cMsDwdmOtnCurrentSES       Counter32,
+    cMsDwdmOtnCurrentUAS       Counter32,
+    cMsDwdmOtnCurrentBBE       Counter32,
+    cMsDwdmOtnCurrentESR       Counter32,
+    cMsDwdmOtnCurrentSESR      Counter32,
+    cMsDwdmOtnCurrentBBER      Counter32
+}
+
+cMsDwdmOtnCurrentMonType OBJECT-TYPE
+    SYNTAX        MonitorType
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the cMsDwdmOtnCurrentTable.
+         It is used to otain G.709 statistics for path, section  
+         and tcm ( tandem connection)."  
+    ::= { cMsDwdmOtnCurrentEntry 1 }
+
+cMsDwdmOtnCurIntervalType OBJECT-TYPE
+    SYNTAX        LocationAndIntervalType
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the cMsDwdmOtnCurrentTable.
+         It specifies the interval type (farEnd/ nearEnd and
+         15 min/ 1 Day )for the table objects."  
+    ::= { cMsDwdmOtnCurrentEntry 2 }
+
+cMsDwdmOtnCurrentFC OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of
+        failure counts encountered on this interface in the 
+        current interval."  
+    ::= { cMsDwdmOtnCurrentEntry 3 }
+
+cMsDwdmOtnCurrentES OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only  
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Errored Seconds encountered  
+         on this interface in the current interval."
+    ::= { cMsDwdmOtnCurrentEntry 4 }
+    
+cMsDwdmOtnCurrentSES OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Severely Errored Seconds encountered 
+         on this interface in the current interval."
+    ::= { cMsDwdmOtnCurrentEntry 5 }
+
+cMsDwdmOtnCurrentUAS OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Unavailable Seconds encountered
+         on this interface in the current interval."
+    ::= { cMsDwdmOtnCurrentEntry 6 }
+
+cMsDwdmOtnCurrentBBE OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Background Block Errors encountered
+         on this interface in the current interval."
+    ::= { cMsDwdmOtnCurrentEntry 7 }
+
+cMsDwdmOtnCurrentESR OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the Errored Seconds Ratio
+         on this interface in the current interval."
+    ::= { cMsDwdmOtnCurrentEntry 8 }
+
+cMsDwdmOtnCurrentSESR OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the Severely Errored Seconds  
+         ratio on this interface in the current interval."
+    ::= { cMsDwdmOtnCurrentEntry 9 }
+
+cMsDwdmOtnCurrentBBER OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the Background Block Errors  
+        ratio on this interface in the current interval."
+    ::= { cMsDwdmOtnCurrentEntry 10 }
+   
+
+-- OTN Interval Table
+-- used to gather PM stats for OTN (G.709) enabled interfaces.
+
+cMsDwdmOtnIntervalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmOtnIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION  
+        "This table contains the cumulative OTN (G.709) PM stats    
+         for the trunk side interfaces.
+        "
+    ::= { cerentMsDwdmOtn 3 }
+
+cMsDwdmOtnIntervalEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmOtnIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the cMsDwdmOtnIntervalTable."  
+    INDEX         { ifIndex,
+                    cMsDwdmOtnIntervalMonType,
+                    cMsDwdmOtnIntervalType,
+                    cMsDwdmOtnIntervalNum }
+    ::= { cMsDwdmOtnIntervalTable 1 }
+
+CMsDwdmOtnIntervalEntry ::= SEQUENCE {
+    cMsDwdmOtnIntervalMonType   MonitorType,
+    cMsDwdmOtnIntervalType      LocationAndIntervalType,  
+    cMsDwdmOtnIntervalNum       Integer32,   
+    cMsDwdmOtnIntervalFC        Counter32,
+    cMsDwdmOtnIntervalES        Counter32,
+    cMsDwdmOtnIntervalSES       Counter32,
+    cMsDwdmOtnIntervalUAS       Counter32,
+    cMsDwdmOtnIntervalBBE       Counter32,
+    cMsDwdmOtnIntervalESR       Counter32,
+    cMsDwdmOtnIntervalSESR      Counter32,
+    cMsDwdmOtnIntervalBBER      Counter32,
+    cMsDwdmOtnIntervalValidData TruthValue
+}
+
+cMsDwdmOtnIntervalMonType OBJECT-TYPE
+    SYNTAX        MonitorType
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the cMsDwdmOtnIntervalTable.
+         It is used to otain G.709 statistics for path, section  
+         and tcm ( tandem connection)."  
+    ::= { cMsDwdmOtnIntervalEntry 1 }
+
+cMsDwdmOtnIntervalType OBJECT-TYPE
+    SYNTAX        LocationAndIntervalType
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the cMsDwdmOtnIntervalTable.
+         It specifies the interval type (farEnd/ nearEnd and
+         15 min/ 1 Day )for the table objects."  
+    ::= { cMsDwdmOtnIntervalEntry 2 }
+
+cMsDwdmOtnIntervalNum OBJECT-TYPE
+    SYNTAX        Integer32 (1..96)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the cMsDwdmOtnIntervalTable.
+         This object gives the  number of the interval.
+         It is a number between 1 and 96, which identifies the
+         interval for which the set of OTN performance values is
+         available. 
+         
+         The interval identified by 1 is the most recent
+         15 minute or 24 hour interval, and the interval
+         identified by N is the interval immediately preceding the 
+         one identified by N-1."
+    ::= { cMsDwdmOtnIntervalEntry 3 }
+
+cMsDwdmOtnIntervalFC OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of
+        failure counts encountered on this interface in a
+        particular interval."  
+    ::= { cMsDwdmOtnIntervalEntry 4 }
+
+cMsDwdmOtnIntervalES OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only  
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Errored Seconds encountered  
+         on this interface in a particular interval."
+    ::= { cMsDwdmOtnIntervalEntry 5 }
+    
+cMsDwdmOtnIntervalSES OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Severely Errored Seconds encountered 
+         on this interface in a particular interval."
+    ::= { cMsDwdmOtnIntervalEntry 6 }
+
+cMsDwdmOtnIntervalUAS OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Unavailable Seconds encountered
+         on this interface in a particular interval."
+    ::= { cMsDwdmOtnIntervalEntry 7 }
+
+cMsDwdmOtnIntervalBBE OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Background Block Errors encountered
+         on this interface in a particular interval."
+    ::= { cMsDwdmOtnIntervalEntry 8 }
+
+cMsDwdmOtnIntervalESR OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the Errored Seconds Ratio
+         on this interface in a particular interval."
+    ::= { cMsDwdmOtnIntervalEntry 9 }
+
+cMsDwdmOtnIntervalSESR OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the Severely Errored Seconds  
+         ratio on this interface in a particular interval."
+    ::= { cMsDwdmOtnIntervalEntry 10 }
+
+cMsDwdmOtnIntervalBBER OBJECT-TYPE
+    SYNTAX        Counter32 
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the Background Block Errors  
+        ratio on this interface in a particular interval."
+    ::= { cMsDwdmOtnIntervalEntry 11 }
+
+cMsDwdmOtnIntervalValidData OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This variable indicates if the data for this
+         interval is valid."
+   ::= { cMsDwdmOtnIntervalEntry 12 }
+    
+
+--  cerentMsDwdmFEC    
+--  This group contains FEC ( Forward Error Correction ) error
+--  counters and thresholds for applicable interfaces.
+
+
+--  FECThresholds Table
+cMsDwdmFECThresholdsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmFECThresholdsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION  
+        "This table contains the configurable thresholds     
+        for FEC ( Forward Error Correction ) statistics."
+    ::= { cerentMsDwdmFEC 1 }
+
+cMsDwdmFECThresholdsEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmFECThresholdsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the cMsDwdmFECThresholdsTable."  
+    INDEX         { ifIndex, cMsDwdmFECThreshIntervalType }
+    ::= { cMsDwdmFECThresholdsTable 1 }
+
+CMsDwdmFECThresholdsEntry ::= SEQUENCE {
+    cMsDwdmFECThreshIntervalType     CerentPeriod,
+    cMsDwdmFECThreshBitErrCor        Unsigned32,  
+    cMsDwdmFECThreshByteErrCor       Unsigned32,  
+    cMsDwdmFECThreshZeroErrDet       Unsigned32,  
+    cMsDwdmFECThreshOneErrDet        Unsigned32,  
+    cMsDwdmFECThreshUncorWords       Unsigned32  
+}
+
+cMsDwdmFECThreshIntervalType  OBJECT-TYPE
+    SYNTAX        CerentPeriod
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the  cMsDwdmFECThreshTable.
+         It gives the type of the interval for which the thresholds
+         are being set.
+        "
+    ::= { cMsDwdmFECThresholdsEntry 1 }
+
+
+cMsDwdmFECThreshBitErrCor   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object sets the threshold value of the number of 
+         Bit Errors Corrected on an applicable trunk side 
+         interface."
+    ::= { cMsDwdmFECThresholdsEntry 2 }
+     
+ cMsDwdmFECThreshByteErrCor   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object sets the threshold value of the number of
+         Byte Errors Corrected on an applicable trunk side
+         interface."
+    ::= { cMsDwdmFECThresholdsEntry 3 }
+     
+cMsDwdmFECThreshZeroErrDet   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object sets the threshold value of the number of
+         zero bit errors detected on an applicable trunk side
+         interface."
+    ::= { cMsDwdmFECThresholdsEntry 4 }
+     
+cMsDwdmFECThreshOneErrDet   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object sets the threshold value of the number of
+         one bit errors detected on an applicable trunk side
+         interface."
+    ::= { cMsDwdmFECThresholdsEntry 5 }
+     
+cMsDwdmFECThreshUncorWords   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object sets the threshold value of the number of 
+         Uncorrectable Words on an applicable trunk side interface."
+    ::= { cMsDwdmFECThresholdsEntry 6 }
+
+
+-- FEC Current Table
+cMsDwdmFECCurrentTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmFECCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION  
+        "This table contains the cumulative PM statistics    
+        for FEC ( Forward Error Correction ) on an applicable 
+        interface."
+    ::= { cerentMsDwdmFEC 2 }
+
+cMsDwdmFECCurrentEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmFECCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the cMsDwdmFECCurrentTable."  
+    INDEX         { ifIndex,cMsDwdmFECCurIntervalType }
+    ::= { cMsDwdmFECCurrentTable 1 }
+
+CMsDwdmFECCurrentEntry ::= SEQUENCE {
+    cMsDwdmFECCurIntervalType         CerentPeriod,
+    cMsDwdmFECCurrentBitErrCor        Counter32,  
+    cMsDwdmFECCurrentByteErrCor       Counter32,  
+    cMsDwdmFECCurrentZeroErrDet       Counter32,  
+    cMsDwdmFECCurrentOneErrDet        Counter32,  
+    cMsDwdmFECCurrentUncorWords       Counter32  
+}
+
+cMsDwdmFECCurIntervalType OBJECT-TYPE
+    SYNTAX        CerentPeriod
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the  cMsDwdmFECCurrentTable.
+         It gives the type of interval for which the FEC values
+         have been collected."
+    ::= { cMsDwdmFECCurrentEntry 1 }
+
+cMsDwdmFECCurrentBitErrCor   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Bit Errors Corrected
+         on this interface in the current interval."
+    ::= { cMsDwdmFECCurrentEntry 2 }
+     
+ cMsDwdmFECCurrentByteErrCor   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Byte Errors Corrected
+         on this interface in the current interval."
+    ::= { cMsDwdmFECCurrentEntry 3 }
+     
+cMsDwdmFECCurrentZeroErrDet   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         zero bit errors detected
+         on this interface in the current interval."
+    ::= { cMsDwdmFECCurrentEntry 4 }
+     
+cMsDwdmFECCurrentOneErrDet   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         one bit errors detected
+         on this interface in the current interval."
+    ::= { cMsDwdmFECCurrentEntry 5 }
+     
+cMsDwdmFECCurrentUncorWords   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Uncorrectable Words encountered 
+         on this interface in the current interval."
+    ::= { cMsDwdmFECCurrentEntry 6 }
+
+    
+-- FEC Interval Table
+cMsDwdmFECIntervalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CMsDwdmFECIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION  
+        "This table contains the cumulative PM statistics    
+        for FEC ( Forward Error Correction ) on an applicable 
+        interface."
+    ::= { cerentMsDwdmFEC 3 }
+
+cMsDwdmFECIntervalEntry OBJECT-TYPE
+    SYNTAX        CMsDwdmFECIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the cMsDwdmFECIntervalTable."  
+    INDEX         { ifIndex,cMsDwdmFECIntervalType,
+                    cMsDwdmFECIntervalNum }
+    ::= { cMsDwdmFECIntervalTable 1 }
+
+CMsDwdmFECIntervalEntry ::= SEQUENCE {
+    cMsDwdmFECIntervalType             CerentPeriod,
+    cMsDwdmFECIntervalNum              Integer32,    
+    cMsDwdmFECIntervalBitErrCor        Counter32,  
+    cMsDwdmFECIntervalByteErrCor       Counter32,  
+    cMsDwdmFECIntervalZeroErrDet       Counter32,  
+    cMsDwdmFECIntervalOneErrDet        Counter32,  
+    cMsDwdmFECIntervalUncorWords       Counter32,  
+    cMsDwdmFECIntervalValidData        TruthValue  
+}
+
+cMsDwdmFECIntervalType OBJECT-TYPE
+    SYNTAX        CerentPeriod
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the  cMsDwdmFECIntervalTable.
+         It gives the type of interval for which the FEC values
+         have been collected."
+    ::= { cMsDwdmFECIntervalEntry 1 }
+
+cMsDwdmFECIntervalNum OBJECT-TYPE
+    SYNTAX        Integer32 (1..96)
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the  cMsDwdmFECIntervalTable.
+         It is a number between 1 and 96, which identifies the
+         interval for which the set of FEC PM values is
+         available. 
+         
+         The interval identified by 1 is the most recent
+         15 minute or 24 hour interval, and the interval
+         identified by N is the interval immediately preceding the one
+         identified by N-1."
+    ::= { cMsDwdmFECIntervalEntry 2 }     
+
+cMsDwdmFECIntervalBitErrCor   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Bit Errors Corrected
+         on this interface in a particular interval."
+    ::= { cMsDwdmFECIntervalEntry 3 }
+     
+ cMsDwdmFECIntervalByteErrCor   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Byte Errors Corrected
+         on this interface in a particular interval."
+    ::= { cMsDwdmFECIntervalEntry 4 }
+     
+cMsDwdmFECIntervalZeroErrDet   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         zero bit errors detected
+         on this interface in a particular interval."
+    ::= { cMsDwdmFECIntervalEntry 5 }
+     
+cMsDwdmFECIntervalOneErrDet   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         one bit errors detected
+         on this interface in a particular interval."
+    ::= { cMsDwdmFECIntervalEntry 6 }
+     
+cMsDwdmFECIntervalUncorWords   OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 
+         Uncorrectable Words encountered 
+         on this interface in a particular interval."
+    ::= { cMsDwdmFECIntervalEntry 7 }
+
+cMsDwdmFECIntervalValidData OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This variable indicates if the data for this
+         interval is valid."
+   ::= { cMsDwdmFECIntervalEntry 8 }
+
+
+--  cerentMsDwdm8B10B group
+
+--  This group contains 8B10B counters for interface 
+--  data traffic, collected by the monitoring hardware
+--  for interfaces like Fiber Channel/Gig E.
+
+--  8B10BThresholds Table
+c8B10BThresholdsTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF C8B10BThresholdsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION  
+        "This table contains the configurable thresholds    
+        for the 8B10B stats."
+    ::= { cerentMsDwdm8B10B 1 }
+
+c8B10BThresholdsEntry OBJECT-TYPE
+    SYNTAX        C8B10BThresholdsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the c8B10BThresholds Table."  
+    INDEX         { ifIndex, c8B10BThreshIntervalType }
+    ::= { c8B10BThresholdsTable 1 }
+
+C8B10BThresholdsEntry ::= SEQUENCE {
+    c8B10BThreshIntervalType                IntervalType,
+    c8B10BThreshInvalidPkts                 Unsigned32,
+    c8B10BThreshIPOverflow                  Unsigned32,
+    c8B10BThreshHCInvalidPkts               Counter64,
+    c8B10BThreshValidPkts                   Unsigned32,
+    c8B10BThreshVPOverflow                  Unsigned32,
+    c8B10BThreshHCValidPkts                 Counter64,
+    c8B10BThreshIdleSets                    Unsigned32,
+    c8B10BThreshISOverflow                  Unsigned32,
+    c8B10BThreshHCIdleSets                  Counter64,
+    c8B10BThreshNonIdleSets                 Unsigned32,
+    c8B10BThreshNISOverflow                 Unsigned32,
+    c8B10BThreshHCNonIdleSets               Counter64,
+    c8B10BThreshDataSets                    Unsigned32,
+    c8B10BThreshDSOverflow                  Unsigned32,
+    c8B10BThreshHCDataSets                  Counter64,
+    c8B10BThreshCodeViols                   Unsigned32,
+    c8B10BThreshCVOverflow                  Unsigned32,
+    c8B10BThreshHCCodeViols                 Counter64
+  }
+
+c8B10BThreshIntervalType OBJECT-TYPE
+    SYNTAX        IntervalType
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the c8B10BThresholdsTable.
+         It gives the type of interval."
+    ::= { c8B10BThresholdsEntry 1 }
+
+c8B10BThreshInvalidPkts   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the lower word value of the threshold 
+        associated with the number of 8B10B invalid packets.
+        
+        The object c8B10BThreshIPOverflow contains the 
+        higher 32 bit value of this number. "
+    ::= { c8B10BThresholdsEntry 2 }
+    
+c8B10BThreshIPOverflow   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the higher word value of the threshold 
+        associated with the number of 8B10B invalid packets.
+        
+        The object c8B10BThreshInvalidPkts contains the 
+        lower 32 bits of this number. If the threshold is greater
+        than 4,294,967,295, the higher word value will be stored in
+        this object."
+    ::= { c8B10BThresholdsEntry 3 }
+
+c8B10BThreshHCInvalidPkts   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object is used to obtain the value of threshold 
+        configured for the number of 8B10B Invalid Packets.
+
+        This a High capacity ( 64 bits ) counter."
+    ::= { c8B10BThresholdsEntry 4 }
+
+c8B10BThreshValidPkts   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the lower word value of the threshold 
+        associated with the number of 8B10B valid packets.
+        
+        The object c8B10BThreshVPOverflow contains the 
+        higher 32 bit value of this number. "
+    ::= { c8B10BThresholdsEntry 5 }
+    
+c8B10BThreshVPOverflow   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the higher word value of the threshold 
+        associated with the number of 8B10B valid packets.
+        
+        The object c8B10BThreshValidPkts contains the 
+        lower 32 bits of this number. If the threshold is greater
+        than 4,294,967,295, the higher word value will be stored in
+        this object."
+    ::= { c8B10BThresholdsEntry 6 }
+
+c8B10BThreshHCValidPkts   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object is used to obtain the value of threshold 
+        configured for the number of 8B10B Valid Packets.
+
+        This a High capacity ( 64 bits ) counter."
+    ::= { c8B10BThresholdsEntry 7 }
+
+c8B10BThreshIdleSets   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the lower word value of the threshold 
+        associated with the number of 8B10B idle sets.
+        
+        The object c8B10BThreshISOverflow contains the 
+        higher 32 bit value of this number. "
+    ::= { c8B10BThresholdsEntry 8 }
+    
+c8B10BThreshISOverflow   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the higher word value of the threshold 
+        associated with the number of 8B10B idle sets.
+        
+        The object c8B10BThreshIdleSets contains the 
+        lower 32 bits of this number. If the threshold is greater
+        than 4,294,967,295, the higher word value will be stored in
+        this object."
+    ::= { c8B10BThresholdsEntry 9 }
+
+c8B10BThreshHCIdleSets   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object is used to obtain the value of threshold 
+        configured for the number of 8B10B idle sets.
+
+        This a High capacity ( 64 bits ) counter."
+    ::= { c8B10BThresholdsEntry 10 }
+
+c8B10BThreshNonIdleSets   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the lower word value of the threshold 
+        associated with the number of 8B10B non idle sets.
+        
+        The object c8B10BThreshNISOverflow contains the 
+        higher 32 bit value of this number. "
+    ::= { c8B10BThresholdsEntry 11 }
+    
+c8B10BThreshNISOverflow   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the higher word value of the threshold 
+        associated with the number of 8B10B non idle sets.
+        
+        The object c8B10BThreshNonIdleSets contains the 
+        lower 32 bits of this number. If the threshold is greater
+        than 4,294,967,295, the higher word value will be stored in
+        this object."
+    ::= { c8B10BThresholdsEntry 12 }
+
+c8B10BThreshHCNonIdleSets   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object is used to obtain the value of threshold 
+        configured for the number of 8B10B non idle sets.
+
+        This a High capacity ( 64 bits ) counter."
+    ::= { c8B10BThresholdsEntry 13 }
+
+c8B10BThreshDataSets   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the lower word value of the threshold 
+        associated with the number of 8B10B data code groups.
+        
+        The object c8B10BThreshDSOverflow contains the 
+        higher 32 bit value of this number. "
+    ::= { c8B10BThresholdsEntry 14 }
+    
+c8B10BThreshDSOverflow   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the higher word value of the threshold 
+        associated with the number of 8B10B data code groups.
+        
+        The object c8B10BThreshDataSets contains the 
+        lower 32 bits of this number. If the threshold is greater
+        than 4,294,967,295, the higher word value will be stored in
+        this object."
+    ::= { c8B10BThresholdsEntry 15 }
+
+c8B10BThreshHCDataSets   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object is used to obtain the value of threshold 
+        configured for the number of 8B10B data code groups.
+
+        This a High capacity ( 64 bits ) counter."
+    ::= { c8B10BThresholdsEntry 16 }
+    
+c8B10BThreshCodeViols   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the lower word value of the threshold 
+        associated with the number of 8B10B coding violations 
+        encountered.
+        
+        The object c8B10BThreshCVOverflow contains the 
+        higher 32 bit value of this number."
+    ::= { c8B10BThresholdsEntry 17 }
+
+c8B10BThreshCVOverflow   OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-write        
+    STATUS        current
+    DESCRIPTION
+        "This object represents the higher word value of threshold 
+        associated with the number of 8B10B code violations 
+        encountered.
+        
+        The object c8B10BThreshCodeViols contains the 
+        lower 32 bits of this number. If the threshold is greater
+        than 4,294,967,295, the higher word value will be stored in
+        this object."
+    ::= { c8B10BThresholdsEntry 18 }
+  
+c8B10BThreshHCCodeViols   OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object is used to obtain the value of threshold 
+        configured for the number of 8B10B Coding Violations
+        on this interface.
+
+        This a High capacity ( 64 bits ) counter."
+    ::= { c8B10BThresholdsEntry 19 }
+
+
+--  8B10BCurrent Table
+c8B10BCurrentTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF C8B10BCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION  
+        "This table contains the cumulative PM statistics    
+        for the Fiber Channel/ Gigabit Ethernet (8B10B) 
+        on the applicable interfaces."
+    ::= { cerentMsDwdm8B10B 2 }
+
+c8B10BCurrentEntry OBJECT-TYPE
+    SYNTAX        C8B10BCurrentEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the c8B10BCurrentTable."  
+    INDEX         { ifIndex, c8B10BCurIntervalType }
+    ::= { c8B10BCurrentTable 1 }
+
+C8B10BCurrentEntry ::= SEQUENCE {
+    c8B10BCurIntervalType               IntervalType,
+    c8B10BCurrentCodeViols              Counter32,
+    c8B10BCurrentCVOverflow             Counter32,
+    c8B10BCurrentHCCodeViols            Counter64,
+    c8B10BCurrentValidPkts              Counter32,
+    c8B10BCurrentVPOverflow             Counter32,
+    c8B10BCurrentHCValidPkts            Counter64,
+    c8B10BCurrentInvalidPkts            Counter32,
+    c8B10BCurrentIPOverflow             Counter32,
+    c8B10BCurrentHCInvalidPkts          Counter64,
+    c8B10BCurrentIdleSets               Counter32,
+    c8B10BCurrentISOverflow             Counter32,
+    c8B10BCurrentHCIdleSets             Counter64,
+    c8B10BCurrentNonIdleSets            Counter32,
+    c8B10BCurrentNISOverflow            Counter32,
+    c8B10BCurrentHCNonIdleSets          Counter64,
+    c8B10BCurrentDataSets               Counter32,
+    c8B10BCurrentDSOverflow             Counter32,
+    c8B10BCurrentHCDataSets             Counter64
+   }
+
+c8B10BCurIntervalType OBJECT-TYPE
+    SYNTAX        IntervalType
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the  c8B10BCurrentTable.
+         It gives the type of interval for which 8B10B data has been
+         collected."
+    ::= { c8B10BCurrentEntry 1 }
+
+c8B10BCurrentCodeViols OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B Coding
+         Violations encountered on an interface for the current
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BCurrentCVOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCCodeViols, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 2 }
+
+c8B10BCurrentCVOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         Coding Violations encountered on an interface for the 
+         current interval. If the value of 
+         c8B10BCurrentCodeViols
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCCodeViols, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 3 }
+    
+c8B10BCurrentHCCodeViols OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B coding 
+         violations encountered on this interface in the current
+         interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BCurrentEntry 4 }
+
+c8B10BCurrentValidPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B Valid 
+         Packets encountered on an interface for the current
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BCurrentVPOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCValidPkts, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 5 }     
+    
+c8B10BCurrentVPOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         valid packets encountered on an interface for the 
+         current interval. If the value of 
+         c8B10BCurrentValidPkts
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCValidPkts, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 6 }
+    
+c8B10BCurrentHCValidPkts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B valid packets 
+         on this interface in the current interval.
+
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BCurrentEntry 7 }     
+
+c8B10BCurrentInvalidPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B invalid 
+         packets encountered on an interface for the current
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BCurrentIPOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCInvalidPkts, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 8 }
+
+c8B10BCurrentIPOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         invalid packets encountered on an interface for the 
+         current interval. If the value of 
+         c8B10BCurrentInvalidPkts
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+    
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCInvalidPkts, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 9 }
+    
+c8B10BCurrentHCInvalidPkts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B invalid packets 
+         encountered on this interface in the current interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BCurrentEntry 10 }
+
+c8B10BCurrentIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B Idle 
+         sets encountered on an interface for the current
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BCurrentISOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCIdleSets, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 11 }
+
+c8B10BCurrentISOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         idle sets encountered on an interface for the 
+         current interval. If the value of 
+         c8B10BCurrentIdleSets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCIdleSets, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 12 }
+    
+c8B10BCurrentHCIdleSets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B idle sets 
+         encountered on this interface in the current interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BCurrentEntry 13 }
+
+c8B10BCurrentNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B non idle 
+         sets encountered on an interface for the current
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BCurrentNISOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCNonIdleSets, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 14 }
+    
+c8B10BCurrentNISOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         non idle sets encountered on an interface for the 
+         current interval. If the value of 
+         c8B10BCurrentNonIdleSets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCNonIdleSets, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 15 }
+    
+c8B10BCurrentHCNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B non-idle sets 
+         encountered on this interface in the current interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BCurrentEntry 16 }
+
+c8B10BCurrentDataSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B data 
+         code groups encountered on an interface for the current
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BCurrentDSOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCDataSets, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 17 }   
+
+c8B10BCurrentDSOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         data code groups encountered on an interface for the 
+         current interval. If the value of 
+         c8B10BCurrentDataSets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.    
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BCurrentHCDataSets, which is a 64 bit counter."
+    ::= { c8B10BCurrentEntry 18 }    
+
+c8B10BCurrentHCDataSets OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B data code 
+         groups encountered on this interface in the current interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BCurrentEntry 19 }
+
+  
+--  8B10BInterval Table
+c8B10BIntervalTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF C8B10BIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION  
+        "This table contains the cumulative PM statistics    
+        for the Fiber Channel/ Gigabit Ethernet (8B10B) 
+        on the applicable interfaces."
+    ::= { cerentMsDwdm8B10B 3 }
+
+c8B10BIntervalEntry OBJECT-TYPE
+    SYNTAX        C8B10BIntervalEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the c8B10BIntervalTable."  
+    INDEX         { ifIndex, c8B10BIntervalType,
+                    c8B10BIntervalNum }
+    ::= { c8B10BIntervalTable 1 }
+
+C8B10BIntervalEntry ::= SEQUENCE {
+    c8B10BIntervalType                   IntervalType,
+    c8B10BIntervalNum                    Integer32,    
+    c8B10BIntervalCodeViols              Counter32,
+    c8B10BIntervalCVOverflow             Counter32,
+    c8B10BIntervalHCCodeViols            Counter64,
+    c8B10BIntervalValidPkts              Counter32,
+    c8B10BIntervalVPOverflow             Counter32,
+    c8B10BIntervalHCValidPkts            Counter64,
+    c8B10BIntervalInvalidPkts            Counter32,
+    c8B10BIntervalIPOverflow             Counter32,
+    c8B10BIntervalHCInvalidPkts          Counter64,
+    c8B10BIntervalIdleSets               Counter32,
+    c8B10BIntervalISOverflow             Counter32,
+    c8B10BIntervalHCIdleSets             Counter64,
+    c8B10BIntervalNonIdleSets            Counter32,
+    c8B10BIntervalNISOverflow            Counter32,
+    c8B10BIntervalHCNonIdleSets          Counter64,
+    c8B10BIntervalDataSets               Counter32,
+    c8B10BIntervalDSOverflow             Counter32,
+    c8B10BIntervalHCDataSets             Counter64,
+    c8B10BIntervalValidData              TruthValue
+   }
+
+c8B10BIntervalType OBJECT-TYPE
+    SYNTAX        IntervalType
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object is an index to the  c8B10BIntervalTable.
+         It gives the type of interval for which 8B10B data has been
+         collected."
+    ::= { c8B10BIntervalEntry 1 }
+
+c8B10BIntervalNum OBJECT-TYPE
+    SYNTAX        Integer32 (1..96)
+    MAX-ACCESS    not-accessible        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the  number of the interval.
+         It is a number between 1 and 96, which identifies the
+         interval for which the set of 8B10B performance values is
+         available. 
+         
+         The interval identified by 1 is the most recent
+         15 minute or 24 hour interval, and the interval
+         identified by N is the interval immediately preceding the one
+         identified by N-1."
+    ::= { c8B10BIntervalEntry 2 }     
+
+c8B10BIntervalCodeViols OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B Coding
+         Violations encountered on an interface for a particular
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BIntervalCVOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCCodeViols, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 3 }
+
+c8B10BIntervalCVOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         Coding Violations encountered on an interface for a 
+         particular interval. If the value of 
+         c8B10BIntervalCodeViols
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCCodeViols, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 4 }
+    
+c8B10BIntervalHCCodeViols OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only 
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B coding 
+         violations encountered on this interface in a particular
+         interval.
+         
+         This is a High Capacity ( 64 bit ) counter.
+        "
+    ::= { c8B10BIntervalEntry 5 }
+
+c8B10BIntervalValidPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B Valid 
+         Packets encountered on an interface for a particular
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BIntervalVPOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCValidPkts, which is a 64 bit counter.
+        "  
+    ::= { c8B10BIntervalEntry 6 }     
+    
+c8B10BIntervalVPOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         valid packets encountered on an interface for a 
+         particular interval. If the value of 
+         c8B10BIntervalValidPkts
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCValidPkts, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 7 }
+    
+c8B10BIntervalHCValidPkts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B valid packets 
+         on this interface in a particular interval.
+
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BIntervalEntry 8 }     
+
+c8B10BIntervalInvalidPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B invalid 
+         packets encountered on an interface for a particular
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BIntervalIPOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCInvalidPkts, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 9 }
+
+c8B10BIntervalIPOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         invalid packets encountered on an interface for a 
+         particular interval. If the value of 
+         c8B10BIntervalInvalidPkts
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+    
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCInvalidPkts, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 10 }
+    
+c8B10BIntervalHCInvalidPkts OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B invalid packets 
+         encountered on this interface in a particular interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BIntervalEntry 11 }
+
+c8B10BIntervalIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B Idle 
+         sets encountered on an interface for a particular
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BIntervalISOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCIdleSets, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 12 }
+
+c8B10BIntervalISOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         idle sets encountered on an interface for a 
+         particular interval. If the value of 
+         c8B10BIntervalIdleSets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCIdleSets, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 13 }
+    
+c8B10BIntervalHCIdleSets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B idle sets 
+         encountered on this interface in a particular interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BIntervalEntry 14 }
+
+c8B10BIntervalNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B non idle 
+         sets encountered on an interface for a particular
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BIntervalNISOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCNonIdleSets, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 15 }
+    
+c8B10BIntervalNISOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         non idle sets encountered on an interface for a 
+         particular interval. If the value of 
+         c8B10BIntervalNonIdleSets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCNonIdleSets, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 16 }
+    
+c8B10BIntervalHCNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B non-idle sets 
+         encountered on this interface in a particular interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BIntervalEntry 17 }
+
+c8B10BIntervalDataSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8B10B data 
+         code groups encountered on an interface for a particular
+         interval. This object only shows the lower word value of 
+         the counter.The high word value is given by
+         c8B10BIntervalDSOverflow.
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCDataSets, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 18 }   
+
+c8B10BIntervalDSOverflow OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 8B10B
+         data code groups encountered on an interface for a 
+         particular interval. If the value of 
+         c8B10BIntervalDataSets
+         is greater than 4,294,967,295, the higher word value will
+         be stored in this object.    
+         
+         SNMP v2c or v3 managers can directly use
+         c8B10BIntervalHCDataSets, which is a 64 bit counter."
+    ::= { c8B10BIntervalEntry 19 }    
+
+c8B10BIntervalHCDataSets OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8B10B data code 
+         groups encountered on this interface in a particular interval.
+         
+         This is a High Capacity ( 64 bit ) counter."
+    ::= { c8B10BIntervalEntry 20 }
+
+c8B10BIntervalValidData OBJECT-TYPE
+    SYNTAX       TruthValue
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This variable indicates if the data for this
+         interval is valid."
+   ::= { c8B10BIntervalEntry 21 }
+   
+   
+-- MIB Conformance Statements
+
+cerentMsDwdmMIBConformance OBJECT IDENTIFIER ::=
+    { cerentRequirements 30 }
+
+cerentMsDwdmMIBCompliances OBJECT IDENTIFIER ::=
+    { cerentMsDwdmMIBConformance 1 }
+
+cerentMsDwdmMIBGroups OBJECT IDENTIFIER ::=
+    { cerentMsDwdmMIBConformance 2 }
+
+cerentMsDwdmMIBCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for platforms that monitor the  
+        operating status and FEC/OTN with respect to error
+        counters, for the physical layer."
+    MODULE -- this module
+        MANDATORY-GROUPS {
+            cerentMsDwdmIfConfigGroup
+        }
+
+    OBJECT    cMsDwdmIfConfigProtocol
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Write access is not required."
+
+    OBJECT    cMsDwdmIfConfigDataRate
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Write access is not required."
+            
+    OBJECT    cMsDwdmIfConfigLoopback
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Write access is not required."
+            
+    OBJECT   cMsDwdmIfConfigWavelength 
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Write access is not required."
+            
+    OBJECT   cMsDwdmIfConfigOtnStatus 
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Write access is not required."
+            
+    OBJECT   cMsDwdmIfConfigFECStatus 
+        MIN-ACCESS    read-only
+        DESCRIPTION
+            "Write access is not required."
+
+
+
+    ::= { cerentMsDwdmMIBCompliances 1 }
+
+--
+-- units of conformance
+--
+cerentMsDwdmIfConfigGroup OBJECT-GROUP
+    OBJECTS {
+    cMsDwdmIfConfigProtocol,
+    cMsDwdmIfConfigDataRate,
+    cMsDwdmIfConfigLoopback,
+    cMsDwdmIfConfigWavelength,
+    cMsDwdmIfConfigOtnStatus,
+    cMsDwdmIfConfigFECStatus,
+    cMsDwdmIfOpticsValidIntervals,
+    cMsDwdmIfOTNValidIntervals,
+    cMsDwdmIfFECValidIntervals,
+    cMsDwdmIfConfigFECMode
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects to allow configurations and give
+        information related to the physical layer characteristics
+        of an interface."
+    ::= { cerentMsDwdmMIBGroups 1 }
+
+cerentMsDwdmOtnGroup OBJECT-GROUP
+    OBJECTS {
+    cMsDwdmOtnThreshFC,
+    cMsDwdmOtnThreshES,
+    cMsDwdmOtnThreshSES,
+    cMsDwdmOtnThreshUAS,
+    cMsDwdmOtnThreshBBE,   
+    cMsDwdmOtnCurrentFC,
+    cMsDwdmOtnCurrentES, 
+    cMsDwdmOtnCurrentSES, 
+    cMsDwdmOtnCurrentUAS,
+    cMsDwdmOtnCurrentBBE, 
+    cMsDwdmOtnCurrentESR,  
+    cMsDwdmOtnCurrentSESR,  
+    cMsDwdmOtnCurrentBBER,
+    cMsDwdmOtnIntervalFC,
+    cMsDwdmOtnIntervalES,
+    cMsDwdmOtnIntervalSES,
+    cMsDwdmOtnIntervalUAS,
+    cMsDwdmOtnIntervalBBE,
+    cMsDwdmOtnIntervalESR,
+    cMsDwdmOtnIntervalSESR,
+    cMsDwdmOtnIntervalBBER,
+    cMsDwdmOtnIntervalValidData
+      
+    }
+    STATUS current
+    DESCRIPTION
+        "The objects used for monitoring the OTN error counters."  
+    ::= { cerentMsDwdmMIBGroups 2 }
+
+cerentMsDwdmFECGroup OBJECT-GROUP
+    OBJECTS {
+    cMsDwdmFECThreshBitErrCor,  
+    cMsDwdmFECThreshByteErrCor,  
+    cMsDwdmFECThreshZeroErrDet,  
+    cMsDwdmFECThreshOneErrDet,  
+    cMsDwdmFECThreshUncorWords,  
+    cMsDwdmFECCurrentBitErrCor,
+    cMsDwdmFECCurrentByteErrCor,
+    cMsDwdmFECCurrentZeroErrDet,
+    cMsDwdmFECCurrentOneErrDet,
+    cMsDwdmFECCurrentUncorWords,
+    cMsDwdmFECIntervalBitErrCor,  
+    cMsDwdmFECIntervalByteErrCor,  
+    cMsDwdmFECIntervalZeroErrDet,  
+    cMsDwdmFECIntervalOneErrDet,  
+    cMsDwdmFECIntervalUncorWords,
+    cMsDwdmFECIntervalValidData
+    }
+    STATUS current
+    DESCRIPTION
+        "The objects used for monitoring the FEC error counters."  
+    ::= { cerentMsDwdmMIBGroups 3 }
+
+cMsDwdmIfTransportGroup OBJECT-GROUP
+    OBJECTS {
+    -- cMsDwdmIfTransportRingDirection, 
+ 	cMsDwdmIfTransportPortRule,
+ 	cMsDwdmIfTransportPower,
+ 	cMsDwdmIfTransportReferencePower,
+ 	cMsDwdmIfTransportCalibratedPower,
+ 	cMsDwdmIfTransportInsertionLoss,
+ 	cMsDwdmIfTransportLaserStatus,
+ 	cMsDwdmIfTransportAmplifierMode,
+ 	cMsDwdmIfTransportGain,
+ 	cMsDwdmIfTransportReferenceTilt,
+ 	cMsDwdmIfTransportCalibratedTilt,
+ 	cMsDwdmIfTransportDCULoss,
+        cMsDwdmIfTransportExpectedGain,
+        cMsDwdmIfTransportOSRI,
+        cMsDwdmIfTransportSideIdentifier
+  
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects to allow configurations and give
+        information related to the optical transportp hysical layer 
+        characteristics of an interface."
+    ::= { cerentMsDwdmMIBGroups 5 }
+
+cMsDwdmIfMultiplexSectionTableGroup OBJECT-GROUP
+    OBJECTS {
+    -- cMsDwdmIfMultiplexSectionRingDirection, 
+    cMsDwdmIfMultiplexSectionPortRule,
+    cMsDwdmIfMultiplexSectionPower,
+    cMsDwdmIfMultiplexSectionReferencePower,
+    cMsDwdmIfMultiplexSectionCalibratedPower,
+    cMsDwdmIfMultiplexSectionInsertionLoss,
+    cMsDwdmIfMultiplexSectionActualBand,
+    cMsDwdmIfMultiplexSectionExpectedBand,
+    cMsDwdmIfMultiplexSectionSideIdentifier
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects to allow configurations and give
+        information related to the optical multiplex section
+        physical layer characteristics of an interface."
+    ::= { cerentMsDwdmMIBGroups 6 }
+
+cMsDwdmIfChannelGroup OBJECT-GROUP
+    OBJECTS {
+    -- cMsDwdmIfChannelRingDirection,
+    cMsDwdmIfChannelPortRule,
+    cMsDwdmIfChannelPower,
+    cMsDwdmIfChannelReferencePower,
+    cMsDwdmIfChannelCalibratedPower,
+    cMsDwdmIfChannelInsertionLoss,
+    cMsDwdmIfChannelActualWavelength,
+    cMsDwdmIfChannelExpectedWavelength,
+    cMsDwdmIfChannelSideIdentifier
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects to allow configurations and give
+        information related to the optical channel physical layer 
+        characteristics of an interface."
+    ::= { cerentMsDwdmMIBGroups 7 }
+      
+cerent8B10BThreshGroup OBJECT-GROUP
+    OBJECTS {
+    c8B10BThreshInvalidPkts,
+    c8B10BThreshValidPkts,
+    c8B10BThreshIdleSets,
+    c8B10BThreshNonIdleSets,
+    c8B10BThreshDataSets,
+    c8B10BThreshCodeViols,
+    c8B10BIntervalCodeViols,
+    c8B10BThreshIPOverflow,
+    c8B10BThreshVPOverflow,
+    c8B10BThreshISOverflow,
+    c8B10BThreshNISOverflow,
+    c8B10BThreshDSOverflow,
+    c8B10BThreshCVOverflow,
+    c8B10BThreshHCInvalidPkts,
+    c8B10BThreshHCValidPkts,
+    c8B10BThreshHCIdleSets,
+    c8B10BThreshHCNonIdleSets,
+    c8B10BThreshHCDataSets,
+    c8B10BThreshHCCodeViols
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects used to set the thresholds
+         on 8B10B counters."
+    ::= { cerentMsDwdmMIBGroups 8 }
+
+cerent8B10BStatsGroup OBJECT-GROUP
+    OBJECTS {
+    c8B10BCurrentCodeViols,          
+    c8B10BCurrentCVOverflow,             
+    c8B10BCurrentHCCodeViols,            
+    c8B10BCurrentValidPkts,               
+    c8B10BCurrentVPOverflow,             
+    c8B10BCurrentHCValidPkts,             
+    c8B10BCurrentInvalidPkts,                
+    c8B10BCurrentIPOverflow,             
+    c8B10BCurrentHCInvalidPkts,              
+    c8B10BCurrentIdleSets,               
+    c8B10BCurrentISOverflow,             
+    c8B10BCurrentHCIdleSets,             
+    c8B10BCurrentNonIdleSets,            
+    c8B10BCurrentNISOverflow,            
+    c8B10BCurrentHCNonIdleSets,          
+    c8B10BCurrentDataSets,               
+    c8B10BCurrentDSOverflow,
+    c8B10BCurrentHCDataSets,
+    c8B10BIntervalHCCodeViols,
+    c8B10BIntervalValidPkts,
+    c8B10BIntervalHCValidPkts,
+    c8B10BIntervalInvalidPkts,
+    c8B10BIntervalHCInvalidPkts,
+    c8B10BIntervalIdleSets,
+    c8B10BIntervalHCIdleSets,
+    c8B10BIntervalNonIdleSets,
+    c8B10BIntervalHCNonIdleSets,
+    c8B10BIntervalDataSets,
+    c8B10BIntervalHCDataSets,
+    c8B10BIntervalCVOverflow,
+    c8B10BIntervalVPOverflow,
+    c8B10BIntervalIPOverflow,
+    c8B10BIntervalISOverflow,
+    c8B10BIntervalNISOverflow,
+    c8B10BIntervalDSOverflow,
+    c8B10BIntervalValidData
+    }
+    STATUS  current
+    DESCRIPTION
+        "The collection of objects used to monitor the 8B10B
+        error counters."
+    ::= { cerentMsDwdmMIBGroups 9 }
+    
+END

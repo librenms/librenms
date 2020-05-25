@@ -1,0 +1,467 @@
+-- ************************************************************
+-- SILVERPEAK-MGMT-MIB.txt:   Silver Peak Systems, Inc
+--                        System Status MIB
+--
+-- Copyright (c) 2012 Silver Peak Systems, Inc.
+-- All rights reserved.
+--
+-- ************************************************************
+--
+                                                                                
+SILVERPEAK-MGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    SilverpeakAlarmSeverity,
+    SilverpeakSeqNum,
+    SilverpeakYesNo
+        FROM SILVERPEAK-TC
+    silverpeakMgmt,
+    silverpeakNotifications
+        FROM SILVERPEAK-SMI;
+
+silverpeakMgmtMIB MODULE-IDENTITY
+    LAST-UPDATED    "201201060000Z"
+    ORGANIZATION    "Silver Peak Systems, Inc."
+    CONTACT-INFO
+            "  URL: http://www.silver-peak.com/contact
+            E-mail: support@silver-peak.com "
+    DESCRIPTION
+        "This module defines the management variables used to manage
+         and monitor appliance status."
+    ::= { silverpeakMgmt 1 }
+
+--
+-- Base assignments
+--
+
+silverpeakMgmtMIBObjects        OBJECT IDENTIFIER ::= { silverpeakMgmtMIB 1 }
+silverpeakMgmtMIBNotifications  OBJECT IDENTIFIER ::= { silverpeakNotifications 1 }
+silverpeakMgmtMIBConformance    OBJECT IDENTIFIER ::= { silverpeakMgmtMIB 2 }
+
+--
+-- Status Scalars 
+--
+silverpeakMgmtMIBScalars        OBJECT IDENTIFIER ::= { silverpeakMgmtMIBObjects 1 }
+
+spsSystemVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System software version string"
+    ::= { silverpeakMgmtMIBScalars 1 }
+
+spsProductModel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System product model"
+    ::= { silverpeakMgmtMIBScalars 2 }
+
+spsOperStatus OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The current operational state of the appliance."
+    ::= { silverpeakMgmtMIBScalars 3 }
+
+spsActiveAlarmCount OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of active alarm entries in the alarm table -
+             spsActiveAlarmTable, defined under silverpeakMgmtMIBTables
+             subtree."
+    ::= { silverpeakMgmtMIBScalars 4 }
+
+spsSystemUptime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The amount of time in hundredth of a second since
+             this NX was last initialized.  Note that this is
+             different from sysUpTime in the SNMPv2-MIB [RFC1907]
+             because sysUpTime is the uptime of the network
+             management portion of the system."
+    ::= { silverpeakMgmtMIBScalars 5 }
+
+spsSystemSerial OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System serial number string"
+    ::= { silverpeakMgmtMIBScalars 6 }
+
+--
+-- Status Tables
+--
+silverpeakMgmtMIBTables  OBJECT IDENTIFIER ::= { silverpeakMgmtMIBObjects 2 }
+
+--
+-- Active alarm table
+--
+
+spsActiveAlarmTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF ActiveAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of the active alarm entries. This represents the fault
+         conditions that are still active in the appliance.
+        "
+    ::= { silverpeakMgmtMIBTables 1 }
+
+activeAlarmEntry OBJECT-TYPE
+    SYNTAX     ActiveAlarmEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The active alarm entries that are still valid system faults."
+    INDEX { spsActiveAlarmIndex }
+    ::= { spsActiveAlarmTable 1 }
+ 
+ActiveAlarmEntry ::= SEQUENCE {
+    spsActiveAlarmIndex            INTEGER,
+    spsActiveAlarmSeqNum           SilverpeakSeqNum,
+    spsActiveAlarmSeverity         SilverpeakAlarmSeverity,
+    spsActiveAlarmName             DisplayString,
+    spsActiveAlarmDescr            DisplayString,
+    spsActiveAlarmSource           DisplayString,
+    spsActiveAlarmType             DisplayString,
+    spsActiveAlarmAcked            SilverpeakYesNo,
+    spsActiveAlarmActive           SilverpeakYesNo,
+    spsActiveAlarmClearable        SilverpeakYesNo,
+    spsActiveAlarmLogTime          OCTET STRING,
+    spsActiveAlarmServiceAffect    SilverpeakYesNo,
+    spsActiveAlarmTypeId           INTEGER
+}
+ 
+spsActiveAlarmIndex OBJECT-TYPE
+    SYNTAX     INTEGER (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        active alarm table."
+    ::= { activeAlarmEntry 1 }
+
+spsActiveAlarmSeqNum OBJECT-TYPE
+    SYNTAX     SilverpeakSeqNum
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The active alarm's sequence number at the time it was generated."
+    ::= { activeAlarmEntry 2 }
+
+spsActiveAlarmSeverity OBJECT-TYPE
+    SYNTAX     SilverpeakAlarmSeverity
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The alarm severity for the active alarm."
+    ::= { activeAlarmEntry 3 }
+
+spsActiveAlarmName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A short name for the active alarm."
+    ::= { activeAlarmEntry 4 }
+
+spsActiveAlarmDescr OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A description for the active alarm."
+    ::= { activeAlarmEntry 5 }
+
+spsActiveAlarmSource OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The source for the active alarm."
+    ::= { activeAlarmEntry 6 }
+
+spsActiveAlarmType OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The alarm type for the active alarm."
+    ::= { activeAlarmEntry 7 }
+
+spsActiveAlarmAcked OBJECT-TYPE
+    SYNTAX     SilverpeakYesNo
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Identifies if the user has acknowledged the alarm."
+    ::= { activeAlarmEntry 8 }
+
+spsActiveAlarmActive OBJECT-TYPE
+    SYNTAX     SilverpeakYesNo
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Identifies if the alarm is currently active."
+    ::= { activeAlarmEntry 9 }
+
+spsActiveAlarmClearable OBJECT-TYPE
+    SYNTAX     SilverpeakYesNo
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Identifies if the user can manually clear the alarm."
+    ::= { activeAlarmEntry 10 }
+
+spsActiveAlarmLogTime OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE(0..255))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The value of sysUpTime when the alarm was generated."
+    ::= { activeAlarmEntry 11 }
+
+spsActiveAlarmServiceAffect OBJECT-TYPE
+    SYNTAX     SilverpeakYesNo
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Identifies if the alarm is service affecting."
+    ::= { activeAlarmEntry 12 }
+
+spsActiveAlarmTypeId OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "An ID that uniquely identifies a type of alarm.
+         The following is a list of currently defined type IDs
+         (ID listed below is in hexadecimal):
+
+            ID     Description
+            -----  ------------------------------------------
+            10000  Tunnel remote ID is misconfigured
+            10001  Tunnel state is Down
+            10002  Tunnel VRRP IP is misconfigured
+            10003  Tunnel keepalive version mismatch
+            10004  Tunnel WCCP GID is misconfigured
+            10005  Tunnel software version mismatch
+            10006  Connecting to a non-VX-X is not supported. 
+                   Please contact sales@silver-peak.com to discuss your options.
+            10007  Duplicate Silver Peak license detected on peer device.
+            10008  Tunnel local IP address not owned by this appliance
+            10009  Tunnel software version mismatch results in reduced functionality.
+            1000a  Tunnel peer encapsulation mode mismatch detected.
+            1000b  UDP Destination Port is the same as flow redirection port
+
+            20000  Tunnel has unexpected traffic class error
+
+            30000  RAID array is degraded
+            30001  Disk is failed
+            30002  Disk is degraded
+            30003  Fan failure detected
+            30004  System bypass mode
+            30005  LAN/WAN fail-to-wire card failure
+            30006  LAN/WAN fail-to-wire card relay failure
+            30007  Encryption card hardware failure
+            30008  Network interface admin down
+            30009  Network interface link down
+            3000a  Management interface link down
+            3000b  Interface is half duplex
+            3000c  Interface speed is 10 Mbps
+            3000d  Config DB disk full
+            3000e  Operating System disk full
+            3000f  File system disk full
+            30010  Datapath internal loopback test failed
+            30011  WAN next-hop unreachable
+            30012  VRRP instance is down
+            30013  VRRP state changed from Master to Backup
+            30014  WAN next-hop router discovered on a LAN port
+                   (box is in backwards)
+            30015  Disk is not in service
+            30016  Disk is rebuilding
+            30017  Disk removed by operator
+            30018  LAN/WAN interfaces have different admin states
+            30019  LAN/WAN interfaces have different link carrier states
+            3001a  LAN/WAN interface has been shutdown due to
+                   link propagation of paired interface
+            3001b  Disk SMART threshold exceeded
+            3001c  Flow redirection cluster peer is down
+            3001d  Bonding members have different speed/duplex
+            3001e  WCCP adjacency(ies) down
+            3001f  WCCP assignment table mismatch
+            30020  Power supply not connected, not powered or failed
+            30021  NIC interface failure
+            30022  LAN next-hop unreachable
+            30023  Unexpected system restart
+            30024  Insufficient configured memory size for this virtual appliance
+            30025  Insufficient configured processor count for this virtual appliance
+            30026  Insufficient configured disk storage for this virtual appliance
+            30027  Interfaces have different MTUs
+            30028  Interfaces have different MTUs
+            30029  Bridge loop is detected
+            3002a  Bridge creation failed
+            3002b  Network interface is unassigned
+            3002c  System optimization turned off
+            3002d  Sub-optimal configured memory size for this virtual appliance
+            3002e  Sub-optimal configured processor count for this virtual appliance
+            3002f  Sub-optimal configured disk storage for this virtual appliance
+
+
+            40000  Software upgrade process has failed
+            40001  System is low on resources
+            40002  Significant change in time of day has occurred,
+                   and might compromise statistics.
+            40003  The licensing for this virtual appliance has expired.
+            40004  There is no license installed on this virtual appliance.
+            40005  A disk self test has been performed. The system will
+                   require a reboot after the test.
+            40006  The SSL private key is invalid.
+            40007  The SSL certificate is not yet valid.
+            40008  The SSL certificate has expired.
+            40009  The NTP server is unreachable.
+            4000a  Virtual appliance license expires on yyyy/mm/dd.
+            4000b  Virtual appliance license expires on yyyy/mm/dd.
+            4000c  Invalid virtual appliance license.
+            4000d  Dual Wan-nexthop topology configuration no longer supported.
+            4000e  Setting system wan-nexthop to VLAN nhop is no longer necessary.
+            4000f  Minor inconsistencies during QOS upgrade.
+            40010  Major inconsistencies during QOS upgrade.
+            40011  Tunnel IP hdr disable setting was discarded during upgrade.
+            40012  A very large range has been configured for a local subnet.
+            40013  A peer name has been specified in a route-map that can't be resolved.
+            40014  Shaper max bandwidth exceeds system bandwidth
+            40015  Software capability token exceeds warning threshold
+            40016  Software capability token has exceeded the required limit
+            40017  Silvepeak Portal is unreachable
+            40018  Silverpeak Portal is unreachable for setting up a remote help session
+            40019  An application has been deleted on the Silver Peak portal
+            4001a  Boost Limiting MTS
+            4001b  Bad portal registration data
+            4001c  EdgeConnect Base license not granted
+            4001d  Orchestrator is unreachable from appliance using HTTPS
+            4001e  Silver Peak Portal is unreachable for licensing
+            4001f  Silver Peak Portal hostname cannot be resolved
+            40020  Edge Connect Plus license not granted
+            40021  Edge Connect Boost license not granted
+            40022  Appliance has not been approved for licensing by Orchestrator
+            40023  Software capability token related alarm
+            40024  A NATed interface connected to Internet has no public IP address
+            40025  Initial admin password is not yet changed
+            40026  DHCP server mis-configuration
+            40027  Subnet table has exceeded high-water level for BGP/OSPF entries
+            40028  Subnet table has reached maximum capacity
+            40029  Unable to resolve Orchestrator DNS name
+            4002a  Builtin CA certificate is not valid
+            4002b  CA certificate Bundle is not valid
+            4002c  A BGP peer session is no longer in Established state
+            4002d  An IP SLA monitor is in Down state
+            4002e  An OSPF neighbor session is no longer in Full state
+            4002f  DNS Proxy is down
+            40030  EC Licensing Warning
+
+
+            50001  WAN-side transmit throughput TCA
+            50002  LAN-side receive throughput TCA
+            50003  Total number of optimized flows TCA
+            50004  Total number of flows TCA
+            50005  File-system utilization TCA
+            50006  Tunnel latency TCA
+            50007  Tunnel loss pre-FEC TCA
+            50008  Tunnel loss post-FEC TCA
+            50009  Tunnel OOP pre-POC TCA
+            5000a  Tunnel OOP post-POC TCA
+            5000b  Tunnel utilization TCA
+            5000c  Tunnel reduction TCA
+            5000d  Appliance capacity TCA
+            -----  ------------------------------------------"
+    ::= { activeAlarmEntry 13 }
+
+--
+-- Notifications
+--
+
+spsNotifyAlarm  NOTIFICATION-TYPE
+    OBJECTS        { spsActiveAlarmSource,
+                     spsActiveAlarmSeverity,
+                     spsActiveAlarmDescr
+                   }
+    STATUS         current
+    DESCRIPTION
+        "A notification that the system has just generated and alarm."
+    ::= { silverpeakMgmtMIBNotifications 1 }
+
+
+--
+-- Conformance information 
+--
+
+silverpeakMgmtMIBCompliances  OBJECT IDENTIFIER ::= { silverpeakMgmtMIBConformance 1 }
+silverpeakMgmtMIBGroups       OBJECT IDENTIFIER ::= { silverpeakMgmtMIBConformance 2 }
+
+-- Compliance statements 
+
+silverpeakMgmtCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for agents implementing 
+                silverpeakMgmtMIB."
+    MODULE
+      MANDATORY-GROUPS {
+                         silverpeakMgmtGroup,
+                         silverpeakMgmtNotifyGroup
+                       }
+    ::= { silverpeakMgmtMIBCompliances 1 }
+
+--
+-- Units of conformance 
+--
+
+silverpeakMgmtGroup OBJECT-GROUP
+    OBJECTS {
+              spsSystemVersion,
+              spsProductModel,
+              spsOperStatus,
+              spsActiveAlarmSeqNum,
+              spsActiveAlarmSeverity,
+              spsActiveAlarmName,
+              spsActiveAlarmDescr,
+              spsActiveAlarmSource,
+              spsActiveAlarmType,
+              spsActiveAlarmAcked,
+              spsActiveAlarmActive,
+              spsActiveAlarmClearable,
+              spsActiveAlarmLogTime,
+              spsActiveAlarmServiceAffect
+            }
+    STATUS       current
+    DESCRIPTION "A collection of objects used to retrieve management
+                 information from Silverpeak Systems appliances.
+                "
+    ::= { silverpeakMgmtMIBGroups 1 }
+
+silverpeakMgmtNotifyGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+              spsNotifyAlarm
+            }
+    STATUS       current
+    DESCRIPTION "A collection of the Notifications supported in
+                 the management MIB."
+    ::= { silverpeakMgmtMIBGroups 3 }
+
+END
+

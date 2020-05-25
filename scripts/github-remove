@@ -1,0 +1,71 @@
+#! /usr/bin/env python
+import argparse, datetime, sys, subprocess
+from subprocess import call, Popen
+from os.path import dirname, abspath
+
+raw_input = getattr(__builtins__, 'raw_input', input)
+
+def confirm(question):
+    valid = {"yes":True, "y":True, "ye":True, "no":False, "n":False}
+    while 1:
+        sys.stdout.write(question + " [y/N] ")
+        choice = raw_input().lower()
+        if choice == '':
+            return False
+        elif choice in valid.keys():
+            return valid[choice]
+        else:
+            sys.stdout.write("Please respond with 'yes' or 'no'  (or 'y' or 'n').\n")
+
+
+librenms_dir = dirname(dirname(abspath(__file__)))
+
+parser = argparse.ArgumentParser()
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument("-d", "--discard", action="store_true", help="Discard all changes clean extra files")
+group.add_argument("-s", "--save", action="store_true", help="Save and remove changes by stashing them. (git stash)")
+group.add_argument("-r", "--restore", action="store_true", help="Attempt to restore saved changes (git stash pop)")
+parser.add_argument("-v", "--vendor", action="store_true", help="Also discard changes to ./vendor (requires --discard)")
+args = parser.parse_args()
+
+
+if args.discard:
+    if confirm("Are you sure you want to delete all modified and untracked files?"):
+        dirs = ["app/", "bootstrap/", "contrib/", "database/", "doc/", "html/", "includes/", "LibreNMS/",
+                "licenses/", "mibs/", "misc/", "resources/", "routes", "scripts/", "sql-schema/", "tests/"]
+        gitignores = ['.gitignore',
+                      'bootstrap/cache/.gitignore',
+                      'logs/.gitignore',
+                      'rrd/.gitignore',
+                      'storage/app/.gitignore',
+                      'storage/app/public/.gitignore',
+                      'storage/debugbar/.gitignore',
+                      'storage/framework/cache/.gitignore',
+                      'storage/framework/cache/data/.gitignore',
+                      'storage/framework/sessions/.gitignore',
+                      'storage/framework/testing/.gitignore',
+                      'storage/framework/views/.gitignore',
+                      'storage/logs/.gitignore']
+
+        call(["git", "reset", "-q"], cwd=librenms_dir)
+        call(["git", "checkout", "."], cwd=librenms_dir)
+        call(["git", "clean", "-d", "-f"] + dirs, cwd=librenms_dir)
+        # fix messed up gitignore file modes
+        call(["git", "checkout"] + gitignores, cwd=librenms_dir)
+
+        if args.vendor:
+            call(["git", "clean",  "-x",  "-d",  "-f",  "vendor/"], cwd=librenms_dir)
+
+elif args.save:
+    msg = "github-remove saved on "+str(datetime.datetime.now())
+    call(["git", "stash", "save", msg], cwd=librenms_dir)
+
+elif args.restore:
+    p = Popen(["git", "stash", "list"], stdout=subprocess.PIPE)
+    out, err = p.communicate()
+    last = out.decode("utf-8") .split('\n', 1)[0]
+
+    if "github-remove" in last:
+        call(["git", "stash", "pop"], cwd=librenms_dir)
+    else:
+        print("Last stash was not created by " + __file__ + ". Aborting.")

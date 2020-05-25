@@ -1,0 +1,18 @@
+mib: NETONIX-SWITCH-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: poeStatusTable
+                    value: poeStatus
+                    num_oid: '.1.3.6.1.4.1.46242.5.1.2.{{ $index }}'
+                    descr: Port {{ $index }} PoE
+                    index: '{{ $index }}'
+                    state_name: netonixPoeStatus
+                    states:
+                        - { descr: Off, graph: 0, value: 1, generic: -1 }
+                        - { descr: 24V, graph: 0, value: 2, generic: 0 }
+                        - { descr: 48V, graph: 0, value: 3, generic: 0 }
+                        - { descr: 24VH, graph: 0, value: 4, generic: 0 }
+                        - { descr: 48VH, graph: 0, value: 5, generic: 0 }

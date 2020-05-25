@@ -1,0 +1,133 @@
+mib: CPS-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: upsBaseBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.1.1.{{ $index }}'
+                    descr: 'Battery Status'
+                    index: 'upsBaseBatteryStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: Known, graph: 1, generic: 3 }
+                        - { value: 2, descr: Normal, graph: 1, generic: 0 }
+                        - { value: 3, descr: Low, graph: 1, generic: 2 }
+                -
+                    oid: upsAdvanceBatteryReplaceIndicator
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.5.{{ $index }}'
+                    descr: 'Battery Replace Indicator'
+                    index: 'upsAdvanceBatteryReplaceIndicator.{{ $index }}'
+                    states:
+                        - { value: 1, descr: No, graph: 1, generic: 0 }
+                        - { value: 2, descr: Replace, graph: 1, generic: 2 }
+                -
+                    oid: upsAdvanceInputLineFailCause
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.3.2.5.{{ $index }}'
+                    descr: 'Input Line Cause'
+                    index: 'upsAdvanceInputLineFailCause.{{ $index }}'
+                    states:
+                        - { value: 1, descr: 'No Transfer', graph: 1, generic: 0 }
+                        - { value: 2, descr: 'High Voltage', graph: 1, generic: 2 }
+                        - { value: 3, descr: 'Brown Out', graph: 1, generic: 2 }
+                        - { value: 4, descr: 'Self Test', graph: 1, generic: 1 }
+                -
+                    oid: upsAdvanceInputStatus
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.3.2.6.{{ $index }}'
+                    descr: 'Input Status'
+                    index: 'upsAdvanceInputStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: 'Normal', graph: 1, generic: 0 }
+                        - { value: 2, descr: 'Over Voltage', graph: 1, generic: 2 }
+                        - { value: 3, descr: 'Under Voltage', graph: 1, generic: 2 }
+                        - { value: 4, descr: 'Frequency Failure', graph: 1, generic: 2 }
+                        - { value: 5, descr: 'Blackout', graph: 1, generic: 2 }
+                -
+                    oid: upsBaseOutputStatus
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.4.1.1.{{ $index }}'
+                    descr: 'Output Status'
+                    index: 'upsBaseOutputStatus.{{ $index }}'
+                    states:
+                        - { value: 1, descr: 'Unknown', graph: 1, generic: 3 }
+                        - { value: 2, descr: 'Online', graph: 1, generic: 0 }
+                        - { value: 3, descr: 'On Battery', graph: 1, generic: 2 }
+                        - { value: 4, descr: 'On Boost', graph: 1, generic: 1 }
+                        - { value: 5, descr: 'On Sleep', graph: 1, generic: 1 }
+                        - { value: 6, descr: 'Off', graph: 1, generic: 2 }
+                        - { value: 7, descr: 'Rebooting', graph: 1, generic: 1 }
+        charge:
+            data:
+                -
+                    oid: upsAdvanceBatteryCapacity
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.1.{{ $index }}'
+                    index: 'upsAdvanceBatteryCapacity.{{ $index }}'
+                    descr: 'Battery Capacity'
+        current:
+            data:
+                -
+                    oid: upsAdvanceOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.4.2.4.{{ $index }}'
+                    index: 'upsAdvanceOutputCurrent.{{ $index }}'
+                    descr: 'Output'
+        voltage:
+            data:
+                -
+                    oid: upsAdvanceBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.2.{{ $index }}'
+                    index: 'upsAdvanceBatteryVoltage.{{ $index }}'
+                    descr: 'Battery Voltage'
+                -
+                    oid: upsAdvanceInputLineVoltage
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.3.2.1.{{ $index }}'
+                    index: 'upsAdvanceInputLineVoltage.{{ $index }}'
+                    descr: 'Input Line Voltage'
+                    divisor: 10
+                -
+                    oid: upsAdvanceOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.4.2.1.{{ $index }}'
+                    index: 'upsAdvanceOutputVoltage.{{ $index }}'
+                    descr: 'Output Voltage'
+                    divisor: 10
+        temperature:
+            data:
+                -
+                    oid: upsAdvanceBatteryTemperature
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.3.{{ $index }}'
+                    index: 'upsAdvanceBatteryTemperature.{{ $index }}'
+                    descr: 'Battery Temperature'
+                -
+                    oid: envirTemperature
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.4.2.1.{{ $index }}'
+                    index: 'envirTemperature.{{ $index }}'
+                    descr: 'Environment Sensor Temperature'
+                    user_func: fahrenheit_to_celsius
+                    divisor: 10
+
+        runtime:
+            data:
+                -
+                    oid: upsAdvanceBatteryRunTimeRemaining
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.2.2.4.{{ $index }}'
+                    index: 'upsAdvanceBatteryRunTimeRemaining.{{ $index }}'
+                    descr: 'Battery Runtime'
+                    divisor: 6000
+        frequency:
+            data:
+                -
+                    oid: upsAdvanceInputFrequency
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.3.2.4.{{ $index }}'
+                    index: 'upsAdvanceInputFrequency.{{ $index }}'
+                    descr: 'Input'
+                    divisor: 10
+                -
+                    oid: upsAdvanceOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.3808.1.1.1.4.2.2.{{ $index }}'
+                    index: 'upsAdvanceOutputFrequency.{{ $index }}'
+                    descr: 'Output'
+                    divisor: 10
+        humidity:
+            data:
+                -
+                    oid: envirHumidity
+                    num_oid:  '.1.3.6.1.4.1.3808.1.1.4.3.1.{{ $index }}'
+                    index: 'envirHumidity.{{ $index }}'
+                    descr: 'Environment Sensor Humidity'

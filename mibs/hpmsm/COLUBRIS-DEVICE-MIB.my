@@ -1,0 +1,585 @@
+-- ****************************************************************************
+--  COLUBRIS-DEVICE-MIB definitions
+--
+--  Copyright (c) 2006, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Device MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-DEVICE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Unsigned32, IpAddress, TimeTicks, Counter32
+        FROM    SNMPv2-SMI
+    DisplayString, MacAddress
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    ColubrisNotificationEnable
+        FROM    COLUBRIS-TC
+;
+
+
+colubrisDeviceMIB MODULE-IDENTITY
+    LAST-UPDATED    "200609050000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Device MIB."
+
+    ::= { colubrisMgmtV2 23 }
+
+
+-- colubrisDeviceMIB definition
+colubrisDeviceMIBObjects OBJECT IDENTIFIER ::= { colubrisDeviceMIB 1 }
+
+-- colubris Device groups
+coDeviceConfigGroup       OBJECT IDENTIFIER ::= { colubrisDeviceMIBObjects 1 }
+coDeviceDiscoveryGroup    OBJECT IDENTIFIER ::= { colubrisDeviceMIBObjects 2 }
+coDeviceInformationGroup  OBJECT IDENTIFIER ::= { colubrisDeviceMIBObjects 3 }
+coDeviceStatusGroup       OBJECT IDENTIFIER ::= { colubrisDeviceMIBObjects 4 }
+
+-- The Device Config Group
+coDeviceStateChangeNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if the coDeviceStateChangeNotification notification
+                 is generated."
+    DEFVAL      { disable }
+    ::= { coDeviceConfigGroup 1 }
+
+coDeviceAuthorizationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if the coDeviceAuthorizationFailureNotification
+                 notification is generated."
+    DEFVAL      { enable }
+    ::= { coDeviceConfigGroup 2 }
+
+coDeviceSecurityFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if the coDeviceSecurityFailureNotification
+                 notification is generated."
+    DEFVAL      { enable }
+    ::= { coDeviceConfigGroup 3 }
+
+coDeviceFirmwareFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if the coDeviceFirmwareFailureNotification
+                 notification is generated."
+    DEFVAL      { enable }
+    ::= { coDeviceConfigGroup 4 }
+
+coDeviceConfigurationFailureNotificationEnabled OBJECT-TYPE
+    SYNTAX      ColubrisNotificationEnable
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Specifies if the coDeviceConfigurationFailureNotification
+                 notification is generated."
+    DEFVAL      { enable }
+    ::= { coDeviceConfigGroup 5 }
+
+-- The Device Discovery Group
+coDeviceDiscoveryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceDiscoveryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device discovery attributes."
+    ::= { coDeviceDiscoveryGroup 1 }
+
+coDeviceDiscoveryEntry OBJECT-TYPE
+    SYNTAX      CoDeviceDiscoveryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceDiscoveryTable.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller."
+    INDEX       { coDevDisIndex }
+    ::= { coDeviceDiscoveryTable 1 }
+
+CoDeviceDiscoveryEntry ::= SEQUENCE
+{
+    coDevDisIndex                  Integer32,
+    coDevDisSerialNumber           DisplayString,
+    coDevDisMacAddress             MacAddress,
+    coDevDisIpAddress              IpAddress,
+    coDevDisState                  INTEGER,
+    coDevDisSystemName             DisplayString,
+    coDevDisLocation               DisplayString,
+    coDevDisContact                DisplayString,
+    coDevDisGroupName              DisplayString,
+    coDevDisConnectionTime         Counter32
+}
+
+coDevDisIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Specifies the index of the device."
+    ::= { coDeviceDiscoveryEntry 1 }
+
+coDevDisSerialNumber OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device serial number."
+    ::= { coDeviceDiscoveryEntry 2 }
+
+coDevDisMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Ethernet MAC address of the device."
+    ::= { coDeviceDiscoveryEntry 3 }
+
+coDevDisIpAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "IP address of the device."
+    ::= { coDeviceDiscoveryEntry 4 }
+
+coDevDisState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    disconnected(1),
+                    authorized(2),
+                    join(3),
+                    firmware(4),
+                    security(5),
+                    configuration(6),
+                    running(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Device operational state."
+    ::= { coDeviceDiscoveryEntry 5 }
+
+coDevDisSystemName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Name assigned to the device by the configuration tool."
+    ::= { coDeviceDiscoveryEntry 6 }
+
+coDevDisLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Location assigned to the device by the configuration tool."
+    ::= { coDeviceDiscoveryEntry 7 }
+
+coDevDisContact OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Contact assigned to the device by the configuration tool."
+    ::= { coDeviceDiscoveryEntry 8 }
+
+coDevDisGroupName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Identifies the group that the device belongs to."
+    ::= { coDeviceDiscoveryEntry 9 }
+
+coDevDisConnectionTime OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Elapsed time in minutes since the device was last authorized."
+    ::= { coDeviceDiscoveryEntry 10 }
+
+-- The Device Information Group
+coDeviceInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device information attributes."
+    ::= { coDeviceInformationGroup 1 }
+
+coDeviceInfoEntry OBJECT-TYPE
+    SYNTAX      CoDeviceInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceInfoTable.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller."
+    AUGMENTS    { coDeviceDiscoveryEntry }
+    ::= { coDeviceInfoTable 1 }
+
+CoDeviceInfoEntry ::= SEQUENCE
+{
+    coDevInfoProductType            OBJECT IDENTIFIER,
+    coDevInfoProductName            DisplayString,
+    coDevInfoFirmwareRevision       DisplayString,
+    coDevInfoBootRevision           DisplayString,
+    coDevInfoHardwareRevision       DisplayString
+}
+
+coDevInfoProductType OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Refer to a Colubris product inside colubrisProductsMIB."
+    ::= { coDeviceInfoEntry 1 }
+
+coDevInfoProductName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Colubris Networks product name for the device."
+    ::= { coDeviceInfoEntry 2 }
+
+coDevInfoFirmwareRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Revision number of the device firmware."
+    ::= { coDeviceInfoEntry 3 }
+
+coDevInfoBootRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Revision number of the device boot loader."
+    ::= { coDeviceInfoEntry 4 }
+
+coDevInfoHardwareRevision OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Revision number of the system hardware."
+    ::= { coDeviceInfoEntry 5 }
+
+-- The Device Status Group
+coDeviceStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device status attributes."
+    ::= { coDeviceStatusGroup 1 }
+
+coDeviceStatusEntry OBJECT-TYPE
+    SYNTAX      CoDeviceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceStatusTable.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller."
+    AUGMENTS    { coDeviceDiscoveryEntry }
+    ::= { coDeviceStatusTable 1 }
+
+CoDeviceStatusEntry ::= SEQUENCE
+{
+    coDevStUpTime                  TimeTicks,
+    coDevStLoadAverage1Min         Unsigned32,
+    coDevStLoadAverage5Min         Unsigned32,
+    coDevStLoadAverage15Min        Unsigned32,
+    coDevStCpuUseNow               Unsigned32,
+    coDevStCpuUse5Sec              Unsigned32,
+    coDevStCpuUse10Sec             Unsigned32,
+    coDevStCpuUse20Sec             Unsigned32,
+    coDevStRamTotal                Unsigned32,
+    coDevStRamFree                 Unsigned32,
+    coDevStRamBuffer               Unsigned32,
+    coDevStRamCached               Unsigned32,
+    coDevStStorageUsePermanent     Unsigned32,
+    coDevStStorageUseTemporary     Unsigned32
+}
+
+coDevStUpTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Time elapsed after the device powered up."
+    ::= { coDeviceStatusEntry 1 }
+
+coDevStLoadAverage1Min OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average number of processes running during the last minute."
+    ::= { coDeviceStatusEntry 2 }
+
+coDevStLoadAverage5Min OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average number of processes running during the last 5 minutes."
+    ::= { coDeviceStatusEntry 3 }
+
+coDevStLoadAverage15Min OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average number of processes running during the last 15 minutes."
+    ::= { coDeviceStatusEntry 4 }
+
+coDevStCpuUseNow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current CPU usage."
+    ::= { coDeviceStatusEntry 5 }
+
+coDevStCpuUse5Sec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU usage during the last 5 seconds."
+    ::= { coDeviceStatusEntry 6 }
+
+coDevStCpuUse10Sec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU usage during the last 10 seconds."
+    ::= { coDeviceStatusEntry 7 }
+
+coDevStCpuUse20Sec OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Average CPU usage during the last 20 seconds."
+    ::= { coDeviceStatusEntry 8 }
+
+coDevStRamTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kb"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Total system RAM."
+    ::= { coDeviceStatusEntry 9 }
+
+coDevStRamFree OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kb"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Available system RAM."
+    ::= { coDeviceStatusEntry 10 }
+
+coDevStRamBuffer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kb"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Memory used by the buffers."
+    ::= { coDeviceStatusEntry 11 }
+
+coDevStRamCached OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "Kb"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Memory used by the system cache."
+    ::= { coDeviceStatusEntry 12 }
+
+coDevStStorageUsePermanent OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Percentage of the permanent storage in use."
+    ::= { coDeviceStatusEntry 13 }
+
+coDevStStorageUseTemporary OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Percentage of the temporary storage in use."
+    ::= { coDeviceStatusEntry 14 }
+
+
+-- Device notifications
+colubrisDeviceMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisDeviceMIB 2 }
+colubrisDeviceMIBNotifications OBJECT IDENTIFIER ::= { colubrisDeviceMIBNotificationPrefix 0 }
+
+coDeviceStateChangeNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevDisSerialNumber,
+                    coDevDisIpAddress,
+                    coDevDisState,
+                    coDevDisSystemName
+                }
+    STATUS      current
+    DESCRIPTION "A coDeviceStateChangeNotification trap signifies that the
+                 SNMP entity has detected a device state change."
+   ::= { colubrisDeviceMIBNotifications 1 }
+
+coDeviceAuthorizationFailureNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevDisSerialNumber,
+                    coDevDisIpAddress,
+                    coDevDisState,
+                    coDevDisSystemName
+                }
+    STATUS      current
+    DESCRIPTION "A coDeviceAuthorizationFailureNotification trap
+                 signifies that the SNMP entity has detected a device
+                 authentication failure."
+   ::= { colubrisDeviceMIBNotifications 2 }
+
+coDeviceSecurityFailureNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevDisSerialNumber,
+                    coDevDisIpAddress,
+                    coDevDisState,
+                    coDevDisSystemName
+                }
+    STATUS      current
+    DESCRIPTION "A coDeviceSecurityFailureNotification trap signifies
+                 that the SNMP entity has detected a device connection
+                 failure."
+   ::= { colubrisDeviceMIBNotifications 3 }
+
+coDeviceFirmwareFailureNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevDisSerialNumber,
+                    coDevDisIpAddress,
+                    coDevDisState,
+                    coDevDisSystemName
+                }
+    STATUS      current
+    DESCRIPTION "A coDeviceFirmwareFailureNotification trap signifies
+                 that the SNMP entity has detected a device firmware
+                 failure."
+   ::= { colubrisDeviceMIBNotifications 4 }
+
+coDeviceConfigurationFailureNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                    coDevDisSerialNumber,
+                    coDevDisIpAddress,
+                    coDevDisState,
+                    coDevDisSystemName
+                }
+    STATUS      current
+    DESCRIPTION "A coDeviceConfigurationFailureNotification trap
+                 signifies that the SNMP entity has detected a device
+                 configuration failure."
+   ::= { colubrisDeviceMIBNotifications 5 }
+
+
+-- conformance information
+colubrisDeviceMIBConformance OBJECT IDENTIFIER ::= { colubrisDeviceMIB 3 }
+colubrisDeviceMIBCompliances OBJECT IDENTIFIER ::= { colubrisDeviceMIBConformance 1 }
+colubrisDeviceMIBGroups      OBJECT IDENTIFIER ::= { colubrisDeviceMIBConformance 2 }
+
+
+-- compliance statements
+colubrisDeviceMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the Device MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisDeviceConfigMIBGroup,
+                        colubrisDeviceDiscoveryMIBGroup,
+                        colubrisDeviceInformationMIBGroup,
+                        colubrisDeviceStatusMIBGroup,
+                        colubrisDeviceNotificationGroup
+                    }
+    ::= { colubrisDeviceMIBCompliances 1 }
+
+-- units of conformance
+colubrisDeviceConfigMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDeviceStateChangeNotificationEnabled,
+                    coDeviceAuthorizationFailureNotificationEnabled,
+                    coDeviceSecurityFailureNotificationEnabled,
+                    coDeviceFirmwareFailureNotificationEnabled,
+                    coDeviceConfigurationFailureNotificationEnabled
+                }
+    STATUS      current
+    DESCRIPTION "A collection of configuration objects."
+    ::= { colubrisDeviceMIBGroups 1 }
+
+colubrisDeviceDiscoveryMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevDisSerialNumber,
+                    coDevDisMacAddress,
+                    coDevDisIpAddress,
+                    coDevDisState,
+                    coDevDisSystemName,
+                    coDevDisLocation,
+                    coDevDisContact,
+                    coDevDisGroupName,
+                    coDevDisConnectionTime
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for Device
+                 discovery status."
+    ::= { colubrisDeviceMIBGroups 2 }
+
+colubrisDeviceInformationMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevInfoProductType,
+                    coDevInfoProductName,
+                    coDevInfoFirmwareRevision,
+                    coDevInfoBootRevision,
+                    coDevInfoHardwareRevision
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for device
+                 configuration items."
+    ::= { colubrisDeviceMIBGroups 3 }
+
+colubrisDeviceStatusMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevStUpTime,
+                    coDevStLoadAverage1Min,
+                    coDevStLoadAverage5Min,
+                    coDevStLoadAverage15Min,
+                    coDevStCpuUseNow,
+                    coDevStCpuUse5Sec,
+                    coDevStCpuUse10Sec,
+                    coDevStCpuUse20Sec,
+                    coDevStRamTotal,
+                    coDevStRamFree,
+                    coDevStRamBuffer,
+                    coDevStRamCached,
+                    coDevStStorageUsePermanent,
+                    coDevStStorageUseTemporary
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for device
+                 status."
+    ::= { colubrisDeviceMIBGroups 4 }
+
+colubrisDeviceNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                        coDeviceStateChangeNotification,
+                        coDeviceAuthorizationFailureNotification,
+                        coDeviceSecurityFailureNotification,
+                        coDeviceFirmwareFailureNotification,
+                        coDeviceConfigurationFailureNotification
+                    }
+    STATUS      current
+    DESCRIPTION "A collection of supported device notifications."
+    ::= { colubrisDeviceMIBGroups 5 }
+
+END

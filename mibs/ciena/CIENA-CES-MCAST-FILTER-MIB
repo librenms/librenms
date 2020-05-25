@@ -1,0 +1,1506 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-MCAST-FILTER-MIB.my
+ --    
+
+ CIENA-CES-MCAST-FILTER-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS                
+   Integer32, Unsigned32, Counter32, OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY                       
+        FROM SNMPv2-SMI                 
+   InetAddressType,InetAddress, InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB            
+   DisplayString, MacAddress, TEXTUAL-CONVENTION                
+        FROM SNMPv2-TC                                                  
+    cienaGlobalSeverity, cienaGlobalMacAddress
+   		FROM  CIENA-GLOBAL-MIB
+   CienaGlobalState, CienaStatsClear,CienaMacAddress
+   		FROM CIENA-TC
+   cienaCesConfig,cienaCesStatistics, cienaCesNotifications         
+        FROM CIENA-SMI;
+        
+ cienaCesMcastFilterMIB MODULE-IDENTITY
+	LAST-UPDATED "201609300000Z"
+	ORGANIZATION "Ciena, Inc"
+	CONTACT-INFO
+                       "Mib Meister
+                        115 North Sullivan Road
+                        Spokane Valley, WA 99037
+                        USA            
+                        Phone:  +1 509 242 9000
+			Email:  support@ciena.com"
+       DESCRIPTION
+	                    "This module defines the IGMP Multicast SNMP objects."
+
+       REVISION    "201609300000Z"
+       DESCRIPTION "Added objects cienaCesMcastIgmpQueryEngineOperState, 
+                    cienaCesMcastRouterOlderVersionQuerierTimeRemaining, 
+                    cienaCesMcastRouterQueryIntervalTimeRemaining, 
+                    cienaCesMcastGlobalSnoopAdminState.
+                    Clarified DESCRIPTION of cienaCesMcastGlobalSnoopState. 
+                    Defined an object-identifier cienaCesMcastGlobalResources and twelve objects 
+                    under it for reporting global resource information."
+
+       REVISION    "201503160000Z"
+       DESCRIPTION "Initial creation."
+
+                        ::= { cienaCesConfig 37 }
+
+--
+--Textual cnventions
+--
+
+InterfaceType ::= TEXTUAL-CONVENTION
+   STATUS	current
+   DESCRIPTION
+        "Interface type of a multicast member or router interface."
+   SYNTAX	INTEGER {              
+                  subport(1),
+                  pbtsi(2),
+                  vlanport(3),
+                  mplsVc(4)
+   }
+
+IgmpCompatibilityMode ::= TEXTUAL-CONVENTION
+   STATUS	current
+   DESCRIPTION
+        "IGMP version based compatibility mode."
+   SYNTAX	INTEGER { 
+                  v1(1),
+                  v2(2),
+                  v3(3)
+   }
+
+
+ cienaCesMcastFilterMIBObjects OBJECT IDENTIFIER ::= { cienaCesMcastFilterMIB 1 }
+ 
+ --
+ -- multicast filter group
+ --
+ cienaCesMcastFilterConfig OBJECT IDENTIFIER ::= { cienaCesMcastFilterMIBObjects 1 }
+ --
+ -- multicast filter status
+ --
+ cienaCesMcastFilterStatus OBJECT IDENTIFIER ::= { cienaCesMcastFilterMIBObjects 2 }
+ --
+ -- multicast global resources
+ --
+ cienaCesMcastGlobalResources OBJECT IDENTIFIER ::= { cienaCesMcastFilterMIBObjects 3 }
+ --
+ -- multicast filter statistics
+ --
+ cienaCesMcastFilterStats OBJECT IDENTIFIER ::= { cienaCesStatistics 8 }
+
+-- Notifications 
+  
+ cienaCesMcastFilterMIBNotificationPrefix  	OBJECT IDENTIFIER ::= { cienaCesNotifications 100 } 
+ 
+ cienaCesMcastFilterMIBNotification              OBJECT IDENTIFIER ::=  { cienaCesMcastFilterMIBNotificationPrefix 0 }
+
+
+ cienaCesMcastGlobalAdminState OBJECT-TYPE
+     SYNTAX     CienaGlobalState 
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "This object represents global multicast admin state."
+     ::= { cienaCesMcastFilterConfig 1 } 
+    
+  
+ --
+ --  The Multicast filter Activation Table
+ --
+
+ cienaCesMcastFilterServiceTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastFilterServiceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing multicast service configuration on the L2FDs (Layer 2 forwarding domains - VS/VLAN)."
+    ::= { cienaCesMcastFilterConfig 2 }
+
+ cienaCesMcastFilterServiceEntry OBJECT-TYPE
+     SYNTAX     CienaCesMcastFilterServiceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastFilterActivationTable."
+     INDEX      { cienaCesMcastFilterServiceType, cienaCesMcastFilterServiceIndex }
+     ::= { cienaCesMcastFilterServiceTable 1 }
+
+ CienaCesMcastFilterServiceEntry ::= SEQUENCE {   
+     cienaCesMcastFilterServiceType			INTEGER,
+     cienaCesMcastFilterServiceIndex          Unsigned32,
+     cienaCesMcastFilterServiceAdminState	INTEGER,
+     cienaCesMcastFilterServiceOperState	INTEGER,       
+     cienaCesMcastFilterServiceUMFState INTEGER
+ }
+
+ cienaCesMcastFilterServiceType OBJECT-TYPE
+     SYNTAX     INTEGER {
+                      vlan(1),
+                      vs(2)
+     }
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The service instance type on which this multicast filter is configured."
+     ::= { cienaCesMcastFilterServiceEntry 1 }
+
+ cienaCesMcastFilterServiceIndex OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The service instance index on which this multicast filter is configured."
+     ::= { cienaCesMcastFilterServiceEntry 2 }
+ 
+ cienaCesMcastFilterServiceAdminState OBJECT-TYPE
+     SYNTAX     CienaGlobalState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "This object represents the admin state of multicast-services 
+	     the given service Instance."
+     ::= { cienaCesMcastFilterServiceEntry 3 }
+
+ cienaCesMcastFilterServiceOperState OBJECT-TYPE
+     SYNTAX     CienaGlobalState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "This object represents the operational state of multicast-services
+	     on the given service Instance."
+     ::= { cienaCesMcastFilterServiceEntry 4 }
+
+ cienaCesMcastFilterServiceUMFState  OBJECT-TYPE
+     SYNTAX          INTEGER {
+                         drop(1),
+                         flood(2)
+     }
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents how unknown multicast frames are handled for this multicast service.
+    	    'flood' indicates that the device will flood all the unresolved messages for this service instance to all 
+    	    the interfaces in the flooding domain.
+			'drop' causes the device to drop all the unresolved messages for this service. 
+"
+     ::= { cienaCesMcastFilterServiceEntry 5 }
+  
+ --
+ --  The Multicast filter Server Interface Table
+ --
+
+ cienaCesMcastFilterServerInterfaceTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastFilterServerInterfaceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the 
+	    authorized server ports."
+    ::= { cienaCesMcastFilterConfig 3 }
+
+ cienaCesMcastFilterServerInterfaceEntry OBJECT-TYPE
+     SYNTAX     CienaCesMcastFilterServerInterfaceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastFilterServerInterfaceTable."
+     INDEX      { cienaCesMcastFilterServiceType, cienaCesMcastFilterServiceIndex, cienaCesMcastFilterServerInterfaceType, cienaCesMcastFilterServerInterfaceIndex }
+     ::= { cienaCesMcastFilterServerInterfaceTable 1 }
+
+ CienaCesMcastFilterServerInterfaceEntry ::= SEQUENCE {
+     cienaCesMcastFilterServerInterfaceType         InterfaceType,
+     cienaCesMcastFilterServerInterfaceIndex			  Integer32,
+     cienaCesMcastFilterServerInterfaceLiType         InterfaceType,
+     cienaCesMcastFilterServerInterfaceLiIndex			  Integer32
+ }
+
+ cienaCesMcastFilterServerInterfaceType OBJECT-TYPE
+     SYNTAX      InterfaceType 
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	    "Interface type of server interface from which the IGMP query messages can be received, and joins/leaves 
+	     messages can be sent."  
+     ::= { cienaCesMcastFilterServerInterfaceEntry 1 }
+ 
+ cienaCesMcastFilterServerInterfaceIndex OBJECT-TYPE
+     SYNTAX      Integer32 (0..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	    "Interface Id of the server interface from which the IGMP query messages can be received, and joins/leaves 
+	     messages can be sent."  
+     ::= { cienaCesMcastFilterServerInterfaceEntry 2 }
+
+ cienaCesMcastFilterServerInterfaceLiType OBJECT-TYPE
+     SYNTAX      InterfaceType 
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "This object has the same definition as cienaCesMcastFilterServerInterfaceType."  
+     ::= { cienaCesMcastFilterServerInterfaceEntry 3 }
+ 
+ cienaCesMcastFilterServerInterfaceLiIndex OBJECT-TYPE
+     SYNTAX      Integer32 (0..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "This object has the same definition as cienaCesMcastFilterServerInterfaceIndex."  
+     ::= { cienaCesMcastFilterServerInterfaceEntry 4 }
+
+  cienaCesMcastGlobalSnoopState OBJECT-TYPE
+     SYNTAX     CienaGlobalState
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+            "This object represents global IGMP Snooping operational state."
+     ::= { cienaCesMcastFilterConfig 4 }   
+ 
+ --
+ --  The Mcast IGMP Snoop Config Table
+ --
+
+ cienaCesMcastIgmpSnoopTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastIgmpSnoopEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the configuration parameters
+            for the IGMP snooping."
+    ::= { cienaCesMcastFilterConfig 5 }
+
+ cienaCesMcastIgmpSnoopEntry OBJECT-TYPE
+    SYNTAX     CienaCesMcastIgmpSnoopEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastIgmpSnoopTable."
+    INDEX      { cienaCesMcastFilterServiceType, cienaCesMcastFilterServiceIndex }
+    ::= { cienaCesMcastIgmpSnoopTable 1 }
+
+
+ CienaCesMcastIgmpSnoopEntry ::= SEQUENCE {   
+    cienaCesMcastIgmpSnoopEnable                  CienaGlobalState,
+    cienaCesMcastIgmpSnoopRobustness              Integer32,
+    cienaCesMcastIgmpSnoopProxyQueryInterval      Integer32,
+    cienaCesMcastIgmpSnoopProxyQueryReplyTmo      Integer32,
+    cienaCesMcastIgmpSnoopProxyQueryDelay         Integer32,
+    cienaCesMcastIgmpSnoopLingerTmo               Integer32,
+    cienaCesMcastIgmpQueryEngineState             INTEGER,
+    cienaCesMcastIgmpProxyQuerySrcIpAddrType      InetAddressType,   
+    cienaCesMcastIgmpProxyQuerySrcIpAddr          InetAddress,
+    cienaCesMcastIgmpRouterQueryInterval          Integer32,
+    cienaCesMcastIgmpMinResponseTime              Integer32,
+    cienaCesMcastIgmpDefaultRouterInterfaceType   InterfaceType,
+    cienaCesMcastIgmpDefaultRouterInterfaceId     Integer32,
+    cienaCesMcastIgmpInquisitiveLeaveState        INTEGER,	
+    cienaCesMcastIgmpLastMemberQueryInterval      Integer32,
+    cienaCesMcastIgmpPriority                     Integer32,
+    cienaCesMcastIgmpSnoopRouterRangeStartIpAddrType    InetAddressType,
+    cienaCesMcastIgmpSnoopRouterRangeStartIpAddr        InetAddress,
+    cienaCesMcastIgmpSnoopRouterRangeEndIpAddrType      InetAddressType,
+    cienaCesMcastIgmpSnoopRouterRangeEndIpAddr          InetAddress,
+    cienaCesMcastIgmpSnoopActiveLingerTimeout           Integer32,
+    cienaCesMcastIgmpSnoopServerTopology                INTEGER,
+    cienaCesMcastIgmpSnoopRapidRecoveryMode             INTEGER,
+    cienaCesMcastIgmpSnoopQuerierCompatibilityMode      IgmpCompatibilityMode,
+    cienaCesMcastIgmpSnoopForkMode                      INTEGER,
+    cienaCesMcastIgmpSnoopEnableOperState               CienaGlobalState,
+    cienaCesMcastRouterSrcMacAddr                       MacAddress,    
+    cienaCesMcastRouterSrcIpAddrType                    InetAddressType,
+    cienaCesMcastRouterSrcIpAddr                        InetAddress,
+    cienaCesMcastRouterInterfaceType                    InterfaceType,
+    cienaCesMcastRouterInterfaceId                      Integer32,
+    cienaCesMcastReportSendInterfaceType                InterfaceType,
+    cienaCesMcastReportSendInterfaceId                  Integer32,
+    cienaCesMcastRouterCompatibilityMode                IgmpCompatibilityMode,
+    cienaCesMcastReportSendInterfaceIsMeshVc            INTEGER, 
+    cienaCesMcastIgmpQueryEngineOperState               INTEGER,
+    cienaCesMcastRouterOlderVersionQuerierTimeRemaining Integer32,
+    cienaCesMcastRouterQueryIntervalTimeRemaining       Integer32
+ }
+
+  
+ cienaCesMcastIgmpSnoopEnable  OBJECT-TYPE
+     SYNTAX          CienaGlobalState
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents admin state of IGMP snooping for a multicast service."
+     ::= { cienaCesMcastIgmpSnoopEntry 1 } 
+          
+ cienaCesMcastIgmpSnoopRobustness  OBJECT-TYPE
+     SYNTAX          Integer32(1..2)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The number of replies to send for 
+	    each multicast group."
+     DEFVAL { 1 }              
+     ::= { cienaCesMcastIgmpSnoopEntry 2 }
+ 
+ cienaCesMcastIgmpSnoopProxyQueryInterval  OBJECT-TYPE
+     SYNTAX          Integer32(10..999999)
+     UNITS           "seconds"
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The interval period between each general query
+	     sent to the router. This parameter specifies how 
+	     often to repeat the group specific query.  
+	     Default value is 125 seconds.  Note that the actual 
+	     rate may be slower when the switch becomes busy, 
+	     so this parameter should be thought of as a 
+	     minimum time interval."
+     DEFVAL { 125 }              
+     ::= { cienaCesMcastIgmpSnoopEntry 3 }
+     
+ cienaCesMcastIgmpSnoopProxyQueryReplyTmo  OBJECT-TYPE
+     SYNTAX          Integer32(10..255)     
+     UNITS           "seconds"
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The amount of time to receive a membership 
+	     report after a query message is sent.
+	     This value goes directly into the query packet."     
+     ::= { cienaCesMcastIgmpSnoopEntry 4 }
+     
+ cienaCesMcastIgmpSnoopProxyQueryDelay  OBJECT-TYPE
+     SYNTAX          Integer32(1..100)
+     UNITS           "seconds"
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The amount of time to wait before sending the next 
+	     group specific query downstream.  
+	     General queries are sent one interface at a time." 
+     DEFVAL { 50 }              
+     ::= { cienaCesMcastIgmpSnoopEntry 5 }
+        
+ cienaCesMcastIgmpSnoopLingerTmo  OBJECT-TYPE
+     SYNTAX          Integer32(10..300)
+     UNITS           "seconds"
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This value specifies the amount of time that a 
+	     multicast filter is in place after the last 
+	     host has left. In essence it configures how long 
+	     to filter the stream after all the hosts have left 
+             the group. This can tune the system as to how long 
+	     the router has to remove the stream from the subnet. 
+	     The minimum value is 1 second, with no maximum value."
+       DEFVAL { 125 }                
+       ::= { cienaCesMcastIgmpSnoopEntry 6 }
+ 
+  cienaCesMcastIgmpQueryEngineState  OBJECT-TYPE
+     SYNTAX          CienaGlobalState     
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents query engine state for 
+	     a given multicast service. "       
+       ::= { cienaCesMcastIgmpSnoopEntry 7 }
+
+ cienaCesMcastIgmpProxyQuerySrcIpAddrType  OBJECT-TYPE
+     SYNTAX          InetAddressType 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the source IP address type for the multicast service."       
+       ::= { cienaCesMcastIgmpSnoopEntry 8 }
+
+ cienaCesMcastIgmpProxyQuerySrcIpAddr  OBJECT-TYPE
+     SYNTAX          InetAddress 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the source IP address for the multicast service."       
+       ::= { cienaCesMcastIgmpSnoopEntry 9 }
+
+ cienaCesMcastIgmpRouterQueryInterval  OBJECT-TYPE
+     SYNTAX          Integer32 (10..999999)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the router query interval for the given multicast service."       
+       ::= { cienaCesMcastIgmpSnoopEntry 10 }
+
+ cienaCesMcastIgmpMinResponseTime  OBJECT-TYPE
+     SYNTAX          Integer32 (50..600)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the minimum response time for the given multicast service."       
+       ::= { cienaCesMcastIgmpSnoopEntry 11 }
+
+ cienaCesMcastIgmpDefaultRouterInterfaceType  OBJECT-TYPE
+     SYNTAX          InterfaceType
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the default router interface type for the given multicast service."
+       ::= { cienaCesMcastIgmpSnoopEntry 12 }
+
+ cienaCesMcastIgmpDefaultRouterInterfaceId  OBJECT-TYPE
+     SYNTAX          Integer32 (0..65535)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the default router interface id for the given multicast service."
+       ::= { cienaCesMcastIgmpSnoopEntry 13 }
+
+ cienaCesMcastIgmpInquisitiveLeaveState  OBJECT-TYPE
+     SYNTAX          CienaGlobalState
+	 MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the IGMP inquisitive leave state for the given multicast service."       
+       ::= { cienaCesMcastIgmpSnoopEntry 14 }
+  
+  cienaCesMcastIgmpLastMemberQueryInterval  OBJECT-TYPE
+     SYNTAX          Integer32 (10..100)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the last membership query interval for the given multicast service."       
+       ::= { cienaCesMcastIgmpSnoopEntry 15 }
+
+   cienaCesMcastIgmpPriority  OBJECT-TYPE
+     SYNTAX          Integer32 (0..7)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents the priority of IGMP packets  
+	     for this multicast service."                
+     ::= { cienaCesMcastIgmpSnoopEntry 16 }
+
+   cienaCesMcastIgmpSnoopRouterRangeStartIpAddrType  OBJECT-TYPE
+     SYNTAX          InetAddressType
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The IP address type of first IP Address of the router IP Address range."                
+     ::= { cienaCesMcastIgmpSnoopEntry 17 }  
+
+   cienaCesMcastIgmpSnoopRouterRangeStartIpAddr  OBJECT-TYPE
+     SYNTAX          InetAddress
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The first IP Address of the router IP Address range."                
+     ::= { cienaCesMcastIgmpSnoopEntry 18 }  
+
+  cienaCesMcastIgmpSnoopRouterRangeEndIpAddrType  OBJECT-TYPE
+     SYNTAX          InetAddressType
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The IP address type of the last IP Address of the router IP Address range."                
+     ::= { cienaCesMcastIgmpSnoopEntry 19 }   
+     
+  cienaCesMcastIgmpSnoopRouterRangeEndIpAddr  OBJECT-TYPE
+     SYNTAX          InetAddress
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The last IP Address of the router IP Address range.
+	     When range is undefined, all leave/join 
+	     messages are forwarded to the router even when the 
+	     multicast stream does not originate from the router.  
+	     If the range is defined, leave/join messages are filtered.
+	     The default value for this object is equal 
+	     to the value of cienaCesMcastIgmpSnoopRouterRangeStartIpAddr."                
+     ::= { cienaCesMcastIgmpSnoopEntry 20 }   
+  
+  cienaCesMcastIgmpSnoopActiveLingerTimeout  OBJECT-TYPE     
+     SYNTAX          Integer32 (0..300)
+     UNITS           "seconds"
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object specifies the active linger timeout in seconds."                
+     ::= { cienaCesMcastIgmpSnoopEntry 21 } 
+ 
+ cienaCesMcastIgmpSnoopServerTopology  OBJECT-TYPE     
+     SYNTAX          INTEGER {
+			centralized(1),
+			distributed(2)
+			}
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object specifies the server topology."                
+     ::= { cienaCesMcastIgmpSnoopEntry 22 }
+     
+  cienaCesMcastIgmpSnoopRapidRecoveryMode	OBJECT-TYPE
+     SYNTAX          INTEGER {
+			on(1),
+			off(2)
+		     } 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+             "Specifies whether the rapid recovery mode is set to on or off.
+             If this object is set to ON then the device generates and
+             accepts query packets with source IP = 0 else in the OFF state, it does not." 
+     DEFVAL { on }
+	 ::= { cienaCesMcastIgmpSnoopEntry 23 }
+    
+  cienaCesMcastIgmpSnoopQuerierCompatibilityMode	OBJECT-TYPE
+     SYNTAX          IgmpCompatibilityMode 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+             "This object specifies the query engine
+              compatibility mode."
+     DEFVAL { v3 }
+	 ::= { cienaCesMcastIgmpSnoopEntry 24 } 
+
+
+  cienaCesMcastIgmpSnoopForkMode	OBJECT-TYPE
+     SYNTAX          INTEGER {
+			on(1),
+			off(2)
+		     } 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+             "This object specifies whether IGMP
+             Forking mode is set to on or off."
+     DEFVAL { off }
+	 ::= { cienaCesMcastIgmpSnoopEntry 25 }
+	 
+  cienaCesMcastIgmpSnoopEnableOperState  OBJECT-TYPE
+     SYNTAX          CienaGlobalState
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the operational state of IGMP snooping
+	         on the given multicast service"
+     ::= { cienaCesMcastIgmpSnoopEntry 26 }     
+
+  cienaCesMcastRouterSrcMacAddr  OBJECT-TYPE
+     SYNTAX          MacAddress
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "Specifies the router's MAC address."                              
+       ::= { cienaCesMcastIgmpSnoopEntry 27 }
+
+ cienaCesMcastRouterSrcIpAddrType  OBJECT-TYPE
+     SYNTAX          InetAddressType
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "Specifies the router's IP address."                              
+       ::= { cienaCesMcastIgmpSnoopEntry 28 }
+
+ cienaCesMcastRouterSrcIpAddr  OBJECT-TYPE
+     SYNTAX          InetAddress
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "Specifies the router's IP address."                              
+       ::= { cienaCesMcastIgmpSnoopEntry 29 }
+
+ cienaCesMcastRouterInterfaceType  OBJECT-TYPE
+     SYNTAX          InterfaceType
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "Specifies the interface type for the interface from where router queries are coming."
+       ::= { cienaCesMcastIgmpSnoopEntry 30 }
+
+ cienaCesMcastRouterInterfaceId  OBJECT-TYPE
+     SYNTAX          Integer32 (0..65535)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "Specifies the interface Id of the interface from where router queries are coming."
+       ::= { cienaCesMcastIgmpSnoopEntry 31 }
+
+ cienaCesMcastReportSendInterfaceType  OBJECT-TYPE
+     SYNTAX          InterfaceType
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The obejct specifies the interface type of the interface where IGMP 
+	      reports are sent.  Not always the same as the router interface."
+       ::= { cienaCesMcastIgmpSnoopEntry 32 } 
+       
+ cienaCesMcastReportSendInterfaceId  OBJECT-TYPE
+     SYNTAX          Integer32 (0..65535)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The obejct specifies the interface id of the interface where IGMP 
+	      reports are sent.  Not always the same as the router interface."
+       ::= { cienaCesMcastIgmpSnoopEntry 33 } 
+       
+ cienaCesMcastRouterCompatibilityMode OBJECT-TYPE                           
+     SYNTAX          IgmpCompatibilityMode
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object specifies the IGMP version of the router."
+       ::= { cienaCesMcastIgmpSnoopEntry 34 }
+       
+ cienaCesMcastReportSendInterfaceIsMeshVc	OBJECT-TYPE
+     SYNTAX          INTEGER {
+ 			 yes(1),
+			 no(2),
+			 undefined(3)
+		     } 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+             "Specifies whether the current report send interface is a meshvc or not."
+       ::= { cienaCesMcastIgmpSnoopEntry 35 }
+
+ cienaCesMcastIgmpQueryEngineOperState OBJECT-TYPE
+     SYNTAX          INTEGER {
+ 			 active(1),
+			 inactive(2),
+			 disabled(3)
+		     } 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "This object represents query engine operational state 
+             for a given multicast service. Active when query-engine is enabled and active,
+             inactive when query-engine is enabled and not active, disabled otherwise."       
+       ::= { cienaCesMcastIgmpSnoopEntry 36 }
+
+     
+ cienaCesMcastRouterOlderVersionQuerierTimeRemaining OBJECT-TYPE
+     SYNTAX          Integer32
+     UNITS           "seconds"
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "This object specifies the older version querier time remaining in seconds.
+              This is only applicable when an external IGMP querier is present and
+              an older version query is heard."                
+     ::= { cienaCesMcastIgmpSnoopEntry 37 } 
+ 
+ cienaCesMcastRouterQueryIntervalTimeRemaining OBJECT-TYPE
+     SYNTAX          Integer32
+     UNITS           "seconds"
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "This object specifies the query interval time remaining in seconds.
+              This timer will not be applicable if value for object 
+              cienaCesMcastIgmpQueryEngineOperState is active."
+     ::= { cienaCesMcastIgmpSnoopEntry 38 } 
+     
+ --
+ --  The Mcast Channel Stream Config Table
+ --
+
+ cienaCesMcastChannelStreamTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastChannelStreamEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the configuration parameters
+            for the multicast channel stream."
+    ::= { cienaCesMcastFilterConfig 6 }
+
+ cienaCesMcastChannelStreamEntry OBJECT-TYPE
+    SYNTAX     CienaCesMcastChannelStreamEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastChannelStreamTable."
+    INDEX      { cienaCesMcastFilterServiceType, cienaCesMcastFilterServiceIndex,cienaCesMcastChanelStreamStartGroupAddrType, cienaCesMcastChanelStreamStartGroupAddr, cienaCesMcastChanelStreamStartGroupAddrPrefixLen }
+    ::= { cienaCesMcastChannelStreamTable 1 }
+
+ CienaCesMcastChannelStreamEntry ::= SEQUENCE { 
+    cienaCesMcastChanelStreamStartGroupAddrType       InetAddressType,
+    cienaCesMcastChanelStreamStartGroupAddr       	  InetAddress,
+    cienaCesMcastChanelStreamStartGroupAddrPrefixLen   InetAddressPrefixLength,
+    cienaCesMcastChanelStreamEndGroupAddrType         InetAddressType,
+    cienaCesMcastChanelStreamEndGroupAddr         InetAddress
+ }
+
+ cienaCesMcastChanelStreamStartGroupAddrType  OBJECT-TYPE
+     SYNTAX          InetAddressType
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+    	    "The Inet address type of first IP Address of the multicast IP Address range. "                
+     ::= { cienaCesMcastChannelStreamEntry 1 }  
+ 
+ cienaCesMcastChanelStreamStartGroupAddr  OBJECT-TYPE
+     SYNTAX          InetAddress
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+    	    "The first IP Address of the multicast IP Address range. "                
+     ::= { cienaCesMcastChannelStreamEntry 2 }  
+
+ cienaCesMcastChanelStreamStartGroupAddrPrefixLen  OBJECT-TYPE
+     SYNTAX          InetAddressPrefixLength
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+    	    "The prefix lenngth of first IP Address of the multicast IP Address range. "                
+     ::= { cienaCesMcastChannelStreamEntry 3 }  
+
+ cienaCesMcastChanelStreamEndGroupAddrType  OBJECT-TYPE
+     SYNTAX          InetAddressType
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The Inet Address type of last IP Address of the multicast IP address range." 
+     ::= { cienaCesMcastChannelStreamEntry 4 }  
+     
+ cienaCesMcastChanelStreamEndGroupAddr  OBJECT-TYPE
+     SYNTAX          InetAddress
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The last IP Address of the multicast IP address range." 
+     ::= { cienaCesMcastChannelStreamEntry 5 }  
+       
+  --
+ --  The Multicast Channel Stream Exclude Interface List
+ --
+
+ cienaCesMcastChannelStreamExIfcMemTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastChannelStreamExIfcMemEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the excluded interface list
+             per multicast service for channel stream."
+    ::= { cienaCesMcastFilterConfig 7 }
+
+ cienaCesMcastChannelStreamExIfcMemEntry OBJECT-TYPE
+     SYNTAX     CienaCesMcastChannelStreamExIfcMemEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastChannelStreamExIfcMemTable."
+     INDEX      { cienaCesMcastFilterServiceType,cienaCesMcastFilterServiceIndex, cienaCesMcastChannelStreamExIfcType,cienaCesMcastChannelStreamExIfcIndex }
+     ::= { cienaCesMcastChannelStreamExIfcMemTable 1 }
+
+ CienaCesMcastChannelStreamExIfcMemEntry ::= SEQUENCE {     
+     cienaCesMcastChannelStreamExIfcType		InterfaceType,
+     cienaCesMcastChannelStreamExIfcIndex		Integer32,
+     cienaCesMcastChannelStreamExIfcLiType		InterfaceType,
+     cienaCesMcastChannelStreamExIfcLiIndex		Integer32
+ }
+ 
+ cienaCesMcastChannelStreamExIfcType  OBJECT-TYPE
+     SYNTAX          InterfaceType
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+    	    "The Interface type of the interface to be excluded from channel stream."     
+     ::= { cienaCesMcastChannelStreamExIfcMemEntry 1 }
+
+ cienaCesMcastChannelStreamExIfcIndex  OBJECT-TYPE
+     SYNTAX          Integer32 (1..65535)
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+    	    "The Interface Id of the interface to be excluded from channel stream."     
+     ::= { cienaCesMcastChannelStreamExIfcMemEntry 2 }
+
+ cienaCesMcastChannelStreamExIfcLiType  OBJECT-TYPE
+     SYNTAX          InterfaceType
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The Interface type of the interface to be excluded from channel stream."     
+     ::= { cienaCesMcastChannelStreamExIfcMemEntry 3 }
+
+ cienaCesMcastChannelStreamExIfcLiIndex  OBJECT-TYPE
+     SYNTAX          Integer32 (1..65535)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The Interface Id of the interface to be excluded from channel stream."     
+     ::= { cienaCesMcastChannelStreamExIfcMemEntry 4 }
+
+ cienaCesMcastGlobalSnoopAdminState OBJECT-TYPE
+     SYNTAX     CienaGlobalState
+     MAX-ACCESS read-only
+     STATUS     current  
+     DESCRIPTION
+            "This object represents global IGMP Snooping administratively configured state."
+     ::= { cienaCesMcastFilterConfig 8 }  
+
+ --
+ --  The Multicast Group Table
+ --
+ cienaCesMcastFilterGroupTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastFilterGroupEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing all the 
+	     multicast groups."
+     ::= { cienaCesMcastFilterStatus 1 }
+
+ cienaCesMcastFilterGroupEntry OBJECT-TYPE
+     SYNTAX     CienaCesMcastFilterGroupEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastFilterGroupTable."
+     INDEX      { cienaCesMcastFilterServiceType, cienaCesMcastFilterServiceIndex, cienaCesMcastFilterGroupAddrType, cienaCesMcastFilterGroupAddr, cienaCesMcastFilterGroupAddrPrefixLen }
+     ::= { cienaCesMcastFilterGroupTable 1 }
+
+ CienaCesMcastFilterGroupEntry ::= SEQUENCE {   
+     cienaCesMcastFilterGroupAddrType            InetAddressType,
+     cienaCesMcastFilterGroupAddr            InetAddress,
+     cienaCesMcastFilterGroupAddrPrefixLen            InetAddressPrefixLength,
+     cienaCesMcastFilterGroupState                INTEGER,
+     cienaCesMcastFilterGroupType                 INTEGER,
+     cienaCesMcastFilterGroupSource               INTEGER,
+     cienaCesMcastFilterGroupMemberCount          Counter32,
+     cienaCesMcastFilterGroupCompatibilityMode			IgmpCompatibilityMode,  
+     cienaCesMcastFilterGroupIGMPV1HostPresentTimeRemainingValue OCTET STRING,
+     cienaCesMcastFilterGroupIGMPV2HostPresentTimeRemainingValue OCTET STRING,
+     cienaCesMcastFilterGroupFilterMode                INTEGER,
+     cienaCesMcastFilterGroupNumOfSrcAddrs				INTEGER,   
+     cienaCesMcastFilterGroupTimer                      OCTET STRING                           
+ }
+ cienaCesMcastFilterGroupAddrType   OBJECT-TYPE
+     SYNTAX          InetAddressType
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+    	    "The inet address type of multicast group IP address."                
+     ::= { cienaCesMcastFilterGroupEntry 1 } 
+
+ cienaCesMcastFilterGroupAddr   OBJECT-TYPE
+     SYNTAX          InetAddress
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+    	    "The multicast group IP address."                
+     ::= { cienaCesMcastFilterGroupEntry 2 } 
+     
+ cienaCesMcastFilterGroupAddrPrefixLen   OBJECT-TYPE
+     SYNTAX          InetAddressPrefixLength
+     MAX-ACCESS      not-accessible
+     STATUS          current
+     DESCRIPTION
+    	    "The prefix length of multicast group IP address."                
+     ::= { cienaCesMcastFilterGroupEntry 3 } 
+
+ cienaCesMcastFilterGroupState   OBJECT-TYPE
+     SYNTAX          INTEGER {                        
+			active(1),
+			query(2),
+			activelinger(3),
+			linger(4)
+		     } 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The current state of the multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 4 } 
+
+ cienaCesMcastFilterGroupType   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        static(1),
+			dynamic(2)      
+		     } 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The type of the multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 5 } 
+     
+ cienaCesMcastFilterGroupSource   OBJECT-TYPE
+     SYNTAX          INTEGER {
+                        router(1),
+			server(2)      
+		     } 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The source for this multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 6 }
+     
+ cienaCesMcastFilterGroupMemberCount  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The number of member interfaces that joined the group." 
+     ::= { cienaCesMcastFilterGroupEntry 7 } 
+ 
+ cienaCesMcastFilterGroupCompatibilityMode   OBJECT-TYPE
+     SYNTAX          IgmpCompatibilityMode 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The group compatibility mode for this group based on the lowest version of 
+    	    IGMP membership reports recieved for this multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 8 }    
+     
+ cienaCesMcastFilterGroupIGMPV1HostPresentTimeRemainingValue  OBJECT-TYPE
+     SYNTAX          OCTET STRING (SIZE (0..255)) 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The remaining time for IGMPV1 host present timer value for this multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 9 }    
+
+ cienaCesMcastFilterGroupIGMPV2HostPresentTimeRemainingValue  OBJECT-TYPE
+     SYNTAX          OCTET STRING (SIZE (0..255)) 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The remaining time for IGMPV2 host present timer value for this multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 10 }    
+
+ cienaCesMcastFilterGroupFilterMode   OBJECT-TYPE
+     SYNTAX          INTEGER {
+     				in(1),
+     				ex(2)
+     } 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The src address filter mode for this multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 11 }
+
+ cienaCesMcastFilterGroupNumOfSrcAddrs   OBJECT-TYPE
+     SYNTAX          INTEGER 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The number of source addresses for this multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 12 }
+                                                 
+  cienaCesMcastFilterGroupTimer   OBJECT-TYPE
+     SYNTAX          OCTET STRING (SIZE (0..255)) 
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	    "The group timer value for this multicast stream."                
+     ::= { cienaCesMcastFilterGroupEntry 13 }    
+--
+ --  The Multicast Group Source Record Table
+ --
+
+ cienaCesMcastFilterGroupSrcRecordTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastFilterGroupSrcRecordEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing all the 
+	     source address records of the multicast groups."
+     ::= { cienaCesMcastFilterStatus 2 }
+
+ cienaCesMcastFilterGroupSrcRecordEntry OBJECT-TYPE
+     SYNTAX     CienaCesMcastFilterGroupSrcRecordEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastFilterGroupMemberTable."
+     INDEX      { cienaCesMcastFilterServiceType, cienaCesMcastFilterServiceIndex, cienaCesMcastFilterGroupAddrType, cienaCesMcastFilterGroupAddr, cienaCesMcastFilterGroupAddrPrefixLen, cienaCesMcastFilterGroupSrcRecordSrcIpAddrType,cienaCesMcastFilterGroupSrcRecordSrcIp, cienaCesMcastFilterGroupSrcRecordSrcIpAddrPrefixLen }
+     ::= { cienaCesMcastFilterGroupSrcRecordTable 1 }
+ 
+ CienaCesMcastFilterGroupSrcRecordEntry ::= SEQUENCE {
+     cienaCesMcastFilterGroupSrcRecordSrcIpAddrType               		InetAddressType,
+     cienaCesMcastFilterGroupSrcRecordSrcIp               		InetAddress,
+     cienaCesMcastFilterGroupSrcRecordSrcIpAddrPrefixLen               		InetAddressPrefixLength,
+     cienaCesMcastFilterGroupSrcRecordSrcIpAddress               		InetAddress,
+     cienaCesMcastFilterGroupSrcRecordSrcTimer            		OCTET STRING 
+ }
+     
+ cienaCesMcastFilterGroupSrcRecordSrcIpAddrType OBJECT-TYPE
+     SYNTAX      InetAddressType
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	    "The Inet address type of IP address of the source record table for the multicast group"  
+     ::= { cienaCesMcastFilterGroupSrcRecordEntry 1 }
+
+ cienaCesMcastFilterGroupSrcRecordSrcIp OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	    "The IP address of the source record table for the multicast group"  
+     ::= { cienaCesMcastFilterGroupSrcRecordEntry 2 }
+
+ cienaCesMcastFilterGroupSrcRecordSrcIpAddrPrefixLen OBJECT-TYPE
+     SYNTAX      InetAddressPrefixLength
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	    "The inet address prefix length of IP address of the source record table for the multicast group"  
+     ::= { cienaCesMcastFilterGroupSrcRecordEntry 3 }
+
+ cienaCesMcastFilterGroupSrcRecordSrcIpAddress OBJECT-TYPE
+     SYNTAX      InetAddress
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	    "The IP address of the source record table for the multicast group. The mode of this source address is determined by the group filter mode - cienaCesMcastFilterGroupFilterMode object."  
+     ::= { cienaCesMcastFilterGroupSrcRecordEntry 4 }
+ 
+ cienaCesMcastFilterGroupSrcRecordSrcTimer   OBJECT-TYPE
+     SYNTAX      OCTET STRING (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "The remaining source timer value of the source address."
+     ::= { cienaCesMcastFilterGroupSrcRecordEntry 5 }
+     
+ --
+ --  The Multicast Group Membership Table
+ --
+
+ cienaCesMcastFilterGroupMemberTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastFilterGroupMemberEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing all the 
+	     interface members of the multicast groups."
+     ::= { cienaCesMcastFilterStatus 3 }
+
+ cienaCesMcastFilterGroupMemberEntry OBJECT-TYPE
+     SYNTAX     CienaCesMcastFilterGroupMemberEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastFilterGroupMemberTable."
+     INDEX      { cienaCesMcastFilterServiceType, cienaCesMcastFilterServiceIndex, cienaCesMcastFilterGroupAddrType, cienaCesMcastFilterGroupAddr, cienaCesMcastFilterGroupAddrPrefixLen, cienaCesMcastFilterGroupMemberInterfaceType, cienaCesMcastFilterGroupMemberInterfaceIndex }
+     ::= { cienaCesMcastFilterGroupMemberTable 1 }
+ 
+ CienaCesMcastFilterGroupMemberEntry ::= SEQUENCE {
+     cienaCesMcastFilterGroupMemberInterfaceType               InterfaceType,
+     cienaCesMcastFilterGroupMemberInterfaceIndex            		Integer32,
+     cienaCesMcastFilterGroupMemberInterfaceLiType               InterfaceType,
+     cienaCesMcastFilterGroupMemberInterfaceLiIndex            		Integer32
+ }
+     
+ cienaCesMcastFilterGroupMemberInterfaceType OBJECT-TYPE
+     SYNTAX      InterfaceType
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	    "The interface type of the group member"  
+     ::= { cienaCesMcastFilterGroupMemberEntry 1 }
+ 
+ cienaCesMcastFilterGroupMemberInterfaceIndex   OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+	    "The interface Id of the group member."
+     ::= { cienaCesMcastFilterGroupMemberEntry 2 }
+
+ cienaCesMcastFilterGroupMemberInterfaceLiType OBJECT-TYPE
+     SYNTAX      InterfaceType
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "The interface type of the group member"  
+     ::= { cienaCesMcastFilterGroupMemberEntry 3 }
+ 
+ cienaCesMcastFilterGroupMemberInterfaceLiIndex   OBJECT-TYPE
+     SYNTAX      Integer32(1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+	    "The interface Id of the group member."
+     ::= { cienaCesMcastFilterGroupMemberEntry 4 }
+     
+ --
+ --  The Multicast Global Resources
+ --     
+ cienaCesMcastMaxServiceInstances OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents maximum number of IGMP service instances supported."
+	 ::= { cienaCesMcastGlobalResources 1 }
+	
+ cienaCesMcastCurrentServiceInstances OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the current number of IGMP service instances configured."
+	 ::= { cienaCesMcastGlobalResources 2 }
+ 
+ cienaCesMcastMaxMcastGroups OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the maximum number of multicast groups supported."
+	 ::= { cienaCesMcastGlobalResources 3 }
+	 
+ cienaCesMcastCurrentMcastGroups OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the current number of multicast groups."
+	 ::= { cienaCesMcastGlobalResources 4 }
+	 
+ cienaCesMcastMaxSrcAddrRecords OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the maximum number of multicast source address records."
+	 ::= { cienaCesMcastGlobalResources 5 }
+	 
+ cienaCesMcastCurrentSrcAddrRecords OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the current number of source address records."
+	 ::= { cienaCesMcastGlobalResources 6 }
+
+ cienaCesMcastMaxTimers OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the maximum number of multicast timers."
+	 ::= { cienaCesMcastGlobalResources 7 }
+	 
+ cienaCesMcastCurrentTimers OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the current number of multicast timers."
+	 ::= { cienaCesMcastGlobalResources 8 }
+ 
+ cienaCesMcastMaxLogicalInterfaces OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the maximum number of Logical Interfaces."
+	 ::= { cienaCesMcastGlobalResources 9 }
+	 
+ cienaCesMcastCurrentLogicalInterfaces OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "This object represents the current number of Logical Interfaces."
+	 ::= { cienaCesMcastGlobalResources 10 }
+	 
+ cienaCesMcastMaxGrpMemberInterfaces OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION 
+	    "This object represents the maximum number of Group member Interfaces."
+	 ::= { cienaCesMcastGlobalResources 11 }
+	 
+ cienaCesMcastCurrentGrpMemberInterfaces OBJECT-TYPE
+     SYNTAX          Unsigned32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION 
+	    "This object represents the current number of Group member Interfaces."
+	 ::= { cienaCesMcastGlobalResources 12 } 
+ --
+ --  statistics group 
+ --
+ 
+ --
+ --  The Multicast filter Stats Table
+ --
+
+ cienaCesMcastFilterStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesMcastFilterStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the multicast statistics."
+     ::= { cienaCesMcastFilterStats 1 }
+
+ cienaCesMcastFilterStatsEntry OBJECT-TYPE
+     SYNTAX     CienaCesMcastFilterStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "An entry (conceptual row) in the cienaCesMcastFilterServerTable."
+     INDEX      { cienaCesMcastFilterServiceType, cienaCesMcastFilterServiceIndex }
+     ::= { cienaCesMcastFilterStatsTable 1 }
+
+ CienaCesMcastFilterStatsEntry ::= SEQUENCE {   
+    cienaCesMcastStaticGrpCount        Integer32,
+    cienaCesMcastDynamicGrpCount       Integer32,
+    cienaCesMcastJoinMessagesRx        Counter32,
+    cienaCesMcastLeaveMessagesRx       Counter32,     
+    cienaCesMcastV3ReportsRx           Counter32,
+    cienaCesMcastQueryMessagesRx       Counter32,
+    cienaCesMcastQueryRxDiscards       Counter32,
+    cienaCesMcastQueryTimeouts         Counter32,
+    cienaCesMcastUnknownPktTypeRx      Counter32,
+    cienaCesMcastRouterRxDiscards      Counter32,
+    cienaCesMcastHostRxDiscards        Counter32,
+    cienaCesMcastBadChecksumRx         Counter32,
+    cienaCesMcastL2L3MismatchRx        Counter32,
+    cienaCesMcastTotalMembers          Counter32,
+    cienaCesMcastLingerCount           Counter32,
+    cienaCesMcastStatsQuerySrcIpZeroDiscard    Counter32,
+    cienaCesMcastCompatibilityModeDiscards     Counter32,
+    cienaCesMcastReplyTimeouts          Counter32,
+    cienaCesMcastResourceExceed         Counter32,
+    cienaCesMcastV3ReportsRxIsIn       Counter32,
+    cienaCesMcastV3ReportsRxIsEx       Counter32,
+    cienaCesMcastV3ReportsRxToIn       Counter32,
+    cienaCesMcastV3ReportsRxToEx       Counter32,
+    cienaCesMcastV3ReportsRxAllow      Counter32,
+    cienaCesMcastV3ReportsRxBlock      Counter32
+ }
+
+ cienaCesMcastStaticGrpCount  OBJECT-TYPE
+     SYNTAX          Integer32 (0..65535)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of static multicast groups."                              
+       ::= { cienaCesMcastFilterStatsEntry 1 } 
+
+ cienaCesMcastDynamicGrpCount  OBJECT-TYPE
+     SYNTAX          Integer32 (0..65535)
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of dynamic mcast groups."                              
+       ::= { cienaCesMcastFilterStatsEntry 2 } 
+
+ cienaCesMcastJoinMessagesRx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of join messages received."                              
+       ::= { cienaCesMcastFilterStatsEntry 3 }
+       
+ cienaCesMcastLeaveMessagesRx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of leave messages received."                              
+       ::= { cienaCesMcastFilterStatsEntry 4 }
+
+ cienaCesMcastV3ReportsRx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of V3 membership reports recieved."                              
+       ::= { cienaCesMcastFilterStatsEntry 5 }
+       
+ cienaCesMcastQueryMessagesRx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of queries received."                              
+       ::= { cienaCesMcastFilterStatsEntry 6 }
+       
+ cienaCesMcastQueryRxDiscards  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of queries discarded."                              
+       ::= { cienaCesMcastFilterStatsEntry 7 }
+       
+ cienaCesMcastQueryTimeouts  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of timeouts waiting for the
+	      router to send query."                              
+       ::= { cienaCesMcastFilterStatsEntry 8 }
+       
+ cienaCesMcastUnknownPktTypeRx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of unknown (unknown type ) IGMP 
+	      packets received."                              
+       ::= { cienaCesMcastFilterStatsEntry 9 }
+       
+ cienaCesMcastRouterRxDiscards  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of messages discarded by the
+	      router. This happens when join comes in from
+	      a router interface."                              
+       ::= { cienaCesMcastFilterStatsEntry 10 }
+       
+ cienaCesMcastHostRxDiscards  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of messages discarded by the
+	      host. This happens when a join/leave comes
+	      in from a interface, but no router interface is established."                              
+       ::= { cienaCesMcastFilterStatsEntry 11 }
+       
+ cienaCesMcastBadChecksumRx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of packets received with bad
+	      IP checksum."                              
+       ::= { cienaCesMcastFilterStatsEntry 12  }
+       
+ cienaCesMcastL2L3MismatchRx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of IGMP Layer2 / Layer 3 mismatch packets
+	      received."                              
+       ::= { cienaCesMcastFilterStatsEntry 13 }
+
+ cienaCesMcastTotalMembers OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of group members for all groups in the given multicast service."                              
+       ::= { cienaCesMcastFilterStatsEntry 14 }
+
+ cienaCesMcastLingerCount OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of groups in linger state."                              
+       ::= { cienaCesMcastFilterStatsEntry 15 }
+
+ cienaCesMcastStatsQuerySrcIpZeroDiscard	OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "Specifies the number of queries discarded with a zero source IP."
+       ::= { cienaCesMcastFilterStatsEntry 16 }
+
+ cienaCesMcastCompatibilityModeDiscards OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "For products that support IGMPv3, this object specifies the total number
+            of frames discarded because of compatibility mode mismatches.  Products
+            that do not support IGMPv3 will not return this object."                              
+       ::= { cienaCesMcastFilterStatsEntry 17 }
+
+ cienaCesMcastReplyTimeouts OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "Specifies the number of query reply timeouts."
+       ::= { cienaCesMcastFilterStatsEntry 18 }
+
+ cienaCesMcastResourceExceed OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+            "Specifies the number of resource exceeded errors."
+       ::= { cienaCesMcastFilterStatsEntry 19 }
+
+ cienaCesMcastV3ReportsRxIsIn  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of V3 membership IS_IN reports recieved."                              
+       ::= { cienaCesMcastFilterStatsEntry 20 }
+       
+ cienaCesMcastV3ReportsRxIsEx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of V3 membership IS_EX reports recieved."                              
+       ::= { cienaCesMcastFilterStatsEntry 21 }
+     
+ cienaCesMcastV3ReportsRxToIn  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of V3 membership TO_IN reports recieved."                              
+       ::= { cienaCesMcastFilterStatsEntry 22 }
+      
+ cienaCesMcastV3ReportsRxToEx  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of V3 membership TO_EX reports recieved."                              
+       ::= { cienaCesMcastFilterStatsEntry 23 }
+       
+ cienaCesMcastV3ReportsRxAllow  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of V3 membership Allow reports recieved."                              
+       ::= { cienaCesMcastFilterStatsEntry 24 }
+       
+ cienaCesMcastV3ReportsRxBlock  OBJECT-TYPE
+     SYNTAX          Counter32
+     MAX-ACCESS      read-only
+     STATUS          current
+     DESCRIPTION
+    	     "The total number of V3 membership Block reports recieved."                              
+       ::= { cienaCesMcastFilterStatsEntry 25 }         
+
+--
+-- Notifications
+--  
+ cienaCesMcastAddrOverlapNotification  NOTIFICATION-TYPE
+        OBJECTS      {      
+          cienaGlobalSeverity,
+          cienaGlobalMacAddress
+   }
+   STATUS      current
+   DESCRIPTION
+
+		"A cienaCesMcastAddrOverlapNotification is sent whenever 
+		 several multicast IP addresses overlap (matches the 
+		 same L2 address)."
+
+   ::= { cienaCesMcastFilterMIBNotification 1 }
+
+
+END
+ 

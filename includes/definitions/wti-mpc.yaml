@@ -1,0 +1,27 @@
+os: wti-mpc
+text: 'WTI MPC'
+type: power
+icon: wti
+mib_dir:
+    - wti
+poller_modules:
+    wireless: false
+    ntp: false
+    applications: false
+    stp: false
+    services: false
+discovery_modules:
+    stp: false
+    wireless: false
+    vlans: false
+    ntp: false
+    services: false
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+          oid: 'WTI-MPC-MIB::environmentUnitName.1'
+          mib_dir: wti
+          op: '!='
+          value: false
+

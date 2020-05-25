@@ -1,0 +1,168 @@
+ARRIS-D5-WAN-POST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TimeStamp
+        FROM SNMPv2-TC
+    arrisD5UEQam
+        FROM ARRIS-MIB;
+
+    d5WanPOSTMIB  MODULE-IDENTITY
+        LAST-UPDATED "200602220000Z" -- 22nd February 2006
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB reports POST result on the Arris D5 WAN card"
+        ::= { arrisD5UEQam 3 }
+
+    d5WanPOSTObjects OBJECT IDENTIFIER ::= { d5WanPOSTMIB 1 }
+
+
+    D5WanPOSTTestResult ::= TEXTUAL-CONVENTION
+        STATUS    current
+        DESCRIPTION
+            "A convenient type definition for POST test results."
+        SYNTAX    INTEGER {
+                            passed(1),
+                            skipped(2),
+                            failed(3),
+                            notYetKnown(4)
+                          }
+
+    d5WanPOSTTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF D5WanPOSTEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+        "This table contains a list of WAN POST tests and test-results."
+        ::= { d5WanPOSTObjects 1 }
+    d5WanPOSTEntry  OBJECT-TYPE
+        SYNTAX  D5WanPOSTEntry
+        MAX-ACCESS  not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry for a single POST test and result."
+        INDEX { d5WanPOSTTestId }
+        ::= { d5WanPOSTTable 1 }
+    D5WanPOSTEntry ::= SEQUENCE {
+        d5WanPOSTTestId          Unsigned32,
+        d5WanPOSTTestDescr       DisplayString,
+        d5WanPOSTTestResult      D5WanPOSTTestResult,
+        d5WanPOSTTestResultDescr DisplayString
+    }
+    d5WanPOSTTestId  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A unique identifier specifying a particular POST test."
+        ::= { d5WanPOSTEntry 1 }
+    d5WanPOSTTestDescr  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A textual description of the associated POST test."
+        ::= { d5WanPOSTEntry 2 }
+    d5WanPOSTTestResult  OBJECT-TYPE
+        SYNTAX      D5WanPOSTTestResult
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Test result from boot-time test"
+        ::= { d5WanPOSTEntry 3 }
+    d5WanPOSTTestResultDescr  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Optional textual description of the test result."
+        ::= { d5WanPOSTEntry 4 }
+
+
+    d5WanPOSTDiagnosticTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF D5WanPOSTDiagnosticEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+        "This table contains a list of the WAN POST tests that can be run after boot-time."
+        ::= { d5WanPOSTObjects 2 }
+    d5WanPOSTDiagnosticEntry  OBJECT-TYPE
+        SYNTAX  D5WanPOSTDiagnosticEntry
+        MAX-ACCESS  not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry for a single POST test and result."
+        INDEX { d5WanPOSTDiagTestId }
+        ::= { d5WanPOSTDiagnosticTable 1 }
+    D5WanPOSTDiagnosticEntry ::= SEQUENCE {
+        d5WanPOSTDiagTestId              Unsigned32,
+        d5WanPOSTDiagLastTestTimeStamp   TimeStamp,
+        d5WanPOSTDiagLastTestResult      D5WanPOSTTestResult,
+        d5WanPOSTDiagLastTestResultDescr DisplayString,
+        d5WanPOSTDiagExecute         INTEGER,
+        d5WanPOSTDiagParam           Integer32
+    }
+    d5WanPOSTDiagTestId  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A unique identifier specifying a particular POST test."
+        ::= { d5WanPOSTDiagnosticEntry 1 }
+    d5WanPOSTDiagLastTestTimeStamp  OBJECT-TYPE
+        SYNTAX      TimeStamp
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The value of sysUpTime when this test was last executed.
+                   Zero if not-applicable or if last executed at boot-time."
+        ::= { d5WanPOSTDiagnosticEntry 2 }
+
+    d5WanPOSTDiagLastTestResult  OBJECT-TYPE
+        SYNTAX      D5WanPOSTTestResult
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Most recent test result"
+        ::= { d5WanPOSTDiagnosticEntry 3 }
+    d5WanPOSTDiagLastTestResultDescr  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Optional textual description of the test result."
+        ::= { d5WanPOSTDiagnosticEntry 4 }
+
+    d5WanPOSTDiagExecute  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        start(0),
+                        running(1),
+                        idle(2),
+                        stop(3) }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Control for starting/stopping a test and checking for test completion.
+             Only a value of start or stop is allowed on write access.
+             Only a value of idle or running is allowed on read access."
+        ::= { d5WanPOSTDiagnosticEntry 5 }
+    
+    d5WanPOSTDiagParam  OBJECT-TYPE
+        SYNTAX      Integer32 
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Parameter passed to a test started by setting d5WanPOSTDiagExecute to start."
+        ::= { d5WanPOSTDiagnosticEntry 6 }
+
+ END

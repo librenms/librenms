@@ -1,0 +1,63 @@
+mib: RUGGEDCOM-SYS-INFO-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: rcDeviceStsPowerSupply1
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.4.{{ $index }}'
+                    descr: 'Power Supply 1 Status'
+                    index: 'rcDeviceStsPowerSupply1.{{ $index }}'
+                    states:
+                        - { descr: notPresent, graph: 0, value: 1, generic: 3 }
+                        - { descr: functional, graph: 0, value: 2, generic: 0 }
+                        - { descr: notFunctional, graph: 0, value: 3, generic: 2 }
+                        - { descr: notConnected, graph: 0, value: 4, generic: 1 }
+                -
+                    oid: rcDeviceStsPowerSupply2
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.5.{{ $index }}'
+                    descr: 'Power Supply 2 Status'
+                    index: 'rcDeviceStsPowerSupply2.{{ $index }}'
+                    states:
+                        - { descr: notPresent, graph: 0, value: 1, generic: 3 }
+                        - { descr: functional, graph: 0, value: 2, generic: 0 }
+                        - { descr: notFunctional, graph: 0, value: 3, generic: 2 }
+                        - { descr: notConnected, graph: 0, value: 4, generic: 1 }
+                -
+                    oid: rcDeviceStsFailSafeRelay
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.7.{{ $index }}'
+                    descr: Fail Safe Relay
+                    index: 'rcDeviceStsFailSafeRelay.{{ $index }}'
+                    states:
+                        - { descr: energized, graph: 0, value: 1, generic: 0 }
+                        - { descr: deEnergized, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: rcDeviceStsFanBank1
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.10.{{ $index }}'
+                    descr: 'Fan Bank Module 1'
+                    index: 'rcDeviceStsFanBank1.{{ $index }}'
+                    states:
+                        - { descr: notPresent, graph: 0, value: 1, generic: 3 }
+                        - { descr: failed, graph: 0, value: 2, generic: 2 }
+                        - { descr: standby, graph: 0, value: 3, generic: 0 }
+                        - { descr: off, graph: 0, value: 4, generic: 0 }
+                        - { descr: on, graph: 0, value: 5, generic: 0 }
+                -
+                    oid: rcDeviceStsFanBank2
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.11.{{ $index }}'
+                    descr: 'Fan Bank Module 2'
+                    index: 'rcDeviceStsFanBank2.{{ $index }}'
+                    states:
+                        - { descr: notPresent, graph: 0, value: 1, generic: 3 }
+                        - { descr: failed, graph: 0, value: 2, generic: 2 }
+                        - { descr: standby, graph: 0, value: 3, generic: 0 }
+                        - { descr: off, graph: 0, value: 4, generic: 0 }
+                        - { descr: on, graph: 0, value: 5, generic: 0 }
+        temperature:
+            data:
+                -
+                    oid: rcDeviceStsTemperature
+                    num_oid: '.1.3.6.1.4.1.15004.4.2.2.3.{{ $index }}'
+                    index: 'rcDeviceStsTemperature.{{ $index }}'
+                    descr: System Temperature
+                    divisor: 1

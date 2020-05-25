@@ -1,0 +1,152 @@
+RUGGEDCOM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY,
+    OBJECT-IDENTITY                     FROM SNMPv2-SMI;
+
+ruggedcom MODULE-IDENTITY
+    LAST-UPDATED "201504020900Z"      -- Apr 2, 9:00 EST 2015;
+    ORGANIZATION "RuggedCom"
+    CONTACT-INFO
+       "Postal: RuggedCom Inc.
+                300 Applewood Crescent
+                Concord, Ontario, 
+                L4K 5C7 Canada
+        Tel:    1-905-856-5288
+        E-Mail: support@ruggedcom.com"
+
+    DESCRIPTION
+        "RuggedCom enterprise structure of management information."
+
+	REVISION    "201504020900Z"      -- Apr 2, 9:00 EST 2015;
+    DESCRIPTION                
+        "Added Added specific ros product branch ruggedcomMC."
+
+	REVISION    "201206011700Z"      -- Jun 01, 17:00 EST 2012;
+    DESCRIPTION                
+        "Added Added specific rox2 products branch ruggedcomRX1XXXrox2X."
+
+    REVISION "201005271030Z"      -- May 27, 10:30 EST 2010
+    DESCRIPTION
+        "Updated ruggedcomProducts branches - added ruggedcomMX5000."
+
+    REVISION "201003121030Z"      -- March 12, 10:30 EST 2010
+    DESCRIPTION
+        "Updated ruggedcomProducts branches."
+
+
+    REVISION "200812171300Z"         -- Dec 17, 13:00 EST 2008
+    DESCRIPTION
+        "Removed inclusion of OBJECT-TYPE and Interger32.
+         Included OBJECT-IDENTITY."
+
+    REVISION "200609090900Z"      -- September 9, 09:00 EST 2006; 
+    DESCRIPTION
+        "Updated CONTACT-INFO."
+
+    REVISION "200302181400Z"      -- February 18, 14:00 EST 2003; 
+    DESCRIPTION
+        "The initial version of RuggedCom enterprise structure of management
+        information."
+    ::= { enterprises 15004 }
+
+-- Branch 'ruggedcomExperiment 1' is obsoleted.  It was used as branch named
+-- 'products' in RCSWITCH-MIB (prereleased versions of RC-SWITCH-MIB)
+-- which has never been a RuggedCom official MIB, but has been supported
+-- by main firmware version 1.0.0. 
+
+ruggedcomExperiment OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The root object identifier from which experimental MIBs may
+        be temporarily based.  MIBs are typicaly based here if they fall
+        in one of two categories:
+        1) are IETF work-in-process MIBs which have not been assigned a 
+        permanet object identifier by the IANA.
+        2) are RugedCom work-in-process which has not been assigne a 
+        permanent object identifier, typically because the MIB is not 
+        ready for deployment."
+    ::= { ruggedcom 1 }
+
+
+ruggedcomProducts  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The root object identifier from which sysObjectID values are 
+        assigned."  
+    ::= { ruggedcom 2 }
+
+-- Branches with following OIDs are used by specific products:
+-- ruggedcomProducts.1 is reserved for ruggedcomSwitchModule (RuggedCom Switch)
+-- ruggedcomProducts.2 is reserved for ruggedcomServerModule (RuggedCom Server)
+-- ruggedcomProducts.3 is reserved for ruggedcomMC30Module (RuggedCom Media Converter RMC30)
+-- ruggedcomProducts.4 is reserved for RX1XXX 
+ruggedcomRX1XXX OBJECT IDENTIFIER ::= { ruggedcomProducts 4 }
+ruggedcomRX1000 OBJECT IDENTIFIER ::= { ruggedcomRX1XXX 1 }
+ruggedcomRX1100 OBJECT IDENTIFIER ::= { ruggedcomRX1XXX 2 }
+-- ruggedcomProducts.5 is reserved for RX5XXX 
+ruggedcomRX5XXX OBJECT IDENTIFIER ::= { ruggedcomProducts 5 }
+ruggedcomRX5000 OBJECT IDENTIFIER ::= { ruggedcomRX5XXX 1 }
+ruggedcomMX5000 OBJECT IDENTIFIER ::= { ruggedcomRX5XXX 2 }
+-- ruggedcomProducts.6 is reserved for ruggedmaxProducts
+ruggedmaxProducts OBJECT IDENTIFIER ::= { ruggedcomProducts 6 }
+-- ruggedcomProducts.8 is reserved for RX15XX products
+ruggedcomRX15XX OBJECT IDENTIFIER ::= { ruggedcomProducts 8 }
+ruggedcomRX1500 OBJECT IDENTIFIER ::= { ruggedcomRX15XX 1 }
+ruggedcomRX1501 OBJECT IDENTIFIER ::= { ruggedcomRX15XX 2 }
+ruggedcomRX1510 OBJECT IDENTIFIER ::= { ruggedcomRX15XX 11 }
+ruggedcomRX1511 OBJECT IDENTIFIER ::= { ruggedcomRX15XX 12 }
+ruggedcomRX1512 OBJECT IDENTIFIER ::= { ruggedcomRX15XX 13 }
+-- ruggedcomProducts.9 is reserved for RX1XXXrox2X 
+ruggedcomRX1XXXrox2X OBJECT IDENTIFIER ::= { ruggedcomProducts 9 }
+ruggedcomRX1000rox2X OBJECT IDENTIFIER ::= { ruggedcomRX1XXXrox2X 1 }
+ruggedcomRX1100rox2X OBJECT IDENTIFIER ::= { ruggedcomRX1XXXrox2X 2 }
+
+-- ruggedcomProducts.10 is reserved for ruggedcomAirModule
+ruggedcomAirModule OBJECT IDENTIFIER ::= { ruggedcomProducts 10 }
+
+-- ruggedcomProducts.11 is reserved for ruggedcomMC (RuggedCom Media Converter)
+ruggedcomMC OBJECT IDENTIFIER ::= { ruggedcomProducts 11 }
+
+ruggedcomOtherEnterprises OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The root object identifier from which MIBs produced by other 
+        companies may be placed.  MIBs produced by other enterprises 
+        are typically implemented with the object identifiers as defined
+        in the MIB, but if the MIB is deemed to be uncontrolelled, we may 
+        reroot the MIB at this subtree in order to have a controlled 
+        version."
+    ::= { ruggedcom 3 }
+
+ruggedcomMgmt  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The main subtree for new MIB development where specific RuggedCom
+        proprietary MIBs can be placed."
+    ::= { ruggedcom 4 }  
+
+-- ruggedcomMgmt.3 branch is reserved for RuggedCom Internal use (Discovery Tool uses .1)
+-- ruggedcomMgmt.10 branch is reserved for ruggedmax
+
+ruggedcomTraps OBJECT-IDENTITY 
+    STATUS  current
+    DESCRIPTION
+        "The root of the subtree where RuggedCom traps can be placed."
+    ::= { ruggedcom 5 }  
+
+ruggedcomAgentCapabilities OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The root object identifier from which AGENT-CAPABILITIES values
+        may be assigned."
+    ::= { ruggedcom 6 }  
+
+ruggedcomAgentCapability OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "The root object identifier from which AGENT-CAPABILITIES for 
+        individual MIBs are described."
+    ::= { ruggedcomAgentCapabilities 30 }  
+
+END

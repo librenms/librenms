@@ -1,0 +1,74 @@
+mib: CISCO-UNIFIED-COMPUTING-COMPUTE-MIB:CISCO-UNIFIED-COMPUTING-PROCESSOR-MIB:CISCO-UNIFIED-COMPUTING-MEMORY-MIB
+modules:
+    sensors:
+        current:
+            data:
+                -
+                    oid: cucsComputeMbPowerStatsTable
+                    value: cucsComputeMbPowerStatsInputCurrent
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.9.14.1.8.{{ $index }}'
+                    descr: MB Input Current
+                    index: 'mb-input-current'
+        voltage:
+            data:
+                -
+                    oid: cucsComputeMbPowerStatsTable
+                    value: cucsComputeMbPowerStatsInputVoltage
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.9.14.1.12.{{ $index }}'
+                    descr: MB Input Voltage
+                    index: 'mb-input-voltage'
+        power:
+            data:
+                -
+                    oid: cucsComputeMbPowerStatsTable
+                    value: cucsComputeMbPowerStatsConsumedPower
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.9.14.1.4.{{ $index }}'
+                    descr: MB Input Power
+                    index: 'mb-input-power'
+        temperature:
+            data:
+                -
+                    oid: cucsComputeRackUnitMbTempStatsTable
+                    value: cucsComputeRackUnitMbTempStatsAmbientTemp
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.4.{{ $index }}'
+                    descr: 'Rack Unit Ambient Temperature'
+                    index: 'ambient.{{ $index }}'
+                -
+                    oid: cucsComputeRackUnitMbTempStatsTable
+                    value: cucsComputeRackUnitMbTempStatsIoh1Temp
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.13.{{ $index }}'
+                    descr: 'IO Hub 1 Temperature'
+                    index: 'ioh1.{{ $index }}'
+                -
+                    oid: cucsComputeRackUnitMbTempStatsTable
+                    value: cucsComputeRackUnitMbTempStatsIoh2Temp
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.17.{{ $index }}'
+                    descr: 'IO Hub 2 Temperature'
+                    index: 'ioh2.{{ $index }}'
+                -
+                    oid: cucsComputeRackUnitMbTempStatsTable
+                    value: cucsComputeRackUnitMbTempStatsFrontTemp
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.8.{{ $index }}'
+                    descr: 'Rack Unit Front Temperature'
+                    index: 'front.{{ $index }}'
+                -
+                    oid: cucsComputeRackUnitMbTempStatsTable
+                    value: cucsComputeRackUnitMbTempStatsRearTemp
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.9.44.1.21.{{ $index }}'
+                    descr: 'Rack Unit Rear Temperature'
+                    index: 'rear.{{ $index }}'
+                -
+                    oid: cucsMemoryUnitEnvStatsTable
+                    value: cucsMemoryUnitEnvStatsTemperature
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.30.12.1.6.{{ $index }}'
+                    warn_limit: 40
+                    descr: 'Memory {{ $index }} Temperature'
+                    index: 'mem.{{ $index }}'
+                -
+                    oid: cucsProcessorEnvStatsTable
+                    value: cucsProcessorEnvStatsTemperature
+                    num_oid: '.1.3.6.1.4.1.9.9.719.1.41.2.1.10.{{ $index }}'
+                    warn_limit: 40
+                    descr: 'CPU {{ $index }} Temperature'
+                    index: 'cpu.{{ $index }}'
+

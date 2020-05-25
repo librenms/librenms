@@ -1,0 +1,940 @@
+PT-FM-MIB DEFINITIONS::=BEGIN
+	IMPORTS	
+		MODULE-IDENTITY,OBJECT-TYPE,Integer32
+			FROM SNMPv2-SMI
+			MODULE-COMPLIANCE,
+      OBJECT-GROUP FROM SNMPv2-CONF
+		pt FROM PT-MIB
+  TEXTUAL-CONVENTION, DateAndTime FROM SNMPv2-TC;
+  		
+		    ptFM MODULE-IDENTITY
+        LAST-UPDATED "201603211200Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the MIB of PT specifics"
+            
+        REVISION      "201603211200Z"
+        DESCRIPTION
+            "Added Managed and Reference OID to the current alarms"
+
+        REVISION      "201603091200Z"
+        DESCRIPTION
+            "Validated."
+            
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "The initial version of this MIB module."
+
+        ::= { pt 3 }
+			 
+	config             OBJECT IDENTIFIER ::= { ptFM 1 } 
+	alarm              OBJECT IDENTIFIER ::= { ptFM 2 } 	
+	log                OBJECT IDENTIFIER ::= { ptFM 3 }
+	ptFMConformance    OBJECT IDENTIFIER ::= { ptFM 4 }
+--
+-- The textual conventions we define and use in this MIB.
+--   	 
+ NotificationIdTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Notification ID which is NONE now."
+    SYNTAX     INTEGER {  
+    	eNONE (0)
+	}  
+	
+ MoClassTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Textual Convention for MoClass"
+    SYNTAX     INTEGER {  
+    	eNONE (0)
+	}  
+	
+ SeverityTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the severity level, take the value of INDETERMINATE,
+	   CRITICAL, MAJOR, MINOR, WARNING and CLEARED. "
+    SYNTAX     INTEGER {  
+          eINDETERMINATE (1),
+          eCRITICAL      (2),
+          eMAJOR         (3),
+          eMINOR         (4),
+          eWARNING       (5),
+          eCLEARED       (6)
+	} 
+	
+ProbableCauseTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "Probable Cause"
+    SYNTAX     INTEGER { 
+    	eNONE (0)
+	}   
+	
+ CategoryTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the category. "
+    SYNTAX     INTEGER {  
+             eHIGHORDERLEVEL        (1),
+             eUNFILTERED            (2),
+             eLOWORDERLEVEL         (3),
+             eNONE                  (4)
+            }   
+ ClearableTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates whether a notification is clearable or not."
+    SYNTAX     INTEGER {  
+             eTRUE      (1),
+             eFALSE     (2)
+            }   
+ EnableStatusTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the enable status type: ENABLED or DISABLED. "
+    SYNTAX     INTEGER {  
+             eENABLED      (1),
+             eDISABLED     (2)
+            }   
+
+ LayerRateTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An emulation for layer rate."
+    SYNTAX     INTEGER {  
+                  eLRNOTAPPLICABLE  (1),
+                  eLRT3ANDDS345M (4),
+                  eLRE12M   (5),
+                  eLRE334M  (7),
+                  eLRVT2ANDTU12VC12  (11),
+                  eLRLOWORDERTU3VC3 (13),
+                  eLRSTS3CANDAU4VC4  (15),
+                  eLRSTS12CVC44C       (16),
+                  eLRSECTIONOC3STS3ANDRSSTM1  (20),
+                  eLRSECTIONOC12STS12ANDRSSTM4 (21),
+                  eLRSECTIONOC48STS48ANDRSSTM16 (22),
+                  eLRLINEOC3STS3ANDMSSTM1 (25),
+                  eLRLINEOC12STS12ANDMSSTM4 (26),
+                  eLRLINEOC48STS48ANDMSSTM16 (27),
+                  eLRDSROC3STM1  (73),
+                  eLRDSROC12STM4  (74),
+                  eLRDSROC48STM16  (76),
+                  eLRDSRGIGABITETHERNET (87),
+                  eLRENCAPSULATION   (98),
+                  eLRFRAGMENT  (99)
+             }  
+ EventTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the event type: INFORMATION or WARNING. "
+    SYNTAX     INTEGER {  
+             eINFORMATION      (1),
+             eWARNING          (2)
+            }   
+
+ EventCauseTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the event cause (only NONE is supported)."
+    SYNTAX     INTEGER {  
+             eNONE      (0)
+            }   
+	    
+ SwitchTypeTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the switch type. "
+    SYNTAX     INTEGER {  
+            eSDHMSP (1),
+            eSDHSNCP (2),
+            eEQUIPEMEMTPROTECTION (3),
+            eSYNCHRONISATION (4),
+            eSCSWITCHOVER (5)
+            }  
+	    
+ SwitchReasonTC ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+           "An integer indicates the switch reason. "
+    SYNTAX     INTEGER {  
+            eNA (1),
+            eRESTORED (2),
+            eSIGNALFAIL (3),
+            eSIGNALMISMATCH (4),
+            eSIGNALDEGRADE (5),
+            eAUTOMATICSWITCH (6),
+            eMANUAL (7),
+            eREMOTEREQUEST (8),
+            ePROTECTIONDISABLED (9),
+            eMODULEFAIL (10)
+            }   
+
+---
+---The Fault Managment Group definition
+---
+
+---
+--- Alarm Config Table definition
+---
+	alarmConfigTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlarmConfigEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "This configuration defines the default severity of an alarm notification.
+            "
+    		::= { config 1 }
+
+	alarmConfigEntry OBJECT-TYPE
+    		SYNTAX      AlarmConfigEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface indexed by NotificationId and moClass. "
+    		INDEX   { notificationId ,moClass }
+    		::= { alarmConfigTable 1 }
+ 
+	AlarmConfigEntry ::=
+		    SEQUENCE {
+                    notificationId              NotificationIdTC,
+                    moClass                     MoClassTC,
+                    severity                    SeverityTC,
+                    probableCauseQualifier      OCTET STRING,
+                    probableCause               ProbableCauseTC,
+                    category                    CategoryTC,
+                    clearable                   ClearableTC
+		    }      
+ 
+	notificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "Notification Id"
+    	     ::= { alarmConfigEntry 1 }
+ 
+	moClass OBJECT-TYPE
+    		SYNTAX      MoClassTC
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "MO Class"
+    	::= { alarmConfigEntry 2 }  
+     		
+	severity OBJECT-TYPE
+    	   SYNTAX      SeverityTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "SeverityTC"
+    	     ::= { alarmConfigEntry 3 }
+ 
+	probableCauseQualifier OBJECT-TYPE
+    		SYNTAX      OCTET STRING (SIZE (0..80))
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Probable Cause Qualifier"
+    	::= { alarmConfigEntry 4 }  
+	probableCause OBJECT-TYPE
+    	   SYNTAX      ProbableCauseTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Probable Cause"
+    	     ::= { alarmConfigEntry 5 }
+ 
+	category OBJECT-TYPE
+    		SYNTAX      CategoryTC
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "For non-clearable alarms, filtering category is NONE."
+    	::= { alarmConfigEntry 6 }  
+	
+	clearable OBJECT-TYPE
+    		SYNTAX      ClearableTC
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "This attribute indicates whether this is a clearable or 
+	     non-clearable alarm notification."
+    	::= { alarmConfigEntry 7 }     
+
+---
+--- AlarmPersistencyConfigTable definition 
+---   
+     
+  	alarmPersistencyConfigTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlarmPersistencyConfigEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+                "Alarm Persistency Configuration Table"
+    		::= { config 2 }   
+    		
+	alarmPersistencyConfigEntry OBJECT-TYPE
+    		SYNTAX      AlarmPersistencyConfigEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+                "An entry containing management information applicable to a
+                 particular interface."
+    		INDEX   { category }
+    		::= { alarmPersistencyConfigTable 1 }
+ 
+	AlarmPersistencyConfigEntry ::=
+		    SEQUENCE {
+                    persistencyConfigcategory       CategoryTC,
+                    onFilter               Integer32,
+                    offFilter              Integer32
+		    }      
+ 
+	persistencyConfigcategory OBJECT-TYPE
+    	       SYNTAX      CategoryTC
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    	       DESCRIPTION
+               "Persistency Configuration category"
+    	       ::= { alarmPersistencyConfigEntry 1 }
+ 
+	onFilter OBJECT-TYPE
+    		SYNTAX      Integer32
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+                "An integer with max value of 30. 
+	        Default is 0 sec for highOrderLevel and Unfiltered, 
+	        and 3 sec for lowOrderLevel"
+    	        ::= { alarmPersistencyConfigEntry 2 }  
+     		
+	offFilter OBJECT-TYPE
+    	       SYNTAX      Integer32
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    	       DESCRIPTION
+               "Off Filter"
+    	       ::= { alarmPersistencyConfigEntry 3 }   
+	        	       
+---NotificationConfigTable definition   
+notificationConfig   OBJECT IDENTIFIER ::= { config 3 }
+	notificationReporting OBJECT-TYPE
+    	   SYNTAX      EnableStatusTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "This attribute is used to enable or disable reporting of notifications 
+	    from the AXXMETRO device. When disabled, no notifications will be sent."
+    	     ::= { notificationConfig 1 }
+ 
+	lCASExtendedAlarms OBJECT-TYPE
+    		SYNTAX      EnableStatusTypeTC
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "This attribute is used to enable or disable reporting of 
+	     extended LCAS notifications."
+    	::= { notificationConfig 2 }  
+     		
+	nIMAlarms OBJECT-TYPE
+    	   SYNTAX      EnableStatusTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "This attribute is used to enable or disable reporting of 
+	    notifications from the NIM objects."
+    	::= { notificationConfig 3 }   
+	pJEAlarms OBJECT-TYPE
+    	   SYNTAX      EnableStatusTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "When the operator changes the value from enabled to disabled, 
+	    all active PJE alarms shall be cleared.
+	    When the operator changes the value from disabled to enabled, 
+	    event counting shall be restarted (counters reset to 0).
+	    This attribute has node scope, ie. it impacts all PJE alarms 
+	    on all SDH ports on the node."
+    	::= { notificationConfig 4 }  
+
+---CurrentAlarmsTable definition
+  	currentAlarmsTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF CurrentAlarmsEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "Current Alarms Table"
+    		::= { alarm 1 }   
+    		
+	currentAlarmsEntry OBJECT-TYPE
+    		SYNTAX      CurrentAlarmsEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {sequenceNumber}
+    		::= { currentAlarmsTable 1 }              
+            
+	CurrentAlarmsEntry ::=
+		    SEQUENCE {   
+                    sequenceNumber                        Integer32,
+                    currentAlarmTimeStamp                 DateAndTime,
+                    currentAlarmNotificationId            NotificationIdTC,
+                    currentAlarmManagedObjectId           OCTET STRING,
+                    currentAlarmReferenceObjectId         OCTET STRING,
+                    currentAlarmSeverity                  SeverityTC,
+                    currentAlarmProbableCause             ProbableCauseTC,
+                    currentAlarmProbableCauseQualifier    OCTET STRING,
+                    currentAlarmAdditionalText            OCTET STRING,
+                    currentAlarmLayerRate                 LayerRateTC		    
+            }      
+ 
+	sequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "Sequence Number"
+    	     ::= { currentAlarmsEntry 1 }
+ 
+	currentAlarmTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Time Stamp"
+    	::= { currentAlarmsEntry 2 }  
+     		
+	currentAlarmNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Current Alarm Notification Id"
+    	::= { currentAlarmsEntry 3 } 
+    	
+  currentAlarmManagedObjectId  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the managed object id of an active alarm.
+             The managed object id uniquely identifies the source of the
+             notification and consists of class and instance information
+             for the source. It is represented by a formated text string
+             which first contains the class and depending on the class a list
+             of attribute name and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { currentAlarmsEntry 4 }
+
+  currentAlarmReferenceObjectId  OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..80))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object represents the referenced object id for the
+             managed object id in cases where the managed object id is
+             a virtual object id.
+             It has the same format as 'currentAlarmManagedObjectId' and
+             is represented by a formated text string which first contains
+             the class and depending on the class a list of attribute name
+             and value pairs:
+
+             '<class>:<name>=<value>;<name>=<value>;...'
+
+             <class> : class name.
+             <name>  : attribute name.
+             <value> : attribute value."
+        ::= { currentAlarmsEntry 5 }
+    	
+    	  
+	currentAlarmSeverity OBJECT-TYPE
+    	   SYNTAX      SeverityTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Current Alarm Severity"
+    	::= { currentAlarmsEntry 6 }  
+	currentAlarmProbableCause OBJECT-TYPE
+    	   SYNTAX      ProbableCauseTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Current Alarm Probable Cause"
+    	  ::= { currentAlarmsEntry 7 }
+ 
+	currentAlarmProbableCauseQualifier OBJECT-TYPE
+    		SYNTAX      OCTET STRING (SIZE (0..80))
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Current Alarm Probable Cause Qualifier"
+    	::= { currentAlarmsEntry 8 }  
+     		
+	currentAlarmAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Additional Text"
+    	::= { currentAlarmsEntry 9 }   
+	currentAlarmLayerRate OBJECT-TYPE
+    	   SYNTAX      LayerRateTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Layer Rate"
+    	::= { currentAlarmsEntry 10 } 
+   
+---Log definition  
+alarmLog  OBJECT IDENTIFIER ::= { log 1 }
+---Alarm Log definition
+    maxNumOfEntriesForAlarm  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Max Number Of Entries For Alarm"
+        ::= { alarmLog 1 }  
+    lastSeqNumForAlarm  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Last Sequence Number For Alarm"
+        ::= { alarmLog 2 } 	
+---AlarmLog table definition          
+  	alarmLogTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF AlarmLogEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "Alarm Log Table"
+    		::= { alarmLog 3 }   
+    		
+	alarmLogEntry OBJECT-TYPE
+    		SYNTAX      AlarmLogEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {alarmLogSequenceNumber}
+    		::= { alarmLogTable 1 }              
+            
+	AlarmLogEntry ::=
+		    SEQUENCE {   
+                    alarmLogSequenceNumber           Integer32,
+                    alarmLogTimeStamp                DateAndTime,
+                    alarmLogNotificationId           NotificationIdTC,
+                    alarmLogSeverity                 SeverityTC,
+                    alarmLogProbableCause            ProbableCauseTC,
+                    alarmLogProbableCauseQualifier   OCTET STRING,
+                    alarmLogAdditionalText           OCTET STRING,
+                    alarmLogLayerRate                LayerRateTC		    
+            }      
+ 
+	alarmLogSequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "AlarmLog Sequence Number"
+    	     ::= { alarmLogEntry 1 }
+ 
+	alarmLogTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Alarm Log TimeStamp"
+    	::= { alarmLogEntry 2 }  
+     		
+	alarmLogNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Notification Id"
+    	::= { alarmLogEntry 3 }   
+	alarmLogSeverity OBJECT-TYPE
+    	   SYNTAX      SeverityTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Severity"
+    	::= { alarmLogEntry 4 }  
+	alarmLogProbableCause OBJECT-TYPE
+    	   SYNTAX      ProbableCauseTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Probable Cause"
+    	  ::= { alarmLogEntry 5 }
+ 
+	alarmLogProbableCauseQualifier OBJECT-TYPE
+    		SYNTAX      OCTET STRING (SIZE (0..80))
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Alarm Log Probable Cause Qualifier"
+    	::= { alarmLogEntry 6 }  
+     		
+	alarmLogAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Additional Text"
+    	::= { alarmLogEntry 7 }   
+	alarmLogLayerRate OBJECT-TYPE
+    	   SYNTAX      LayerRateTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Alarm Log Layer Rate"
+    	::= { alarmLogEntry 8 }    
+--- TMNNotificationLog definition      
+tmnNotificationLog  OBJECT IDENTIFIER ::= { log 2 }
+    maxNumOfEntriesForTMN  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Maximum Number Of Entries For TMN"
+        ::= { tmnNotificationLog 1 }  
+    lastSeqNumForTMN  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Last Sequence Number For TMN"
+        ::= { tmnNotificationLog 2 } 
+        
+---TMNNotificationLog table definition
+ 	tmnNotificationLogTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF TmnNotificationLogEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "TMN Notification Log Table"
+    		::= { tmnNotificationLog 3 }   
+    		
+	tmnNotificationLogEntry OBJECT-TYPE
+    		SYNTAX      TmnNotificationLogEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {tmnSequenceNumber}
+    		::= { tmnNotificationLogTable 1 }              
+            
+	TmnNotificationLogEntry ::=
+		    SEQUENCE {   
+                    tmnSequenceNumber           Integer32,
+                    tmnTimeStamp                DateAndTime,
+                    tmnNotificationId           NotificationIdTC,
+                    tmnAdditionalText           OCTET STRING		    
+            }      
+ 
+	tmnSequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "TMN Sequence Number"
+    	     ::= { tmnNotificationLogEntry 1 }
+ 
+	tmnTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "TMN TimeStamp"
+    	::= { tmnNotificationLogEntry 2 }  
+     		
+	tmnNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "TMN Notification Id"
+    	::= { tmnNotificationLogEntry 3 }    		
+	tmnAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "TMN Additional Text"
+    	::= { tmnNotificationLogEntry 4 }   
+
+---EventLog definition    
+eventLog  OBJECT IDENTIFIER ::= { log 3 }
+    maxNumOfEntriesForEvent  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Maximum Number Of Entries For Event"
+        ::= { eventLog 1 }  
+    lastSeqNumForEvent  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Last Sequence Number For Event"
+        ::= { eventLog 2 } 	
+---EventLog table definition          
+  	eventLogTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF EventLogEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "Event Log Table"
+    		::= { eventLog 3 }   
+    		
+	eventLogEntry OBJECT-TYPE
+    		SYNTAX      EventLogEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {eventLogSequenceNumber}
+    		::= { eventLogTable 1 }              
+            
+	EventLogEntry ::=
+		    SEQUENCE {   
+                            eventLogSequenceNumber           Integer32,
+                            eventLogTimeStamp                DateAndTime,
+                            eventLogNotificationId           NotificationIdTC,
+                            eventType                        EventTypeTC,
+                            eventLogAdditionalText           OCTET STRING,
+                            eventCause                       EventCauseTC		    
+            }      
+ 
+	eventLogSequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "Event Log Sequence Number"
+    	     ::= { eventLogEntry 1 }
+ 
+	eventLogTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Event Log TimeStamp"
+    	::= { eventLogEntry 2 }  
+     		
+	eventLogNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Event Log Notification Id"
+    	::= { eventLogEntry 3 }   
+	eventType OBJECT-TYPE
+    	   SYNTAX      EventTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Event Type"
+    	::= { eventLogEntry 4 }     		
+	eventLogAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Event Log Additional Text"
+    	::= { eventLogEntry 5 }   
+	eventCause OBJECT-TYPE
+    	   SYNTAX      EventCauseTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Event Cause"
+    	::= { eventLogEntry 6 }  
+    	
+---ProtectionSwitchLog definition 
+protectionSwitchLog  OBJECT IDENTIFIER ::= { log 4 }
+    maxNumOfEntriesForSwitch  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Maximum Number Of Entries For Switch"
+        ::= { protectionSwitchLog 1 }  
+    lastSeqNumForSwitch  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Last Sequence Number For Switch"
+        ::= { protectionSwitchLog 2 } 	
+---ProtectionSwitchLog table definition          
+  	protectionSwitchLogTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF ProtectionSwitchLogEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+            "Protection Switch Log Table"
+    		::= { protectionSwitchLog 3 }   
+    		
+	protectionSwitchLogEntry OBJECT-TYPE
+    		SYNTAX      ProtectionSwitchLogEntry
+    		MAX-ACCESS  not-accessible
+    		STATUS      current
+    		DESCRIPTION
+            "An entry containing management information applicable to a
+            particular interface."  
+            INDEX {switchLogSequenceNumber}
+    		::= { protectionSwitchLogTable 1 }              
+            
+	ProtectionSwitchLogEntry ::=
+		    SEQUENCE {   
+		                switchLogSequenceNumber           Integer32,
+                    switchLogTimeStamp                DateAndTime,
+                    switchLogNotificationId           NotificationIdTC,
+                    switchType                        SwitchTypeTC,
+                    switchLogAdditionalText           OCTET STRING,
+                    switchReason                      SwitchReasonTC		    
+            }      
+ 
+	switchLogSequenceNumber OBJECT-TYPE
+    	   SYNTAX      Integer32 (0..2147483647)
+	       MAX-ACCESS  not-accessible
+	       STATUS      current
+    		DESCRIPTION
+            "Switch Log Sequence Number"
+    	     ::= { protectionSwitchLogEntry 1 }
+ 
+	switchLogTimeStamp OBJECT-TYPE
+    		SYNTAX      DateAndTime
+    		MAX-ACCESS  read-only
+    		STATUS      current
+    		DESCRIPTION
+            "Switch Log TimeStamp"
+    	::= { protectionSwitchLogEntry 2 }  
+     		
+	switchLogNotificationId OBJECT-TYPE
+    	   SYNTAX      NotificationIdTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Switch Log Notification Id"
+    	::= { protectionSwitchLogEntry 3 }   
+	switchType OBJECT-TYPE
+    	   SYNTAX      SwitchTypeTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Represents the type of the protection for which the switch has occurred."
+    	::= { protectionSwitchLogEntry 4 }     		
+	switchLogAdditionalText OBJECT-TYPE
+    	   SYNTAX       OCTET STRING (SIZE (0..80))
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "Switch Log Additional Text"
+    	::= { protectionSwitchLogEntry 5 }   
+	switchReason OBJECT-TYPE
+    	   SYNTAX      SwitchReasonTC
+	       MAX-ACCESS  read-only
+	       STATUS      current
+    		DESCRIPTION
+            "This attribute represents the reason for the switch."
+    	::= { protectionSwitchLogEntry 6 }  
+    	
+--
+-- Conformance
+--
+
+    ptFMCompliances OBJECT IDENTIFIER ::= { ptFMConformance 1 }
+    ptFMGroups      OBJECT IDENTIFIER ::= { ptFMConformance 2 }
+
+    ptFMFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptFMCompleteGroup}
+        ::= { ptFMCompliances 1 }
+
+    ptFMCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+          alarmLogTimeStamp,
+          alarmLogNotificationId,
+          alarmLogSeverity,
+          alarmLogProbableCause,
+          alarmLogProbableCauseQualifier,
+          alarmLogAdditionalText,
+          alarmLogLayerRate,
+          category,
+          clearable,
+          currentAlarmTimeStamp,
+          currentAlarmNotificationId,
+          currentAlarmManagedObjectId,
+          currentAlarmReferenceObjectId,
+          currentAlarmSeverity,
+          currentAlarmProbableCause,
+          currentAlarmProbableCauseQualifier,
+          currentAlarmAdditionalText,
+          currentAlarmLayerRate,
+          eventLogTimeStamp,
+          eventLogNotificationId,
+          eventType,
+          eventLogAdditionalText,
+          eventCause,
+          lastSeqNumForAlarm,
+          lastSeqNumForTMN,
+          lastSeqNumForEvent,
+          lastSeqNumForSwitch,
+          lCASExtendedAlarms,
+          maxNumOfEntriesForAlarm, 
+          maxNumOfEntriesForTMN,
+          maxNumOfEntriesForEvent,
+          maxNumOfEntriesForSwitch,
+          notificationReporting,
+          nIMAlarms,
+          onFilter,
+          offFilter,
+          pJEAlarms,
+          probableCauseQualifier,
+          probableCause,
+          severity,
+          switchLogTimeStamp,
+          switchLogNotificationId,
+          switchType,
+          switchLogAdditionalText,
+          switchReason,
+          tmnTimeStamp,
+          tmnNotificationId,
+          tmnAdditionalText
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptFMGroups 1 }        
+
+
+END 
+

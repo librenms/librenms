@@ -1,0 +1,122 @@
+-- =================================================================
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved
+--
+-- Description:HUAWEI ERRORDOWN MIB
+-- Reference:
+-- Version: V2.01
+-- History:
+--          V1.00 W55319, 2011-08-08, publish
+-- ===========================================================
+
+    HUAWEI-ERRORDOWN-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            hwDatacomm
+                FROM HUAWEI-MIB
+            EnabledStatus
+                FROM P-BRIDGE-MIB
+            ifIndex, ifName
+                FROM IF-MIB
+            DisplayString, RowStatus
+                FROM SNMPv2-TC
+            Integer32, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                FROM SNMPv2-CONF;
+
+--
+-- Module Identifier
+--
+    hwErrordownMIB MODULE-IDENTITY
+        LAST-UPDATED "201108081000Z"            -- Aug 8, 2011 at 10:00 GMT
+        ORGANIZATION
+           "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
+        DESCRIPTION
+            "The HUAWEI-ERRORDOWN-MIB contains objects to
+            Manage configuration and Monitor running state
+            for ERROR-DOWN feature."
+        REVISION "201108081000Z"            -- Aug 8, 2011 at 10:00 GMT
+        DESCRIPTION
+            "The initial revision of this MIB module."
+        ::= { hwDatacomm 257 }
+--
+-- Objects Identifier
+--
+    hwErrordownObjects OBJECT IDENTIFIER ::= { hwErrordownMIB 1 }
+    hwErrordownNotifications OBJECT IDENTIFIER ::= { hwErrordownMIB 2 }
+    hwErrordownConformance OBJECT IDENTIFIER ::= { hwErrordownMIB 3 }
+
+--
+-- Node definitions
+--
+    hwErrordownCause OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The cause of error-down."
+        ::= { hwErrordownObjects 1 }    
+        
+    hwErrordownRecoverType OBJECT-TYPE
+        SYNTAX     DisplayString
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The type of error-down recovery."
+        ::= { hwErrordownObjects 2 }                  
+
+--
+-- Notification Identifier
+--
+    hwErrordown NOTIFICATION-TYPE
+        OBJECTS { ifName, hwErrordownCause }
+        STATUS current
+        DESCRIPTION
+            "The event is reported when error-down occur."
+        ::= { hwErrordownNotifications 1 }
+
+    hwErrordownRecovery NOTIFICATION-TYPE
+        OBJECTS { ifName, hwErrordownCause, hwErrordownRecoverType }
+        STATUS current
+        DESCRIPTION
+            "The event is reported when error-down recover."
+        ::= { hwErrordownNotifications 2 }
+
+--
+-- Conformance Identifier
+--
+    hwErrordownCompliances OBJECT IDENTIFIER ::= { hwErrordownConformance 1 }
+
+    hwErrordowFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "This is the Error-down compliance."
+        MODULE -- this module
+            MANDATORY-GROUPS { hwErrordownObjectGroup, hwErrordownNotificationGroup }
+        ::= { hwErrordownCompliances 1 }
+
+    hwErrordownGroups OBJECT IDENTIFIER ::= { hwErrordownConformance 2 }
+
+    hwErrordownObjectGroup OBJECT-GROUP
+        OBJECTS { hwErrordownCause, hwErrordownRecoverType }
+        STATUS current
+        DESCRIPTION
+            "This is the Error-down object group."
+        ::= { hwErrordownGroups 1 }
+        
+    hwErrordownNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwErrordown, hwErrordownRecovery }
+        STATUS current
+        DESCRIPTION
+            "This is the Error-down notification group."
+        ::= { hwErrordownGroups 2 }        
+
+    END

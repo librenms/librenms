@@ -1,0 +1,14 @@
+[Unit]
+Description=LibreNMS SNMP Poller Service
+After=network.target
+
+[Service]
+ExecStart=/usr/bin/scl enable rh-python36 -- /opt/librenms/librenms-service.py -v
+WorkingDirectory=/opt/librenms
+User=librenms
+Group=librenms
+RestartSec=2
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

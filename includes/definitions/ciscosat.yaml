@@ -1,0 +1,12 @@
+os: ciscosat
+text: 'Cisco Satellite Receiver'
+type: network
+icon: cisco
+mib_dir:
+    - cisco
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_wireless_rssi, text: Sat Signal Level }
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.1429.2.2.6.5

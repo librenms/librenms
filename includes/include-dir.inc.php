@@ -1,7 +1,8 @@
 <?php
 
-foreach (glob($config['install_dir'].'/'.$include_dir.'/*.inc.php') as $file) {
-    d_echo('Including: ' . $file . PHP_EOL);
+use LibreNMS\Config;
+
+foreach (glob(Config::get('install_dir').'/'.$include_dir.'/*.inc.php') as $file) {
     include $file;
 }
 

@@ -1,0 +1,121 @@
+-- *****************************************************************
+-- TN-FRA-MIB.my : TN Fault Relay Alarm MIB
+--
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+--                     
+-- *****************************************************************
+--
+
+TN-FRA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP FROM SNMPv2-CONF
+    entPhysicalIndex FROM ENTITY-MIB
+    ifIndex FROM IF-MIB
+    tnProducts FROM TRANSITION-SMI;
+
+tnFraMIB MODULE-IDENTITY
+    LAST-UPDATED    "201206251030Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+                  Technical Support
+
+                  10900 Red Circle Drive
+                  Minnetonka, MN 55343 USA
+                  Tel: +1-800-526-9267
+
+                  E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for managing all transition products with FRA(Fault relay alarm)"
+    REVISION        "201206250000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 21 }
+
+tnFraObjects  OBJECT IDENTIFIER
+    ::= { tnFraMIB 1 }
+
+tnFraMgmt   OBJECT IDENTIFIER ::= { tnFraObjects 1 }
+
+tnFraRelayAlarmState    OBJECT-TYPE
+    SYNTAX     INTEGER {normal(1),negated(2)}
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Change the state of the relay when an alarm condition is active 
+         Normal (1): Relay is activated on alarm 
+         Negated(2): Relay is de-activated on alarm
+        "
+    ::= { tnFraMgmt 1 }
+
+tnFraPowerSupplyTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnFraPowerSupplyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table is used for configuring fault relay status of the powersupply modules"
+    ::= { tnFraMgmt 2 }    
+    
+tnFraPowerSupplyEntry OBJECT-TYPE
+    SYNTAX          TnFraPowerSupplyEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry contains configuration element of tnFraPowerSupplyTable"
+    INDEX           { entPhysicalIndex }
+    ::= { tnFraPowerSupplyTable 1 }
+
+TnFraPowerSupplyEntry ::= SEQUENCE {
+    tnFraPowerSupplyState          INTEGER
+    }
+
+tnFraPowerSupplyState OBJECT-TYPE 
+    SYNTAX     INTEGER { enable(1),disable(2)}
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Trigger fault relay alarm while monitored power supply is not present 
+        Enabled(1) : Enable fault relay alarm.
+        Disabled(2): Disable fault relay alarm.
+        "
+    ::= { tnFraPowerSupplyEntry 1 }
+    
+tnFraLinkTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnFraLinkEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        " This table is used for configuring fault relay status of the each port
+        "
+    ::= { tnFraMgmt 3 }
+    
+tnFraLinkEntry OBJECT-TYPE
+    SYNTAX           TnFraLinkEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+    " The entry list the tnFraLinkState priority of each port
+    "
+    INDEX { ifIndex }
+    ::= { tnFraLinkTable 1 }
+    
+TnFraLinkEntry ::= SEQUENCE {
+    tnFraLinkState  INTEGER    
+    }
+tnFraLinkState  OBJECT-TYPE
+    SYNTAX       INTEGER { enable(1),disable(2)}
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+    "Trigger fault relay alarm while monitored Port is down 
+     Enabled(1) : Enable fault relay alarm of the link. 
+     Disabled(2): Disable fault relay alarm of the link.
+    "
+    ::= { tnFraLinkEntry 1}
+END
+

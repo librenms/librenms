@@ -1,0 +1,362 @@
+-- *****************************************************************
+-- Transponder MIB
+-- *****************************************************************
+
+SL-XPDR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, IpAddress      	FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	TimeStamp, RowStatus		  		FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+    sitelight			        		FROM SL-NE-MIB;
+
+
+slXpdr MODULE-IDENTITY
+	LAST-UPDATED "200501250000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the optical connections."
+	::= { sitelight 8 }
+
+--
+--	The XPDR MIB consists of the following groups:
+--	Static Optical Connection Tables for Transponders and Muxponders
+--	XPDR Last Change
+--	XPDR Traps
+--
+
+slXpdrConn			OBJECT IDENTIFIER ::= { slXpdr 1 }
+-- slXpdrAps       	  OBJECT IDENTIFIER ::= { slXpdr 2 } 
+slXpdrLastChange	OBJECT IDENTIFIER ::= { slXpdr 6 }
+slXpdrTraps	 		OBJECT IDENTIFIER ::= { slXpdr 7 }
+slXpdrTraps0	 		OBJECT IDENTIFIER ::= { slXpdrTraps 0 }
+
+XpdrServiceType ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "The service type of the tarsponder."
+    SYNTAX         INTEGER {
+		ds3Sts1(1),         -- DS3/STS1
+		fe(2),              -- Fast Ethernet full duplex
+		escon(3),           -- ESCON
+		dvbVideo(4),		-- DVB ASI 270 Mbps
+		fc1gFicon(5),		-- 1G FC/FICON
+		gbE(6),				-- Gigabit Ethernet
+		fc2g(7),			-- 2G FC/FICON
+		oc3Stm1(8),         -- OC3/STM1
+		oc12Stm4(9),        -- OC12/STM4
+		oc48Stm16(10),      -- OC48 and GPON 2.48 Gbps
+		other(11),			-- Bypass
+		fc4g(12),			-- 4G FC/FICON
+		infiniband25G(13),	-- InfiniBand 2.5G
+		otn27g(14),			-- OC48 + FEC
+		oc24gpon(15),		-- OC24/GPON 1.24G
+		smpteSdi(16),		-- SMPTE SDI 540 Mbps
+		copperFe(17),		-- Copper Fast Ethernet
+		copperGbe(18),		-- Copper GbE
+		mux2GbE(19), 		-- Muxponder 2x1GBE
+		mux4GbE(20),   		-- Muxponder 4x1GBE
+		xpdr5G(21),         -- Transponder 5G
+		ficon1g(22),		-- 1G FICON
+		ficon2g(23),		-- 2G FICON
+		stm1(24),         	-- STM1
+		stm4(25),       	-- STM4
+		stm16(26),      	-- STM16 
+		gpon248(27),      	-- GPON 2.48 Gbps
+		ficon4g(28),		-- 4G FICON
+		eth10m(29),			-- 10Base-T 
+		xfp10oc192(30),		-- 9.95328 
+		xfp10stm64(31),		-- 9.95328 
+		xfp10GbEWan(32),	-- 9.95328   over sonet
+		xfp10GbELan(33),	-- 10.3125=10.0*66/64 
+		xfp10otu2(34),		-- 10.709255 
+		xfp10GFC(35),		-- 10.51875=10.2*66/64 
+		xfp10GbEWanStm64(36),	-- 9.95328       over sdh
+		mux1GbE(37), 		-- Muxponder 1x1GBE
+		mux1GbERegen(38), 	-- Muxponder 1x1GBE regenerator
+		mux2GbERegen(39), 	-- Muxponder 2x1GBE regenerator
+		mux4GbERegen(40), 	-- Muxponder 4x1GBE	regenerator 
+		fc8g(41),           -- 8G FC
+		ficon8g(42),        -- 8G FICON
+		mux10GbE(43),		-- Muxponder 10xGBE into 10GFC
+
+		otu1e(50),       		-- OTU1e
+		otu2e(51),       		-- OTU2e
+		otu1f(52),       		-- OTU1f
+		otu2f(53),       		-- OTU2f
+		oc192ToOtu2(54),       	-- OC192 mapped to OTU2 (G.709)
+		stm64ToOtu2(55),       	-- STM64 mapped to OTU2 (G.709)
+		gbe10WanToOtu2(56),		-- 10G GBE Wan mapped to OTU2 (G.Sup43 6.1)
+		gbe10LanToOtu2A(57),	-- 10G GBE Lan mapped to OTU2 (G.Sup43 6.2)
+		gbe10LanToOtu1e(58),	-- 10G GBE Lan mapped to OTU1e (G.Sup43 7.2)
+		gbe10LanToOtu2e(59),	-- 10G GBE Lan mapped to OTU2e (G.Sup43 7.1)
+		gbe10LanToOtu2B(60),	-- 10G GBE Lan mapped to OTU2 (G.Sup43 7.3)
+		fc10LanToOtu1f(61),		-- 10G FC mapped to OTU1f (like G.Sup43 7.2)
+		fc10LanToOtu2f(62),		-- 10G FC mapped to OTU2f (like G.Sup43 7.1)
+		fc8LanToOtu2(63),		-- 8G FC mapped to OTU2 (GFP-T)
+
+		copper10m(170),		-- Copper 10Base-T Ethernet
+		copper10mAn(171),	-- Copper 10Base-T Ethernet with Auto-negotiation
+		copperFeAn(1701)	-- Copper Fast Ethernet with Auto-negotiation
+    }
+
+--
+-- The Static Transponding Connection Table
+-- This table defines the connections between the Transponding modules
+--
+
+xpdrConnConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF XpdrConnConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current 
+	DESCRIPTION
+		"The connection table contains for each
+		transponding connection a single bi-directional entry.
+		The index to the table is the ifIndex of both XPDR interfaces.
+		The ifType valued used for the index is: 196."
+	::= { slXpdrConn 1 }
+
+xpdrConnConfigEntry OBJECT-TYPE
+	SYNTAX  XpdrConnConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the transponding connection table."
+	INDEX   { xpdrConnConfigIf1, 
+			  xpdrConnConfigIf2 }
+	::= { xpdrConnConfigTable 1 }
+
+XpdrConnConfigEntry ::=
+	SEQUENCE {
+		xpdrConnConfigIf1					InterfaceIndex,  
+		xpdrConnConfigIf2					InterfaceIndex,    
+		xpdrConnConfigRateControlAdmin		INTEGER,
+		xpdrConnConfigRateControlOper		INTEGER,
+		xpdrConnConfigLosPropagation		TruthValue,
+		xpdrServiceType						XpdrServiceType,
+		xpdrConnAddMask 					INTEGER,
+		xpdrMuxInbandAdmin	 				INTEGER,
+		xpdrMuxInbandOper	 				INTEGER,
+		xpdrDirection 						INTEGER
+	}
+
+xpdrConnConfigIf1 OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The first XPDR interface."
+	::= { xpdrConnConfigEntry 1 }
+
+xpdrConnConfigIf2 OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The second XPDR interface."
+	::= { xpdrConnConfigEntry 2 }
+
+xpdrConnConfigRateControlAdmin OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"This variable ask the rate of the traffic used
+		by this interface. Frequency is in Kbp/s. 		
+		The value 0-30 is used for rate control Bypass."
+    ::= { xpdrConnConfigEntry 3 }
+
+xpdrConnConfigRateControlOper OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"This variable tells the rate of the traffic used
+		by this interface. Frequency is in Kbp/s. 		
+		The value 0 returned for rate control Bypass."
+    ::= { xpdrConnConfigEntry 4 }
+
+xpdrConnConfigLosPropagation 	OBJECT-TYPE
+	SYNTAX      	TruthValue
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is used to detrmine if the LOS propagation should be active."
+	::= { xpdrConnConfigEntry 5 }
+
+xpdrServiceType 	OBJECT-TYPE
+	SYNTAX      	XpdrServiceType
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"The service type of the transponder."
+	::= { xpdrConnConfigEntry 6 }
+
+xpdrConnAddMask 	OBJECT-TYPE
+	SYNTAX      	INTEGER
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is a bit mask relevant only for Muxponder entry. 
+		It contains a bit for each Muxponder service.
+		To add a service the management should set the corresponding bit to 1.
+		To remove a service the bit should be set to 0."
+	::= { xpdrConnConfigEntry 7 }
+
+xpdrMuxInbandAdmin 	OBJECT-TYPE
+	SYNTAX			INTEGER {
+		up(1),
+		down(2),
+		standby(3)
+	}
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is relevant only for muxponder.
+		 up value means that the muxponder inband management is enabled."
+	::= { xpdrConnConfigEntry 8 }
+
+xpdrMuxInbandOper	OBJECT-TYPE
+	SYNTAX			INTEGER {
+		up(1),
+		down(2),
+		standby(3)
+	}
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION	
+		"The operational state of the inband interface."
+	::= { xpdrConnConfigEntry 9 }
+
+xpdrDirection 	OBJECT-TYPE
+	SYNTAX      	INTEGER {
+		bidirectional(1),		-- transponder is bidierctional (default)
+		unidirectionalTx(2),	-- tranponder uplink is TX and client is RX
+		unidirectionalRx(3),	-- tranponder uplink is RX and client is TX
+		loopback(4)				-- transponder with a single tranciever
+	}
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is used for unidirectional services.
+		The upper port is the uplink as with the aps configuration.
+		The transponder on one side should be configured as TX and the peer as RX."
+	::= { xpdrConnConfigEntry 10 }
+
+
+--
+-- The Static Muxponder Connection Table
+-- This table defines the connections of the Muxponder services
+--
+
+mpdrConnConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF MpdrConnConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current 
+	DESCRIPTION
+		"The connection table contains entry for each service.
+		All entries are bi-directional."
+	::= { slXpdrConn 2 }
+
+mpdrConnConfigEntry OBJECT-TYPE
+	SYNTAX MpdrConnConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the transponding connection table.
+		There are three types of entries:
+		1. Add/Drop - a service that is locally dropped and added.
+		2. Bypass - a path that is bybassed via the node between the uplinks.
+		3. Unequipped - path that is not yet allocated for any service"
+	INDEX   { mpdrConnConfigIf1 }
+	::= { mpdrConnConfigTable 1 }
+
+MpdrConnConfigEntry ::=
+	SEQUENCE {
+		mpdrConnConfigIf1				InterfaceIndex,  
+		mpdrConnConfigIf2				InterfaceIndex,    
+		mpdrConnConfigRateAdmin			INTEGER,
+		mpdrConnConfigLosPropagation	TruthValue,
+		mpdrServiceType					XpdrServiceType
+	}
+
+mpdrConnConfigIf1 OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The first MPDR interface. The ifIndex of the uplink path."
+	::= { mpdrConnConfigEntry 1 }
+
+mpdrConnConfigIf2 OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The second MPDR interface.
+		- In the case of Bypass the value should be the path ifIndex of the other uplink.
+		  The bypass entry will be duplicated. Once for each uplink.
+		- In the case of Unequipped the value is 0.
+		  The Unequipped entry will be duplicated for a ring. Once for each uplink.
+		- In the case of Add/Drop the value is the ifIndex of the local service port.
+		  The Add/Drop entry will be duplicated in a case of a ring. Once for each uplink
+		The default value is 0"
+	::= { mpdrConnConfigEntry 2 }
+
+mpdrConnConfigRateAdmin OBJECT-TYPE
+	SYNTAX  INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"This variable ask the rate of the traffic used by this service. 
+		Bandwidth is in Kbp/s units. 		
+		The value 0 is used for rate of Bypass or Unequipped services."
+    ::= { mpdrConnConfigEntry 3 }
+
+mpdrConnConfigLosPropagation 	OBJECT-TYPE
+	SYNTAX      	TruthValue
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is used to detrmine if the LOS propagation should be active."
+	::= { mpdrConnConfigEntry 4 }
+
+mpdrServiceType 	OBJECT-TYPE
+	SYNTAX      	XpdrServiceType
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"The service type of the muxponder interface.
+		In the case of Muxponder sevice the value is e.g gbE(6).
+		In the case of Muxponder uplink the value is mux10GbE(43). 
+		In the case of Bypass or Unequipped the value should be other(11)"
+	::= { mpdrConnConfigEntry 5 }
+
+
+--
+-- The traps
+--
+
+xpdrConnConfigTableChange NOTIFICATION-TYPE
+	STATUS  current
+	DESCRIPTION
+		"A xpdrConnConfigTableChange trap is sent when the
+		content of the xpdrConnConfigTable is changed."
+	::= { slXpdrTraps 1 }
+
+xpdrConnConfigTableChange0 NOTIFICATION-TYPE
+	STATUS  current
+	DESCRIPTION
+		"A xpdrConnConfigTableChange trap is sent when the
+		content of the xpdrConnConfigTable is changed.
+		It is defined to support browsers that don't recognize RFC 2576."
+	::= { slXpdrTraps0 1 }
+
+END

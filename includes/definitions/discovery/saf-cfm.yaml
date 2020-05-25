@@ -1,0 +1,239 @@
+--- 
+mib: SAF-MPMUX-MIB
+modules: 
+  processors:
+    data:
+      -
+        num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.28.{{ $index }}'
+        oid: cpuUsage
+        precision: 1
+        type: saf-cfm
+  sensors: 
+    state: 
+      data: 
+        - 
+          descr: 'Active link'
+          index: 'activeLink.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.1.{{ $index }}'
+          oid: activeLink
+          state_name: activeLink
+          states: 
+            - { value: 0, descr: Unknown, graph: 1, generic: 1 }
+            - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
+            - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
+            - { value: 255, descr: Error, graph: 1, generic: 2 }
+        - 
+          descr: 'Active TX'
+          index: 'activeTx.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.2.{{ $index }}'
+          oid: activeTx
+          state_name: activeTx
+          states: 
+            - { value: 0, descr: None, graph: 1, generic: 2 }
+            - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
+            - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
+            - { value: 3, descr: Both, graph: 1, generic: 0 }
+        - 
+          descr: 'Forced link'
+          index: 'forcedLink.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.4.{{ $index }}'
+          oid: forcedLink
+          state_name: forcedLink
+          states: 
+            - { value: 0, descr: Off, graph: 1, generic: 0 }
+            - { value: 1, descr: 'Link 1', graph: 1, generic: 0 }
+            - { value: 2, descr: 'Link 2', graph: 1, generic: 0 }
+            - { value: 255, descr: Error, graph: 1, generic: 2 }
+        - 
+          descr: 'Switch mode'
+          index: 'switchMode.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.5.{{ $index }}'
+          oid: switchMode
+          state_name: switchMode
+          states: 
+            - { value: 0, descr: Unknown, graph: 1, generic: 1 }
+            - { value: 1, descr: 'Frequency diversity', graph: 1, generic: 0 }
+            - { value: 2, descr: 'Hot standby', graph: 1, generic: 0 }
+            - { value: 3, descr: Independent, graph: 1, generic: 0 }
+        - 
+          descr: 'Switch enabled for RX BER'
+          index: 'switchEnabledForRxBer.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.5.13.{{ $index }}'
+          oid: switchEnabledForRxBer
+          state_name: switchEnabledForRxBer
+          states: 
+            - { value: 0, descr: Disabled, graph: 1, generic: 0 }
+            - { value: 1, descr: Enabled, graph: 1, generic: 0 }
+        - 
+          descr: Sync
+          index: 'bbSyncLostAlarm.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.2.6.{{ $index }}'
+          oid: bbSyncLostAlarm
+          state_name: bbSyncLostAlarm
+          states: 
+            - { value: 0, descr: Ok, graph: 1, generic: 0 }
+            - { value: 1, descr: Alarm, graph: 1, generic: 2 }
+        - 
+          descr: 'R1 Operation'
+          index: 'rf1Operation.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.3.1.{{ $index }}'
+          oid: rf1Operation
+          state_name: rf1Operation
+          states: 
+            - { value: 0, descr: None, graph: 1, generic: 1 }
+            - { value: 1, descr: Booting, graph: 1, generic: 1 }
+            - { value: 2, descr: Ok, graph: 1, generic: 0 }
+            - { value: 3, descr: Testing, graph: 1, generic: 1 }
+            - { value: 4, descr: Error, graph: 1, generic: 2 }
+            - { value: 5, descr: 'No data from ODU', graph: 1, generic: 2 }
+        - 
+          descr: 'R2 Operation'
+          index: 'rf2Operation.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.4.1.{{ $index }}'
+          oid: rf2Operation
+          state_name: rf2Operation
+          states: 
+            - { value: 0, graph: 1, generic: 1, descr: None }
+            - { value: 1, graph: 1, generic: 1, descr: Booting }
+            - { value: 2, graph: 1, generic: 0, descr: Ok }
+            - { value: 3, graph: 1, generic: 1, descr: Testing }
+            - { value: 4, graph: 1, generic: 2, descr: Error }
+            - { value: 5, graph: 1, generic: 2, descr: 'No data from ODU' }
+        - 
+          descr: 'R1 Humidity'
+          index: 'rf1OduHumidity.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.3.16.{{ $index }}'
+          oid: rf1OduHumidity
+          state_name: rf1OduHumidity
+          states: 
+            - { value: 0, descr: Low, graph: 1, generic: 0 }
+            - { value: 1, descr: High, graph: 1, generic: 1 }
+        - 
+          descr: 'R2 Humidity'
+          index: 'rf2OduHumidity.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.4.16.{{ $index }}'
+          oid: rf2OduHumidity
+          state_name: rf2OduHumidity
+          states: 
+            - { value: 0, descr: Low, graph: 1, generic: 0 }
+            - { value: 1, descr: High, graph: 1, generic: 1 }
+        - 
+          descr: R1CblPwrStat
+          index: 'termRf1CablePowerStatus.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.14.{{ $index }}'
+          oid: termRf1CablePowerStatus
+          state_name: termRf1CablePowerStatus
+          states: 
+            - { value: 0, descr: 'false', graph: 1, generic: 1 }
+            - { value: 1, descr: ok, graph: 1, generic: 0 }
+            - { value: 2, descr: short, graph: 1, generic: 2 }
+            - { value: 3, descr: error, graph: 1, generic: 2 }
+            - { value: 4, descr: power-off, graph: 1, generic: 2 }
+        - 
+          descr: R2CblPwrStat
+          index: 'termRf2CablePowerStatus.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.15.{{ $index }}'
+          oid: termRf2CablePowerStatus
+          state_name: termRf2CablePowerStatus
+          states: 
+            - { value: 0, descr: 'false', graph: 1, generic: 1 }
+            - { value: 1, descr: ok, graph: 1, generic: 0 }
+            - { value: 2, descr: short, graph: 1, generic: 2 }
+            - { value: 3, descr: error, graph: 1, generic: 2 }
+            - { value: 4, descr: power-off, graph: 1, generic: 2 }
+    signal: 
+      data: 
+        - 
+          descr: 'R1 cable attenuation'
+          index: 'rf1CableAttenuation.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.3.11.{{ $index }}'
+          oid: rf1CableAttenuation
+        - 
+          descr: 'R2 cable attenuation'
+          index: 'rf2CableAttenuation.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.4.11.{{ $index }}'
+          oid: rf2CableAttenuation
+    temperature: 
+      data: 
+        - 
+          descr: 'Idu temp'
+          index: 'termIduTemperature.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.6.{{ $index }}'
+          oid: termIduTemperature
+        - 
+          descr: 'R1 odu temp'
+          index: 'rf1OduTemperature.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.3.15.{{ $index }}'
+          oid: rf1OduTemperature
+        - 
+          descr: 'R2 odu temp'
+          index: 'rf2OduTemperature.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.4.15.{{ $index }}'
+          oid: rf2OduTemperature
+    voltage: 
+      data: 
+        - 
+          descr: 'PSU-1 3V'
+          index: 'power3V3PS1.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.16.{{ $index }}'
+          oid: power3V3PS1
+        - 
+          descr: 'PSU-1 5V'
+          index: 'power5VPS1.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.17.{{ $index }}'
+          oid: power5VPS1
+        - 
+          descr: 'PSU-1 -5V'
+          index: 'powerM5VPS1.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.18.{{ $index }}'
+          oid: powerM5VPS1
+        - 
+          descr: 'ODU-1 V'
+          index: 'powerODU1V.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.19.{{ $index }}'
+          oid: powerODU1V
+        - 
+          descr: 'PSU-2 3V'
+          index: 'power3V3PS2.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.22.{{ $index }}'
+          oid: power3V3PS2
+        - 
+          descr: 'PSU-2 5V'
+          index: 'power5VPS2.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.23.{{ $index }}'
+          oid: power5VPS2
+        - 
+          descr: 'PSU-2 -5V'
+          index: 'powerM5VPS2.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.24.{{ $index }}'
+          oid: powerM5VPS2
+        - 
+          descr: 'ODU-2 V'
+          index: 'powerODU2V.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.25.{{ $index }}'
+          oid: powerODU2V
+    current: 
+      data: 
+        - 
+          descr: 'ODU-1 Amp'
+          index: 'powerODU1I.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.20.{{ $index }}'
+          oid: powerODU1I
+        - 
+          descr: 'ODU-2 Amp'
+          index: 'powerODU2I.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.26.{{ $index }}'
+          oid: powerODU2I
+    power: 
+      data: 
+        - 
+          descr: 'OUD-1 Watt'
+          index: 'powerODU1W.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.21.{{ $index }}'
+          oid: powerODU1W
+        - 
+          descr: 'OUD-2 Watt'
+          index: 'powerODU2W.{{ $index }}'
+          num_oid: '.1.3.6.1.4.1.7571.100.1.1.2.22.1.27.{{ $index }}'
+          oid: powerODU2W
+

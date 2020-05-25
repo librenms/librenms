@@ -1,0 +1,116 @@
+mib: Argus-Power-System-MIB
+modules:
+    sensors:
+        voltage:
+            options:
+              divisor: 10
+            data:
+                -
+                    oid: upsOutputTable
+                    value: upsOutputVoltage
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.2.{{ $index }}'
+                    index: 'upsOutputVoltage.{{ $index }}'
+                    descr: 'Output #{{ $index }}'
+                -
+                    oid: upsInputTable
+                    value: upsInputVoltage
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.3.2.1.3.{{ $index }}'
+                    index: 'upsInputVoltage.{{ $index }}'
+                    descr: 'Input #{{ $index }}'
+                -
+                    oid: upsBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.2.3.{{ $index }}'
+                    index: 'upsBatteryVoltage.{{ $index }}'
+                    descr: Battery
+        frequency:
+            data:
+                -
+                    oid: upsInputTable
+                    value: upsInputFrequency
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.3.2.1.2.{{ $index }}'
+                    index: 'upsInputFrequency.{{ $index }}'
+                    descr: 'Input #{{ $index }}'
+                -
+                    oid: upsOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.2.{{ $index }}'
+                    index: 'upsOutputFrequency.{{ $index }}'
+                    descr: Output
+                    divisor: 10
+        current:
+            options:
+              divisor: 10
+            data:
+                -
+                    oid: upsOutputTable
+                    value: upsOutputCurrent
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.3.{{ $index }}'
+                    index: 'upsOutputCurrent.{{ $index }}'
+                    descr: 'Output #{{ $index }}'
+        power:
+            data:
+                -
+                    oid: upsOutputTable
+                    value: upsOutputPowerWatt
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.5.{{ $index }}'
+                    index: 'upsOutputPowerWatt.{{ $index }}'
+                    descr: 'Output #{{ $index }}'
+        load:
+            data:
+                -
+                    oid: upsOutputTable
+                    value: upsOutputPercentLoad
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.4.1.7.{{ $index }}'
+                    index: 'upsOutputPercentLoad.{{ $index }}'
+                    descr: 'Output {{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: upsConfigFanOnTemperature
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.6.4.{{ $index }}'
+                    index: 'upsConfigFanOnTemperature.{{ $index }}'
+                    descr: Fan On
+                -
+                    oid: upsBatteryTemperature
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.2.6.{{ $index }}'
+                    index: 'upsBatteryTemperature.{{ $index }}'
+                    descr: Battery
+        runtime:
+            options:
+              divisor: 60
+            data:
+                -
+                    oid: upsMinutesOnBattery
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.2.2.{{ $index }}'
+                    index: 'upsMinutesOnBattery.{{ $index }}'
+                    descr: Minutes on battery
+        state:
+            data:
+                -
+                    oid: upsOutputSource
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.4.1.{{ $index }}'
+                    descr: Output Source
+                    index: 'upsOutputSource.{{ $index }}'
+                    state_name: upsOutputSource
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: standby }
+                        - { value: 2, generic: 0, graph: 1, descr: line }
+                        - { value: 3, generic: 1, graph: 1, descr: boost2 }
+                        - { value: 4, generic: 1, graph: 1, descr: boost1 }
+                        - { value: 5, generic: 1, graph: 1, descr: buck1 }
+                        - { value: 6, generic: 1, graph: 1, descr: buck2 }
+                        - { value: 7, generic: 1, graph: 1, descr: inverter }
+                        - { value: 8, generic: 1, graph: 1, descr: retransfer }
+                        - { value: 9, generic: 1, graph: 1, descr: transfer }
+                        - { value: 10, generic: 2, graph: 1, descr: shutdown }
+                        - { value: 11, generic: 2, graph: 1, descr: bypass }
+                -
+                    oid: upsBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.7309.6.1.2.1.{{ $index }}'
+                    descr: Battery Status
+                    index: 'upsBatteryStatus.{{ $index }}'
+                    state_name: upsBatteryStatus
+                    states:
+                        - { value: 1, generic: 3, graph: 1, descr: unknown }
+                        - { value: 2, generic: 0, graph: 1, descr: batteryNormal }
+                        - { value: 3, generic: 1, graph: 1, descr: batteryLow }
+                        - { value: 4, generic: 2, graph: 1, descr: batteryDepleted }

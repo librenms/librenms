@@ -1,0 +1,9 @@
+os: avr-hd
+text: 'AvediaPlayer Receivers'
+type: appliance
+icon: exterity
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.28194.

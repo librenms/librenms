@@ -14,7 +14,7 @@ if (!is_array($mempool_cache['hpGlobal'])) {
     d_echo('Cached!');
 }
 
-$entry = $mempool_cache['hpGlobal'][$mempool[mempool_index]];
+$entry = $mempool_cache['hpGlobal'][$mempool['mempool_index']];
 
 $mempool['units'] = '1';
 $mempool['used']  = $entry['hpGlobalMemAllocBytes'];

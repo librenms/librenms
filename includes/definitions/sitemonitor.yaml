@@ -1,0 +1,11 @@
+os: sitemonitor
+text: 'Packetflux SiteMonitor'
+type: appliance
+icon: packetflux
+over:
+    - { graph: device_poller_perf, text: 'Poller time' }
+mib_dir:
+    - packetflux
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.32050

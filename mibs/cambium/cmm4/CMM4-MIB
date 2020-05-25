@@ -1,0 +1,1089 @@
+
+--
+-- 	cmm4-mib.txt
+--	GENERATED FROM ui_db.cmm.xml
+--
+--      ********************************************************************
+--	    Copyright 2006-2012 (c), Cambium Networks
+--      Cambium Networks Confidential Proprietary
+--      ********************************************************************
+--
+--      Canopy CMM4 MIB definitions.
+--      
+--      ********************************************************************
+--	    $Id: ui_db.cmm.xml,v 1.48 2012/01/09 19:31:18 aschnei2 Exp $
+--
+--      Revision History:
+--
+--      <Date>  	<Author>  <Changes>
+--      Mar 29, 2006	AJS				Initial Release
+--      Sep 5,  2006    CEG             CMM4 2.0 Release
+--		6/4/2009		AJS				Added user configuration table
+--      ********************************************************************
+
+CMM4-MIB   DEFINITIONS ::= BEGIN
+IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64, NOTIFICATION-TYPE, IpAddress
+				FROM SNMPv2-SMI
+		DisplayString
+				FROM SNMPv2-TC
+		OBJECT-GROUP
+				FROM SNMPv2-CONF
+		WhispLUID, WhispMACAddress, EventString
+				FROM WHISP-TCV2-MIB
+		whispModules, whispBox, whispCMM4
+				FROM WHISP-GLOBAL-REG-MIB
+				;
+
+cmm4MibModule  MODULE-IDENTITY
+	LAST-UPDATED	"200603290000Z"
+	ORGANIZATION	"Cambium Networks"
+	CONTACT-INFO
+		"
+            Canopy Technical Support
+            email: technical-support@canopywireless.com"
+	DESCRIPTION
+		"This module contains CMM4 MIB definitions."
+	::= {whispModules 15}
+
+-- -------------------------------------------------------------------------
+-- Top Level Registrations
+
+cmm4Groups		OBJECT IDENTIFIER ::= {whispCMM4 1}
+cmm4Config		OBJECT IDENTIFIER ::= {whispCMM4 2}
+cmm4Status		OBJECT IDENTIFIER ::= {whispCMM4 3}
+cmm4Gps		OBJECT IDENTIFIER ::= {whispCMM4 4}
+cmm4EventLog		OBJECT IDENTIFIER ::= {whispCMM4 5}
+cmm4Controls		OBJECT IDENTIFIER ::= {whispCMM4 6}
+cmm4Snmp		OBJECT IDENTIFIER ::= {whispCMM4 7}
+cmm4Event		OBJECT IDENTIFIER ::= {whispCMM4 8}
+cmm4GPSEvent		OBJECT IDENTIFIER ::= {cmm4Event 1}
+
+-- -------------------------------------------------------------------------
+
+
+	cmm4PortCfgGroup	OBJECT-GROUP
+			OBJECTS {
+					portCfgIndex,
+					cmm4PortText,
+					cmm4PortDevType,
+					cmm4PortPowerCfg,
+					cmm4PortResetCfg}
+		STATUS		current
+		DESCRIPTION
+			"CMM4 Port Configuration Table."
+		::= {cmm4Groups 1}
+
+	cmm4ConfigGroup	OBJECT-GROUP
+			OBJECTS {
+					gpsTimingPulse,
+					lan1Ip,
+					lan1SubnetMask,
+					defaultGateway,
+					cmm4WebAutoUpdate,
+					cmm4ExtEthPowerReset,
+					cmm4IpAccessFilter,
+					cmm4IpAccess1,
+					cmm4IpAccess2,
+					cmm4IpAccess3,
+					cmm4MgmtPortSpeed,
+					cmm4NTPServerIp,
+					sessionTimeout,
+					vlanEnable,
+					managementVID,
+					siteInfoViewable}
+		STATUS		current
+		DESCRIPTION
+			"CMM4 configuration group."
+		::= {cmm4Groups 2}
+
+	cmm4PortStatusGroup	OBJECT-GROUP
+			OBJECTS {
+					portStatusIndex,
+					cmm4PortPowerStatus}
+		STATUS		current
+		DESCRIPTION
+			"CMM4 Port Configuration Status Table."
+		::= {cmm4Groups 3}
+
+	cmm4StatusGroup	OBJECT-GROUP
+			OBJECTS {
+					deviceType,
+					cmm4pldVersion,
+					cmm4SoftwareVersion,
+					cmm4SystemTime,
+					cmm4UpTime,
+					satellitesVisible,
+					satellitesTracked,
+					latitude,
+					longitude,
+					height,
+					trackingMode,
+					syncStatus,
+					cmm4MacAddress,
+					cmm4ExtEthPwrStat,
+					cmm4FPGAVersion,
+					cmm4FPGAPlatform,
+					defaultStatus}
+		STATUS		current
+		DESCRIPTION
+			"CMM4 Status group."
+		::= {cmm4Groups 4}
+
+	cmm4GPSGroup	OBJECT-GROUP
+			OBJECTS {
+					gpsTrackingMode,
+					gpsTime,
+					gpsDate,
+					gpsSatellitesVisible,
+					gpsSatellitesTracked,
+					gpsHeight,
+					gpsAntennaConnection,
+					gpsLatitude,
+					gpsLongitude,
+					gpsInvalidMsg,
+					gpsRestartCount,
+					gpsReceiverInfo,
+					gpsSyncStatus,
+					gpsSyncMasterSlave,
+					gpsLog,
+					gpsReInitCount}
+		STATUS		current
+		DESCRIPTION
+			"CMM4 GPS status group."
+		::= {cmm4Groups 5}
+
+	cmm4ControlsGroup	OBJECT-GROUP
+			OBJECTS {
+					cmm4Reboot,
+					cmm4ClearEventLog,
+					cmm4RebootIfRequired}
+		STATUS		current
+		DESCRIPTION
+			"CMM4 Controls group."
+		::= {cmm4Groups 6}
+
+	cmm4SNMPGroup	OBJECT-GROUP
+			OBJECTS {
+					cmm4SnmpComString,
+					cmm4SnmpAccessSubnet,
+					cmm4SnmpTrapIp1,
+					cmm4SnmpTrapIp2,
+					cmm4SnmpTrapIp3,
+					cmm4SnmpTrapIp4,
+					cmm4SnmpTrapIp5,
+					cmm4SnmpTrapIp6,
+					cmm4SnmpTrapIp7,
+					cmm4SnmpTrapIp8,
+					cmm4SnmpTrapIp9,
+					cmm4SnmpTrapIp10,
+					cmm4SnmpReadOnly,
+					cmm4SnmpGPSSyncTrapEnable,
+					cmm4SnmpAccessSubnet2,
+					cmm4SnmpAccessSubnet3,
+					cmm4SnmpAccessSubnet4,
+					cmm4SnmpAccessSubnet5,
+					cmm4SnmpAccessSubnet6,
+					cmm4SnmpAccessSubnet7,
+					cmm4SnmpAccessSubnet8,
+					cmm4SnmpAccessSubnet9,
+					cmm4SnmpAccessSubnet10}
+		STATUS		current
+		DESCRIPTION
+			"CMM4 SNMP group."
+		::= {cmm4Groups 7}
+
+	cmm4UserTableGroup	OBJECT-GROUP
+			OBJECTS {
+					entryIndex,
+					userLoginName,
+					userPswd,
+					accessLevel}
+		STATUS		current
+		DESCRIPTION
+			"CMM4 User Information Table group."
+		::= {cmm4Groups 8}
+
+-- CMM 4 configuration page
+
+	gpsTimingPulse	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					master(1),
+					slave(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"(1) -- Master.
+            (0) -- Slave."
+		::={cmm4Config 1}
+
+	lan1Ip	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"LAN 1 IP address"
+		::={cmm4Config 2}
+
+	lan1SubnetMask	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"LAN 1 subnet mask."
+		::={cmm4Config 3}
+
+	defaultGateway	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Default gateway"
+		::={cmm4Config 4}
+
+	cmm4WebAutoUpdate	OBJECT-TYPE
+		SYNTAX		INTEGER
+		UNITS		"Seconds"
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Web page auto update in seconds. 0 means disabled."
+		::={cmm4Config 5}
+
+	cmm4ExtEthPowerReset	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					off(0),
+					on(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Resets power to external ethernet switch.
+            (0) Reset Complete.
+            (1) Reset Switch."
+		::={cmm4Config 6}
+
+	cmm4IpAccessFilter	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					off(0),
+					on(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"IP Access filtering.
+            (0) Filtering Disabled - All IPs will be allowed access.
+            (1) Filtering Enabled - Only allow IPs in the allowed access list."
+		::={cmm4Config 8}
+
+	cmm4IpAccess1	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"IP Access list entry 1."
+		::={cmm4Config 9}
+
+	cmm4IpAccess2	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"IP Access list entry 2."
+		::={cmm4Config 10}
+
+	cmm4IpAccess3	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"IP Access list entry 3."
+		::={cmm4Config 11}
+
+	cmm4MgmtPortSpeed	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					autoNegotiate(1),
+					force10Half(2),
+					force10Full(3),
+					force100Half(4),
+					force100Full(5)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Management Port Speed Configuration.
+            (1) autoNegotiate - Auto negotiate to best speed and duplex setting.
+            (2) force10Half - Set port to 10 Mbit/s half-duplex.
+            (3) force10Full - Set port to 10 Mbit/s full-duplex.
+            (4) force100Half - Set port to 100 Mbit/s half-duplex.
+            (5) force100Full - Set port to 100 Mbit/s full-duplex."
+		::={cmm4Config 12}
+
+	cmm4NTPServerIp	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"IP address for NTP server for CMM4 GPS Slave."
+		::={cmm4Config 13}
+
+	sessionTimeout	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Timer for Telnet, Web and FTP sessions."
+		::={cmm4Config 14}
+
+	vlanEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					disable(0),
+					enable(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"To enable or disable VLAN tagging"
+		::={cmm4Config 15}
+
+	managementVID	OBJECT-TYPE
+		SYNTAX		INTEGER (1..4094)
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Management VLAN VID"
+		::={cmm4Config 16}
+
+	siteInfoViewable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					enable(1),
+					disable(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Enable non login users the ability to view Site Information"
+		::={cmm4Config 17}
+
+	cmm4PortCfgTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF Cmm4PortCfgEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A list of CMM 4 port configuration entries."
+		::= {cmm4Config 7}
+
+	cmm4PortCfgEntry OBJECT-TYPE
+		SYNTAX		Cmm4PortCfgEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A CMM4 port entry containing objects with
+            port status."
+		INDEX		{portCfgIndex}
+		::= {cmm4PortCfgTable 1}
+
+		Cmm4PortCfgEntry ::= SEQUENCE{
+			portCfgIndex		INTEGER,
+			cmm4PortText		DisplayString,
+			cmm4PortDevType		INTEGER,
+			cmm4PortPowerCfg		INTEGER,
+			cmm4PortResetCfg	INTEGER
+			}
+
+	portCfgIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (1..8)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port."
+		::={cmm4PortCfgEntry 1}
+
+	cmm4PortText	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port Description."
+		::={cmm4PortCfgEntry 2}
+
+	cmm4PortDevType	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					none(0),
+					canopy(1),
+					canopy56V(2)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Type of Device configured for each port."
+		::={cmm4PortCfgEntry 3}
+
+	cmm4PortPowerCfg	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Port power status indicates power on or power off."
+		::={cmm4PortCfgEntry 4}
+
+	cmm4PortResetCfg	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					resetPort(1),
+					resetComplete(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Reset power to port if and only if port is currently powered."
+		::={cmm4PortCfgEntry 5}
+
+	deviceType	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A textual string containing information about device 
+            type."
+		::={cmm4Status 2}
+
+	cmm4pldVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Version of CMM4 PLD code."
+		::={cmm4Status 3}
+
+	cmm4SoftwareVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 software version. It includes the operating system
+            and software build time."
+		::={cmm4Status 4}
+
+	cmm4SystemTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The current time."
+		::={cmm4Status 5}
+
+	cmm4UpTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Time since last system reboot."
+		::={cmm4Status 6}
+
+	satellitesVisible	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of satellites the GPS sees."
+		::={cmm4Status 7}
+
+	satellitesTracked	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current number of satellites that GPS actually tracks."
+		::={cmm4Status 8}
+
+	latitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 latitude."
+		::={cmm4Status 9}
+
+	longitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 longitude."
+		::={cmm4Status 10}
+
+	height	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"The height of CMM4 unit."
+		::={cmm4Status 11}
+
+	trackingMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 GPS tracking mode."
+		::={cmm4Status 12}
+
+	syncStatus	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 GPS sync pulse status."
+		::={cmm4Status 13}
+
+	cmm4MacAddress	OBJECT-TYPE
+		SYNTAX		WhispMACAddress
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"MAC address of the unit."
+		::={cmm4Status 14}
+
+	cmm4ExtEthPwrStat	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					off(0),
+					on(1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Live value of external Ethernet switch power."
+		::={cmm4Status 15}
+
+	cmm4FPGAVersion	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 FPGA Version."
+		::={cmm4Status 16}
+
+	cmm4FPGAPlatform	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 FPGA Revision."
+		::={cmm4Status 17}
+
+	defaultStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					none(0),
+					defaultPlugInserted(1),
+					defaultSwitchActive(2),
+					defaultPlugInsertedAndDefaultSwitchActive(3)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Status of the Default Plug and switch.  
+                            If either is active the next boot will be a default boot.
+                            0: None, Default Plug not inserted, Default Switch not active
+                            1: Plug inserted
+                            2: Switch Active
+                            3: Plug inserted and Switch active"
+		::={cmm4Status 18}
+
+	cmm4PortStatusTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF Cmm4PortStatusEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A list of Live CMM 4 port status entries."
+		::= {cmm4Status 1}
+
+	cmm4PortStatusEntry OBJECT-TYPE
+		SYNTAX		Cmm4PortStatusEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A CMM4 port entry containing port status."
+		INDEX		{portStatusIndex}
+		::= {cmm4PortStatusTable 1}
+
+		Cmm4PortStatusEntry ::= SEQUENCE{
+			portStatusIndex		INTEGER,
+			cmm4PortPowerStatus	INTEGER
+			}
+
+	portStatusIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (1..8)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A unique value for each CMM port."
+		::={cmm4PortStatusEntry 1}
+
+	cmm4PortPowerStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					on(1),
+					off(0),
+					powerOverEthernetFault(-1)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Port power status indicates power on, off or Power over Ethernet fault."
+		::={cmm4PortStatusEntry 4}
+
+-- CMM 4 GPS status
+
+	gpsTrackingMode	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 GPS tracking mode."
+		::={cmm4Gps 1}
+
+	gpsTime	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 GPS time."
+		::={cmm4Gps 2}
+
+	gpsDate	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 GPS date."
+		::={cmm4Gps 3}
+
+	gpsSatellitesVisible	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of satellites the GPS sees"
+		::={cmm4Gps 4}
+
+	gpsSatellitesTracked	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current number of satellites GPS is tracking."
+		::={cmm4Gps 5}
+
+	gpsHeight	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 height."
+		::={cmm4Gps 6}
+
+	gpsAntennaConnection	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Antenna Connection status."
+		::={cmm4Gps 7}
+
+	gpsLatitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 Latitude."
+		::={cmm4Gps 8}
+
+	gpsLongitude	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 longitude."
+		::={cmm4Gps 9}
+
+	gpsInvalidMsg	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of invalid messages."
+		::={cmm4Gps 10}
+
+	gpsRestartCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Number of unit restarts."
+		::={cmm4Gps 11}
+
+	gpsReceiverInfo	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"A textual string contains information on GPS receiver."
+		::={cmm4Gps 12}
+
+	gpsSyncStatus	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					syncOK(1),
+					noSync(2)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Live value of GPS Sync Status."
+		::={cmm4Gps 13}
+
+	gpsSyncMasterSlave	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					cmmIsGPSMaster(1),
+					cmmIsGPSSlave(0)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"Current Live value of GPS Sync Master/Slave Setting."
+		::={cmm4Gps 14}
+
+	gpsLog	OBJECT-TYPE
+		SYNTAX		EventString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS log.  Includes times of sync detected and sync lost."
+		::={cmm4Gps 15}
+
+	gpsReInitCount	OBJECT-TYPE
+		SYNTAX		INTEGER
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"GPS ReInit counts.  The number of times we have done a complete re-initialization of the GPS device."
+		::={cmm4Gps 16}
+
+-- CMM4 event log
+
+	eventLog	OBJECT-TYPE
+		SYNTAX		EventString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 Event log."
+		::={cmm4EventLog 1}
+
+	ntpLog	OBJECT-TYPE
+		SYNTAX		EventString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"CMM4 NTP Log"
+		::={cmm4EventLog 2}
+
+-- CMM4 controls
+
+	cmm4Reboot	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					reboot(1),
+					finishedReboot(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting the variable to 1 will reboot the unit. When the
+            unit finishes rebooting, it will be in finishedReboot state."
+		::={cmm4Controls 1}
+
+	cmm4ClearEventLog	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					clear(1),
+					notClear(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting the variable to 1 will clear the event log."
+		::={cmm4Controls 2}
+
+	cmm4RebootIfRequired	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					rebootifrquired(1),
+					rebootcomplete(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Setting this to 1 will reboot the CMM4 IF and ONLY IF it is required
+            due to configuration updates.  If a reboot is NOT required, setting
+            this value to 1 will have no affect.  If a reboot IS required, setting 
+            this value to 1 will reboot the CMM.  Writing 0 has no affect."
+		::={cmm4Controls 3}
+
+-- CMM4 SNMP
+
+	cmm4SnmpComString	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Community String"
+		::={cmm4Snmp 1}
+
+	cmm4SnmpAccessSubnet	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 2}
+
+	cmm4SnmpTrapIp1	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 1."
+		::={cmm4Snmp 3}
+
+	cmm4SnmpTrapIp2	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 2."
+		::={cmm4Snmp 4}
+
+	cmm4SnmpTrapIp3	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 3."
+		::={cmm4Snmp 5}
+
+	cmm4SnmpTrapIp4	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 4."
+		::={cmm4Snmp 6}
+
+	cmm4SnmpTrapIp5	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 5."
+		::={cmm4Snmp 7}
+
+	cmm4SnmpTrapIp6	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 6."
+		::={cmm4Snmp 8}
+
+	cmm4SnmpTrapIp7	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 7."
+		::={cmm4Snmp 9}
+
+	cmm4SnmpTrapIp8	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 8."
+		::={cmm4Snmp 10}
+
+	cmm4SnmpTrapIp9	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 9."
+		::={cmm4Snmp 11}
+
+	cmm4SnmpTrapIp10	OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Trap IP 10."
+		::={cmm4Snmp 12}
+
+	cmm4SnmpReadOnly	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					readOnlyPermissions(1),
+					readWritePermissions(0)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Permissions
+                1 - Read Only
+                0 - Read/Write."
+		::={cmm4Snmp 13}
+
+	cmm4SnmpGPSSyncTrapEnable	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					gpsSyncTrapDisabled(0),
+					gpsSyncTrapEnabled(1)}
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"Variable to enable/disable GPS sync/out-sync traps."
+		::={cmm4Snmp 14}
+
+	cmm4SnmpAccessSubnet2	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 2.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 15}
+
+	cmm4SnmpAccessSubnet3	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 3.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 16}
+
+	cmm4SnmpAccessSubnet4	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 4.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 17}
+
+	cmm4SnmpAccessSubnet5	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 5.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 18}
+
+	cmm4SnmpAccessSubnet6	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 6.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 19}
+
+	cmm4SnmpAccessSubnet7	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 7.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 20}
+
+	cmm4SnmpAccessSubnet8	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 8.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 21}
+
+	cmm4SnmpAccessSubnet9	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 9.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 22}
+
+	cmm4SnmpAccessSubnet10	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-write
+		STATUS		current
+		DESCRIPTION		
+			"SNMP Accessing Subnet 10.  In x.x.x.x/y form where x.x.x.x is network and y is mask length."
+		::={cmm4Snmp 23}
+
+-- cmm4 GPS Events
+
+	cmm4GPSInSync	NOTIFICATION-TYPE
+		OBJECTS {
+					gpsSyncStatus,
+					cmm4MacAddress}
+		STATUS		current
+		DESCRIPTION		
+			"Signals a transition from No Sync to Sync OK."
+		::={cmm4GPSEvent 1}
+
+	cmm4GPSNoSync	NOTIFICATION-TYPE
+		OBJECTS {
+					gpsSyncStatus,
+					cmm4MacAddress}
+		STATUS		current
+		DESCRIPTION		
+			"Signals a transition from Sync OK to No Sync."
+		::={cmm4GPSEvent 2}
+
+	cmm4UserTable OBJECT-TYPE
+		SYNTAX		SEQUENCE OF Cmm4UserEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"User information table."
+		::= {whispCMM4 9}
+
+	cmm4UserEntry OBJECT-TYPE
+		SYNTAX		Cmm4UserEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"User entry."
+		INDEX		{entryIndex}
+		::= {cmm4UserTable 1}
+
+		Cmm4UserEntry ::= SEQUENCE{
+			entryIndex		INTEGER,
+			userLoginName		DisplayString,
+			userPswd		DisplayString,
+			accessLevel	INTEGER
+			}
+
+	entryIndex	OBJECT-TYPE
+		SYNTAX		INTEGER (1..5)
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"User information table index."
+		::={cmm4UserEntry 1}
+
+	userLoginName	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"User name."
+		::={cmm4UserEntry 2}
+
+	userPswd	OBJECT-TYPE
+		SYNTAX		DisplayString
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"User password."
+		::={cmm4UserEntry 3}
+
+	accessLevel	OBJECT-TYPE
+		SYNTAX		INTEGER {
+					noAdmin(0),
+					guest(1),
+					installer(2),
+					administrator(3),
+					technician(4),
+					engineering(5)}
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION		
+			"User access level."
+		::={cmm4UserEntry 4}
+
+
+END

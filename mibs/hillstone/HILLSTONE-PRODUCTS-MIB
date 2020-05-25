@@ -1,0 +1,64 @@
+-- ***********************************************************************
+-- HILLSTONE-PRODUCTS-MIB 
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3    
+-- Description:	 Hillstone Networks Product Object Identifier Assignments
+-- ***********************************************************************
+--
+
+HILLSTONE-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY
+		FROM SNMPv2-SMI
+	hillstoneProducts
+		FROM HILLSTONE-SMI;
+
+hillstoneSA5020				OBJECT IDENTIFIER ::= { hillstoneProducts 1 }
+hillstoneSA5040				OBJECT IDENTIFIER ::= { hillstoneProducts 2 }
+hillstoneSA5050				OBJECT IDENTIFIER ::= { hillstoneProducts 3 }
+hillstoneSA2005				OBJECT IDENTIFIER ::= { hillstoneProducts 4 }
+hillstoneSA2010				OBJECT IDENTIFIER ::= { hillstoneProducts 5 }
+hillstoneSR550				OBJECT IDENTIFIER ::= { hillstoneProducts 6 }
+hillstoneSR530				OBJECT IDENTIFIER ::= { hillstoneProducts 7 }
+hillstoneSR330				OBJECT IDENTIFIER ::= { hillstoneProducts 8 }
+hillstoneSA2003				OBJECT IDENTIFIER ::= { hillstoneProducts 9 }
+hillstoneSA2001				OBJECT IDENTIFIER ::= { hillstoneProducts 10 }
+hillstoneSR320				OBJECT IDENTIFIER ::= { hillstoneProducts 11 }
+hillstoneMS10				OBJECT IDENTIFIER ::= { hillstoneProducts 12 }
+hillstoneSR520				OBJECT IDENTIFIER ::= { hillstoneProducts 13 }
+hillstoneSA5180				OBJECT IDENTIFIER ::= { hillstoneProducts 17 }
+hillstoneSA5160				OBJECT IDENTIFIER ::= { hillstoneProducts 18 }
+SG-6000-X5100				OBJECT IDENTIFIER ::= { hillstoneProducts 21 }
+SG-6000-G6100				OBJECT IDENTIFIER ::= { hillstoneProducts 22 }
+SG-6000-G3100				OBJECT IDENTIFIER ::= { hillstoneProducts 23 }
+SG-6000-M3100				OBJECT IDENTIFIER ::= { hillstoneProducts 24 }
+SG-6000-M2100				OBJECT IDENTIFIER ::= { hillstoneProducts 25 }
+SG-6000-G5150				OBJECT IDENTIFIER ::= { hillstoneProducts 28 }
+SG-6000-G3150				OBJECT IDENTIFIER ::= { hillstoneProducts 29 }
+SG-6000-G2120				OBJECT IDENTIFIER ::= { hillstoneProducts 31 }
+VR5600T						OBJECT IDENTIFIER ::= { hillstoneProducts 32 }
+SG-6000-NAV10				OBJECT IDENTIFIER ::= { hillstoneProducts 33 }
+SG-6000-NAV20				OBJECT IDENTIFIER ::= { hillstoneProducts 34 }
+SG-6000-NAV30				OBJECT IDENTIFIER ::= { hillstoneProducts 35 }
+SG-6000-G2110				OBJECT IDENTIFIER ::= { hillstoneProducts 36 }
+SG-6000-NAV50				OBJECT IDENTIFIER ::= { hillstoneProducts 37 }
+SG-6000-NAV200				OBJECT IDENTIFIER ::= { hillstoneProducts 38 }
+SG-6000-NAV300				OBJECT IDENTIFIER ::= { hillstoneProducts 39 }
+SG-6000-NAV500				OBJECT IDENTIFIER ::= { hillstoneProducts 40 }
+SG-6000-X6150				OBJECT IDENTIFIER ::= { hillstoneProducts 43 }
+SG-6000-M2105				OBJECT IDENTIFIER ::= { hillstoneProducts 45 }
+SR-320						OBJECT IDENTIFIER ::= { hillstoneProducts 47 }
+SR-520						OBJECT IDENTIFIER ::= { hillstoneProducts 48 }
+SG-6000-M6110				OBJECT IDENTIFIER ::= { hillstoneProducts 49 }
+SG-6000-M6115				OBJECT IDENTIFIER ::= { hillstoneProducts 50 }
+SG-6000-M3105				OBJECT IDENTIFIER ::= { hillstoneProducts 51 }
+SC-1000-M3108				OBJECT IDENTIFIER ::= { hillstoneProducts 52 }
+SG-6000-BANFF				OBJECT IDENTIFIER ::= { hillstoneProducts 54 }
+SG-6000-BANFF-DEMO			OBJECT IDENTIFIER ::= { hillstoneProducts 55 }
+
+END
+

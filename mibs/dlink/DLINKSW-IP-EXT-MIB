@@ -1,0 +1,1315 @@
+--  *****************************************************************
+--  DLINKSW-IP-EXT-MIB.mib : IP Extension MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-IP-EXT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        IpAddress,
+        Integer32,
+        Unsigned32
+            FROM SNMPv2-SMI
+        RowStatus,
+        TruthValue,
+        DisplayString,
+        MacAddress
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+	    OBJECT-GROUP
+		    FROM SNMPv2-CONF        
+        InetPortNumber,
+        InetAddressType,
+        InetAddress,  
+        InetAddressIPv4,     
+        InetAddressIPv6,
+        InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB
+        InterfaceIndex, InterfaceIndexOrZero
+            FROM IF-MIB       
+        dlinkIndustrialCommon			
+			FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwIpExtMIB MODULE-IDENTITY
+        LAST-UPDATED "201309180000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+                "        D-Link Corporation
+
+                 Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                         Taipei City 114, Taiwan, R.O.C
+                 Tel:     +886-2-66000123
+                 E-mail: tsd@dlink.com.tw
+                "
+        DESCRIPTION
+            "This MIB is an extension to the standard IP-MIB."
+        REVISION "201308060000Z"
+        DESCRIPTION
+            "Initial version of this MIB."
+
+        REVISION "201308290000Z"
+        DESCRIPTION
+            "1.Add dIpExtGratuitousARPDadReplyEnabled."
+
+        REVISION "201309180000Z"
+        DESCRIPTION
+            "1.Remove dIpExtDhcpClientIfRowStatus(Note:follow IP interface).
+             2.Update dIpExtDhcpClientIfLeaseDay value range(Note:follow UIS)."
+
+        ::= { dlinkIndustrialCommon 75 }
+
+-- -----------------------------------------------------------------------------
+    dIpExtMIBNotifications      OBJECT IDENTIFIER ::= { dlinkSwIpExtMIB 0 }
+    dIpExtMIBObjects            OBJECT IDENTIFIER ::= { dlinkSwIpExtMIB 1 }
+    dIpExtMIBConformance        OBJECT IDENTIFIER ::= { dlinkSwIpExtMIB 2 }
+
+-- ----------------------------------------------------------------------------- 
+    dIpExtGratuitousARPTrap  NOTIFICATION-TYPE
+        OBJECTS   {
+
+                    dIpExtGratuitousARPIpAddr,
+                    dIpExtGratuitousARPMacAddr,
+                    dIpExtGratuitousARPPortNumber,
+                    dIpExtIfCfgIfIndex
+                  }
+        STATUS  current
+        DESCRIPTION
+           "This trap is sent when there is an IP address conflict."
+        ::={dIpExtMIBNotifications 1}
+
+-- ----------------------------------------------------------------------------- 
+    dIpExtGenArpMgmt  OBJECT IDENTIFIER ::={dIpExtMIBObjects 1}   
+    
+    dIpExtClearArpCacheAll OBJECT-TYPE
+        SYNTAX          INTEGER	    {   
+			clear(1),
+			noOp(2)
+		}
+		MAX-ACCESS      read-write
+		STATUS current
+		DESCRIPTION
+			"This object is used to clear all dynamic ARP entries from the
+			table when set to 'clear'.
+			No action is taken if this object is set to 'noOp'.
+			When read, the value 'noOp' is returned."
+		DEFVAL      { noOp }	
+		::= { dIpExtGenArpMgmt 1 }
+	 
+     dIpExtClearArpCacheByIf OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface on which
+            the dynamic ARP entries will be cleared.
+            When read, a value of 0 is returned."                     
+        ::= { dIpExtGenArpMgmt 2 }                           
+
+    dIpExtTotalArpEntries OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the total number of ARP entries."
+        ::= { dIpExtGenArpMgmt 3 }
+        
+-- ----------------------------------------------------------------------------- 
+    dIpExtGratuitousArpMgmt  OBJECT IDENTIFIER ::={ dIpExtMIBObjects 2 }
+
+    dIpExtGratuitousARPSendRequestEnabled OBJECT-TYPE
+        SYNTAX          TruthValue                   
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to enable/disable transmission of gratuitous
+            ARP request.
+            The device will send out the packet when an IP interface becomes 
+            link up or when the IP address of an interface is configured or 
+            modified."                
+        DEFVAL { false }
+        ::={ dIpExtGratuitousArpMgmt 1}
+     
+    dIpExtGratuitousARPLearningEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "This object is used to enable/disable learning of an ARP entry in
+            the ARP cache based on the received gratuitous ARP packet. If the 
+            device receives a gratuitous ARP request/reply packet and the 
+            sender's IP address is in its ARP table, it should update the
+            ARP entry.
+            "
+        DEFVAL { true }
+        ::={ dIpExtGratuitousArpMgmt 2}
+     
+     dIpExtGratuitousARPDadReplyEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+           "This object is used to enable/disable sending of gratuitous ARP request 
+             while duplicate IP address is detected."
+        DEFVAL { false }
+        ::={ dIpExtGratuitousArpMgmt 3}
+
+      dIpExtGratuitousARPTrapEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS  current
+        DESCRIPTION
+            "This indicates the state of the gratuitous ARP trap. The switch can
+            trap the IP conflict events to inform the administrator.
+            By default, the trap is disabled."
+        DEFVAL { false }
+        ::={dIpExtGratuitousArpMgmt 4}
+  
+     dIpExtGratuitousARPNotifyInfo  OBJECT IDENTIFIER ::= {dIpExtGratuitousArpMgmt 5 }
+               
+       dIpExtGratuitousARPIpAddr       OBJECT-TYPE
+            SYNTAX      IpAddress
+            MAX-ACCESS  accessible-for-notify
+            STATUS  current
+            DESCRIPTION
+            "A duplicate IP address with the switch already exists."
+            ::={dIpExtGratuitousARPNotifyInfo 1}
+
+       dIpExtGratuitousARPMacAddr     OBJECT-TYPE
+            SYNTAX    MacAddress
+            MAX-ACCESS accessible-for-notify
+            STATUS  current
+            DESCRIPTION
+               "This object is the MAC address of the device which has 
+               	the duplicate IP address."
+            ::={dIpExtGratuitousARPNotifyInfo 2}
+
+       dIpExtGratuitousARPPortNumber   OBJECT-TYPE
+            SYNTAX   DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS  current
+            DESCRIPTION
+                "This object is the the port number."
+            ::={dIpExtGratuitousARPNotifyInfo 3}
+
+        
+
+-- ----------------------------------------------------------------------------- 
+    dIpExtIpv6NeighborDiscoverMgmt  OBJECT IDENTIFIER ::={dIpExtMIBObjects 3}   
+    
+    dIpExtClearAllIpv6Neighbors OBJECT-TYPE
+        SYNTAX          INTEGER	    {   
+			clear(1),
+			noOp(2)
+		}
+		MAX-ACCESS      read-write
+		STATUS current
+		DESCRIPTION
+			"This object is used to clear dynamic neighbor cache entries
+            associated with all interfaces when set to 'clear'.
+			No action is taken if this object is set to 'noOp'.
+			When read, the value 'noOp' is returned."
+		DEFVAL      { noOp }	
+		::= { dIpExtIpv6NeighborDiscoverMgmt 1 }
+	 
+     dIpExtClearIpv6NeighborsByIf OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex of the interface on which
+            the dynamic neighbor cache entries will be cleared.
+            When read, a value of 0 is returned."                     
+        ::= { dIpExtIpv6NeighborDiscoverMgmt 2 }                           
+
+    dIpExtTotalIpv6Neighbors OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the total number of dynamic neighbor cache
+            entries."
+        ::= { dIpExtIpv6NeighborDiscoverMgmt 3 }
+   
+-- -----------------------------------------------------------------------------
+    dIpExtInterfaceMgmt         OBJECT IDENTIFIER ::={dIpExtMIBObjects 4}
+    
+    dIpExtIpIfTable    OBJECT-TYPE    
+        SYNTAX          SEQUENCE OF DIpExtIpIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table provides the mechanism to create or delete layer 3 interfaces.  
+             It is expected that user first creates a row in this table, followed by 
+             configuring the row in dIpExtIfCfgTable via the corresponding ifIndex.
+             "         
+        ::= { dIpExtInterfaceMgmt 1 }
+    
+    dIpExtIpIfEntry OBJECT-TYPE
+        SYNTAX          DIpExtIpIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A row instance contains the information of the layer 3 interface.
+            Creating/deleting entries in this table causes corresponding entries 
+            be created/deleted in ifTable/ifXTable."   
+        INDEX  { 
+            dIpExtIpIfType,
+            dIpExtIpIfNumber
+        }
+        ::= { dIpExtIpIfTable 1 }
+            
+    DIpExtIpIfEntry ::= SEQUENCE {      
+        dIpExtIpIfType                INTEGER,  
+        dIpExtIpIfNumber              Unsigned32,
+        dIpExtIpIfIndex               InterfaceIndex,         
+        dIpExtIpIfRowStatus           RowStatus
+    }
+    
+    dIpExtIpIfType OBJECT-TYPE
+       SYNTAX           INTEGER {						
+            loopback(1),
+            vlan(2)                               
+	   }
+	   MAX-ACCESS	    not-accessible
+	   STATUS		    current
+	   DESCRIPTION	
+           "This object indicates the type of the interface.           
+           'loopback' -	The software only interface which always stays in up status.
+           'vlan'     -	VLAN interface.                   
+           "
+        ::= { dIpExtIpIfEntry 1 }
+ 
+     dIpExtIpIfNumber OBJECT-TYPE
+        SYNTAX          Unsigned32 (0 .. 65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the interface ID within the type.
+            "
+        ::= { dIpExtIpIfEntry 2 }
+
+    dIpExtIpIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface is determined by the agent.
+            "
+        ::= { dIpExtIpIfEntry 3 }
+                                        
+     dIpExtIpIfRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The status of this conceptual row." 
+        ::= { dIpExtIpIfEntry 4 }    
+
+-- ----------------------------------------------------------------------------- 
+    dIpExtIfCfgTableNumber     OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in the dIpExtIfCfgTable."
+        ::= { dIpExtInterfaceMgmt 2 }
+        
+    dIpExtIfCfgTable    OBJECT-TYPE    
+        SYNTAX          SEQUENCE OF DIpExtIfCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table contains extended per-interface information."            
+        ::= { dIpExtInterfaceMgmt 3 }
+        
+    dIpExtIfCfgEntry OBJECT-TYPE
+        SYNTAX          DIpExtIfCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION    
+            "A row in this table is created as a side effect of row addition
+            in the dIpExtIpIfTable.
+            " 
+        INDEX  { dIpExtIfCfgIfIndex }
+        ::= { dIpExtIfCfgTable 1 }
+            
+    DIpExtIfCfgEntry ::= SEQUENCE {        
+        dIpExtIfCfgIfIndex                 InterfaceIndex,  
+        dIpExtIfCfgDhcpEnabled             TruthValue,
+        dIpExtIfCfgArpTimeout              Unsigned32,
+        dIpExtIfCfgProxyArpEnabled         TruthValue,            
+        dIpExtIfCfgLocalProxyArpEnabled    TruthValue,
+        dIpExtIfCfgDirectedBcastEnabled    TruthValue,
+        dIpExtIfCfgDirectedBcastAcl        DisplayString,
+        dIpExtIfCfgGratuitousARPSendInterval        Unsigned32,
+        dIpExtIfCfgIpMtu                   Unsigned32,
+        dIpExtIfCfgDADTransmits            Unsigned32        
+    }
+       
+    dIpExtIfCfgIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+            "
+        ::= { dIpExtIfCfgEntry 1 }
+                                   
+    dIpExtIfCfgDhcpEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+             "The object indicates whether acquire an IP address configuration
+             on the interface from the DHCP protocol."   
+        DEFVAL { false }  
+        ::= { dIpExtIfCfgEntry 2 }
+    
+    dIpExtIfCfgArpTimeout OBJECT-TYPE
+        SYNTAX          Unsigned32 (0 | 1..65535)
+        UNITS           "minutes"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION            
+            "This object indicates the ARP aging time in unit of minute for
+            dynamic ARP entries on the corresponding interface. 
+            Setting this variable to 0 the ARP entries will not be aged out." 
+        DEFVAL { 240 }    
+        ::= { dIpExtIfCfgEntry 3 }
+        
+    dIpExtIfCfgProxyArpEnabled     OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The object indicates the state of proxy ARP on the corresponding
+            interface."    
+        DEFVAL          { false } 
+        ::= { dIpExtIfCfgEntry 4 }
+   
+    dIpExtIfCfgLocalProxyArpEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The object indicates the state of local proxy ARP on the
+            corresponding interface."    
+        DEFVAL          { false }  
+        ::= { dIpExtIfCfgEntry 5 }
+
+    dIpExtIfCfgDirectedBcastEnabled    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "The object indicates the state of the conversion of IP directed
+            broadcasts on the corresponding interface."    
+        DEFVAL          { false }  
+        ::= { dIpExtIfCfgEntry 6 } 
+
+    dIpExtIfCfgDirectedBcastAcl  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE  (0..32))
+	    MAX-ACCESS      read-write
+	    STATUS          current
+	    DESCRIPTION
+	        "The object indicates the name of a standard IP access list."
+	    ::= { dIpExtIfCfgEntry 7 }
+	    
+	dIpExtIfCfgGratuitousARPSendInterval OBJECT-TYPE
+        SYNTAX          Unsigned32 (0 | 1..3600)
+        UNITS           "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION            
+            "This object indicates the interval of regularly sending the 
+            gratuitous ARP request message in unit of second on the 
+            corresponding interface.
+            A value of zero indicates the gratuitous ARP will not be regularly 
+            sent."            
+        DEFVAL { 0 }    
+        ::= { dIpExtIfCfgEntry 8 }      
+     
+     dIpExtIfCfgIpMtu      OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION            
+            "The MTU is the largest size of the IP datagram which may be transferred 
+            using a specific data link connection. The MTU value is a design parameter 
+            of a LAN and is a mutually agreed value (i.e. both ends of a link agree to 
+            use the same specific value) for most WAN links.
+            The MTU range is based on the chip of the current device."               
+        DEFVAL { 1500 }    
+        ::= { dIpExtIfCfgEntry 9 }
+                     
+    dIpExtIfCfgDADTransmits      OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 0..255 )
+        MAX-ACCESS      read-write
+        STATUS          current   
+        DESCRIPTION 
+            "This object indicates the number of Neighbor Solicitations to send
+            during Duplicate Address Detection (DAD).
+            A value of zero indicates DAD is disabled.
+            "
+        DEFVAL { 1 }  
+        ::= { dIpExtIfCfgEntry 10 }
+
+-- ----------------------------------------------------------------------------- 
+    dIpExtIpAddressTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpExtIpAddressEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table of addressing information relevant to
+            this entity's IP addresses. This is the enhancement of
+            the ipAddressTable in IP-MIB. Creating/deleting entries in this table
+            causes corresponding entries be created/deleted in ipAddressTable."    
+        ::= { dIpExtInterfaceMgmt 4 }
+
+    dIpExtIpAddressEntry OBJECT-TYPE
+        SYNTAX          DIpExtIpAddressEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The addressing information for one of this entity's IP addresses.
+            "
+        INDEX           {
+            dIpExtIpAddressType,
+            dIpExtIpAddress,
+            dIpExtIpAddressIfIndex
+        } 
+        ::= { dIpExtIpAddressTable 1 }
+
+    DIpExtIpAddressEntry ::= SEQUENCE {
+        dIpExtIpAddressType             InetAddressType,
+        dIpExtIpAddress                 InetAddress,
+        dIpExtIpAddressIfIndex          InterfaceIndex,
+        dIpExtIpAddressPrefixLength     InetAddressPrefixLength,       
+        dIpExtIpAddressCategory         INTEGER,
+        dIpExtIpAddressRowStatus        RowStatus
+    }
+   
+    dIpExtIpAddressType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The Internet address type of entry." 
+        ::= { dIpExtIpAddressEntry 1 }
+
+    dIpExtIpAddress OBJECT-TYPE
+        SYNTAX          InetAddress (SIZE  (1..16))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The IP address to which this entry's addressing
+            information pertains." 
+        ::= { dIpExtIpAddressEntry 2 }
+
+    dIpExtIpAddressIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifindex value which uniquely identifies the interface to which
+            this entry is applicable. 
+            " 
+        ::= { dIpExtIpAddressEntry 3 }
+
+    dIpExtIpAddressPrefixLength OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The length of the prefix associated with the IP address of this
+            entry. 
+            " 
+        ::= { dIpExtIpAddressEntry 4 }
+
+    dIpExtIpAddressCategory OBJECT-TYPE
+        SYNTAX          INTEGER  { 
+            primary(1), 
+            secondary(2),
+            linkLocal(3),
+            eui64(4)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address category of this entry.
+            The 'primary' and 'secondary' are valid for IPv4 address.
+            Although multiple IPv4 addresses can be created for an interface,
+            at most one of these addresses is the primary IPv4 address, and the
+            rest are secondary IPv4 address.  
+            'linkLocal' and 'eui64' are valid for IPv6 address.   
+            'linkLocal' - The IPv6 address is a link local address.
+            'eui64' - The IPv6 address is formed by EUI-64 interface ID.
+                      The corresponding prefix length must be smaller than 64.
+            " 
+        ::= { dIpExtIpAddressEntry 5 }
+
+     dIpExtIpAddressRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is used to manage creation and deletion of rows
+            in this table. 
+            " 
+        ::= { dIpExtIpAddressEntry 6 }
+
+-- -----------------------------------------------------------------------------   
+    dIpExtIpAddrBaseGenPrefixTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpExtAddrBaseGenPrefixEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table allows the configuration of IPv6 address based on a
+            general prefix.
+	        "    
+        ::= { dIpExtInterfaceMgmt 5 }
+
+    dIpExtIpAddrBaseGenPrefixEntry OBJECT-TYPE
+        SYNTAX          DIpExtAddrBaseGenPrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the association of general prefix for
+            configuring IPv6 address on an interface.
+            "
+        INDEX           {
+            dIpExtIpAddrBasePrefixIfIndex,
+            dIpExtIpAddrBasePrefixName
+        } 
+        ::= { dIpExtIpAddrBaseGenPrefixTable 1 }
+
+    DIpExtAddrBaseGenPrefixEntry ::= SEQUENCE {
+        dIpExtIpAddrBasePrefixIfIndex     InterfaceIndex,
+        dIpExtIpAddrBasePrefixName        DisplayString,
+        dIpExtIpAddrBasePrefixSubBits     InetAddressIPv6,        
+        dIpExtIpAddrBasePrefixLength      InetAddressPrefixLength,              
+        dIpExtIpAddrBasePrefixRowStatus   RowStatus
+    }
+   
+    dIpExtIpAddrBasePrefixIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifindex value which uniquely identifies the interface to which
+            this entry is applicable. 
+            " 
+        ::= { dIpExtIpAddrBaseGenPrefixEntry 1 }
+
+    dIpExtIpAddrBasePrefixName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE  (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the general prefix name which will be used to configure the IPv6 
+            address on the interface.
+            " 
+        ::= { dIpExtIpAddrBaseGenPrefixEntry 2 }
+
+    dIpExtIpAddrBasePrefixSubBits OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the sub-prefix part and host part of the IPv6 address.
+            " 
+        ::= { dIpExtIpAddrBaseGenPrefixEntry 3 }
+
+    dIpExtIpAddrBasePrefixLength OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The length of the prefix associated with the IP address of this
+            entry. 
+            " 
+        ::= { dIpExtIpAddrBaseGenPrefixEntry 4 }
+
+     dIpExtIpAddrBasePrefixRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is used to manage creation and deletion of rows
+            in this table. 
+            " 
+        ::= { dIpExtIpAddrBaseGenPrefixEntry 5 }
+
+-- ----------------------------------------------------------------------------- 
+    dIpExtPrefixMgmt         OBJECT IDENTIFIER ::={dIpExtMIBObjects 5}
+    
+    dIpExtIpv6GneralPrefixTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpExtIpv6GneralPrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+	        "This table allows the creation and removal of IPv6 general
+	        prefixes.    
+            "
+        ::= { dIpExtPrefixMgmt 1 }
+    
+    dIpExtIpv6GneralPrefixEntry OBJECT-TYPE
+        SYNTAX          DIpExtIpv6GneralPrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+	        "An entry consists of information of an IPv6 general prefix."
+        INDEX  { dIpExtGneralPrefixName }
+        ::= { dIpExtIpv6GneralPrefixTable 1 }
+
+    DIpExtIpv6GneralPrefixEntry ::= SEQUENCE {    
+        dIpExtGneralPrefixName              DisplayString,
+        dIpExtGneralPrefixType              INTEGER, 
+        dIpExtGneralPrefix                  InetAddressIPv6,
+        dIpExtGneralPrefixLength            InetAddressPrefixLength,
+        dIpExtGeneralPrefix6to4IfIndex      InterfaceIndex,       
+        dIpExtGeneralPrefixRowStatus        RowStatus
+    }
+
+    dIpExtGneralPrefixName OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+	        "The ifindex value which uniquely identifies the
+            interface to which this entry is applicable. 
+            " 
+        ::= { dIpExtIpv6GneralPrefixEntry 1 }
+    
+    dIpExtGneralPrefixType OBJECT-TYPE
+        SYNTAX          INTEGER  {
+           normal(1),
+           ipv6ToIpv4(2)
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "This object indicates the type of the prefix configuration.
+            'normal' - This general prefix is configured by dIpExtGneralPrefix
+                       and dIpExtGneralPrefixLength.
+            'ipv6ToIpv4' - The general prefix is configured by the interface 
+                       (dIpExtGeneralPrefix6to4IfIndex) whose IPv4
+                       address will be used to form a general prefix used for
+                       6to4 tunnel.
+            "
+        ::= { dIpExtIpv6GneralPrefixEntry 2 } 
+   
+    dIpExtGneralPrefix OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "This object indicates the prefix of the entry.
+            This object is meaningless when dIpExtGneralPrefixType is not 'normal'.
+            "
+        ::= { dIpExtIpv6GneralPrefixEntry 3 } 
+
+     dIpExtGneralPrefixLength OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "The length of the prefix associated with the general prefix of this
+            entry. 
+            This object is meaningless when dIpExtGneralPrefixType is not 'normal'.
+            " 
+        ::= { dIpExtIpv6GneralPrefixEntry 4 } 
+
+     dIpExtGeneralPrefix6to4IfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "This object indicates ifIndex of the interface whose IPv4 address
+            will be used to form a general prefix used for 6to4 tunnel.
+            This object is meaningless when dIpExtGneralPrefixType is not 'ipv6ToIpv4'.
+            "
+        ::= { dIpExtIpv6GneralPrefixEntry 5 } 
+
+    dIpExtGeneralPrefixRowStatus OBJECT-TYPE         
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "Used to control the addition and removal of IPv6
+	        general prefixes.
+            "
+        ::= { dIpExtIpv6GneralPrefixEntry 6 }
+
+-- ----------------------------------------------------------------------------- 
+    dIpExtIpv6PrefixTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpExtIpv6PrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+	        "This table allows the creation and removal of IPv6
+	        prefixes to be placed in Prefix Information
+	        options in Router Advertisement messages sent
+	        from the interface.    
+            This is the enhancement of the ipAddressPrefixTable in IP-MIB.           
+	        "
+        ::= { dIpExtPrefixMgmt 2 }
+
+    dIpExtIpv6PrefixEntry OBJECT-TYPE
+        SYNTAX          DIpExtIpv6PrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+	        "An IPv6 interface prefix entry."
+        INDEX  { 
+            dIpExtIpv6PrefixIfIndex, 
+            dIpExtIpv6Prefix,
+            dIpExtIpv6PrefixLength 
+        }
+        ::= { dIpExtIpv6PrefixTable 1 }
+
+    DIpExtIpv6PrefixEntry ::= SEQUENCE {    
+        dIpExtIpv6PrefixIfIndex             InterfaceIndex,
+        dIpExtIpv6Prefix                    InetAddressIPv6,
+        dIpExtIpv6PrefixLength              InetAddressPrefixLength,
+        dIpExtIpv6PrefixValidLifetime       Unsigned32,
+        dIpExtIpv6PrefixPreferLifetime      Unsigned32,
+        dIpExtIpv6PrefixOnLinkFlag          TruthValue,    
+        dIpExtIpv6PrefixAutonomousFlag      TruthValue,   
+        dIpExtIpv6PrefixRowStatus           RowStatus
+    }
+    
+    dIpExtIpv6PrefixIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+	        "The ifindex value which uniquely identifies the
+            interface to which this entry is applicable. 
+            " 
+        ::= { dIpExtIpv6PrefixEntry 1 }
+    
+    dIpExtIpv6Prefix OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "The prefix of the entry."
+        ::= { dIpExtIpv6PrefixEntry 2 }
+
+    dIpExtIpv6PrefixLength OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "The prefix length of the entry."
+        ::= { dIpExtIpv6PrefixEntry 3 }
+ 
+    dIpExtIpv6PrefixValidLifetime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "This object indicates the valid life time in seconds of the entry. 
+            A value of 4,294,967,295 represents infinity.
+            "
+        DEFVAL { 2592000 }
+        ::= { dIpExtIpv6PrefixEntry 4 }
+
+    dIpExtIpv6PrefixPreferLifetime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	       "This object indicates the preferred life time in seconds of the entry.
+            A value of 4,294,967,295 represents infinity.
+           "
+        DEFVAL { 604800 }
+        ::= { dIpExtIpv6PrefixEntry 5 }
+
+     dIpExtIpv6PrefixOnLinkFlag OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	       "This object has the value 'true(1)', if this prefix can be
+            used for on-link determination; otherwise, the value is
+            'false(2)'.
+
+            The default for IPv4 prefixes is 'true(1)'."
+        DEFVAL { false }
+        ::= { dIpExtIpv6PrefixEntry 6 }
+
+    dIpExtIpv6PrefixAutonomousFlag OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	       "Autonomous address configuration flag.  When true(1),
+            indicates that this prefix can be used for autonomous
+            address configuration (i.e., can be used to form a local
+            interface address).  If false(2), it is not used to auto-
+            configure a local interface address.
+
+            The default for IPv4 prefixes is 'false(2)'."
+        DEFVAL { true }
+        ::= { dIpExtIpv6PrefixEntry 7 }
+
+    dIpExtIpv6PrefixRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+	        "Used to control the addition and removal of IPv6
+	        interface prefixes for RA messages."
+        ::= { dIpExtIpv6PrefixEntry 8 }
+
+-- ----------------------------------------------------------------------------- 
+    dIpExtDhcpClientMgmt  OBJECT IDENTIFIER ::={ dIpExtMIBObjects 6 }
+    
+    dIpExtDhcpClientIfTable    OBJECT-TYPE    
+        SYNTAX          SEQUENCE OF DIpExtDhcpClientIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table contains a list of DHCP client configuration of interfaces."            
+        ::= { dIpExtDhcpClientMgmt 1 }
+        
+    dIpExtDhcpClientIfEntry OBJECT-TYPE
+        SYNTAX          DIpExtDhcpClientIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION    
+            "An entry is created to configure DHCP client per-interface
+            settings to different value from default value. When an entry is
+            deleted, all the settings are reverted to default value." 
+        INDEX  { dIpExtDhcpClientIfIndex }
+        ::= { dIpExtDhcpClientIfTable 1 }
+                       
+    DIpExtDhcpClientIfEntry ::= SEQUENCE {
+        dIpExtDhcpClientIfIndex             InterfaceIndex,  
+        dIpExtDhcpClientIfClassIdType       INTEGER,
+        dIpExtDhcpClientIfClassIdValue      DisplayString,            
+        dIpExtDhcpClientIfClientIdIfIdx     InterfaceIndex,   
+        dIpExtDhcpClientIfLeaseDay		    Integer32,
+        dIpExtDhcpClientIfLeaseHour    	    Unsigned32,
+        dIpExtDhcpClientIfLeaseMinute       Unsigned32,  
+        dIpExtDhcpClientIfHostName          DisplayString
+    }
+    
+    dIpExtDhcpClientIfIndex  OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+	    MAX-ACCESS      not-accessible
+	    STATUS          current	    
+	    DESCRIPTION
+	        "The ifIndex value of the interface.
+            Only VLAN interfaces are valid interfaces."
+        ::= { dIpExtDhcpClientIfEntry 1 }
+        
+	dIpExtDhcpClientIfClassIdType OBJECT-TYPE
+        SYNTAX INTEGER      {
+            ascii(1),
+            hex(2)            
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The object indicates the type of class id which is defined by
+            dIpExtDhcpClientIfClassIdValue.            
+            The value means :
+            ascii(1)- The dIpExtDhcpClientIfClassIdValue is ascii string.
+            hex(2)  - The dIpExtDhcpClientIfClassIdValue is a string of HEX
+                      number.
+            "
+        ::= { dIpExtDhcpClientIfEntry 2 }
+        
+    dIpExtDhcpClientIfClassIdValue  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+	    MAX-ACCESS      read-create
+	    STATUS          current	    
+	    DESCRIPTION
+	        "This object indicates the value of vendor class identifier
+	        (option 60) to be sent with the DHCP DISCOVER message. 
+ 
+             An dIpExtDhcpClientIfClassIdValue value is always interpreted
+             within the context of an dIpExtDhcpClientIfClassIdType value. 
+             If dIpExtDhcpClientIfClassIdType is 'hex', this object is a HEX
+             string value, which is restricted to hexadecimal character set."
+        ::= { dIpExtDhcpClientIfEntry 3 }
+                   
+    dIpExtDhcpClientIfClientIdIfIdx  OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+	    MAX-ACCESS      read-create
+	    STATUS          current
+	    DESCRIPTION	    
+	        "This object indicates ifIndex of the VLAN interface whose
+	        hexadecimal MAC address will be used as the client ID to be
+	        sent with the DISCOVER message.
+            "
+        ::= { dIpExtDhcpClientIfEntry 4 }        
+    
+    dIpExtDhcpClientIfHostName  OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..64))
+	    MAX-ACCESS      read-create
+	    STATUS          current	    
+	    DESCRIPTION
+	        "This object indicates the host name. The host name must start with
+	        a letter, end with a letter or digit, and only with interior 
+	        characters letters, digits, and hyphens.
+	        "
+        ::= { dIpExtDhcpClientIfEntry 5 }
+               
+    dIpExtDhcpClientIfLeaseDay OBJECT-TYPE
+       SYNTAX           Integer32	(-1 | 0..10000)
+       MAX-ACCESS       read-create
+       STATUS           current
+       DESCRIPTION
+            "This object indicates the number of days for the duration of 
+            preferred lease time. Value of -1 indicates that preferred lease
+            time is unspecified. 
+            This value is checked when an IP address is acquired from
+            a DHCP server. "
+       DEFVAL          { -1 }
+       ::= { dIpExtDhcpClientIfEntry 6 }
+
+    dIpExtDhcpClientIfLeaseHour OBJECT-TYPE
+        SYNTAX          Unsigned32	(0..23)
+        MAX-ACCESS      read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the number of hours for the duration of preferred
+            lease time."
+        DEFVAL          { 0 }    
+        ::= { dIpExtDhcpClientIfEntry 7 }
+
+    dIpExtDhcpClientIfLeaseMinute OBJECT-TYPE
+        SYNTAX          Unsigned32	(0..59)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of minutes for the duration of preferred
+            lease time."
+        DEFVAL          { 0 }     
+        ::= { dIpExtDhcpClientIfEntry 8 } 
+    
+    dIpExtDhcpClientAutoconfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    enabled(1),
+                    disabled(2)
+                }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Indicates the status of automatically getting the configuration information
+             from a TFTP server connected to the device."
+        ::= { dIpExtDhcpClientMgmt 2 }
+-- ----------------------------------------------------------------------------- 
+    dIpExtUdpForwardMgmt  OBJECT IDENTIFIER ::={dIpExtMIBObjects 7} 
+     
+    dIpExtUdpFwdPortTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpExtUdpFwdPortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current          
+        DESCRIPTION
+            "This table consists of a list of UDP ports to forward UDP packets.
+            "
+        ::= { dIpExtUdpForwardMgmt 1 }
+
+    dIpExtUdpFwdPortEntry OBJECT-TYPE
+        SYNTAX          DIpExtUdpFwdPortEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION    
+            "An entry is created/deleted to enable/disable forwarding of a
+            specific UDP service type of packets." 
+        INDEX  { dIpExtUdpFwdPortNumber }
+        ::= { dIpExtUdpFwdPortTable 1 }
+                       
+    DIpExtUdpFwdPortEntry ::= SEQUENCE {
+        dIpExtUdpFwdPortNumber          InetPortNumber,         
+        dIpExtUdpFwdPortRowStatus       RowStatus
+    }
+    
+    dIpExtUdpFwdPortNumber  OBJECT-TYPE
+        SYNTAX          InetPortNumber
+	    MAX-ACCESS      not-accessible
+	    STATUS          current	    
+	    DESCRIPTION
+	        "The UDP port number of the entry.
+            "
+        ::= { dIpExtUdpFwdPortEntry 1 }
+        
+	dIpExtUdpFwdPortRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The status of this conceptual row." 
+        ::= { dIpExtUdpFwdPortEntry 2 }  
+
+-- -----------------------------------------------------------------------------           
+    dIpExtUdpHelperAddrTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DIpExtUdpHelperAddrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current          
+        DESCRIPTION
+            "This table consists of a list of target addresses for forwarding of
+            UDP broadcast packets.
+            "
+        ::= { dIpExtUdpForwardMgmt 2 }
+
+     dIpExtUdpHelperAddrEntry OBJECT-TYPE
+        SYNTAX          DIpExtUdpHelperAddrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION    
+            "An target IP address for forwarding of the UDP broadcast packet
+            on an interface.
+            " 
+        INDEX  { 
+            dIpExtUdpHelperIfIndex,
+            dIpExtUdpHelperAddrType,
+            dIpExtUdpHelperAddr
+        }
+        ::= { dIpExtUdpHelperAddrTable 1 }
+                       
+    DIpExtUdpHelperAddrEntry ::= SEQUENCE {
+        dIpExtUdpHelperIfIndex          InterfaceIndex,
+        dIpExtUdpHelperAddrType         InetAddressType,
+        dIpExtUdpHelperAddr             InetAddress,         
+        dIpExtUdpHelperAddrRowStatus    RowStatus
+    }
+    
+    dIpExtUdpHelperIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface on which the entry is configured.
+            Only VLAN interfaces are valid interfaces."
+        ::= { dIpExtUdpHelperAddrEntry 1 }
+ 
+    dIpExtUdpHelperAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "The address type of UDP helper address."
+        ::= { dIpExtUdpHelperAddrEntry 2 }
+
+    dIpExtUdpHelperAddr  OBJECT-TYPE
+        SYNTAX          InetAddress
+	    MAX-ACCESS      not-accessible
+	    STATUS          current	    
+	    DESCRIPTION
+	        "An IP address of the server.
+            "
+        ::= { dIpExtUdpHelperAddrEntry 3 }
+        
+	dIpExtUdpHelperAddrRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The status of this conceptual row." 
+        ::= { dIpExtUdpHelperAddrEntry 4 } 
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	dIpExtCompliances OBJECT IDENTIFIER ::= { dIpExtMIBConformance 1 }
+		
+	dIpExtCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-IP-EXT-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dIpExtBasicGroup
+		}	
+		       
+        GROUP       dIpExtBasicIpv6OnlyGroup 
+        DESCRIPTION 
+            "This group is required only if IPv6 is implemented by the agent."
+
+        GROUP       dIpExtGeneralPrefixGroup 
+        DESCRIPTION 
+            "This group is required only if general prefix is implemented by
+            the agent."
+
+        OBJECT          dIpExtGeneralPrefix6to4IfIndex
+	    MIN-ACCESS      read-only
+	    DESCRIPTION
+		    "Create/Write access is required only if the agent supports forming
+            a general prefix for 6to4 tunnel."     
+
+		GROUP       dIpExtGratuitousArpGroup 
+        DESCRIPTION 
+            "This group is required only if Gratuitous ARP feature is
+            implemented by the agent."		
+        
+        GROUP       dIpExtProxyArpGroup 
+        DESCRIPTION 
+            "This group is required only if Proxy ARP feature is
+            implemented by the agent."	
+        
+        OBJECT          dIpExtIfCfgLocalProxyArpEnabled
+	    MIN-ACCESS      read-only
+	    DESCRIPTION
+		    "Create/Write access is required only if the agent supports local 
+		    Proxy ARP."     
+		
+		GROUP       dIpExtDirectedBroadcastGroup 
+        DESCRIPTION 
+            "This group is required only if IP directed broadcast is
+            implemented by the agent."	
+        
+        GROUP       dIpExtDhcpClientGroup 
+        DESCRIPTION 
+            "This group is required only if IP DHCP client is
+            implemented by the agent."
+         
+        GROUP       dIpExtUdpForwardGroup 
+        DESCRIPTION 
+            "This group is required only if UDP forwarder is
+            implemented by the agent."    	                    
+		::= { dIpExtCompliances 1 }
+		
+	dIpExtGroups OBJECT IDENTIFIER ::= { dIpExtMIBConformance 2 }
+			
+   	dIpExtBasicGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtClearArpCacheAll,
+            dIpExtClearArpCacheByIf, 
+		    dIpExtTotalArpEntries,            
+            dIpExtIpIfIndex,
+            dIpExtIpIfRowStatus,           
+            dIpExtIfCfgTableNumber,
+            dIpExtIfCfgDhcpEnabled,
+		    dIpExtIfCfgArpTimeout,  
+			dIpExtIfCfgIpMtu,
+            dIpExtIpAddressPrefixLength,
+            dIpExtIpAddressCategory,
+            dIpExtIpAddressRowStatus
+		}
+		STATUS current
+		DESCRIPTION 
+				"This group contains the collection of objects related to
+				IP/ARP settings which are not covered by standard IP-MIB."
+		::= { dIpExtGroups 1 }
+         
+    dIpExtBasicIpv6OnlyGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtClearAllIpv6Neighbors, 
+		    dIpExtClearIpv6NeighborsByIf,
+            dIpExtTotalIpv6Neighbors,
+            dIpExtIfCfgDADTransmits
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to
+			fundamental IPv6 feature."
+		::= { dIpExtGroups 2 }
+
+    dIpExtGeneralPrefixGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtIpAddrBasePrefixSubBits, 
+		    dIpExtIpAddrBasePrefixLength,
+            dIpExtIpAddrBasePrefixRowStatus,
+            dIpExtGneralPrefixType,
+            dIpExtGneralPrefix,
+            dIpExtGneralPrefixLength,
+            dIpExtGeneralPrefix6to4IfIndex,
+            dIpExtGeneralPrefixRowStatus            
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to
+			general prefix configuration."
+		::= { dIpExtGroups 3 }
+
+    dIpExtRaPrefixGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtIpv6Prefix, 
+		    dIpExtIpv6PrefixLength,
+            dIpExtIpv6PrefixValidLifetime,
+            dIpExtIpv6PrefixPreferLifetime,
+            dIpExtIpv6PrefixOnLinkFlag,
+            dIpExtIpv6PrefixAutonomousFlag,
+            dIpExtIpv6PrefixRowStatus         
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to
+			the configuration of IPv6 prefix which are advertised in RA."
+		::= { dIpExtGroups 4 }
+
+	dIpExtGratuitousArpGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtIfCfgGratuitousARPSendInterval, 
+		    dIpExtGratuitousARPSendRequestEnabled, 
+		    dIpExtGratuitousARPLearningEnabled 
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to
+			Gratuitous ARP feature."
+		::= { dIpExtGroups 5 }
+		
+	dIpExtProxyArpGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtIfCfgProxyArpEnabled, 
+		    dIpExtIfCfgLocalProxyArpEnabled 
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to Proxy
+			ARP."
+		::= { dIpExtGroups 6 }
+		
+	dIpExtDirectedBroadcastGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtIfCfgDirectedBcastEnabled, 
+		    dIpExtIfCfgDirectedBcastAcl 
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to IP
+			directed broadcasts feature."
+		::= { dIpExtGroups 7 }
+					
+	dIpExtDhcpClientGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtDhcpClientIfClassIdType, 
+		    dIpExtDhcpClientIfClassIdValue, 
+		    dIpExtDhcpClientIfClientIdIfIdx, 
+		    dIpExtDhcpClientIfHostName, 
+			dIpExtDhcpClientIfLeaseDay, 
+			dIpExtDhcpClientIfLeaseHour, 
+			dIpExtDhcpClientIfLeaseMinute }
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to DHCP
+			client."
+		::= { dIpExtGroups 8 }
+
+    dIpExtUdpForwardGroup OBJECT-GROUP
+		OBJECTS { 
+		    dIpExtUdpFwdPortRowStatus, 
+		    dIpExtUdpHelperAddrRowStatus
+        }
+		STATUS current
+		DESCRIPTION 
+		    "This group contains the collection of objects related to UDP
+			forwarding feature."
+		::= { dIpExtGroups 9 }
+	
+END

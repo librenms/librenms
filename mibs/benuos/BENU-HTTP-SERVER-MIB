@@ -1,0 +1,275 @@
+BENU-HTTP-SERVER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Integer32 ,Unsigned32, MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY
+      FROM SNMPv2-SMI
+
+   benuWAG FROM BENU-WAG-MIB;
+
+benuHttpServerMIB  MODULE-IDENTITY 
+            LAST-UPDATED "201510210000Z" -- Oct 21, 2015
+
+
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "This MIB module defines management information
+                related to the HTTP server.
+
+                Copyright (C)  2013 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201510210000Z" --  Oct 21, 2015
+            DESCRIPTION "Initial Version"
+
+    ::= { benuWAG 10 }
+
+-- declare top-level MIB objects for each component
+
+bHttpServerObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "HTTP server information is defined in this branch."
+   ::= { benuHttpServerMIB 1 }
+
+
+-- HTTP server latency Table
+
+bHttpServerLatencyTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BHttpServerLatencyEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "Latency information list for HTTP server."
+   ::= { bHttpServerObjects 1 }
+
+bHttpServerLatencyEntry  OBJECT-TYPE
+   SYNTAX      BHttpServerLatencyEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "A logical row in the bHttpServerLatencyTable."
+   INDEX {
+      bHttpServLatencyStatsInterval
+   }
+   ::= { bHttpServerLatencyTable 1}
+
+BHttpServerLatencyEntry ::= SEQUENCE {
+    bHttpServLatencyStatsInterval                         Integer32,
+    bHttpServLatencyStatsIntervalDuration                 Integer32,
+    bHttpServLatencyTotalPktCount                         Unsigned32,
+    bHttpServLatencyMaxProcessingTime                     Unsigned32,
+    bHttpServLatencyMinProcessingTime                     Unsigned32,
+    bHttpServLatencyAvgProcessingTime                     Unsigned32,
+    bHttpServLatencyProcessTimeMorethan1MSPktCount        Unsigned32,
+    bHttpServLatencyGetTotalPktCount                      Unsigned32,
+    bHttpServLatencyGetMaxProcessingTime                  Unsigned32,
+    bHttpServLatencyGetMinProcessingTime                  Unsigned32,
+    bHttpServLatencyGetAvgProcessingTime                  Unsigned32,
+    bHttpServLatencyGetProcessTimeMorethan1MSPktCount     Unsigned32,
+    bHttpServLatencyPostTotalPktCount                     Unsigned32,
+    bHttpServLatencyPostMaxProcessingTime                 Unsigned32,
+    bHttpServLatencyPostMinProcessingTime                 Unsigned32,
+    bHttpServLatencyPostAvgProcessingTime                 Unsigned32,
+    bHttpServLatencyPostProcessTimeMorethan1MSPktCount    Unsigned32,
+    bHttpServLatencyDeleteTotalPktCount                   Unsigned32,
+    bHttpServLatencyDeleteMaxProcessingTime               Unsigned32,
+    bHttpServLatencyDeleteMinProcessingTime               Unsigned32,
+    bHttpServLatencyDeleteAvgProcessingTime               Unsigned32,
+    bHttpServLatencyDeleteProcessTimeMorethan1MSPktCount  Unsigned32
+}
+
+bHttpServLatencyStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated. The
+       interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics data, greater the interval
+       index value.
+       In a system supporting a history of n intervals with IntervalCount(1)
+       and IntervalCount(n), the most and least recent intervals respectively, the
+       following applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that of IntervalCount(i+1) for
+         1 <= i < n
+       - the value of IntervalCount(1) becomes that of CurrentCount." 
+   ::= { bHttpServerLatencyEntry 1 }
+
+bHttpServLatencyStatsIntervalDuration     OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Http server latency stats interval duration."
+   ::= { bHttpServerLatencyEntry 2 }
+
+bHttpServLatencyTotalPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of packets handled by http server."
+   ::= { bHttpServerLatencyEntry 3 }
+
+bHttpServLatencyMaxProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum packet processing time handled by http server in micro seconds."
+   ::= { bHttpServerLatencyEntry 4 }
+
+bHttpServLatencyMinProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Minimum packet processing time handled by http server in micro seconds."
+   ::= { bHttpServerLatencyEntry 5 }
+
+bHttpServLatencyAvgProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Average packet processing time handled by http server in micro seconds."
+   ::= { bHttpServerLatencyEntry 6 }
+
+bHttpServLatencyProcessTimeMorethan1MSPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of packets took more than 1 milli second processing time handled by http server."
+   ::= { bHttpServerLatencyEntry 7 }
+
+bHttpServLatencyGetTotalPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of packets handled by http server GET."
+   ::= { bHttpServerLatencyEntry 8 }
+
+bHttpServLatencyGetMaxProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum packet processing time handled by http server in micro seconds - GET."
+   ::= { bHttpServerLatencyEntry 9 }
+
+bHttpServLatencyGetMinProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Minimum packet processing time handled by http server in micro seconds - GET."
+   ::= { bHttpServerLatencyEntry 10 }
+
+bHttpServLatencyGetAvgProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Average packet processing time handled by http server in micro seconds - GET."
+   ::= { bHttpServerLatencyEntry 11 }
+
+bHttpServLatencyGetProcessTimeMorethan1MSPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of packets took more than 1 milli second processing time handled by http server - GET."
+   ::= { bHttpServerLatencyEntry 12 }
+
+bHttpServLatencyPostTotalPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of packets handled by http server POST."
+   ::= { bHttpServerLatencyEntry 13 }
+
+bHttpServLatencyPostMaxProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum packet processing time handled by http server in micro seconds - POST."
+   ::= { bHttpServerLatencyEntry 14 }
+
+bHttpServLatencyPostMinProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Minimum packet processing time handled by http server in micro seconds - POST."
+   ::= { bHttpServerLatencyEntry 15 }
+
+bHttpServLatencyPostAvgProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Average packet processing time handled by http server in micro seconds - POST."
+   ::= { bHttpServerLatencyEntry 16 }
+
+bHttpServLatencyPostProcessTimeMorethan1MSPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of packets took more than 1 milli second processing time handled by http server - POST."
+   ::= { bHttpServerLatencyEntry 17 }
+
+bHttpServLatencyDeleteTotalPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of the total number of packets handled by http server DELETE."
+   ::= { bHttpServerLatencyEntry 18 }
+
+bHttpServLatencyDeleteMaxProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum packet processing time handled by http server in micro seconds - DELETE."
+   ::= { bHttpServerLatencyEntry 19 }
+
+bHttpServLatencyDeleteMinProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Minimum packet processing time handled by http server in micro seconds - DELETE."
+   ::= { bHttpServerLatencyEntry 20 }
+
+bHttpServLatencyDeleteAvgProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Average packet processing time handled by http server in micro seconds - DELETE."
+   ::= { bHttpServerLatencyEntry 21 }
+
+bHttpServLatencyDeleteProcessTimeMorethan1MSPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of packets took more than 1 milli second processing time handled by http server - DELETE."
+   ::= { bHttpServerLatencyEntry 22 }
+
+END
+

@@ -1,0 +1,205 @@
+-- *****************************************************************
+-- Port MIB
+-- *****************************************************************
+
+SL-PORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, TimeTicks     	FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	TimeStamp, DateAndTime, RowStatus	FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+    slMain				        		FROM SL-MAIN-MIB;
+
+slPort MODULE-IDENTITY
+	LAST-UPDATED "200101180000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Leds."
+	::= { slMain 14 }
+
+
+LedColor ::= TEXTUAL-CONVENTION
+    STATUS		current
+    DESCRIPTION
+		"The LED color."
+    SYNTAX		INTEGER  {
+		off(1),
+    	red(2),
+    	yellow(3),
+    	green(4)
+    }            
+
+LedMode ::= TEXTUAL-CONVENTION
+    STATUS		current
+    DESCRIPTION
+		"The LED mode."
+    SYNTAX		INTEGER  {
+		stable(1),
+    	fastBlinking(2),
+    	slowBlinking(3)
+    }            
+
+slPortConfig	 		OBJECT IDENTIFIER 	::= { slPort 1 }
+slPortNotification		OBJECT IDENTIFIER 	::= { slPort 2 }
+
+-- 
+--
+-- The Port Config Table
+--
+-- 
+	
+slPortConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SlPortConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"This table describe the state of the LEDs."
+	::= { slPortConfig 1 }
+
+slPortConfigEntry OBJECT-TYPE
+	SYNTAX  SlPortConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the table correspond to a port of the node."
+	INDEX   { slPortConfigIndex }
+	::= { slPortConfigTable 1 }
+
+SlPortConfigEntry ::=
+	SEQUENCE {
+		slPortConfigIndex		INTEGER,
+		slPortConfigLedColor	LedColor,
+		slPortConfigLedMode		LedMode,
+		slPortConfigChangeType	INTEGER,
+		slPortConfigAlarmMask	TruthValue,
+		slPortConfigLabel		DisplayString
+	}	
+
+slPortConfigIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Slot Index of the LED. The Slot number for
+        the Shelf led is 0."
+    ::= { slPortConfigEntry 1 }
+		
+slPortConfigLedColor OBJECT-TYPE
+    SYNTAX      LedColor
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LED color of the port."
+    ::= { slPortConfigEntry 2 }	
+		
+slPortConfigLedMode OBJECT-TYPE
+    SYNTAX      LedMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The LED mode of the port."
+    ::= { slPortConfigEntry 3 }	
+		
+slPortConfigChangeType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to change the type of the port.
+        The type value is one of the IANA types.
+        Changing port type should remove all the information related to this port.
+        Such as, ifTable entry, PM info, GFP and VCG entries, current alarms, ..."
+    ::= { slPortConfigEntry 4 }	
+
+slPortConfigAlarmMask OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to mask the alarms of the port."
+    ::= { slPortConfigEntry 5 }	
+
+slPortConfigLabel OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is the shadow of ifAlias. When the ifAlias
+        of the primary interface of this port is changed, 
+        the value of this object should be changed to the same value."
+    ::= { slPortConfigEntry 6 }	
+
+--
+--
+
+slPortConfigLastChange OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime at last time a slPortConfigTable table
+         was changed."
+    ::= { slPortConfig 2 }
+
+
+--
+--
+-- Notifications
+--
+--
+
+slPortConfigChanged NOTIFICATION-TYPE
+    OBJECTS { slPortConfigIndex,
+    		  slPortConfigLedColor,
+    		  slPortConfigLedMode,
+    		  slPortConfigChangeType,
+    		  slPortConfigAlarmMask,
+    		  slPortConfigLabel }
+    STATUS        current
+    DESCRIPTION
+		"An slPortConfigChanged notification is sent
+		when the state of one of the port is changed."
+   ::= { slPortNotification 1 }
+
+slPortConfigChangedType NOTIFICATION-TYPE
+    OBJECTS { slPortConfigIndex,
+    		  slPortConfigChangeType }
+    STATUS        current
+    DESCRIPTION
+		"An slPortConfigChangedType notification is sent
+		when the type of one of a port is changed."
+   ::= { slPortNotification 2 }
+
+slPortConfigChangedMask NOTIFICATION-TYPE
+    OBJECTS { slPortConfigIndex,
+    		  slPortConfigAlarmMask }
+    STATUS        current
+    DESCRIPTION
+		"An slPortConfigChangedMask notification is sent
+		when the mask of one of the port is changed."
+   ::= { slPortNotification 3 }
+
+slPortConfigChangedLabel NOTIFICATION-TYPE
+    OBJECTS { slPortConfigIndex,
+    		  slPortConfigLabel }
+    STATUS        current
+    DESCRIPTION
+		"An slPortConfigChangedLabel notification is sent when the 
+		corresponding object slPortConfigLabel is changed."
+   ::= { slPortNotification 4 }
+
+slPortConfigChangedApsEnabled NOTIFICATION-TYPE
+    OBJECTS { slPortConfigIndex }
+    STATUS        current
+    DESCRIPTION
+		"An slPortConfigChangedLabel notification is sent when the 
+		corresponding object slPortConfigApsEnable is changed."
+   ::= { slPortNotification 5 }
+
+END

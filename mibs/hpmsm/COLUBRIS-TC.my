@@ -1,0 +1,277 @@
+-- ****************************************************************************
+--  COLUBRIS-TC definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Textual Conventions for Colubris Networks MIBs.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-TC DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    Integer32
+        FROM    SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM    SNMPv2-TC
+    colubrisModules
+        FROM    COLUBRIS-SMI
+;
+
+
+colubrisTextualConventions MODULE-IDENTITY
+    LAST-UPDATED    "200710300000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "This module defines the Textual Conventions used in
+                    Colubris Networks enterprise MIBs."
+    ::= { colubrisModules 1 }
+
+
+-- Colubris authentication mode textual convention
+--      local   - the authentication is done locally from the device local
+--                database information.
+--      profile - an AAA profile is used in order to retrieve the
+--                authentication parameters.
+ColubrisAuthenticationMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Specifies the authentication mode to be used.
+
+                  local: The authentication is done locally from the
+                         device local database information.
+
+                  profile: An AAA profile is used in order to retrieve
+                           the authentication parameters."
+    SYNTAX      INTEGER
+                    {
+                        local(1),
+                        profile(2)
+                    }
+
+-- Colubris public access users authentication mode textual convention
+--      none    - users are not allowed to login.
+--      local   - the authentication is done locally from the device local
+--                database information.
+--      profile - an AAA profile is used in order to retrieve the
+--                authentication parameters.
+--      localAndProfile - the authentication is done locally first. If it fails
+--                        an AAA profile is used.
+ColubrisUsersAuthenticationMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Specifies the authentication mode to be used.
+
+                   none: Users are not allowed to login.
+
+                   local: The authentication is done locally from the
+                          device local database information.
+
+                   profile: An AAA profile is used in order to retrieve
+                            the authentication parameters.
+
+                   localAndProfile: The authentication is done locally
+                                    first. If it fails an AAA profile
+                                    is used."
+    SYNTAX      INTEGER
+                    {
+                        none(0),
+                        local(1),
+                        profile(2),
+                        localAndProfile(3)
+                    }
+
+-- Colubris public access users authentication type textual convention
+--      mac          - users authenticated using their MAC addresses.
+--      ieee802dot1x - users authenticated through 802.1x.
+--      html         - users authenticated with html.
+ColubrisUsersAuthenticationType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Specifies the authentication type to be used.
+
+                   mac: Users authenticated using their MAC addresses.
+
+		       ieee802dot1x: Users authenticated through 802.1x.
+
+		       html: Users authenticated with html."
+    SYNTAX      INTEGER
+                {
+                    mac(1),
+                    ieee802dot1x(2),
+                    html(3)
+                }
+
+-- Colubris Notification enable textual convention
+--      enable  - enables the generation of the associated notification
+--      disable - disables the generation of the associated notification
+ColubrisNotificationEnable ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "Specifies the generation of notification traps.
+                 
+                   enable: Enable the generation of the associated
+                           notification.
+
+                   disable: Disables the generation of the associated
+                            notification"
+    SYNTAX      INTEGER
+                    {
+                        enable(1),
+                        disable(2)
+                    }
+
+-- Colubris AAA Profile Index textual convention
+--      A profile index refers to an entry in the AAA profile table.
+ColubrisProfileIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A profile index refers to an entry in the AAA profile table."
+    SYNTAX      Integer32 (1..2147483647)
+
+-- Colubris AAA Profile Index textual convention
+--      A profile index refers to an entry in the AAA profile table.
+--      When the special value Zero is specified, no AAA server profile is
+--      selected.
+ColubrisProfileIndexOrZero ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A profile index refers to an entry in the AAA profile table.
+                 When the special value Zero is specified, no AAA
+                 server profile is selected."
+    SYNTAX      Integer32 (0..2147483647)
+
+-- Colubris AAA Server Index textual convention
+--      A server index refers to an entry in the AAA server table.
+ColubrisServerIndex ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A server index refers to an entry in the AAA server table."
+    SYNTAX      Integer32 (1..2147483647)
+
+-- Colubris AAA Server Index textual convention
+--      A server index refers to an entry in the AAA server table.
+--      When the special value Zero is specified, no AAA server is selected.
+ColubrisServerIndexOrZero ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A server index refers to an entry in the AAA server table.
+                 When the special value Zero is specified, no AAA
+                 server is selected."
+    SYNTAX      Integer32 (0..2147483647)
+
+-- Colubris Service Set Identifier textual convention
+--      A generic service set identifier (SSID) convention is defined here and
+--      used throughout the Colubris proprietary MIBs.
+ColubrisSSID ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A generic service set identifier (SSID) convention is defined
+                 here and used throughout the Colubris proprietary MIBs. This
+		 specific textual convention is used for inputing SSIDs."
+    SYNTAX      OCTET STRING (SIZE (1..32))
+
+-- Colubris Service Set Identifier textual convention
+--      A generic service set identifier (SSID) convention is defined here and
+--      used throughout the Colubris proprietary MIBs.
+ColubrisSSIDOrNone ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "A generic service set identifier (SSID) convention is defined
+                 here and used throughout the Colubris proprietary MIBs. This
+		 specific textual convention is used when displaying SSIDs."
+    SYNTAX      OCTET STRING (SIZE (0..32))
+
+-- Colubris Security textual convention
+--      An enumeration of the different Wireless Security modes allowed in the
+--      Colubris products.
+--                     'none'   - No wireless protection.
+--                     'wep'    - WEP (static keys).
+--                     'ieee802dot1x' - 802.1x no encryption.
+--                     'ieee802dot1xWithWep' - 802.1x + WEP (dynamic keys).
+--                     'wpa'    - 802.1x + TKIP + Key source AAA profile.
+--                     'wpaPsk' - 802.1x + TKIP + Key Source Pre-Shared Key.
+ColubrisSecurity ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration of the different Security modes allowed
+                 in the Colubris products.
+
+                 NOTE: 'unknown'- Could not identify the protection mode.
+                       'none'   - No wireless protection.
+                       'wep'    - WEP (static keys).
+                       'ieee802dot1x' - 802.1x no encryption.
+                       'ieee802dot1xWithWep' - 802.1x + WEP (dynamic keys).
+                       'wpa'    - 802.1x + TKIP + Key source AAA profile.
+                       'wpaPsk' - 802.1x + TKIP + Key Source Pre-Shared Key."
+    SYNTAX      INTEGER
+                {
+                    unknown(0),
+                    none(1),
+                    wep(2),
+                    ieee802dot1x(3),
+                    ieee802dot1xWithWep(4),
+                    wpa(5),
+                    wpaPsk(6)
+                }
+
+-- Colubris Priority Queue textual convention
+--      An enumeration of the different queues supported in the QOS
+--      and Bandwidth control feature of the Colubris products.
+--                     'low' - Low priority queue
+--                     'normal' - Normal priority queue
+--                     'high' - High priority queue
+--                     'veryHigh' - Very High priority queue
+ColubrisPriorityQueue ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration of the different queues supported in the
+                 QOS and Bandwidth control feature of the Colubris products."
+    SYNTAX      INTEGER 
+                {
+                    low(1),
+                    normal(2),
+                    high(3),
+                    veryHigh(4)
+                }
+
+-- Colubris Data Rate textual convention
+--      An enumeration of the different data rates supported on a per VAP basis.
+--                     'lowestAvailable' - 
+ColubrisDataRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration of the different data rates supported on a per
+                 VAP basis."
+    SYNTAX      INTEGER
+                {
+                    unknown(0),
+                    rateLowestAvailable(1),
+                    rate1Meg(2),
+                    rate2Meg(3),
+                    rate5dot5Meg(4),
+                    rate6Meg(5),
+                    rate9Meg(6),
+                    rate11Meg(7),
+                    rate12Meg(8),
+                    rate18Meg(9),
+                    rate24Meg(10),
+                    rate36Meg(11),
+                    rate48Meg(12),
+                    rate54Meg(13),
+                    rateHighestAvailable(14)
+                }
+
+-- Colubris Radio Type textual convention
+--      An enumeration of the different radio types used in
+--      the Colubris products.
+ColubrisRadioType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION "An enumeration of the different radio types used in
+                 the Colubris products."
+    SYNTAX      INTEGER 
+                {
+                    cm6(1),
+                    cm9(2),
+                    sunfish(3),
+                    mb82(5)
+                }
+
+END

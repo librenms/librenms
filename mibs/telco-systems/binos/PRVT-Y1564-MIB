@@ -1,0 +1,781 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-SWITCH-Y1564-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-Y1564-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI                  -- [RFC2578]
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP       
+        FROM SNMPv2-CONF                 -- [RFC2580]
+    RowStatus, TruthValue, DisplayString
+        FROM SNMPv2-TC                   -- [RFC2579]
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB          -- [RFC2571]
+    switch
+ 	FROM PRVT-SWITCH-MIB;
+
+prvtY1564Mib MODULE-IDENTITY
+LAST-UPDATED "201202270000Z"
+ORGANIZATION "BATM Advanced Communication"       
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email: 
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"This MIB provides the extended capability of controlling and 
+provisioning for Y1564 test.
+It adds extra functionality for DISMAN-PING-MIB"
+      -- revision history
+	REVISION       "201202270000Z"
+	DESCRIPTION
+	"Initial version."
+
+::= { switch 129 }
+
+-- ***********************************************
+-- ************ Top level structure of the MIB****
+-- ***********************************************
+ prvtY1564Notifications              OBJECT IDENTIFIER ::= { prvtY1564Mib 0 }
+ prvtY1564Objects                    OBJECT IDENTIFIER ::= { prvtY1564Mib 1 }
+ prvtY1564Conformance                OBJECT IDENTIFIER ::= { prvtY1564Mib 2 }
+
+prvtY1564Test OBJECT IDENTIFIER ::= { prvtY1564Objects 1 }
+prvtY1564TestResult OBJECT IDENTIFIER ::= { prvtY1564Objects 2 }
+prvtY1564Profiles OBJECT IDENTIFIER ::= { prvtY1564Objects 3 }
+
+-- ***********************************************
+-- ************* global scalar objects ***********
+-- ***********************************************
+
+prvtY1564TestTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PrvtY1564TestEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table holds the configuration for a Y1564 test"
+    ::= { prvtY1564Test 1 }
+
+prvtY1564TestEntry OBJECT-TYPE
+	SYNTAX PrvtY1564TestEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"NONE"
+	INDEX {
+		prvtY1564TestName
+              }
+	::= { prvtY1564TestTable 1 }
+
+PrvtY1564TestEntry ::= SEQUENCE {
+	prvtY1564TestName		SnmpAdminString,
+    prvtY1564TestType 		INTEGER,
+	prvtY1564TestMode       INTEGER,
+	prvtY1564TestExecStatus		INTEGER,
+	prvtY1564TestSourceType		INTEGER,
+    prvtY1564TestSource		OCTET STRING,
+    prvtY1564TestTargetType		INTEGER,
+    prvtY1564TestTarget		OCTET STRING,
+	prvtY1564TestTimeout		Unsigned32,
+    prvtY1564TestCIR			Unsigned32,
+	prvtY1564TestEIR Unsigned32,
+	prvtY1564TestConfigurationTestTrafficPolicing TruthValue,
+	prvtY1564TestConfigurationTestCirSteps Unsigned32,
+	prvtY1564TestConfigurationStepDuration Unsigned32,
+	prvtY1564TestPerformanceTestDuration INTEGER,
+    prvtY1564TestCVLAN		Unsigned32,
+	prvtY1564TestCVLANPriority	Unsigned32,
+	prvtY1564TestCVLANDropEligible	TruthValue,
+	prvtY1564TestSVLAN		Unsigned32,
+	prvtY1564TestSVLANPriority	Unsigned32,
+	prvtY1564TestSVLANDropEligible	TruthValue,
+	prvtY1564TestPDUSize		INTEGER,
+	prvtY1564TestLoopbackType 	INTEGER,
+	prvtY1564TestPaternType 	INTEGER,
+	prvtY1564TestProfileName    OCTET STRING,
+       
+	prvtY1564TestRowStatus		RowStatus
+}
+
+
+
+prvtY1564TestName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This string is used to describe the test name for the
+        Y1564 test. It is also used as a test identifier."
+    ::= { prvtY1564TestEntry 1 }
+
+prvtY1564TestType OBJECT-TYPE
+	SYNTAX INTEGER
+        {
+        testHead ( 1 ),
+		testLoopback( 2 )
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Y1564 test type"
+	::= { prvtY1564TestEntry 2 }
+	
+prvtY1564TestMode OBJECT-TYPE
+	SYNTAX INTEGER {
+	configurationTest ( 1 ),
+	performanceTest ( 2 ),
+	both ( 3 )
+	}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify test mode"
+	::= { prvtY1564TestEntry 3 }	
+
+prvtY1564TestExecStatus OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		notRunning ( 1 ),
+		running ( 2 )
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Y1564   test execution status."
+	DEFVAL { notRunning }
+	::= { prvtY1564TestEntry 4 }
+
+
+prvtY1564TestSourceType OBJECT-TYPE
+	SYNTAX INTEGER
+        {
+		none( 0 ),
+		mac ( 1 ),
+		mep ( 2 )
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Y1564 test source type."
+	::= { prvtY1564TestEntry 5}
+
+prvtY1564TestSource OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(1..17))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"String that holds either the MAC or the MEP ID.
+	 MAC should be in the format AA:BB:CC:DD:EE:FF
+	 MEP shold be in the format DOMAIN:MA:MEP that represent 
+	 the values corresponding to dot1agCfmMdIndex, 
+	 dot1agCfmMaIndex and dot1agCfmMepIdentifier from 
+	 IEEE8021-CFM-MIB.
+	 e.g.:
+		MAC:   00:A0:12:5C:12:C0
+		MEP:   1:1:2"
+	::= { prvtY1564TestEntry 6 }
+
+prvtY1564TestTargetType OBJECT-TYPE
+	SYNTAX INTEGER
+        {
+		none( 0 ),
+		mac ( 1 ),
+		mep ( 2 )
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Y1564 test target type."
+	::= { prvtY1564TestEntry 7 }
+
+prvtY1564TestTarget OBJECT-TYPE
+	SYNTAX OCTET STRING (SIZE(1..17))
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"String that holds either the MAC or the MEP ID.
+	 MAC should be in the format AA:BB:CC:DD:EE:FF
+	 MEP shold be in the format DOMAIN:MA:MEP that represent 
+	 the values corresponding to dot1agCfmMdIndex, 
+	 dot1agCfmMaIndex and dot1agCfmMepIdentifier from 
+	 IEEE8021-CFM-MIB.
+	 e.g.:
+		MAC:   00:A0:12:5C:12:C0
+		MEP:   1:1:2"
+	::= { prvtY1564TestEntry 8 }
+
+prvtY1564TestTimeout OBJECT-TYPE
+	SYNTAX Unsigned32 (0..100)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Y1564 test timeout in 0.1 of a second increments."
+	DEFVAL { 1 }
+	::= { prvtY1564TestEntry 9 }
+
+prvtY1564TestCIR OBJECT-TYPE
+	SYNTAX Unsigned32 (64..1000000)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Y1564   Committed Information Rate (CIR) value."
+	::= { prvtY1564TestEntry 10 }
+	
+prvtY1564TestEIR OBJECT-TYPE
+	SYNTAX Unsigned32 (0..1000000)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify Excess Information Rate"
+	::= { prvtY1564TestEntry 11 }
+
+prvtY1564TestConfigurationTestTrafficPolicing OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify Traffic Policing "
+	::= { prvtY1564TestEntry 12 }
+
+
+	prvtY1564TestConfigurationTestCirSteps OBJECT-TYPE
+	SYNTAX Unsigned32 (1..10)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify the number of Comitted Information Rate Steps"
+	::= { prvtY1564TestEntry 13 }
+
+	prvtY1564TestConfigurationStepDuration OBJECT-TYPE
+	SYNTAX Unsigned32 (1..60)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify the configuration step duration, in seconds. This duration is used for every CIR step test and 
+	also for EIR test and Policing test."
+	::= { prvtY1564TestEntry 14 }
+
+	prvtY1564TestPerformanceTestDuration OBJECT-TYPE
+	SYNTAX INTEGER {
+	testDuration15min (15),
+	testDuration30min (30)
+	}
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify the performane test duration, in minutes"
+	::= { prvtY1564TestEntry 15}
+	
+
+	prvtY1564TestCVLAN OBJECT-TYPE
+	SYNTAX Unsigned32 (0..4094)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"C-VLAN ID for the Y1564   test."
+	::= { prvtY1564TestEntry 16 }
+
+	prvtY1564TestCVLANPriority OBJECT-TYPE
+	SYNTAX Unsigned32 (0..7)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"VPT for C-VLAN0 for the Y1564   test."
+	::= { prvtY1564TestEntry 17 }
+
+    prvtY1564TestCVLANDropEligible OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Drop Eligible flag for C-VLAN for the Y1564   test."
+	::= { prvtY1564TestEntry 18 }
+
+    prvtY1564TestSVLAN OBJECT-TYPE
+	SYNTAX Unsigned32 (0..4094)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"S-VLAN ID for the Y1564   test."
+	::= { prvtY1564TestEntry 19 }
+
+prvtY1564TestSVLANPriority OBJECT-TYPE
+	SYNTAX Unsigned32 (0..7)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"VPT for S-VLAN0 for the Y1564 test."
+	::= { prvtY1564TestEntry 20 }
+
+prvtY1564TestSVLANDropEligible OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Drop Eligible flag for S-VLAN for the Y1564 test."
+	::= { prvtY1564TestEntry 21 }
+
+prvtY1564TestPDUSize OBJECT-TYPE
+	SYNTAX  INTEGER
+    {
+	value64 ( 64 ),
+	value128 ( 128 ),
+	value256 ( 256 ),
+	value512 ( 512),
+	value1024 ( 1024 ),
+	value1280 ( 1280 ),
+	value1518 ( 1518 ),
+	value2000 ( 2000 ),
+	value9000 ( 9000)
+	} 	
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Packet sizes for Y1564 test:
+	   64,128,256,512,1024,1280,1518,2000,9000"
+	::= { prvtY1564TestEntry 22 }
+
+prvtY1564TestLoopbackType OBJECT-TYPE
+	SYNTAX INTEGER
+        {
+		macSwap ( 1 ),
+                oam ( 2 )
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Y1564   test loopback type."
+	::= { prvtY1564TestEntry 23 }
+
+prvtY1564TestPaternType OBJECT-TYPE
+	SYNTAX INTEGER
+        {
+		null ( 1 ),
+                nullCRC ( 2 ),
+		prbs ( 3 ),
+                prbsCRC ( 4 ),
+                none ( 8 )
+	}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+	"Y1564   test patern type.
+	 Options for it are none, null, null-crc, prbs, prbs-crc."
+	::= { prvtY1564TestEntry 24 }
+	
+
+prvtY1564TestProfileName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "Name assigned to the Y1564 profile."
+        DEFVAL { '00'H }
+        ::= { prvtY1564TestEntry 25 }	
+	
+
+prvtY1564TestRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"The status of the row entry.
+	 The writable columns in a row can not be changed if the row
+	 is active. Certain columns must have a valid value before a row
+	 can be activated."
+	::= { prvtY1564TestEntry 26 }    
+	 
+
+-- ***********************************************
+-- *************  TEST RESULT *************
+-- ***********************************************
+
+prvtY1564TestResultTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PrvtY1564TestResultEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+        "This table contains Y1564 results for tests."
+	::= { prvtY1564TestResult 1 }
+
+prvtY1564TestResultEntry OBJECT-TYPE
+	SYNTAX PrvtY1564TestResultEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION	"NONE"
+	INDEX { 
+		prvtY1564TestName,
+		prvtY1564TestResultIndex }
+	::= { prvtY1564TestResultTable 1 }
+
+PrvtY1564TestResultEntry ::= SEQUENCE {
+	prvtY1564TestResultIndex 			Unsigned32,
+	prvtY1564TestResultSentInformationRate	Unsigned32,
+	prvtY1564TestResultPacketSize		Unsigned32,
+	prvtY1564TestResultMode		INTEGER,
+	prvtY1564TestResultFrameLoss		Unsigned32,
+	prvtY1564TestResultInformationRate		Unsigned32,
+	prvtY1564TestResultFrameTransferDelay		Unsigned32,
+	prvtY1564TestResutFrameDelayVariation            Unsigned32,
+	prvtY1564TestResultStatus			INTEGER
+   
+       
+}
+
+prvtY1564TestResultIndex OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Y1564   test results table index.
+	Index will take values 1 to 13, each value representing a percentage 
+	of the CIR or EIR.1-10 step of CIR , EIR+CIR, EIR+CIR+25%EIR + Peformance test CIR
+	The leaf prvtY1564TestResultFrameSize will present this value
+	in a more user-friendly way."
+	::= { prvtY1564TestResultEntry 1 }
+	
+prvtY1564TestResultSentInformationRate OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The sent information rate at each test step"
+	::= { prvtY1564TestResultEntry 2 }	
+	
+prvtY1564TestResultPacketSize OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The packet size for a Y1564 test packet"
+	::= { prvtY1564TestResultEntry 3 }
+
+prvtY1564TestResultMode OBJECT-TYPE
+	 SYNTAX INTEGER
+        {
+		    notAvailable ( 1 ),
+            configurationCIRTest ( 2),
+			configurationEIRTest ( 3),
+			configurationPolicingTest ( 4),
+			performanceTest ( 5 )
+			
+        }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The Y1564 test mode correspondig to the result"
+	::= { prvtY1564TestResultEntry 4 }	
+	
+
+prvtY1564TestResultFrameLoss OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Frame loss of the Y1564  test measured in 0.001 of a percent"
+	::= { prvtY1564TestResultEntry 5 }
+
+prvtY1564TestResultInformationRate OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The received information Rate of the Y1564  test measured in Kbps"
+	::= { prvtY1564TestResultEntry 6 }
+
+prvtY1564TestResultFrameTransferDelay OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Frame transfer delay  for Y1564 test measured in 1/100th of a microsecond.."
+	::= { prvtY1564TestResultEntry 7 }
+	
+prvtY1564TestResutFrameDelayVariation OBJECT-TYPE
+        SYNTAX Unsigned32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "Frame delay variation for Y1564 test measured in 1/100th of a microsecond."
+        ::= { prvtY1564TestResultEntry 8 }
+		
+prvtY1564TestResultStatus OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+                notAvailable ( 1 ),
+                ready ( 2 ),
+                error ( 3 )
+        }
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"Status of the Y1564  test"
+	::= { prvtY1564TestResultEntry 9 }
+
+
+
+-- ***********************************************
+-- ****************** PROFILE *******************
+-- ***********************************************
+prvtY1564ProfileTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF PrvtY1564ProfileEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	"Table contains Y1564 thresholds."
+	::= { prvtY1564Profiles 1 }
+
+prvtY1564ProfileEntry OBJECT-TYPE
+	SYNTAX PrvtY1564ProfileEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION	"NONE"
+	INDEX { prvtY1564ProfileName }
+	::= { prvtY1564ProfileTable 1 }
+
+PrvtY1564ProfileEntry ::= SEQUENCE {
+		prvtY1564ProfileName      SnmpAdminString,
+		prvtY1564ProfileFrameLoss Unsigned32,
+		prvtY1564ProfileFrameTransferDelay Unsigned32,
+		prvtY1564ProfileFrameDelayVariation Unsigned32,
+        prvtY1564ProfileRowStatus                 RowStatus
+       
+       }
+
+prvtY1564ProfileName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This string is used to describe the test profile name for the
+        Y1564 test. It is also used as a profile identifier."
+    ::= { prvtY1564ProfileEntry 1 }
+	
+	prvtY1564ProfileFrameLoss OBJECT-TYPE
+	SYNTAX Unsigned32 (0..100000)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify maximum frameloss to declare test succeeded"
+::= { prvtY1564ProfileEntry 2 }
+
+	prvtY1564ProfileFrameTransferDelay OBJECT-TYPE
+	SYNTAX Unsigned32 (1..60000000)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify maximum frame transfer delay in microseconds  to declare test succeeded"
+	::= { prvtY1564ProfileEntry 3 }
+
+	prvtY1564ProfileFrameDelayVariation OBJECT-TYPE
+	SYNTAX Unsigned32 (1..60000000)
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Specify maximum frame delay variation in microseconds to declare test succeeded"
+::= { prvtY1564ProfileEntry 4 }
+
+prvtY1564ProfileRowStatus OBJECT-TYPE
+	SYNTAX RowStatus
+	MAX-ACCESS read-create
+	STATUS current
+	DESCRIPTION
+	"Creation/delete/edit of the Y1564 profile. "
+	::= { prvtY1564ProfileEntry 5 }
+
+-- ***********************************************
+-- **************** Notification *****************
+-- ***********************************************
+
+prvtY1564ProbeFailed NOTIFICATION-TYPE
+	OBJECTS {
+		prvtY1564TestType,
+		prvtY1564TestResultStatus
+	}
+	STATUS current
+	DESCRIPTION
+		"This trap should be sent whenever a Y1564 probe
+		on a specific test fails."
+	::= { prvtY1564Notifications 1 }
+
+prvtY1564ProbeSuccess NOTIFICATION-TYPE
+	OBJECTS {
+		prvtY1564TestType,
+		prvtY1564TestResultStatus
+	}
+	STATUS current
+	DESCRIPTION
+		"This trap should be sent whenever a Y1564 probe
+		on a specific test finishes with success."
+	::= { prvtY1564Notifications 2 }
+
+prvtY1564TestFinished NOTIFICATION-TYPE
+	OBJECTS {
+		prvtY1564TestExecStatus
+	}
+	STATUS current
+	DESCRIPTION
+		"This trap should be sent whenever a Y1564  test is finished"
+	::= { prvtY1564Notifications 3 }
+
+-- ******************************************************************
+-- PRVT-Y1564 MIB Module - Conformance Information
+-- ******************************************************************
+
+prvtY1564Compliances OBJECT IDENTIFIER ::= { prvtY1564Conformance 1 }
+prvtY1564Groups      OBJECT IDENTIFIER ::= { prvtY1564Conformance 2 }
+
+-- ******************************************************************
+-- Units of conformance
+-- ******************************************************************
+
+
+prvtY1564TestGroup OBJECT-GROUP
+    OBJECTS {
+        prvtY1564TestType,
+		prvtY1564TestMode,
+		prvtY1564TestExecStatus,
+		prvtY1564TestSourceType,
+        prvtY1564TestSource,
+        prvtY1564TestTargetType,
+        prvtY1564TestTarget,
+		prvtY1564TestTimeout,
+        prvtY1564TestCIR ,
+		prvtY1564TestEIR ,
+		prvtY1564TestConfigurationTestTrafficPolicing ,
+		prvtY1564TestConfigurationTestCirSteps ,
+		prvtY1564TestConfigurationStepDuration ,
+		prvtY1564TestPerformanceTestDuration ,
+		prvtY1564TestCVLAN,
+		prvtY1564TestCVLANPriority,
+		prvtY1564TestCVLANDropEligible,
+		prvtY1564TestSVLAN,
+		prvtY1564TestSVLANPriority,
+		prvtY1564TestSVLANDropEligible,
+		prvtY1564TestPDUSize,
+		prvtY1564TestLoopbackType,
+		prvtY1564TestPaternType,
+		prvtY1564TestProfileName,
+		prvtY1564TestRowStatus 
+	
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Y1564  test group."
+    ::= { prvtY1564Groups 1 }
+
+
+prvtY1564TestResultsGroup OBJECT-GROUP
+    OBJECTS {
+	prvtY1564TestResultSentInformationRate,
+	prvtY1564TestResultPacketSize,
+	prvtY1564TestResultMode,
+	prvtY1564TestResultFrameLoss,
+	prvtY1564TestResultInformationRate,
+	prvtY1564TestResultFrameTransferDelay,
+	prvtY1564TestResutFrameDelayVariation,
+	prvtY1564TestResultStatus
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Y1564  test results group."
+    ::= { prvtY1564Groups 2 }
+
+prvtY1564ProfilesGroup OBJECT-GROUP
+    OBJECTS {
+        prvtY1564ProfileFrameLoss ,
+		prvtY1564ProfileFrameTransferDelay ,
+		prvtY1564ProfileFrameDelayVariation ,
+        prvtY1564ProfileRowStatus
+	}
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Y1564 profiles group."
+    ::= { prvtY1564Groups 3 }
+
+prvtY1564NotificationsGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+      prvtY1564ProbeFailed,
+      prvtY1564ProbeSuccess,
+      prvtY1564TestFinished
+    }
+    STATUS      current
+    DESCRIPTION
+       "Objects for the Notifications group."
+    ::= { prvtY1564Groups 4 }
+    
+
+
+
+-- ******************************************************************
+-- MIB Module Compliance statements
+-- ******************************************************************
+
+prvtY1564Compliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+       "The compliance statement for support of the Y1564 MIB module."
+    MODULE
+        MANDATORY-GROUPS {
+        prvtY1564TestGroup,
+	    prvtY1564TestResultsGroup,
+	    prvtY1564ProfilesGroup,
+	    prvtY1564NotificationsGroup
+            }
+
+    OBJECT prvtY1564TestRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2), notReady(3) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2), notReady(3),
+                               createAndWait(5), destroy(6) }
+      DESCRIPTION "Support for createAndWait is required."
+      
+    OBJECT prvtY1564ProfileRowStatus
+      SYNTAX       RowStatus { active(1), notInService(2), notReady(3) }
+      WRITE-SYNTAX RowStatus { active(1), notInService(2), notReady(3),
+                               createAndWait(5), destroy(6) }
+      DESCRIPTION "Support for createAndWait is required."
+
+
+    ::= { prvtY1564Compliances 1 }
+
+END
+

@@ -1,6 +1,6 @@
 os: powerconnect
 text: 'Dell PowerConnect'
-ifname: 1
+ifname: true
 type: network
 icon: dell
 over:
@@ -9,3 +9,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 mib_dir:
     - dell
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.674.10895

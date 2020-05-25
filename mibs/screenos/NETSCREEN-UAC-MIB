@@ -1,0 +1,124 @@
+-- This module defines enterprise MIBs for UACs
+-- 
+-- Copyright (c) 1999-2010, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-UAC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenUAC
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenUACMibModule MODULE-IDENTITY
+    LAST-UPDATED  "201004140000Z" -- Apr 14, 2010
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         UAC"
+    REVISION      "201004140000Z" -- Apr 14, 2010
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenUAC 0 }
+
+
+nsUACActiveUsers OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Active users on this box, base on auth entry from UAC controler"
+    ::= { netscreenUAC 1 }
+
+
+NsUACControlerStatusEntry ::= SEQUENCE
+{
+    nsUACControlerId         Integer32,
+    nsUACControlerName       DisplayString,
+    nsUACControlerHost       DisplayString,
+    nsUACConnectionStatus     Integer32
+}
+
+nsUACControlerStatusTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsUACControlerStatusEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen UAC controler status table"
+    ::= { netscreenUAC 2}
+
+nsUACControlerStatusEntry OBJECT-TYPE
+    SYNTAX        NsUACControlerStatusEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the table holds a set of configuration
+         parameters associated  with an instance of secure UAC."
+    INDEX
+        { nsUACControlerID}
+    ::= { nsUACControlerStatusTable 1 }
+
+nsUACControlerId OBJECT-TYPE
+    SYNTAX        Integer32 (1..8)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for UAC table.  Its value ranges between 1 and
+         65535 and may not be contiguous.  the index has no other
+         meaning but a pure index"
+    ::= { nsUACControlerStatusEntry 1 }
+
+nsUACControlerName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure UAC name."
+    ::= { nsUACControlerStatusEntry 2 }
+
+
+nsUACControlerHost OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure UAC name."
+    ::= { nsUACControlerStatusEntry 3 }
+
+nsUACConnectionStatus OBJECT-TYPE
+    SYNTAX        Integer32 {
+        disconnected(0),
+        connected(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "UAC controler status table"
+    ::= { nsUACControlerStatusEntry 4 }
+    
+nsUACGlobalStatus OBJECT-TYPE
+    SYNTAX        Integer32 {
+        disconnected(0),
+        connected(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "To indicate whether there is at least one heathy IC-IE connection"
+    ::= { netscreenUAC 3 }
+END

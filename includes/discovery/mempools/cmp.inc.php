@@ -15,4 +15,5 @@ if (($device['os_group'] == 'cisco') && $cemp_count == '0') {
             }
         }
     }
+    unset($cmp_array);
 }

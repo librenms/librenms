@@ -1,0 +1,1624 @@
+--
+-- HUAWEI-PERFMGMT-MIB.my
+-- Friday, March 19, 2010 at 10:45:33
+--
+
+--    ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI PERFMGMT MIB
+-- Reference:
+-- Version: V4.14
+-- History:  V4.08  huqing, 2015-09-21,Modify nodes 
+-- created 2014-05-05
+-- ==================================================================
+
+    HUAWEI-PERFMGMT-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS                    
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE, IpAddress
+                FROM SNMPv2-SMI            
+            RowStatus, TimeStamp, DateAndTime            
+                FROM SNMPv2-TC 
+            InetAddressType, InetAddress  
+                FROM INET-ADDRESS-MIB;    
+    
+--  June 07, 2009 at 16:33 GMT
+-- February 27, 2009 at 11:41 GMT
+        -- 1.3.6.1.4.1.2011.5.25.190
+        hwPerfMgmt MODULE-IDENTITY 
+            LAST-UPDATED "201708210958Z"        --Aug 21, 2017 at 09:58GMT
+            ORGANIZATION 
+                  "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                  "Huawei Industrial Base
+                    Bantian, Longgang
+                     Shenzhen 518129
+                     People's Republic of China
+                     Website: http://www.huawei.com
+                     Email: support@huawei.com
+                   "
+            DESCRIPTION 
+                "V4.13  add MIB nodes ." 
+
+           REVISION "201708210958Z"        --Aug 21, 2017 at 09:58GMT
+          
+           DESCRIPTION 
+                "V4.14  modify description." 
+
+                
+            REVISION "201708172119Z"        --Aug 17, 2017 at 15:30GMT
+
+            DESCRIPTION 
+                "V4.12  add MIB nodes ." 
+                
+            REVISION "201708092119Z"        --Aug 9, 2017 at 21:19GMT
+
+            DESCRIPTION 
+                "V4.11  delete MIB nodes ." 
+                
+            REVISION "201601291434Z"        --Jur 19, 2016 at 14:34GMT
+            
+            DESCRIPTION 
+                "V4.10  add MIB nodes ." 
+                
+            REVISION "201601191434Z"        --Jur 19, 2016 at 14:34GMT
+                        
+            DESCRIPTION 
+                "V4.09  modify MIB nodes hwPMMeasureExceed ." 
+                
+            REVISION "201510161434Z"        --Oct 16, 2015 at 14:34GMT
+
+            DESCRIPTION 
+                "The MIB module for performance management."  
+                
+           REVISION "201509211434Z"        --Sep 21, 2015 at 14:34GMT
+
+            DESCRIPTION 
+                "V4.08  add MIB nodes." 
+                
+            REVISION "201502071434Z"        --Feb 7, 2015 at 14:34GMT
+            DESCRIPTION 
+                "V4.07  modify MIB nodes  hwPMReSetCurrentDataIndicatorID, hwPMReSetCurrentDataInstanceName,hwPMReSetCurrentDataInstanceType for mistakes in format." 
+
+            REVISION "201502061434Z"        --Feb 6, 2015 at 14:34GMT
+            DESCRIPTION 
+                "V4.06  delete MIB nodes  hwPMReSetCurrentDataIndicatorID, hwPMReSetCurrentDataInstanceName,hwPMReSetCurrentDataInstanceType from group as they are undefined or unaccessible."    
+
+            REVISION "201405051631Z"        --May 5, 2014 at 16:31GMT
+            DESCRIPTION 
+                "V4.05  modify MIB nodes."    
+        
+            REVISION "201403132119Z"        -- Oct 14, 2013 at 16:55GMT
+            DESCRIPTION 
+                "V4.04  modify MIB nodes."    
+            REVISION "201310141655Z"        -- Oct 14, 2013 at 16:55GMT
+            DESCRIPTION 
+                "V4.03  modify MIB nodes."        
+            REVISION "201309261000Z"        -- Sep 26, 2013 at 10:00GMT
+            DESCRIPTION 
+                "V4.02  Add hwPMServerVPNType to support VPN."                    
+            REVISION "201305201512Z"        -- July 19, 2013 at 15:39GMT
+            DESCRIPTION 
+                "V4.00,  modify MIB nodes." 
+            REVISION "201305201512Z"        -- May 20, 2013 at 15:12 GMT
+            DESCRIPTION 
+                "V3.00,  add MIB nodes."  
+            REVISION "201305201512Z"        -- May 20, 2013 at 15:12 GMT
+            DESCRIPTION 
+                "V3.00,  modify for this MIB module."    
+            REVISION "201103160000Z"        
+            DESCRIPTION 
+                "V1.01  modify for mib index."
+            REVISION "200902271141Z"        -- February 27, 2009 at 11:41 GMT
+            DESCRIPTION 
+                "V1.00, The initial revision of this MIB module."       
+          
+            ::= { hwDatacomm 190 }
+
+        
+    
+    
+--
+-- Node definitions
+--
+        hwPMStatisticsMIBInstances OBJECT IDENTIFIER ::= { hwPerfMgmt 1 }
+        
+        hwPMStatisticsEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enable or disable the statistics data function."
+            DEFVAL { disable }
+            ::= { hwPMStatisticsMIBInstances 1 }
+        
+        hwPMStatisticsMaxFilesPerTask OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum number of files reserved for each statistics task."
+            ::= { hwPMStatisticsMIBInstances 2 }
+        
+        hwPMStatisticsMaxTasks OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum number of statistics tasks allowed to be created."
+            ::= { hwPMStatisticsMIBInstances 3 }
+        
+        hwPMStatisticsCurrentTasks OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current number of statistics tasks configured."
+            ::= { hwPMStatisticsMIBInstances 4 }
+        
+        hwPMStatisticsTaskTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMStatisticsTaskEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The statistics task table, providing create/modify/delete operations.
+                To create a task, you need to create a related record in this table, and add instance nodes in the hwPMTaskInstanceTable.
+                If you delete a task, the related instances in the hwPMTaskInstanceTable will be deleted."
+            ::= { hwPMStatisticsMIBInstances 5 }
+        
+        hwPMStatisticsTaskEntry OBJECT-TYPE
+            SYNTAX HwPMStatisticsTaskEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwStatisticsTaskTable."
+            INDEX { hwPMStatisticsTaskName }
+            ::= { hwPMStatisticsTaskTable 1 }
+        
+        HwPMStatisticsTaskEntry ::=
+            SEQUENCE { 
+                hwPMStatisticsTaskName
+                    OCTET STRING,
+                hwPMStatisticsTaskFileFormat
+                    INTEGER,
+                hwPMStatisticsRecordFileEnable
+                  INTEGER,
+                hwPMStatisticsThresholdEnable
+                  INTEGER,
+                hwPMStatisticsTaskPeriod
+                    INTEGER,
+                hwPMStatisticsTaskTransferPeriod
+                    Integer32,
+                hwPMStatisticsTaskCurrentFileIndex
+                    Unsigned32,
+                hwPMStatisticsTaskRowStatus
+                    RowStatus,
+                hwPMStatisticsTaskSampleInterval
+                    INTEGER,
+                hwPMStatisticsUploadAutoName
+                    OCTET STRING,
+                hwPMStatisticsTaskType
+                	INTEGER,
+                hwPMStatisticsHighPrecisionPeriod
+                	Unsigned32,
+                hwPMStatisticsSampleLevel
+                	INTEGER
+             }
+
+        hwPMStatisticsTaskName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the name of a statistics task."
+            ::= { hwPMStatisticsTaskEntry 1 }
+        
+        hwPMStatisticsTaskFileFormat OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                hwPMtxtv1(1),
+                hwPMbinv1(2),
+                hwPM3Gppxmlv1(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The statistics task file format, only text(1) can be supported now."
+            DEFVAL { hwPMtxtv1 }
+            ::= { hwPMStatisticsTaskEntry 2 }
+        
+        
+        hwPMStatisticsRecordFileEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Enable or disable the record file function. "
+            DEFVAL { enable }
+            ::= { hwPMStatisticsTaskEntry 3 }
+            
+        hwPMStatisticsThresholdEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Enable or disable the threshold function. "
+            DEFVAL { disable }
+            ::= { hwPMStatisticsTaskEntry 4 }    
+            
+        hwPMStatisticsTaskPeriod OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                five(5),
+                ten(10),
+                fifteen(15),
+                thirty(30),
+                sixty(60),
+                twentyfourhours(1440),
+                invalid(0)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The interval of statistics task, in minutes."
+            DEFVAL { fifteen }
+            ::= { hwPMStatisticsTaskEntry 5 }
+        
+        hwPMStatisticsTaskTransferPeriod OBJECT-TYPE
+            SYNTAX Integer32 (1..60)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the interval for generating performance data files. The value is an integer multiple of the statistics period. If a short statistics collection period (non-24 hour), the value ranges from 1 to 16.
+For a long period, the value ranges from 1 to 3."
+            DEFVAL { 4 }
+            ::= { hwPMStatisticsTaskEntry 6 }
+        
+        hwPMStatisticsTaskCurrentFileIndex OBJECT-TYPE
+            SYNTAX Unsigned32 (0..4)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current file index of statistics task."
+            DEFVAL { 0 }
+            ::= { hwPMStatisticsTaskEntry 7 }
+            
+            hwPMStatisticsTaskRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status."
+            ::= { hwPMStatisticsTaskEntry 16 }
+            
+        hwPMStatisticsTaskSampleInterval OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                one(1),
+                two(2),
+                three(3),
+                five(5),
+                ten(10),
+                fifteen(15),
+                thirty(30),
+                sixty(60)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The interval of task sampling, in minutes."
+            DEFVAL { 3 }
+            ::= { hwPMStatisticsTaskEntry 17 }            
+        hwPMStatisticsUploadAutoName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object refers to the mib node hwPMFileUploadRequestName,which enables the device to automatically 
+                and periodically send statistics files to the server."
+            ::= { hwPMStatisticsTaskEntry 18 }
+                      
+        hwPMStatisticsTaskType OBJECT-TYPE  
+           SYNTAX INTEGER
+                {
+                pmStatistics(3),
+                pmSdh(6),
+                monHistory(7),
+                monStatistics(8),
+                sdhShort(10)                
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The type of statistics task."
+            DEFVAL { pm-statistics }
+            ::= { hwPMStatisticsTaskEntry 19 }    
+           
+       	hwPMStatisticsHighPrecisionPeriod OBJECT-TYPE
+            SYNTAX Unsigned32 (5..86400)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The interval of statistics task, in seconds. if taskType is sdhShort , It must be multiple of 5 seconds and less or equal to 900 seconds, else It must be multiple of 30 seconds."
+            DEFVAL { 900 }
+            ::= { hwPMStatisticsTaskEntry 20 }
+ 
+       hwPMStatisticsSampleLevel OBJECT-TYPE  
+           SYNTAX INTEGER
+                {
+                default(0),
+                second(1)              
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The sample level of statistics task."
+            DEFVAL { minute }
+            ::= { hwPMStatisticsTaskEntry 21 }    
+                 
+        hwPMStatisticsTaskInstanceTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMStatisticsTaskInstanceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The statistics task instance table."
+            ::= { hwPMStatisticsMIBInstances 6 }
+        
+        hwPMStatisticsTaskInstanceEntry OBJECT-TYPE
+            SYNTAX HwPMStatisticsTaskInstanceEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwStatisticsTaskInstanceTable."
+            INDEX { hwPMStatisticsTaskName, hwPMStatisticsTaskInstanceType, hwPMStatisticsTaskInstanceName }
+            ::= { hwPMStatisticsTaskInstanceTable 1 }
+        
+        HwPMStatisticsTaskInstanceEntry ::=
+            SEQUENCE { 
+                hwPMStatisticsTaskInstanceType
+                    Unsigned32,
+                hwPMStatisticsTaskInstanceName
+                    OCTET STRING,
+                hwPMStatisticsTaskInstanceRowStatus
+                    RowStatus
+             }
+
+        hwPMStatisticsTaskInstanceType OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The instance type of statistics task."
+            ::= { hwPMStatisticsTaskInstanceEntry 1 }
+        
+        hwPMStatisticsTaskInstanceName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The instance name of statistics task."
+            ::= { hwPMStatisticsTaskInstanceEntry 2 }
+        
+        hwPMStatisticsTaskInstanceRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status."
+            ::= { hwPMStatisticsTaskInstanceEntry 3 }
+        
+        hwPMStatisticsTaskIndicatorTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMStatisticsTaskIndicatorEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The statistics task indicator table."
+            ::= { hwPMStatisticsMIBInstances 7 }
+        
+        hwPMStatisticsTaskIndicatorEntry OBJECT-TYPE
+            SYNTAX HwPMStatisticsTaskIndicatorEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwStatisticsTaskIndicatorTable."
+            INDEX { hwPMStatisticsTaskName, hwPMStatisticsTaskInstanceType, hwPMStatisticsTaskIndicator }
+            ::= { hwPMStatisticsTaskIndicatorTable 1 }
+        
+        HwPMStatisticsTaskIndicatorEntry ::=
+            SEQUENCE { 
+                hwPMStatisticsTaskIndicator
+                    Unsigned32,
+                hwPMStatisticsTaskIndicatorRowStatus
+                    RowStatus
+             }
+
+        hwPMStatisticsTaskIndicator OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The statistics task indicator."
+            ::= { hwPMStatisticsTaskIndicatorEntry 1 }
+        
+        hwPMStatisticsTaskIndicatorRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status."
+            ::= { hwPMStatisticsTaskIndicatorEntry 2 }
+        
+        hwPMStatisticsTaskThresholdRuleTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMStatisticsTaskThresholdRuleEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table is threshold management rule table, which is used to configure threshold rules for the indexes of the object type to be associated with the threshold template. "
+            ::= { hwPMStatisticsMIBInstances 8 }
+        
+        hwPMStatisticsTaskThresholdRuleEntry OBJECT-TYPE
+            SYNTAX HwPMStatisticsTaskThresholdRuleEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwStatisticsTaskThresholdRuleTable."
+            INDEX { hwPMStatisticsTaskName, hwPMStatisticsTaskInstanceType, hwPMStatisticsTaskIndicator, hwPMStatisticsTaskThresholdType}
+            ::= { hwPMStatisticsTaskThresholdRuleTable 1 }
+        
+        HwPMStatisticsTaskThresholdRuleEntry ::=
+            SEQUENCE { 
+              hwPMStatisticsTaskThresholdType
+                  INTEGER,
+                hwPMStatisticsTaskThresholdHighTriggerValue
+                    Unsigned32,
+                hwPMStatisticsTaskThresholdLowTriggerValue
+                    Unsigned32,
+                hwPMStatisticsTaskThresholdHighClearedValue
+                    Unsigned32,
+                hwPMStatisticsTaskThresholdLowClearedValue
+                    Unsigned32,
+                hwPMStatisticsTaskThresholdRuleRowStatus
+                    RowStatus
+             }
+    
+        
+        hwPMStatisticsTaskThresholdType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                hightrigger(1),
+                lowtrigger(2)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The threshold type of the threshold rule."
+            ::= { hwPMStatisticsTaskThresholdRuleEntry 1 }
+        
+        hwPMStatisticsTaskThresholdHighTriggerValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The high 32 bit of threshold alarm trigger value. "
+            ::= { hwPMStatisticsTaskThresholdRuleEntry 2 }
+        
+        hwPMStatisticsTaskThresholdLowTriggerValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The low 32 bit of threshold alarm trigger value . "
+            ::= { hwPMStatisticsTaskThresholdRuleEntry 3 }
+        
+        hwPMStatisticsTaskThresholdHighClearedValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The high 32 bit of threshold alarm clear value. "
+            ::= { hwPMStatisticsTaskThresholdRuleEntry 4 }
+        
+        hwPMStatisticsTaskThresholdLowClearedValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The low 32 bit of threshold alarm clear value. "
+            ::= { hwPMStatisticsTaskThresholdRuleEntry 5 }
+        
+        hwPMStatisticsTaskThresholdRuleRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The row status of the threshold rule."
+            ::= { hwPMStatisticsTaskThresholdRuleEntry 50 }
+        
+    
+        
+        hwPMStatisticsTaskThresholdEvent OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Definition point for performance threshold notifications."
+            ::= { hwPMStatisticsMIBInstances 9 }
+                
+        hwPMStatisticsTaskThresholdTriggerAlarm NOTIFICATION-TYPE
+            OBJECTS { hwPMStatisticsTaskName, hwPMStatisticsTaskPeriod, hwPMStatisticsTaskInstanceName, hwPMStatisticsTaskIndicator, 
+            hwPMStatisticsTaskThresholdType, hwPMStatisticsTaskThresholdHighTriggerValue, hwPMStatisticsTaskThresholdLowTriggerValue,
+            hwPMStatisticsTaskIndicateHighValue, hwPMStatisticsTaskIndicateLowValue}
+            STATUS current
+            DESCRIPTION
+                "This object indicates the threshold triggering alarm object."
+            ::= { hwPMStatisticsTaskThresholdEvent 1 }
+
+        
+        hwPMStatisticsTaskThresholdClearAlarm NOTIFICATION-TYPE
+            OBJECTS {hwPMStatisticsTaskName, hwPMStatisticsTaskPeriod, hwPMStatisticsTaskInstanceName, hwPMStatisticsTaskIndicator, 
+            hwPMStatisticsTaskThresholdType, hwPMStatisticsTaskThresholdHighClearedValue, hwPMStatisticsTaskThresholdLowClearedValue,
+            hwPMStatisticsTaskIndicateHighValue, hwPMStatisticsTaskIndicateLowValue}
+            STATUS current
+            DESCRIPTION
+                "This object indicates the threshold clear object. "
+            ::= { hwPMStatisticsTaskThresholdEvent 2 } 
+
+        hwPMCSESEvent NOTIFICATION-TYPE
+            OBJECTS {hwPMEventStartTime, hwPMEventDuration, hwPMStatisticsInstanceTypeName, hwPMInstanceType, 
+            hwPMInstanceName, hwPMIndicator, hwPMStatisticsIndicatorName}
+            STATUS current
+            DESCRIPTION
+                "The SNMP trap that is generated when CSES measure
+                entry crosses its falling or rising threshold  generates
+                an event that is configured for sending SNMP
+                traps."
+            ::= { hwPMStatisticsTaskThresholdEvent 3 }
+
+        hwPMUATEvent NOTIFICATION-TYPE
+            OBJECTS {hwPMEventStartTime, hwPMEventEndTime, hwPMEventState, hwPMStatisticsInstanceTypeName, hwPMInstanceType, 
+            hwPMInstanceName, hwPMIndicator, hwPMStatisticsIndicatorName}
+            STATUS current
+            DESCRIPTION
+                "The SNMP trap that is generated when UAT measure
+                entry crosses its falling or rising threshold  generates
+                an event that is configured for sending SNMP
+                traps."
+            ::= { hwPMStatisticsTaskThresholdEvent 4 }
+            
+        hwPMStatisticsTaskIndicateLowValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the lower 32 bits of the current alarm value. "
+            ::= { hwPMStatisticsMIBInstances 10 }  
+               
+        hwPMStatisticsTaskIndicateHighValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the higher 32 bits of the current alarm value. "
+            ::= { hwPMStatisticsMIBInstances 11 }
+
+    
+        hwPMStatisticsTaskFileTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMStatisticsTaskFileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to query information about statistic tasks' performance data files."
+            ::= { hwPMStatisticsMIBInstances 12 }
+      
+        
+        hwPMStatisticsTaskFileEntry OBJECT-TYPE
+            SYNTAX HwPMStatisticsTaskFileEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwStatisticsTaskFileTable."
+            INDEX { hwPMStatisticsTaskName, hwPMStatisticsTaskFileIndex }
+            ::= { hwPMStatisticsTaskFileTable 1 }
+        
+        HwPMStatisticsTaskFileEntry ::=
+            SEQUENCE { 
+                hwPMStatisticsTaskFileIndex
+                    Unsigned32,
+                hwPMStatisticsTaskFileName
+                    OCTET STRING    
+                     }
+
+        hwPMStatisticsTaskFileIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics task file index."
+            ::= { hwPMStatisticsTaskFileEntry 1 }
+        
+        hwPMStatisticsTaskFileName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The statistics task file name."
+            ::= { hwPMStatisticsTaskFileEntry 2 }
+            
+        hwPMStatisticsTraps OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION
+                "Definition point for measure exceed notifications."
+            ::= { hwPMStatisticsMIBInstances 13}
+
+        hwPMEventStartTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The CSES event  starttime value. "
+            ::= { hwPMStatisticsMIBInstances 14 }
+
+        hwPMEventEndTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The CSES event endtime value. "
+            ::= { hwPMStatisticsMIBInstances 15 }
+
+        hwPMEventDuration OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The CSES event duration value. "
+            ::= { hwPMStatisticsMIBInstances 16 }
+        
+        hwPMEventState OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The UAT event state. "
+            ::= { hwPMStatisticsMIBInstances 17 }
+
+         hwPMIndicator  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The indicator ID."
+            ::= { hwPMStatisticsMIBInstances 18 }
+            
+        hwPMInstanceType  OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The instance type ID."
+            ::= { hwPMStatisticsMIBInstances 19 }
+        
+        hwPMStatisticsInstanceTypeName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The statistics instance type name."
+            ::= { hwPMStatisticsMIBInstances 20 }
+             
+        hwPMInstanceName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The instance name."
+            ::= { hwPMStatisticsMIBInstances 21 }
+                               
+         hwPMStatisticsIndicatorName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The statistics indicator name."
+            ::= { hwPMStatisticsMIBInstances 22 }
+          
+        hwPMMeasureExceed NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION
+                "The number of statistical indexes has reached the upper limit."
+            ::= { hwPMStatisticsTraps 1 }
+        
+        hwPMFileUploadMgmtInstances OBJECT IDENTIFIER ::= { hwPerfMgmt 2 }
+        
+        hwPMServerTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "After the performance statistics file is generated, the file is transmitted to the performance management server. The table is used to create a performance management server."
+            ::= { hwPMFileUploadMgmtInstances 1 }
+        
+        hwPMServerEntry OBJECT-TYPE
+            SYNTAX HwPMServerEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+            "The entry of hwPMServerTable."
+            INDEX { hwPMServerName }
+            ::= { hwPMServerTable 1 }        
+ 
+        HwPMServerEntry ::=
+            SEQUENCE { 
+                hwPMServerName
+                    OCTET STRING,  
+                hwPMServerSrcAddrType
+                   InetAddressType,  
+                hwPMServerSrcAddr
+                    InetAddress,
+                hwPMServerVpnName
+                    OCTET STRING, 
+                hwPMServerHostAddrType
+                   InetAddressType, 
+                hwPMServerHostAddr
+                    InetAddress,
+                hwPMServerPort
+                    Integer32,
+                hwPMServerUserName
+                    OCTET STRING,
+                hwPMServerPassword
+                    OCTET STRING,
+                hwPMServerSrcIfName
+                    OCTET STRING, 
+                hwPMServerRetryTimes
+                    Unsigned32,
+                hwPMServerDestPath
+                   OCTET STRING,
+                hwPMServerTransferProtocol
+                    INTEGER,
+                hwPMServerRowStatus
+                    RowStatus,
+                hwPMServerVpnType
+                    INTEGER
+            }
+
+        hwPMServerName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The server name."
+            ::= { hwPMServerEntry 1 }
+
+        hwPMServerSrcAddrType OBJECT-TYPE
+             SYNTAX InetAddressType
+             MAX-ACCESS read-only
+             STATUS current 
+              DESCRIPTION
+            "Server source ip-address type."    
+            DEFVAL { ipv4 }
+            ::= { hwPMServerEntry 2 }   
+            
+
+            
+        hwPMServerSrcAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The server source ip-address, reservation node, don't support now."
+            ::= { hwPMServerEntry 3 }
+
+        
+        hwPMServerVpnName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..31))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "The server VPN name."
+            ::= { hwPMServerEntry 4 }
+
+        hwPMServerHostAddrType OBJECT-TYPE
+         SYNTAX InetAddressType
+             MAX-ACCESS read-create
+             STATUS current 
+              DESCRIPTION
+            "Server host ip-address type."   
+            DEFVAL { ipv4 }
+            ::= { hwPMServerEntry 5 }  
+            
+
+        hwPMServerHostAddr OBJECT-TYPE
+            SYNTAX InetAddress
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "The server host ip-address."
+            ::= { hwPMServerEntry 6 }  
+
+        
+        hwPMServerPort OBJECT-TYPE
+            SYNTAX Integer32 (1..65535)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION 
+            "The server port." 
+            ::= { hwPMServerEntry 7 }
+
+        
+        hwPMServerUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "The server user name."
+            ::= { hwPMServerEntry 8 }
+
+        
+        hwPMServerPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..128))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "This object indicates the password for logging in to the PM server."
+            ::= { hwPMServerEntry 9 }
+
+        hwPMServerSrcIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..48))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The server source interface name, reservation node, don't support now."
+            ::= { hwPMServerEntry 10 }
+
+        hwPMServerRetryTimes OBJECT-TYPE
+            SYNTAX Unsigned32 (1..3)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "The erver retry times."
+            DEFVAL { 3 }
+            ::= { hwPMServerEntry 11 }
+
+        hwPMServerDestPath OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..63))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The server destination path." 
+            ::= { hwPMServerEntry 12 }
+            
+        hwPMServerTransferProtocol OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ftp(1),
+                tftp(2), 
+                sftp(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "The server transfer protocol"
+            ::= { hwPMServerEntry 13 }
+                
+        hwPMServerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "The row status."
+            ::= { hwPMServerEntry 14 }       
+       
+        hwPMServerVpnType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                managevpn(1),
+                vpninstance(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+            "The server VPN type."
+            ::= { hwPMServerEntry 15 }
+            
+        hwPMFileUploadCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMFileUploadCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The PM file upload config table."
+            ::= { hwPMFileUploadMgmtInstances 2 }
+            
+            hwPMFileUploadCfgEntry OBJECT-TYPE
+            SYNTAX HwPMFileUploadCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The Entry of hwPMFileUploadCfgTable."
+            INDEX { hwPMFileUploadRequestName }
+            ::= { hwPMFileUploadCfgTable 1 }
+        
+        HwPMFileUploadCfgEntry  ::=
+            SEQUENCE { 
+                hwPMFileUploadRequestName
+                    OCTET STRING,
+                hwPMFileUploadServerName
+                    OCTET STRING,
+                hwPMFileUploadCfgRowStatus
+                    RowStatus
+             }    
+             
+     hwPMFileUploadRequestName OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE (1..31))
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+               "The Upload Request name."
+           ::= { hwPMFileUploadCfgEntry 1 }
+        
+         hwPMFileUploadServerName OBJECT-TYPE
+             SYNTAX OCTET STRING (SIZE (1..31))
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                 "The file upload server name."
+             ::= { hwPMFileUploadCfgEntry 2 }
+            
+        hwPMFileUploadCfgRowStatus OBJECT-TYPE
+             SYNTAX RowStatus
+             MAX-ACCESS read-create
+             STATUS current
+             DESCRIPTION
+                 "File upload request config row status."
+             ::= { hwPMFileUploadCfgEntry 3 }
+                   
+      hwPMFileUploadMgmtTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMFileUploadMgmtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is a file upload management table and is used to create file upload requests."
+            ::= { hwPMFileUploadMgmtInstances 3 }
+
+        hwPMFileUploadMgmtEntry OBJECT-TYPE
+            SYNTAX HwPMFileUploadMgmtEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of hwPMFileUploadMgmtTable."
+            INDEX { hwPMFileUploadRequestName }
+            ::= { hwPMFileUploadMgmtTable 1 }
+        
+        HwPMFileUploadMgmtEntry ::=
+            SEQUENCE { 
+                hwPMFileUploadFileList
+                    OCTET STRING,
+                hwPMFileUploadStatus
+                    INTEGER             
+                    }
+                
+        hwPMFileUploadFileList OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..543))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the performance statistics file transfer list."
+            ::= { hwPMFileUploadMgmtEntry 3 }
+        
+        hwPMFileUploadStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                init(1),
+                running(2),
+                success(3),
+                fileOpenFail(4),
+                unreachableServerIp(5),
+                linkFailed(6),
+                authenticateFailed(7),
+                fileReadFailed(8),
+                fileWriteFailed(9),
+                failed(10)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The file upload status. 
+                init(1): FTP has not been starting to upload file.
+                running(2): FTP is running. If you set this node as running, the FTP will be started.                
+                success(3): FTP completed successfully.                                                              
+                fileOpenFail(4): FTP failed. The cause is file open failure.                                         
+                unreachableServerIp(5): FTP failed. The cause is that the IP address of the server is not reachable. 
+                linkFailed(6): FTP failed. The cause is connecting to server failed.                                 
+                authenticateFailed(7): FTP failed. The cause is authenticating failed.For FTP mode only.             
+                fileReadFailed(8): FTP failed. The cause is reading file failed.                                     
+                fileWriteFailed(9): FTP failed. The cause is writing file failed.
+                failed(10):FTP failed, General error."
+            ::= { hwPMFileUploadMgmtEntry 4 }
+                            
+            
+        hwPMDataInstances OBJECT IDENTIFIER ::= { hwPerfMgmt 4 }
+        
+        hwPMHistoryDataTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMHistoryDataEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the historical performance data table and is used to provide historical data query function."
+            ::= { hwPMDataInstances 1 }
+        
+        hwPMHistoryDataEntry OBJECT-TYPE
+            SYNTAX HwPMHistoryDataEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of performance statistic history data table."
+            INDEX { hwPMStatisticsTaskName, hwPMHistoryDataInstanceType, hwPMHistoryDataInstanceName, hwPMHistoryDataIndicatorID, hwPMHistoryDataIntervalIndex
+                 }
+            ::= { hwPMHistoryDataTable 1 }
+        
+        HwPMHistoryDataEntry ::=
+            SEQUENCE { 
+                hwPMHistoryDataInstanceType
+                    Unsigned32,
+                hwPMHistoryDataInstanceName
+                    OCTET STRING,
+                hwPMHistoryDataIndicatorID
+                    Unsigned32,
+                hwPMHistoryDataIntervalIndex
+                    Integer32,
+                hwPMHistoryDataHighValue
+                    Unsigned32,
+                hwPMHistoryDataLowValue
+                    Unsigned32,
+                hwPMHistoryDataValidFlag
+                    INTEGER,
+                hwPMHistoryDateAndTime
+                    DateAndTime
+             }
+
+        hwPMHistoryDataInstanceType OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The instance type of history data."
+            ::= { hwPMHistoryDataEntry 1 }
+        
+        hwPMHistoryDataInstanceName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The instance name of history data."
+            ::= { hwPMHistoryDataEntry 2 }
+        
+        hwPMHistoryDataIndicatorID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The indicator ID of history data."
+            ::= { hwPMHistoryDataEntry 3 }
+        
+        hwPMHistoryDataIntervalIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The interval index of history data."
+            ::= { hwPMHistoryDataEntry 4 }
+        
+        hwPMHistoryDataHighValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The high 32 bit of history data value."
+            ::= { hwPMHistoryDataEntry 5 }
+        
+        hwPMHistoryDataLowValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The low 32 bit of history data value."
+            ::= { hwPMHistoryDataEntry 6 }
+        
+        hwPMHistoryDataValidFlag OBJECT-TYPE
+            SYNTAX INTEGER
+                {  
+                init(1),
+                valid(2),
+                incredible(3),
+                measureNotConfigured(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The valid flag of history data."
+            ::= { hwPMHistoryDataEntry 7 }
+        
+        hwPMHistoryDateAndTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date and time of history data."
+            ::= { hwPMHistoryDataEntry 8 }
+        
+        hwPMCurrentDataTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMCurrentDataEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the current performance data table and is used to provide the query function of the statistical data and the current data reset function."
+            ::= { hwPMDataInstances 2 }
+        
+        hwPMCurrentDataEntry OBJECT-TYPE
+            SYNTAX HwPMCurrentDataEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of performance statistic current data table."
+            INDEX { hwPMStatisticsTaskName, hwPMCurrentDataInstanceType, hwPMCurrentDataInstanceName, hwPMCurrentDataIndicatorID }
+            ::= { hwPMCurrentDataTable 1 }
+        
+        HwPMCurrentDataEntry ::=
+            SEQUENCE { 
+                hwPMCurrentDataInstanceType
+                    Unsigned32,
+                hwPMCurrentDataInstanceName
+                    OCTET STRING,
+                hwPMCurrentDataIndicatorID
+                    Unsigned32,
+                hwPMCurrentDataHighValue
+                    Unsigned32,
+                hwPMCurrentDataLowValue
+                    Unsigned32,
+                hwPMCurrentDataValidFlag
+                    INTEGER,
+                hwPMCurrentDateAndTime
+                    DateAndTime
+             }
+
+        hwPMCurrentDataInstanceType OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The instance type of current data."
+            ::= { hwPMCurrentDataEntry 1 }
+        
+        hwPMCurrentDataInstanceName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The instance name of current data."
+            ::= { hwPMCurrentDataEntry 2 }
+        
+        hwPMCurrentDataIndicatorID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The indicator ID of current data."
+            ::= { hwPMCurrentDataEntry 3 }
+        
+        hwPMCurrentDataHighValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The high 32 bit of current data value."
+            ::= { hwPMCurrentDataEntry 5 }
+        
+        hwPMCurrentDataLowValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The low 32 bit of current data value."
+            ::= { hwPMCurrentDataEntry 6 }
+        
+        hwPMCurrentDataValidFlag OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                init(1),
+                valid(2),
+                incredible(3),
+                measureNotConfigured(4)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The valid flag of current data."
+            ::= { hwPMCurrentDataEntry 7 } 
+            
+        hwPMCurrentDateAndTime OBJECT-TYPE
+            SYNTAX DateAndTime
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date and time of current data."
+            ::= { hwPMCurrentDataEntry 8 }
+            
+               hwPMResetCurrentDataTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMResetCurrentDataEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Performance statistic current data table." 
+            ::= { hwPMDataInstances 3 }
+        
+        hwPMResetCurrentDataEntry OBJECT-TYPE
+            SYNTAX HwPMResetCurrentDataEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry of reset performance statistic current data table."
+            INDEX { hwPMStatisticsTaskName, hwPMResetCurrentDataInstanceType }
+            ::= { hwPMResetCurrentDataTable 1 }
+        
+        HwPMResetCurrentDataEntry ::=
+            SEQUENCE { 
+                hwPMResetCurrentDataInstanceType
+                    Unsigned32,
+                hwPMResetCurrentDataInstanceName
+                    OCTET STRING,
+                hwPMResetCurrentDataIndicatorID
+                    Unsigned32
+             }
+
+        hwPMResetCurrentDataInstanceType OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The instance type of current data."
+            ::= { hwPMResetCurrentDataEntry 1 }
+        
+        hwPMResetCurrentDataInstanceName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The instance name of current data."
+            ::= { hwPMResetCurrentDataEntry 2 }
+        
+        hwPMResetCurrentDataIndicatorID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The indicator ID of current data."
+            ::= { hwPMResetCurrentDataEntry 3 }
+        
+        hwPMGlobalInstances OBJECT IDENTIFIER ::= { hwPerfMgmt 5 }
+        
+        hwPMIntervalTypeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMIntervalTypeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is of the period type and is used to provide the performance measurement period attribute query function."
+            ::= { hwPMGlobalInstances 1 }
+        
+        hwPMIntervalTypeEntry OBJECT-TYPE
+            SYNTAX HwPMIntervalTypeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwPMIntervalTypeTable."
+            INDEX { hwPMIntervalType }
+            ::= { hwPMIntervalTypeTable 1 }
+        
+        HwPMIntervalTypeEntry ::=
+            SEQUENCE { 
+                hwPMIntervalType
+                    Unsigned32,
+                hwPMIntervalTypeName
+                    OCTET STRING,
+                hwPMIntervalTypeInterval
+                    INTEGER,
+                hwPMIntervalTypeHistorynum
+                    Unsigned32,
+                hwPMIntervalTypeDelayRange
+                    Unsigned32,
+                hwPMIntervalTypeSampleInterval
+                    Unsigned32
+             }
+
+        hwPMIntervalType OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The interval type ID."
+            ::= { hwPMIntervalTypeEntry 1 }
+        
+        hwPMIntervalTypeName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interval type name."
+            ::= { hwPMIntervalTypeEntry 2 }
+        
+        hwPMIntervalTypeInterval OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                five(5),
+                ten(10),
+                fifteen(15),
+                thirty(30),
+                sixty(60),
+                twentyfourhours(1440)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the length of the performance measurement period, in minutes."
+            ::= { hwPMIntervalTypeEntry 3 }
+        
+        hwPMIntervalTypeHistorynum OBJECT-TYPE
+            SYNTAX Unsigned32 (0..16)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The history number of save data per interval type."
+            ::= { hwPMIntervalTypeEntry 4 }
+        
+        hwPMIntervalTypeDelayRange OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The range of delay time per interval type."
+            ::= { hwPMIntervalTypeEntry 5 }
+        
+        hwPMIntervalTypeSampleInterval OBJECT-TYPE
+            SYNTAX Unsigned32
+            UNITS "second"
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The default sample interval per interval type."
+            ::= { hwPMIntervalTypeEntry 6 }
+        
+        hwPMInstanceTypeTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMInstanceTypeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to provide the function of querying the performance statistics instance type."
+            ::= { hwPMGlobalInstances 2 }
+        
+        hwPMInstanceTypeEntry OBJECT-TYPE
+            SYNTAX HwPMInstanceTypeEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwPMInstanceTypeTable."
+            INDEX { hwPMInstanceTypeID }
+            ::= { hwPMInstanceTypeTable 1 }
+        
+        HwPMInstanceTypeEntry ::=
+            SEQUENCE { 
+                hwPMInstanceTypeID
+                    Unsigned32,
+                hwPMInstanceTypeName
+                    OCTET STRING
+             }
+
+        hwPMInstanceTypeID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The instance type ID."
+            ::= { hwPMInstanceTypeEntry 1 }
+        
+        hwPMInstanceTypeName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The instance type name."
+            ::= { hwPMInstanceTypeEntry 2 }
+        
+        hwPMIndicatorTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwPMIndicatorEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is used to provide the function of querying performance counters."
+            ::= { hwPMGlobalInstances 3 }
+        
+        hwPMIndicatorEntry OBJECT-TYPE
+            SYNTAX HwPMIndicatorEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of hwPMIndicatorTable."
+            INDEX { hwPMIndicatorID }
+            ::= { hwPMIndicatorTable 1 }
+        
+        HwPMIndicatorEntry ::=
+            SEQUENCE { 
+                hwPMIndicatorID
+                    Unsigned32,
+                hwPMIndicatorName
+                    OCTET STRING,
+                hwPMIndicatorType
+                    INTEGER,
+                hwPMIndicatorCounterType
+                    INTEGER
+             }
+
+        hwPMIndicatorID OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The indicator ID."
+            ::= { hwPMIndicatorEntry 1 }
+        
+        hwPMIndicatorName OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The indicator name."
+            ::= { hwPMIndicatorEntry 2 }
+        
+        hwPMIndicatorType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                increase(1),
+                measure(2),
+                max(3),
+                min(4),
+                avg(5),
+                es(6),
+                delta(7)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The indicator type."
+            ::= { hwPMIndicatorEntry 3 }
+        
+        hwPMIndicatorCounterType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                counter32(1),
+                counter64(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The indicator counter type."
+            ::= { hwPMIndicatorEntry 4 }
+                        
+        hwPMConformance OBJECT IDENTIFIER ::= { hwPerfMgmt 6 }
+        
+        hwPMCompliances OBJECT IDENTIFIER ::= { hwPMConformance 1 }
+        
+        hwPMCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION
+                "The performance management compliance."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwPMMIBGroup, hwPMTaskGroup, hwPMTaskInstanceGroup, hwPMTaskThresholdGroup, hwPMFileUploadGroup, hwPMTaskFileGroup, hwPMDataInstanceGroup,
+                hwPMIntervalTypeGroup, hwPMInstanceTypeGroup, hwPMIndicatorGroup, hwPMNotificationGroup }
+            ::= { hwPMCompliances 1 }
+        
+        hwPMGroup OBJECT IDENTIFIER ::= { hwPMConformance 2 }
+        
+        hwPMMIBGroup OBJECT-GROUP
+            OBJECTS { hwPMStatisticsEnable, hwPMStatisticsMaxFilesPerTask, hwPMStatisticsMaxTasks, hwPMStatisticsCurrentTasks }
+            STATUS current
+            DESCRIPTION
+                "The performance management group."
+            ::= { hwPMGroup 1 }
+        
+        hwPMTaskGroup OBJECT-GROUP
+            OBJECTS { hwPMStatisticsTaskName, hwPMStatisticsTaskFileFormat, hwPMStatisticsRecordFileEnable, hwPMStatisticsThresholdEnable, hwPMStatisticsTaskPeriod, hwPMStatisticsTaskTransferPeriod,  
+                hwPMStatisticsTaskRowStatus, hwPMStatisticsTaskSampleInterval, hwPMStatisticsTaskIndicator, hwPMStatisticsTaskIndicatorRowStatus, hwPMStatisticsTaskCurrentFileIndex, hwPMStatisticsUploadAutoName}
+            STATUS current
+            DESCRIPTION
+                "The performance management statistics task group."
+            ::= { hwPMGroup 2 }
+        
+        hwPMTaskInstanceGroup OBJECT-GROUP
+            OBJECTS { hwPMStatisticsTaskInstanceType, hwPMStatisticsTaskInstanceName, hwPMStatisticsTaskInstanceRowStatus }
+            STATUS current
+            DESCRIPTION
+                "The performance management statistics task instances group."
+            ::= { hwPMGroup 3 }
+        hwPMTaskThresholdGroup OBJECT-GROUP
+            OBJECTS { hwPMStatisticsTaskThresholdType,hwPMStatisticsTaskThresholdHighTriggerValue,hwPMStatisticsTaskThresholdLowTriggerValue, 
+            hwPMStatisticsTaskThresholdHighClearedValue,hwPMStatisticsTaskThresholdLowClearedValue,hwPMStatisticsTaskThresholdRuleRowStatus,hwPMStatisticsTaskIndicateLowValue,
+            hwPMStatisticsTaskIndicateHighValue, hwPMStatisticsTaskThresholdRuleRowStatus }
+            STATUS current
+            DESCRIPTION
+                "The performance management statistics task threshold group."
+            ::= { hwPMGroup 4 }
+            
+        hwPMTaskFileGroup OBJECT-GROUP
+            OBJECTS { hwPMStatisticsTaskFileIndex, hwPMStatisticsTaskFileName }
+            STATUS current
+            DESCRIPTION
+                "The performance management statistics task file group."
+            ::= { hwPMGroup 5 }
+        
+        hwPMFileUploadGroup OBJECT-GROUP
+            OBJECTS { hwPMFileUploadRequestName, hwPMFileUploadServerName, hwPMFileUploadFileList, hwPMFileUploadStatus, hwPMFileUploadCfgRowStatus, 
+                hwPMServerName, hwPMServerSrcAddrType,hwPMServerSrcAddr, hwPMServerVpnName, hwPMServerHostAddr,hwPMServerHostAddrType, hwPMServerPort, 
+                hwPMServerUserName, hwPMServerPassword, hwPMServerSrcIfName, hwPMServerRetryTimes, 
+                hwPMServerTransferProtocol, hwPMServerDestPath, hwPMServerRowStatus, hwPMServerVpnType }
+            STATUS current
+            DESCRIPTION
+                "The performance management statistics file upload group."
+            ::= { hwPMGroup 6 }
+        
+        hwPMDataInstanceGroup OBJECT-GROUP
+            OBJECTS {hwPMHistoryDataHighValue, 
+                hwPMHistoryDataLowValue, hwPMHistoryDataValidFlag, hwPMHistoryDateAndTime, 
+                hwPMCurrentDataHighValue, hwPMCurrentDataLowValue, hwPMCurrentDataValidFlag, hwPMCurrentDateAndTime ,hwPMResetCurrentDataIndicatorID,hwPMResetCurrentDataInstanceName,hwPMResetCurrentDataInstanceType}
+            STATUS current
+            DESCRIPTION
+                "The performance management data group."
+            ::= { hwPMGroup 7 }
+        
+        hwPMIntervalTypeGroup OBJECT-GROUP
+            OBJECTS { hwPMIntervalTypeName, hwPMIntervalTypeInterval, hwPMIntervalTypeHistorynum, hwPMIntervalTypeDelayRange, 
+                hwPMIntervalTypeSampleInterval }
+            STATUS current
+            DESCRIPTION
+                "The performance management interval type group."
+            ::= { hwPMGroup 8 }
+        
+        hwPMInstanceTypeGroup OBJECT-GROUP
+            OBJECTS { hwPMInstanceTypeName }
+            STATUS current
+            DESCRIPTION
+                "The performance management instance type group."
+            ::= { hwPMGroup 9 }
+        
+        hwPMIndicatorGroup OBJECT-GROUP
+            OBJECTS { hwPMIndicatorName, hwPMIndicatorType, hwPMIndicatorCounterType}
+            STATUS current
+            DESCRIPTION
+                "The performance management indicator group."
+            ::= { hwPMGroup 10 }
+            
+        hwPMNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwPMStatisticsTaskThresholdTriggerAlarm, hwPMStatisticsTaskThresholdClearAlarm ,hwPMCSESEvent, hwPMUATEvent}
+            STATUS current
+            DESCRIPTION 
+                "The notification group."
+            ::= { hwPMGroup 11 }
+    
+    END
+
+--
+-- HUAWEI-PERFMGMT-MIB.my
+--

@@ -1,25 +1,28 @@
 <?php
 
+use Illuminate\Support\Str;
+use LibreNMS\Config;
+
 // FIXME should do the deletion etc in a common file perhaps? like for the sensors
 // Try to discover Libvirt Virtual Machines.
-if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
+if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
     $libvirt_vmlist = array();
 
     $ssh_ok = 0;
 
     $userHostname = $device['hostname'];
-    if (isset($config['libvirt_username'])) {
-        $userHostname = $config['libvirt_username'].'@'.$userHostname;
+    if (Config::has('libvirt_username')) {
+        $userHostname = Config::get('libvirt_username').'@'.$userHostname;
     }
 
-    foreach ($config['libvirt_protocols'] as $method) {
-        if (strstr($method, 'qemu')) {
+    foreach (Config::get('libvirt_protocols') as $method) {
+        if (Str::contains($method, 'qemu')) {
             $uri = $method.'://'.$userHostname.'/system';
         } else {
             $uri = $method.'://'.$userHostname;
         }
 
-        if (strstr($method, 'ssh') && !$ssh_ok) {
+        if (Str::contains($method, 'ssh') && !$ssh_ok) {
             // Check if we are using SSH if we can log in without password - without blocking the discovery
             // Also automatically add the host key so discovery doesn't block on the yes/no question, and run echo so we don't get stuck in a remote shell ;-)
             exec('ssh -o "StrictHostKeyChecking no" -o "PreferredAuthentications publickey" -o "IdentitiesOnly yes" '.$userHostname.' echo -e', $out, $ret);
@@ -28,10 +31,10 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
             }
         }
 
-        if ($ssh_ok || !strstr($method, 'ssh')) {
+        if ($ssh_ok || !Str::contains($method, 'ssh')) {
             // Fetch virtual machine list
             unset($domlist);
-            exec($config['virsh'].' -rc '.$uri.' list', $domlist);
+            exec(Config::get('virsh').' -rc '.$uri.' list', $domlist);
 
             foreach ($domlist as $dom) {
                 list($dom_id,) = explode(' ', trim($dom), 2);
@@ -39,7 +42,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                 if (is_numeric($dom_id)) {
                     // Fetch the Virtual Machine information.
                     unset($vm_info_array);
-                    exec($config['virsh'].' -rc '.$uri.' dumpxml '.$dom_id, $vm_info_array);
+                    exec(Config::get('virsh').' -rc '.$uri.' dumpxml '.$dom_id, $vm_info_array);
 
                     // Example xml:
                     // <domain type='kvm' id='3'>
@@ -69,7 +72,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                     $vmwVmDisplayName = $xml->name;
                     $vmwVmGuestOS     = '';
                     // libvirt does not supply this
-                    exec($config['virsh'].' -rc '.$uri.' domstate '.$dom_id, $vm_state);
+                    exec(Config::get('virsh').' -rc '.$uri.' domstate '.$dom_id, $vm_state);
                     $vmwVmState = ucfirst($vm_state[0]);
 
                     $vmwVmCpus  = $xml->vcpu['current'];
@@ -95,7 +98,6 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                             break;
                         case 'M':
                         case 'MiB':
-                            $vmwVmMemSize = $vmwVmMemSize;
                             break;
                         case 'MB':
                             $vmwVmMemSize = $vmwVmMemSize * 1000000 / 1048576;
@@ -118,7 +120,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
                     if (count($result['device_id']) == 0) {
                         $inserted_id = dbInsert(array('device_id' => $device['device_id'], 'vm_type' => 'libvirt', 'vmwVmVMID' => $dom_id, 'vmwVmDisplayName' => mres($vmwVmDisplayName), 'vmwVmGuestOS' => mres($vmwVmGuestOS), 'vmwVmMemSize' => mres($vmwVmMemSize), 'vmwVmCpus' => mres($vmwVmCpus), 'vmwVmState' => mres($vmwVmState)), 'vminfo');
                         echo '+';
-                        log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', $inserted_id);
+                        log_event("Virtual Machine added: $vmwVmDisplayName ($vmwVmMemSize MB)", $device, 'vm', 3, $inserted_id);
                     } else {
                         if ($result['vmwVmState'] != $vmwVmState
                             || $result['vmwVmDisplayName'] != $vmwVmDisplayName
@@ -154,7 +156,7 @@ if ($config['enable_libvirt'] == '1' && $device['os'] == 'linux') {
         if (!in_array($db_vm['vmwVmVMID'], $libvirt_vmlist)) {
             dbDelete('vminfo', '`id` = ?', array($db_vm['id']));
             echo '-';
-            log_event('Virtual Machine removed: '.$db_vm['vmwVmDisplayName'], $device, 'vm', $db_vm['id']);
+            log_event('Virtual Machine removed: ' . $db_vm['vmwVmDisplayName'], $device, 'vm', 4, $db_vm['id']);
         }
     }
 

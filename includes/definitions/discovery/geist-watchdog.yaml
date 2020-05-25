@@ -1,0 +1,425 @@
+mib: GEIST-V4-MIB:GEIST-MIB-V3
+modules:
+    sensors:
+        temperature:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: internalTable
+                    value: internalTemp
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.2.1.5.{{ $index }}'
+                    descr: internalName
+                -
+                    oid: tempSensorTable
+                    value: tempSensorTemp
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.4.1.5.{{ $index }}'
+                    descr: tempSensorName
+                -
+                    oid: airFlowSensorTable
+                    value: airFlowSensorTemp
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.5.1.5.{{ $index }}'
+                    descr: airFlowSensorName
+                -
+                    oid: dewPointSensorTable
+                    value: dewPointSensorTemp
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.6.1.5.{{ $index }}'
+                    descr: dewPointSensorName
+                -
+                    oid: t3hdSensorTable
+                    value: t3hdSensorIntTemp
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.8.1.6.{{ $index }}'
+                    descr: t3hdSensorIntName
+                -
+                    oid: thdSensorTable
+                    value: thdSensorTemp
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.9.1.5.{{ $index }}'
+                    descr: thdSensorName
+                -
+                    oid: thdSensorTable
+                    value: thdSensorTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.32.1.5.{{ $index }}'
+                    descr: thdSensorName
+                    skip_values:
+                        -
+                            oid: thdSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: t3hdSensorTable
+                    value: t3hdSensorIntTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.31.1.6.{{ $index }}'
+                    descr: t3hdSensorName
+                    skip_values:
+                        -
+                            oid: t3hdSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: climateRelayTable
+                    value: climateRelayTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.26.1.5.{{ $index }}'
+                    descr: climateRelayName
+                    skip_values:
+                        -
+                            oid: climateRelayAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: dewPointSensorTable
+                    value: dewPointSensorTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.17.1.5.{{ $index }}'
+                    descr: dewPointSensorName
+                    skip_values:
+                        -
+                            oid: dewPointSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: vsfcTable
+                    value: vsfcIntTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.13.1.8.{{ $index }}'
+                    descr: vsfcName
+                    skip_values:
+                        -
+                            oid: vsfcAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: airFlowSensorTable
+                    value: airFlowSensorTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.5.1.5.{{ $index }}'
+                    descr: airFlowSensorName
+                    skip_values:
+                        -
+                            oid: airFlowSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: tempSensorTable
+                    value: tempSensorTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.4.1.5.{{ $index }}'
+                    descr: tempSensorName
+                    skip_values:
+                        -
+                            oid: tempSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: climateTable
+                    value: climateTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.2.1.5.{{ $index }}'
+                    descr: climateName
+                    skip_values:
+                        -
+                            oid: climateAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: dstsTable
+                    value: dstsSourceATempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.19.1.13.{{ $index }}'
+                    descr: dstsName
+                    skip_values:
+                        -
+                            oid: dstsAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: dstsTable
+                    value: dstsSourceBTempC
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.19.1.14.{{ $index }}'
+                    descr: dstsName
+                    skip_values:
+                        -
+                            oid: dstsAvail
+                            op: '!='
+                            value: 1
+        current:
+            data:
+                -
+                    oid: rpmSensorTable
+                    value: rpmSensorCurrent
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.10.1.10.{{ $index }}'
+                    descr: rpmSensorName
+                    divisor: 10
+        voltage:
+            data:
+                -
+                    oid: rpmSensorTable
+                    value: rpmSensorVoltage
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.10.1.6.{{ $index }}'
+                    descr: rpmSensorName
+                -
+                    oid: pos60VdcSensorTable
+                    value: pos60VdcSensorVoltage
+                    num_oid: '.1.3.6.1.4.1.21239.2.33.1.5.{{ $index }}'
+                    descr: pos60VdcSensorName
+                    skip_values:
+                        -
+                            oid: pos60VdcSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: ctrl3ChIECTable
+                    value: ctrl3ChIECVoltsA
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.6.{{ $index }}'
+                    descr: ctrl3ChIECName
+                    skip_values:
+                        -
+                            oid: ctrl3ChIECAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: ctrl3ChIECTable
+                    value: ctrl3ChIECVoltsB
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.14.{{ $index }}'
+                    descr: ctrl3ChIECName
+                    skip_values:
+                        -
+                            oid: ctrl3ChIECAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: ctrl3ChIECTable
+                    value: ctrl3ChIECVoltsC
+                    num_oid: '.1.3.6.1.4.1.21239.2.25.1.22.{{ $index }}'
+                    descr: ctrl3ChIECName
+                    skip_values:
+                        -
+                            oid: ctrl3ChIECAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: pos30VdcSensorTable
+                    value: pos30VdcSensorVoltage
+                    num_oid: '.1.3.6.1.4.1.21239.2.23.1.5.{{ $index }}'
+                    descr: pos30VdcSensorName
+                    skip_values:
+                        -
+                            oid: pos30VdcSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: neg48VdcSensorTable
+                    value: neg48VdcSensorVoltage
+                    num_oid: '.1.3.6.1.4.1.21239.2.22.1.5.{{ $index }}'
+                    descr: neg48VdcSensorName
+                    skip_values:
+                        -
+                            oid: neg48VdcSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: dstsTable
+                    value: dstsVoltsA
+                    num_oid: '.1.3.6.1.4.1.21239.2.19.1.5.{{ $index }}'
+                    descr: dstsName
+                    skip_values:
+                        -
+                            oid: dstsAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: dstsTable
+                    value: dstsVoltsB
+                    num_oid: '.1.3.6.1.4.1.21239.2.19.1.7.{{ $index }}'
+                    descr: dstsName
+                    skip_values:
+                        -
+                            oid: dstsAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: ctrl3ChTable
+                    value: ctrl3ChVoltsA
+                    num_oid: '.1.3.6.1.4.1.21239.2.14.1.5.{{ $index }}'
+                    descr: ctrl3ChName
+                    skip_values:
+                        -
+                            oid: ctrl3ChAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: ctrl3ChTable
+                    value: ctrl3ChVoltsB
+                    num_oid: '.1.3.6.1.4.1.21239.2.14.1.12.{{ $index }}'
+                    descr: ctrl3ChName
+                    skip_values:
+                        -
+                            oid: ctrl3ChAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: ctrl3ChTable
+                    value: ctrl3ChVoltsC
+                    num_oid: '.1.3.6.1.4.1.21239.2.14.1.19.{{ $index }}'
+                    descr: ctrl3ChName
+                    skip_values:
+                        -
+                            oid: ctrl3ChAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: pow3ChTable
+                    value: pow3ChVoltsA
+                    num_oid: '.1.3.6.1.4.1.21239.2.11.1.6.{{ $index }}'
+                    descr: pow3ChName
+                    skip_values:
+                        -
+                            oid: pow3ChAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: pow3ChTable
+                    value: pow3ChVoltsB
+                    num_oid: '.1.3.6.1.4.1.21239.2.11.1.15.{{ $index }}'
+                    descr: pow3ChName
+                    skip_values:
+                        -
+                            oid: pow3ChAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: pow3ChTable
+                    value: pow3ChVoltsC
+                    num_oid: '.1.3.6.1.4.1.21239.2.11.1.24.{{ $index }}'
+                    descr: pow3ChName
+                    skip_values:
+                        -
+                            oid: pow3ChAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: powMonTable
+                    value: powMonVolts
+                    num_oid: '.1.3.6.1.4.1.21239.2.3.1.6.{{ $index }}'
+                    descr: powMonName
+                    skip_values:
+                        -
+                            oid: powMonAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: climateTable
+                    value: climateVolts
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.2.1.14.{{ $index }}'
+                    descr: climateName
+                    skip_values:
+                        -
+                            oid: climateAvail
+                            op: '!='
+                            value: 1
+        humidity:
+            data:
+                -
+                    oid: thdSensorTable
+                    value: thdSensorHumidity
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.9.1.6.{{ $index }}'
+                    descr: thdSensorName
+                -
+                    oid: t3hdSensorTable
+                    value: t3hdSensorIntHumidity
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.8.1.7.{{ $index }}'
+                    descr: t3hdSensorIntName
+                -
+                    oid: internalTable
+                    value: internalHumidity
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.2.1.6.{{ $index }}'
+                    descr: internalName
+                -
+                    oid: thdSensorTable
+                    value: thdSensorHumidity
+                    num_oid: '.1.3.6.1.4.1.21239.2.32.1.7.{{ $index }}'
+                    descr: thdSensorName
+                    skip_values:
+                        -
+                            oid: thdSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: t3hdSensorTable
+                    value: t3hdSensorIntHumidity
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.31.1.8.{{ $index }}'
+                    descr: t3hdSensorName
+                    skip_values:
+                        -
+                            oid: t3hdSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: dewPointSensorTable
+                    value: dewPointSensorHumidity
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.17.1.7.{{ $index }}'
+                    descr: dewPointSensorName
+                    skip_values:
+                        -
+                            oid: dewPointSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: airFlowSensorTable
+                    value: airFlowSensorHumidity
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.5.1.8.{{ $index }}'
+                    descr: airFlowSensorName
+                    skip_values:
+                        -
+                            oid: airFlowSensorAvail
+                            op: '!='
+                            value: 1
+                -
+                    oid: climateTable
+                    value: climateHumidity
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.2.1.7.{{ $index }}'
+                    descr: climateName
+                    skip_values:
+                        -
+                            oid: climateAvail
+                            op: '!='
+                            value: 1
+        airflow:
+            data:
+                -
+                    oid: airFlowSensorTable
+                    value: airFlowSensorFlow
+                    num_oid: '.1.3.6.1.4.1.21239.5.1.5.1.6.{{ $index }}'
+                    descr: airFlowSensorName
+                -
+                    oid: climateTable
+                    value: climateAirflow
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.2.1.9.{{ $index }}'
+                    descr: climateName
+                    skip_values:
+                        -
+                            oid: climateAvail
+                            op: '!='
+                            value: 1
+        fanspeed:
+            data:
+                -
+                    oid: vsfcTable
+                    value: vsfcFanSpeed
+                    divisor: 1
+                    num_oid: '.1.3.6.1.4.1.21239.2.13.1.7.{{ $index }}'
+                    descr: vsfcName
+                    skip_values:
+                        -
+                            oid: vsfcAvail
+                            op: '!='
+                            value: 1

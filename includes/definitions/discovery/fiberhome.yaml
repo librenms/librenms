@@ -1,0 +1,45 @@
+mib: GEPON-OLT-COMMON-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: mgrCardInfoTable
+                  value: mgrCardCpuUtil
+                  num_oid: '.1.3.6.1.4.1.5875.800.3.9.8.1.1.5.{{ $index }}'
+                  descr: 'Hswa {{ $index }} Processor'
+                  precision: 100
+                  skip_values:
+                        -
+                            oid: mgrCardWorkStatus
+                            op: '!='
+                            value: 1
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: sysTemperature
+                    num_oid: '.1.3.6.1.4.1.5875.800.3.9.4.5.{{ $index }}'
+                    descr: 'Internal Temperature {{ $index }}'
+                    low_limit: 0
+                    high_limit: 100
+                    low_warn_limit: 15
+                    warn_limit: 55
+        state:
+            data:
+                -
+                    oid: fanAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.5875.800.3.60.2.1.1.{{ $index }}'
+                    descr: "Fan slot {{ $index }} Status"
+                    state_name: fanState
+                    states:
+                        - { descr: Normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: Failed, graph: 0, value: 2, generic: 2 }
+                -
+                    oid: powerAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.5875.800.3.60.1.1.2.{{ $index }}'
+                    descr: "Power slot {{ $index }} Status"
+                    state_name: powerState
+                    states:
+                        - { descr: Normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: Logw Voltage, graph: 0, value: 2, generic: 1 }
+                        - { descr: PowerFault, graph: 0, value: 3, generic: 2 }

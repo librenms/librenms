@@ -1,0 +1,6021 @@
+--  ***************************************************************************
+--  ADVA-FSPR7-DEF-MIB.txt
+--
+--               ADVA AG Optical Networking Default MIB File
+--
+--  Copyright 2011 ADVA AG Optical Networking.
+--
+--  All rights reserved.
+--  ***************************************************************************
+
+
+--  MIB default definitions required for entity management.
+
+ADVA-FSPR7-DEF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+                                        FROM  SNMPv2-CONF
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    Unsigned32,
+    Integer32,
+    IpAddress
+                                        FROM  SNMPv2-SMI
+    RowStatus
+                                        FROM  SNMPv2-TC
+    SnmpAdminString
+                                        FROM  SNMP-FRAMEWORK-MIB
+    fspR7,
+    ApsHoldoffTime,
+    ApsDirection,
+    EnableState,
+    EthDuplexMode,
+    FspR7EquipmentType,
+    LoopConfig,
+    OhTerminationLevel,
+    OtnPayloadType,
+    OtnTcmLevel,
+    ProtectionMech,
+    SonetTimingSource,
+    SonetTraceForm,
+    TimMode,
+    VirtualContainerType
+                                        FROM  ADVA-MIB
+    ApsRevertMode,
+    ApsType,
+    FfpType,
+    FspR7APSCommand,
+    FspR7AdminState,
+    FspR7AlsMode,
+    FspR7AseTabOpr,
+    FspR7AutoThresReset,
+    FspR7BERThreshold,
+    FspR7BERThresholdSection,
+    FspR7BidirectionalChannel,
+    FspR7Baund,
+    FspR7Bitrate,
+    FspR7CapInventory,
+    FspR7ChannelBandwidth,
+    FspR7ChannelIdentifier,
+    FspR7ChannelSpacing,
+    FspR7CodeGain,
+    FspR7Conn,
+    FspR7ConnectorType,
+    FspR7CpAuthType,
+    FspR7DCFiberType,
+    FspR7DeploymentScenario,
+    FspR7DisableEnable,
+    FspR7DispersionCompensation,
+    FspR7DispersionConfig,
+    FspR7DispersionModes,
+    FspR7EdfaOutputPowerRating,
+    FspR7EnableDisable,
+    FspR7EqlzAdminState,
+    FspR7ErrorFwdMode,
+    FspR7FecType,
+    FspR7FiberBrand,
+    FspR7FiberDetect,
+    FspR7FlowControlMode,
+    FspR7ForceConfig,
+    FspR7FrameFormat,
+    FspR7FunctionCrs,
+    FspR7Gain,
+    FspR7GainRange,
+    FspR7InitEqualization,
+    FspR7InterfaceType,
+    FspR7InvertTelemetryInputLogic,
+    FspR7IpType,
+    FspR7IPv6Type,
+    FspR7IpMode,
+    FspR7LacpMode,
+    FspR7LacpTimeout,
+    FspR7LagPortType,
+    FspR7LaneGroupInventory,
+    FspR7LaserDelayTimer,
+    FspR7LaserForcedOperation,
+    FspR7LineCoding,
+    FspR7LossAttenuation,
+    FspR7ManualAuto,
+    FspR7Mapping,
+    FspR7MaxBitErrorRate,
+    FspR7MuxMethod,
+    FspR7NdpCleanup,
+    FspR7NoYes,
+    FspR7NumberOfChannels,
+    FspR7NumberOfChannelsProv,
+    FspR7OpticalBand,
+    FspR7OpticalFiberType,
+    FspR7OpticalGroup,
+    FspR7OpticalInterfaceReach,
+    FspR7OpticalSubBand,
+    FspR7OptUpdate,
+    FspR7OpuPayloadType,
+    FspR7OscUsage,
+    FspR7OspfMode,
+    FspR7OtdrPeriod,
+    FspR7PathNode,
+    FspR7PlugDataRate,
+    FspR7PmReset,
+    FspR7PortBehaviour,
+    FspR7PortMode,
+    FspR7PortRole,
+    FspR7PrbsPmReset,
+    FspR7ProtectionType,
+    FspR7PsuOutputPower,
+    FspR7RedLinedState,
+    FspR7RlsMan,
+    FspR7RoadmNumber,
+    FspR7RowStatus,
+    FspR7Scrambling,
+    FspR7SingleFiberLocation,
+    FspR7SnmpHexString,
+    FspR7SnmpLongString,
+    FspR7Stuff,
+    FspR7SupplyType,
+    FspR7TelemetryOutput,
+    FspR7PRBSTest,
+    FspR7TifOutputReset,
+    FspR7TiltSet,
+    FspR7Topology,
+    FspR7TrafficDirection,
+    FspR7TransmissionMode,
+    FspR7TurnupConfig,
+    FspR7TxOffOnTm,
+    FspR7TypeConnection,
+    FspR7TypeCrs,
+    FspR7Unsigned32Caps,
+    FspR7UntaggedFrames,
+    FspR7VoaMode,
+    FspR7XfpDecisionThres,
+    FspR7YesNo
+                                        FROM  ADVA-FSPR7-TC-MIB
+    entityConnectionClassName,
+    entityContainerShelfNo,
+    entityContainerSlotNo,
+    entityContainerPortNo,
+    entityContainerExtNo,
+    entityContainerClassName,
+    entityCrossConnFromShelfNo,
+    entityCrossConnFromSlotNo,
+    entityCrossConnFromPortNo,
+    entityCrossConnFromExtNo,
+    entityCrossConnFromClassName,
+    entityCrossConnToShelfNo,
+    entityCrossConnToSlotNo,
+    entityCrossConnToPortNo,
+    entityCrossConnToExtNo,
+    entityCrossConnToClassName,
+    entityCrossConnClassName,
+    entityCrsOptLineFromIndexNo1,
+    entityCrsOptLineFromIndexNo2,
+    entityCrsOptLineFromIndexNo3,
+    entityCrsOptLineFromIndexNo4,
+    entityCrsOptLineFromClassName,
+    entityCrsOptLineToIndexNo1,
+    entityCrsOptLineToIndexNo2,
+    entityCrsOptLineToIndexNo3,
+    entityCrsOptLineToIndexNo4,
+    entityCrsOptLineToClassName,
+    entityCrsOptLineClassName,
+    entityDcnShelfNo,
+    entityDcnSlotNo,
+    entityDcnPortNo,
+    entityDcnExtNo,
+    entityDcnClassName,
+    entityEqptShelfNo,
+    entityEqptSlotNo,
+    entityEqptPortNo,
+    entityEqptExtNo,
+    entityEqptClassName,
+    entityExternalPortShelfNo,
+    entityExternalPortSlotNo,
+    entityExternalPortPortNo,
+    entityExternalPortExtNo,
+    entityExternalPortClassName,
+    entityFacilityShelfNo,
+    entityFacilitySlotNo,
+    entityFacilityPortNo,
+    entityFacilityExtNo,
+    entityFacilityClassName,
+    entityOpticalMuxShelfNo,
+    entityOpticalMuxSlotNo,
+    entityOpticalMuxPortNo,
+    entityOpticalMuxExtNo,
+    entityOpticalMuxClassName,
+    entityOptLineIndexNo1,
+    entityOptLineClassName,
+    entityShelfConnShelfNo,
+    entityShelfConnSlotNo,
+    entityShelfConnPortNo,
+    entityShelfConnExtNo,
+    entityShelfConnClassName,
+    entityTerminPointIndexNo1,
+    entityTerminPointIndexNo2,
+    entityTerminPointIndexNo3,
+    entityTerminPointIndexNo4,
+    entityTerminPointClassName,
+    entityFfpShelfNo,
+    entityFfpSlotNo,
+    entityFfpPortNo,
+    entityFfpExtNo,
+    entityFfpClassName,
+    entityCrossDcnShelfNo,
+    entityCrossDcnSlotNo,
+    entityCrossDcnPortNo,
+    entityCrossDcnExtNo,
+    entityCrossDcnClassName
+                                        FROM  ADVA-FSPR7-MIB;
+    
+
+advaFspR7Def MODULE-IDENTITY
+
+    LAST-UPDATED "201410150000Z"
+
+    ORGANIZATION "ADVA Optical Networking"
+
+    CONTACT-INFO "EMEA Support
+                  Phone : +49 89 89 0665 848
+                  Fax   : +49 89 89 0665 22848
+                  Email : support@advaoptical.com
+
+                  North American Support
+                  Phone : 886 442 ADVA (2382) (toll-free within the US, Canada and Mexico)
+                  Fax   : + 1 806 741 8529 (elsewhere)
+                  Email : support-usa@advaoptical.com
+
+                  Asia Pacific Support
+                  Phone : + 1 866 442 2382 (other toll-free numbers available in some countries)
+                  Email : support-asia@advaoptical.com"
+
+    DESCRIPTION   "This is a MIB definition for ADVA AG Optical Networking entity management."
+
+    REVISION      "201410150000Z"
+    DESCRIPTION   "FSP3000 F7 Release 13.2.2 MIB."
+
+    REVISION      "201409290000Z"
+    DESCRIPTION   "FSP3000 F7 Release 13.2.1 MIB."
+
+    REVISION      "201312040000Z"
+    DESCRIPTION   "FSP3000 F7 Release 12.2.1 MIB."
+
+    REVISION      "201308200000Z"
+    DESCRIPTION   "FSP3000 F7 Release 12.1.1 MIB."
+
+    REVISION      "201105220000Z"
+    DESCRIPTION   "FSP3000 F7 Release 11.2 MIB."
+    ::= { fspR7 10 }
+
+
+managementDef
+    OBJECT IDENTIFIER ::= { advaFspR7Def 3 }
+
+specificMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 2 }
+
+eqptMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 3 }
+
+facilityMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 4 }
+
+dcnMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 5 }
+
+opticalMuxMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 6 }
+
+shelfConnMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 7 }
+
+envMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 8 }
+
+containerMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 9 }
+
+opticalLineMgmtDef
+    OBJECT IDENTIFIER ::= { managementDef 10 }
+
+performanceDef
+    OBJECT IDENTIFIER ::= { advaFspR7Def 6 }
+
+performanceFacilityDef
+    OBJECT IDENTIFIER ::= { performanceDef 4 }
+
+performanceFacilityThresholdDef
+    OBJECT IDENTIFIER ::= { performanceFacilityDef 1 }
+
+featureSpecificDef
+    OBJECT IDENTIFIER ::= { advaFspR7Def 7 }
+
+fiberMapDef
+    OBJECT IDENTIFIER ::= { featureSpecificDef 1 }
+
+eciDef
+    OBJECT IDENTIFIER ::= { featureSpecificDef 3 }
+
+changeServiceDef
+    OBJECT IDENTIFIER ::= { featureSpecificDef 5 }
+
+protectionDef
+    OBJECT IDENTIFIER ::= { featureSpecificDef 6 }
+
+crossConnectionDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CrossConnectionDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "crossConnectionDefTable"
+    ::=  { specificMgmtDef 6 }
+
+crossConnectionDefEntry OBJECT-TYPE
+    SYNTAX      CrossConnectionDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of crossConnectionDefTable"
+    INDEX       {
+                  entityCrossConnFromShelfNo,
+                  entityCrossConnFromSlotNo,
+                  entityCrossConnFromPortNo,
+                  entityCrossConnFromExtNo,
+                  entityCrossConnFromClassName,
+                  entityCrossConnToShelfNo,
+                  entityCrossConnToSlotNo,
+                  entityCrossConnToPortNo,
+                  entityCrossConnToExtNo,
+                  entityCrossConnToClassName,
+                  entityCrossConnClassName
+                }
+    ::=  { crossConnectionDefTable 1 }
+
+CrossConnectionDefEntry ::=  SEQUENCE
+  { crossConnectionDefRowStatus FspR7RowStatus,
+    crossConnectionDefAdmin FspR7AdminState,
+    crossConnectionDefRedLineState FspR7RedLinedState,
+    crossConnectionDefConn FspR7Conn,
+    crossConnectionDefAlias SnmpAdminString,
+    crossConnectionDefPathNode FspR7PathNode,
+    crossConnectionDefTunnelAid SnmpAdminString,
+    crossConnectionDefType FspR7InterfaceType,
+    crossConnectionDefCrsFunction FspR7FunctionCrs }
+
+crossConnectionDefRowStatus OBJECT-TYPE
+    SYNTAX      FspR7RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default RowStatus."
+    ::=  { crossConnectionDefEntry 1 }
+
+crossConnectionDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default Adminstrative State."
+    ::=  { crossConnectionDefEntry 2 }
+
+crossConnectionDefRedLineState OBJECT-TYPE
+    SYNTAX      FspR7RedLinedState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default Red Lined State."
+    ::=  { crossConnectionDefEntry 3 }
+
+crossConnectionDefConn OBJECT-TYPE
+    SYNTAX      FspR7Conn
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default Direction."
+    ::=  { crossConnectionDefEntry 4 }
+
+crossConnectionDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default Alias."
+    ::=  { crossConnectionDefEntry 5 }
+
+crossConnectionDefPathNode OBJECT-TYPE
+    SYNTAX      FspR7PathNode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default Path Node."
+    ::=  { crossConnectionDefEntry 6 }
+
+crossConnectionDefTunnelAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default Tunnel AID."
+    ::=  { crossConnectionDefEntry 7 }
+
+crossConnectionDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default Type Facility."
+    ::=  { crossConnectionDefEntry 8 }
+
+crossConnectionDefCrsFunction OBJECT-TYPE
+    SYNTAX      FspR7FunctionCrs
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes the Cross Connect Functionality" 
+    ::=  { crossConnectionDefEntry 9 }
+
+crossOpticalLineDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CrossOpticalLineDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "crossOpticalLineDefTable"
+    ::=  { specificMgmtDef 7 }
+
+crossOpticalLineDefEntry OBJECT-TYPE
+    SYNTAX      CrossOpticalLineDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of crossOpticalLineDefTable"
+    INDEX       {
+                  entityCrsOptLineFromIndexNo1,
+                  entityCrsOptLineFromIndexNo2,
+                  entityCrsOptLineFromIndexNo3,
+                  entityCrsOptLineFromIndexNo4,
+                  entityCrsOptLineFromClassName,
+                  entityCrsOptLineToIndexNo1,
+                  entityCrsOptLineToIndexNo2,
+                  entityCrsOptLineToIndexNo3,
+                  entityCrsOptLineToIndexNo4,
+                  entityCrsOptLineToClassName,
+                  entityCrsOptLineClassName
+                }
+    ::=  { crossOpticalLineDefTable 1 }
+
+CrossOpticalLineDefEntry ::=  SEQUENCE
+  { crossOpticalLineDefRowStatus FspR7RowStatus,
+    crossOpticalLineDefRedLineState FspR7RedLinedState,
+    crossOpticalLineDefConn FspR7Conn,
+    crossOpticalLineDefCrsType FspR7TypeCrs,
+    crossOpticalLineDefAlias SnmpAdminString,
+    crossOpticalLineDefTunnelAid SnmpAdminString }
+
+crossOpticalLineDefRowStatus OBJECT-TYPE
+    SYNTAX      FspR7RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Connection Default RowStatus."
+    ::=  { crossOpticalLineDefEntry 1 }
+
+crossOpticalLineDefRedLineState OBJECT-TYPE
+    SYNTAX      FspR7RedLinedState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Optical Line Default Red Lined State."
+    ::=  { crossOpticalLineDefEntry 2 }
+
+crossOpticalLineDefConn OBJECT-TYPE
+    SYNTAX      FspR7Conn
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Optical Line Default Direction."
+    ::=  { crossOpticalLineDefEntry 3 }
+
+crossOpticalLineDefCrsType OBJECT-TYPE
+    SYNTAX      FspR7TypeCrs
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Optical Line Default Type."
+    ::=  { crossOpticalLineDefEntry 4 }
+
+crossOpticalLineDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Optical Line Default Alias."
+    ::=  { crossOpticalLineDefEntry 5 }
+
+crossOpticalLineDefTunnelAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Cross Optical Line Default Tunnel AID."
+    ::=  { crossOpticalLineDefEntry 6 }
+
+endOfCrossOpticalLineDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { specificMgmtDef 8 }
+
+crossDcnDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CrossDcnDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "crossDcnDefTable"
+    ::=  { specificMgmtDef 9 }
+
+crossDcnDefEntry OBJECT-TYPE
+    SYNTAX      CrossDcnDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of crossDcnDefTable"
+    INDEX       {
+                  entityCrossDcnShelfNo,
+                  entityCrossDcnSlotNo,
+                  entityCrossDcnPortNo,
+                  entityCrossDcnExtNo,
+                  entityCrossDcnClassName
+                }
+    ::=  { crossDcnDefTable 1 }
+
+CrossDcnDefEntry ::=  SEQUENCE
+  { crossDcnDefRowStatus RowStatus,
+    crossDcnDefType FspR7TypeConnection,
+    crossDcnDefLink SnmpAdminString,
+    crossDcnDefEcc SnmpAdminString }
+
+crossDcnDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { crossDcnDefEntry 1 }
+
+crossDcnDefType OBJECT-TYPE
+    SYNTAX      FspR7TypeConnection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of Cross-Connect" 
+    ::=  { crossDcnDefEntry 2 }
+
+crossDcnDefLink OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Address Identifier of PPPIP LINK Entity." 
+    ::=  { crossDcnDefEntry 3 }
+
+crossDcnDefEcc OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Address Identifier of ECC Entity." 
+    ::=  { crossDcnDefEntry 4 }
+
+endOfCrossDcnDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { specificMgmtDef 10 }
+
+endOfSpecificMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { specificMgmtDef 10000 }
+
+shelfDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ShelfDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "shelfCapTable"
+    ::=  { eqptMgmtDef 1 }
+
+shelfDefEntry OBJECT-TYPE
+    SYNTAX      ShelfDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of shelfCapTable"
+    INDEX       {
+                  entityEqptShelfNo,
+                  entityEqptSlotNo,
+                  entityEqptPortNo,
+                  entityEqptExtNo,
+                  entityEqptClassName
+                }
+    ::=  { shelfDefTable 1 }
+
+ShelfDefEntry ::=  SEQUENCE
+  { shelfDefRowStatus RowStatus,
+    shelfDefPsuOutputPower FspR7PsuOutputPower,
+    shelfDefType FspR7EquipmentType,
+    shelfDefRack SnmpAdminString,
+    shelfDefSupply FspR7SupplyType,
+    shelfDefBandProvision FspR7OpticalBand,
+    shelfDefAdmin FspR7AdminState,
+    shelfDefRackNumber Unsigned32,
+    shelfDefRackOrder Unsigned32,
+    shelfDefAlias SnmpAdminString,
+    shelfDefSlot Unsigned32 }
+
+shelfDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { shelfDefEntry 1 }
+
+shelfDefPsuOutputPower OBJECT-TYPE
+    SYNTAX      FspR7PsuOutputPower
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum PSU Output Power" 
+    ::=  { shelfDefEntry 2 }
+
+shelfDefType OBJECT-TYPE
+    SYNTAX      FspR7EquipmentType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE of Equipment and the MODE setting determine uniquely the number and allowed TYPE's of the provisionable dependent entities (plugs, interfaces, modules)" 
+    ::=  { shelfDefEntry 3 }
+
+shelfDefRack OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rack Containing Shelf" 
+    ::=  { shelfDefEntry 4 }
+
+shelfDefSupply OBJECT-TYPE
+    SYNTAX      FspR7SupplyType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The kind of power supply - provisioned value" 
+    ::=  { shelfDefEntry 5 }
+
+shelfDefBandProvision OBJECT-TYPE
+    SYNTAX      FspR7OpticalBand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Band Provision. Reference to BAND__INVENTORY." 
+    ::=  { shelfDefEntry 6 }
+
+shelfDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { shelfDefEntry 7 }
+
+shelfDefRackNumber OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of the Rack" 
+    ::=  { shelfDefEntry 8 }
+
+shelfDefRackOrder OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..45)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number place where the Shelf is placed in the rack (buttom up counting)" 
+    ::=  { shelfDefEntry 9 }
+
+shelfDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { shelfDefEntry 10 }
+
+shelfDefSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..20)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Slot Position" 
+    ::=  { shelfDefEntry 11 }
+
+endOfShelfDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { eqptMgmtDef 2 }
+
+fanDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FanDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "fanCapTable"
+    ::=  { eqptMgmtDef 3 }
+
+fanDefEntry OBJECT-TYPE
+    SYNTAX      FanDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of fanCapTable"
+    INDEX       {
+                  entityEqptShelfNo,
+                  entityEqptSlotNo,
+                  entityEqptPortNo,
+                  entityEqptExtNo,
+                  entityEqptClassName
+                }
+    ::=  { fanDefTable 1 }
+
+FanDefEntry ::=  SEQUENCE
+  { fanDefRowStatus RowStatus,
+    fanDefAdmin FspR7AdminState,
+    fanDefType FspR7EquipmentType,
+    fanDefAlias SnmpAdminString,
+    fanDefOutputReset FspR7TifOutputReset }
+
+fanDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { fanDefEntry 1 }
+
+fanDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { fanDefEntry 2 }
+
+fanDefType OBJECT-TYPE
+    SYNTAX      FspR7EquipmentType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE of Equipment and the MODE setting determine uniquely the number and allowed TYPE's of the provisionable dependent entities (plugs, interfaces, modules)" 
+    ::=  { fanDefEntry 3 }
+
+fanDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { fanDefEntry 4 }
+
+fanDefOutputReset OBJECT-TYPE
+    SYNTAX      FspR7TifOutputReset
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Has the same function as the HW switch at the UTM board" 
+    ::=  { fanDefEntry 5 }
+
+endOfFanDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { eqptMgmtDef 4 }
+
+plugDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PlugDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "plugCapTable"
+    ::=  { eqptMgmtDef 5 }
+
+plugDefEntry OBJECT-TYPE
+    SYNTAX      PlugDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of plugCapTable"
+    INDEX       {
+                  entityEqptShelfNo,
+                  entityEqptSlotNo,
+                  entityEqptPortNo,
+                  entityEqptExtNo,
+                  entityEqptClassName
+                }
+    ::=  { plugDefTable 1 }
+
+PlugDefEntry ::=  SEQUENCE
+  { plugDefRowStatus RowStatus,
+    plugDefConnector FspR7ConnectorType,
+    plugDefType FspR7EquipmentType,
+    plugDefReach FspR7OpticalInterfaceReach,
+    plugDefLoopbackAttenuation Unsigned32,
+    plugDefTransmitChannel FspR7ChannelIdentifier,
+    plugDefAlias SnmpAdminString,
+    plugDefLaneGroup FspR7LaneGroupInventory,
+    plugDefMaxDataRate FspR7PlugDataRate,
+    plugDefThirdPartyUsage EnableState,
+    plugDefAdmin FspR7AdminState,
+    plugDefBidirectionalChannel FspR7BidirectionalChannel,
+    plugDefChannelSpacingProvision FspR7ChannelSpacing }
+
+plugDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { plugDefEntry 1 }
+
+plugDefConnector OBJECT-TYPE
+    SYNTAX      FspR7ConnectorType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connector" 
+    ::=  { plugDefEntry 2 }
+
+plugDefType OBJECT-TYPE
+    SYNTAX      FspR7EquipmentType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE of Equipment and the MODE setting determine uniquely the number and allowed TYPE's of the provisionable dependent entities (plugs, interfaces, modules)" 
+    ::=  { plugDefEntry 3 }
+
+plugDefReach OBJECT-TYPE
+    SYNTAX      FspR7OpticalInterfaceReach
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reach" 
+    ::=  { plugDefEntry 4 }
+
+plugDefLoopbackAttenuation OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..300) 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Loop back attenuation used for Optojack SE plugs" 
+    ::=  { plugDefEntry 5 }
+
+plugDefTransmitChannel OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel" 
+    ::=  { plugDefEntry 6 }
+
+plugDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { plugDefEntry 7 }
+
+plugDefLaneGroup OBJECT-TYPE
+    SYNTAX      FspR7LaneGroupInventory
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lane group to provision" 
+    ::=  { plugDefEntry 8 }
+
+plugDefMaxDataRate OBJECT-TYPE
+    SYNTAX      FspR7PlugDataRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rate" 
+    ::=  { plugDefEntry 9 }
+
+plugDefThirdPartyUsage OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Usage of 3rd Party Plugs" 
+    ::=  { plugDefEntry 10 }
+
+plugDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { plugDefEntry 11 }
+
+plugDefBidirectionalChannel OBJECT-TYPE
+    SYNTAX      FspR7BidirectionalChannel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bidirectional Channel Rates from Provisioning" 
+    ::=  { plugDefEntry 12 }
+
+plugDefChannelSpacingProvision OBJECT-TYPE
+    SYNTAX      FspR7ChannelSpacing
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel Space Provision, reference to CHA-SPC__INVENTORY" 
+    ::=  { plugDefEntry 13 }
+
+endOfPlugDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { eqptMgmtDef 6 }
+
+moduleDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ModuleDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "moduleCapTable"
+    ::=  { eqptMgmtDef 7 }
+
+moduleDefEntry OBJECT-TYPE
+    SYNTAX      ModuleDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of moduleCapTable"
+    INDEX       {
+                  entityEqptShelfNo,
+                  entityEqptSlotNo,
+                  entityEqptPortNo,
+                  entityEqptExtNo,
+                  entityEqptClassName
+                }
+    ::=  { moduleDefTable 1 }
+
+ModuleDefEntry ::=  SEQUENCE
+  { moduleDefRowStatus RowStatus,
+    moduleDefPsuOutputPower FspR7PsuOutputPower,
+    moduleDefPower FspR7EdfaOutputPowerRating,
+    moduleDefReach FspR7OpticalInterfaceReach,
+    moduleDefInitEqlz FspR7InitEqualization,
+    moduleDefLanAid SnmpAdminString,
+    moduleDefType FspR7EquipmentType,
+    moduleDefMapping FspR7Mapping,
+    moduleDefGainRange FspR7GainRange,
+    moduleDefSfProvision FspR7SingleFiberLocation,
+    moduleDefCapabilityLevelProvision FspR7CapInventory,
+    moduleDefDCFiberType FspR7DCFiberType,
+    moduleDefChannelsProvision FspR7NumberOfChannelsProv,
+    moduleDefFiberDetect FspR7FiberDetect,
+    moduleDefSupply FspR7SupplyType,
+    moduleDefGroup FspR7OpticalGroup,
+    moduleDefDeploy FspR7DeploymentScenario,
+    moduleDefLagSysPrio Unsigned32,
+    moduleDefTransmitChannel FspR7ChannelIdentifier,
+    moduleDefBand FspR7OpticalBand,
+    moduleDefTrafficDirection FspR7TrafficDirection,
+    moduleDefIpAddr IpAddress,
+    moduleDefDispersionCompensation FspR7DispersionCompensation,
+    moduleDefActivateDetect FspR7YesNo,
+    moduleDefOscUsage FspR7OscUsage,
+    moduleDefAdmin FspR7AdminState,
+    moduleDefScrambling FspR7Scrambling,
+    moduleDefChannelsNumber FspR7NumberOfChannels,
+    moduleDefChannelSpacingProvision FspR7ChannelSpacing,
+    moduleDefMode FspR7TransmissionMode,
+    moduleDefSubBandProvision FspR7OpticalSubBand,
+    moduleDefAlias SnmpAdminString,
+    moduleDefFiberType FspR7OpticalFiberType,
+    moduleDefChannelSpacing FspR7ChannelSpacing,
+    moduleDefOutputReset FspR7TifOutputReset,
+    moduleDefRoadmNumber FspR7RoadmNumber,
+    moduleDefTopology FspR7Topology,
+    moduleDefForceConfig FspR7ForceConfig,
+    moduleDefMuxMethod FspR7MuxMethod,
+    moduleDefNdpCleanup FspR7NdpCleanup,
+    moduleDefRstp FspR7EnableDisable,
+    moduleDefRemoteReset FspR7RlsMan }
+
+moduleDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { moduleDefEntry 1 }
+
+moduleDefPsuOutputPower OBJECT-TYPE
+    SYNTAX      FspR7PsuOutputPower
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum PSU Output Power" 
+    ::=  { moduleDefEntry 2 }
+
+moduleDefPower OBJECT-TYPE
+    SYNTAX      FspR7EdfaOutputPowerRating
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Optical Output Power Rating - Provision" 
+    ::=  { moduleDefEntry 3 }
+
+moduleDefReach OBJECT-TYPE
+    SYNTAX      FspR7OpticalInterfaceReach
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reach" 
+    ::=  { moduleDefEntry 4 }
+
+moduleDefInitEqlz OBJECT-TYPE
+    SYNTAX      FspR7InitEqualization
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Initiate Equalization" 
+    ::=  { moduleDefEntry 5 }
+
+moduleDefLanAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "AID of LAN" 
+    ::=  { moduleDefEntry 6 }
+
+moduleDefType OBJECT-TYPE
+    SYNTAX      FspR7EquipmentType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE of Equipment and the MODE setting determine uniquely the number and allowed TYPE's of the provisionable dependent entities (plugs, interfaces, modules)" 
+    ::=  { moduleDefEntry 7 }
+
+moduleDefMapping OBJECT-TYPE
+    SYNTAX      FspR7Mapping
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of mapping; transparent or framing" 
+    ::=  { moduleDefEntry 8 }
+
+moduleDefGainRange OBJECT-TYPE
+    SYNTAX      FspR7GainRange
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "EDFA gain range to provision" 
+    ::=  { moduleDefEntry 9 }
+
+moduleDefSfProvision OBJECT-TYPE
+    SYNTAX      FspR7SingleFiberLocation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "determines the location (A or B) for Single Fiber applications" 
+    ::=  { moduleDefEntry 10 }
+
+moduleDefCapabilityLevelProvision OBJECT-TYPE
+    SYNTAX      FspR7CapInventory
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Capability level provisioned" 
+    ::=  { moduleDefEntry 11 }
+
+moduleDefDCFiberType OBJECT-TYPE
+    SYNTAX      FspR7DCFiberType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Fibertype" 
+    ::=  { moduleDefEntry 12 }
+
+moduleDefChannelsProvision OBJECT-TYPE
+    SYNTAX      FspR7NumberOfChannelsProv
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of channels supported by an entity" 
+    ::=  { moduleDefEntry 13 }
+
+moduleDefFiberDetect OBJECT-TYPE
+    SYNTAX      FspR7FiberDetect
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fiber Detect" 
+    ::=  { moduleDefEntry 14 }
+
+moduleDefSupply OBJECT-TYPE
+    SYNTAX      FspR7SupplyType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The kind of power supply - provisioned value" 
+    ::=  { moduleDefEntry 15 }
+
+moduleDefGroup OBJECT-TYPE
+    SYNTAX      FspR7OpticalGroup
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Group of 4 DWDM channels or the Group of 4 CWDM channels" 
+    ::=  { moduleDefEntry 16 }
+
+moduleDefDeploy OBJECT-TYPE
+    SYNTAX      FspR7DeploymentScenario
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Describes how the card is applied related to a network scenario" 
+    ::=  { moduleDefEntry 17 }
+
+moduleDefLagSysPrio OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Link Aggregation Group Actor System Priority Part of LAG ID" 
+    ::=  { moduleDefEntry 18 }
+
+moduleDefTransmitChannel OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel" 
+    ::=  { moduleDefEntry 19 }
+
+moduleDefBand OBJECT-TYPE
+    SYNTAX      FspR7OpticalBand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The optical band of the module."
+    ::=  { moduleDefEntry 20 }
+
+moduleDefTrafficDirection OBJECT-TYPE
+    SYNTAX      FspR7TrafficDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Traffic Direction" 
+    ::=  { moduleDefEntry 21 }
+
+moduleDefIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Address assigned to LAN IP Interface" 
+    ::=  { moduleDefEntry 22 }
+
+moduleDefDispersionCompensation OBJECT-TYPE
+    SYNTAX      FspR7DispersionCompensation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Dispersion Compensation Value in km of SSMF fiber" 
+    ::=  { moduleDefEntry 23 }
+
+moduleDefActivateDetect OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Initialize Topology Detection" 
+    ::=  { moduleDefEntry 24 }
+
+moduleDefOscUsage OBJECT-TYPE
+    SYNTAX      FspR7OscUsage
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Select if and how the OSC is to be used on an amplifier" 
+    ::=  { moduleDefEntry 25 }
+
+moduleDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { moduleDefEntry 26 }
+
+moduleDefScrambling OBJECT-TYPE
+    SYNTAX      FspR7Scrambling
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configuration of scrambling functionality for Virtual Facilities" 
+    ::=  { moduleDefEntry 27 }
+
+moduleDefChannelsNumber OBJECT-TYPE
+    SYNTAX      FspR7NumberOfChannels
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of channels supported by an entity" 
+    ::=  { moduleDefEntry 28 }
+
+moduleDefChannelSpacingProvision OBJECT-TYPE
+    SYNTAX      FspR7ChannelSpacing
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel Space Provision, reference to CHA-SPC__INVENTORY" 
+    ::=  { moduleDefEntry 29 }
+
+moduleDefMode OBJECT-TYPE
+    SYNTAX      FspR7TransmissionMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Mode of the module, determine operation or functionality" 
+    ::=  { moduleDefEntry 30 }
+
+moduleDefSubBandProvision OBJECT-TYPE
+    SYNTAX      FspR7OpticalSubBand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Subband - Provision" 
+    ::=  { moduleDefEntry 31 }
+
+moduleDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { moduleDefEntry 32 }
+
+moduleDefFiberType OBJECT-TYPE
+    SYNTAX      FspR7OpticalFiberType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fiber of Optical Interface - Provision, Reference to FIBER__INVENTORY" 
+    ::=  { moduleDefEntry 33 }
+
+moduleDefChannelSpacing OBJECT-TYPE
+    SYNTAX      FspR7ChannelSpacing
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ITU Grid channel spacing" 
+    ::=  { moduleDefEntry 34 }
+
+moduleDefOutputReset OBJECT-TYPE
+    SYNTAX      FspR7TifOutputReset
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Has the same function as the HW switch at the UTM board" 
+    ::=  { moduleDefEntry 35 }
+
+moduleDefRoadmNumber OBJECT-TYPE
+    SYNTAX      FspR7RoadmNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number for ROADM module typically associated with a Network Fiber or Degree" 
+    ::=  { moduleDefEntry 36 }
+
+moduleDefTopology OBJECT-TYPE
+    SYNTAX      FspR7Topology
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows the card topology in the NE" 
+    ::=  { moduleDefEntry 37 }
+
+moduleDefForceConfig OBJECT-TYPE
+    SYNTAX      FspR7ForceConfig
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Force cserver to send down configuration to module" 
+    ::=  { moduleDefEntry 38 }
+
+moduleDefMuxMethod OBJECT-TYPE
+    SYNTAX      FspR7MuxMethod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Selection of mux method" 
+    ::=  { moduleDefEntry 39 }
+
+moduleDefNdpCleanup OBJECT-TYPE
+    SYNTAX      FspR7NdpCleanup
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Cleanup Network Data Path allocation" 
+    ::=  { moduleDefEntry 40 }
+
+moduleDefRstp OBJECT-TYPE
+    SYNTAX      FspR7EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rapid spanning tree protocol" 
+    ::=  { moduleDefEntry 41 }
+
+moduleDefRemoteReset OBJECT-TYPE
+    SYNTAX      FspR7RlsMan
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Remote reset of module. This parameter will be available only on SH9HU and SH1HUPF shelves." 
+    ::=  { moduleDefEntry 42 }
+
+endOfModuleDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { eqptMgmtDef 8 }
+
+endOfEqptMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { eqptMgmtDef 10000 }
+
+physicalPortDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PhysicalPortDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "physicalPortDefTable"
+    ::=  { facilityMgmtDef 1 }
+
+physicalPortDefEntry OBJECT-TYPE
+    SYNTAX      PhysicalPortDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of physicalPortDefTable"
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { physicalPortDefTable 1 }
+
+PhysicalPortDefEntry ::=  SEQUENCE
+  { physicalPortDefRowStatus RowStatus,
+    physicalPortDefType FspR7InterfaceType,
+    physicalPortDefAdmin FspR7AdminState,
+    physicalPortDefAlias SnmpAdminString,
+    physicalPortDefAlsMode FspR7AlsMode,
+    physicalPortDefAutoThresReset FspR7AutoThresReset,
+    physicalPortDefAutonegotiation EnableState,
+    physicalPortDefBehaviour FspR7PortBehaviour,
+    physicalPortDefDispertionConfig FspR7DispersionConfig,
+    physicalPortDefDispersionSetting Integer32,
+    physicalPortDefDispersionMode FspR7DispersionModes,
+    physicalPortDefChannelProv FspR7ChannelIdentifier,
+    physicalPortDefWdmRxChannel FspR7ChannelIdentifier,
+    physicalPortDefCodeGain FspR7CodeGain,
+    physicalPortDefXfpDecisionThres FspR7XfpDecisionThres,
+    physicalPortDefDisparityCorrection EnableState,
+    physicalPortDefEqlzAdmin FspR7EqlzAdminState,
+    physicalPortDefErrorForwarding FspR7ErrorFwdMode,
+    physicalPortDefFecType FspR7FecType,
+    physicalPortDefFarEndCommunication FspR7YesNo,
+    physicalPortDefFlowControl FspR7FlowControlMode,
+    physicalPortDefForceLaserOn FspR7LaserForcedOperation,
+    physicalPortDefInhibitSwitchToProt FspR7YesNo,
+    physicalPortDefInhibitSwitchToWork FspR7YesNo,
+    physicalPortDefLaneChannelSetting FspR7ChannelIdentifier,
+    physicalPortDefLoopConfig LoopConfig,
+    physicalPortDefLaserDelayTimer FspR7LaserDelayTimer,
+    physicalPortDefLaserOffTimer Unsigned32,
+    physicalPortDefLaserOnTimer Unsigned32,
+    physicalPortDefLaserOffDelayFunction EnableState,
+    physicalPortDefAutoPTassignment FspR7ManualAuto,
+    physicalPortDefTributarySlotMethod FspR7ManualAuto,
+    physicalPortDefInitiateEqualization FspR7InitEqualization,
+    physicalPortDefLossAttenuation FspR7LossAttenuation,
+    physicalPortDefOpticalSetPoint Integer32,
+    physicalPortDefDataLayerPmReset FspR7PmReset,
+    physicalPortDefPrbsPmReset FspR7PrbsPmReset,
+    physicalPortDefTestPrbsRcvMode FspR7PRBSTest,
+    physicalPortDefTestPrbsTrmtMode FspR7PRBSTest,
+    physicalPortDefSwitchCommand FspR7APSCommand,
+    physicalPortDefOpuPayloadType FspR7OpuPayloadType,
+    physicalPortDefSigDegThresSonetLine FspR7BERThreshold,
+    physicalPortDefSigDegThresSdhMs Unsigned32,
+    physicalPortDefSigDegThresOtu Integer32,
+    physicalPortDefSigDegThresOdu Integer32,
+    physicalPortDefSigDegThreshold Unsigned32,
+    physicalPortDefSigDegPcslThreshold Unsigned32,
+    physicalPortDefSigDegThresSonetSection FspR7BERThresholdSection,
+    physicalPortDefSigDegThresSdhSection Unsigned32,
+    physicalPortDefSigDegThresOduTcmA Integer32,
+    physicalPortDefSigDegThresOduTcmB Integer32,
+    physicalPortDefSigDegThresOduTcmC Integer32,
+    physicalPortDefSignalDegradePeriod Unsigned32,
+    physicalPortDefSigDegPeriodOdu Unsigned32,
+    physicalPortDefSigDegPeriodOtu Unsigned32,
+    physicalPortDefSigDegPeriodIntegration Unsigned32,
+    physicalPortDefSigDegPeriodSdhSection Unsigned32,
+    physicalPortDefSigDegPeriodOduTcmA Unsigned32,
+    physicalPortDefSigDegPeriodOduTcmB Unsigned32,
+    physicalPortDefSigDegPeriodOduTcmC Unsigned32,
+    physicalPortDefOtnStuffing FspR7Stuff,
+    physicalPortDefTcmALevel OtnTcmLevel,
+    physicalPortDefTcmBLevel OtnTcmLevel,
+    physicalPortDefTcmCLevel OtnTcmLevel,
+    physicalPortDefTerminationLevel OhTerminationLevel,
+    physicalPortDefTimingSource SonetTimingSource,
+    physicalPortDefTimModeOdu TimMode,
+    physicalPortDefTimModeOtu TimMode,
+    physicalPortDefTimModeSonetSection TimMode,
+    physicalPortDefTimModeOduTcmA TimMode,
+    physicalPortDefTimModeOduTcmB TimMode,
+    physicalPortDefTimModeOduTcmC TimMode,
+    physicalPortDefTraceFormSonetSection SonetTraceForm,
+    physicalPortDefTraceExpectedSonetSection OCTET STRING,
+    physicalPortDefTraceTransmitSonetSection OCTET STRING,
+    physicalPortDefTraceExpectedOtu OCTET STRING,
+    physicalPortDefTraceTransmitSapiOtu OCTET STRING,
+    physicalPortDefTraceTransmitDapiOtu OCTET STRING,
+    physicalPortDefTraceTransmitOpspOtu OCTET STRING,
+    physicalPortDefTraceExpectedOdu OCTET STRING,
+    physicalPortDefTraceTransmitSapiOdu OCTET STRING,
+    physicalPortDefTraceTransmitDapiOdu OCTET STRING,
+    physicalPortDefTraceTransmitOpspOdu OCTET STRING,
+    physicalPortDefTraceExpectedOduTcmA OCTET STRING,
+    physicalPortDefTraceTransmitSapiOduTcmA OCTET STRING,
+    physicalPortDefTraceTransmitDapiOduTcmA OCTET STRING,
+    physicalPortDefTraceTransmitOpspOduTcmA OCTET STRING,
+    physicalPortDefTraceExpectedOduTcmB OCTET STRING,
+    physicalPortDefTraceTransmitSapiOduTcmB OCTET STRING,
+    physicalPortDefTraceTransmitDapiOduTcmB OCTET STRING,
+    physicalPortDefTraceTransmitOpspOduTcmB OCTET STRING,
+    physicalPortDefTraceExpectedOduTcmC OCTET STRING,
+    physicalPortDefTraceTransmitSapiOduTcmC OCTET STRING,
+    physicalPortDefTraceTransmitDapiOduTcmC OCTET STRING,
+    physicalPortDefTraceTransmitOpspOduTcmC OCTET STRING,
+    physicalPortDefTurnupConfig FspR7TurnupConfig,
+    physicalPortDefTxOffDelay FspR7EnableDisable,
+    physicalPortDefVoaMode FspR7VoaMode,
+    physicalPortDefVoaSetpoint Unsigned32,
+    physicalPortDefLagPrio Unsigned32,
+    physicalPortDefMaxFrameSize Unsigned32,
+    physicalPortDefPayload OtnPayloadType,
+    physicalPortDefPortMode FspR7PortMode,
+    physicalPortDefPortRole FspR7PortRole,
+    physicalPortDefPriority Unsigned32,
+    physicalPortDefPvid Unsigned32,
+    physicalPortDefStagType FspR7SnmpHexString,
+    physicalPortDefUtag FspR7UntaggedFrames,
+    physicalPortDefVethAid SnmpAdminString,
+    physicalPortDefRedLineState FspR7RedLinedState,
+    physicalPortDefTunnelAid SnmpAdminString,
+    physicalPortDefRateLimit FspR7DisableEnable,
+    physicalPortDefTxOffOnTm FspR7TxOffOnTm,
+    physicalPortDefTxOffTimer Unsigned32,
+    physicalPortDefTxOnTimer Unsigned32 }
+
+physicalPortDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Port Capability RowStatus."
+    ::=  { physicalPortDefEntry 1 }
+
+physicalPortDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Port Capability Facility Type."
+    ::=  { physicalPortDefEntry 2 }
+
+physicalPortDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Port Capability Adminstrative State."
+    ::=  { physicalPortDefEntry 3 }
+
+physicalPortDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { physicalPortDefEntry 4 }
+
+physicalPortDefAlsMode OBJECT-TYPE
+    SYNTAX      FspR7AlsMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Determines the reaction in backward direction in response to a LOS
+         on the same Interface: on a Network Interface connected to the DWDM
+         this is a matter of laser safety" 
+    ::=  { physicalPortDefEntry 5 }
+
+physicalPortDefAutoThresReset OBJECT-TYPE
+    SYNTAX      FspR7AutoThresReset
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Adaptive Threshold Control Reset" 
+    ::=  { physicalPortDefEntry 6 }
+
+physicalPortDefAutonegotiation OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Auto Negotiation for the data rate" 
+    ::=  { physicalPortDefEntry 7 }
+
+physicalPortDefBehaviour OBJECT-TYPE
+    SYNTAX      FspR7PortBehaviour
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Behavior or Port usage based on configuration/usage in the system regardless of faceplate designation" 
+    ::=  { physicalPortDefEntry 8 }
+
+physicalPortDefDispertionConfig OBJECT-TYPE
+    SYNTAX      FspR7DispersionConfig
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chromatic Dispersion Compensation" 
+    ::=  { physicalPortDefEntry 9 }
+
+physicalPortDefDispersionSetting OBJECT-TYPE
+    SYNTAX      Integer32 (-50000..50000) 
+    UNITS       "ps/nm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chromatic Dispersion Compensation setting on module" 
+    ::=  { physicalPortDefEntry 10 }
+
+physicalPortDefDispersionMode OBJECT-TYPE
+    SYNTAX      FspR7DispersionModes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chromatic Dispersion Compensation Mode" 
+    ::=  { physicalPortDefEntry 11 }
+
+physicalPortDefChannelProv OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel" 
+    ::=  { physicalPortDefEntry 12 }
+
+physicalPortDefWdmRxChannel OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configuration of Rx optical channel" 
+    ::=  { physicalPortDefEntry 13 }
+
+physicalPortDefCodeGain OBJECT-TYPE
+    SYNTAX      FspR7CodeGain
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Forward Error Correction Coding gain" 
+    ::=  { physicalPortDefEntry 14 }
+
+physicalPortDefXfpDecisionThres OBJECT-TYPE
+    SYNTAX      FspR7XfpDecisionThres
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "XFP Decision threshold setting" 
+    ::=  { physicalPortDefEntry 15 }
+
+physicalPortDefDisparityCorrection OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disparity correction" 
+    ::=  { physicalPortDefEntry 16 }
+
+physicalPortDefEqlzAdmin OBJECT-TYPE
+    SYNTAX      FspR7EqlzAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Scheduled Equalization Administration" 
+    ::=  { physicalPortDefEntry 17 }
+
+physicalPortDefErrorForwarding OBJECT-TYPE
+    SYNTAX      FspR7ErrorFwdMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Determines the reaction in forward direction in response to a LOS on
+         the interface on the opposite side of the module: may override
+         this behaviour in the interests of laser safety." 
+    ::=  { physicalPortDefEntry 18 }
+
+physicalPortDefFecType OBJECT-TYPE
+    SYNTAX      FspR7FecType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Forward Error Correction (Only relevant where TYPE = OTU#)" 
+    ::=  { physicalPortDefEntry 19 }
+
+physicalPortDefFarEndCommunication OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used for Optojack plugs; Communication to Far End Plug is observed" 
+    ::=  { physicalPortDefEntry 20 }
+
+physicalPortDefFlowControl OBJECT-TYPE
+    SYNTAX      FspR7FlowControlMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Flow Control mechanism" 
+    ::=  { physicalPortDefEntry 21 }
+
+physicalPortDefForceLaserOn OBJECT-TYPE
+    SYNTAX      FspR7LaserForcedOperation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Laser Forced On" 
+    ::=  { physicalPortDefEntry 22 }
+
+physicalPortDefInhibitSwitchToProt OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Inhibit Switch to protection facility. Inhibition blocks an automatic switch
+         to the protection facility. Valid only for the working facility."
+    ::=  { physicalPortDefEntry 23 }
+
+physicalPortDefInhibitSwitchToWork OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Inhibit Switch to working facility. Inhibition blocks an automatic switch to the
+         working facility. Valid only for the protection facility."
+    ::=  { physicalPortDefEntry 24 }
+
+physicalPortDefLaneChannelSetting OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lane Channel Setting" 
+    ::=  { physicalPortDefEntry 25 }
+
+physicalPortDefLoopConfig OBJECT-TYPE
+    SYNTAX      LoopConfig
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The configuration of the loopback function.
+         - noLoop: no loop configuration on the interface.
+         - lineLoop: the incoming signal is looped to the outgoing
+         line on the interface. The incoming signal is sent in the
+         downstream direction and processed as normal.
+         - inwardLoop: the output signal is looped to the incoming line
+         on the interface. The looped signal is transmitted unchanged on
+         the optical output."
+    ::=  { physicalPortDefEntry 26 }
+
+physicalPortDefLaserDelayTimer OBJECT-TYPE
+    SYNTAX      FspR7LaserDelayTimer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Relevant only when ERRFWD=LSROFF. Enables/disables the
+         possibility to delay turning off and on the laser.
+         This applies to the case when turning off the laser
+         is done as an error forwarding mechanism." 
+    ::=  { physicalPortDefEntry 27 }
+
+physicalPortDefLaserOffTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000) 
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Delay before laser is swiched off" 
+    ::=  { physicalPortDefEntry 28 }
+
+physicalPortDefLaserOnTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000) 
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Delay before laser is switched on" 
+    ::=  { physicalPortDefEntry 29 }
+
+physicalPortDefLaserOffDelayFunction OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "A configuration request for the Laser Off Delay function. This function
+         delays turning off the laser as a consequent action to a defect."
+    ::=  { physicalPortDefEntry 30 }
+
+physicalPortDefAutoPTassignment OBJECT-TYPE
+    SYNTAX      FspR7ManualAuto
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Auto assignment of ODU PT" 
+    ::=  { physicalPortDefEntry 31 }
+
+physicalPortDefTributarySlotMethod OBJECT-TYPE
+    SYNTAX      FspR7ManualAuto
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tributary Slot assignment method" 
+    ::=  { physicalPortDefEntry 32 }
+
+physicalPortDefInitiateEqualization OBJECT-TYPE
+    SYNTAX      FspR7InitEqualization
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Initiate Equalization" 
+    ::=  { physicalPortDefEntry 33 }
+
+physicalPortDefLossAttenuation OBJECT-TYPE
+    SYNTAX      FspR7LossAttenuation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "LOS Attenuation Finding in progress" 
+    ::=  { physicalPortDefEntry 34 }
+
+physicalPortDefOpticalSetPoint OBJECT-TYPE
+    SYNTAX      Integer32 (-250..50) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the optical power for power equalization in ROADM or for channel power control in OPCM" 
+    ::=  { physicalPortDefEntry 35 }
+
+physicalPortDefDataLayerPmReset OBJECT-TYPE
+    SYNTAX      FspR7PmReset
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reset data-layer Performance registers" 
+    ::=  { physicalPortDefEntry 36 }
+
+physicalPortDefPrbsPmReset OBJECT-TYPE
+    SYNTAX      FspR7PrbsPmReset
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reset PRBS PM counters" 
+    ::=  { physicalPortDefEntry 37 }
+
+physicalPortDefTestPrbsRcvMode OBJECT-TYPE
+    SYNTAX      FspR7PRBSTest
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PRBS test pattern received" 
+    ::=  { physicalPortDefEntry 38 }
+
+physicalPortDefTestPrbsTrmtMode OBJECT-TYPE
+    SYNTAX      FspR7PRBSTest
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PRBS test pattern transmitted" 
+    ::=  { physicalPortDefEntry 39 }
+
+physicalPortDefSwitchCommand OBJECT-TYPE
+    SYNTAX      FspR7APSCommand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The switch command action for this facility. A command resulting
+         in a switch event will also cause a change of the facility secondary state
+         and a corresponding condition. Addressed by this command is the active port,
+         the port to switch away from. Since this is a manual switch command, it will
+         not switch if other port suffers from a signalfailure or a signal degrade."
+    ::=  { physicalPortDefEntry 40 }
+
+physicalPortDefOpuPayloadType OBJECT-TYPE
+    SYNTAX      FspR7OpuPayloadType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OPU Payload Type Indicator" 
+    ::=  { physicalPortDefEntry 41 }
+
+physicalPortDefSigDegThresSonetLine OBJECT-TYPE
+    SYNTAX      FspR7BERThreshold
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit-Error-Based Degradation Definition for SONET (standard integration period)" 
+    ::=  { physicalPortDefEntry 42 }
+
+physicalPortDefSigDegThresSdhMs OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Block-Error-Based Degradation Definition for SDH (standard integration period).
+         Defined as percentage Background Block Errors (30% default) evaluated
+         over a defined period (SDPER-RS)." 
+    ::=  { physicalPortDefEntry 43 }
+
+physicalPortDefSigDegThresOtu OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for OTU" 
+    ::=  { physicalPortDefEntry 44 }
+
+physicalPortDefSigDegThresOdu OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for ODU" 
+    ::=  { physicalPortDefEntry 45 }
+
+physicalPortDefSigDegThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Threshold for number of errors (CV or CV+DE) in one second" 
+    ::=  { physicalPortDefEntry 46 }
+
+physicalPortDefSigDegPcslThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Block-Error-Based Degradation Definition for Physical Coding Sublayer" 
+    ::=  { physicalPortDefEntry 47 }
+
+physicalPortDefSigDegThresSonetSection OBJECT-TYPE
+    SYNTAX      FspR7BERThresholdSection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit-Error-Based Degradation Definition for SONET (standard integration period)" 
+    ::=  { physicalPortDefEntry 48 }
+
+physicalPortDefSigDegThresSdhSection OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Block-Error-Based Degradation Definition for SDH (standard integration period).
+         Defined as percentage Background Block Errors (30% default) evaluated
+         over a defined period (SDPER-RS)." 
+    ::=  { physicalPortDefEntry 49 }
+
+physicalPortDefSigDegThresOduTcmA OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-A" 
+    ::=  { physicalPortDefEntry 50 }
+
+physicalPortDefSigDegThresOduTcmB OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-B" 
+    ::=  { physicalPortDefEntry 51 }
+
+physicalPortDefSigDegThresOduTcmC OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-C" 
+    ::=  { physicalPortDefEntry 52 }
+
+physicalPortDefSignalDegradePeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The measurement period in seconds used together with
+         the deployProvIfSigDegThresSdhRegSect based on the block error counting method.
+         The valid range is 2..10,
+         The default being 7."
+    ::=  { physicalPortDefEntry 53 }
+
+physicalPortDefSigDegPeriodOdu OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { physicalPortDefEntry 54 }
+
+physicalPortDefSigDegPeriodOtu OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { physicalPortDefEntry 55 }
+
+physicalPortDefSigDegPeriodIntegration OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { physicalPortDefEntry 56 }
+
+physicalPortDefSigDegPeriodSdhSection OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provisionable Signal Degrade Integration Period for SDH" 
+    ::=  { physicalPortDefEntry 57 }
+
+physicalPortDefSigDegPeriodOduTcmA OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { physicalPortDefEntry 58 }
+
+physicalPortDefSigDegPeriodOduTcmB OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period of TCMB Signal Segrade" 
+    ::=  { physicalPortDefEntry 59 }
+
+physicalPortDefSigDegPeriodOduTcmC OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period of TCMC Signal Segrade" 
+    ::=  { physicalPortDefEntry 60 }
+
+physicalPortDefOtnStuffing OBJECT-TYPE
+    SYNTAX      FspR7Stuff
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if bit/byte stuffing is used in the transport signal." 
+    ::=  { physicalPortDefEntry 61 }
+
+physicalPortDefTcmALevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance A" 
+    ::=  { physicalPortDefEntry 62 }
+
+physicalPortDefTcmBLevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance B" 
+    ::=  { physicalPortDefEntry 63 }
+
+physicalPortDefTcmCLevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance C" 
+    ::=  { physicalPortDefEntry 64 }
+
+physicalPortDefTerminationLevel OBJECT-TYPE
+    SYNTAX      OhTerminationLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entity is Addressable by Management [because its supporting entity is defined in the database and therefore its address existsSignal Tremination Level of Intrusive Access to Header Information.
+         Not used in 7.0, monitoring is one layer higher than TERM level,
+         if applicable. All conditions detected on monitoring layer will not
+         be reported (severity degradated to NR)." 
+    ::=  { physicalPortDefEntry 65 }
+
+physicalPortDefTimingSource OBJECT-TYPE
+    SYNTAX      SonetTimingSource
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The timing source for this interface.
+         - internal: used in stand-alone, point-to-point topologies stand-alone (dedicated fiber operation).
+         - loopTiming: e.g. used in point-to-point via SONET network and feeder topologies. The default is
+         internal(1)."
+    ::=  { physicalPortDefEntry 66 }
+
+physicalPortDefTimModeOdu OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-ODU Condition can be configured" 
+    ::=  { physicalPortDefEntry 67 }
+
+physicalPortDefTimModeOtu OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-OTU Condition can be configured" 
+    ::=  { physicalPortDefEntry 68 }
+
+physicalPortDefTimModeSonetSection OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM Sonet Section Condition can be configured" 
+    ::=  { physicalPortDefEntry 69 }
+
+physicalPortDefTimModeOduTcmA OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMA Condition can be configured" 
+    ::=  { physicalPortDefEntry 70 }
+
+physicalPortDefTimModeOduTcmB OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMB Condition can be configured" 
+    ::=  { physicalPortDefEntry 71 }
+
+physicalPortDefTimModeOduTcmC OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMC Condition can be configured" 
+    ::=  { physicalPortDefEntry 72 }
+
+physicalPortDefTraceFormSonetSection OBJECT-TYPE
+    SYNTAX      SonetTraceForm
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Byte-Length of Trace Compared to Expected" 
+    ::=  { physicalPortDefEntry 73 }
+
+physicalPortDefTraceExpectedSonetSection OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..62))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected Sec/RS trace. NULL TRACE implies that no trace comparison is made." 
+    ::=  { physicalPortDefEntry 74 }
+
+physicalPortDefTraceTransmitSonetSection OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..62))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sec/RS Trace to be Transmitted" 
+    ::=  { physicalPortDefEntry 75 }
+
+physicalPortDefTraceExpectedOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the OTU trace (15 character). NULL TRACE implies that no trace comparison is made." 
+    ::=  { physicalPortDefEntry 76 }
+
+physicalPortDefTraceTransmitSapiOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the OTU trace (15 character)" 
+    ::=  { physicalPortDefEntry 77 }
+
+physicalPortDefTraceTransmitDapiOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the OTU trace (15 character)" 
+    ::=  { physicalPortDefEntry 78 }
+
+physicalPortDefTraceTransmitOpspOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the OTU trace (32 character)" 
+    ::=  { physicalPortDefEntry 79 }
+
+physicalPortDefTraceExpectedOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the ODU trace (15 character). NULL TRACE implies that no trace comparison is made." 
+    ::=  { physicalPortDefEntry 80 }
+
+physicalPortDefTraceTransmitSapiOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the ODU trace (15 character)" 
+    ::=  { physicalPortDefEntry 81 }
+
+physicalPortDefTraceTransmitDapiOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the ODU trace (15 character)" 
+    ::=  { physicalPortDefEntry 82 }
+
+physicalPortDefTraceTransmitOpspOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the ODU trace (32 character)" 
+    ::=  { physicalPortDefEntry 83 }
+
+physicalPortDefTraceExpectedOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMA trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { physicalPortDefEntry 84 }
+
+physicalPortDefTraceTransmitSapiOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMA trace (15 character)" 
+    ::=  { physicalPortDefEntry 85 }
+
+physicalPortDefTraceTransmitDapiOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMA trace (15 character)" 
+    ::=  { physicalPortDefEntry 86 }
+
+physicalPortDefTraceTransmitOpspOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMA trace (32 character)" 
+    ::=  { physicalPortDefEntry 87 }
+
+physicalPortDefTraceExpectedOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMB trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { physicalPortDefEntry 88 }
+
+physicalPortDefTraceTransmitSapiOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMB trace (15 character)" 
+    ::=  { physicalPortDefEntry 89 }
+
+physicalPortDefTraceTransmitDapiOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMB trace (15 character)" 
+    ::=  { physicalPortDefEntry 90 }
+
+physicalPortDefTraceTransmitOpspOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMB trace (32 character)" 
+    ::=  { physicalPortDefEntry 91 }
+
+physicalPortDefTraceExpectedOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMC trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { physicalPortDefEntry 92 }
+
+physicalPortDefTraceTransmitSapiOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMC trace (15 character)" 
+    ::=  { physicalPortDefEntry 93 }
+
+physicalPortDefTraceTransmitDapiOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMC trace (15 character)" 
+    ::=  { physicalPortDefEntry 94 }
+
+physicalPortDefTraceTransmitOpspOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMC trace (32 character)" 
+    ::=  { physicalPortDefEntry 95 }
+
+physicalPortDefTurnupConfig OBJECT-TYPE
+    SYNTAX      FspR7TurnupConfig
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Turnup Operation" 
+    ::=  { physicalPortDefEntry 96 }
+
+physicalPortDefTxOffDelay OBJECT-TYPE
+    SYNTAX      FspR7EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable TXOFFHOLD Period for Error Forwarding and LKDO-OFF Consequent Action." 
+    ::=  { physicalPortDefEntry 97 }
+
+physicalPortDefVoaMode OBJECT-TYPE
+    SYNTAX      FspR7VoaMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VOA operating mode" 
+    ::=  { physicalPortDefEntry 98 }
+
+physicalPortDefVoaSetpoint OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300) 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the optical attenuation of VOA" 
+    ::=  { physicalPortDefEntry 99 }
+
+physicalPortDefLagPrio OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Part of ID. Port pri that defines standby." 
+    ::=  { physicalPortDefEntry 100 }
+
+physicalPortDefMaxFrameSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (1518..9600)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max Frame Size" 
+    ::=  { physicalPortDefEntry 101 }
+
+physicalPortDefPayload OBJECT-TYPE
+    SYNTAX      OtnPayloadType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The PAYLOAD defines the transport service type of the payload" 
+    ::=  { physicalPortDefEntry 102 }
+
+physicalPortDefPortMode OBJECT-TYPE
+    SYNTAX      FspR7PortMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Mode" 
+    ::=  { physicalPortDefEntry 103 }
+
+physicalPortDefPortRole OBJECT-TYPE
+    SYNTAX      FspR7PortRole
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ADVA cloud Port Roles" 
+    ::=  { physicalPortDefEntry 104 }
+
+physicalPortDefPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Default PCP in case UTAG is Enabled. The Prio may be remapped in the EVC." 
+    ::=  { physicalPortDefEntry 105 }
+
+physicalPortDefPvid OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Default VLAN ID (both STAG/CTAG mode) in case UTAG is enabled" 
+    ::=  { physicalPortDefEntry 106 }
+
+physicalPortDefStagType OBJECT-TYPE
+    SYNTAX      FspR7SnmpHexString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TAG type field" 
+    ::=  { physicalPortDefEntry 107 }
+
+physicalPortDefUtag OBJECT-TYPE
+    SYNTAX      FspR7UntaggedFrames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If untagged frames shall be enabled on this port or not." 
+    ::=  { physicalPortDefEntry 108 }
+
+physicalPortDefVethAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Shows if PORT is a member in the LAG with the VETH AID" 
+    ::=  { physicalPortDefEntry 109 }
+
+physicalPortDefRedLineState OBJECT-TYPE
+    SYNTAX      FspR7RedLinedState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "will be set by higher level software to act as a barrier to deletion" 
+    ::=  { physicalPortDefEntry 110 }
+
+physicalPortDefTunnelAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel AID" 
+    ::=  { physicalPortDefEntry 111 }
+
+physicalPortDefRateLimit OBJECT-TYPE
+    SYNTAX      FspR7DisableEnable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Selection to apply rate limit feature or not." 
+    ::=  { physicalPortDefEntry 112 }
+
+physicalPortDefTxOffOnTm OBJECT-TYPE
+    SYNTAX      FspR7TxOffOnTm
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Relevant only when ERRFWD=TXOFF. Enables/disables the
+         possibility to delay turning off and on the the transmitter.
+         This applies to the case when turning off the transmitter
+         is done as an error forwarding mechanism." 
+    ::=  { physicalPortDefEntry 113 }
+
+physicalPortDefTxOffTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000) 
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Delay before transmitter is swiched off" 
+    ::=  { physicalPortDefEntry 114 }
+
+physicalPortDefTxOnTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000) 
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Delay before transmitter is switched on" 
+    ::=  { physicalPortDefEntry 115 }
+
+virtualPortDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VirtualPortDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "virtualPortDefTable"
+    ::=  { facilityMgmtDef 2 }
+
+virtualPortDefEntry OBJECT-TYPE
+    SYNTAX      VirtualPortDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of virtualPortDefTable"
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { virtualPortDefTable 1 }
+
+VirtualPortDefEntry ::=  SEQUENCE
+  { virtualPortDefRowStatus RowStatus,
+    virtualPortDefChannelBand FspR7ChannelBandwidth,
+    virtualPortDefType FspR7InterfaceType,
+    virtualPortDefAlias SnmpAdminString,
+    virtualPortDefAdmin FspR7AdminState,
+    virtualPortDefEqlzAdmin FspR7EqlzAdminState,
+    virtualPortDefInitEqlz FspR7InitEqualization,
+    virtualPortDefLacpMode FspR7LacpMode,
+    virtualPortDefLacpTimeout FspR7LacpTimeout,
+    virtualPortDefLagActivePorts Unsigned32,
+    virtualPortDefMaxFrameSize Unsigned32,
+    virtualPortDefPortMode FspR7PortMode,
+    virtualPortDefDataLayerPmReset FspR7PmReset,
+    virtualPortDefPortRole FspR7PortRole,
+    virtualPortDefLagPortType FspR7LagPortType,
+    virtualPortDefPriority Unsigned32,
+    virtualPortDefPvid Unsigned32,
+    virtualPortDefRevertiveMode ApsRevertMode,
+    virtualPortDefStagType FspR7SnmpHexString,
+    virtualPortDefUtag FspR7UntaggedFrames,
+    virtualPortDefBundle FspR7SnmpLongString,
+    virtualPortDefSwitchCommand FspR7APSCommand,
+    virtualPortDefInhibitSwitchToWork FspR7YesNo,
+    virtualPortDefInhibitSwitchToProt FspR7YesNo,
+    virtualPortDefOduTribPortNo SnmpAdminString,
+    virtualPortDefOduTribTimeSlottNo SnmpAdminString,
+    virtualPortDefSigDegThresOdu Integer32,
+    virtualPortDefSigDegPeriodOdu Unsigned32,
+    virtualPortDefTraceExpectedOdu OCTET STRING,
+    virtualPortDefTraceTransmitSapiOdu OCTET STRING,
+    virtualPortDefTraceTransmitDapiOdu OCTET STRING,
+    virtualPortDefTraceTransmitOpspOdu OCTET STRING,
+    virtualPortDefTimModeOdu TimMode,
+    virtualPortDefSigDegThresOduTcmA Integer32,
+    virtualPortDefSigDegPeriodOduTcmA Unsigned32,
+    virtualPortDefSigDegThresOduTcmB Integer32,
+    virtualPortDefSigDegPeriodOduTcmB Unsigned32,
+    virtualPortDefSigDegThresOduTcmC Integer32,
+    virtualPortDefSigDegPeriodOduTcmC Unsigned32,
+    virtualPortDefTcmALevel OtnTcmLevel,
+    virtualPortDefTcmBLevel OtnTcmLevel,
+    virtualPortDefTcmCLevel OtnTcmLevel,
+    virtualPortDefTraceTransmitSapiOduTcmA OCTET STRING,
+    virtualPortDefTraceTransmitDapiOduTcmA OCTET STRING,
+    virtualPortDefTraceTransmitOpspOduTcmA OCTET STRING,
+    virtualPortDefTraceExpectedOduTcmA OCTET STRING,
+    virtualPortDefTimModeOduTcmA TimMode,
+    virtualPortDefTraceExpectedOduTcmB OCTET STRING,
+    virtualPortDefTraceTransmitSapiOduTcmB OCTET STRING,
+    virtualPortDefTraceTransmitDapiOduTcmB OCTET STRING,
+    virtualPortDefTraceTransmitOpspOduTcmB OCTET STRING,
+    virtualPortDefTimModeOduTcmB TimMode,
+    virtualPortDefTraceExpectedOduTcmC OCTET STRING,
+    virtualPortDefTraceTransmitSapiOduTcmC OCTET STRING,
+    virtualPortDefTraceTransmitDapiOduTcmC OCTET STRING,
+    virtualPortDefTraceTransmitOpspOduTcmC OCTET STRING,
+    virtualPortDefTimModeOduTcmC TimMode,
+    virtualPortDefTerminationLevel OhTerminationLevel,
+    virtualPortDefLoopConfig LoopConfig,
+    virtualPortDefVcType VirtualContainerType,
+    virtualPortDefCir Unsigned32,
+    virtualPortDefOpuPayloadType FspR7OpuPayloadType,
+    virtualPortDefOtnStuffing FspR7Stuff,
+    virtualPortDefRedLineState FspR7RedLinedState,
+    virtualPortDefTunnelAid SnmpAdminString }
+
+virtualPortDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Virtual Port Capability RowStatus."
+    ::=  { virtualPortDefEntry 1 }
+
+virtualPortDefChannelBand OBJECT-TYPE
+    SYNTAX      FspR7ChannelBandwidth
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Virtual Port Capability Channel Bandwidth."
+    ::=  { virtualPortDefEntry 2 }
+
+virtualPortDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Virtual Port Capability Facility Type."
+    ::=  { virtualPortDefEntry 3 }
+
+virtualPortDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Virtual Port Capability Alias."
+    ::=  { virtualPortDefEntry 4 }
+
+virtualPortDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Virtual Port Capability Adminstrative State."
+    ::=  { virtualPortDefEntry 5 }
+
+virtualPortDefEqlzAdmin OBJECT-TYPE
+    SYNTAX      FspR7EqlzAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Virtual Port Capability Fiber Connection Attenuation."
+    ::=  { virtualPortDefEntry 6 }
+
+virtualPortDefInitEqlz OBJECT-TYPE
+    SYNTAX      FspR7InitEqualization
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Virtual Port Capability Initiate Equalization."
+    ::=  { virtualPortDefEntry 7 }
+
+virtualPortDefLacpMode OBJECT-TYPE
+    SYNTAX      FspR7LacpMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable of LACP state machine" 
+    ::=  { virtualPortDefEntry 8 }
+
+virtualPortDefLacpTimeout OBJECT-TYPE
+    SYNTAX      FspR7LacpTimeout
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Timeout of the LACP" 
+    ::=  { virtualPortDefEntry 9 }
+
+virtualPortDefLagActivePorts OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..12)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of active ports in the Link Aggregation Group" 
+    ::=  { virtualPortDefEntry 10 }
+
+virtualPortDefMaxFrameSize OBJECT-TYPE
+    SYNTAX      Unsigned32 (1518..9600)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Max Frame Size" 
+    ::=  { virtualPortDefEntry 11 }
+
+virtualPortDefPortMode OBJECT-TYPE
+    SYNTAX      FspR7PortMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Port Mode" 
+    ::=  { virtualPortDefEntry 12 }
+
+virtualPortDefDataLayerPmReset OBJECT-TYPE
+    SYNTAX      FspR7PmReset
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reset data-layer Performance registers" 
+    ::=  { virtualPortDefEntry 13 }
+
+virtualPortDefPortRole OBJECT-TYPE
+    SYNTAX      FspR7PortRole
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ADVA cloud Port Roles" 
+    ::=  { virtualPortDefEntry 14 }
+
+virtualPortDefLagPortType OBJECT-TYPE
+    SYNTAX      FspR7LagPortType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type/Speed of connected ports in the Link Aggregation Group" 
+    ::=  { virtualPortDefEntry 15 }
+
+virtualPortDefPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Default PCP in case UTAG is Enabled. The Prio may be remapped in the EVC." 
+    ::=  { virtualPortDefEntry 16 }
+
+virtualPortDefPvid OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Default VLAN ID (both STAG/CTAG mode) in case UTAG is enabled" 
+    ::=  { virtualPortDefEntry 17 }
+
+virtualPortDefRevertiveMode OBJECT-TYPE
+    SYNTAX      ApsRevertMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Revertive Protection Switching" 
+    ::=  { virtualPortDefEntry 18 }
+
+virtualPortDefStagType OBJECT-TYPE
+    SYNTAX      FspR7SnmpHexString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "TAG type field" 
+    ::=  { virtualPortDefEntry 19 }
+
+virtualPortDefUtag OBJECT-TYPE
+    SYNTAX      FspR7UntaggedFrames
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If untagged frames shall be enabled on this port or not." 
+    ::=  { virtualPortDefEntry 20 }
+
+virtualPortDefBundle OBJECT-TYPE
+    SYNTAX      FspR7SnmpLongString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "List of VC4/VC3/STS1/STS3c/STS24c/STS48c containers used in the BUNDLE" 
+    ::=  { virtualPortDefEntry 21 }
+
+virtualPortDefSwitchCommand OBJECT-TYPE
+    SYNTAX      FspR7APSCommand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The switch command action for this facility. A command resulting
+         in a switch event will also cause a change of the facility secondary state
+         and a corresponding condition. Addressed by this command is the active port,
+         the port to switch away from. Since this is a manual switch command, it will
+         not switch if other port suffers from a signalfailure or a signal degrade."
+    ::=  { virtualPortDefEntry 22 }
+
+virtualPortDefInhibitSwitchToWork OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Inhibit Switch to working facility. Inhibition blocks an automatic switch to the
+         working facility. Valid only for the protection facility."
+    ::=  { virtualPortDefEntry 23 }
+
+virtualPortDefInhibitSwitchToProt OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Inhibit Switch to protection facility. Inhibition blocks an automatic switch
+         to the protection facility. Valid only for the working facility."
+    ::=  { virtualPortDefEntry 24 }
+
+virtualPortDefOduTribPortNo OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ODU Tributary Port Number" 
+    ::=  { virtualPortDefEntry 25 }
+
+virtualPortDefOduTribTimeSlottNo OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "ODU Tributary slot number. Multiple values can be entered as a string, separated by commas or given as a range.
+         For capabilities objects possible number of slots and valid range are displayed in a form:
+         [1,2,3,8][count: 1-1]
+         In first brackets valid slots are shown and in the second possible number of slots."
+    ::=  { virtualPortDefEntry 26 }
+
+virtualPortDefSigDegThresOdu OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for ODU" 
+    ::=  { virtualPortDefEntry 27 }
+
+virtualPortDefSigDegPeriodOdu OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { virtualPortDefEntry 28 }
+
+virtualPortDefTraceExpectedOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the ODU trace (15 character). NULL TRACE implies that no trace comparison is made." 
+    ::=  { virtualPortDefEntry 29 }
+
+virtualPortDefTraceTransmitSapiOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the ODU trace (15 character)" 
+    ::=  { virtualPortDefEntry 30 }
+
+virtualPortDefTraceTransmitDapiOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the ODU trace (15 character)" 
+    ::=  { virtualPortDefEntry 31 }
+
+virtualPortDefTraceTransmitOpspOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the ODU trace (32 character)" 
+    ::=  { virtualPortDefEntry 32 }
+
+virtualPortDefTimModeOdu OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-ODU Condition can be configured" 
+    ::=  { virtualPortDefEntry 33 }
+
+virtualPortDefSigDegThresOduTcmA OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-A" 
+    ::=  { virtualPortDefEntry 34 }
+
+virtualPortDefSigDegPeriodOduTcmA OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { virtualPortDefEntry 35 }
+
+virtualPortDefSigDegThresOduTcmB OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-B" 
+    ::=  { virtualPortDefEntry 36 }
+
+virtualPortDefSigDegPeriodOduTcmB OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period of TCMB Signal Segrade" 
+    ::=  { virtualPortDefEntry 37 }
+
+virtualPortDefSigDegThresOduTcmC OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-C" 
+    ::=  { virtualPortDefEntry 38 }
+
+virtualPortDefSigDegPeriodOduTcmC OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period of TCMC Signal Segrade" 
+    ::=  { virtualPortDefEntry 39 }
+
+virtualPortDefTcmALevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance A" 
+    ::=  { virtualPortDefEntry 40 }
+
+virtualPortDefTcmBLevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance B" 
+    ::=  { virtualPortDefEntry 41 }
+
+virtualPortDefTcmCLevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance C" 
+    ::=  { virtualPortDefEntry 42 }
+
+virtualPortDefTraceTransmitSapiOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMA trace (15 character)" 
+    ::=  { virtualPortDefEntry 43 }
+
+virtualPortDefTraceTransmitDapiOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMA trace (15 character)" 
+    ::=  { virtualPortDefEntry 44 }
+
+virtualPortDefTraceTransmitOpspOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMA trace (32 character)" 
+    ::=  { virtualPortDefEntry 45 }
+
+virtualPortDefTraceExpectedOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMA trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { virtualPortDefEntry 46 }
+
+virtualPortDefTimModeOduTcmA OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMA Condition can be configured" 
+    ::=  { virtualPortDefEntry 47 }
+
+virtualPortDefTraceExpectedOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMB trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { virtualPortDefEntry 48 }
+
+virtualPortDefTraceTransmitSapiOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMB trace (15 character)" 
+    ::=  { virtualPortDefEntry 49 }
+
+virtualPortDefTraceTransmitDapiOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMB trace (15 character)" 
+    ::=  { virtualPortDefEntry 50 }
+
+virtualPortDefTraceTransmitOpspOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMB trace (32 character)" 
+    ::=  { virtualPortDefEntry 51 }
+
+virtualPortDefTimModeOduTcmB OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMB Condition can be configured" 
+    ::=  { virtualPortDefEntry 52 }
+
+virtualPortDefTraceExpectedOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMC trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { virtualPortDefEntry 53 }
+
+virtualPortDefTraceTransmitSapiOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMC trace (15 character)" 
+    ::=  { virtualPortDefEntry 54 }
+
+virtualPortDefTraceTransmitDapiOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMC trace (15 character)" 
+    ::=  { virtualPortDefEntry 55 }
+
+virtualPortDefTraceTransmitOpspOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMC trace (32 character)" 
+    ::=  { virtualPortDefEntry 56 }
+
+virtualPortDefTimModeOduTcmC OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMC Condition can be configured" 
+    ::=  { virtualPortDefEntry 57 }
+
+virtualPortDefTerminationLevel OBJECT-TYPE
+    SYNTAX      OhTerminationLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entity is Addressable by Management [because its supporting entity is defined in the database and therefore its address existsSignal Tremination Level of Intrusive Access to Header Information.
+         Not used in 7.0, monitoring is one layer higher than TERM level,
+         if applicable. All conditions detected on monitoring layer will not
+         be reported (severity degradated to NR)." 
+    ::=  { virtualPortDefEntry 58 }
+
+virtualPortDefLoopConfig OBJECT-TYPE
+    SYNTAX      LoopConfig
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "External or Facility Loopback" 
+    ::=  { virtualPortDefEntry 59 }
+
+virtualPortDefVcType OBJECT-TYPE
+    SYNTAX      VirtualContainerType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Virtual Container Group Type" 
+    ::=  { virtualPortDefEntry 60 }
+
+virtualPortDefCir OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CIR (Committed Information Rate ) is used on Ethernet Interfaces with a policing function" 
+    ::=  { virtualPortDefEntry 61 }
+
+virtualPortDefOpuPayloadType OBJECT-TYPE
+    SYNTAX      FspR7OpuPayloadType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OPU Payload Type Indicator" 
+    ::=  { virtualPortDefEntry 62 }
+
+virtualPortDefOtnStuffing OBJECT-TYPE
+    SYNTAX      FspR7Stuff
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if bit/byte stuffing is used in the transport signal." 
+    ::=  { virtualPortDefEntry 63 }
+
+virtualPortDefRedLineState OBJECT-TYPE
+    SYNTAX      FspR7RedLinedState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "will be set by higher level software to act as a barrier to deletion" 
+    ::=  { virtualPortDefEntry 64 }
+
+virtualPortDefTunnelAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tunnel AID" 
+    ::=  { virtualPortDefEntry 65 }
+
+endOfVirtualPortDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { facilityMgmtDef 3 }
+
+endOfFacilityMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { facilityMgmtDef 10000 }
+
+linkDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LinkDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "linkCapTable"
+    ::=  { dcnMgmtDef 1 }
+
+linkDefEntry OBJECT-TYPE
+    SYNTAX      LinkDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of linkCapTable"
+    INDEX       {
+                  entityDcnShelfNo,
+                  entityDcnSlotNo,
+                  entityDcnPortNo,
+                  entityDcnExtNo,
+                  entityDcnClassName
+                }
+    ::=  { linkDefTable 1 }
+
+LinkDefEntry ::=  SEQUENCE
+  { linkDefRowStatus RowStatus,
+    linkDefType FspR7InterfaceType,
+    linkDefAdmin FspR7AdminState,
+    linkDefAlias SnmpAdminString,
+    linkDefAuthString SnmpAdminString,
+    linkDefProxyArp FspR7NoYes,
+    linkDefOspf FspR7OspfMode,
+    linkDefBaud FspR7Baund,
+    linkDefAuthType FspR7CpAuthType,
+    linkDefIpType FspR7IpType,
+    linkDefMetric Unsigned32,
+    linkDefAreaAid SnmpAdminString,
+    linkDefNearEndIp IpAddress,
+    linkDefBitrate Unsigned32,
+    linkDefIPv6Type FspR7IPv6Type,
+    linkDefNendIPv6 SnmpAdminString }
+
+linkDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { linkDefEntry 1 }
+
+linkDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { linkDefEntry 2 }
+
+linkDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { linkDefEntry 3 }
+
+linkDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { linkDefEntry 4 }
+
+linkDefAuthString OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Authentication Key/String depending on Authentication Type" 
+    ::=  { linkDefEntry 5 }
+
+linkDefProxyArp OBJECT-TYPE
+    SYNTAX      FspR7NoYes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "If enabled then ARP requests for FENDIP (coming in on another interface in the same subnet as FENDIP) will be replied too." 
+    ::=  { linkDefEntry 6 }
+
+linkDefOspf OBJECT-TYPE
+    SYNTAX      FspR7OspfMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Routing (Dynamic)" 
+    ::=  { linkDefEntry 7 }
+
+linkDefBaud OBJECT-TYPE
+    SYNTAX      FspR7Baund
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Baud rate of the serial interface" 
+    ::=  { linkDefEntry 8 }
+
+linkDefAuthType OBJECT-TYPE
+    SYNTAX      FspR7CpAuthType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Authentication Type" 
+    ::=  { linkDefEntry 9 }
+
+linkDefIpType OBJECT-TYPE
+    SYNTAX      FspR7IpType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of IP configuration" 
+    ::=  { linkDefEntry 10 }
+
+linkDefMetric OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Routing Metric" 
+    ::=  { linkDefEntry 11 }
+
+linkDefAreaAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Area AID" 
+    ::=  { linkDefEntry 12 }
+
+linkDefNearEndIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Address assigned to PPP Termination Point on Near-End NE. Defaults to System IP address" 
+    ::=  { linkDefEntry 13 }
+
+linkDefBitrate OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..13702) 
+    UNITS       "kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum provisioned bit rate for PPP/IP Link of transmitter for an ECC" 
+    ::=  { linkDefEntry 14 }
+
+linkDefIPv6Type OBJECT-TYPE
+    SYNTAX      FspR7IPv6Type
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of IPv6 configuration" 
+    ::=  { linkDefEntry 15 }
+
+linkDefNendIPv6 OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Address assigned to PPP Termination Point on Near-End NE." 
+    ::=  { linkDefEntry 16 }
+
+endOfLinkDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { dcnMgmtDef 2 }
+
+scDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ScDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "scCapTable"
+    ::=  { dcnMgmtDef 3 }
+
+scDefEntry OBJECT-TYPE
+    SYNTAX      ScDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of scCapTable"
+    INDEX       {
+                  entityDcnShelfNo,
+                  entityDcnSlotNo,
+                  entityDcnPortNo,
+                  entityDcnExtNo,
+                  entityDcnClassName
+                }
+    ::=  { scDefTable 1 }
+
+ScDefEntry ::=  SEQUENCE
+  { scDefRowStatus RowStatus,
+    scDefType FspR7InterfaceType,
+    scDefAdmin FspR7AdminState,
+    scDefAlias SnmpAdminString,
+    scDefAuthString SnmpAdminString,
+    scDefOspf FspR7OspfMode,
+    scDefAuthType FspR7CpAuthType,
+    scDefIpType FspR7IpType,
+    scDefMetric Unsigned32,
+    scDefAreaAid SnmpAdminString,
+    scDefAlsMode FspR7AlsMode,
+    scDefSigDegThresReceiver Unsigned32,
+    scDefAutonegotiation EnableState,
+    scDefBitrate FspR7Bitrate,
+    scDefDuplex EthDuplexMode,
+    scDefAttGradientTh Unsigned32,
+    scDefIpAddr IpAddress,
+    scDefLanAid SnmpAdminString,
+    scDefIpMask IpAddress,
+    scDefDataLayerPmReset FspR7PmReset,
+    scDefPriority Unsigned32,
+    scDefIPv6 SnmpAdminString,
+    scDefIPv6PrefixLen Unsigned32,
+    scDefIpMode FspR7IpMode,
+    scDefGatewayProxyArp FspR7EnableDisable }
+
+scDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { scDefEntry 1 }
+
+scDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { scDefEntry 2 }
+
+scDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { scDefEntry 3 }
+
+scDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { scDefEntry 4 }
+
+scDefAuthString OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Authentication Key/String depending on Authentication Type" 
+    ::=  { scDefEntry 5 }
+
+scDefOspf OBJECT-TYPE
+    SYNTAX      FspR7OspfMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Routing (Dynamic)" 
+    ::=  { scDefEntry 6 }
+
+scDefAuthType OBJECT-TYPE
+    SYNTAX      FspR7CpAuthType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Authentication Type" 
+    ::=  { scDefEntry 7 }
+
+scDefIpType OBJECT-TYPE
+    SYNTAX      FspR7IpType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of IP configuration" 
+    ::=  { scDefEntry 8 }
+
+scDefMetric OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Routing Metric" 
+    ::=  { scDefEntry 9 }
+
+scDefAreaAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Area AID" 
+    ::=  { scDefEntry 10 }
+
+scDefAlsMode OBJECT-TYPE
+    SYNTAX      FspR7AlsMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Determines the reaction in backward direction in response to a LOS
+         on the same Interface: on a Network Interface connected to the DWDM
+         this is a matter of laser safety" 
+    ::=  { scDefEntry 11 }
+
+scDefSigDegThresReceiver OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Signal Degrade Threshold on Receiver. Reported as ATTRMT-SDHT to far end." 
+    ::=  { scDefEntry 12 }
+
+scDefAutonegotiation OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Auto Negotiation for the data rate" 
+    ::=  { scDefEntry 13 }
+
+scDefBitrate OBJECT-TYPE
+    SYNTAX      FspR7Bitrate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provisioned data rate" 
+    ::=  { scDefEntry 14 }
+
+scDefDuplex OBJECT-TYPE
+    SYNTAX      EthDuplexMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Duplex Mode Provision." 
+    ::=  { scDefEntry 15 }
+
+scDefAttGradientTh OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..30) 
+    UNITS       "0.1 dB/min"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Attenuation Gradient Threshold on Receive Fiber. Applies to both
+         TRMT and RCV directions; but threshold violation is reported for
+         each direction separately by the 'tapping' alarms: INTRUDE-RCV
+         and INTRUDE-TRMT."
+    ::=  { scDefEntry 16 }
+
+scDefIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Address assigned to LAN IP Interface" 
+    ::=  { scDefEntry 17 }
+
+scDefLanAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "AID of LAN" 
+    ::=  { scDefEntry 18 }
+
+scDefIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP MASK assigned to LAN IP Interface" 
+    ::=  { scDefEntry 19 }
+
+scDefDataLayerPmReset OBJECT-TYPE
+    SYNTAX      FspR7PmReset
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reset data-layer Performance registers" 
+    ::=  { scDefEntry 20 }
+
+scDefPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Priority" 
+    ::=  { scDefEntry 21 }
+
+scDefIPv6 OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Address" 
+    ::=  { scDefEntry 22 }
+
+scDefIPv6PrefixLen OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Subnet Prefix Length" 
+    ::=  { scDefEntry 23 }
+
+scDefIpMode OBJECT-TYPE
+    SYNTAX      FspR7IpMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Mode of Operation either IPv4 only or IPv4 and IPv6. When operation supports IPv6, it is used for addresses external to the network." 
+    ::=  { scDefEntry 24 }
+
+scDefGatewayProxyArp OBJECT-TYPE
+    SYNTAX      FspR7EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Gateway works as an ARP proxy" 
+    ::=  { scDefEntry 25 }
+
+endOfScDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { dcnMgmtDef 4 }
+
+lanDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LanDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "lanCapTable"
+    ::=  { dcnMgmtDef 5 }
+
+lanDefEntry OBJECT-TYPE
+    SYNTAX      LanDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of lanCapTable"
+    INDEX       {
+                  entityDcnShelfNo,
+                  entityDcnSlotNo,
+                  entityDcnPortNo,
+                  entityDcnExtNo,
+                  entityDcnClassName
+                }
+    ::=  { lanDefTable 1 }
+
+LanDefEntry ::=  SEQUENCE
+  { lanDefRowStatus RowStatus,
+    lanDefType FspR7InterfaceType,
+    lanDefAdmin FspR7AdminState,
+    lanDefAlias SnmpAdminString,
+    lanDefAuthString SnmpAdminString,
+    lanDefOspf FspR7OspfMode,
+    lanDefAuthType FspR7CpAuthType,
+    lanDefIpType FspR7IpType,
+    lanDefMetric Unsigned32,
+    lanDefAreaAid SnmpAdminString,
+    lanDefIpAddr IpAddress,
+    lanDefIpMask IpAddress,
+    lanDefPriority Unsigned32,
+    lanDefIPv6 SnmpAdminString,
+    lanDefIPv6PrefixLen Unsigned32,
+    lanDefIpMode FspR7IpMode }
+
+lanDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { lanDefEntry 1 }
+
+lanDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { lanDefEntry 2 }
+
+lanDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { lanDefEntry 3 }
+
+lanDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { lanDefEntry 4 }
+
+lanDefAuthString OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Authentication Key/String depending on Authentication Type" 
+    ::=  { lanDefEntry 5 }
+
+lanDefOspf OBJECT-TYPE
+    SYNTAX      FspR7OspfMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Routing (Dynamic)" 
+    ::=  { lanDefEntry 6 }
+
+lanDefAuthType OBJECT-TYPE
+    SYNTAX      FspR7CpAuthType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Authentication Type" 
+    ::=  { lanDefEntry 7 }
+
+lanDefIpType OBJECT-TYPE
+    SYNTAX      FspR7IpType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Type of IP configuration" 
+    ::=  { lanDefEntry 8 }
+
+lanDefMetric OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Routing Metric" 
+    ::=  { lanDefEntry 9 }
+
+lanDefAreaAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSPF Area AID" 
+    ::=  { lanDefEntry 10 }
+
+lanDefIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Address assigned to LAN IP Interface" 
+    ::=  { lanDefEntry 11 }
+
+lanDefIpMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP MASK assigned to LAN IP Interface" 
+    ::=  { lanDefEntry 12 }
+
+lanDefPriority OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Priority" 
+    ::=  { lanDefEntry 13 }
+
+lanDefIPv6 OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Address" 
+    ::=  { lanDefEntry 14 }
+
+lanDefIPv6PrefixLen OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IPv6 Subnet Prefix Length" 
+    ::=  { lanDefEntry 15 }
+
+lanDefIpMode OBJECT-TYPE
+    SYNTAX      FspR7IpMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "IP Mode of Operation either IPv4 only or IPv4 and IPv6. When operation supports IPv6, it is used for addresses external to the network." 
+    ::=  { lanDefEntry 16 }
+
+endOfLanDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { dcnMgmtDef 6 }
+
+eccDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EccDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "eccCapTable (Embedded Communication Channel)"
+    ::=  { dcnMgmtDef 7 }
+
+eccDefEntry OBJECT-TYPE
+    SYNTAX      EccDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of eccCapTable"
+    INDEX       {
+                  entityDcnShelfNo,
+                  entityDcnSlotNo,
+                  entityDcnPortNo,
+                  entityDcnExtNo,
+                  entityDcnClassName
+                }
+    ::=  { eccDefTable 1 }
+
+EccDefEntry ::=  SEQUENCE
+  { eccDefRowStatus RowStatus,
+    eccDefType FspR7InterfaceType,
+    eccDefAdmin FspR7AdminState,
+    eccDefAlias SnmpAdminString,
+    eccDefLanAid SnmpAdminString,
+    eccDefExternalVid Unsigned32 }
+
+eccDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { eccDefEntry 1 }
+
+eccDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { eccDefEntry 2 }
+
+eccDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { eccDefEntry 3 }
+
+eccDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { eccDefEntry 4 }
+
+eccDefLanAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "AID of LAN" 
+    ::=  { eccDefEntry 5 }
+
+eccDefExternalVid OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4095)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "External VID" 
+    ::=  { eccDefEntry 6 }
+
+endOfEccDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { dcnMgmtDef 8 }
+
+endOfDcnMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { dcnMgmtDef 10000 }
+
+opticalMuxDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OpticalMuxDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "opticalCapTable"
+    ::=  { opticalMuxMgmtDef 1 }
+
+opticalMuxDefEntry OBJECT-TYPE
+    SYNTAX      OpticalMuxDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of opticalCapTable"
+    INDEX       {
+                  entityOpticalMuxShelfNo,
+                  entityOpticalMuxSlotNo,
+                  entityOpticalMuxPortNo,
+                  entityOpticalMuxExtNo,
+                  entityOpticalMuxClassName
+                }
+    ::=  { opticalMuxDefTable 1 }
+
+OpticalMuxDefEntry ::=  SEQUENCE
+  { opticalMuxDefRowStatus RowStatus,
+    opticalMuxDefPumpPower Integer32,
+    opticalMuxDefInhibitSwitchToWork FspR7YesNo,
+    opticalMuxDefForceLaserOn FspR7LaserForcedOperation,
+    opticalMuxDefAseTabCreation FspR7AseTabOpr,
+    opticalMuxDefOpticalSetPoint Integer32,
+    opticalMuxDefInitiateEqualization FspR7InitEqualization,
+    opticalMuxDefTilt Integer32,
+    opticalMuxDefOscOpticalSetpoint Integer32,
+    opticalMuxDefOffset Integer32,
+    opticalMuxDefSwitchCommand FspR7APSCommand,
+    opticalMuxDefAlsMode FspR7AlsMode,
+    opticalMuxDefType FspR7InterfaceType,
+    opticalMuxDefAttenuationGradient Unsigned32,
+    opticalMuxDefInhibitSwitchToProt FspR7YesNo,
+    opticalMuxDefVariableGain Unsigned32,
+    opticalMuxDefAdmin FspR7AdminState,
+    opticalMuxDefTimePeriod FspR7OtdrPeriod,
+    opticalMuxDefSigDegThresReceiver Unsigned32,
+    opticalMuxDefAlias SnmpAdminString,
+    opticalMuxDefDataLayerPmReset FspR7PmReset,
+    opticalMuxDefGain FspR7Gain,
+    opticalMuxDefEdfaPwrOut FspR7EdfaOutputPowerRating,
+    opticalMuxDefVoaSetpoint Unsigned32,
+    opticalMuxDefFiberBrand FspR7FiberBrand,
+    opticalMuxDefTiltSet FspR7TiltSet,
+    opticalMuxDefForceFwdAsePilotOn FspR7LaserForcedOperation,
+    opticalMuxDefBandProvision FspR7OpticalBand,
+    opticalMuxDefOffsetHigh Integer32,
+    opticalMuxDefOffsetLow Integer32,
+    opticalMuxDefOptUpdate FspR7OptUpdate }
+
+opticalMuxDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { opticalMuxDefEntry 1 }
+
+opticalMuxDefPumpPower OBJECT-TYPE
+    SYNTAX      Integer32 (115..138) 
+    UNITS       "0.2 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total raman pump power" 
+    ::=  { opticalMuxDefEntry 2 }
+
+opticalMuxDefInhibitSwitchToWork OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inhibit Switch to Working. Inhibition blocks a switchInhibit Switch to Protection facility. Inhibition blocksInhibit Switch to Working. Inhibition blocks a switch
+         switch to the Protection facility (protection path).Inhibit Switch to Protection facility. Inhibition blocks
+         switch to the Protection facility (protection path).
+         to the Working facility (working path).
+         to the Working facility (working path).
+         Applicable only for the Working facility in ACT state.
+         Applicable only for the Working facility in ACT state.
+         Applicable for the Protection facility in ACT state.
+         Applicable for the Protection facility in ACT state." 
+    ::=  { opticalMuxDefEntry 3 }
+
+opticalMuxDefForceLaserOn OBJECT-TYPE
+    SYNTAX      FspR7LaserForcedOperation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Laser Forced On" 
+    ::=  { opticalMuxDefEntry 4 }
+
+opticalMuxDefAseTabCreation OBJECT-TYPE
+    SYNTAX      FspR7AseTabOpr
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ASE Table creation in process" 
+    ::=  { opticalMuxDefEntry 5 }
+
+opticalMuxDefOpticalSetPoint OBJECT-TYPE
+    SYNTAX      Integer32 (-250..50) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the optical power for power equalization in ROADM or for channel power control in OPCM" 
+    ::=  { opticalMuxDefEntry 6 }
+
+opticalMuxDefInitiateEqualization OBJECT-TYPE
+    SYNTAX      FspR7InitEqualization
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Initiate Equalization" 
+    ::=  { opticalMuxDefEntry 7 }
+
+opticalMuxDefTilt OBJECT-TYPE
+    SYNTAX      Integer32 (-50..0) 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Change of optical channel power in dB over the complete transmission band" 
+    ::=  { opticalMuxDefEntry 8 }
+
+opticalMuxDefOscOpticalSetpoint OBJECT-TYPE
+    SYNTAX      Integer32 (-250..50) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the OSC optical power" 
+    ::=  { opticalMuxDefEntry 9 }
+
+opticalMuxDefOffset OBJECT-TYPE
+    SYNTAX      Integer32 (10..30) 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the offset for the mean optical power for power equalization in ROADM" 
+    ::=  { opticalMuxDefEntry 10 }
+
+opticalMuxDefSwitchCommand OBJECT-TYPE
+    SYNTAX      FspR7APSCommand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The switch command action for this facility. A command resulting
+         in a switch event will also cause a change of the facility secondary state
+         and a corresponding condition. Addressed by this command is the active port,
+         the port to switch away from. Since this is a manual switch command, it will
+         not switch if other port suffers from a signalfailure or a signal degrade."
+    ::=  { opticalMuxDefEntry 11 }
+
+opticalMuxDefAlsMode OBJECT-TYPE
+    SYNTAX      FspR7AlsMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Determines the reaction in backward direction in response to a LOS
+         on the same Interface: on a Network Interface connected to the DWDM
+         this is a matter of laser safety" 
+    ::=  { opticalMuxDefEntry 12 }
+
+opticalMuxDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { opticalMuxDefEntry 13 }
+
+opticalMuxDefAttenuationGradient OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..30) 
+    UNITS       "0.1 dB/min"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Attenuation Gradient Threshold on Receive Fiber. Applies to both TRMT and RCV directions; but threshold violation is reported for each direction separately by the 'tapping' alarms: INTRUDE-RCV and INTRUDE-TRMT." 
+    ::=  { opticalMuxDefEntry 14 }
+
+opticalMuxDefInhibitSwitchToProt OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Inhibit Switch to Working. Inhibition blocks a switchInhibit Switch to Protection facility. Inhibition blocksInhibit Switch to Working. Inhibition blocks a switch" 
+    ::=  { opticalMuxDefEntry 15 }
+
+opticalMuxDefVariableGain OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..350) 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Variable Gain of EDFA" 
+    ::=  { opticalMuxDefEntry 16 }
+
+opticalMuxDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { opticalMuxDefEntry 17 }
+
+opticalMuxDefTimePeriod OBJECT-TYPE
+    SYNTAX      FspR7OtdrPeriod
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "NONE - OTDR measurement disabled otherwise the OTDR duration in minutes." 
+    ::=  { opticalMuxDefEntry 18 }
+
+opticalMuxDefSigDegThresReceiver OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Signal Degrade Threshold on Receiver. Reported as ATTRMT-SDHT to far end." 
+    ::=  { opticalMuxDefEntry 19 }
+
+opticalMuxDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { opticalMuxDefEntry 20 }
+
+opticalMuxDefDataLayerPmReset OBJECT-TYPE
+    SYNTAX      FspR7PmReset
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reset data-layer Performance registers" 
+    ::=  { opticalMuxDefEntry 21 }
+
+opticalMuxDefGain OBJECT-TYPE
+    SYNTAX      FspR7Gain
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Gain" 
+    ::=  { opticalMuxDefEntry 22 }
+
+opticalMuxDefEdfaPwrOut OBJECT-TYPE
+    SYNTAX      FspR7EdfaOutputPowerRating
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Optical Output Power Rating - Provision" 
+    ::=  { opticalMuxDefEntry 23 }
+
+opticalMuxDefVoaSetpoint OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300) 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the optical attenuation of VOA" 
+    ::=  { opticalMuxDefEntry 24 }
+
+opticalMuxDefFiberBrand OBJECT-TYPE
+    SYNTAX      FspR7FiberBrand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Brand of fiber present in the fiber plant" 
+    ::=  { opticalMuxDefEntry 25 }
+
+opticalMuxDefTiltSet OBJECT-TYPE
+    SYNTAX      FspR7TiltSet
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tilt setting as discrete values versus a range" 
+    ::=  { opticalMuxDefEntry 26 }
+
+opticalMuxDefForceFwdAsePilotOn OBJECT-TYPE
+    SYNTAX      FspR7LaserForcedOperation
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Force the BWD Raman pilot on to allow building of FWD Raman ASE Table" 
+    ::=  { opticalMuxDefEntry 27 }
+
+opticalMuxDefBandProvision OBJECT-TYPE
+    SYNTAX      FspR7OpticalBand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Band Provision. Reference to BAND__INVENTORY." 
+    ::=  { opticalMuxDefEntry 28 }
+
+opticalMuxDefOffsetHigh OBJECT-TYPE
+    SYNTAX      Integer32 (-250..210) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the high level offset for power equalization in CCM" 
+    ::=  { opticalMuxDefEntry 29 }
+
+opticalMuxDefOffsetLow OBJECT-TYPE
+    SYNTAX      Integer32 (-250..210) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the low level offset for power equalization in CCM" 
+    ::=  { opticalMuxDefEntry 30 }
+
+opticalMuxDefOptUpdate OBJECT-TYPE
+    SYNTAX      FspR7OptUpdate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This parameter is used to operate/trigger OPT PM update; it triggers the entity to update its current OPT PM value, which can be retrieved via GET function." 
+    ::=  { opticalMuxDefEntry 31 }
+
+endOfOpticalMuxDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { opticalMuxMgmtDef 2 }
+
+endOfOpticalMuxMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { opticalMuxMgmtDef 10000 }
+
+shelfConnDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ShelfConnDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "shelfConnCapTable"
+    ::=  { shelfConnMgmtDef 1 }
+
+shelfConnDefEntry OBJECT-TYPE
+    SYNTAX      ShelfConnDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of shelfConnCapTable"
+    INDEX       {
+                  entityShelfConnShelfNo,
+                  entityShelfConnSlotNo,
+                  entityShelfConnPortNo,
+                  entityShelfConnExtNo,
+                  entityShelfConnClassName
+                }
+    ::=  { shelfConnDefTable 1 }
+
+ShelfConnDefEntry ::=  SEQUENCE
+  { shelfConnDefRowStatus RowStatus,
+    shelfConnDefAdmin FspR7AdminState,
+    shelfConnDefAlias SnmpAdminString,
+    shelfConnDefFacilityType FspR7InterfaceType }
+
+shelfConnDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { shelfConnDefEntry 1 }
+
+shelfConnDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { shelfConnDefEntry 2 }
+
+shelfConnDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { shelfConnDefEntry 3 }
+
+shelfConnDefFacilityType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { shelfConnDefEntry 4 }
+
+endOfShelfConnDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { shelfConnMgmtDef 2 }
+
+endOfShelfConnMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { shelfConnMgmtDef 10000 }
+
+envPortDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EnvPortDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "envPortCapTable"
+    ::=  { envMgmtDef 1 }
+
+envPortDefEntry OBJECT-TYPE
+    SYNTAX      EnvPortDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of envPortCapTable"
+    INDEX       {
+                  entityEqptShelfNo,
+                  entityEqptSlotNo,
+                  entityEqptPortNo,
+                  entityEqptExtNo,
+                  entityEqptClassName
+                }
+    ::=  { envPortDefTable 1 }
+
+EnvPortDefEntry ::=  SEQUENCE
+  { envPortDefRowStatus RowStatus,
+    envPortDefTelemetry FspR7TelemetryOutput,
+    envPortDefFacilityType FspR7InterfaceType,
+    envPortDefTifAlarmType SnmpAdminString,
+    envPortDefTifAlarmMessage SnmpAdminString,
+    envPortDefInvertTifInputLogic FspR7InvertTelemetryInputLogic }
+
+envPortDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { envPortDefEntry 1 }
+
+envPortDefTelemetry OBJECT-TYPE
+    SYNTAX      FspR7TelemetryOutput
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Telemetry interface output provision" 
+    ::=  { envPortDefEntry 2 }
+
+envPortDefFacilityType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { envPortDefEntry 3 }
+
+envPortDefTifAlarmType OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Telemetry interface alarm type" 
+    ::=  { envPortDefEntry 4 }
+
+envPortDefTifAlarmMessage OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Telemetry interface alarm message" 
+    ::=  { envPortDefEntry 5 }
+
+envPortDefInvertTifInputLogic OBJECT-TYPE
+    SYNTAX      FspR7InvertTelemetryInputLogic
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Invert telemetry interface input logic" 
+    ::=  { envPortDefEntry 6 }
+
+endOfEnvPortDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { envMgmtDef 2 }
+
+endOfEnvMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { envMgmtDef 10000 }
+
+containerDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ContainerDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "containerCapTable"
+    ::=  { containerMgmtDef 1 }
+
+containerDefEntry OBJECT-TYPE
+    SYNTAX      ContainerDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of containerCapTable"
+    INDEX       {
+                  entityContainerShelfNo,
+                  entityContainerSlotNo,
+                  entityContainerPortNo,
+                  entityContainerExtNo,
+                  entityContainerClassName
+                }
+    ::=  { containerDefTable 1 }
+
+ContainerDefEntry ::=  SEQUENCE
+  { containerDefRowStatus RowStatus,
+    containerDefFacilityType FspR7InterfaceType }
+
+containerDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { containerDefEntry 1 }
+
+containerDefFacilityType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { containerDefEntry 2 }
+
+endOfContainerDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { containerMgmtDef 2 }
+
+endOfContainerMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { containerMgmtDef 10000 }
+
+opticalLineDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OpticalLineDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "opticalLineCapTable"
+    ::=  { opticalLineMgmtDef 1 }
+
+opticalLineDefEntry OBJECT-TYPE
+    SYNTAX      OpticalLineDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of opticalLineCapTable"
+    INDEX       {
+                  entityOptLineIndexNo1,
+                  entityOptLineIndexNo1,
+                  entityOptLineIndexNo1,
+                  entityOptLineIndexNo1,
+                  entityOptLineClassName
+                }
+    ::=  { opticalLineDefTable 1 }
+
+OpticalLineDefEntry ::=  SEQUENCE
+  { opticalLineDefRowStatus RowStatus,
+    opticalLineDefTxLineAttenuation Integer32,
+    opticalLineDefRxLineAttenuation Integer32,
+    opticalLineDefAlias SnmpAdminString,
+    opticalLineDefFarEndLocation SnmpAdminString }
+
+opticalLineDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { opticalLineDefEntry 1 }
+
+opticalLineDefTxLineAttenuation OBJECT-TYPE
+    SYNTAX      Integer32 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The Attenuation (in 0.1 dB) on line connected to
+         transmitter of this interface. If there is loss of signal
+         then line attenuation is -65535. The value -255 will be
+         returned if the value isn't available."
+    ::=  { opticalLineDefEntry 2 }
+
+opticalLineDefRxLineAttenuation OBJECT-TYPE
+    SYNTAX      Integer32 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The Attenuation (in 0.1 dB) on line connected to receiver
+         of this interface. If there is loss of signal then ine
+         attenuation is -65535. The value -255 will be returned if
+         the value isn't available."
+    ::=  { opticalLineDefEntry 3 }
+
+opticalLineDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { opticalLineDefEntry 4 }
+
+opticalLineDefFarEndLocation OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FEND Location" 
+    ::=  { opticalLineDefEntry 5 }
+
+endOfOpticalLineDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { opticalLineMgmtDef 2 }
+
+endOfOpticalLineMgmtDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { opticalLineMgmtDef 10000 }
+
+optThresholdConfigDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OptThresholdConfigDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "optThresholdConfigCapTable"
+    ::=  { performanceFacilityThresholdDef 1 }
+
+optThresholdConfigDefEntry OBJECT-TYPE
+    SYNTAX      OptThresholdConfigDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of optThresholdConfigCapTable"
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { optThresholdConfigDefTable 1 }
+
+OptThresholdConfigDefEntry ::=  SEQUENCE
+  { optThresholdConfigDefLowConfig Integer32,
+    optThresholdConfigDefHighConfig Integer32 }
+
+optThresholdConfigDefLowConfig OBJECT-TYPE
+    SYNTAX      Integer32 (-500..300) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configurable threshold of the Optical Power Transmitted (output)" 
+    ::=  { optThresholdConfigDefEntry 1 }
+
+optThresholdConfigDefHighConfig OBJECT-TYPE
+    SYNTAX      Integer32 (-500..300) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configurable high threshold of the Optical Power Transmitted (output)" 
+    ::=  { optThresholdConfigDefEntry 2 }
+
+oprThresholdConfigDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF OprThresholdConfigDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "oprThresholdConfigCapTable"
+    ::=  { performanceFacilityThresholdDef 2 }
+
+oprThresholdConfigDefEntry OBJECT-TYPE
+    SYNTAX      OprThresholdConfigDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of oprThresholdConfigCapTable"
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { oprThresholdConfigDefTable 1 }
+
+OprThresholdConfigDefEntry ::=  SEQUENCE
+  { oprThresholdConfigDefLowConfig Integer32,
+    oprThresholdConfigDefHighConfig Integer32 }
+
+oprThresholdConfigDefLowConfig OBJECT-TYPE
+    SYNTAX      Integer32 (-450..260) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Optical Input Power Received" 
+    ::=  { oprThresholdConfigDefEntry 1 }
+
+oprThresholdConfigDefHighConfig OBJECT-TYPE
+    SYNTAX      Integer32 (-450..260) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Optical Input Power Received" 
+    ::=  { oprThresholdConfigDefEntry 2 }
+
+endOfOprThresholdConfigDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { performanceFacilityThresholdDef 3 }
+
+endOfPerformanceFacilityThresholdDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { performanceFacilityThresholdDef 10000 }
+
+terminationPointDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TerminationPointDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "terminationPointCapTable"
+    ::=  { fiberMapDef 1 }
+
+terminationPointDefEntry OBJECT-TYPE
+    SYNTAX      TerminationPointDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of terminationPointCapTable"
+    INDEX       {
+                  entityTerminPointIndexNo1,
+                  entityTerminPointIndexNo2,
+                  entityTerminPointIndexNo3,
+                  entityTerminPointIndexNo4,
+                  entityTerminPointClassName
+                }
+    ::=  { terminationPointDefTable 1 }
+
+TerminationPointDefEntry ::=  SEQUENCE
+  { terminationPointDefRowStatus RowStatus,
+    terminationPointDefAdmin FspR7AdminState,
+    terminationPointDefFiberDetect FspR7FiberDetect,
+    terminationPointDefAlias SnmpAdminString }
+
+terminationPointDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Termination Point Capability RowStatus."
+    ::=  { terminationPointDefEntry 1 }
+
+terminationPointDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Termination Point Capability Adminstrative State."
+    ::=  { terminationPointDefEntry 2 }
+
+terminationPointDefFiberDetect OBJECT-TYPE
+    SYNTAX      FspR7FiberDetect
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Termination Point Capability Fiber Detect."
+    ::=  { terminationPointDefEntry 3 }
+
+terminationPointDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Termination Point Capabillity Alias."
+    ::=  { terminationPointDefEntry 4 }
+
+connectionDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ConnectionDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "connectionCapTable"
+    ::=  { fiberMapDef 2 }
+
+connectionDefEntry OBJECT-TYPE
+    SYNTAX      ConnectionDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of connectionCapTable"
+    INDEX       {
+                  entityTerminPointIndexNo1,
+                  entityTerminPointIndexNo2,
+                  entityTerminPointIndexNo3,
+                  entityTerminPointIndexNo4,
+                  entityTerminPointClassName,
+                  entityTerminPointIndexNo1,
+                  entityTerminPointIndexNo2,
+                  entityTerminPointIndexNo3,
+                  entityTerminPointIndexNo4,
+                  entityTerminPointClassName,
+                  entityConnectionClassName
+                }
+    ::=  { connectionDefTable 1 }
+
+ConnectionDefEntry ::=  SEQUENCE
+  { connectionDefRowStatus FspR7RowStatus,
+    connectionDefType FspR7TypeConnection }
+
+connectionDefRowStatus OBJECT-TYPE
+    SYNTAX      FspR7RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Connection Default RowStatus."
+    ::=  { connectionDefEntry 1 }
+
+connectionDefType OBJECT-TYPE
+    SYNTAX      FspR7TypeConnection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Connection Default Type."
+    ::=  { connectionDefEntry 2 }
+
+endOfConnectionDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { fiberMapDef 3 }
+
+endOfFiberMapDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { fiberMapDef 10000 }
+
+externalPortDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ExternalPortDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "externalPortDef"
+    ::=  { eciDef 1 }
+
+externalPortDefEntry OBJECT-TYPE
+    SYNTAX      ExternalPortDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of externalPortDef"
+    INDEX       {
+                  entityExternalPortShelfNo,
+                  entityExternalPortSlotNo,
+                  entityExternalPortPortNo,
+                  entityExternalPortExtNo,
+                  entityExternalPortClassName
+                }
+    ::=  { externalPortDefTable 1 }
+
+ExternalPortDefEntry ::=  SEQUENCE
+  { externalPortDefRowStatus FspR7RowStatus,
+    externalPortDefType FspR7InterfaceType,
+    externalPortDefTransmitChannel FspR7ChannelIdentifier,
+    externalPortDefChannelBandwith FspR7ChannelBandwidth,
+    externalPortDefAlias SnmpAdminString,
+    externalPortDefFarEndLocation SnmpAdminString,
+    externalPortDefBitrate Unsigned32,
+    externalPortDefFecType FspR7FecType,
+    externalPortDefLineCoding FspR7LineCoding,
+    externalPortDefFrameFormat FspR7FrameFormat,
+    externalPortDefOpticalPowerTx Integer32,
+    externalPortDefOsnrTransmit Unsigned32,
+    externalPortDefPmdTransmit Unsigned32,
+    externalPortDefChromDisperTx Integer32,
+    externalPortDefMinOsnrRcv Unsigned32,
+    externalPortDefMinOptPowerRcv Integer32,
+    externalPortDefMaxOptPowerRcv Integer32,
+    externalPortDefMaxPmdRcv Unsigned32,
+    externalPortDefMinChromDisperRcv Integer32,
+    externalPortDefMaxChromDisperRcv Integer32,
+    externalPortDefMaxBitErrorRate FspR7MaxBitErrorRate,
+    externalPortDefSourceProfile SnmpAdminString }
+
+externalPortDefRowStatus OBJECT-TYPE
+    SYNTAX      FspR7RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Physical Connection Default RowStatus."
+    ::=  { externalPortDefEntry 1 }
+
+externalPortDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 2 }
+
+externalPortDefTransmitChannel OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 3 }
+
+externalPortDefChannelBandwith OBJECT-TYPE
+    SYNTAX      FspR7ChannelBandwidth
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 4 }
+
+externalPortDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 5 }
+
+externalPortDefFarEndLocation OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 6 }
+
+externalPortDefBitrate OBJECT-TYPE
+    SYNTAX      Unsigned32 
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 7 }
+
+externalPortDefFecType OBJECT-TYPE
+    SYNTAX      FspR7FecType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 8 }
+
+externalPortDefLineCoding OBJECT-TYPE
+    SYNTAX      FspR7LineCoding
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 9 }
+
+externalPortDefFrameFormat OBJECT-TYPE
+    SYNTAX      FspR7FrameFormat
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 10 }
+
+externalPortDefOpticalPowerTx OBJECT-TYPE
+    SYNTAX      Integer32 (-9900..600) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 11 }
+
+externalPortDefOsnrTransmit OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..58) 
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 12 }
+
+externalPortDefPmdTransmit OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..30) 
+    UNITS       "ps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 13 }
+
+externalPortDefChromDisperTx OBJECT-TYPE
+    SYNTAX      Integer32 (-60000..60000) 
+    UNITS       "ps/nm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 14 }
+
+externalPortDefMinOsnrRcv OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..58) 
+    UNITS       "dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 15 }
+
+externalPortDefMinOptPowerRcv OBJECT-TYPE
+    SYNTAX      Integer32 (-2500..0) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 16 }
+
+externalPortDefMaxOptPowerRcv OBJECT-TYPE
+    SYNTAX      Integer32 (-1000..1000) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 17 }
+
+externalPortDefMaxPmdRcv OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..30) 
+    UNITS       "ps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 18 }
+
+externalPortDefMinChromDisperRcv OBJECT-TYPE
+    SYNTAX      Integer32 (-60000..60000) 
+    UNITS       "ps/nm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 19 }
+
+externalPortDefMaxChromDisperRcv OBJECT-TYPE
+    SYNTAX      Integer32 (-60000..60000) 
+    UNITS       "ps/nm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 20 }
+
+externalPortDefMaxBitErrorRate OBJECT-TYPE
+    SYNTAX      FspR7MaxBitErrorRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 21 }
+
+externalPortDefSourceProfile OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "."
+    ::=  { externalPortDefEntry 22 }
+
+endOfExternalPortDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { eciDef 2 }
+
+endOfEciDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { eciDef 10000 }
+
+changePhysicalPortServiceDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ChangePhysicalPortServiceDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   ""
+    ::=  { changeServiceDef 1 }
+
+changePhysicalPortServiceDefEntry OBJECT-TYPE
+    SYNTAX      ChangePhysicalPortServiceDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   ""
+    INDEX       {
+                  entityFacilityShelfNo,
+                  entityFacilitySlotNo,
+                  entityFacilityPortNo,
+                  entityFacilityExtNo,
+                  entityFacilityClassName
+                }
+    ::=  { changePhysicalPortServiceDefTable 1 }
+
+ChangePhysicalPortServiceDefEntry ::=  SEQUENCE
+  { changePhysicalPortServiceDefRowStatus RowStatus,
+    changePhysicalPortServiceDefType FspR7InterfaceType,
+    changePhysicalPortServiceDefAdmin FspR7AdminState,
+    changePhysicalPortServiceDefAlias SnmpAdminString,
+    changePhysicalPortServiceDefAlsMode FspR7AlsMode,
+    changePhysicalPortServiceDefBehaviour FspR7PortBehaviour,
+    changePhysicalPortServiceDefDispersionSetting Integer32,
+    changePhysicalPortServiceDefDispersionMode FspR7DispersionModes,
+    changePhysicalPortServiceDefChannelProv FspR7ChannelIdentifier,
+    changePhysicalPortServiceDefWdmRxChannel FspR7ChannelIdentifier,
+    changePhysicalPortServiceDefCodeGain FspR7CodeGain,
+    changePhysicalPortServiceDefXfpDecisionThres FspR7XfpDecisionThres,
+    changePhysicalPortServiceDefDisparityCorrection EnableState,
+    changePhysicalPortServiceDefEqlzAdmin FspR7EqlzAdminState,
+    changePhysicalPortServiceDefErrorForwarding FspR7ErrorFwdMode,
+    changePhysicalPortServiceDefFecType FspR7FecType,
+    changePhysicalPortServiceDefFarEndCommunication FspR7YesNo,
+    changePhysicalPortServiceDefFlowControl FspR7FlowControlMode,
+    changePhysicalPortServiceDefLaneChannelSetting FspR7ChannelIdentifier,
+    changePhysicalPortServiceDefLaserDelayTimer FspR7LaserDelayTimer,
+    changePhysicalPortServiceDefLaserOffTimer Unsigned32,
+    changePhysicalPortServiceDefLaserOnTimer Unsigned32,
+    changePhysicalPortServiceDefLaserOffDelayFunction EnableState,
+    changePhysicalPortServiceDefAutoPTassignment FspR7ManualAuto,
+    changePhysicalPortServiceDefTributarySlotMethod FspR7ManualAuto,
+    changePhysicalPortServiceDefOpticalSetPoint Integer32,
+    changePhysicalPortServiceDefOpuPayloadType FspR7OpuPayloadType,
+    changePhysicalPortServiceDefSigDegThresSonetLine FspR7BERThreshold,
+    changePhysicalPortServiceDefSigDegThresSdhMs Unsigned32,
+    changePhysicalPortServiceDefSigDegThresOtu Integer32,
+    changePhysicalPortServiceDefSigDegThresOdu Integer32,
+    changePhysicalPortServiceDefSigDegThreshold Unsigned32,
+    changePhysicalPortServiceDefSigDegPcslThreshold Unsigned32,
+    changePhysicalPortServiceDefSigDegThresSonetSection FspR7BERThresholdSection,
+    changePhysicalPortServiceDefSigDegThresSdhSection Unsigned32,
+    changePhysicalPortServiceDefSigDegThresOduTcmA Integer32,
+    changePhysicalPortServiceDefSigDegThresOduTcmB Integer32,
+    changePhysicalPortServiceDefSigDegThresOduTcmC Integer32,
+    changePhysicalPortServiceDefSignalDegradePeriod Unsigned32,
+    changePhysicalPortServiceDefSigDegPeriodOdu Unsigned32,
+    changePhysicalPortServiceDefSigDegPeriodOtu Unsigned32,
+    changePhysicalPortServiceDefSigDegPeriodIntegration Unsigned32,
+    changePhysicalPortServiceDefSigDegPeriodSdhSection Unsigned32,
+    changePhysicalPortServiceDefSigDegPeriodOduTcmA Unsigned32,
+    changePhysicalPortServiceDefSigDegPeriodOduTcmB Unsigned32,
+    changePhysicalPortServiceDefSigDegPeriodOduTcmC Unsigned32,
+    changePhysicalPortServiceDefOtnStuffing FspR7Stuff,
+    changePhysicalPortServiceDefTcmALevel OtnTcmLevel,
+    changePhysicalPortServiceDefTcmBLevel OtnTcmLevel,
+    changePhysicalPortServiceDefTcmCLevel OtnTcmLevel,
+    changePhysicalPortServiceDefTerminationLevel OhTerminationLevel,
+    changePhysicalPortServiceDefTimingSource SonetTimingSource,
+    changePhysicalPortServiceDefTimModeOdu TimMode,
+    changePhysicalPortServiceDefTimModeOtu TimMode,
+    changePhysicalPortServiceDefTimModeSonetSection TimMode,
+    changePhysicalPortServiceDefTimModeOduTcmA TimMode,
+    changePhysicalPortServiceDefTimModeOduTcmB TimMode,
+    changePhysicalPortServiceDefTimModeOduTcmC TimMode,
+    changePhysicalPortServiceDefTraceFormSonetSection SonetTraceForm,
+    changePhysicalPortServiceDefTraceExpectedSonetSection OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitSonetSection OCTET STRING,
+    changePhysicalPortServiceDefTraceExpectedOtu OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitSapiOtu OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitDapiOtu OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitOpspOtu OCTET STRING,
+    changePhysicalPortServiceDefTraceExpectedOdu OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitSapiOdu OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitDapiOdu OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitOpspOdu OCTET STRING,
+    changePhysicalPortServiceDefTraceExpectedOduTcmA OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitSapiOduTcmA OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitDapiOduTcmA OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitOpspOduTcmA OCTET STRING,
+    changePhysicalPortServiceDefTraceExpectedOduTcmB OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitSapiOduTcmB OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitDapiOduTcmB OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitOpspOduTcmB OCTET STRING,
+    changePhysicalPortServiceDefTraceExpectedOduTcmC OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitSapiOduTcmC OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitDapiOduTcmC OCTET STRING,
+    changePhysicalPortServiceDefTraceTransmitOpspOduTcmC OCTET STRING,
+    changePhysicalPortServiceDefTxOffDelay FspR7EnableDisable,
+    changePhysicalPortServiceDefVoaMode FspR7VoaMode,
+    changePhysicalPortServiceDefVoaSetpoint Unsigned32 }
+
+changePhysicalPortServiceDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus object is used to create or delete a row in the table."
+    ::=  { changePhysicalPortServiceDefEntry 1 }
+
+changePhysicalPortServiceDefType OBJECT-TYPE
+    SYNTAX      FspR7InterfaceType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TYPE defines the transport service type as wrapper with wrapper layer termination OR else as payload" 
+    ::=  { changePhysicalPortServiceDefEntry 2 }
+
+changePhysicalPortServiceDefAdmin OBJECT-TYPE
+    SYNTAX      FspR7AdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Administrative State will be displayed in the GUI with full
+         name values; it will be differently displayed in TL1 syntax according
+         to TL1 display rules. The transaction into the UAS state requires
+         a special destroy/delete function" 
+    ::=  { changePhysicalPortServiceDefEntry 3 }
+
+changePhysicalPortServiceDefAlias OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "User Applied Descriptor" 
+    ::=  { changePhysicalPortServiceDefEntry 4 }
+
+changePhysicalPortServiceDefAlsMode OBJECT-TYPE
+    SYNTAX      FspR7AlsMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Determines the reaction in backward direction in response to a LOS
+         on the same Interface: on a Network Interface connected to the DWDM
+         this is a matter of laser safety" 
+    ::=  { changePhysicalPortServiceDefEntry 5 }
+
+changePhysicalPortServiceDefBehaviour OBJECT-TYPE
+    SYNTAX      FspR7PortBehaviour
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Behavior or Port usage based on configuration/usage in the system regardless of faceplate designation" 
+    ::=  { changePhysicalPortServiceDefEntry 6 }
+
+changePhysicalPortServiceDefDispersionSetting OBJECT-TYPE
+    SYNTAX      Integer32 (-50000..50000) 
+    UNITS       "ps/nm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chromatic Dispersion Compensation setting on module" 
+    ::=  { changePhysicalPortServiceDefEntry 7 }
+
+changePhysicalPortServiceDefDispersionMode OBJECT-TYPE
+    SYNTAX      FspR7DispersionModes
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Chromatic Dispersion Compensation Mode" 
+    ::=  { changePhysicalPortServiceDefEntry 8 }
+
+changePhysicalPortServiceDefChannelProv OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Channel" 
+    ::=  { changePhysicalPortServiceDefEntry 9 }
+
+changePhysicalPortServiceDefWdmRxChannel OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Configuration of Rx optical channel" 
+    ::=  { changePhysicalPortServiceDefEntry 10 }
+
+changePhysicalPortServiceDefCodeGain OBJECT-TYPE
+    SYNTAX      FspR7CodeGain
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Forward Error Correction Coding gain" 
+    ::=  { changePhysicalPortServiceDefEntry 11 }
+
+changePhysicalPortServiceDefXfpDecisionThres OBJECT-TYPE
+    SYNTAX      FspR7XfpDecisionThres
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "XFP Decision threshold setting" 
+    ::=  { changePhysicalPortServiceDefEntry 12 }
+
+changePhysicalPortServiceDefDisparityCorrection OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Disparity correction" 
+    ::=  { changePhysicalPortServiceDefEntry 13 }
+
+changePhysicalPortServiceDefEqlzAdmin OBJECT-TYPE
+    SYNTAX      FspR7EqlzAdminState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Scheduled Equalization Administration" 
+    ::=  { changePhysicalPortServiceDefEntry 14 }
+
+changePhysicalPortServiceDefErrorForwarding OBJECT-TYPE
+    SYNTAX      FspR7ErrorFwdMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Determines the reaction in forward direction in response to a LOS on
+         the interface on the opposite side of the module: may override
+         this behaviour in the interests of laser safety." 
+    ::=  { changePhysicalPortServiceDefEntry 15 }
+
+changePhysicalPortServiceDefFecType OBJECT-TYPE
+    SYNTAX      FspR7FecType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Forward Error Correction (Only relevant where TYPE = OTU#)" 
+    ::=  { changePhysicalPortServiceDefEntry 16 }
+
+changePhysicalPortServiceDefFarEndCommunication OBJECT-TYPE
+    SYNTAX      FspR7YesNo
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Used for Optojack plugs; Communication to Far End Plug is observed" 
+    ::=  { changePhysicalPortServiceDefEntry 17 }
+
+changePhysicalPortServiceDefFlowControl OBJECT-TYPE
+    SYNTAX      FspR7FlowControlMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Flow Control mechanism" 
+    ::=  { changePhysicalPortServiceDefEntry 18 }
+
+changePhysicalPortServiceDefLaneChannelSetting OBJECT-TYPE
+    SYNTAX      FspR7ChannelIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Lane Channel Setting" 
+    ::=  { changePhysicalPortServiceDefEntry 19 }
+
+changePhysicalPortServiceDefLaserDelayTimer OBJECT-TYPE
+    SYNTAX      FspR7LaserDelayTimer
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Relevant only when ERRFWD=LSROFF. Enables/disables the
+         possibility to delay turning off and on the laser.
+         This applies to the case when turning off the laser
+         is done as an error forwarding mechanism." 
+    ::=  { changePhysicalPortServiceDefEntry 20 }
+
+changePhysicalPortServiceDefLaserOffTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000) 
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Delay before laser is swiched off" 
+    ::=  { changePhysicalPortServiceDefEntry 21 }
+
+changePhysicalPortServiceDefLaserOnTimer OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1000) 
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Delay before laser is switched on" 
+    ::=  { changePhysicalPortServiceDefEntry 22 }
+
+changePhysicalPortServiceDefLaserOffDelayFunction OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "A configuration request for the Laser Off Delay function. This function
+         delays turning off the laser as a consequent action to a defect."
+    ::=  { changePhysicalPortServiceDefEntry 23 }
+
+changePhysicalPortServiceDefAutoPTassignment OBJECT-TYPE
+    SYNTAX      FspR7ManualAuto
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Auto assignment of ODU PT" 
+    ::=  { changePhysicalPortServiceDefEntry 24 }
+
+changePhysicalPortServiceDefTributarySlotMethod OBJECT-TYPE
+    SYNTAX      FspR7ManualAuto
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tributary Slot assignment method" 
+    ::=  { changePhysicalPortServiceDefEntry 25 }
+
+changePhysicalPortServiceDefOpticalSetPoint OBJECT-TYPE
+    SYNTAX      Integer32 (-250..50) 
+    UNITS       "0.1 dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the optical power for power equalization in ROADM or for channel power control in OPCM" 
+    ::=  { changePhysicalPortServiceDefEntry 26 }
+
+changePhysicalPortServiceDefOpuPayloadType OBJECT-TYPE
+    SYNTAX      FspR7OpuPayloadType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OPU Payload Type Indicator" 
+    ::=  { changePhysicalPortServiceDefEntry 27 }
+
+changePhysicalPortServiceDefSigDegThresSonetLine OBJECT-TYPE
+    SYNTAX      FspR7BERThreshold
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit-Error-Based Degradation Definition for SONET (standard integration period)" 
+    ::=  { changePhysicalPortServiceDefEntry 28 }
+
+changePhysicalPortServiceDefSigDegThresSdhMs OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Block-Error-Based Degradation Definition for SDH (standard integration period).
+         Defined as percentage Background Block Errors (30% default) evaluated
+         over a defined period (SDPER-RS)." 
+    ::=  { changePhysicalPortServiceDefEntry 29 }
+
+changePhysicalPortServiceDefSigDegThresOtu OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for OTU" 
+    ::=  { changePhysicalPortServiceDefEntry 30 }
+
+changePhysicalPortServiceDefSigDegThresOdu OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for ODU" 
+    ::=  { changePhysicalPortServiceDefEntry 31 }
+
+changePhysicalPortServiceDefSigDegThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Threshold for number of errors (CV or CV+DE) in one second" 
+    ::=  { changePhysicalPortServiceDefEntry 32 }
+
+changePhysicalPortServiceDefSigDegPcslThreshold OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Block-Error-Based Degradation Definition for Physical Coding Sublayer" 
+    ::=  { changePhysicalPortServiceDefEntry 33 }
+
+changePhysicalPortServiceDefSigDegThresSonetSection OBJECT-TYPE
+    SYNTAX      FspR7BERThresholdSection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bit-Error-Based Degradation Definition for SONET (standard integration period)" 
+    ::=  { changePhysicalPortServiceDefEntry 34 }
+
+changePhysicalPortServiceDefSigDegThresSdhSection OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Block-Error-Based Degradation Definition for SDH (standard integration period).
+         Defined as percentage Background Block Errors (30% default) evaluated
+         over a defined period (SDPER-RS)." 
+    ::=  { changePhysicalPortServiceDefEntry 35 }
+
+changePhysicalPortServiceDefSigDegThresOduTcmA OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-A" 
+    ::=  { changePhysicalPortServiceDefEntry 36 }
+
+changePhysicalPortServiceDefSigDegThresOduTcmB OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-B" 
+    ::=  { changePhysicalPortServiceDefEntry 37 }
+
+changePhysicalPortServiceDefSigDegThresOduTcmC OBJECT-TYPE
+    SYNTAX      Integer32 (1..100) 
+    UNITS       "%"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background-Block-Error-Based Signal Degradation Definition for TCM-C" 
+    ::=  { changePhysicalPortServiceDefEntry 38 }
+
+changePhysicalPortServiceDefSignalDegradePeriod OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The measurement period in seconds used together with
+         the deployProvIfSigDegThresSdhRegSect based on the block error counting method.
+         The valid range is 2..10,
+         The default being 7."
+    ::=  { changePhysicalPortServiceDefEntry 39 }
+
+changePhysicalPortServiceDefSigDegPeriodOdu OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { changePhysicalPortServiceDefEntry 40 }
+
+changePhysicalPortServiceDefSigDegPeriodOtu OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { changePhysicalPortServiceDefEntry 41 }
+
+changePhysicalPortServiceDefSigDegPeriodIntegration OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { changePhysicalPortServiceDefEntry 42 }
+
+changePhysicalPortServiceDefSigDegPeriodSdhSection OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provisionable Signal Degrade Integration Period for SDH" 
+    ::=  { changePhysicalPortServiceDefEntry 43 }
+
+changePhysicalPortServiceDefSigDegPeriodOduTcmA OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period for Signal degrade" 
+    ::=  { changePhysicalPortServiceDefEntry 44 }
+
+changePhysicalPortServiceDefSigDegPeriodOduTcmB OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period of TCMB Signal Segrade" 
+    ::=  { changePhysicalPortServiceDefEntry 45 }
+
+changePhysicalPortServiceDefSigDegPeriodOduTcmC OBJECT-TYPE
+    SYNTAX      Unsigned32 (2..10) 
+    UNITS       "s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Integration Period of TCMC Signal Segrade" 
+    ::=  { changePhysicalPortServiceDefEntry 46 }
+
+changePhysicalPortServiceDefOtnStuffing OBJECT-TYPE
+    SYNTAX      FspR7Stuff
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if bit/byte stuffing is used in the transport signal." 
+    ::=  { changePhysicalPortServiceDefEntry 47 }
+
+changePhysicalPortServiceDefTcmALevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance A" 
+    ::=  { changePhysicalPortServiceDefEntry 48 }
+
+changePhysicalPortServiceDefTcmBLevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance B" 
+    ::=  { changePhysicalPortServiceDefEntry 49 }
+
+changePhysicalPortServiceDefTcmCLevel OBJECT-TYPE
+    SYNTAX      OtnTcmLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Activation of Tandem Connection Monitoring Instance C" 
+    ::=  { changePhysicalPortServiceDefEntry 50 }
+
+changePhysicalPortServiceDefTerminationLevel OBJECT-TYPE
+    SYNTAX      OhTerminationLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The entity is Addressable by Management [because its supporting entity is defined in the database and therefore its address existsSignal Tremination Level of Intrusive Access to Header Information.
+         Not used in 7.0, monitoring is one layer higher than TERM level,
+         if applicable. All conditions detected on monitoring layer will not
+         be reported (severity degradated to NR)." 
+    ::=  { changePhysicalPortServiceDefEntry 51 }
+
+changePhysicalPortServiceDefTimingSource OBJECT-TYPE
+    SYNTAX      SonetTimingSource
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The timing source for this interface.
+         - internal: used in stand-alone, point-to-point topologies stand-alone (dedicated fiber operation).
+         - loopTiming: e.g. used in point-to-point via SONET network and feeder topologies. The default is
+         internal(1)."
+    ::=  { changePhysicalPortServiceDefEntry 52 }
+
+changePhysicalPortServiceDefTimModeOdu OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-ODU Condition can be configured" 
+    ::=  { changePhysicalPortServiceDefEntry 53 }
+
+changePhysicalPortServiceDefTimModeOtu OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-OTU Condition can be configured" 
+    ::=  { changePhysicalPortServiceDefEntry 54 }
+
+changePhysicalPortServiceDefTimModeSonetSection OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM Sonet Section Condition can be configured" 
+    ::=  { changePhysicalPortServiceDefEntry 55 }
+
+changePhysicalPortServiceDefTimModeOduTcmA OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMA Condition can be configured" 
+    ::=  { changePhysicalPortServiceDefEntry 56 }
+
+changePhysicalPortServiceDefTimModeOduTcmB OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMB Condition can be configured" 
+    ::=  { changePhysicalPortServiceDefEntry 57 }
+
+changePhysicalPortServiceDefTimModeOduTcmC OBJECT-TYPE
+    SYNTAX      TimMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Detection of TIM-TCMC Condition can be configured" 
+    ::=  { changePhysicalPortServiceDefEntry 58 }
+
+changePhysicalPortServiceDefTraceFormSonetSection OBJECT-TYPE
+    SYNTAX      SonetTraceForm
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Byte-Length of Trace Compared to Expected" 
+    ::=  { changePhysicalPortServiceDefEntry 59 }
+
+changePhysicalPortServiceDefTraceExpectedSonetSection OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..62))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected Sec/RS trace. NULL TRACE implies that no trace comparison is made." 
+    ::=  { changePhysicalPortServiceDefEntry 60 }
+
+changePhysicalPortServiceDefTraceTransmitSonetSection OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..62))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sec/RS Trace to be Transmitted" 
+    ::=  { changePhysicalPortServiceDefEntry 61 }
+
+changePhysicalPortServiceDefTraceExpectedOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the OTU trace (15 character). NULL TRACE implies that no trace comparison is made." 
+    ::=  { changePhysicalPortServiceDefEntry 62 }
+
+changePhysicalPortServiceDefTraceTransmitSapiOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the OTU trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 63 }
+
+changePhysicalPortServiceDefTraceTransmitDapiOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the OTU trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 64 }
+
+changePhysicalPortServiceDefTraceTransmitOpspOtu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the OTU trace (32 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 65 }
+
+changePhysicalPortServiceDefTraceExpectedOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the ODU trace (15 character). NULL TRACE implies that no trace comparison is made." 
+    ::=  { changePhysicalPortServiceDefEntry 66 }
+
+changePhysicalPortServiceDefTraceTransmitSapiOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the ODU trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 67 }
+
+changePhysicalPortServiceDefTraceTransmitDapiOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the ODU trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 68 }
+
+changePhysicalPortServiceDefTraceTransmitOpspOdu OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the ODU trace (32 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 69 }
+
+changePhysicalPortServiceDefTraceExpectedOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMA trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { changePhysicalPortServiceDefEntry 70 }
+
+changePhysicalPortServiceDefTraceTransmitSapiOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMA trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 71 }
+
+changePhysicalPortServiceDefTraceTransmitDapiOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMA trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 72 }
+
+changePhysicalPortServiceDefTraceTransmitOpspOduTcmA OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMA trace (32 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 73 }
+
+changePhysicalPortServiceDefTraceExpectedOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMB trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { changePhysicalPortServiceDefEntry 74 }
+
+changePhysicalPortServiceDefTraceTransmitSapiOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMB trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 75 }
+
+changePhysicalPortServiceDefTraceTransmitDapiOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMB trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 76 }
+
+changePhysicalPortServiceDefTraceTransmitOpspOduTcmB OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMB trace (32 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 77 }
+
+changePhysicalPortServiceDefTraceExpectedOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Expected SAPI part of the TCMC trace (15 character). NULL TRACE-TCM implies that no trace comparison is made." 
+    ::=  { changePhysicalPortServiceDefEntry 78 }
+
+changePhysicalPortServiceDefTraceTransmitSapiOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted SAPI part of the TCMC trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 79 }
+
+changePhysicalPortServiceDefTraceTransmitDapiOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted DAPI part of the TCMC trace (15 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 80 }
+
+changePhysicalPortServiceDefTraceTransmitOpspOduTcmC OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The transmitted Operator Specific part of the TCMC trace (32 character)" 
+    ::=  { changePhysicalPortServiceDefEntry 81 }
+
+changePhysicalPortServiceDefTxOffDelay OBJECT-TYPE
+    SYNTAX      FspR7EnableDisable
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Enable or disable TXOFFHOLD Period for Error Forwarding and LKDO-OFF Consequent Action." 
+    ::=  { changePhysicalPortServiceDefEntry 82 }
+
+changePhysicalPortServiceDefVoaMode OBJECT-TYPE
+    SYNTAX      FspR7VoaMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "VOA operating mode" 
+    ::=  { changePhysicalPortServiceDefEntry 83 }
+
+changePhysicalPortServiceDefVoaSetpoint OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..300) 
+    UNITS       "0.1 dB"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Sets the optical attenuation of VOA" 
+    ::=  { changePhysicalPortServiceDefEntry 84 }
+
+endOfChangePhysicalPortServiceDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { changeServiceDef 2 }
+
+endOfChangeServiceDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { changeServiceDef 10000 }
+
+ffpDefTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FfpDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "FfpDefTable"
+    ::=  { protectionDef 2 }
+
+ffpDefEntry OBJECT-TYPE
+    SYNTAX      FfpDefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION   "Entry of FfpDefTable"
+    INDEX       {
+                  entityFfpShelfNo,
+                  entityFfpSlotNo,
+                  entityFfpPortNo,
+                  entityFfpExtNo,
+                  entityFfpClassName
+                }
+    ::=  { ffpDefTable 1 }
+
+FfpDefEntry ::=  SEQUENCE
+  { ffpDefRowStatus RowStatus,
+    ffpDefCreationMethod FfpType,
+    ffpDefSDswitching EnableState,
+    ffpDefHoldOffTime ApsHoldoffTime,
+    ffpDefProtectionMech ProtectionMech,
+    ffpDefWorkingAid SnmpAdminString,
+    ffpDefProtectionAid SnmpAdminString,
+    ffpDefSignalDegradeSwitching EnableState,
+    ffpDefSignalFailureSwitching EnableState,
+    ffpDefFarEndIp IpAddress,
+    ffpDefPeerAid SnmpAdminString,
+    ffpDefApsType ApsType,
+    ffpDefRevertMode ApsRevertMode,
+    ffpDefWaitToRestore Unsigned32,
+    ffpDefDirection ApsDirection,
+    ffpDefProtectionType FspR7ProtectionType }
+
+ffpDefRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "RowStatus"
+    ::=  { ffpDefEntry 1 }
+
+ffpDefCreationMethod OBJECT-TYPE
+    SYNTAX      FfpType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Type of protection (normal/forced)"
+    ::=  { ffpDefEntry 2 }
+
+ffpDefSDswitching OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "This state controls whether the switch criteria for the APS group will
+         include the Signal Degrade alarm."
+    ::=  { ffpDefEntry 3 }
+
+ffpDefHoldOffTime OBJECT-TYPE
+    SYNTAX      ApsHoldoffTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "This value controls the switch delay (0 to 10 seconds in
+         100ms steps) for the protection group. Changing the hold-off
+         time when the timer is active will not affect the active
+         timer. The change will take effect the next time the timer
+         is active."
+    ::=  { ffpDefEntry 4 }
+
+ffpDefProtectionMech OBJECT-TYPE
+    SYNTAX      ProtectionMech
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The protection type of this protection group."
+    ::=  { ffpDefEntry 5 }
+
+ffpDefWorkingAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "AID of working port involved in the protection group." 
+    ::=  { ffpDefEntry 6 }
+
+ffpDefProtectionAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "(Protection AID) AID of protection entity involved in the protection group." 
+    ::=  { ffpDefEntry 7 }
+
+ffpDefSignalDegradeSwitching OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Switch Trigger Additionally on Signal Degrade Link Detection" 
+    ::=  { ffpDefEntry 8 }
+
+ffpDefSignalFailureSwitching OBJECT-TYPE
+    SYNTAX      EnableState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Switch Trigger on Signal Failure Link Detection" 
+    ::=  { ffpDefEntry 9 }
+
+ffpDefFarEndIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "IP Address assigned to PPP Termination Point on Far-End NE. Default
+         is set by NE System on LINK establishment if FENDIPACPT = Y"
+    ::=  { ffpDefEntry 10 }
+
+ffpDefPeerAid OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "AID of Protection Partner involved in the protection group." 
+    ::=  { ffpDefEntry 11 }
+
+ffpDefApsType OBJECT-TYPE
+    SYNTAX      ApsType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "The type of APS implemented in this protection group."
+    ::=  { ffpDefEntry 12 }
+
+ffpDefRevertMode OBJECT-TYPE
+    SYNTAX      ApsRevertMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Revertive Protection Switching" 
+    ::=  { ffpDefEntry 13 }
+
+ffpDefWaitToRestore OBJECT-TYPE
+    SYNTAX      Unsigned32 (5..12) 
+    UNITS       "min"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Wait to Restore Timer value" 
+    ::=  { ffpDefEntry 14 }
+
+ffpDefDirection OBJECT-TYPE
+    SYNTAX      ApsDirection
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION   "Indicates whether the APS function is 'unidirectional' (single-ended)
+         or 'bidirectional' (dual-ended)."
+    ::=  { ffpDefEntry 15 }
+
+ffpDefProtectionType OBJECT-TYPE
+    SYNTAX      FspR7ProtectionType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "" 
+    ::=  { ffpDefEntry 16 }
+
+endOfFfpDefTable OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { protectionDef 3 }
+
+endOfProtectionDef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::=  { protectionDef 10000 }
+
+
+-- conformance information
+
+conformanceDef OBJECT IDENTIFIER ::= { advaFspR7Def 10 }
+
+compliancesDef OBJECT IDENTIFIER ::= { conformanceDef 1 }
+
+groupsDef      OBJECT IDENTIFIER ::= { conformanceDef 2 }
+
+-- compliance statements
+
+complianceDef MODULE-COMPLIANCE
+  STATUS  current
+  DESCRIPTION
+    "The compliance statement for entities implementing the ADVA FSPR7 DEF MIB."
+  MODULE  -- this module
+  MANDATORY-GROUPS { objectGroupDef }
+  ::= { compliancesDef 1 }
+
+
+-- units of conformance
+
+objectGroupDef OBJECT-GROUP
+  OBJECTS {
+    crossConnectionDefRowStatus,
+    crossConnectionDefAdmin,
+    crossConnectionDefRedLineState,
+    crossConnectionDefConn,
+    crossConnectionDefAlias,
+    crossConnectionDefPathNode,
+    crossConnectionDefTunnelAid,
+    crossOpticalLineDefRowStatus,
+    crossOpticalLineDefRedLineState,
+    crossOpticalLineDefConn,
+    crossOpticalLineDefCrsType,
+    crossOpticalLineDefAlias,
+    crossOpticalLineDefTunnelAid,
+    crossConnectionDefType,
+    physicalPortDefRowStatus,
+    physicalPortDefType,
+    physicalPortDefAdmin,
+    virtualPortDefRowStatus,
+    virtualPortDefChannelBand,
+    virtualPortDefType,
+    virtualPortDefAlias,
+    virtualPortDefAdmin,
+    virtualPortDefEqlzAdmin,
+    connectionDefRowStatus,
+    connectionDefType,
+    externalPortDefRowStatus,
+    externalPortDefType,
+    externalPortDefTransmitChannel,
+    externalPortDefChannelBandwith,
+    externalPortDefAlias,
+    externalPortDefFarEndLocation,
+    externalPortDefBitrate,
+    externalPortDefMaxChromDisperRcv,
+    externalPortDefMaxBitErrorRate,
+    externalPortDefFecType,
+    externalPortDefLineCoding,
+    externalPortDefFrameFormat,
+    externalPortDefOpticalPowerTx,
+    externalPortDefOsnrTransmit,
+    externalPortDefPmdTransmit,
+    externalPortDefChromDisperTx,
+    externalPortDefMinOsnrRcv,
+    externalPortDefMinOptPowerRcv,
+    externalPortDefMaxOptPowerRcv,
+    externalPortDefMaxPmdRcv,
+    externalPortDefMinChromDisperRcv,
+    externalPortDefSourceProfile
+  }
+  STATUS  current
+  DESCRIPTION
+    "A list of objects used for configuration of an entity in ADVA FSPR7 DEF MIB."
+  ::= { groupsDef 1 }
+
+
+END
+

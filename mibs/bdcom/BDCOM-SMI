@@ -1,0 +1,90 @@
+-- *****************************************************************
+-- BDCOM-SMI.my:  BDCom Enterprise Structure of Management Information
+--
+-- June 2000
+--
+-- *****************************************************************
+
+BDCOM-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+bdcom MODULE-IDENTITY
+	LAST-UPDATED "200006280000Z"
+	ORGANIZATION "BDCom, Inc."
+	CONTACT-INFO
+		" Tel:   +86-21-50800666  
+		 Postal: No.123,Juli RD,Zhangjiang Hitech Park,
+			 Shanghai Baud Data Communication Corporation Inc,
+			 Shanghai City 201203,
+		 	P.R.C "
+	DESCRIPTION
+		"Initial version of this MIB module.The Structure of
+		 Management Information for the Bdcom enterprise."
+	::= { enterprises 3320}	
+	-- assigned by IANA
+
+
+bdcomProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Bdcom Products is the root OBJECT IDENTIFIER from
+		which sysObjectID values are assigned."
+	::= { bdcom 1 }
+
+bdlocal OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which pre-10.2 MIBS were built."
+	::= { bdcom 2 }
+	
+bdtemporary OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"Subtree beneath which pre-10.2 experiments were
+		placed."
+	::= { bdcom 3 }
+	
+bdMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"bdMgmt is the main subtree for new mib development."
+	::= { bdcom 9 }  
+bdcomModules OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"bdcomModules provides a root object identifier
+		from which MODULE-IDENTITY values may be assigned."
+	::= { bdcom 12 } 
+bdcomPolicyAuto OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "bdcomPolicyAuto is the root of the BDCOM-assigned
+                OID subtree for OIDs which are automatically assigned
+                for use in Policy Management."
+         ::= { bdcom 18 }
+
+--  Note that 1.3.6.1.4.1.9.18.1 is currently unassigned
+
+bdcomPibToMib OBJECT-IDENTITY
+         STATUS current
+         DESCRIPTION
+                "bdcomPibToMib is the root of the BDCOM-assigned
+                OID subtree for MIBs which are algorithmically
+                generated/translated from BDCOM PIBs with OIDs
+                assigned under the bdcomPIB subtree.
+                These generated MIBs allow management
+                entities (other the current Policy Server) to
+                read the downloaded policy.  By convention, for PIB
+                'bdcomPIB.x', the generated MIB shall have the
+                name 'bdcomPibToMib.x'."
+         ::= { bdcomPolicyAuto 2 }
+
+
+
+END
+

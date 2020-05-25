@@ -1,0 +1,318 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-SOFT-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+             Integer32, IpAddress
+        FROM SNMPv2-SMI
+             DisplayString
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             alarmTrap
+        FROM SIAE-ALARM-MIB
+             equipIpSnmpAgentAddress
+        FROM SIAE-EQUIP-MIB;
+
+    software MODULE-IDENTITY
+        LAST-UPDATED "201503230000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: help@siaemic.com
+            "
+        DESCRIPTION
+            "Maintenance of software releases loaded on SIAE equiment.
+            "
+        REVISION "201503230000Z"
+        DESCRIPTION
+            "Removed alarmTrapNumber from softwareDownloadStatusTrap
+             and IMPORTS.
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of softwareMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 7 }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+--  software GROUP
+----------------------------------------------------------------------------------
+--
+--  This group is used to manage the Sw present in the equipment units.
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+
+    softwareMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {software 1}
+
+    softwareEquipmentReleaseBench1  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..15))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the equipment release present in Bench1."
+    ::= {software 2}
+
+    softwareEquipmentReleaseBench1Status  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notLoaded (1),
+                             loaded    (2),
+                             running   (3)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of the bench 1 software."
+    ::= {software 3}
+
+    softwareEquipmentReleaseBench2  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..15))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the equipment release present in Bench2."
+    ::= {software 4}
+
+    softwareEquipmentReleaseBench2Status  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notLoaded (1),
+                             loaded    (2),
+                             running   (3)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of the bench 2 software."
+    ::= {software 5}
+
+    softwareIpAddressDwlServer  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip address of the SNMP manager connected from which the Software is downloaded,
+             if the leaf softwareRemoteIpAddressDwlServer is set '0.0.0.0'."
+    ::= {software 6}
+
+    softwareGosipAddressDwlServer  OBJECT-TYPE
+        SYNTAX      OCTET STRING    (SIZE(0..31))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "GOSIP address of the remote element from which the Software is downloaded."
+    ::= {software 7}
+
+    softwareDownloadfile  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "CEM or LOM Directory and name of the descriptor file. The files
+             with the SW code must be present in the same directory."
+    ::= {software 8}
+
+    softwareActionRequest  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This Integer is a bit string  with each bit when set has the following meaning:
+              BIT 0   -    Download  request
+              BIT 1   -    Abort Download  request
+              BIT 2   -    Bench switch   request
+              BIT 4   -    Partial download
+              BIT 5   -    Forced Download
+              BIT 6   -    Implicit Activation
+              BIT 7   -    Delete bench not running
+              BIT 8   -    ODU FW download (whitout activation)
+              BIT 9   -    ODU FW activation
+              BIT 10  -    IDU FPGA download (whitout activation)
+              BIT 11  -    IDU FPGA activation
+             The bit 4...6 enable/disable the different options on download request."
+    ::= {software 9}
+
+    softwareDownloadStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             downloading                (1),
+                             completed                  (2),
+                             interrupted                (3),
+                             perifDownloading           (4),
+                             configurationDownloading   (5)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Status of SW download operation."
+    ::= {software 10}
+
+-------  Begin of softwareUnitTable
+--
+    softwareUnitTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF     SoftwareUnitRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Software records concerning units within the equipment."
+    ::= {software 11}
+
+    softwareUnitRecord  OBJECT-TYPE
+        SYNTAX      SoftwareUnitRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Software record."
+        INDEX {softwareUnitId, softwareElementId}
+    ::= {softwareUnitTable 1}
+
+    SoftwareUnitRecord  ::=
+        SEQUENCE {
+            softwareUnitId             Integer32,
+            softwareElementId          Integer32,
+            softwareType               INTEGER,
+            softwareUnitReleaseBench1  DisplayString,
+            softwareUnitReleaseBench2  DisplayString,
+            softwareUnitActualRelease  DisplayString
+        }
+
+    softwareUnitId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of the softwareUnit Table and also identifies
+             the unit in the equipment."
+    ::= {softwareUnitRecord 1}
+
+    softwareElementId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of the softwareUnit Table and also identifies
+             the SW programmable element in the specified unit."
+    ::= {softwareUnitRecord 2}
+
+    softwareType  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             s-record    (1),
+                             image-FPGA  (2),
+                             volatile    (3)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Format type."
+    ::= {softwareUnitRecord 3}
+
+    softwareUnitReleaseBench1  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..8))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the software release present
+             in the programmable element of specified unit bench 1."
+    ::= {softwareUnitRecord 4}
+
+    softwareUnitReleaseBench2  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..8))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the software release present
+             in the programmable element of specified unit bench 2."
+    ::= {softwareUnitRecord 5}
+
+    softwareUnitActualRelease  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..33))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string identifying the software release actually present
+             in the programmable element of specified unit."
+    ::= {softwareUnitRecord 6}
+--
+-------  End of softwareUnitTable
+
+    softwareDownloadStatusTrapNotification  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapDisable        (1),
+                             trapEnable         (2),
+                             trapEnableWithACK  (34)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the trap generation on download status change."
+        DEFVAL {trapEnable}
+    ::= {software 12}
+
+    softwareRemoteIpAddressDwlServer  OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Ip address of the remote Server from which the Software is downloaded,
+             different from SNMP manager connected IpAddress.
+             It is used if different from '0.0.0.0'.
+             After each download procedure the leaf is set to '0.0.0.0'."
+        DEFVAL {'00'H}
+    ::= {software 13}
+
+-----------------------
+--
+--  The software Group generates the following TRAP:
+--
+-----------------------
+
+    softwareDownloadStatusTrap  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, softwareDownloadStatus}
+        STATUS current
+        DESCRIPTION
+            "This event is generated by ALFOHD-NE when the status of download is changed.
+             The data passed with the event are:
+                1) equipIpSnmpAgentAddress
+                2) softwareDownloadStatus"
+    ::= {alarmTrap 701}
+
+------ End group -----------------------------------------------------------------
+
+END
+

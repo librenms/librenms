@@ -1,0 +1,1052 @@
+-- ==================================================================
+-- Copyright (C) 2017 by HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI SMARTLINK MIB
+-- Reference:
+-- Version: V3.05
+-- History:
+-- ==================================================================
+
+    HUAWEI-SMARTLINK-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            InterfaceIndex, InterfaceIndexOrZero
+                FROM IF-MIB 
+            VlanIdOrNone
+                FROM Q-BRIDGE-MIB
+            EnabledStatus
+                FROM P-BRIDGE-MIB     
+            MacAddress            
+                FROM  SNMPv2-TC            
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE,NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DateAndTime, RowStatus, TEXTUAL-CONVENTION            
+                FROM SNMPv2-TC;
+                        
+        hwSmartLinkMib MODULE-IDENTITY 
+
+			      LAST-UPDATED "201707141055Z"		-- Jul 14, 2017 at 10:55 GMT
+			      ORGANIZATION 
+				        "Huawei Technologies Co.,Ltd."
+			      CONTACT-INFO 
+                "Huawei Industrial Base
+                 Bantian, Longgang
+                 Shenzhen 518129
+                 People's Republic of China
+                 Website: http://www.huawei.com
+                 Email: support@huawei.com
+                "
+            DESCRIPTION 
+                "This module includes the information about smart link.
+                The information can be read and some of them can be set."  
+
+            REVISION  "201707141055Z"
+            DESCRIPTION  "Update index of hwMonitorLinkDlArrayIndex."                
+
+            REVISION  "201607091717Z"
+            DESCRIPTION  "Update to increase  hwSmartLinkPcIfName."
+
+            REVISION  "201507271717Z"
+            DESCRIPTION  "Update to increase  hwSmartLinkRpcRevAuthMode and hwSmartLinkMulRpcRevAuthMode ENUM elemt as null(0)."
+
+            REVISION  "201504301443Z"
+            DESCRIPTION  "Update DESCRIPTION of hwMonitorLinkDlArrayIndex."
+
+            REVISION  "201308291443Z"
+            DESCRIPTION  "Update DESCRIPTION of hwSmartLinkRevLastFlushTime and hwSmartLinkPcSendFlushTime."
+          
+            REVISION  "201305031155Z"
+            DESCRIPTION  "Update to increase  hwSmartLinkMulRevPortCfgTable table."
+            
+            REVISION  "201303181420Z"
+            DESCRIPTION  "Update to increase  hwSmartLinkGcGroupStatus ENUM elemt as idle(4), init(5)."
+            
+            REVISION  "201208300936Z"
+            DESCRIPTION  "Initial version, published at Aug 30, 2012 at 09:36 GMT."
+
+            ::= { hwL2Mgmt 5 }    
+--
+-- Node definitions
+--
+        hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }        
+        hwSmartLinkMibObjects OBJECT IDENTIFIER ::= { hwSmartLinkMib 1 }
+        
+        hwSmartLinkRevFlushTotal OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total of received flush packets."
+            ::= { hwSmartLinkMibObjects 1 }
+
+        hwSmartLinkRevLastFlushIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The interface index of port which received flush packet lastly."
+            ::= { hwSmartLinkMibObjects 2 }
+        
+        hwSmartLinkRevLastFlushTime OBJECT-TYPE
+            SYNTAX DateAndTime (SIZE(8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time when received flush packet lastly.
+                field  octets  contents                range
+                 - - -  - - - -  - - - -                 - - -
+                   1      1-2       year                   0..65536
+                   2       3        month                  1..12
+                   3       4        day                    1..31
+                   4       5        hour                   0..23
+                   5       6        minutes                0..59
+                   6       7        seconds                0..60
+                                (use 60 for leap-second)
+                   7       8        deci-seconds           0..9"
+            ::= { hwSmartLinkMibObjects 3 }
+        
+        hwSmartLinkRevLastFlushSourceMacAddr OBJECT-TYPE
+            SYNTAX MacAddress
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The SMAC of flush packet which arrived this device lastly."
+            ::= { hwSmartLinkMibObjects 4 }
+        
+        hwSmartLinkRevLastFlushVlan OBJECT-TYPE
+            SYNTAX VlanIdOrNone
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The control VLAN of flush packet which arrived this device lastly."
+            ::= { hwSmartLinkMibObjects 5 } 
+              
+        hwSmartLinkResetFlushStatistics OBJECT-TYPE
+            SYNTAX INTEGER
+                { 
+                cleared(1),
+                unused(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Reset the statistics of flush packets."
+            ::= { hwSmartLinkMibObjects 6 }
+            
+--hwSmartLinkRevPortCfgTable
+        
+        hwSmartLinkRevPortCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSmartLinkRevPortCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is port configuration table which received flush packet, 
+                and configuration relation of port received flush packet was described.
+                The index of table is hwSmartLinkRpcIfIndex."
+            ::= { hwSmartLinkMibObjects 7 }
+        
+        hwSmartLinkRevPortCfgEntry OBJECT-TYPE
+            SYNTAX HwSmartLinkRevPortCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table includes the information of the received flush packet port configuration information.
+                The index of the table is hwSmartLinkRpcIfIndex."
+            INDEX { hwSmartLinkRpcIfIndex }
+            ::= { hwSmartLinkRevPortCfgTable 1 }
+        
+        HwSmartLinkRevPortCfgEntry ::=
+            SEQUENCE { 
+                hwSmartLinkRpcIfIndex
+                    InterfaceIndex,
+                hwSmartLinkRpcRevVlan
+                    VlanIdOrNone,
+                hwSmartLinkRpcRevPassword
+                    OCTET STRING,
+                hwSmartLinkRpcRevAuthMode
+                    INTEGER
+             }
+
+        hwSmartLinkRpcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of port from which received flush packets."
+            ::= { hwSmartLinkRevPortCfgEntry 1 }
+                         
+        hwSmartLinkRpcRevVlan OBJECT-TYPE
+            SYNTAX VlanIdOrNone
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set the VLAN ID to verify the validity of flush packets received.
+                Ranging from 0 to 4095."
+            ::= { hwSmartLinkRevPortCfgEntry 2 }
+        
+        hwSmartLinkRpcRevPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set the password to verify the validity of flush packets received."
+            ::= { hwSmartLinkRevPortCfgEntry 3 }
+        
+        hwSmartLinkRpcRevAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {   
+            null(0),
+            simple(1),
+            sha(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set the password mode to verify the validity of flush packets received."
+            ::= { hwSmartLinkRevPortCfgEntry 4 }
+
+--hwSmartLinkGroupCfgTable    
+        
+        hwSmartLinkGroupCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSmartLinkGroupCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table includes the information of the smart link group configuration information,
+                and include the mode of smart link group, working status of group, control vlan of group etc."
+            ::= { hwSmartLinkMibObjects 8 }
+        
+        hwSmartLinkGroupCfgEntry OBJECT-TYPE
+            SYNTAX HwSmartLinkGroupCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table includes the information of the smart link group configuration information.
+                The index of the table is hwSmartLinkGcGroupId."
+            INDEX { hwSmartLinkGcGroupId }
+            ::= { hwSmartLinkGroupCfgTable 1 }
+        
+        HwSmartLinkGroupCfgEntry ::=
+            SEQUENCE { 
+                hwSmartLinkGcGroupId  
+                    Integer32,     
+                hwSmartLinkGcMasterIfIndex
+                    InterfaceIndexOrZero,
+                hwSmartLinkGcSlaveIfIndex
+                    InterfaceIndexOrZero,
+                hwSmartLinkGcGroupStatus 
+                    INTEGER, 
+                hwSmartLinkGcEnable
+                    EnabledStatus,
+                hwSmartLinkGcSendControlVlan
+                    VlanIdOrNone,
+                hwSmartLinkGcSendPassword
+                    OCTET STRING,
+                hwSmartLinkGcLock
+                    EnabledStatus,
+                hwSmartLinkGcForce
+                    EnabledStatus,
+                hwSmartLinkGcRevertWtrTime
+                    Integer32,  
+                hwSmartLinkGcRevertEnable
+                    EnabledStatus,  
+                hwSmartLinkGcManual
+                    INTEGER, 
+                hwSmartLinkGcRowStatus
+                    RowStatus,
+                hwSmartLinkGcAuthMode
+                    INTEGER
+             }
+
+        hwSmartLinkGcGroupId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Smart link group index."
+            ::= { hwSmartLinkGroupCfgEntry 1 }
+        
+        hwSmartLinkGcMasterIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The master interface index of smart link group."
+            ::= { hwSmartLinkGroupCfgEntry 2 }
+        
+        hwSmartLinkGcSlaveIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The slave interface index of smart link group."
+            ::= { hwSmartLinkGroupCfgEntry 3 }
+        
+        hwSmartLinkGcGroupStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                { 
+                none(1),
+                master(2),
+                slave(3),
+                idle(4),
+                init(5)                
+                }
+            MAX-ACCESS read-only
+            STATUS current            
+            DESCRIPTION
+                "Working status of smart link group, include none, master, slave, idle and init. 
+                none: all ports in group are inactive.
+                Master: master port is active, and slave port is inactive.
+                Slave: master port is inactive, and slave port is active.
+                Idle: smart-link group is disable, and all ports are inactive.
+                Init: smart-link group is enable, and all ports are inactive."
+            ::= { hwSmartLinkGroupCfgEntry 4 }
+        
+        hwSmartLinkGcEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Startup or close the smart link group.
+                Before startup the smart link group, the group must be created."
+            ::= { hwSmartLinkGroupCfgEntry 5 }
+        
+        hwSmartLinkGcSendControlVlan OBJECT-TYPE
+            SYNTAX VlanIdOrNone
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set the tag of flush packets which send from this smart link group."
+            ::= { hwSmartLinkGroupCfgEntry 6 }
+        
+        hwSmartLinkGcSendPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set password of flush packets which send from this smart link group."
+            ::= { hwSmartLinkGroupCfgEntry 7 }
+        
+        hwSmartLinkGcLock OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Active port was locked on master port"
+            ::= { hwSmartLinkGroupCfgEntry 8 }
+            
+        hwSmartLinkGcForce OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Active port was locked on slave port."
+            ::= { hwSmartLinkGroupCfgEntry 9 }
+        
+        hwSmartLinkGcRevertWtrTime OBJECT-TYPE
+            SYNTAX Integer32 (30..1200)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set wait-to-restore time."  
+            DEFVAL { 60 }
+            ::= { hwSmartLinkGroupCfgEntry 10 }
+        
+        hwSmartLinkGcRevertEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "When wait-to-restore timer is over, the smart link group link will be switched."
+            ::= { hwSmartLinkGroupCfgEntry 11 }
+
+        hwSmartLinkGcManual OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                switch(1),
+                unused(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The link was switched every setting manual command."
+            ::= { hwSmartLinkGroupCfgEntry 12 }                     
+
+        hwSmartLinkGcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Status of smart link group row."
+            ::= { hwSmartLinkGroupCfgEntry 13 }  
+
+        hwSmartLinkGcAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+            null(0),
+            simple(1),                  
+            sha(2)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Set the password mode of flush packets which send from this smart link group."
+        ::= { hwSmartLinkGroupCfgEntry 14 } 
+
+--hwSmartLinkPortCfgTable
+            
+        hwSmartLinkPortCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSmartLinkPortCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the configuration table of member port of smart link group.
+                This table described that configuration relation of member port of smart link group.
+                This table index is hwSmartLinkPcGroupId and hwSmartLinkPcPortType."
+            ::= { hwSmartLinkMibObjects 9 }
+        
+        hwSmartLinkPortCfgEntry OBJECT-TYPE
+            SYNTAX HwSmartLinkPortCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table described that configuration relation of member port of smart link group.
+                This table index is hwSmartLinkPcGroupId and hwSmartLinkPcPortType."
+            INDEX { hwSmartLinkPcGroupId, hwSmartLinkPcPortType }
+            ::= { hwSmartLinkPortCfgTable 1 }
+        
+        HwSmartLinkPortCfgEntry ::=
+            SEQUENCE { 
+                hwSmartLinkPcGroupId
+                    Integer32,
+                hwSmartLinkPcPortType
+                    INTEGER,
+                hwSmartLinkPcIfIndex
+                    InterfaceIndexOrZero,
+                hwSmartLinkPcPortStatus
+                    INTEGER, 
+                hwSmartLinkPcSendFlushNum
+                    Counter32,
+                hwSmartLinkPcSendFlushTime
+                    DateAndTime,            
+                hwSmartLinkPcRowStatus
+                    RowStatus
+             }
+
+        hwSmartLinkPcGroupId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Smart link group index."
+            ::= { hwSmartLinkPortCfgEntry 1 }
+        
+        hwSmartLinkPcPortType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                master(1),
+                slave(2)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The role of smart link group member port."
+            ::= { hwSmartLinkPortCfgEntry 2 }
+        
+        hwSmartLinkPcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Interface index of member port of smart link group."
+            ::= { hwSmartLinkPortCfgEntry 3 }
+        
+        hwSmartLinkPcPortStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {  
+                unknown(1),
+                active(2),
+                inactive(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The status of member port, include unknown, active and inactive."
+            ::= { hwSmartLinkPortCfgEntry 4 }  
+            
+        hwSmartLinkPcSendFlushNum OBJECT-TYPE
+            SYNTAX Counter32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The total of flush packets send from this port."
+            ::= { hwSmartLinkPortCfgEntry 5 } 
+            
+        hwSmartLinkPcSendFlushTime OBJECT-TYPE
+            SYNTAX DateAndTime (SIZE(8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The time when send flush packet lastly.
+                field  octets  contents                range
+                 - - -  - - -   - - - - -               - - -
+                   1      1-2       year                   0..65536
+                   2       3        month                  1..12
+                   3       4        day                    1..31
+                   4       5        hour                   0..23
+                   5       6        minutes                0..59
+                   6       7        seconds                0..60
+                                (use 60 for leap-second)
+                   7       8        deci-seconds           0..9"
+            ::= { hwSmartLinkPortCfgEntry 6 }
+
+        hwSmartLinkPcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Status of monitor link group row."
+            ::= { hwSmartLinkPortCfgEntry 7 }
+             
+--hwMonitorLinkGroupCfgTable
+                     
+        hwMonitorLinkGroupCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMonitorLinkGroupCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is status information table of monitor link group,
+                and index is hwMonitorLinkGcGroupId."
+            ::= { hwSmartLinkMibObjects 10 }
+        
+        hwMonitorLinkGroupCfgEntry OBJECT-TYPE
+            SYNTAX HwMonitorLinkGroupCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is status information table of monitor link group,
+                and index is hwMonitorLinkGcGroupId."
+            INDEX { hwMonitorLinkGcGroupId }
+            ::= { hwMonitorLinkGroupCfgTable 1 }
+        
+        HwMonitorLinkGroupCfgEntry ::=
+            SEQUENCE { 
+                hwMonitorLinkGcGroupId
+                    Integer32,
+                hwMonitorLinkGcRecoverTime
+                    Integer32,
+                hwMonitorLinkGcRowStatus
+                    RowStatus
+             }
+
+        hwMonitorLinkGcGroupId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Monitor link group index."
+            ::= { hwMonitorLinkGroupCfgEntry 1 }
+        
+        hwMonitorLinkGcRecoverTime OBJECT-TYPE
+            SYNTAX Integer32 (3..60)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set recover time, when uplink port turn to UP and over the recover time, 
+                all downlink port will be undo shutdown."
+            DEFVAL { 3 }
+            ::= { hwMonitorLinkGroupCfgEntry 2 }
+        
+        hwMonitorLinkGcRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Status of monitor link group row."
+            ::= { hwMonitorLinkGroupCfgEntry 3 }
+        
+--hwMonitorLinkUpLinkPortTable
+        
+        hwMonitorLinkUpLinkPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMonitorLinkUpLinkPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is the information table of member port in monitor link group upink,
+                The table indexes are hwMonitorLinkUlGroupId, hwMonitorLinkUlPortType."
+            ::= { hwSmartLinkMibObjects 11 }
+        
+        hwMonitorLinkUpLinkPortEntry OBJECT-TYPE
+            SYNTAX HwMonitorLinkUpLinkPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is the information table of member port in monitor link group upink,
+                The table indexes are hwMonitorLinkUlGroupId and hwMonitorLinkUlPortType."
+            INDEX { hwMonitorLinkUlGroupId, hwMonitorLinkUlPortType }
+            ::= { hwMonitorLinkUpLinkPortTable 1 }
+        
+        HwMonitorLinkUpLinkPortEntry ::=
+            SEQUENCE { 
+                hwMonitorLinkUlGroupId
+                    Integer32,
+                hwMonitorLinkUlPortType
+                    INTEGER,
+                hwMonitorLinkUlPortValue
+                    Integer32,
+                hwMonitorLinkUlPortStatus
+                    INTEGER,
+                hwMonitorLinkUlPortUpTime
+                    DateAndTime,
+                hwMonitorLinkUlPortDownTime
+                    DateAndTime,
+                hwMonitorLinkUlRowStatus
+                    RowStatus
+             }
+
+        hwMonitorLinkUlGroupId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Monitor link group index."
+            ::= { hwMonitorLinkUpLinkPortEntry 1 }
+        
+        hwMonitorLinkUlPortType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                smartLink(1),
+                switchPort(2)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Type of uplink port in monitor link group, include smart link group and switch port."
+            ::= { hwMonitorLinkUpLinkPortEntry 2 }
+        
+        hwMonitorLinkUlPortValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "When port type is smart link, the value is smart link group index.
+                When port type is switch port, the value is ifindex of switch port."
+            ::= { hwMonitorLinkUpLinkPortEntry 3 }
+        
+        hwMonitorLinkUlPortStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "State of member port in monitor group, include UP and DOWN."
+            ::= { hwMonitorLinkUpLinkPortEntry 4 }
+        
+        hwMonitorLinkUlPortUpTime OBJECT-TYPE
+            SYNTAX DateAndTime (SIZE(8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Show the time when the port state turn to UP recently."
+            ::= { hwMonitorLinkUpLinkPortEntry 5 }
+        
+        hwMonitorLinkUlPortDownTime OBJECT-TYPE
+            SYNTAX DateAndTime (SIZE(8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Show the time when the port state turn to DOWN recently."
+            ::= { hwMonitorLinkUpLinkPortEntry 6 }
+        
+        hwMonitorLinkUlRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Status of monitor link group row."
+            ::= { hwMonitorLinkUpLinkPortEntry 7 }
+
+--hwMonitorLinkDownLinkPortTable
+        
+        hwMonitorLinkDownLinkPortTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwMonitorLinkDownLinkPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is the information table of member port in monitor link group downlink,
+                The table indexes are hwMonitorLinkDlGroupId and hwMonitorLinkDlArrayIndex."
+            ::= { hwSmartLinkMibObjects 12 }
+        
+        hwMonitorLinkDownLinkPortEntry OBJECT-TYPE
+            SYNTAX HwMonitorLinkDownLinkPortEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is the information table of member port in monitor link group downlink,
+                The table indexes are hwMonitorLinkDlGroupId and hwMonitorLinkDlArrayIndex."
+            INDEX { hwMonitorLinkDlGroupId, hwMonitorLinkDlArrayIndex }
+            ::= { hwMonitorLinkDownLinkPortTable 1 }
+        
+        HwMonitorLinkDownLinkPortEntry ::=
+            SEQUENCE { 
+                hwMonitorLinkDlGroupId
+                    Integer32, 
+                hwMonitorLinkDlArrayIndex
+                    Integer32,
+                hwMonitorLinkDlIfIndex
+                    InterfaceIndexOrZero,
+                hwMonitorLinkDlPortStatus
+                    INTEGER,
+                hwMonitorLinkDlPortUpTime
+                    DateAndTime,
+                hwMonitorLinkDlPortDownTime
+                    DateAndTime,
+                hwMonitorLinkDlRowStatus
+                    RowStatus
+             }
+
+        hwMonitorLinkDlGroupId OBJECT-TYPE
+            SYNTAX Integer32 (1..16)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Monitor link group index."
+            ::= { hwMonitorLinkDownLinkPortEntry 1 }
+        
+        hwMonitorLinkDlArrayIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..48)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The downlink array index of Monitor link group."
+            ::= { hwMonitorLinkDownLinkPortEntry 2 }
+
+        hwMonitorLinkDlIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Member interface index of monitor link group downlink."
+            ::= { hwMonitorLinkDownLinkPortEntry 3 }
+        
+        hwMonitorLinkDlPortStatus OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                up(1),
+                down(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "State of member port in monitor group, include UP and DOWN."
+            ::= { hwMonitorLinkDownLinkPortEntry 4 }
+        
+        hwMonitorLinkDlPortUpTime OBJECT-TYPE
+            SYNTAX DateAndTime (SIZE(8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Show the time when the port state turn to UP recently."
+            ::= { hwMonitorLinkDownLinkPortEntry 5 }
+        
+        hwMonitorLinkDlPortDownTime OBJECT-TYPE
+            SYNTAX DateAndTime (SIZE(8))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Show the time when the port state turn to DOWN recently."
+            ::= { hwMonitorLinkDownLinkPortEntry 6 }
+        
+        hwMonitorLinkDlRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Status of monitor link group row."
+            ::= { hwMonitorLinkDownLinkPortEntry 7 }
+           
+--hwSmartLinkMulRevPortCfgTable
+        
+        hwSmartLinkMulRevPortCfgTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSmartLinkMulRevPortCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This is port configuration table which received flush packet, 
+                and configuration relation of port received flush packet was described.
+                The index of table is hwSmartLinkMulRpcIfIndex and hwSmartLinkMulRpcVlan."
+            ::= { hwSmartLinkMibObjects 13 }
+        
+        hwSmartLinkMulRevPortCfgEntry OBJECT-TYPE
+            SYNTAX HwSmartLinkMulRevPortCfgEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The table includes the information of the received flush packet port configuration information.
+                The index of the table is hwSmartLinkMulRpcIfIndex and hwSmartLinkMulRpcVlan."
+            INDEX { hwSmartLinkMulRpcIfIndex, hwSmartLinkMulRpcVlan }
+            ::= { hwSmartLinkMulRevPortCfgTable 1 }
+        
+        HwSmartLinkMulRevPortCfgEntry ::=
+            SEQUENCE { 
+                hwSmartLinkMulRpcIfIndex
+                    InterfaceIndex,  
+                hwSmartLinkMulRpcVlan  
+                	Integer32,
+                hwSmartLinkMulRpcRevPassword
+                    OCTET STRING,
+                hwSmartLinkMulRpcRevAuthMode
+                    INTEGER, 
+                hwSmartLinkMulRpcRevRowStatus
+                    RowStatus    
+             }
+
+        hwSmartLinkMulRpcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndex
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of port from which received flush packets."
+            ::= { hwSmartLinkMulRevPortCfgEntry 1 }  
+            
+        hwSmartLinkMulRpcVlan OBJECT-TYPE
+            SYNTAX Integer32 (0..4095)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The control-vlan of port from which received flush packets"
+            ::= { hwSmartLinkMulRevPortCfgEntry 2 }
+                              
+        hwSmartLinkMulRpcRevPassword OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Set the password to verify the validity of flush packets received."
+            ::= { hwSmartLinkMulRevPortCfgEntry 3 }
+        
+        hwSmartLinkMulRpcRevAuthMode OBJECT-TYPE
+            SYNTAX INTEGER
+            {         
+            null(0),
+            simple(1),
+            sha(2)
+            }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Set the password mode to verify the validity of flush packets received."
+            ::= { hwSmartLinkMulRevPortCfgEntry 4 }  
+            
+        hwSmartLinkMulRpcRevRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                " Operation of CreateAndGo can be
+	             used to create a new instance, and operation of Destroy be 
+	             used to destroy an existent index."
+            ::= { hwSmartLinkMulRevPortCfgEntry 50 }
+
+	hwSmartLinkPcIfName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..80))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Indicates the interface name."
+            ::= { hwSmartLinkMibObjects 14 } 
+	                      
+        hwSmartLinkMibTraps OBJECT-IDENTITY
+            STATUS current
+            DESCRIPTION 
+                "Definition point for smart link group notifications."
+            ::= { hwSmartLinkMib 2 }
+        
+        hwSmartLinkLinkSwitch NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkGcGroupStatus }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when smart link group link status switches."
+            ::= { hwSmartLinkMibTraps 1 }
+        
+        hwSmartLinkInactiveLinkFail NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkPcIfIndex, hwSmartLinkPcIfName }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when detect the link change to abnormal status."
+            ::= { hwSmartLinkMibTraps 2 }
+        
+        hwSmartLinkInactiveLinkResume NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkPcIfIndex, hwSmartLinkPcIfName }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when detect the link change to normal status from abnormal status."
+            ::= { hwSmartLinkMibTraps 3 }
+        
+        hwSmartLinkGroupEnable NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkGcEnable }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when smart link group was enabled."
+            ::= { hwSmartLinkMibTraps 4 }      
+            
+        hwSmartLinkGroupDisable NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkGcEnable }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when smart link group was disabled."
+            ::= { hwSmartLinkMibTraps 5 }
+            
+        hwSmartLinkLinkSwitchToMaster NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkGcGroupStatus }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when detect the link change to master from slave."
+            ::= { hwSmartLinkMibTraps 6 }
+        
+        hwSmartLinkLinkSwitchToSlave NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkGcGroupStatus }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when detect the link change to slave from master."
+            ::= { hwSmartLinkMibTraps 7 }
+        
+        hwSmartLinkGroupUp NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkGcGroupStatus }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when detect the group turn to up."
+            ::= { hwSmartLinkMibTraps 8 }
+        
+        hwSmartLinkGroupDown NOTIFICATION-TYPE
+            OBJECTS { hwSmartLinkGcGroupStatus }
+            STATUS current
+            DESCRIPTION 
+                "The SNMP trap that is generated when detect the group turn to down."
+            ::= { hwSmartLinkMibTraps 9 }      
+            
+        hwSmartLinkConformance OBJECT IDENTIFIER ::= { hwSmartLinkMib 100 }
+        hwSmartLinkCompliances OBJECT IDENTIFIER ::= { hwSmartLinkConformance 1 }
+        hwSmartLinkCompliance MODULE-COMPLIANCE
+           STATUS      current
+           DESCRIPTION
+            "The compliance statement for systems supporting this module."
+           MODULE
+           MANDATORY-GROUPS
+               {
+                   hwSmartLinkInfoGroup, hwSmartLinkRevPortCfgGroup, hwSmartLinkGroupCfgGroup, 
+                   hwSmartLinkPortCfgGroup, hwMonitorLinkGroupCfgGroup, hwMonitorLinkUpLinkPortGroup,
+                   hwMonitorLinkDownLinkPortGroup,hwSmartLinkTrapsGroup
+               }  
+                                           
+        ::= { hwSmartLinkCompliances 1 }  		
+       
+        hwSmartLinkGroups OBJECT IDENTIFIER ::= { hwSmartLinkConformance 2 }
+        
+        hwSmartLinkInfoGroup OBJECT-GROUP
+            OBJECTS { hwSmartLinkRevFlushTotal,
+                      hwSmartLinkRevLastFlushIfIndex, 
+                      hwSmartLinkRevLastFlushTime, 
+                      hwSmartLinkRevLastFlushSourceMacAddr, 
+                      hwSmartLinkRevLastFlushVlan,
+                      hwSmartLinkResetFlushStatistics }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing smart link information."
+            ::= { hwSmartLinkGroups 1 }
+        
+        hwSmartLinkRevPortCfgGroup OBJECT-GROUP
+            OBJECTS { hwSmartLinkRpcRevVlan, hwSmartLinkRpcRevPassword, hwSmartLinkRpcRevAuthMode }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing port configuration which received flush packet."
+            ::= { hwSmartLinkGroups 2 }
+        
+        hwSmartLinkGroupCfgGroup OBJECT-GROUP
+            OBJECTS { hwSmartLinkGcMasterIfIndex, 
+                      hwSmartLinkGcSlaveIfIndex,
+                      hwSmartLinkGcGroupStatus,
+                      hwSmartLinkGcEnable,
+                      hwSmartLinkGcSendControlVlan, 
+                      hwSmartLinkGcSendPassword, 
+                      hwSmartLinkGcLock,
+                      hwSmartLinkGcForce, 
+                      hwSmartLinkGcRevertWtrTime, 
+                      hwSmartLinkGcRevertEnable, 
+                      hwSmartLinkGcManual, 
+                      hwSmartLinkGcRowStatus,
+                      hwSmartLinkGcAuthMode }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing smart link group status information."
+            ::= { hwSmartLinkGroups 3 }
+        
+        hwSmartLinkPortCfgGroup OBJECT-GROUP
+            OBJECTS { hwSmartLinkPcIfIndex, 
+                      hwSmartLinkPcPortStatus,
+                      hwSmartLinkPcSendFlushNum,
+                      hwSmartLinkPcSendFlushTime, 
+                      hwSmartLinkPcRowStatus,
+                      hwSmartLinkPcIfName }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing smart link port configuration."
+            ::= { hwSmartLinkGroups 4 }
+                    
+        hwMonitorLinkGroupCfgGroup OBJECT-GROUP
+            OBJECTS { hwMonitorLinkGcRecoverTime, 
+                      hwMonitorLinkGcRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects provding monitor link group information. "
+            ::= { hwSmartLinkGroups 5 }
+                
+        hwMonitorLinkUpLinkPortGroup OBJECT-GROUP
+            OBJECTS { hwMonitorLinkUlPortValue,
+                      hwMonitorLinkUlPortStatus,
+                      hwMonitorLinkUlPortUpTime, 
+                      hwMonitorLinkUlPortDownTime, 
+                      hwMonitorLinkUlRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing monitor link group uplink port configuration."
+            ::= { hwSmartLinkGroups 6 }
+        
+        hwMonitorLinkDownLinkPortGroup OBJECT-GROUP
+            OBJECTS { hwMonitorLinkDlIfIndex,
+                      hwMonitorLinkDlPortStatus, 
+                      hwMonitorLinkDlPortUpTime, 
+                      hwMonitorLinkDlPortDownTime, 
+                      hwMonitorLinkDlRowStatus }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing monitor link group downlink port configuration."
+            ::= { hwSmartLinkGroups 7 }
+        
+        hwSmartLinkTrapGroups OBJECT IDENTIFIER ::= { hwSmartLinkConformance 3 }
+        
+        hwSmartLinkTrapsGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwSmartLinkLinkSwitch, 
+                            hwSmartLinkInactiveLinkFail, 
+                            hwSmartLinkInactiveLinkResume,
+                            hwSmartLinkGroupEnable, 
+                            hwSmartLinkGroupDisable,
+                            hwSmartLinkLinkSwitchToMaster, 
+                            hwSmartLinkLinkSwitchToSlave, 
+                            hwSmartLinkGroupUp,
+                            hwSmartLinkGroupDown }
+            STATUS current
+            DESCRIPTION 
+                "The Group of smart link Trap."
+            ::= { hwSmartLinkTrapGroups 1 }
+        
+        
+    
+    END

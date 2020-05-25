@@ -1,0 +1,12 @@
+os: fiberhome-switch
+text: 'FiberHome Switch'
+type: network
+icon: fiberhome
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3807.1.
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - fiberhome

@@ -1,0 +1,1414 @@
+-- =================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: The HUAWEI-DC-BASE-MIB provides information about DataComm TRAPS
+-- 
+-- Reference:
+-- Version:     V2.08
+-- History:
+-- 
+-- =================================================================
+
+    HUAWEI-BASE-TRAP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+			ifOperStatus,ifAdminStatus
+				FROM RFC1213-MIB
+            entPhysicalIndex, entPhysicalContainedIn, entPhysicalClass, entPhysicalName
+                FROM ENTITY-MIB   
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            IANAItuProbableCause, IANAItuEventType            
+                FROM IANA-ITU-ALARM-TC-MIB            
+            ifIndex, ifName, ifDescr           
+                FROM IF-MIB            
+            ItuPerceivedSeverity            
+                FROM ITU-ALARM-TC-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString            
+                FROM SNMPv2-TC
+            hwStorageSpace
+                FROM  HUAWEI-FLASH-MAN-MIB
+            hwStorageSpaceFree
+                FROM  HUAWEI-FLASH-MAN-MIB
+            hwStorageName
+                FROM  HUAWEI-FLASH-MAN-MIB
+            hwSecStatTrapSlot, hwSecStatTrapCPU
+               FROM  HUAWEI-SECURITY-STAT-MIB;           
+
+    
+        hwBaseTrapMIB MODULE-IDENTITY 
+            LAST-UPDATED "201609091200Z"        -- Sep 9, 2016 at 12:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
+            DESCRIPTION 
+                "This is the base trap definition for DataCom."
+            -- Revision history
+                                                          REVISION     "201609091200Z"
+                                                          DESCRIPTION  "v2.08, add new node: hwHdlcIICPacketCrcErr"
+
+                                                     REVISION     "201607251400Z"
+			DESCRIPTION  "V2.07,hwEntBandwidthMode, hwEntityBandwidthModeChange"
+
+			REVISION     "201506021411Z"
+			DESCRIPTION  "V2.06, hwVsDiskFullAlarm,hwVsDiskResume"
+
+			REVISION     "201410131411Z"
+			DESCRIPTION  "V2.05, delete the content modified in V2.04 to rollback to V2.03"
+			
+			REVISION     "201410091411Z"
+			DESCRIPTION  "V2.04, add ifindex as VB binder under hwPortPhysicalUp, hwPortPhysicalDown"
+			
+			REVISION     "201409011411Z"
+            DESCRIPTION  "V2.03, add ifOperStatus and ifAdminStatus to objects of hwPortPhysicalDown and hwPortPhysicalUp "
+			
+            REVISION     "201306251411Z"
+            DESCRIPTION  "V2.02, add hwPortPhysicalDownReason"
+
+            REVISION "201305240000Z"                                          -- May 24, 2013 at 16:19 GMT
+            DESCRIPTION 
+                                  "V2.01, Add new nodes : hwFESInconsistencyForMemoryLack , hwFESInconsistencyForMemoryLackResume." 
+            REVISION "200701170000Z"                                         -- January 17, 2007 at 00:00 GMT           
+            DESCRIPTION 
+                                  "V1.0, the first draft."
+            ::= { hwDatacomm 129 }
+        
+    
+    
+--
+-- Node definitions
+--
+    
+        hwBaseTrapObject OBJECT IDENTIFIER ::= { hwBaseTrapMIB 1 }
+
+        
+        hwBaseTrapSeverity OBJECT-TYPE
+            SYNTAX ItuPerceivedSeverity
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe the level of trap."
+            ::= { hwBaseTrapObject 1 }
+
+        
+        hwBaseTrapProbableCause OBJECT-TYPE
+            SYNTAX IANAItuProbableCause
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe the probable cause of trap."
+            ::= { hwBaseTrapObject 2 }
+
+        
+        hwBaseTrapEventType OBJECT-TYPE
+            SYNTAX IANAItuEventType
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe the type of trap."
+            ::= { hwBaseTrapObject 3 }
+
+        
+        hwBaseTrapRelativeResource OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object may contain a key word to indicate the relative
+                resource of an entity.
+                Such as:
+                    hwEntityCommunicateError alarm may relate to a resource 
+                    named 'IPC01'(A specified channel). So the trap may contain such a varbind in 
+                    DisplayString style."
+            ::= { hwBaseTrapObject 4 }
+
+        
+        hwBaseTrapReasonDescr OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "To describe the reason of trap in DisplayString style."
+            ::= { hwBaseTrapObject 5 }
+
+        
+        hwBaseThresholdTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBaseThresholdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table to config the threshold of each sensor."
+            ::= { hwBaseTrapObject 6 }
+
+        
+        hwBaseThresholdEntry OBJECT-TYPE
+            SYNTAX HwBaseThresholdEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry of threshold table."
+            INDEX { entPhysicalIndex, hwBaseThresholdType, hwBaseThresholdIndex }
+            ::= { hwBaseThresholdTable 1 }
+
+        
+        HwBaseThresholdEntry ::=
+            SEQUENCE { 
+                hwBaseThresholdType
+                    INTEGER,
+                hwBaseThresholdIndex
+                    Integer32,
+                hwBaseThresholdValue
+                    Integer32,
+                hwBaseThresholdUnit
+                    INTEGER,
+                hwBaseThresholdLowCritical
+                    Integer32,
+                hwBaseThresholdLowWarning
+                    Integer32,
+                hwBaseThresholdHighWarning
+                    Integer32,
+                hwBaseThresholdHighCritical
+                    Integer32
+             }
+
+        hwBaseThresholdType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                temperatureSensor(1),
+                humiditySensor(2),
+                voltageSensor(3),
+                currentSensor(4),
+                powerSensor(5),
+                portTraffic(6),
+                portCrcError(7),
+                portBroadcast(8)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index to indicate the type of threshold for an entry.Such as
+                temperature, humidity ,power supply......"
+            ::= { hwBaseThresholdEntry 1 }
+
+        
+        hwBaseThresholdIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A subindex to identify each sensor on physical entity."
+            ::= { hwBaseThresholdEntry 2 }
+
+        
+        hwBaseThresholdValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current value that been measured."
+            ::= { hwBaseThresholdEntry 3 }
+
+        
+        hwBaseThresholdUnit OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                percentage(1),
+                centigrade1(2),
+                centigrade2(3),
+                voltage1(4),
+                voltage2(5),
+                current1(6),
+                current2(7),
+                power1(8),
+                power2(9)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unit for this threshold value.
+                
+                percentage(1)         ---unit for humidity
+                
+                centigrade1(2)        ---unit for temperature
+                centigrade2(3)        ---unit for hundredth of centigrade
+                
+                voltage1(4)           ---unit for volt (V)
+                voltage2(5)           ---unit for thousandth of volt (mV)
+                
+                electric current:
+                current1(6)           ---unit for milliampere (mA)
+                current2(7)           ---unit for microampere (uA)
+                
+                power1(8)             ---unit for dbm(decibels above one milliwatt in 600 ohms)
+                power2(9)             ---unit for hundredth of dbm(decibels above one milliwatt in 600 ohms)"
+            ::= { hwBaseThresholdEntry 4 }
+
+        
+        hwBaseThresholdLowCritical OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The critical alarm threshold for falling alarm. It could be used
+                for a more dangerous instance than hwBaseThresholdLowWarning.
+                
+                It should be equal to hwBaseThresholdLowWarning when don't support
+                this threshold.
+                "
+            ::= { hwBaseThresholdEntry 5 }
+
+        
+        hwBaseThresholdLowWarning OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The normal warning threshold for falling alarm. "
+            ::= { hwBaseThresholdEntry 6 }
+
+        
+        hwBaseThresholdHighWarning OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The normal warning threshold for rising alarm. "
+            ::= { hwBaseThresholdEntry 7 }
+
+        
+        hwBaseThresholdHighCritical OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The critical alarm threshold for rising alarm. It could be used
+                for a more dangerous instance than hwBaseThresholdHighWarning.
+                
+                It should be equal to hwBaseThresholdHighWarning when don't support
+                this threshold."
+            ::= { hwBaseThresholdEntry 8 }
+
+        
+        hwBaseUsageTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwBaseUsageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table to config the threshold for each storage device."
+            ::= { hwBaseTrapObject 7 }
+
+        
+        hwBaseUsageEntry OBJECT-TYPE
+            SYNTAX HwBaseUsageEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The entry for hwBaseUsageTable."
+            INDEX { entPhysicalIndex, hwBaseUsageType, hwBaseUsageIndex }
+            ::= { hwBaseUsageTable 1 }
+
+        
+        HwBaseUsageEntry ::=
+            SEQUENCE { 
+                hwBaseUsageType
+                    INTEGER,
+                hwBaseUsageIndex
+                    Integer32,
+                hwBaseUsageValue
+                    Integer32,
+                hwBaseUsageUnit
+                    INTEGER,
+                hwBaseUsageThreshold
+                    Integer32
+             }
+
+        hwBaseUsageType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                cpuUtilization(1),
+                memoryUtilization(2),
+                diskUtilizatino(3),
+                flashUtilizatino(4),
+                cfCardUtilization(5)
+                }
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index to indicate the type of threshold for an entry.Such as
+                cpu,memory,flash and so on."
+            ::= { hwBaseUsageEntry 1 }
+
+        
+        hwBaseUsageIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A subindex to identify each sensor on physical entity."
+            ::= { hwBaseUsageEntry 2 }
+
+        
+        hwBaseUsageValue OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The current value that been measured."
+            ::= { hwBaseUsageEntry 3 }
+
+        
+        hwBaseUsageUnit OBJECT-TYPE
+            SYNTAX INTEGER { percentage(1) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The unit for this threshold value.
+                
+                percentage(1)         ---unit for cpu/men/disk/flash/cfCard
+                "
+            ::= { hwBaseUsageEntry 4 }
+
+        
+        hwBaseUsageThreshold OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The threshold of usage for storage device."
+            ::= { hwBaseUsageEntry 5 }
+
+        
+        hwFIBOverloadModule OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                ipv4(1),
+                ipv6(2)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "module is ipv4 or ipv6"
+            ::= { hwBaseTrapObject 8 }
+
+        
+        hwBaseFlowDirectionType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                inbound(1),
+                outbound(2)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "
+                The direction of data flow is specified.
+                "
+            ::= { hwBaseTrapObject 9 }
+
+        
+        hwPowerDirection OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                inbound(1),
+                outbound(2)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The direction of photoelectric power."
+            ::= { hwBaseTrapObject 10 }
+
+
+        hwBaseTrapTrafficDir OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                trafficIn(1),
+                trafficOut(2)
+                }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The traffic flows in or out of the port."
+            ::= { hwBaseTrapObject 11 }
+        
+    hwEntityRatedPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The rated power of board."
+        ::= { hwBaseTrapObject 12 }
+        
+    hwDevAvailablePower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Available power of the device."
+        ::= { hwBaseTrapObject 13 }
+        
+    hwDeviceTotalPower OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "Total power of the device."
+        ::= { hwBaseTrapObject 14 }
+        
+        
+    hwBaseTrapCurPortType OBJECT-TYPE
+       SYNTAX Integer32
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The current type of port."
+       ::= { hwBaseTrapObject 15 }
+
+
+    hwBaseTrapLastPortType OBJECT-TYPE
+       SYNTAX Integer32
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "The last type of port."
+       ::= { hwBaseTrapObject 16 }
+       
+       
+    hwPortPhysicalDownReason OBJECT-TYPE
+       SYNTAX OCTET STRING
+       MAX-ACCESS accessible-for-notify
+       STATUS current
+       DESCRIPTION
+           "AUAIS: The RX detects administrative(A) unit(U) alarm(A) indication(I) signal(S).
+           B1TCA: The RX detects b1(B1) threshold(T) crossing(C) alarm(A).
+           B2TCA: The RX detects b2(B2) threshold(T) crossing(C) alarm(A).
+           B3TCA: The RX detects b3(B3) threshold(T) crossing(C) alarm(A).
+           LAIS: The RX detects line(L) alarm(A) indication(I) signal(S).
+           LCD: The RX detects loss(L) of code-group(C) delineation(D).
+           LOF: The RX detects loss(L) of(O) frame(F).
+           LOM: The RX detects loss(L) of(O) multiframe(M).
+           LOP: The RX detects loss(L) of(O) pointer(M).
+           LOS: The RX detects loss(L) of(O) signal(S).
+           LRDI: The RX detects line(L) remote(R) defect(D) indication(I).
+           LREI: The RX detects line(L) remote(R) error(D) indication(I).
+           OOF: The RX detects out(O) of(O) frame(F).
+           PAIS: The RX detects path(P) alarm(A) indication(I) signal(S).
+           PPLM: The RX detects path(P) payload(P) label(L) mismatch(M).
+           PRDI: The RX detects path(P) remote(R) defect(D) indication(I).
+           PREI: The RX detects path(P) remote(R) error(E) indication(I).
+           PUNEQ: The RX detects path(P) unequipped(UNEQ).
+           RDOOL: The RX detects receive(R) data(D) out(O) of(O) lock(L).
+           RROOL: The RX detects receive(R) reference(R) out(O) of(O) lock(L).
+           SD: The RX detects signal(S) degrade(D).
+           SF: The RX detects signal(S) fail(F).
+           TROOL: The TX detects transmit(T) reference(R) out(O) of(O) lock(L).
+           WLINK: The RX detects pcs link has failed (wis mode).
+           TRANSCEIVER_OFFLINE: The transceiver is not in position.
+           TRANSCEIVER_FAIL: A hardware failure occurs when accessing the transceiver.
+           TRANSCEIVER_MISMATCH: The transceiver does not match the port-mode.
+           TRANSCEIVER_UNKNOWN: The transceiver is unknown type.
+           PMA_LOS: The PMA(physical medium attachment) detects loss of signal.
+           PMA_UNLOCK: The PMA(physical medium attachment) detects receive data out of lock.
+           PCS_HIGHBER: The PCS(physical coding sublayer) enter High-BER status.
+           PCS_UNLOCK: The PCS(physical coding sublayer) detects receive data out of lock.
+           LOCAL_FAULT: The RX detects Local Fault signal.
+           REMOTE_FAULT: The RX detects Remote Fault signal.
+           NEGOTIATION_FAIL: Auto-negotiation is not successful.
+           SOFT_FORCE_DOWN: The interface was DOWN triggered by a protocol module or was administratively shut down."
+       ::= { hwBaseTrapObject 17 }
+
+    hwEntBandwidthMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                eth28x10gf(1),
+                eth26x10gf18xgf(2)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The bandwidth mode of card."
+            ::= { hwBaseTrapObject 18 }   
+
+        hwBaseTraps OBJECT IDENTIFIER ::= { hwBaseTrapMIB 2 }
+
+        
+        hwEntityTrap OBJECT IDENTIFIER ::= { hwBaseTraps 1 }
+
+        
+        hwEntityRemove NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Entity has been removed."
+            ::= { hwEntityTrap 1 }
+
+        
+        hwEntityInsert NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Entity has been inserted."
+            ::= { hwEntityTrap 2 }
+
+        
+        hwEntityUnstable NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Entity has been inserted but position unstable."
+            ::= { hwEntityTrap 3 }
+
+        
+        hwEntityUnstableResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "Resume from entity position unstable situation."
+            ::= { hwEntityTrap 4 }
+
+        
+        hwEntityReset NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Entity will be reseted."
+            ::= { hwEntityTrap 5 }
+
+        
+        hwEntityResetDone NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Entity has been reseted and in good health now."
+            ::= { hwEntityTrap 6 }
+
+        
+        hwEntityCommunicateError NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Communication error has been detected.
+                Include all kinds of communication error between boards."
+            ::= { hwEntityTrap 7 }
+
+        
+        hwEntityCommunicateResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Resume from communication error situation."
+            ::= { hwEntityTrap 8 }
+
+        
+        hwEntityInvalid NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Entity is invalid for some reason."
+            ::= { hwEntityTrap 9 }
+
+        
+        hwEntityResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Entity reusme from invalid situation."
+            ::= { hwEntityTrap 10 }
+
+        
+        hwEntityLeaveMaster NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Redundant entity leave master role."
+            ::= { hwEntityTrap 11 }
+
+        
+        hwEntityBecomeMaster NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Redundant entity become master role."
+            ::= { hwEntityTrap 12 }
+
+        
+        hwEntityOffline NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Entity change to OFFLINE status."
+            ::= { hwEntityTrap 13 }
+
+        
+        hwEntityOnline NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Entity change to ONLINE status."
+            ::= { hwEntityTrap 14 }
+
+        
+        hwEntityCheckFail NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "
+                Failure of self-check occurs to the board
+                "
+            ::= { hwEntityTrap 15 }
+
+        
+        hwEntityCheckResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "
+                The status is recovered from the failure of board self-check
+                "
+            ::= { hwEntityTrap 16 }
+
+        
+        hwEntityRegFail NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Entity fail in registration."
+            ::= { hwEntityTrap 17 }
+
+        
+        hwEntityRegSuccess NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Entity success in registration."
+            ::= { hwEntityTrap 18 }
+
+        hwEntityDyingGasp NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapRelativeResource, hwBaseTrapProbableCause, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Dying gasp event is occurred."
+            ::= { hwEntityTrap 19 }
+
+        hwEntityBandwidthModeChange NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapEventType, entPhysicalIndex, entPhysicalContainedIn, entPhysicalName, 
+                hwEntBandwidthMode}
+            STATUS current
+            DESCRIPTION 
+                "The bandwidth mode of physical entity is changed."
+            ::= { hwEntityTrap 20 }
+        
+        hwEnvironmentTrap OBJECT IDENTIFIER ::= { hwBaseTraps 2 }
+
+        
+        hwTempRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
+            STATUS current
+            DESCRIPTION 
+                "Temperature rise over HIGH threshold."
+            ::= { hwEnvironmentTrap 1 }
+
+        
+        hwTempRisingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
+            STATUS current
+            DESCRIPTION 
+                "Temperature back to normal level."
+            ::= { hwEnvironmentTrap 2 }
+
+        
+        hwTempFallingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "Temperature fall below LOW threshold."
+            ::= { hwEnvironmentTrap 3 }
+
+        
+        hwTempFallingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "Temperature back to normal level."
+            ::= { hwEnvironmentTrap 4 }
+
+        
+        hwHumidityRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
+            STATUS current
+            DESCRIPTION 
+                "Humidity rise over HIGH threshold."
+            ::= { hwEnvironmentTrap 5 }
+
+        
+        hwHumidityRisingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
+            STATUS current
+            DESCRIPTION 
+                "Humidity back to normal level."
+            ::= { hwEnvironmentTrap 6 }
+
+        
+        hwHumidityFallingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "Humidity fall below LOW threshold."
+            ::= { hwEnvironmentTrap 7 }
+
+        
+        hwHumidityFallingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "Humidity back to normal level."
+            ::= { hwEnvironmentTrap 8 }
+
+        
+        hwVoltRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
+            STATUS current
+            DESCRIPTION 
+                "Voltage of power rise over HIGH threshold."
+            ::= { hwEnvironmentTrap 9 }
+
+        
+        hwVoltRisingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
+            STATUS current
+            DESCRIPTION 
+                "Voltage back to normal level."
+            ::= { hwEnvironmentTrap 10 }
+
+        
+        hwVoltFallingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "Voltage of power fall below LOW threshold."
+            ::= { hwEnvironmentTrap 11 }
+
+        
+        hwVoltFallingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "Voltage back to normal level."
+            ::= { hwEnvironmentTrap 12 }
+
+        
+        hwCurrentRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
+            STATUS current
+            DESCRIPTION 
+                "Current rise over HIGH threshold."
+            ::= { hwEnvironmentTrap 13 }
+
+        
+        hwCurrentRisingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical }
+            STATUS current
+            DESCRIPTION 
+                "Current back to normal level."
+            ::= { hwEnvironmentTrap 14 }
+
+        
+        hwCurrentFallingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "Current fall below LOW threshold."
+            ::= { hwEnvironmentTrap 15 }
+
+        
+        hwCurrentFallingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "Current back to normal level."
+            ::= { hwEnvironmentTrap 16 }
+
+        
+        hwPowerRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical, hwPowerDirection }
+            STATUS current
+            DESCRIPTION 
+                "Photoelectric power rise over HIGH threshold."
+            ::= { hwEnvironmentTrap 17 }
+
+        
+        hwPowerRisingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical, hwPowerDirection }
+            STATUS current
+            DESCRIPTION 
+                "Photoelectric power back to normal level."
+            ::= { hwEnvironmentTrap 18 }
+
+        
+        hwPowerFallingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning, hwPowerDirection }
+            STATUS current
+            DESCRIPTION 
+                "Photoelectric power fall below LOW threshold."
+            ::= { hwEnvironmentTrap 19 }
+
+        
+        hwPowerFallingResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseThresholdValue, 
+                hwBaseThresholdUnit, hwBaseThresholdLowCritical, hwBaseThresholdLowWarning, hwPowerDirection }
+            STATUS current
+            DESCRIPTION 
+                "Photoelectric power back to normal level."
+            ::= { hwEnvironmentTrap 20 }
+
+    hwPowerInsufficiencyAlarm NOTIFICATION-TYPE
+        OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+            hwEntityRatedPower, hwDevAvailablePower, hwDeviceTotalPower }
+        STATUS current
+        DESCRIPTION 
+            "The available power of device is not enough for the board."
+        ::= { hwEnvironmentTrap 21 }
+
+    hwPowerInsufficiencyResume NOTIFICATION-TYPE
+        OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+            hwEntityRatedPower, hwDevAvailablePower, hwDeviceTotalPower }
+        STATUS current
+        DESCRIPTION 
+            "The available power of device becomes sufficient for the board."
+        ::= { hwEnvironmentTrap 22 }
+        
+    hwAcuSoftwareUpgradeFailure NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "ACU current startup system software and next startup system software are difference."
+        ::= { hwEnvironmentTrap 23 }
+
+
+        hwPowerTrap OBJECT IDENTIFIER ::= { hwBaseTraps 3 }
+
+        
+        hwPowerOff NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "One of the power is shutting down."
+            ::= { hwPowerTrap 1 }
+
+        
+        hwPowerOn NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "One of the power is starting up."
+            ::= { hwPowerTrap 2 }
+           
+           
+        hwPowerMixed NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The power is not of the same type!"
+            ::= { hwPowerTrap 3 }
+
+
+        hwPowerMixedResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName
+                 }
+            STATUS current
+            DESCRIPTION 
+                "The power is changed to the same type!"
+            ::= { hwPowerTrap 4 }
+        
+        hwCPUTrap OBJECT IDENTIFIER ::= { hwBaseTraps 4 }
+
+        
+        hwCPUUtilizationRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, 
+                hwBaseUsageValue, hwBaseUsageUnit, hwBaseUsageThreshold }
+            STATUS current
+            DESCRIPTION 
+                "CPU utilization exceed threshold."
+            ::= { hwCPUTrap 1 }
+
+        
+        hwCPUUtilizationResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, 
+                hwBaseUsageValue, hwBaseUsageUnit, hwBaseUsageThreshold }
+            STATUS current
+            DESCRIPTION 
+                "CPU utilization back to normal level."
+            ::= { hwCPUTrap 2 }
+
+        
+        hwPortTrap OBJECT IDENTIFIER ::= { hwBaseTraps 5 }
+
+        
+        hwPortPhysicalDown NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwPortPhysicalDownReason, ifOperStatus, ifAdminStatus }
+            STATUS current
+            DESCRIPTION 
+                "One of the port physical connect down."
+            ::= { hwPortTrap 1 }
+
+        
+        hwPortPhysicalUp NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, ifOperStatus, ifAdminStatus }
+            STATUS current
+            DESCRIPTION 
+                "One of the port physical connect up."
+            ::= { hwPortTrap 2 }
+
+        
+        hwPortPhysicalNoTrafficAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, hwBaseTrapTrafficDir }
+            STATUS current
+            DESCRIPTION 
+                "One of the port has none traffic."
+            ::= { hwPortTrap 3 }
+            
+        
+        hwPortPhysicalNoTrafficClear NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, hwBaseTrapTrafficDir }
+            STATUS current
+            DESCRIPTION 
+                "One of the port traffic resume."
+            ::= { hwPortTrap 4 }
+            
+        
+        hwPortPhysicalTrafficRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, hwBaseThresholdValue, hwBaseThresholdUnit, hwBaseThresholdHighWarning, hwBaseTrapTrafficDir }
+            STATUS current
+            DESCRIPTION 
+                "One of the port traffic rise over threshold."
+            ::= { hwPortTrap 5 }
+            
+        
+        hwPortPhysicalTrafficClear NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, hwBaseThresholdValue, hwBaseThresholdUnit, hwBaseThresholdLowWarning, hwBaseTrapTrafficDir }
+            STATUS current
+            DESCRIPTION 
+                "One of the port traffic resume to normal level."
+            ::= { hwPortTrap 6 }
+            
+        
+        hwPortPhysicalCrcErrorRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, hwBaseThresholdValue, hwBaseThresholdUnit, hwBaseThresholdHighWarning }
+            STATUS current
+            DESCRIPTION 
+                "One of the port CRC error rise over threshold."
+            ::= { hwPortTrap 7 }
+            
+        
+        hwPortPhysicalCrcErrorClear NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, hwBaseThresholdValue, hwBaseThresholdUnit, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "One of the port CRC error resume to normal level."
+            ::= { hwPortTrap 8 }
+            
+        
+        hwPortPhysicalEthBroadcastRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, hwBaseThresholdValue, hwBaseThresholdUnit, hwBaseThresholdHighWarning }
+            STATUS current
+            DESCRIPTION 
+                "One of the Ethernet port broadcast rise over threshold."
+            ::= { hwPortTrap 9 }
+            
+        
+        hwPortPhysicalEthBroadcastClear NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, hwBaseThresholdValue, hwBaseThresholdUnit, hwBaseThresholdLowWarning }
+            STATUS current
+            DESCRIPTION 
+                "One of the Ethernet port broadcast resume to normal level."
+            ::= { hwPortTrap 10 }
+            
+        
+        hwPortPhysicalEthHalfDuplexAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource }
+            STATUS current
+            DESCRIPTION 
+                "One of the Ethernet port works on the half-duplex mode."
+            ::= { hwPortTrap 11 }
+            
+        
+        hwPortPhysicalEthFullDuplexClear NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource }
+            STATUS current
+            DESCRIPTION 
+                "One of the Ethernet port works on the full-duplex mode."
+            ::= { hwPortTrap 12 }
+            
+                                                
+        hwPortPhysicalPortTypeChange NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapLastPortType, 
+                hwBaseTrapCurPortType }
+            STATUS current
+            DESCRIPTION 
+                    "One of the port type changed."
+            ::= { hwPortTrap 13 }
+
+hwPortPhysicalAutoNegotiateFail NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource }
+            STATUS current
+            DESCRIPTION 
+                    "One of the port auto-negotiation failed."
+            ::= { hwPortTrap 14 }
+
+hwPortPhysicalAutoNegotiateResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource }
+            STATUS current
+            DESCRIPTION 
+                    "One of the port auto-negotiation resumed."
+            ::= { hwPortTrap 15 }
+                
+        hwStorageTrap OBJECT IDENTIFIER ::= { hwBaseTraps 6 }
+
+        
+        hwStorageUtilizationRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, 
+                hwBaseUsageValue, hwBaseUsageUnit, hwBaseUsageThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Storage device utilization rise over threshold."
+            ::= { hwStorageTrap 1 }
+
+        
+        hwStorageUtilizationResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource, 
+                hwBaseUsageValue, hwBaseUsageUnit, hwBaseUsageThreshold }
+            STATUS current
+            DESCRIPTION 
+                "Storage utilization resume to normal level."
+            ::= { hwStorageTrap 2 }
+
+        hwVsDiskFullAlarm NOTIFICATION-TYPE
+            OBJECTS {hwStorageSpace,hwStorageSpaceFree,hwStorageName}
+            STATUS current
+            DESCRIPTION 
+                "The disk usage exceeded  the overload threadhold."
+            ::= { hwStorageTrap 3 }
+
+
+        hwVsDiskResume NOTIFICATION-TYPE
+            OBJECTS { hwStorageSpace,hwStorageSpaceFree,hwStorageName}
+            STATUS current
+            DESCRIPTION 
+                "The disk usage fall below the clear threashold."
+            ::= { hwStorageTrap 4}
+
+
+        hwClockTrap OBJECT IDENTIFIER ::= { hwBaseTraps 7 }
+
+        
+        hwFanTrap OBJECT IDENTIFIER ::= { hwBaseTraps 8 }
+
+        
+        hwFibTrap OBJECT IDENTIFIER ::= { hwBaseTraps 9 }
+
+        
+        hwFIBOverloadSuspend NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwFIBOverloadModule, entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The board is suspended for IPv4/IPv6 FIB capability overload."
+            ::= { hwFibTrap 1 }
+
+        
+        hwFIBOverloadSusResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwFIBOverloadModule, entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The board is recovered for FIB capability overload suspend."
+            ::= { hwFibTrap 2 }
+
+        
+        hwFIBOverloadForward NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwFIBOverloadModule, entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The board is forwarding for IPv4/IPv6 FIB capability overload."
+            ::= { hwFibTrap 3 }
+
+        
+        hwFIBOverloadFwResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwFIBOverloadModule, entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The board is recovered for IPv4/IPv6 FIB capability overload forward."
+            ::= { hwFibTrap 4 }
+
+
+        hwFESInconsistencyForMemoryLack NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapEventType, entPhysicalIndex, entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "Because the memory usage of the interface board exceeds the upper threshold, the 
+                FES cannot add new entries. As a result, the entries of the interface board is inconsistent with those of the main  board."
+            ::= { hwFibTrap 5 }
+
+         
+        hwFESInconsistencyForMemoryLackResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapEventType, entPhysicalIndex, entPhysicalName }
+            STATUS current
+            DESCRIPTION 
+                "The memory usage of the interface board reduces to the lower threshold, and the FES can add entries. 
+                The entries of the interface board is consistent with those of the main board."
+            ::= { hwFibTrap 6 }
+                      
+           
+        hwPppTrap OBJECT IDENTIFIER ::= { hwBaseTraps 10 }
+
+        
+        hwPppLoopbackDetect NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, ifIndex, ifName }
+            STATUS current
+            DESCRIPTION 
+                "The interface Loopback is detected."
+            ::= { hwPppTrap 1 }
+
+        
+        hwPppLoopbackDetResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, ifIndex, ifName }
+            STATUS current
+            DESCRIPTION 
+                "The interface is recovered from Loopback."
+            ::= { hwPppTrap 2 }
+
+        
+        hwFlowControlTrap OBJECT IDENTIFIER ::= { hwBaseTraps 11 }
+
+        
+        hwFlowCongestion NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalClass, entPhysicalName, 
+                hwBaseFlowDirectionType }
+            STATUS current
+            DESCRIPTION 
+                "
+                The object is in congested state and some of the frames are dropped.
+                "
+            ::= { hwFlowControlTrap 1 }
+
+        
+        hwFlowCongestionResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalClass, entPhysicalName, 
+                hwBaseFlowDirectionType }
+            STATUS current
+            DESCRIPTION 
+                "
+                Alarms of the congested object are cleared.
+                "
+            ::= { hwFlowControlTrap 2 }
+
+        hwDeviceAbnormalTrap OBJECT IDENTIFIER ::= { hwBaseTraps 12 }
+
+        
+        hwDeviceAbnormalRisingAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalName, hwBaseTrapRelativeResource }
+            STATUS current
+            DESCRIPTION 
+                "Device abnormal or pulled out."
+            ::= { hwDeviceAbnormalTrap 1 }
+
+                
+        hwResExhaustBfdTrap OBJECT IDENTIFIER ::= { hwBaseTraps 13 }
+
+        
+        hwResExhaustBfdAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType }
+            STATUS current
+            DESCRIPTION 
+                "Failed to allocate resources for BFD because hardware resources were exhausted."
+            ::= { hwResExhaustBfdTrap 1 }
+
+        hwResExhaustBfdResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType }
+            STATUS current
+            DESCRIPTION 
+                "BFD recovered from alarms of hardware resources exhausting."
+            ::= { hwResExhaustBfdTrap 2 }   
+            
+        hwResExhaustOamTrap OBJECT IDENTIFIER ::= { hwBaseTraps 14 }
+
+        
+        hwResExhaustOamAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType }
+            STATUS current
+            DESCRIPTION 
+                "Failed to allocate resources for OAM because hardware resources were exhausted. 
+                MPLS OAM is short for Operation Administration and Maintenance by MPLS. 
+                It is used for connectivity verification of MPLS LSP."
+            ::= { hwResExhaustOamTrap 1 }
+
+        hwResExhaustOamResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType }
+            STATUS current
+            DESCRIPTION 
+                "OAM recovered from alarms of hardware resources exhausting.
+                MPLS OAM is short for Operation Administration and Maintenance by MPLS. 
+                It is used for connectivity verification of MPLS LSP."
+            ::= { hwResExhaustOamTrap 2 }
+
+        hwHdlcTrap OBJECT IDENTIFIER ::= { hwBaseTraps 15 }
+
+        
+        hwHdlcLoopbackDetect NOTIFICATION-TYPE
+            OBJECTS { ifDescr }
+            STATUS current
+            DESCRIPTION 
+                "The interface Loopback is detected."
+            ::= { hwHdlcTrap 1 }
+
+        
+        hwHdlcLoopbackDetResume NOTIFICATION-TYPE
+            OBJECTS { ifDescr }
+            STATUS current
+            DESCRIPTION 
+                "The interface is recovered from Loopback."
+            ::= { hwHdlcTrap 2 }
+       
+         hwHdlcIICPacketCrcErr NOTIFICATION-TYPE
+             OBJECTS {hwSecStatTrapSlot, hwSecStatTrapCPU}
+             STATUS current
+             DESCRIPTION 
+                 "The packet(s) crc error"
+              ::= { hwHdlcTrap 3 }
+
+    hwAutoFtpTrap OBJECT IDENTIFIER ::= { hwBaseTraps 16 }
+        
+        hwAutoFtpFailAlarm NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapReasonDescr,hwBaseTrapSeverity }
+            STATUS current
+            DESCRIPTION 
+                "This object indicates the software failure in the automatic upgrade system."
+            ::= { hwAutoFtpTrap 1 }
+            
+        hwBaseOpticalTrap OBJECT IDENTIFIER ::= { hwBaseTraps 17 }
+        
+        hwOpticalPowerAbnormal NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Optical rxpower or txpower is exceed threshold value."
+            ::= { hwBaseOpticalTrap 1 }
+                    
+        hwOpticalPowerResume NOTIFICATION-TYPE
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, entPhysicalContainedIn, entPhysicalName, 
+                hwBaseTrapRelativeResource, hwBaseTrapReasonDescr }
+            STATUS current
+            DESCRIPTION 
+                "Optical power resume."
+            ::= { hwBaseOpticalTrap 2 }
+        hwBaseTrapConformance OBJECT IDENTIFIER ::= { hwBaseTrapMIB 3 }
+
+        
+        hwBaseTrapCompliances OBJECT IDENTIFIER ::= { hwBaseTrapConformance 1 }
+
+        
+        hwBaseTrapCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "Compliance statement for agents that provide full support for 
+                hwBaseTrapMIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwBaseObjectGroup }
+            ::= { hwBaseTrapCompliances 1 }
+
+        
+        hwBaseTrapGroups OBJECT IDENTIFIER ::= { hwBaseTrapConformance 2 }
+
+        
+        hwBaseObjectGroup OBJECT-GROUP
+            OBJECTS { hwBaseTrapSeverity, hwBaseTrapProbableCause, hwBaseTrapEventType, hwBaseThresholdValue, hwBaseThresholdUnit, 
+                hwBaseThresholdLowCritical, hwBaseThresholdLowWarning, hwBaseThresholdHighWarning, hwBaseThresholdHighCritical, hwBaseUsageValue, 
+                hwBaseUsageUnit, hwBaseUsageThreshold, hwDevAvailablePower, hwEntityRatedPower, hwDeviceTotalPower, 
+                hwBaseTrapLastPortType, hwPortPhysicalDownReason, hwBaseTrapCurPortType, hwBaseTrapReasonDescr, 
+                hwBaseTrapRelativeResource, hwFIBOverloadModule, hwBaseFlowDirectionType, hwPowerDirection, hwBaseTrapTrafficDir,hwEntBandwidthMode
+                }
+            STATUS current
+            DESCRIPTION 
+                "Group for base trap objects."
+            ::= { hwBaseTrapGroups 1 }
+
+        
+        hwBaseTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwEntityRemove, hwEntityInsert, hwEntityUnstable, hwEntityUnstableResume, hwEntityReset, 
+                hwEntityResetDone, hwEntityCommunicateError, hwEntityCommunicateResume, hwEntityInvalid, hwEntityResume, 
+                hwEntityLeaveMaster, hwEntityBecomeMaster, hwEntityOffline, hwEntityOnline, hwEntityRegFail, 
+                hwEntityRegSuccess, hwEntityDyingGasp, hwTempRisingAlarm, hwTempRisingResume, hwTempFallingAlarm, 
+                hwTempFallingResume, hwHumidityRisingAlarm, hwHumidityRisingResume, hwHumidityFallingAlarm, hwHumidityFallingResume, 
+                hwVoltRisingAlarm, hwVoltRisingResume, hwVoltFallingAlarm, hwVoltFallingResume, hwCurrentRisingAlarm, 
+                hwCurrentRisingResume, hwCurrentFallingAlarm, hwCurrentFallingResume, hwPowerRisingAlarm, hwPowerRisingResume, 
+                hwPowerFallingAlarm, hwPowerInsufficiencyAlarm, hwPowerInsufficiencyResume, hwPowerFallingResume, hwPowerOff, 
+                hwPowerOn, hwPowerMixed, hwPowerMixedResume, hwCPUUtilizationRisingAlarm, hwCPUUtilizationResume, 
+                hwPortPhysicalDown, hwPortPhysicalUp, hwPortPhysicalNoTrafficAlarm, hwPortPhysicalNoTrafficClear, hwPortPhysicalTrafficRisingAlarm, 
+                hwPortPhysicalTrafficClear, hwPortPhysicalCrcErrorRisingAlarm, hwPortPhysicalCrcErrorClear, hwPortPhysicalEthBroadcastRisingAlarm, hwPortPhysicalEthBroadcastClear, 
+                hwPortPhysicalEthHalfDuplexAlarm, hwPortPhysicalEthFullDuplexClear, hwStorageUtilizationRisingAlarm, hwStorageUtilizationResume, hwVsDiskFullAlarm,hwVsDiskResume,hwFIBOverloadSuspend, 
+                hwFIBOverloadSusResume, hwFIBOverloadForward, hwFIBOverloadFwResume, hwFESInconsistencyForMemoryLack, hwFESInconsistencyForMemoryLackResume, 
+                hwPppLoopbackDetect, hwPppLoopbackDetResume, hwEntityCheckFail, hwEntityCheckResume, hwFlowCongestion, hwFlowCongestionResume, hwDeviceAbnormalRisingAlarm, 
+                hwResExhaustBfdAlarm, hwResExhaustBfdResume, hwResExhaustOamAlarm, hwResExhaustOamResume, hwHdlcLoopbackDetect, 
+                hwAutoFtpFailAlarm, hwOpticalPowerResume, hwHdlcLoopbackDetResume, hwPortPhysicalPortTypeChange, hwPortPhysicalAutoNegotiateFail, 
+                hwPortPhysicalAutoNegotiateResume, hwOpticalPowerAbnormal, hwAcuSoftwareUpgradeFailure, hwEntityBandwidthModeChange,hwHdlcIICPacketCrcErr}
+            STATUS current
+            DESCRIPTION 
+                "Group for all base traps."
+            ::= { hwBaseTrapGroups 2 }
+
+        
+    
+    END
+
+--
+-- HUAWEI-BASE-TRAP-MIB.mib
+--

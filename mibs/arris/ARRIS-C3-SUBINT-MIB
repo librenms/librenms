@@ -1,0 +1,516 @@
+ARRIS-C3-SUBINT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    TruthValue
+        FROM SNMPv2-TC
+    TEXTUAL-CONVENTION, RowStatus
+        FROM SNMPv2-TC
+    cmtsC3
+        FROM ARRIS-MIB;
+
+    cmtsC3SubIntMIB  MODULE-IDENTITY
+        LAST-UPDATED "200308200000Z" -- 20th August 2003
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the Sub-Interface software on the Arris CMTS C3"
+        ::= { cmtsC3 11 }
+
+    dcxSubIntObjects OBJECT IDENTIFIER ::= { cmtsC3SubIntMIB 1 }
+
+    dcxSubIntControlGroup OBJECT IDENTIFIER ::= { dcxSubIntObjects 1 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- SUB INTERFACE TABLE
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    dcxSubIntTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DcxSubIntEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Arris C3 Proprietary Sub-Interface table"
+        ::= { dcxSubIntControlGroup 1 }
+    
+    dcxSubIntEntry OBJECT-TYPE
+        SYNTAX      DcxSubIntEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "A row in the dcxSubIntTable. An entry in this table exists 
+		 for each Sub-Interface configured on the CMTS"
+        INDEX {dcxSubIntSlotIndex, dcxSubIntPortIndex, dcxSubIntSubIntIndex}
+        ::= { dcxSubIntTable 1 }
+    
+    DcxSubIntEntry ::= SEQUENCE {
+            dcxSubIntSlotIndex                 Unsigned32,
+            dcxSubIntPortIndex                 Unsigned32,
+            dcxSubIntSubIntIndex               Unsigned32,
+	    dcxSubIntBridgeGroupNum            Unsigned32,
+	    dcxSubIntManagementAccess          TruthValue,
+	    dcxSubIntPrimaryIpAddress          IpAddress,
+	    dcxSubIntPrimaryIpMask             IpAddress,
+	    dcxSubIntPrimaryIpBCastAddress     IpAddress,
+	    dcxSubIntRelayEnabled              TruthValue,
+	    dcxSubIntRelayInformationOption    TruthValue,
+	    dcxSubIntGiaddrPolicy              INTEGER,
+	    dcxSubIntInboundAclIndex           Unsigned32,
+	    dcxSubIntOutgoingAclIndex          Unsigned32,
+	    dcxSubIntUnboundTag		       Unsigned32,
+	    dcxSubIntUnboundTagIsNative	       TruthValue,
+	    dcxSubIntOperational	       TruthValue,
+	    dcxSubIntStatus                    RowStatus
+         }
+
+    dcxSubIntSlotIndex OBJECT-TYPE
+        SYNTAX          Unsigned32(0..4094)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "the slot index of the card in the Cmts"
+        ::= { dcxSubIntEntry 1 }
+
+    dcxSubIntPortIndex OBJECT-TYPE
+        SYNTAX          Unsigned32(0..4094)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "the port index of the port on a card"
+        ::= { dcxSubIntEntry 2 }
+
+    dcxSubIntSubIntIndex OBJECT-TYPE
+        SYNTAX          Unsigned32(0..4094)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "the sub-interface index of the sub-inteface on a port"
+        ::= { dcxSubIntEntry 3 }
+
+     dcxSubIntBridgeGroupNum OBJECT-TYPE
+        SYNTAX          Unsigned32(0..254)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "bridge-group number which the sub-interface is configured on,
+	     0 is reserved, 255 indicates not configured in a  bridge-group"
+        ::= { dcxSubIntEntry 4 }
+
+     dcxSubIntManagementAccess OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "is management of Cmts allowed through sub-interface "
+        ::= { dcxSubIntEntry 5 }
+
+    dcxSubIntPrimaryIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "primary ip address of sub-interface"
+        ::= { dcxSubIntEntry 6 }   
+
+    dcxSubIntPrimaryIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "primary ip subnet mask of sub-interface"
+        ::= { dcxSubIntEntry 7 }   
+
+    dcxSubIntPrimaryIpBCastAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "primary ip subnet broadcast address of sub-interface"
+        ::= { dcxSubIntEntry 8 }   
+
+     dcxSubIntRelayEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "are DHCP packets relayed on this sub-interface "
+        ::= { dcxSubIntEntry 9 }
+
+     dcxSubIntRelayInformationOption OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "is the information options added to the DHCP packets relayed on this 
+	     sub-interface. Has no effect if dcxSubIntRelayEnabled is False on the 
+	     sub-interface."
+        ::= { dcxSubIntEntry 10 }
+
+     dcxSubIntGiaddrPolicy OBJECT-TYPE
+        SYNTAX INTEGER {
+            off (0),
+            primary (1),
+	    policy (2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "which giaddr is used for DHCP packets relayed from CPEs on this sub-interface,
+	     off(0) is returned when dcxSubIntRelayEnabled is False,
+	     primary(1) indicates that the primary address on sub-interface is used, 
+	     policy(2) indicates that the first secondary is used."
+        ::= { dcxSubIntEntry 11 }
+
+     dcxSubIntInboundAclIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..2999)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "which Access Control List is this sub-interface bound to for inbound packets, a value
+	     of zero indicates no ACL binding for inbound packets on the sub-interface"
+        ::= { dcxSubIntEntry 12 }
+
+     dcxSubIntOutgoingAclIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..2999)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "which Access Control List is this sub-interface bound to for outgoing packets, a value
+	     of zero indicates no ACL binding for inbound packets on the sub-interface"
+        ::= { dcxSubIntEntry 13 }
+
+     dcxSubIntUnboundTag OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..4094)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "sub-interface encapsulate Vlan Tag value, 0 indicates no tag"
+        ::= { dcxSubIntEntry 14 }
+
+     dcxSubIntUnboundTagIsNative OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+	    "sub-interface will not generate packets with tags when native
+	     is configured"
+        ::= { dcxSubIntEntry 15 }
+
+     dcxSubIntOperational OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+	    "states if the subinterface is operational or not, factors are dcxSubIntStatus and the
+	     physical ports oper and admin status"
+        ::= { dcxSubIntEntry 16 }
+
+     dcxSubIntStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this table.  
+	     Rows in this table may be created by either the create-and-go or 
+	     create-and-wait paradigms. There is no restriction on changing 
+	     values in a row of this table while the row is active."
+        ::= { dcxSubIntEntry 17 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+--  SUB INTERFACE IP ADDRESS TABLE
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    dcxSubIntIpTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DcxSubIntIpEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Arris C3 Proprietary Sub-Interface table"
+        ::= { dcxSubIntControlGroup 2 }
+    
+    dcxSubIntIpEntry OBJECT-TYPE
+            SYNTAX      DcxSubIntIpEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "A row in the dcxSubIntIpTable. An entry in this table exists for 
+		 each IP address configured on the Sub-Interface identified by 
+		 the dcxSubIntNumber"
+            INDEX {dcxSubIntSlotIndex, dcxSubIntPortIndex, dcxSubIntSubIntIndex, dcxSubIntIpIndex}
+            ::= { dcxSubIntIpTable 1 }
+    
+    DcxSubIntIpEntry ::= SEQUENCE {
+                dcxSubIntIpIndex            Unsigned32,
+		dcxSubIntIpAddress          IpAddress,
+		dcxSubIntIpAddressType      INTEGER,
+		dcxSubIntIpMask             IpAddress,
+		dcxSubIntIpBCastAddress     IpAddress,
+                dcxSubIntIpStatus           RowStatus
+            }
+
+    dcxSubIntIpIndex OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "sub-interface secondary IP address index"
+        ::= { dcxSubIntIpEntry 1 }
+
+    dcxSubIntIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "a secondary ip address of sub-interface"
+        ::= { dcxSubIntIpEntry 2 }   
+
+    dcxSubIntIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "a secondary ip subnet mask of sub-interface"
+        ::= { dcxSubIntIpEntry 3 }   
+
+    dcxSubIntIpBCastAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "a secondary ip subnet broadcast address 
+	     of sub-interface"
+        ::= { dcxSubIntIpEntry 4 }   
+
+    dcxSubIntIpAddressType OBJECT-TYPE
+        SYNTAX INTEGER
+	{ primary(1), secondary(2) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "primary(1): address is the primary address on
+	        the sub-interface, only one allowed
+	     secondary(2):address is one of the secondary
+	        addresses configured on the sub-interface"
+        ::= { dcxSubIntIpEntry 5 }   
+
+    dcxSubIntIpStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this table.  
+	     Rows in this table may be created by the create-and-go 
+	     paradigm. There is no restriction on changing values 
+	     in a row of this table while the row is active."
+        ::= { dcxSubIntIpEntry 6 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- CABLE HELPER ADDRESS TABLE
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    dcxSubIntCableHelperTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DcxSubIntCableHelperEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Arris C3 Proprietary Sub-Interface Cable Helper Table"
+        ::= { dcxSubIntControlGroup 3 }
+    
+    dcxSubIntCableHelperEntry OBJECT-TYPE
+            SYNTAX      DcxSubIntCableHelperEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "A row in the dcxSubIntCableHelperTable.
+                 An entry in this table exists for each cable helper
+		 IP address configured on the Sub-Interface which is 
+		 identified using the dcxSubIntNumber"
+            INDEX {dcxSubIntSlotIndex, dcxSubIntPortIndex, dcxSubIntSubIntIndex, dcxSubIntCableHelperType, dcxSubIntCableHelperIndex}
+            ::= { dcxSubIntCableHelperTable 1 }
+    
+    DcxSubIntCableHelperEntry ::= SEQUENCE {
+		dcxSubIntCableHelperType            INTEGER,
+                dcxSubIntCableHelperIndex           Unsigned32,
+		dcxSubIntCableHelperIpAddress       IpAddress,
+                dcxSubIntCableHelperStatus           RowStatus
+            }
+
+    dcxSubIntCableHelperType OBJECT-TYPE
+       SYNTAX INTEGER {
+            default (0),
+            cm (1),
+	    cpe (2)
+        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION 
+            "category of cable helper address.
+	     cm(1) these helper addresses are only used when relaying
+	     DHCP packets originating from a CM.
+	     cpe(2) these helper addresses are only used when relaying
+	     DHCP packets originating from a CPE.
+	     default(0) these helper addresses are used when: 
+		- relaying DHCP packets originating from a CM when no 
+		  helper address of type cm(1) is configured
+				or
+		- relaying DHCP packets originating from a CPE when no 
+		  helper address of type cpe(2) is configured"		
+        ::= { dcxSubIntCableHelperEntry 1 }
+
+    dcxSubIntCableHelperIndex OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "sub-interface cable helper index"
+        ::= { dcxSubIntCableHelperEntry 2 }
+
+    dcxSubIntCableHelperIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION 
+            "cable helper ip address configured on sub-interface"
+        ::= { dcxSubIntCableHelperEntry 3 }
+
+    dcxSubIntCableHelperStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this table.  
+	     Rows in this table may be created by the create-and-go 
+	     paradigm. Entries in this table can only be created or
+	     deleted, no modification is possible."
+        ::= { dcxSubIntCableHelperEntry 4 }
+
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --    
+-- VLAN TAG TABLE
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+    dcxSubIntVlanTagTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF DcxSubIntVlanTagEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Arris C3 Proprietary Sub-Interface Vlan Tag Table"
+        ::= { dcxSubIntControlGroup 4 }
+    
+    dcxSubIntVlanTagEntry OBJECT-TYPE
+            SYNTAX      DcxSubIntVlanTagEntry
+            MAX-ACCESS  not-accessible
+            STATUS      current
+            DESCRIPTION
+                "A row in the dcxSubIntVlanTagTable.
+                 An entry in this table exists for each Vlan tag
+		 that is configured on the sub-interface (which is 
+		 identified using the dcxSubIntNumber)"
+            INDEX {dcxSubIntSlotIndex, dcxSubIntPortIndex, dcxSubIntSubIntIndex, dcxSubIntVlanTag}
+            ::= { dcxSubIntVlanTagTable 1 }
+    
+    DcxSubIntVlanTagEntry ::= SEQUENCE {
+		dcxSubIntVlanTag              Unsigned32,
+		dcxSubIntVlanNative           TruthValue,
+		dcxSubIntVlanIsBound	      TruthValue,
+		dcxSubIntBoundVlanSlotIndex   Integer32,
+		dcxSubIntBoundVlanPortIndex   Integer32,
+		dcxSubIntBoundVlanSubIntIndex Integer32,
+		dcxSubIntBoundVlanTag	      Unsigned32,
+		dcxSubIntBoundVlanNative      TruthValue,
+                dcxSubIntVlanTagStatus        RowStatus
+            }
+
+    dcxSubIntVlanTag OBJECT-TYPE
+        SYNTAX          Unsigned32(0..4094)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "sub-interface Vlan Tag value, 0 indicates no tag"
+        ::= { dcxSubIntVlanTagEntry 1 }
+
+    dcxSubIntVlanNative OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "sub-interface will not generate packets with tags when native
+	     is configured"
+        ::= { dcxSubIntVlanTagEntry 2 }
+
+    dcxSubIntVlanIsBound  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "is sub-interface tag bound to another sub-interface's VLAN tag"
+        ::= { dcxSubIntVlanTagEntry 3 }
+
+    dcxSubIntBoundVlanSlotIndex OBJECT-TYPE
+        SYNTAX		Integer32(-1..4094)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	    "slot index of VLAN tag that dcxSubIntVlanTag is bound to
+	     -1 when VLAN not bound to another VLAN tag on another
+	     sub-interface"
+	::= { dcxSubIntVlanTagEntry 4 }
+
+    dcxSubIntBoundVlanPortIndex OBJECT-TYPE
+        SYNTAX		Integer32(-1..4094)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	    "port index of VLAN tag that dcxSubIntVlanTag is bound to
+	     -1 returned when VLAN not bound to another VLAN tag on another
+	     sub-interface"
+	::= { dcxSubIntVlanTagEntry 5 }
+
+    dcxSubIntBoundVlanSubIntIndex OBJECT-TYPE
+        SYNTAX		Integer32(-1..4094)
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION
+	    "sub interface index of VLAN tag that dcxSubIntVlanTag is bound to
+	     -1 returned when VLAN not bound to another VLAN tag on another
+	     sub-interface"
+	::= { dcxSubIntVlanTagEntry 6 }
+
+    dcxSubIntBoundVlanTag OBJECT-TYPE
+        SYNTAX          Unsigned32(0..4094)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "sub-interface Vlan Tag value, 0 indicates no tag"
+        ::= { dcxSubIntVlanTagEntry 7 }
+
+    dcxSubIntBoundVlanNative OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "bound sub-interface will not generate packets with tags when native
+	     is configured
+	     FLASE will be returned when VLAN not bound to another VLAN tag on another
+	     sub-interface"
+        ::= { dcxSubIntVlanTagEntry 8 }
+
+    dcxSubIntVlanTagStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS	read-create
+        STATUS	current
+        DESCRIPTION
+            "Controls and reflects the status of rows in this table.  
+	     Rows in this table may be created by the create-and-go 
+	     paradigm. There is no restriction on changing values 
+	     in a row of this table while the row is active."
+        ::= { dcxSubIntVlanTagEntry 9 }
+
+
+END

@@ -1,0 +1,302 @@
+-- Denial of Service MIB overview:
+-- Denial of Service MIB falls under lb6m MIB node of the private subtree.
+
+NETGEAR-DENIALOFSERVICE-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+-- NETGEAR NETGEAR Denial of Service MIB
+-- Copyright Netgear Inc (2004-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Unsigned32, Integer32               FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    RowStatus, MacAddress               FROM SNMPv2-TC
+    ifIndex                             FROM IF-MIB
+
+    DisplayString		        FROM RFC1213-MIB
+    lb6m                    FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathDenialOfService MODULE-IDENTITY
+           LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+           ORGANIZATION "Netgear Inc"
+           CONTACT-INFO ""
+ 
+     DESCRIPTION
+          "The Netgear Private MIB for NETGEAR Denial of Service."
+
+     -- Revision history.
+     REVISION
+          "201101260000Z" -- 26 January 2011 12:00:00 GMT
+     DESCRIPTION
+          "Postal address updated."
+     REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+     DESCRIPTION
+          "Netgear branding related changes."
+
+      ::= { lb6m 31 }
+
+
+    --**************************************************************************************
+    -- agentSwitchDenialOfServiceGroup
+    --
+    --**************************************************************************************
+    
+    agentSwitchDenialOfServiceGroup          OBJECT IDENTIFIER ::= { fastPathDenialOfService 1 }
+
+
+    agentSwitchDenialOfServiceSIPDIPMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the SIP=DIP Denial of Service 
+                     protection feature."                
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 1 }
+
+    agentSwitchDenialOfServiceSMACDMACMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the SMAC=DMAC Denial of Service 
+                     protection feature."                
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 9 }
+         
+    agentSwitchDenialOfServiceFirstFragMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the First Fragment Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 2 }
+         
+    agentSwitchDenialOfServiceTCPHdrSize OBJECT-TYPE
+         SYNTAX      Integer32 (0..255) 
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configures the Minimum allowed TCP Header size.
+                     This is active if the First Fragment Denial of Service
+                     protection feature is enabled."                    
+         DEFVAL { 20 }
+         ::= { agentSwitchDenialOfServiceGroup 3 }
+
+    agentSwitchDenialOfServiceTCPFragMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the TCP Fragment Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 4 }
+
+    agentSwitchDenialOfServiceTCPOffsetMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the TCP Offset Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 10 }
+         
+    agentSwitchDenialOfServiceTCPFlagMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the TCP Flag Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 5 }
+
+    agentSwitchDenialOfServiceTCPFlagSeqMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the TCP Flag and Sequence Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 11 }
+
+    agentSwitchDenialOfServiceTCPSynMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the TCP Syn Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 14 }
+
+    agentSwitchDenialOfServiceTCPSynFinMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the TCP Syn and Fin Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 15 }
+
+    agentSwitchDenialOfServiceTCPFinUrgPshMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the TCP Fin and Urg and Psh Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 16 }
+         
+    agentSwitchDenialOfServiceL4PortMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the L4 Port Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 6 }
+
+    agentSwitchDenialOfServiceTCPPortMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the TCP Port Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 12 }
+
+    agentSwitchDenialOfServiceUDPPortMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the UDP Port Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 13 }
+         
+    agentSwitchDenialOfServiceICMPMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the ICMP Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 7 }
+
+    agentSwitchDenialOfServiceICMPv6Mode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the ICMPv6 Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 20 }
+
+    agentSwitchDenialOfServiceICMPSize OBJECT-TYPE
+         SYNTAX      Integer32 (0..16376) 
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configures the Maximum allowed ICMP data size.
+                     This is active if the ICMP Denial of Service
+                     protection feature is enabled."
+         DEFVAL { 512 }
+         ::= { agentSwitchDenialOfServiceGroup 8 }
+
+    agentSwitchDenialOfServiceICMPv6Size OBJECT-TYPE
+         SYNTAX      Integer32 (0..1023) 
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Configures the Maximum allowed ICMPv6 data size.
+                     This is active if the ICMPv6 Denial of Service
+                     protection feature is enabled."
+         DEFVAL { 1023 }
+         ::= { agentSwitchDenialOfServiceGroup 18 }
+
+    agentSwitchDenialOfServiceICMPFragMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enables or Disables the ICMP Fragment Denial of Service 
+                     protection feature."
+         DEFVAL { disable }
+         ::= { agentSwitchDenialOfServiceGroup 19 }
+                                                  
+
+END

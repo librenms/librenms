@@ -1,0 +1,2041 @@
+S5-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY,
+  Integer32, Counter32, Gauge32,
+        TimeTicks, IpAddress
+    FROM SNMPv2-SMI
+  DisplayString, TruthValue
+    FROM SNMPv2-TC
+  s5Chassis
+    FROM S5-ROOT-MIB
+  AttId, LocChan
+    FROM S5-TCS-MIB
+  Ipv6Address, Ipv6AddressPrefix
+    FROM IPV6-TC
+  InterfaceIndex
+    FROM IF-MIB;
+
+s5ChasMib MODULE-IDENTITY
+       LAST-UPDATED    "201504070000Z"
+       ORGANIZATION    "Avaya"
+       CONTACT-INFO    "Avaya"
+       DESCRIPTION
+           "5000 Chassis MIB
+
+           Copyright 1995-2012 Nortel Networks, Inc.
+           All rights reserved.
+           This Nortel Networks SNMP Management Information Base Specification
+           (Specification) embodies Nortel Networks' confidential and
+           proprietary intellectual property. Nortel Networks retains all
+           title and ownership in the Specification, including any
+           revisions.
+
+           This Specification is supplied 'AS IS', and Nortel Networks makes
+           no warranty, either express or implied, as to the use,
+           operation, condition, or performance of the Specification."
+
+     REVISION "201504070000Z" -- April 7, 2015
+     DESCRIPTION "Version 155: Changed s5ChasComDescr size."
+
+     REVISION "201311260000Z" -- November 26, 2013
+     DESCRIPTION "Version 154: Added s5ChasComUpTime object in s5ChasComTable."
+
+     REVISION "201310180000Z" -- October 18, 2013
+     DESCRIPTION "Version 153: Added s5ChasComIpMgmtShutdown."
+
+     REVISION "201310160000Z" -- October 16, 2013
+     DESCRIPTION "Version 152: Added s5ChasPluggables, 
+                                     s5ChasGbicInfoTable."
+
+     REVISION "201310100000Z" -- October 10, 2013
+     DESCRIPTION "Version 151: Corrected MIB definitions."
+
+     REVISION "201309090000Z" -- September 9, 2013
+     DESCRIPTION "Version 150: Added s5ChasComIpMgmtLimit, 
+                                     s5ChasComIpMgmtTimeout." 
+
+     REVISION "201308270000Z" -- August 27, 2013
+     DESCRIPTION "Version 149: Added s5ChasBrdFanLeds."
+
+     REVISION "201212200000Z" -- December 20, 2012
+     DESCRIPTION "Version 148: Added s5ChasStoreDescription,
+                                     s5ChasStoreAge."
+
+     REVISION "201206010000Z" -- June 1, 2012
+     DESCRIPTION "Version 147: Added s5ChasComIpv6MgmtAddress, 
+                                     s5ChasComIpv6MgmtNetMask." 
+
+     REVISION "201202210000Z" -- Feb 21, 2012
+     DESCRIPTION "Version 146: Added s5ChasComIpMgmtAddress, 
+                                     s5ChasComIpMgmtNetMask, 
+                                     s5ChasComIpMgmtGateway." 
+
+     REVISION "201110110000Z" -- Oct 11, 2011
+     DESCRIPTION "Version 145:  Added s5ChasComIpv6Address, s5ChasComIpv6NetMask."
+
+     REVISION "201104220000Z" -- Apr 22, 2011
+     DESCRIPTION "Version 144:  Added s5ChasNotify."
+
+     REVISION "201010180000Z" -- Oct 18, 2010
+     DESCRIPTION "Version 143:  Added s5ChasStoreUsedSize."
+
+     REVISION "200805220000Z" -- May 22, 2008
+     DESCRIPTION "Version 142:  Added s5ChasComRunningSoftwareVer."
+
+     REVISION "200802200000Z" -- Feb 20, 2008
+     DESCRIPTION "Version 141:  Added objects for memory utilization in MegaBytes."
+
+     REVISION "200505110000Z" -- May 11, 2005
+     DESCRIPTION "Version 140:  Fix support for USB flash dongles."
+
+     REVISION "200505050000Z" -- May 5, 2005
+     DESCRIPTION "Version 139:  Fleshed out support for USB flash dongles."
+
+     REVISION "200410290000Z" -- October 29, 2004
+     DESCRIPTION "Version 138:  Added baystack15 rpsu type."
+
+     REVISION "200407200000Z" -- July 20, 2004
+     DESCRIPTION "Version 137:  Added version info."
+
+     ::= { s5Chassis 10 }
+
+
+-- Chassis Groups
+
+
+s5ChasGen       OBJECT IDENTIFIER ::= { s5Chassis 1 }
+s5ChasGrp       OBJECT IDENTIFIER ::= { s5Chassis 2 }
+s5ChasCom       OBJECT IDENTIFIER ::= { s5Chassis 3 }
+s5ChasBrd       OBJECT IDENTIFIER ::= { s5Chassis 4 }
+s5ChasStore     OBJECT IDENTIFIER ::= { s5Chassis 5 }
+s5ChasSm        OBJECT IDENTIFIER ::= { s5Chassis 6 }
+s5ChasTmpSnr    OBJECT IDENTIFIER ::= { s5Chassis 7 }
+s5ChasUtil      OBJECT IDENTIFIER ::= { s5Chassis 8 }
+s5ChasPs        OBJECT IDENTIFIER ::= { s5Chassis 9 }
+s5ChasNotify    OBJECT IDENTIFIER ::= { s5Chassis 11 }
+s5ChasPluggables  OBJECT IDENTIFIER ::= { s5Chassis 12 }
+
+-- SECTION 2: MIB Objects
+
+
+-- General Chassis Information
+
+
+s5ChasType OBJECT-TYPE
+  SYNTAX  OBJECT IDENTIFIER
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The chassis type. This is 'what kind of
+    box' is being managed. The values are
+    defined under s5ChasTypeVal in the
+    Registration MIB."
+  ::= { s5ChasGen 1 }
+
+s5ChasDescr OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..64))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A description of the chassis.
+    The value is a zero length string
+    if no information is available."
+  ::= { s5ChasGen 2 }
+
+s5ChasLocation OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..64))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The physical location of the chassis
+    (e.g., 'fourth floor wiring closet in
+    building A'). The value is a zero
+    length string if no information
+    is available.  Note: this object is
+    different from sysLocation in MIB-II.
+    However, an agent may use this value for
+    sysLocation if none is configured in the
+    the agent."
+  ::= { s5ChasGen 3 }
+
+s5ChasContact OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..64))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The textual identification of the
+    contact person for the chassis, together
+    with information on how to contact
+    this person. The value is a zero length
+    string if no information is available.
+    Note: this object is different from sysContact
+    in MIB-II. However, an agent may use this value
+    for sysContact if none is configured in the
+    agent."
+  ::= { s5ChasGen 4 }
+
+s5ChasVer OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..32))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The version of the chassis in the form
+    'major.minor.maintenance[letters]'. If the
+    version is unknown or not available then
+    the value should be a zero length string."
+  ::= { s5ChasGen 5 }
+
+s5ChasSerNum OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..32))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The serial number of the chassis. If the
+    serial number is unknown or unavailable then
+    the value should be a zero length string."
+  ::= { s5ChasGen 6 }
+
+s5ChasGblPhysChngs OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of physical changes (i.e.,
+    an addition or removal of a component or
+    sub-component) that have been detected in the
+    chassis since cold/warm start of the agent."
+  ::= { s5ChasGen 7 }
+
+s5ChasGblPhysLstChng OBJECT-TYPE
+  SYNTAX  TimeTicks
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The value of sysUpTime when the last
+    physical change (i.e., addition or
+    removal of a module or sub-module) was
+    detected in the chassis. If none have
+    been detected since cold/warm start of
+    the agent, then the value is zero."
+  ::= { s5ChasGen 8 }
+
+s5ChasGblAttChngs OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of attachment changes
+    across all boards in the chassis that have
+    been detected since cold/warm start of
+    the agent."
+  ::= { s5ChasGen 9 }
+
+s5ChasGblAttLstChng OBJECT-TYPE
+  SYNTAX  TimeTicks
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The value of sysUpTime when the last
+    attachment change on any board in the chassis
+    was detected. If none have been detected
+    since cold/warm start of the agent, then the
+    value is zero."
+  ::= { s5ChasGen 10 }
+
+s5ChasGblConfChngs OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of configuration changes
+    (other than attachment changes, or physical
+    additions or removals) across all boards in
+    the chassis that have been detected since
+    cold/warm start of the agent."
+  ::= { s5ChasGen 11 }
+
+s5ChasGblConfLstChng OBJECT-TYPE
+  SYNTAX  TimeTicks
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The value of sysUpTime when the last
+    configuration change (other than attachment
+    changes, or physical additions or removals)
+    on any board in the chassis was detected.
+    If none have been detected since cold/warm
+    start of the agent, then the value is zero."
+  ::= { s5ChasGen 12 }
+
+-- Chassis Group Table
+
+
+s5ChasGrpTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF S5ChasGrpEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table that contains information about
+    each group that can contain chassis
+    components."
+  ::= { s5ChasGrp 1 }
+
+s5ChasGrpEntry OBJECT-TYPE
+  SYNTAX  S5ChasGrpEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A row in the group table.
+    Rows can not be created or deleted via
+    SNMP requests. The number of entries
+    is determined by the physical construction
+    of the chassis."
+  INDEX { s5ChasGrpIndx }
+  ::= { s5ChasGrpTable 1 }
+
+S5ChasGrpEntry ::= SEQUENCE {
+  s5ChasGrpIndx         Integer32,
+  s5ChasGrpType         OBJECT IDENTIFIER,
+  s5ChasGrpDescr        DisplayString,
+  s5ChasGrpMaxEnts      Integer32,
+  s5ChasGrpNumEnts      Integer32,
+  s5ChasGrpPhysChngs    Counter32,
+  s5ChasGrpPhysLstChng  TimeTicks,
+  s5ChasGrpEncodeFactor Integer32
+  }
+
+s5ChasGrpIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the group."
+  ::= { s5ChasGrpEntry 1 }
+
+s5ChasGrpType OBJECT-TYPE
+  SYNTAX  OBJECT IDENTIFIER
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The type of the group. The group type
+    determines the types of items that can
+    be plugged into the positions in the
+    group. The groups are defined under
+    s5ChasGrpTypeVal in the Registration MIB."
+  ::= { s5ChasGrpEntry 2 }
+
+s5ChasGrpDescr OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..32))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The description of the group. If not
+    available, the value is a zero length
+    string."
+  ::= { s5ChasGrpEntry 3 }
+
+s5ChasGrpMaxEnts OBJECT-TYPE
+  SYNTAX  Integer32 (-1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The maximum number of entries
+    in the group. If not available, a
+    value of -1 is returned."
+  ::= { s5ChasGrpEntry 4 }
+
+s5ChasGrpNumEnts OBJECT-TYPE
+  SYNTAX  Integer32 (-1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The current number of entries
+    in the group. If not available,
+    a value of -1 is returned."
+  ::= { s5ChasGrpEntry 5 }
+
+s5ChasGrpPhysChngs OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of physical changes (i.e.,
+    an addition or removal of a component or
+    sub-component) that have been detected in
+    the group since cold/warm start of the agent."
+  ::= { s5ChasGrpEntry 6 }
+
+s5ChasGrpPhysLstChng OBJECT-TYPE
+  SYNTAX  TimeTicks
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The value of sysUpTime that the last
+    physical change (i.e., addition or
+    removal of a module or sub-module) was
+    detected in the group. If none have been
+    detected since cold/warm start of the
+    agent, then the value is zero."
+  ::= { s5ChasGrpEntry 7 }
+
+s5ChasGrpEncodeFactor OBJECT-TYPE
+  SYNTAX  Integer32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The multiplication factor used in encoding
+    the component index of a component in the group.
+    The component index for any group should be
+    determined in conjunction with this object for
+    that group.  A value of 1 indicates 'no encoding'.
+
+    Stackable platforms:
+      The component index is encoded using the
+      following formula:
+        Component Index =
+           (Unit# * s5ChasGrpEncodeFactor) + Module#
+
+      Where:  Unit# is obtained from s5ChasComIndx
+              for the Unit Group, and Module# is the
+              module number in a unit starting from 1
+              and increases in a left-to-right and
+              bottom-to-top fashion.
+      
+    NonStackable platforms:
+      These NMMs like 5310, 5510 will always return a
+      value of 1 for this object.  Encoding/decoding
+      should not be performed in this case."
+    ::= { s5ChasGrpEntry 8 }
+
+-- Component (and sub-component) Table
+
+
+s5ChasComTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF S5ChasComEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table that contains information
+    about each chassis level component
+    and sub-component."
+  ::= { s5ChasCom 1 }
+
+s5ChasComEntry OBJECT-TYPE
+  SYNTAX  S5ChasComEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A row in the component/sub-component
+    table. Rows can not be created or
+    deleted via SNMP requests. Entries are
+    created and deleted when components or
+    sub-components are inserted or removed
+    from the chassis."
+  INDEX { s5ChasComGrpIndx,
+      s5ChasComIndx,
+      s5ChasComSubIndx }
+  ::= { s5ChasComTable 1 }
+
+S5ChasComEntry ::= SEQUENCE {
+  s5ChasComGrpIndx         Integer32,
+  s5ChasComIndx            Integer32,
+  s5ChasComSubIndx         Integer32,
+
+  s5ChasComType            OBJECT IDENTIFIER,
+  s5ChasComDescr           DisplayString,
+  s5ChasComVer             DisplayString,
+  s5ChasComSerNum          DisplayString,
+  s5ChasComLstChng         TimeTicks,
+
+  s5ChasComAdminState      INTEGER,
+  s5ChasComOperState       INTEGER,
+
+  s5ChasComMaxSubs         Integer32,
+  s5ChasComNumSubs         Integer32,
+
+  s5ChasComRelPos          Integer32,
+  s5ChasComLocation        DisplayString,
+  s5ChasComGroupMap        Integer32,
+
+  s5ChasComBaseNumPorts    Integer32,
+  s5ChasComTotalNumPorts   Integer32,
+
+  s5ChasComIpAddress       IpAddress,
+
+  s5ChasComRunningSoftwareVer  DisplayString,
+  s5ChasComIpv6Address   Ipv6Address,
+  s5ChasComIpv6NetMask     Ipv6AddressPrefix,
+
+  s5ChasComIpMgmtAddress     IpAddress,
+  s5ChasComIpMgmtNetMask     IpAddress,
+  s5ChasComIpMgmtGateway     IpAddress,
+  
+  s5ChasComIpv6MgmtAddress   Ipv6Address,
+  s5ChasComIpv6MgmtNetMask   Ipv6AddressPrefix,
+
+  s5ChasComIpMgmtLimit       Integer32,
+  s5ChasComIpMgmtTimeout     Integer32,
+  s5ChasComIpMgmtShutdown    TruthValue,
+
+  s5ChasComUpTime   TimeTicks
+  }
+
+s5ChasComGrpIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the chassis level group which
+    contains this component."
+  ::= { s5ChasComEntry 1 }
+
+s5ChasComIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the component in the group.
+    For example, for modules in the 'board'
+    group, this is the slot number."
+  ::= { s5ChasComEntry 2 }
+
+s5ChasComSubIndx OBJECT-TYPE
+  SYNTAX  Integer32 (0..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If this table entry (i.e. table row)
+    describes a component, then the value is
+    zero. Otherwise, this table entry describes
+    a sub-component and this is the index of
+    the sub-component."
+  ::= { s5ChasComEntry 3 }
+
+s5ChasComType OBJECT-TYPE
+  SYNTAX  OBJECT IDENTIFIER
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The type of component/sub-component. The
+    values are defined under s5ChasComTypeVal
+    in the Registration MIB."
+  ::= { s5ChasComEntry 4 }
+
+s5ChasComDescr OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..128))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A description of the component/sub-component.
+    If not available, the value is a zero length
+    string."
+  ::= { s5ChasComEntry 5 }
+
+s5ChasComVer OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..32))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The version number of the component/sub-component.
+    If not available, the value is a zero length
+    string."
+  ::= { s5ChasComEntry 6 }
+
+s5ChasComSerNum OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..32))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The serial number of the component/sub-component.
+    If not available, the value is a zero length
+    string."
+  ::= { s5ChasComEntry 7 }
+
+s5ChasComLstChng OBJECT-TYPE
+  SYNTAX  TimeTicks
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The value of sysUpTime when it was
+    detected that the component/sub-component
+    was added to the chassis. If this has not
+    occurred since the cold/warm start of the
+    agent, then the value is zero."
+  ::= { s5ChasComEntry 8 }
+
+s5ChasComAdminState OBJECT-TYPE
+  SYNTAX  INTEGER {
+    other(1),
+    notAvail(2),
+    disable(3),
+    enable(4),
+    reset(5),
+    test(6)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The desired state of the component/sub-component.
+    The values that are read-only are:
+      other(1)......currently in some other state
+      notAvail(2)...actual value is not available
+
+    The possible values that can be read and
+    written are:
+      disable(3)...disable operation
+      enable(4)....enable operation
+      reset(5).....reset component
+      test(6)......start self test of component, with
+                     the result to be normal(5),
+                     warning(8), nonFatalErr(9),
+                     or fatalErr(10) in object
+                     s5ChasComOperState
+    The allowable (and meaningful) values
+    are determined by the component type."
+  ::= { s5ChasComEntry 9 }
+
+s5ChasComOperState OBJECT-TYPE
+  SYNTAX  INTEGER {
+    other(1),
+    notAvail(2),
+    removed(3),
+    disabled(4),
+    normal(5),
+    resetInProg(6),
+    testing(7),
+    warning(8),
+    nonFatalErr(9),
+                fatalErr(10),
+    notConfig(11),
+    obsoleted(12)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The current operational state of the
+    component. The possible values are:
+      other(1).........some other state
+      notAvail(2)......state not available
+      removed(3).......component removed
+      disabled(4)......operation disabled
+      normal(5)........normal operation
+      resetInProg(6)...reset in progress
+      testing(7).......doing a self test
+      warning(8).......operating at warning level
+      nonFatalErr(9)...operating at error level
+      fatalErr(10).....error stopped operation
+                  notConfig(11)....module needs to be configured
+      obsoleted(12)...module is obsoleted but in the chassis
+    The allowable (and meaningful) values
+    are determined by the component type."
+  ::= { s5ChasComEntry 10 }
+
+s5ChasComMaxSubs OBJECT-TYPE
+  SYNTAX  Integer32 (-1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The potential number of sub-components
+    that can be attached to the component.
+    A value of zero means none. A value of -1
+    indicates that no component information is
+    available. The actual number of
+    installed sub-components is found in
+    s5ChasComNumSubs.
+    If this entry is a sub-component, then
+    this object has a value of zero."
+  ::= { s5ChasComEntry 11 }
+
+s5ChasComNumSubs OBJECT-TYPE
+  SYNTAX  Integer32 (-1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The actual number of sub-components that
+    are attached to the component. A value of
+    zero means none. A value of -1 indicates
+    that no component information is available.
+    The potential number of sub-components
+    that can be installed is found in
+    s5ChasComMaxSubs.
+    If this entry is a sub-component, then
+    this object has the value of zero."
+  ::= { s5ChasComEntry 12 }
+
+s5ChasComRelPos OBJECT-TYPE
+  SYNTAX  Integer32 (0..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "This object describes the position of
+    each component in the unit group relative
+    to each other.  Components in the unit group
+    are numbered in the ascending order with the
+    uppermost component being numbered one.  The
+    value of this object should never be greater
+    than the value of s5ChasGrpMaxEnts.  If not
+    available, a value of zero will be returned.
+
+    Note:  This object is only implemented in
+           agents that support 'virtual' chassis."
+  ::= { s5ChasComEntry 13 }
+
+s5ChasComLocation OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..32))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "This object provides geographic location
+    information of a component in a system
+    modeled as a chassis, but possibly physically
+    implemented with geographically separate devices
+    connected together to exchange managment information.
+    Chassis' modeled in this manner are sometimes refered
+    to as 'virtual chassis'.  An example value is:
+          '4th flr wiring closet in blg A'.
+
+    Notes:  1.)  This object is applicable only to
+                 components that can be found in either
+                 the Board or Unit groups.  If the
+                 information is unavailable (i.e., not
+                 modeling a virtual chassis or component
+                 is not in Board or Unit group), the value
+                 is a zero length string.
+            2.)  If this object is applicable and is not
+                 assigned a value via a SNMP SET PDU when
+                 the row  is created, the value will default
+                 to the value of the object s5ChasComSerNum."
+  ::= { s5ChasComEntry 14 }
+
+s5ChasComGroupMap OBJECT-TYPE
+  SYNTAX  Integer32 (0..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "This object describes the group mapping of
+    each component in the chassis.  For the
+    components in the unit group, the value of this
+    object should be the backplane number to which the
+    unit is connected.  The value of this object should
+    never be greater than the value of s5ChasGrpMaxEnts.
+    If not available, a value of zero should be returned."
+  ::= { s5ChasComEntry 15 }
+
+s5ChasComBaseNumPorts OBJECT-TYPE
+  SYNTAX  Integer32 (0..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "This object indicates the number of ports (of any type)
+             contained in a component, not including any sub-components
+             contained within the component."
+  ::= { s5ChasComEntry 16 }
+
+s5ChasComTotalNumPorts OBJECT-TYPE
+  SYNTAX  Integer32 (0..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "This object indicates the total number of ports (of
+             any type) contained in a component, including any ports
+             contained in sub-components contained within the component."
+  ::= { s5ChasComEntry 17 }
+
+s5ChasComIpAddress OBJECT-TYPE
+  SYNTAX  IpAddress
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The IP address of a component.  For components that do not
+             have an IP address/stack, this value should always be 0.0.0.0.
+             Note that for a stackable system in stack mode, this will be
+             the standalone IP address for individual units in the stack."
+  ::= { s5ChasComEntry 18 }
+
+s5ChasComRunningSoftwareVer OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..32))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The version number of the software image running on this
+                component/sub-component.
+    If not available, the value is a zero length
+    string."
+  ::= { s5ChasComEntry 19 }
+
+s5ChasComIpv6Address OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IPv6 address of a component.  For components that do not
+             have an IPv6 address/stack, this value should always be 0::0.
+             Note that for a stackable system in stack mode, this will be
+             the standalone IPv6 address for individual units in the stack."
+    ::= { s5ChasComEntry 20 }
+
+s5ChasComIpv6NetMask OBJECT-TYPE
+    SYNTAX      Ipv6AddressPrefix
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The IPv6 netmask of a component.  For components that do not
+             have an IPv6 address/stack, this value should always be 0::0.
+             Note that for a stackable system in stack mode, this will be
+             the standalone IPv6 netmask for individual units in the stack."
+    ::= { s5ChasComEntry 21 }
+
+s5ChasComIpMgmtAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "The IP address associated with the physical dedicated
+             management port (out of band management port) of a component. For
+             components that do not have an IP address/stack associated with the
+             dedicated management port, this value should always be 0.0.0.0.
+             Note that for a stackable system in stack mode, this IP address
+             always applies to individual units in the stack."
+    ::= { s5ChasComEntry 22 }
+
+s5ChasComIpMgmtNetMask OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "The IP netmask associated with the physical dedicated
+             management port (out of band management port) of a component. For
+             components that do not have an IP address/stack associated with the
+             dedicated management port, this value should always be 0.0.0.0.
+             Note that for a stackable system in stack mode, this netmask 
+             always applies to individual units in the stack."
+    ::= { s5ChasComEntry 23 }
+
+s5ChasComIpMgmtGateway OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "The IP address of the default gateway associated with the
+             physical dedicated management port (out of band management port)
+             of a component. For components that do not have an IP address/stack
+             associated with the dedicated management port, this value should
+             always be 0.0.0.0.
+             Note that for a stackable system in stack mode, this IP address
+             always applies to individual units in the stack."
+    ::= { s5ChasComEntry 24 }
+    
+s5ChasComIpv6MgmtAddress OBJECT-TYPE
+    SYNTAX      Ipv6Address
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The IPv6 address associated with the physical dedicated
+            management port (out of band management port) of a component.     
+            Note that for a stackable system in stack mode, this IP address
+            always applies to individual units in the stack."
+    ::= { s5ChasComEntry 25 }
+
+s5ChasComIpv6MgmtNetMask OBJECT-TYPE
+    SYNTAX      Ipv6AddressPrefix
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The IPv6 netmask associated with the physical dedicated
+            management port (out of band management port) of a component. 
+            Note that for a stackable system in stack mode, this netmask 
+            always applies to individual units in the stack."
+    ::= { s5ChasComEntry 26 }
+
+s5ChasComIpMgmtLimit OBJECT-TYPE
+  SYNTAX  Integer32 (50..10000)
+  UNITS       "packets per second" 
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+       "This object indicates the in-bound packet threshold rate
+        for the management port (out of band management port)."
+        DEFVAL      { 7000 }
+  ::= { s5ChasComEntry 27 }
+
+s5ChasComIpMgmtTimeout OBJECT-TYPE
+  SYNTAX  Integer32 (0..180)
+  UNITS       "seconds"
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+       "This object indicates the port shutdown period 
+        for the management port (out of band management port)."
+        DEFVAL      { 180 }
+  ::= { s5ChasComEntry 28 }
+
+s5ChasComIpMgmtShutdown OBJECT-TYPE
+  SYNTAX    TruthValue
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+       "This object is used to control whether the out of band management
+        port is up or down (false for port up and true for port down)."
+        DEFVAL     { false }
+  ::= { s5ChasComEntry 29 }
+
+s5ChasComUpTime OBJECT-TYPE
+        SYNTAX  TimeTicks
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+    "The time (in hundredths of a second) 
+    since the unit was initialized."
+        ::= { s5ChasComEntry 30 }
+
+-- Board Table
+
+s5ChasBrdTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF S5ChasBrdEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table containing information about each
+    board that can be inserted into a slot.
+    These include boards such as Repeater Modules
+    and Network Management Modules."
+  ::= { s5ChasBrd 1 }
+
+s5ChasBrdEntry OBJECT-TYPE
+  SYNTAX  S5ChasBrdEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A row in the board table. Entries can not
+    be created or deleted via SNMP. Entries are
+    created and deleted when boards are inserted
+    or removed from slots in the chassis."
+  INDEX { s5ChasBrdIndx }
+  ::= { s5ChasBrdTable 1 }
+
+S5ChasBrdEntry ::= SEQUENCE {
+  s5ChasBrdIndx        Integer32,
+  s5ChasBrdLeds        OCTET STRING,
+  s5ChasBrdNumAtt      Integer32,
+  s5ChasBrdAttChngs    Counter32,
+  s5ChasBrdAttLstChng  TimeTicks,
+  s5ChasBrdStatusDsply DisplayString,
+  s5ChasBrdDateCode    DisplayString,
+  s5ChasBrdCfgSrc      INTEGER,
+  s5ChasBrdCfgChngs    Counter32,
+  s5ChasBrdFanLeds     OCTET STRING
+  }
+
+s5ChasBrdIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the board. This corresponds to
+    the index of the slot containing the board."
+  ::= { s5ChasBrdEntry 1 }
+
+s5ChasBrdLeds OBJECT-TYPE
+  SYNTAX  OCTET STRING
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A bit array that contains the value of the
+    front panel LEDs and the annunciator. This is
+    a packed bit string; each LED is encoded into
+    4 bits (a nibble). The first nibble is stored
+    in the high order bits of the first octet. The
+    second nibble is stored in the low order bits
+    the first octet, etc. However, the current
+    mapping is that the first three nibbles are
+    reserved, the fourth nibble has the value of
+    the 'annunciator', and the 'normal' LEDs start
+    with the fifth nibble. If the LED values are not
+    available, a zero length string is returned. The
+    following shows the meaning of each bit (bit 0 is
+    the least significant bit) when it has a value
+    of one:
+
+      bit  meaning
+      ---  -------
+       0   green light
+       1   yellow light
+       2   blinking
+       3   reserved"
+  ::= { s5ChasBrdEntry 2 }
+
+s5ChasBrdNumAtt OBJECT-TYPE
+  SYNTAX  Integer32 (0..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of backplane network
+    attachment points on the board.
+    This may vary based on the mode of the
+    board for FDDI."
+  ::= { s5ChasBrdEntry 3 }
+
+s5ChasBrdAttChngs OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of attachment changes
+    for the board that have been detected since
+    cold/warm start of the agent or since
+    the board was inserted."
+  ::= { s5ChasBrdEntry 4 }
+
+s5ChasBrdAttLstChng OBJECT-TYPE
+  SYNTAX  TimeTicks
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The value of sysUpTime when the last
+    attachment change on the board
+    has detected. If none have been detected
+    since cold/warm start of the agent, then
+    the value is zero."
+  ::= { s5ChasBrdEntry 5 }
+
+s5ChasBrdStatusDsply OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..48))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The current ASCII character display of
+    the board. The length returned should
+    match the length of the display.
+    Boards with multiple displays should
+    return the values concatenated together.
+    Boards with no display hardware should
+    return a zero length string."
+  ::= { s5ChasBrdEntry 6 }
+
+s5ChasBrdDateCode OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..8))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The date of manufacture of the board
+    in ASCII in the format: YYYYmmdd. For
+    example, the value for April 13, 1993
+    is 19930413. If not available, the
+    value is a zero-length string."
+  ::= { s5ChasBrdEntry 7 }
+
+s5ChasBrdCfgSrc OBJECT-TYPE
+  SYNTAX  INTEGER {
+    other(1),
+    dfltJmpr(2),
+    prmMem(3),
+    brdCfg(4),
+    sm(5),
+    smDfltJmpr(6),
+    smPrmMem(7),
+    smBrdCfg(8)
+    }
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The source of the configuration
+    at the last board reset. The values
+    are:
+      other(1)........unknown or some other value
+      dfltJmpr(2).....default jumpers
+      prmMem(3).......permanent memory on board
+      brdCfg(4).......saved configuration on board
+      sm(5)...........supervisor
+      smDfltJmpr(6)...SM and default jumpers
+      smPrmMem(7).....SM and permanent memory on board
+      smBrdCfg(8).....SM and saved configuration on board"
+  ::= { s5ChasBrdEntry 8 }
+
+s5ChasBrdCfgChngs OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of configuration
+    changes for the board that have been
+    detected since cold/warm start of the
+    agent or since the board was inserted."
+  ::= { s5ChasBrdEntry 9 }
+
+s5ChasBrdFanLeds OBJECT-TYPE
+  SYNTAX  OCTET STRING
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A bit array that contains the value of the
+    front panel LEDs of the fan trays. This is
+    a packed bit string; each LED is encoded into
+    4 bits (a nibble). The first nibble is stored
+    in the high order bits of the first octet. The
+    second nibble is stored in the low order bits
+    of the first octet etc. The current mapping is 
+                that the first four nibbles are reserved, 
+                the fifth nibble has the value of the 
+                'annunciator', and the 'normal' LEDs start with 
+                the sixth nibble. If the LED values are not
+    available, a zero length string is returned. The
+    following shows the meaning of each bit (bit 0 is
+    the least significant bit) when it has a value
+    of one:
+
+      bit  meaning
+      ---  -------
+       0   red light
+       1   blue light
+                   2   purple light
+                   3   blinking
+       4   reserved"
+  ::= { s5ChasBrdEntry 10 }
+
+
+-- Attachment Point Table
+
+
+s5ChasAttTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF S5ChasAttEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table containing information about each
+    backplane attachment point on a board.
+    The number of entries for a board is the
+    value of s5ChasBrdNumAtt."
+  ::= { s5ChasBrd 2 }
+
+s5ChasAttEntry OBJECT-TYPE
+  SYNTAX  S5ChasAttEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A row in the attachment point table.
+    Entries can not be created or deleted
+    via SNMP. Entries are created and deleted
+    when boards are inserted or removed from
+    slots in the chassis, or the number of
+    attachment points is changed."
+  INDEX { s5ChasAttBrdIndx,
+      s5ChasAttIndx }
+  ::= { s5ChasAttTable 1 }
+
+S5ChasAttEntry ::= SEQUENCE {
+  s5ChasAttBrdIndx               Integer32,
+  s5ChasAttIndx                  Integer32,
+  s5ChasAttDfltAtt               AttId,
+  s5ChasAttCurAtt                AttId,
+  s5ChasAttChngs                 Counter32,
+  s5ChasAttLstChng               TimeTicks,
+  s5ChasAttClusterConnCapability OCTET STRING
+  }
+
+s5ChasAttBrdIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the board. This corresponds to
+    the index of the slot containing the board."
+  ::= { s5ChasAttEntry 1 }
+
+s5ChasAttIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the attachment point on
+    the board."
+  ::= { s5ChasAttEntry 2 }
+
+s5ChasAttDfltAtt OBJECT-TYPE
+  SYNTAX  AttId
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The default setting for the attachment
+    point. An attachment point may be attached
+    to a local channel, not attached to any
+    backplane network, or attached to a media
+    specific backplane network. (The valid choices
+    depend on each specific attachment point.)
+    NOTE: This value will always be valid
+    and may change when the backplane divider
+    switch setting is changed."
+  ::= { s5ChasAttEntry 3 }
+
+s5ChasAttCurAtt OBJECT-TYPE
+  SYNTAX  AttId
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "The current setting for the attachment
+    point. The slot position of the board,
+    the setting of the backplane divider switch(es),
+    and the mode setting affect which backplane
+    networks are valid values. Also, some boards
+    may put limitations on which backplane
+    network(s) or local channel(s) may be used."
+  ::= { s5ChasAttEntry 4 }
+
+s5ChasAttChngs OBJECT-TYPE
+  SYNTAX  Counter32
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The total number of attachment changes
+    for the attachment point that have been
+    detected since cold/warm start of the agent."
+  ::= { s5ChasAttEntry 5 }
+
+s5ChasAttLstChng OBJECT-TYPE
+  SYNTAX  TimeTicks
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The value of sysUpTime when the last
+    attachment change for the attachment
+    point was detected. If none have been
+    detected since cold/warm start of the
+    agent, then the value is zero."
+  ::= { s5ChasAttEntry 6 }
+
+s5ChasAttClusterConnCapability OBJECT-TYPE
+  SYNTAX  OCTET STRING (SIZE(8))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A bit array that contains the bit map
+    representing all available backplane
+    segment and local segment connections for
+    the cluster.  One bit is also reserved to
+    indicate if the cluster has an isolate
+    capability.
+
+    The first 31 bits of the array represent
+    the backplane numbers, starting from the
+    lower order bit. Bit 32 indicates whether
+    the Cluster has a null connection capability.
+    The bits in the fifth and sixth octets,
+    starting with bits in the lower order octet,
+    represent local segments that the cluster
+    can connect to.
+
+    A bit with a value of 1 means that the
+    cluster is capable of  connecting to the
+    corresponding backplane segment, local segment
+    or null segment."
+  ::= { s5ChasAttEntry 7 }
+
+-- Local Channel Table
+
+
+s5ChasLocChanTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF S5ChasLocChanEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table containing information about each
+    'dual mode' local channel on a board."
+  ::= { s5ChasBrd 3 }
+
+s5ChasLocChanEntry OBJECT-TYPE
+  SYNTAX  S5ChasLocChanEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A row in the local channel table.
+    Entries can not be created or deleted
+    via SNMP. Entries are added or removed
+    by adding or removing a board that has
+    a 'dual mode' local channel from a slot
+    in the chassis."
+  INDEX { s5ChasLocChanBrdIndx,
+      s5ChasLocChanIndx }
+  ::= { s5ChasLocChanTable 1 }
+
+S5ChasLocChanEntry ::= SEQUENCE {
+  s5ChasLocChanBrdIndx  Integer32,
+  s5ChasLocChanIndx     LocChan,
+  s5ChasLocChanBkplMode INTEGER
+  }
+
+s5ChasLocChanBrdIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the board. This corresponds to
+    the index of the slot containing the board."
+  ::= { s5ChasLocChanEntry 1 }
+
+s5ChasLocChanIndx OBJECT-TYPE
+  SYNTAX  LocChan
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the local channel."
+  ::= { s5ChasLocChanEntry 2 }
+
+s5ChasLocChanBkplMode OBJECT-TYPE
+  SYNTAX  INTEGER {
+    other(1),
+    connected(2),
+    notConnected(3)
+    }
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+    "Indicates the attachment/isolation
+    mode of a local channel to a backplane
+    channel. The values that are read/write are:
+      connected(2)......connect local chan N to bkpl N
+      notConnected(3)...disconnect local chan N from bkpl
+
+    The possible values that can be read are:
+      other(1)..........unknown
+      connected(2)......local chan N connected to bkpl N
+      notConnected(3)...local chan N isolated from bkpl N"
+  ::= { s5ChasLocChanEntry 3 }
+
+-- Storage Area Table
+
+
+s5ChasStoreTable OBJECT-TYPE
+  SYNTAX  SEQUENCE OF S5ChasStoreEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A table listing the storage areas
+    on each component/sub-component in
+    the chassis. The number is determined
+    by the components in the chassis
+    which have manageable storage areas.
+    Examples of storage areas include
+    RAM(main memory), FLASH, ROM,
+    EEPROM, etc. This does not include
+    disk drives."
+  ::= { s5ChasStore 1 }
+
+s5ChasStoreEntry OBJECT-TYPE
+  SYNTAX  S5ChasStoreEntry
+  MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+    "A row in the table of storage areas.
+    The entries can not be created or
+    deleted via SNMP requests. Only those
+    components/sub-components that have
+    storage areas that are installed are
+    present. Storage areas that are on
+    components have a sub-component
+    index value of zero. Storage areas that
+    are on sub-components have a non-zero
+    sub-component index value."
+  INDEX { s5ChasStoreGrpIndx,
+      s5ChasStoreComIndx,
+      s5ChasStoreSubIndx,
+      s5ChasStoreIndx }
+  ::= { s5ChasStoreTable 1 }
+
+S5ChasStoreEntry ::= SEQUENCE {
+  s5ChasStoreGrpIndx  Integer32,
+  s5ChasStoreComIndx  Integer32,
+  s5ChasStoreSubIndx  Integer32,
+  s5ChasStoreIndx     Integer32,
+
+  s5ChasStoreType     OBJECT IDENTIFIER,
+  s5ChasStoreCurSize  Integer32,
+  s5ChasStoreCntntVer DisplayString,
+  s5ChasStoreFilename DisplayString,
+  s5ChasStoreUsedSize  Integer32,
+
+  s5ChasStoreDescription DisplayString,
+  s5ChasStoreAge         Integer32
+  }
+
+s5ChasStoreGrpIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the chassis level group
+    which contains the component or
+    sub-component containing the storage
+    area."
+  ::= { s5ChasStoreEntry 1 }
+
+s5ChasStoreComIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the component or
+    the component which contains the
+    sub-component containing the
+    storage area."
+  ::= { s5ChasStoreEntry 2 }
+
+s5ChasStoreSubIndx OBJECT-TYPE
+  SYNTAX  Integer32 (0..32767)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "If the storage area is on a component,
+    then the value zero. Otherwise, the
+    storage area is on a sub-component and
+    this is the index of the sub-component."
+  ::= { s5ChasStoreEntry 3 }
+
+s5ChasStoreIndx OBJECT-TYPE
+  SYNTAX  Integer32 (1..255)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The index of the storage area on the
+    component or sub-component."
+  ::= { s5ChasStoreEntry 4 }
+
+s5ChasStoreType OBJECT-TYPE
+  SYNTAX  OBJECT IDENTIFIER
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The storage area type on the containing
+    component/sub-component. The values
+    are defined under the .0 branch of the
+    value of s5ChasComType for the
+    component/sub-component containing the
+    storage area in the Registration MIB."
+  ::= { s5ChasStoreEntry 5 }
+
+s5ChasStoreCurSize OBJECT-TYPE
+  SYNTAX  Integer32 (-1..2147483647)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The current size of the storage
+    area in bytes. A value of zero
+    means the storage area is not installed
+    or not usable. A value of -1 indicates
+    that the size is unknown (or unavailable)."
+  ::= { s5ChasStoreEntry 6 }
+
+s5ChasStoreCntntVer OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE (0..255))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The version of the contents (i.e., the
+    code or data) of the storage area in the
+    form 'major.minor.maintenance[letters]'.
+    If not known or not available, then the value
+    is a zero length string. If multiple
+    contents are stored in this container, the
+    the value will contain multiple sub-versions,
+    each separated by a semicolon (;)."
+  ::= { s5ChasStoreEntry 7 }
+
+s5ChasStoreFilename OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE (0..128))
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+            "Name of the image file to be downloaded or
+             uploaded when the s5AgInfoFileAction object
+             is set to upload or download an image.  When the
+             object is not used, the value is a zero-length
+             string."
+  ::= { s5ChasStoreEntry 8 }
+
+s5ChasStoreUsedSize OBJECT-TYPE
+  SYNTAX  Integer32 (-1..2147483647)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The current size of the storage area that is currently in use,
+    measured in bytes. A value of zero means the storage area is
+    not in use.  A value of -1 means the size is unknown
+    (or unavailable)."
+  ::= { s5ChasStoreEntry 9 }
+
+s5ChasStoreDescription OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE (0..128))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+            "A string describing the storage area. When the
+             object is not used, the value is a zero-length
+             string."
+  ::= { s5ChasStoreEntry 10 }
+
+s5ChasStoreAge OBJECT-TYPE
+  SYNTAX  Integer32 (-1..2147483647)
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A counter of the number of writes performed on this storage
+    area which for areas residing in flash memory is an
+    indication of the flash memory age. This number is the maximum
+    number of writes for any of the access units (e.g. sector) from
+    the storage area. A value of zero means the storage area is
+    not in use.  A value of -1 means the age is unknown
+    (or unavailable)."
+  ::= { s5ChasStoreEntry 11 }
+
+
+-- Supervisor Information
+
+
+s5ChasSmLeds OBJECT-TYPE
+  SYNTAX  OCTET STRING
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "A bit array that contains the value of the
+    supervisor LEDs. (The format of these are the
+    same as the format for object s5ChasBrdLeds.)
+    If not available, a zero length string is
+    returned."
+  ::= { s5ChasSm 1 }
+
+s5ChasSmDateCode OBJECT-TYPE
+  SYNTAX  DisplayString (SIZE(0..8))
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The date of manufacture of the SM module
+    in ASCII in the format: YYYYmmdd. For
+    example, the value for April 13, 1993
+    is 19930413. If not available, a zero
+    length string is returned"
+  ::= { s5ChasSm 2 }
+
+-- Temperature Sensor Table
+
+
+s5ChasTmpSnrTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF S5ChasTmpSnrEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A table that contains temperature
+                sensor values."
+        ::= { s5ChasTmpSnr 1 }
+
+s5ChasTmpSnrEntry OBJECT-TYPE
+        SYNTAX  S5ChasTmpSnrEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A row in the s5ChasTmpSnrTable.  Rows
+                in this table will exist for each existing
+                row in the s5ChasComTable which represents
+                a temperature sensor.  The values of the
+                indices of the row in this table will be
+                equal to those of the corresponding row in
+                the s5ChasComTable."
+        INDEX   { s5ChasTmpSnrGrpIndx,
+                  s5ChasTmpSnrIndx,
+                  s5ChasTmpSnrSubIndx }
+        ::= { s5ChasTmpSnrTable 1 }
+
+S5ChasTmpSnrEntry ::= SEQUENCE {
+        s5ChasTmpSnrGrpIndx  Integer32,
+        s5ChasTmpSnrIndx     Integer32,
+        s5ChasTmpSnrSubIndx  Integer32,
+        s5ChasTmpSnrValue    Gauge32,
+        s5ChasTmpSnrTmpValue Integer32
+        }
+
+s5ChasTmpSnrGrpIndx OBJECT-TYPE
+        SYNTAX  Integer32 (1..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The index of the chassis level group which
+                contains this component, corresponds to
+                s5ChasComGrpIndx."
+        ::= { s5ChasTmpSnrEntry 1 }
+
+s5ChasTmpSnrIndx OBJECT-TYPE
+        SYNTAX  Integer32 (1..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The index of the component in the group.
+                Corresponds to s5ChasComIndx."
+        ::= { s5ChasTmpSnrEntry 2 }
+
+s5ChasTmpSnrSubIndx OBJECT-TYPE
+        SYNTAX  Integer32 (0..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Sub-component index.  Corresponds to
+                s5ChasComSubIndx."
+        ::= { s5ChasTmpSnrEntry 3 }
+
+s5ChasTmpSnrValue OBJECT-TYPE
+        SYNTAX  Gauge32
+        MAX-ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "The current temperature value of the temperature
+                sensor.  This is measured in units of a half degree
+                centigrade, e.g. a value of 121 indicates a temperature
+                of 60.5 degrees C.
+
+                This object is deprecated because it cannot represent
+                temperature values below 0, as Gauge32 is an unsigned type."
+        ::= { s5ChasTmpSnrEntry 4 }
+
+s5ChasTmpSnrTmpValue OBJECT-TYPE
+        SYNTAX  Integer32 (-32768..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The current temperature value of the temperature
+                sensor.  This is measured in units of a half degree
+                centigrade, e.g. a value of 121 indicates a temperature
+                of 60.5 degrees C."
+        ::= { s5ChasTmpSnrEntry 5 }
+
+
+
+
+-- Chassis Utilization Table, includes CPU and Memory Utilization information
+
+
+s5ChasUtilTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF S5ChasUtilEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A table that contains CPU and memory utilization
+                information."
+        ::= { s5ChasUtil 1 }
+
+s5ChasUtilEntry OBJECT-TYPE
+        SYNTAX  S5ChasUtilEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A row in the s5ChasUtilTable.  Rows
+                in this table will exist for each existing
+                row in the s5ChasComTable which represents
+                any chassis component for which CPU and/or
+                memory utilization values are available.
+                The values of the indices of a row in this
+                table will be equal to those of the
+                corresponding row in the s5ChasComTable."
+        INDEX   { s5ChasUtilGrpIndx,
+                  s5ChasUtilIndx,
+                  s5ChasUtilSubIndx }
+        ::= { s5ChasUtilTable 1 }
+
+S5ChasUtilEntry ::= SEQUENCE {
+        s5ChasUtilGrpIndx               Integer32,
+        s5ChasUtilIndx                  Integer32,
+        s5ChasUtilSubIndx               Integer32,
+        s5ChasUtilTotalCPUUsage         Gauge32,
+        s5ChasUtilCPUUsageLast1Minute   Gauge32,
+        s5ChasUtilCPUUsageLast10Minutes Gauge32,
+        s5ChasUtilCPUUsageLast1Hour     Gauge32,
+        s5ChasUtilCPUUsageLast24Hours   Gauge32,
+        s5ChasUtilMemoryAvailable       Gauge32,
+        s5ChasUtilMemoryMinAvailable    Gauge32,
+        s5ChasUtilCPUUsageLast10Seconds Gauge32,
+  s5ChasUtilMemoryTotalMB   Gauge32,
+  s5ChasUtilMemoryAvailableMB Gauge32
+        }
+
+s5ChasUtilGrpIndx OBJECT-TYPE
+        SYNTAX  Integer32 (1..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The index of the chassis level group which
+                contains this component, corresponds to
+                s5ChasComGrpIndx."
+        ::= { s5ChasUtilEntry 1 }
+
+s5ChasUtilIndx OBJECT-TYPE
+        SYNTAX  Integer32 (1..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The index of the component in the group.
+                Corresponds to s5ChasComIndx."
+        ::= { s5ChasUtilEntry 2 }
+
+s5ChasUtilSubIndx OBJECT-TYPE
+        SYNTAX  Integer32 (0..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Sub-component index.  Corresponds to
+                s5ChasComSubIndx."
+        ::= { s5ChasUtilEntry 3 }
+
+s5ChasUtilTotalCPUUsage OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the percentage of time the CPU has been
+         busy since system initialization."
+    ::= {s5ChasUtilEntry 4}
+
+s5ChasUtilCPUUsageLast1Minute OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the percentage of time the CPU has been
+         busy over the last 1 minute."
+    ::= {s5ChasUtilEntry 5}
+
+s5ChasUtilCPUUsageLast10Minutes OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the percentage of time the CPU has been
+         busy over the last 10 minutes."
+    ::= {s5ChasUtilEntry 6}
+
+s5ChasUtilCPUUsageLast1Hour OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the percentage of time the CPU has been
+         busy over the last 1 hour."
+    ::= {s5ChasUtilEntry 7}
+
+s5ChasUtilCPUUsageLast24Hours OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the percentage of time the CPU has been
+         busy over the last 24 hours."
+    ::= {s5ChasUtilEntry 8}
+
+s5ChasUtilMemoryAvailable OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the percentage of dynamic memory that
+         is currently free.  This is measured as a percentage of
+         the memory the was available immediately after system
+         initialization."
+    ::= {s5ChasUtilEntry 9}
+
+s5ChasUtilMemoryMinAvailable OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the lowest percentage of dynamic
+         memory that has been free since system initialization.
+         This is a 'low-water mark' for memory utilization, and is
+         essentially the lowest value of s5ChasUtilMemoryUsage
+         since system initialization."
+    ::= {s5ChasUtilEntry 10}
+
+s5ChasUtilCPUUsageLast10Seconds OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "This object returns the percentage of time the CPU has been
+         busy over the last 10 seconds."
+    ::= {s5ChasUtilEntry 11}
+
+s5ChasUtilMemoryTotalMB OBJECT-TYPE
+    SYNTAX  Gauge32 (0..1024)
+    UNITS   "MegaBytes"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object returns the total RAM of unit."
+    ::= { s5ChasUtilEntry 12 }
+
+s5ChasUtilMemoryAvailableMB OBJECT-TYPE
+    SYNTAX  Gauge32 (0..1024)
+    UNITS   "MegaBytes"
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object returns the available RAM of unit."
+    ::= { s5ChasUtilEntry 13 }
+
+
+
+-- Chassis Power Supply Table
+
+
+s5ChasPsRpsuTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF S5ChasPsRpsuEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A table that contains extended information on
+                 RPSU power supply components."
+        ::= { s5ChasPs 1 }
+
+s5ChasPsRpsuEntry OBJECT-TYPE
+        SYNTAX  S5ChasPsRpsuEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+                "A row in the s5ChasPsRpsuTable.  Rows
+                in this table will exist for each existing
+                row in the s5ChasComTable which represents
+                any RPSU power supply.  The values of the
+                indices of a row in this table will be equal
+                to those of the corresponding row in the
+                s5ChasComTable."
+        INDEX   { s5ChasPsRpsuGrpIndx,
+                  s5ChasPsRpsuIndx,
+                  s5ChasPsRpsuSubIndx }
+        ::= { s5ChasPsRpsuTable 1 }
+
+S5ChasPsRpsuEntry ::= SEQUENCE {
+        s5ChasPsRpsuGrpIndx               Integer32,
+        s5ChasPsRpsuIndx                  Integer32,
+        s5ChasPsRpsuSubIndx               Integer32,
+        s5ChasPsRpsuType                  INTEGER,
+        s5ChasPsRpsuSourceConfig          INTEGER
+        }
+
+s5ChasPsRpsuGrpIndx OBJECT-TYPE
+        SYNTAX  Integer32 (1..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The index of the chassis level group which
+                contains this component, corresponds to
+                s5ChasComGrpIndx."
+        ::= { s5ChasPsRpsuEntry 1 }
+
+s5ChasPsRpsuIndx OBJECT-TYPE
+        SYNTAX  Integer32 (1..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The index of the component in the group.
+                Corresponds to s5ChasComIndx."
+        ::= { s5ChasPsRpsuEntry 2 }
+
+s5ChasPsRpsuSubIndx OBJECT-TYPE
+        SYNTAX  Integer32 (0..32767)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "Sub-component index.  Corresponds to
+                s5ChasComSubIndx."
+        ::= { s5ChasPsRpsuEntry 3 }
+
+s5ChasPsRpsuType OBJECT-TYPE
+        SYNTAX  INTEGER {
+                            bayStack10(1),
+                            nes(2),
+                            bayStack15(3)
+                        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "This object returns the specific type of RPSU.
+                 It can be set to indicate to the system the type
+                 of installed RPSU in cases where the RPSU type
+                 cannot be automatically detected."
+    ::= {s5ChasPsRpsuEntry 4}
+
+s5ChasPsRpsuSourceConfig OBJECT-TYPE
+        SYNTAX  INTEGER {
+                            ups(1),
+                            rpsu(2),
+                            powerSharing(3)
+                        }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+                "This object is used to specify how a particular
+                 RPSU should be used by the system, as follows:
+
+                    ups(1)
+                       Indicates that the RPSU should be used only as
+                       an uninterruptible power source for devices
+                       attached to powered ethernet ports.
+
+                    rpsu(2)
+                       Indicates that the RPSU should be used only as
+                       a source of backup power for the device itself.
+
+                    powerSharing(3)
+                       Indicates that the RPSU should be used both as
+                       a source of backup power for the device, and as
+                       a UPS for devices attached to powered ethernet
+                       ports."
+    ::= {s5ChasPsRpsuEntry 5}
+
+
+-- Notification auxiliary objects
+
+s5ChasNotifyFanDirection OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    left(1),
+                    right(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object is used in the s5CtrFanDirectionError notification to
+        indicate fan direction."
+    ::= { s5ChasNotify 1 }
+
+
+-- GBIC Information Table
+
+s5ChasGbicInfoTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF S5ChasGbicInfoEntry
+        MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+                "A table that contains information about 
+                pluggable ports."
+        ::= { s5ChasPluggables 1}
+
+s5ChasGbicInfoEntry OBJECT-TYPE
+        SYNTAX  S5ChasGbicInfoEntry
+        MAX-ACCESS  not-accessible
+  STATUS  current
+  DESCRIPTION
+                "A row in the s5ChasGbicInfoTable."
+        INDEX  { s5ChasGbicInfoIfIndex }
+        ::= { s5ChasGbicInfoTable 1 }
+
+S5ChasGbicInfoEntry ::= SEQUENCE {
+        s5ChasGbicInfoIfIndex        InterfaceIndex,
+        s5ChasGbicInfoGbicType       DisplayString,
+        s5ChasGbicInfoWavelength     Integer32,
+        s5ChasGbicInfoVendorName     DisplayString,
+        s5ChasGbicInfoVendorOui      OCTET STRING,
+        s5ChasGbicInfoVendorPartNo   DisplayString,
+        s5ChasGbicInfoVendorRevision DisplayString,
+        s5ChasGbicInfoVendorSerial   DisplayString,
+        s5ChasGbicInfoHwOptions      BITS,
+        s5ChasGbicInfoDateCode       DisplayString,
+        s5ChasGbicInfoCleiCode       DisplayString,
+        s5ChasGbicInfoProductCode    DisplayString
+  }
+
+s5ChasGbicInfoIfIndex OBJECT-TYPE
+        SYNTAX  InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "A unique value, greater than zero, for each interface."
+  ::= { s5ChasGbicInfoEntry 1 }
+
+s5ChasGbicInfoGbicType OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The type of pluggable part."
+        ::= { s5ChasGbicInfoEntry 2 }
+
+s5ChasGbicInfoWavelength OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The wavelength value measured in nanometers for the pluggable part."
+        ::= { s5ChasGbicInfoEntry 3 }
+
+s5ChasGbicInfoVendorName OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The name of the vendor of the pluggable part."
+        ::= { s5ChasGbicInfoEntry 4 }
+
+s5ChasGbicInfoVendorOui OBJECT-TYPE
+        SYNTAX  OCTET STRING (SIZE (3))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The Organizationally Unique Identifier (OUI) of the pluggable part."
+        ::= { s5ChasGbicInfoEntry 5 }
+
+s5ChasGbicInfoVendorPartNo OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The vendor part number of the pluggable part."
+        ::= { s5ChasGbicInfoEntry 6 }
+
+s5ChasGbicInfoVendorRevision OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The vendor revision of the pluggable part."
+        ::= { s5ChasGbicInfoEntry 7 }
+
+s5ChasGbicInfoVendorSerial OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The vendor serial number for the pluggable part."
+        ::= { s5ChasGbicInfoEntry 8 }
+
+s5ChasGbicInfoHwOptions OBJECT-TYPE
+        SYNTAX  BITS {
+                         rxLoss(0),
+                         txFault(1),
+                         txDisable(2)
+                     }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The hardware options supported by the pluggable part."
+        ::= { s5ChasGbicInfoEntry 9 }
+
+s5ChasGbicInfoDateCode OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The manufacturing date of the pluggable part."
+        ::= { s5ChasGbicInfoEntry 10 }
+
+s5ChasGbicInfoCleiCode OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The Common Language Equipment Identification Code of the pluggable part."
+        ::= { s5ChasGbicInfoEntry 11 }
+
+s5ChasGbicInfoProductCode OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+                "The product code of the pluggable part."
+        ::= { s5ChasGbicInfoEntry 12 }
+
+END
+

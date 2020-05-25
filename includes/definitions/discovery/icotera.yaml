@@ -1,0 +1,40 @@
+mib: ICOTERA-I6400-SERIES
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: transceiverDdmVoltage
+                    num_oid: '.1.3.6.1.4.1.29865.11.3.1.3.4.{{ $index }}'
+                    descr: "WAN port transceiver"
+                    divisor: 10000
+        current:
+            data:
+                -
+                    oid: transceiverDdmTxBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.29865.11.3.1.3.5.{{ $index }}'
+                    descr: "WAN port transceiver"
+                    divisor: 1000
+        dbm:
+            data:
+                -
+                    oid: transceiverDdmRxPower
+                    num_oid: '.1.3.6.1.4.1.29865.11.3.1.3.3.{{ $index }}'
+                    index: 'transceiverDdmRxPower.{{ $index }}'
+                    descr: "WAN port Rx Power"
+                    user_func: uw_to_dbm
+                    divisor: 10
+                -
+                    oid: transceiverDdmTxPower
+                    num_oid: '.1.3.6.1.4.1.29865.11.3.1.3.2.{{ $index }}'
+                    index: 'transceiverDdmTxPower.{{ $index }}'
+                    descr: "WAN port Tx Power"
+                    user_func: uw_to_dbm
+                    divisor: 10
+        temperature:
+            data:
+                -
+                    oid: transceiverDdmTemperature
+                    num_oid: '.1.3.6.1.4.1.29865.11.3.1.3.1.{{ $index }}'
+                    descr: "WAN port transceiver"
+                    divisor: 256

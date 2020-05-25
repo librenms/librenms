@@ -1,0 +1,126 @@
+--
+--
+-- Copyright (C) 1998 by SNMP Research, Incorporated.
+--
+-- This software is furnished under a license and may be used and copied
+-- only in accordance with the terms of such license and with the
+-- inclusion of the above copyright notice. This software or any other
+-- copies thereof may not be provided or otherwise made available to any
+-- other person. No title to and ownership of the software is hereby
+-- transferred.
+--
+-- The information in this software is subject to change without notice
+-- and should not be construed as a commitment by SNMP Research, Incorporated.
+--
+-- Restricted Rights Legend:
+--  Use, duplication, or disclosure by the Government is subject to
+--  restrictions as set forth in subparagraph (c)(1)(ii) of the Rights
+--  in Technical Data and Computer Software clause at DFARS 252.227-7013;
+--  subparagraphs (c)(4) and (d) of the Commercial Computer
+--  Software-Restricted Rights Clause, FAR 52.227-19; and in similar
+--  clauses in the NASA FAR Supplement and other corresponding
+--  governmental regulations.
+--
+--
+
+--
+--                PROPRIETARY NOTICE
+--
+-- This software is an unpublished work subject to a confidentiality agreement
+-- and is protected by copyright and trade secret law.  Unauthorized copying,
+-- redistribution or other use of this work is prohibited.
+--
+-- The above notice of copyright on this source code product does not indicate
+-- any actual or intended publication of such source code.
+--
+
+
+TGT-ADDRESS-MASK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises,
+        MODULE-IDENTITY,
+        OBJECT-TYPE
+            FROM SNMPv2-SMI
+        TAddress
+            FROM SNMPv2-TC
+        snmpTargetAddrEntry
+            FROM SNMP-TARGET-MIB
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF;
+
+	snmpResearch       OBJECT IDENTIFIER ::= {enterprises 99}
+        snmpResearchMIBs   OBJECT IDENTIFIER ::= { snmpResearch 12 }
+
+    tgtAddressMaskMIB MODULE-IDENTITY
+        LAST-UPDATED "9801160000Z"
+        ORGANIZATION "SNMP Research, Inc."
+        CONTACT-INFO
+                      ""
+        DESCRIPTION
+              ""
+        ::= { snmpResearchMIBs 36 }
+
+
+    --
+    -- The tgtAddressMaskObjects Group
+    --
+
+    tgtAddressMaskObjects OBJECT IDENTIFIER ::=
+        { tgtAddressMaskMIB 1 }
+    tgtAddressMaskConformance OBJECT IDENTIFIER ::=
+        { tgtAddressMaskMIB 3 }
+
+    --
+    -- The tgtAddressMaskTable
+    --
+
+    tgtAddressMaskTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF TgtAddressMaskEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+              "Table to add an address mask to the
+               snmpTargetAddrTable."
+        ::= { tgtAddressMaskObjects 1 }
+
+    tgtAddressMaskEntry OBJECT-TYPE
+        SYNTAX       TgtAddressMaskEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+                   "Adds an address mask to an snmpTargetAddrEntry."
+        AUGMENTS { snmpTargetAddrEntry }
+        ::= { tgtAddressMaskTable 1 }
+
+    TgtAddressMaskEntry ::= SEQUENCE {
+        tgtAddressMask     TAddress
+    }
+
+    tgtAddressMask OBJECT-TYPE
+        SYNTAX       TAddress
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+              "This object is used to qualify the value of the
+               corresponding instance of snmpTargetAddrTAddress.
+               The format of this object is determined by the
+               corresponding instance of snmpTargetAddrTDomain.
+
+               When performing transport address validation on
+               a received packet, the value of this object is
+               used as a mask to determine whether a source
+               address matches a particular entry in the
+               snmpTargetAddrTable.  In general, the comparison
+               using this mask value is performed as follows for
+               each octet contained in the source address and
+               snmpTargetAddrTAddress value:
+                   (sourceAddr & tgtAddressMask) ==
+                      (snmpTargetAddrTAddress & tgtAddressMask)
+               if the values are equal for all octets, the source
+               address matches the entry."
+         DEFVAL { ''H }     -- the empty string
+        ::= { tgtAddressMaskEntry 1 }
+
+END

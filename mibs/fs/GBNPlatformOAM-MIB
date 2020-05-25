@@ -1,0 +1,1613 @@
+    GBNPlatformOAM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32, IpAddress,
+        NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+
+        DisplayString, MacAddress,
+        RowStatus, TruthValue                   FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+
+        gbnPlatform                             FROM ADMIN-MASTER-MIB
+
+        SnmpAdminString                         FROM SNMP-FRAMEWORK-MIB
+
+        PortList, dot1qStaticMulticastEntry     FROM Q-BRIDGE-MIB;
+
+    gbnPlatformOAM MODULE-IDENTITY
+        LAST-UPDATED    "0011020000Z"  -- November 2, 2000
+        ORGANIZATION    "Admin Co., Ltd."
+        CONTACT-INFO    "Admin Co., Ltd.
+                         E-mail: support@admin.com"
+
+        DESCRIPTION     "ADMIN Common Enterprise MIB definition."
+
+        REVISION        "0011020000Z"  -- November 2, 2000
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnPlatform 1 }
+
+------------------------------------------------------------------------------
+--  define groups in GBN-COMMON-MIB
+------------------------------------------------------------------------------
+    gbnPlatformOAMSysIf           OBJECT IDENTIFIER ::= { gbnPlatformOAM 1 }
+    gbnPlatformOAMSystem          OBJECT IDENTIFIER ::= { gbnPlatformOAM 2 }
+    gbnPlatformOAMIpAccessControl OBJECT IDENTIFIER ::= { gbnPlatformOAM 3 }
+    gbnPlatformOAMWatchDog        OBJECT IDENTIFIER ::= { gbnPlatformOAM 4 }
+    gbnPlatformOAMMuser           OBJECT IDENTIFIER ::= { gbnPlatformOAM 5 }
+    gbnPlatformOAMUpDownLoad      OBJECT IDENTIFIER ::= { gbnPlatformOAM 6 }
+    gbnPlatformOAMSnmp            OBJECT IDENTIFIER ::= { gbnPlatformOAM 7 }
+    gbnPlatformOAMSntpClient      OBJECT IDENTIFIER ::= { gbnPlatformOAM 8 }
+    gbnPlatformOAMSyslog          OBJECT IDENTIFIER ::= { gbnPlatformOAM 9 }
+    gbnPlatformOAMPortCar         OBJECT IDENTIFIER ::= { gbnPlatformOAM 10 }
+    gbnPlatformOAMSsh             OBJECT IDENTIFIER ::= { gbnPlatformOAM 11 }
+    gbnPlatformOAMMailalarm       OBJECT IDENTIFIER ::= { gbnPlatformOAM 12 }
+    gbnPlatformOAMVctRun          OBJECT IDENTIFIER ::= { gbnPlatformOAM 13 }
+    gbnPlatformOAMVctRunResult    OBJECT IDENTIFIER ::= { gbnPlatformOAM 14 }
+    gbnPlatformOAMTelnet          OBJECT IDENTIFIER ::= { gbnPlatformOAM 15 }
+    gbnPlatformOAMIpControl       OBJECT IDENTIFIER ::= { gbnPlatformOAM 16 }
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMSysIf - System IP Group
+--
+--  This group include manually config system ip-address,or using dhcp/bootp client,
+--  and manageVLAN.
+--
+------------------------------------------------------------------------------
+--
+    sysIfMACAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { '000000000000'H }
+             The base (i.e., first) MAC address used by the gbn agent for its
+             in-band ports."
+        ::= { gbnPlatformOAMSysIf 1 }
+
+    sysIfIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { '00000000'H }
+             The IP Address for sw0 (swEND 0); only applies after reset -
+             see 'gbnCommonMiscReset'."
+        ::= { gbnPlatformOAMSysIf 2 }
+
+    sysIfIPGateAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { '00000000'H }
+             The default Gateway Address (i.e., next hop router) for sw0
+             (swEND 0); only applies after reset - see 'gbnCommonMiscReset'."
+        ::= { gbnPlatformOAMSysIf 3 }
+
+    sysIfIPNetMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 'ffffff00'H }
+             The IP NetMask for sw0 (swEND 0); only applies after reset -
+             see 'gbnCommonMiscReset'."
+        ::= { gbnPlatformOAMSysIf 4 }
+
+    sysIfIPStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               notModified(1),
+               modified(2),
+               restore(3),
+               apply(4)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object is used to synchronize the modification of the IP
+            parameters used by the protocol stack based on the gbnCommonIP
+            MIB objects.  This allows the user to change gbnCommonIPMACAddr,
+            gbnCommonIPIpAddress, gbnCommonIPGateAddress, and
+            gbnCommonIPNetMask, and then apply the changes to the unit
+            using apply(4).  If gbnCommonIPStatus returns notModified(1),
+            no modifications were made to any gbnCommonIP MIB objects.
+            If gbnCommonIPStatus returns modified(2), one or more objects
+            were changed, but have not been applied.  Both notModified(1)
+            and modified(2) are read-only values; the agent returns a
+            SNMPBADVALUE for sets using these values.  Both restore(3) and
+            apply(4) are valid SET values.  If one or more of the gbnCommonIP
+            objects were modified, the user can restore the parameters to a
+            mirror of the NVM values using restore(3)."
+        ::= { gbnPlatformOAMSysIf 5 }
+
+    sysIfBOOTPOnOff OBJECT-TYPE
+        SYNTAX INTEGER {
+               enable(1),
+               disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { disable }
+             Enable/Disable BOOTP operation for the gbn agent.
+             When 'disable(2)', no BOOTPs are transmitted by the Application.
+             When 'enable(1)', the Application sends BOOTP requests during
+             system startup."
+        ::= { gbnPlatformOAMSysIf 7 }
+
+    sysIfDHCPOnOff OBJECT-TYPE
+        SYNTAX INTEGER {
+               enable(1),
+               disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { disable }
+             Enable/Disable DHCP operation for the gbn agent.
+             When 'disable(2)', no DHCPs are transmitted by the Application.
+             When enabled, the Application sends DHCP requests during
+             system startup."
+        ::= { gbnPlatformOAMSysIf 8 }
+
+    sysIfManageVLANTbale OBJECT-TYPE
+              SYNTAX  SEQUENCE OF SysIfManageVLANEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "ManageVlan table"
+                      --管理VLAN表格。
+              ::= { gbnPlatformOAMSysIf 9 }
+
+    sysIfManageVLANEntry OBJECT-TYPE
+              SYNTAX  SysIfManageVLANEntry
+              ACCESS  not-accessible
+              STATUS  mandatory
+              DESCRIPTION
+                      "ManageVlan entry"
+                      --管理VLAN实体。
+              INDEX   { sysIfManageVLANVid }
+              ::= { sysIfManageVLANTbale 1 }
+
+    SysIfManageVLANEntry ::=
+              SEQUENCE {
+                  sysIfManageVLANVid
+                      INTEGER,
+                  sysIfManageVLANRowStatus
+                      RowStatus
+                   }
+
+    sysIfManageVLANVid OBJECT-TYPE
+              SYNTAX  INTEGER
+              ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "ManageVLAN-ID, as an index, the maximum number is 26."
+                      --管理VLAN，作为索引。最多可以创建26个。
+              ::= { sysIfManageVLANEntry 1 }
+
+    sysIfManageVLANRowStatus OBJECT-TYPE
+              SYNTAX  RowStatus
+              ACCESS  read-write
+              STATUS  current
+              DESCRIPTION
+                      "ManageVLAN status"
+              ::= { sysIfManageVLANEntry 2 }
+
+
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMSystem - System Group
+--
+------------------------------------------------------------------------------
+    softwarePlate OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Software platform used by switches."
+                --交换机采用的软件平台。
+            ::= { gbnPlatformOAMSystem 1 }
+
+    softwareVersion OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Software version, the format is V100R001B02D06P03SP3"
+                --软件版本，格式为V100R001B02D06P03SP3
+            ::= { gbnPlatformOAMSystem 2 }
+
+    softwareCompiledTimeE OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Software Compiled time displayed in English, the format is Feburary 17 2003 15:47:00"
+                --软件编译时间，格式为Feburary 17 2003 15:47:00
+            ::= { gbnPlatformOAMSystem 3 }
+
+    softwareCompiledTimeC OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Software Compiled time displayed in Chinese, the format is 2003nian06yue18ri13dian15fen"
+                --软件编译时间，格式为2003年06月18日13点15分
+            ::= { gbnPlatformOAMSystem 4 }
+
+    cpuDescription OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "System CPU description, the format is Mips 32334, 133MHz"
+                --系统CPU描述，格式为Mips 32334, 133MHz
+            ::= { gbnPlatformOAMSystem 5 }
+
+    sdramDescription OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "System Memery description, the format is 32M"
+                --系统内存描述，格式为32M
+            ::= { gbnPlatformOAMSystem 6 }
+
+    flashDescription OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "System Flash description, the format is 4096k"
+                --系统FLASH描述，格式为4096k
+            ::= { gbnPlatformOAMSystem 7 }
+
+    hardwareVersion OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Hardware version, the format is V3.0"
+                --系统主板的版本号，格式为V3.0
+            ::= { gbnPlatformOAMSystem 8 }
+
+    bootromVersion OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (0..100))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Bootrom version, the format is V2.0"
+                --系统主板的版本号，格式为V2.0
+            ::= { gbnPlatformOAMSystem 9 }
+
+    hostName OBJECT-TYPE
+            SYNTAX DisplayString (SIZE (1..128))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "System host name"
+            ::= { gbnPlatformOAMSystem 10 }
+
+    cpuIdle OBJECT-TYPE
+        SYNTAX       INTEGER (0..100)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The percentage of free CPU in the current system."
+        ::= {  gbnPlatformOAMSystem 11 }
+
+    memorySize OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The current system memory size, unit is byte."
+        ::= {  gbnPlatformOAMSystem 12 }
+
+    memoryIdle OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                "The current system free memory size, unit is byte."
+        ::= {  gbnPlatformOAMSystem 13 }
+
+    systemClock OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 14 }
+
+    clockTime OBJECT-TYPE
+        SYNTAX   Unsigned32
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "The current calendar time in seconds. The based time is 1979/1/1.
+            Year of the date must be the number between 2000 and 2099"
+      ::= { systemClock 1 }
+
+    timeZoneName OBJECT-TYPE
+        SYNTAX   DisplayString (SIZE (1..32))
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "the timezone name,1-32 letters.eg CCT(China Coast, USSR Zone 7)"
+       ::= { systemClock 2 }
+
+    timeZoneOffset OBJECT-TYPE
+        SYNTAX   Integer32 (0..86399)
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "seconds between current timezone and GMT "
+      ::= { systemClock 3 }
+
+    offsetNegFlag OBJECT-TYPE
+        SYNTAX INTEGER{    
+               true(1),
+               false(2)
+        }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+           "earlier or latter than GMT,it is true when timeZoneOffset is negative"
+      ::= { systemClock 4 }
+
+    productName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..255))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 'WindRiver gbn Agent' }
+             The product name associated with this agent.  This name is
+             displayed on the console screens and Web pages."
+        ::= { gbnPlatformOAMSystem 15 }
+
+    systemReset OBJECT-TYPE
+        SYNTAX INTEGER {
+               noop(1),           -- no operation
+               reset(2),          -- reset unit
+               resetToDefaults(3) -- reset to factory defaults/reset unit
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Physically performs a hardware reset of the unit.
+             Use with care.  A 'reset(2)' resets the unit, a
+             'resetToDefaults(3)' resets the NVM configuration
+             to factory defaults and then resets the unit, and 'noop(1)'
+             does nothing.  A value of 'noop(1)' is always returned for a
+             GET operation."
+        ::= { gbnPlatformOAMSystem 16 }
+
+    writeConfig OBJECT-TYPE
+        SYNTAX INTEGER {
+               noop(1),             -- no operation
+               save(2),             -- save all configuration parameters to NVM
+               saveInProgress(3),   -- read-only: NVM save in progress
+               saveFailed(4)        -- read-only: NVM save failed
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "When set to 'save(2)', config file is saved to NVM (Nonvolatile
+             Memory).  NVM save operations may be slow (e.g., erasing/writing
+             Flash device).
+
+             Consequently, all or many updates should be made before
+             saving to NVM.  Note that the SNMP set to 'save(2)' returns
+             immediately to the caller.  Gets on this object then return
+             'saveInProgress(3)' until the save operation completes, at
+             which time 'noop(1)' is returned if the save operation is
+             succeeded, otherwise 'saveFailed(4)' is returned.  Consequently,
+             a get operation always returns 'noop(1)', 'saveInProgress(3)'
+             or 'saveFailed(4) depending on the current state and the result
+             of the save operation.
+
+             The agent returns 'badValue' for SNMPv1 or 'inconsistentValue'
+             for SNMPv2c/v3 for a set to 'Save(2)' while the current get
+             state is 'saveInProgress(3)'.
+
+             Attempts to set this object to 'saveInProgress(3)' or 'saveFailed(4)'
+             returns 'badValue' for SNMPv1 or 'wrongValue' for SNMPv2c/v3."
+        ::= { gbnPlatformOAMSystem 17 }
+
+------------------------------------------------------------------------------
+--  define groups in GBN-COMMON-MIB
+------------------------------------------------------------------------------
+    saveNMInterfaceConfig   OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 18 }
+------------------------------------------------------------------------------
+--
+--  saveNMInterfaceConfig - Save nminterface configuration Group
+--
+------------------------------------------------------------------------------
+    nmInterfaceId OBJECT-TYPE
+        SYNTAX INTEGER(0..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "interface id of vlan saved for nminterface configuration."
+            --此节点用于存储vlan接口ID。当值为0时默认为vlan 1 的接口。
+        ::= { saveNMInterfaceConfig 1 }
+
+    nmInterfaceIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "ip address saved for nminterface configuration."
+            --此节点用于存储vlan接口的ip地址。
+        ::= { saveNMInterfaceConfig 2 }
+
+    nmInterfaceNetMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "mask saved for nminterface configuration. "
+            --此节点用于存储vlan接口的掩码。
+        ::= { saveNMInterfaceConfig 3 }
+
+    nmInterfaceGateAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "gateway address saved for nminterface configuration. "
+            --此节点用于存储vlan接口的网关地址。
+        ::= { saveNMInterfaceConfig 4 }
+
+        writeNMInterfaceConifig OBJECT-TYPE
+        SYNTAX INTEGER{
+                   saveNmconfig(1)
+          }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION
+            "We save the nminterface configuration through setting this Mib. When setting to
+            'saveNmconfig(1)', nminterface configuration is starting to be saved.
+            At the same time the value of writeNMInterfaceConifigStatus Mib is set to 'saveInProgress(2)'.
+            Then the value of nmInterfaceId, nmInterfaceIpAddress, nmInterfaceNetMask,
+            nmInterfaceGateAddress will be read one by one.According to these value,
+            the nminterface configuration is to be saved.
+            Untill the process was over the value of writeNMInterfaceConifigStatus Mib is
+            changed to 'saveSuccess(1)'. And if the process was ended for exception the value
+            of writeNMInterfaceConifigStatus Mib is set to a error code from
+            'saveFailed(3)' to 'invalidIpOrMask(11)'. "
+            --我们通过设置这个Mib来保存最小管理配置，当设此Mib的值为1时，ccd模块将调用相应的处理函数
+            --来保存和最小配置相关的信息。此处理函数一开始就将writeNMInterfaceConifigStatus的值设为2，
+            --然后依次读取nmInterfaceId, nmInterfaceIpAddress, nmInterfaceNetMask,nmInterfaceGateAddress
+            --节点中的值，以这些值作为参数对和最小配置相关的信息进行保存。等到完成保存操作，如果成功保存，
+            --处理函数将writeNMInterfaceConifigStatus值设为1，失败设置为相应错误状态为3－11。
+
+            --补充：nmInterfaceId，nmInterfaceIpAddress, nmInterfaceNetMask,nmInterfaceGateAddress
+            --4个节点的值可以都不设置。 如果设置了nmInterfaceId节点，后三个节点可以不设置，但如果设置了
+            --nmInterfaceIpAddress节点的值，nmInterfaceNetMask, nmInterfaceGateAddress的值必须设置。如果
+            --没有设置nmInterfaceIpAddress节点的值，后两个就不能设置。如果nmInterfaceId节点没有设置，
+            --后三个就都不能设置。
+          ::= { saveNMInterfaceConfig 5 }
+
+    writeNMInterfaceConifigStatus OBJECT-TYPE
+        SYNTAX INTEGER{
+               saveSuccess(1),             -- NVM save succeeded
+               saveInProgress(2),          -- read-only: NVM save in progress
+               saveFailed(3),              -- read-only: NVM save failed
+               noInterface(4),             -- the vlan interface doesn't exist
+               noIpAddress(5),             -- no ip for the vlan interface
+               differentSubnet(6),         -- ip address and gateway address are not in the same subnet
+               noInterfaceParameter(7),    -- need to input a vlan interface
+               noIpAddressParameter(8),    -- need to input an ip address
+               noMaskParameter(9),         -- need to input a mask
+               noGatewayParameter(10),     -- need to input a gateway address
+               invalidIpOrMask(11)         -- the ip address or mask is invalid
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Reserve the status of process in saving Nmconfig."
+            --存储保存最小管理配置过程中的状态。
+
+        ::= { saveNMInterfaceConfig 6 }
+
+    prodSerialNo OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+           "Product Serial Number"
+           --产品序列号
+        ::= { gbnPlatformOAMSystem 19 }
+
+    cpuBusyStatus OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "CPU busy status"
+            --CPU忙状态
+        ::= { gbnPlatformOAMSystem 20 }
+
+    cpuBusyAlarmEnable OBJECT-TYPE
+        SYNTAX TruthValue {
+                  true     (1),
+                  false    (2)
+                          }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "the enable status of cpu busy alarm."
+            --CPU忙告警开启/关闭状态
+        DEFVAL {true}
+        ::= { gbnPlatformOAMSystem 21 }
+
+    cpuBusyThreshold OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "CPU busy threshold."
+            --CPU忙的阈值
+        ::= { gbnPlatformOAMSystem 22 }
+
+    cpuUnbusyThreshold OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "CPU unbusy threshold."
+            --CPU不忙的阈值
+        ::= { gbnPlatformOAMSystem 23 }
+
+------------------------------------------------------------------------------
+--
+--  cpuStatusTrap - CPU status TRAP
+--
+------------------------------------------------------------------------------
+    cpuStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 24 }
+
+    cpuBusyTrap NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+               "cpu busy trap."
+               --CPU 忙TRAP
+        ::= { cpuStatusTrap 1 }
+
+    cpuUnbusyTrap NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+               "cpu unbusy trap."
+               --CPU 不忙TRAP
+        ::= { cpuStatusTrap 2 }
+------------------------------------------------------------------------------
+--
+--  dramStatusTrap - DRAM status 
+--
+------------------------------------------------------------------------------
+		dramAlarmEnable OBJECT-TYPE
+        SYNTAX TruthValue {
+                  true     (1),
+                  false    (2)
+                          }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "the enable status of dram alarm."
+            --DRAM警开启/关闭状态
+        DEFVAL {true}
+        ::= { gbnPlatformOAMSystem 25 }
+
+    dramAlarmThreshold OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "the DRAM set alarm threshold."
+            --DRAM使用的利用率超出实际利用率
+        ::= { gbnPlatformOAMSystem 26 }
+        
+    dramStatus OBJECT-TYPE
+    		SYNTAX TruthValue {
+                  true     (1),
+                  false    (2)
+                          }
+    		MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DRAM Status（Beyond the threshold）."
+            --DRAM是否超出阈值（利用率）
+        ::= { gbnPlatformOAMSystem 27 }
+
+    dramUtilization OBJECT-TYPE
+    		SYNTAX  Integer32
+    		MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "DRAM Utilization."
+            --DRAM的利用率
+        ::= { gbnPlatformOAMSystem 28 }        
+
+dramStatusTrap      OBJECT IDENTIFIER ::= { gbnPlatformOAMSystem 29 }
+
+    dramBusyTrap NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+               "dram trap."
+               --DRAM TRAP
+        ::= { dramStatusTrap 1 }
+	
+    copyRunSta OBJECT-TYPE
+        SYNTAX INTEGER {
+               noop(1),           -- no operation
+               op(2)             -- operation
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "copy running-config startup-config."
+        ::= { gbnPlatformOAMSystem 30 }     
+        
+     copyStaRun OBJECT-TYPE
+        SYNTAX INTEGER {
+               noop(1),           -- no operation
+               op(2)             -- operation
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "copy startup-config running-config."
+        ::= { gbnPlatformOAMSystem 31 }
+
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMIpAccessControl - IP Access Control Group
+--
+------------------------------------------------------------------------------
+    ipAccessControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpAccessControlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "IP address access control table."
+            --能够访问交换机的ip地址列表.
+        ::= { gbnPlatformOAMIpAccessControl 1 }
+
+    ipAccessControlEntry OBJECT-TYPE
+        SYNTAX IpAccessControlEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "IP address access control entry."
+            --能够访问交换机的ip地址列表.
+        INDEX { controlIpAddress, controlIpMask, controlTeminal}
+        ::= { ipAccessControlTable 1 }
+
+    IpAccessControlEntry ::= SEQUENCE {
+        controlIpAddress     IpAddress,
+        controlIpMask         IpAddress,
+        controlTeminal        INTEGER,
+        controlStatus          INTEGER
+      }
+
+    controlIpAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The accessible ip address of the switch"
+            --能够访问交换机的ip地址.
+        ::= { ipAccessControlEntry 1 }
+
+    controlIpMask OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The accessible ip address mask of the switch, wildcard supports mask and unmask"
+            --能够访问交换机的ip地址掩码, 通配符支持掩码和反掩码.
+        ::= { ipAccessControlEntry 2 }
+
+    controlTeminal OBJECT-TYPE
+        SYNTAX      INTEGER
+         {
+            snmp(1),
+            web(2),
+            telnet(3)
+        }
+       MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The client type connected to switch, snmp(1) means connecting switch by SNMP,
+            web(2) means connecting switch by WEB, telnet(3) means connecting switch by telnet."
+            --访问交换机客户端类型。snmp(1)表示通过snmp网管访问，web(2)表示通过web网管访问，telnet(3)表示通过telnet网管访问.
+        ::= { ipAccessControlEntry 3 }
+
+    controlStatus OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            active(1),
+            destroy(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IP address control status, active(1) means adding the ip address to list,
+            destroy(2) means deleting the ip address from list"
+            --ip地址状态, active(1)表示加入到活动列表;destroy(2)表示将此ip地址删除。
+        ::= { ipAccessControlEntry 4 }
+
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMWatchDog - Watch Dog Group
+--
+------------------------------------------------------------------------------
+    softDogProxy OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disable the soft dog."
+            ::= { gbnPlatformOAMWatchDog 1 }
+
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMMuser - Manage User Group
+--
+------------------------------------------------------------------------------
+    musrTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MusrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of usrname and Password."
+        ::= { gbnPlatformOAMMuser 1 }
+
+    musrEntry OBJECT-TYPE
+        SYNTAX MusrEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of usr parameters."
+        INDEX { musrIndex }
+        ::= { musrTable 1 }
+
+    MusrEntry ::= SEQUENCE {
+            musrIndex            Integer32,
+            musrName             DisplayString,
+            musrPassword         DisplayString,
+            musrPwdEncrypt       INTEGER,
+            musrType             INTEGER,
+            musrRowStatus        INTEGER
+        }
+
+    musrIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..8)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A simple index into 'gbnCommonUsrTable'."
+        ::= { musrEntry 1 }
+
+    musrName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple usrname of gbnCommonUsrEntry."
+        ::= { musrEntry 2 }
+
+    musrPassword OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..16))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " A simple password of gbnCommonUsrEntry."
+        ::= { musrEntry 3 }
+
+    musrPwdEncrypt OBJECT-TYPE
+        SYNTAX INTEGER {
+            clearText(0),
+            encrypt(7)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 0 }
+            Password in 'gbnCommonUsrTable' is in 
+            format of clear text(0) or enrypt(7)."
+        ::= { musrEntry 6 }
+
+    musrType OBJECT-TYPE
+        SYNTAX INTEGER {
+                    normalUser0(0),
+                    normalUser1(1),
+                    administrator2(2),
+                    administrator3(3),
+                    administrator4(4),
+                    administrator5(5),
+                    administrator6(6),
+                    administrator7(7),
+                    administrator8(8),
+                    administrator9(9),
+                    administrator10(10),
+                    administrator11(11),
+                    administrator12(12),
+                    administrator13(13),
+                    administrator14(14),
+                    administrator15(15)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { NormalUser }
+            A simple UsrType into 'gbnCommonUsrTable'.
+            when 'NomalUser' configuration is limitted"
+        ::= { musrEntry 4 }
+
+    musrRowStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+                    enable(1),
+                    disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { disable }
+            A simple RowStatus into 'gbnCommonUsrTable'.
+            when 'disable' the user is deleted"
+        ::= { musrEntry 5 }
+
+    manageUserAuthenType OBJECT-TYPE
+        SYNTAX INTEGER {
+               locacl(1),
+               radius(2),
+               radiusFailLocal(3),
+               tacacsplus(4),
+               tacacsplusFailLocal(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Authentication method，1:local, 2:radius, 3:radius first，and then local after failed,4:tacacsplus,5:tacacsplus first, and then local after failed."
+            --管理用户认证方式，1:本地方式, 2:radius认证,3:先radius认证，radius服务器连接失败后Local，4:tacacs+认证，5:先tacacs+认证，tacacs+服务器连接失败后Local.
+        ::= { gbnPlatformOAMMuser 2 }
+
+    manageUserAuthenRadiusName OBJECT-TYPE
+        SYNTAX  DisplayString(SIZE (1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "radius server name."
+            --radius服务器方案名称.
+        ::= { gbnPlatformOAMMuser 3 }
+
+    manageUserAuthChallegeType OBJECT-TYPE
+        SYNTAX  INTEGER{
+               chap(1),
+               pap(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Radius authentication method，1:CHAP, 2:PAP."
+            --管理用户radius认证方式，1:CHAP, 2:PAP.
+        ::= { gbnPlatformOAMMuser 4 }
+
+    manageUserTacacsAuthor OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "authorization afer authenticastion."
+            --在tacacs认证后是否进行shell授权.
+        ::= { gbnPlatformOAMMuser 5 }
+
+    manageUserTacacsAccount OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "accounting after authorization."
+            --用户在使用tacacs+认证后登录/退出时发送计费操作.
+        ::= { gbnPlatformOAMMuser 6 }
+
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMUpDownLoad - Upload/Download Group
+--
+------------------------------------------------------------------------------
+    loadTftpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The IP Address for the TFTP server used for downloading
+             and/or uploading files."
+        ::= { gbnPlatformOAMUpDownLoad 1 }
+
+    loadTftpFileName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The TFTP file path and name."
+        ::= { gbnPlatformOAMUpDownLoad 2 }
+
+    loadType OBJECT-TYPE
+        SYNTAX INTEGER {
+               application(1),
+               normalBootRom(2),
+               configuration(3),
+               bootCode(4),
+               alarm(5),
+               syslog(6),
+               wholeBootRom(7),
+               oltImage(8),
+               onuImage(9),
+               geApplication(10),
+               geBootRom(11),
+               10geApplication(12),
+               10geBootRom(13),
+               eponApplication(14),
+               eponBootRom(15),
+               10geponApplication(16),
+               10geponBootRom(17),
+               gponApplication(18),
+               gponBootRom(19)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { application }
+             The type of file to download or upload upon an
+             'gbnCommonLoadExecute'.
+             application:program file of the switch
+             configuration:configuration file,should be uploaded before
+                           you download it.
+             miccode:microcode is the program file of vdsl chip.
+             removed during the boot Flash write operation, the agent
+             cannot be recovered)."
+        ::= { gbnPlatformOAMUpDownLoad 3 }
+
+    loadExecute OBJECT-TYPE
+        SYNTAX INTEGER {
+               noop(1),         -- no operation
+               downloadTftp(2),     -- Application, Boot, or Configuration
+               uploadTftp(3),        -- Configuration only
+               downloadFtp(4),     -- Application, Boot, or Configuration
+               uploadFtp(5),       -- Configuration only
+               downloadXmodem(6)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Execute file download or upload procedure.  A SET of this
+             object starts the load procedure.  Note that the Application
+             and Boot images can only be downloaded.  The NVM Configuration
+             file can be uploaded and downloaded.  A GET of this object
+             will return the status of the executed operation.
+             Use 'gbnCommonLoadExecuteStatus' to determine the status of
+             the executed load."
+        ::= { gbnPlatformOAMUpDownLoad 4 }
+
+    loadExecuteStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               notStarted(1),       -- download has not yet started
+               inProgressTftp(2),       -- download has not yet finished
+               successTftp(3),          -- download has finished successfully
+               errorConnectionTftp(4),  -- download cannot connect
+               errorFilenameTftp(5),    -- download has bad image path/filename
+               errorFaultTftp(6),        -- download has fault condition on device
+               inProgressFtp(7),       -- download has not yet finished
+               successFtp(8),          -- download has finished successfully
+               errorConnectionFtp(9),  -- download cannot connect
+               errorFilenameFtp(10),    -- download has bad image path/filename
+               errorFaultFtp(11),        -- download has fault condition on device
+
+               inProgressXmodem(12),       -- download has not yet finished
+               successXmodem(13),          -- download has finished successfully
+               errorConnectionXmodem(14),  -- download cannot connect
+               errorFilenameXmodem(15),    -- download has bad image path/filename
+               errorFaultXmodem(16)        -- download has fault condition on device
+
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Provides status on the execute file load progress."
+        ::= { gbnPlatformOAMUpDownLoad 5 }
+
+    loadFtpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The IP Address for the FTP server used for downloading
+             and/or uploading files."
+        ::= { gbnPlatformOAMUpDownLoad 6 }
+
+    loadFtpFileName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The FTP file path and name."
+        ::= { gbnPlatformOAMUpDownLoad 7 }
+
+    loadFtpUserName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The FTP user name."
+        ::= { gbnPlatformOAMUpDownLoad 8 }
+
+    loadFtpUserPassword OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE:
+             The FTP user password."
+        ::= { gbnPlatformOAMUpDownLoad 9 }
+
+    FtpdOnOff OBJECT-TYPE
+        SYNTAX INTEGER {
+               enable(1),
+               disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { disable }
+             Enable/Disable Ftpd."
+        ::= { gbnPlatformOAMUpDownLoad 10 }
+
+    FtpdAnonymousOnOff OBJECT-TYPE
+        SYNTAX INTEGER {
+               enable(1),
+               disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { disable }
+             Enable/Disable Ftpd anonymous login."
+        ::= { gbnPlatformOAMUpDownLoad 11 }
+		
+    loadSlotID OBJECT-TYPE
+        SYNTAX INTEGER(0..15)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Slot ID"
+        ::= { gbnPlatformOAMUpDownLoad 12 }
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMSnmp - Snmp Group
+--
+------------------------------------------------------------------------------
+    snmpCommunityToViewTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SnmpCommunityToViewEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of SNMPv1/v2c community string to view name mappings."
+        ::= { gbnPlatformOAMSnmp 1 }
+
+    snmpCommunityToViewEntry OBJECT-TYPE
+        SYNTAX SnmpCommunityToViewEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of community-to-view parameters."
+        INDEX { snmpComm2ViewIndex }
+        ::= { snmpCommunityToViewTable 1 }
+
+    SnmpCommunityToViewEntry ::= SEQUENCE {
+        snmpComm2ViewIndex         Integer32,
+        snmpComm2ViewCommName      DisplayString,
+        snmpComm2ViewViewName      SnmpAdminString,
+        snmpComm2ViewPermission    INTEGER,
+        snmpComm2ViewRowStatus     RowStatus
+    }
+
+    snmpComm2ViewIndex  OBJECT-TYPE
+        SYNTAX Integer32 (1..8)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A simple index into 'gbnCommonCommunityToViewTable'."
+        ::= { snmpCommunityToViewEntry 1 }
+
+    snmpComm2ViewCommName  OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..20))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 'public','':all }
+             The SNMPv1/v2c community name string.  Duplicate community
+             names are not allowed in this table.  Note that a null string
+             is not a valid community name (i.e., a null string forces
+             'gbnCommonComm2ViewRowStatus' to 'notReady(3)')."
+        ::= { snmpCommunityToViewEntry 2 }
+
+    snmpComm2ViewViewName  OBJECT-TYPE
+        SYNTAX SnmpAdminString (SIZE(1..32))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 'internet':all }
+             At runtime (i.e., not when this object is SET), this view name
+             is compared to the 'vacmViewTreeFamilyViewName' in the
+             'vacmViewTreeFamilyTable' (see RFC2575).  If a match is
+             found and the varbind(s) specify valid object type and instance,
+             the 'gbnCommonComm2ViewPermission' privilege is permitted.
+
+             Note that a null string is not a valid view name value.
+             Also note that the value of this object does not have to match
+             an existing entry in the 'vacmViewTreeFamilyTable' (if no match,
+             no access is allowed).
+
+             Note that the factory default value for this object is 'internet',
+             which allows access to the subtree under '1.3.6.1'."
+        ::= { snmpCommunityToViewEntry 3 }
+
+    snmpComm2ViewPermission OBJECT-TYPE
+        SYNTAX INTEGER {
+               readOnly(1),
+               readWrite(2)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { readWrite:all }
+             This object specifies the type of access allowed. 'readOnly(1)'
+             allows GET operations (i.e., GET, GET-NEXT, GET-BULK) and
+             'readWrite(2)' allows both GET and SET operations."
+        ::= { snmpCommunityToViewEntry 4 }
+
+    snmpComm2ViewRowStatus OBJECT-TYPE
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "DURABLE:
+             This object indicates the status of this entry.  A row in this
+             table can be created using the 'createAndGo(4)' (i.e., all
+             parameters must be valid - supplied in a single SNMP PDU or have
+             default values) or the 'createAndWait(5)' action states.  Until
+             all parameters are valid for a conceptual row, this object is
+             'notReady(3)'.  All parameters must be valid before this object
+             can be set to 'active(1)'.
+
+             Any object in a conceptual row can be modified independent of the
+             value of this object (e.g., can be changed while 'active(1)')."
+        ::= { snmpCommunityToViewEntry 5 }
+
+    snmpNotifyTypeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SnmpNotifyTypeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of SNMPv1/v2c notify type ."
+        ::= { gbnPlatformOAMSnmp 2 }
+
+    snmpNotifyTypeEntry OBJECT-TYPE
+        SYNTAX SnmpNotifyTypeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of notify type parameters."
+        INDEX { snmpPrivateNotifyType }
+        ::= { snmpNotifyTypeTable 1 }
+
+    SnmpNotifyTypeEntry ::=
+        SEQUENCE {
+        snmpPrivateNotifyType      DisplayString,
+        snmpNotifyTypeStatus       INTEGER
+        }
+
+    snmpPrivateNotifyType OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "notify type."
+            -- 通告类型
+        ::= { snmpNotifyTypeEntry 1 }
+
+     snmpNotifyTypeStatus  OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "It signifies if the traps with corresponding notify-type can be sent."
+            -- 如果通告对应状态为"enable(1)"表示可以发送此类型的通告，否则不可发送。
+        ::= { snmpNotifyTypeEntry 2 }
+
+      gbnPlatformOAMSnmpNotifyType       OBJECT IDENTIFIER ::= { gbnPlatformOAMSnmp 3 }
+
+      snmpNotifyTypeSaveConfiguration NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+            "A private type for traps or informs. It signifies that the SNMPv2 entity
+            have just saved the configuration."
+            -- 私有的trap类型。发送此类型的trap表示设备刚才有保存配置文件的操作。
+        ::= { gbnPlatformOAMSnmpNotifyType 1 }
+
+     snmpTrapSource OBJECT-TYPE
+        SYNTAX INTEGER (0..4094)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The id of vlan or supervlan which interface traps or informs are
+             sent from belongs to.  vlan id: 0-4094; supervlan id: 0-11."
+            -- trap或inform的源地址所属vlan或supervlan。vlan id：0-4094；
+            -- supervlan id：0-11。本节点值为0表示不指定Trap源地址接口。当
+            -- snmpTrapSourceType节点值为1时，本节点取值范围为0-4094；当
+            -- snmpTrapSourceType节点值为2时，本节点取值范围为0-11。
+        ::= { gbnPlatformOAMSnmp 4 }
+
+    snmpRemoteEngineTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SnmpRemoteEngineEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of remote engine ."
+        ::= { gbnPlatformOAMSnmp 5 }
+
+    snmpRemoteEngineEntry OBJECT-TYPE
+        SYNTAX SnmpRemoteEngineEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of remote engine."
+        INDEX { snmpRemoteEngineID }
+        ::= { snmpRemoteEngineTable 1 }
+
+    SnmpRemoteEngineEntry ::=
+        SEQUENCE {
+        snmpRemoteHostTAddr      OCTET STRING,
+        snmpRemoteEngineID       DisplayString,
+        snmpDeleteRemoteEngineTableRow  INTEGER
+        }
+
+    snmpRemoteEngineID  OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The remote engine's id.Note that the engine id can
+            only appear once in the table."
+            -- 远程引擎id。
+        ::= { snmpRemoteEngineEntry 1 }
+
+    snmpRemoteHostTAddr OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(6))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The ip and port number of remote host.Note that the value including ip and
+            port number can only appear once in the table."
+            -- 远程主机ip和端口号,前四位为主机ip后两位为端口号。其值和一个引擎id必须一一对应，
+            -- 不能出现一对多的情况。一个引擎id只能对应一个主机ip和端口号。
+        ::= { snmpRemoteEngineEntry 2 }
+
+    snmpDeleteRemoteEngineTableRow OBJECT-TYPE
+        SYNTAX INTEGER {
+               deleteRow(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "You can delete a row by setting the value to 'deleteRow(1)'."
+            -- 设置此对象实例值为1将删除此实例所在行。
+        ::= { snmpRemoteEngineEntry 3 }
+
+     snmpTrapSourceType OBJECT-TYPE
+        SYNTAX INTEGER (1..2)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The type of the interface which traps or informs are sent from.
+             1: vlan interface; 2: supervlan interface."
+            -- trap或inform的源地址接口的类型。1：vlan接口类型；2：supervlan接
+            -- 口类型（要设置为此类型必须确保snmpTrapSource节点的值不大于11）。
+            -- 配置Trap源地址接口时，请先设置snmpTrapSource节点的值为0，再设置
+            -- 本节点的值，然后再设置snmpTrapSource节点的值为指定vlan或
+            -- supervlan的接口id。
+        ::= { gbnPlatformOAMSnmp 6 }
+
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMPortCar - Port Car Group
+--
+------------------------------------------------------------------------------
+    portCarTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortCarEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of port CAR."
+            --端口CAR表
+        ::= { gbnPlatformOAMPortCar 1 }
+
+    portCarEntry OBJECT-TYPE
+        SYNTAX PortCarEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of port CAR."
+            --端口CAR列表
+        INDEX { portCarPort }
+        ::= { portCarTable 1 }
+
+    PortCarEntry ::= SEQUENCE {
+            portCarPort            Integer32,
+            portCarEnable          TruthValue,
+            portDiscardBpdu        Integer32,
+            portCarRateBpdu        Integer32
+        }
+
+    portCarPort OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The port number."
+            --端口号，端口CAR表的索引值
+        ::= { portCarEntry 1 }
+
+    portCarEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The enable status of the port CAR"
+            --端口CAR开启/关闭状态
+        ::= { portCarEntry 2 }
+
+    portDiscardBpdu OBJECT-TYPE
+        SYNTAX Integer32 (0..1)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The enable status of the port discard BPDU"
+            --端口discard BPDU开启/关闭状态
+        ::= { portCarEntry 3 }
+
+    portCarRateBpdu OBJECT-TYPE
+        SYNTAX Integer32 (1..128)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port CAR max packet receive rate."
+            --端口CAR的值
+        ::= { portCarEntry 4 }
+
+    portCarGlobalEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The global enable status of port CAR."
+            --全局端口CAR开启/关闭状态
+        ::= { gbnPlatformOAMPortCar 2 }
+
+    portCarOpenTime OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The closed port Re-open time."
+            --被端口CAR关闭的端口重新打开的时间
+        ::= { gbnPlatformOAMPortCar 3 }
+
+    discardBpdu OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "discard specific BPDU, bit 0 for STP packet, bit 1 for GVRP packet, bit 2 for GMRP packet."
+            --丢弃BPDU标记，以位图形式记录BPDU的丢弃状态。第0位表示STP报文，第1位表示GVRP报文，第2位表示GMRP报文
+        ::= { gbnPlatformOAMPortCar 4 }
+
+    portCarRate OBJECT-TYPE
+        SYNTAX  Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The global port CAR max packet receive rate."
+            --端口CAR的值
+        ::= { gbnPlatformOAMPortCar 5 }
+
+    cpuCarRate OBJECT-TYPE
+    	SYNTAX  INTEGER (0..10000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The  CPU CAR max packet receive rate. value 0 is default 400/4000 pps"
+            --CPU CAR的值, 配置为0时, 设置CPU-CAR为默认值400/4000pps
+        ::= { gbnPlatformOAMPortCar 6 }
+
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMVctRun - Vct Run Group
+--
+------------------------------------------------------------------------------
+    vctRunTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VctRunEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of VCT run."
+            --VCT run表
+        ::= { gbnPlatformOAMVctRun 1 }
+
+    vctRunEntry OBJECT-TYPE
+        SYNTAX VctRunEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of VCT run."
+            --VCT run列表
+        INDEX { vctRunPort }
+        ::= { vctRunTable 1 }
+
+    VctRunEntry ::= SEQUENCE {
+            vctRunPort            Integer32,
+            vctRunEnable          TruthValue,
+            vctAutoRunEnable      TruthValue
+        }
+
+    vctRunPort OBJECT-TYPE
+        SYNTAX Integer32 (1..24)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The port number."
+            --端口号，VCT run表的索引值
+        ::= { vctRunEntry 1 }
+
+    vctRunEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The enable status of the VCT run"
+            --是否启动VCT run
+        ::= { vctRunEntry 2 }
+
+    vctAutoRunEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The enable status of the VCT auto run"
+            --是否启动VCT auto run
+        ::= { vctRunEntry 3 }
+
+    vctAutoRunGlobalEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The global enable status of VCT auto run."
+            --全局VCT auto run开启/关闭状态
+        ::= { gbnPlatformOAMVctRun 2 }
+
+    vctRunGlobalEnable OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The global enable status of VCT  run."
+            --全局VCT  run开启/关闭状态
+        ::= { gbnPlatformOAMVctRun 3 }
+
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMVctRunResult - Vct Run Result Group
+--
+------------------------------------------------------------------------------
+    vctRunResultTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VctRunResultEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A Table of VCT run result."
+            --VCT run result表
+        ::= { gbnPlatformOAMVctRunResult 1 }
+
+    vctRunResultEntry OBJECT-TYPE
+        SYNTAX VctRunResultEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of VCT run result."
+            --VCT run result列表
+        INDEX { vctRunResultPort, vctRunResultTxRxPairNo }
+        ::= { vctRunResultTable 1 }
+
+    VctRunResultEntry ::= SEQUENCE {
+            vctRunResultPort            Integer32,
+            vctRunResultTxRxPairNo      Integer32,
+            vctRunResultStatus          Integer32,
+            vctRunResultErrorLocation   Integer32
+        }
+
+    vctRunResultPort OBJECT-TYPE
+        SYNTAX Integer32 (1..24)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The port number."
+            --端口号，VCT run result表的索引值之一
+        ::= { vctRunResultEntry 1 }
+
+    vctRunResultTxRxPairNo OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The tx rx pair NO."
+            --tx rx pair NO，VCT run result表的索引值之一
+        ::= { vctRunResultEntry 2 }
+
+    vctRunResultStatus OBJECT-TYPE
+        SYNTAX Integer32
+        {
+            Normal(1),
+            Open(2),
+            Short(3),
+            Mismatch(4)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of the VCT run result"
+            --VCT run result 状态
+        ::= { vctRunResultEntry 3 }
+
+    vctRunResultErrorLocation OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The error location of the VCT run result. length(m)"
+            --VCT run result的出错地点,长度(米)
+        ::= { vctRunResultEntry 4 }
+------------------------------------------------------------------------------
+--
+--  gbnPlatformOAMIpControl - OAM ip control Group
+--
+------------------------------------------------------------------------------
+  ipControlTtl OBJECT-TYPE
+        SYNTAX	INTEGER{
+	        disable(0),
+	        enable(1)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disable the ip control ttl"
+            ::= { gbnPlatformOAMIpControl 1 }
+         
+--
+-- END of GBN-COMMON-MIB
+--
+
+END

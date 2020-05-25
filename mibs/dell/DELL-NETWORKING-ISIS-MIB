@@ -1,0 +1,282 @@
+DELL-NETWORKING-ISIS-MIB DEFINITIONS ::= BEGIN
+--  This MIB contains tables used to configure a Dell Networking OS switch
+--  running ISIS in addition to the standard MIB.
+--
+--  This module will be extended, as needed.
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE, 
+    Unsigned32       FROM SNMPv2-SMI
+    NOTIFICATION-GROUP, MODULE-COMPLIANCE,
+    OBJECT-GROUP     FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    TruthValue       FROM SNMPv2-TC                   
+    dellNetMgmt
+          FROM DELL-NETWORKING-SMI;
+
+dellNetIsisMib MODULE-IDENTITY
+    LAST-UPDATED "201107010000Z"  -- Jul 01, 2011
+    ORGANIZATION
+        "Dell Inc"
+    CONTACT-INFO
+        "http://www.dell.com/support"
+
+    DESCRIPTION
+        " The proprietary MIB module for Dell Networking OS ISIS. "
+
+    REVISION "201107010000Z"     -- Jul 01, 2011
+    DESCRIPTION
+        "MIB Overload support Dell Networking OS ISIS module"
+
+::=  { dellNetMgmt 18 }
+
+-- ------------------------------------------------------------
+-- Textual conventions
+-- ------------------------------------------------------------
+
+DellNetIsisISLevel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Identifies a level."
+    SYNTAX INTEGER
+    {
+        area(1), -- L1
+        domain(2) -- L2
+    }
+
+-- ------------------------------------------------------------
+-- Top-level structure of the MIB
+-- ------------------------------------------------------------
+
+dellNetIsisNotifications OBJECT IDENTIFIER ::= { dellNetIsisMib 0 }
+dellNetIsisObjects       OBJECT IDENTIFIER ::= { dellNetIsisMib 1 }
+dellNetIsisConformance   OBJECT IDENTIFIER ::= { dellNetIsisMib 2 }
+
+-- ------------------------------------------------------------
+-- Overload Behaviour
+-- ------------------------------------------------------------
+
+dellNetIsisSysOloadSetOverload OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Administratively set the overload bit for both levels.
+        The overload bit MUST continue to be set if the
+        implementation runs out of memory, independent of
+        this variable."
+
+    DEFVAL { false }
+::= { dellNetIsisObjects 1 }
+
+dellNetIsisSysOloadSetOloadOnStartupUntil OBJECT-TYPE
+    SYNTAX Unsigned32 (5..86400)
+    UNITS "Seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	 "If this object is within the range of 5 to 86400, the overload bit is set 
+	 for both levels when isis is enabled for next startup. The overload bit
+	 remains set for seconds.dellNetIsisSysOloadSetOloadOnStartupUntil.
+	 When dellNetIsisSysOloadSetOloadOnStartupUntil seconds have elapsed,the overload flag 
+	 remains set if the implementation has run out of memory. Else, the system clears the 
+	 overload bit. In addition to the value limits, a value of zero 
+	 removes the config so that it will not be effected in the next startup."
+
+    DEFVAL { 600 }
+::= { dellNetIsisObjects 2 }
+
+dellNetIsisSysOloadWaitForBgp OBJECT-TYPE
+    SYNTAX Unsigned32 (5..86400)
+    UNITS "Seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this object is within the range of 5 to 86400, the overload bit is set 
+        for both levels when isis is enabled for next startup. The overload bit
+        remains set until BGP has converged or for seconds.dellNetIsisSysOloadWaitForBgp, whichever
+        occurs first. A value of zero removes the config so that it will not be effected for the 
+        next startup."
+    DEFVAL { 600 }
+::= { dellNetIsisObjects 3 }
+
+dellNetIsisSysOloadV6SetOverload OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Administratively set the overload bit for both levels.
+        The overload bit MUST continue to be set if the
+        implementation runs out of memory, independent of
+        this variable."
+
+    DEFVAL { false }
+::= { dellNetIsisObjects 4 }
+
+dellNetIsisSysOloadV6SetOloadOnStartupUntil OBJECT-TYPE
+    SYNTAX Unsigned32 (5..86400)
+    UNITS "Seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this object is within the range of 5 to 86400, the overload bit is set 
+        for both levels for IPV6 when isis is enabled for next startup. The overload bit
+        remains set for  seconds.dellNetIsisSysOloadV6SetOloadOnStartupUntil.
+        When dellNetIsisSysOloadV6SetOloadOnStartupUntil seconds have elapsed,
+        the overload flag remains set if the implementation has run out of memory. 
+        Else, the system clears the overload bit. A value of zero removes the config 
+        so that it will not be effected in the next startup."
+    DEFVAL { 600 }
+::= { dellNetIsisObjects 5 }
+
+dellNetIsisSysOloadV6WaitForBgp OBJECT-TYPE
+    SYNTAX Unsigned32 (5..86400)
+    UNITS "Seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If this object is within the range of 5 to 86400, the overload bit is set 
+        for both levels when isis is enabled for next startup. The overload bit
+        remains set until BGP has converged for both IPV4 and IPV6 neighbours or 
+        for seconds.dellNetIsisSysOloadV6WaitForBgp, whichever occurs first. A value of zero
+        removes the config so that it will not be effected for the next startup."
+    DEFVAL { 600 }
+::= { dellNetIsisObjects 6 }
+
+-- ------------------------------------------------------------
+-- Attributes associated with one area or domain
+-- ------------------------------------------------------------
+
+dellNetIsisSysLevelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DellNetIsisSysLevelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Level specific information about the System."
+::= { dellNetIsisObjects 7 }
+
+dellNetIsisSysLevelEntry OBJECT-TYPE
+    SYNTAX DellNetIsisSysLevelEntry        
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each row describes variables configured for Area or Domain.
+        Configured values MUST survive an agent reboot."
+    INDEX { dellNetIsisSysLevelIndex }
+::= { dellNetIsisSysLevelTable 1 } 
+
+DellNetIsisSysLevelEntry ::=
+    SEQUENCE {
+        dellNetIsisSysLevelIndex
+            DellNetIsisISLevel,
+        dellNetIsisSysLevelOverloadState
+            TruthValue,
+        dellNetIsisSysLevelV6OverloadState
+            TruthValue
+    }
+
+dellNetIsisSysLevelIndex OBJECT-TYPE
+    SYNTAX DellNetIsisISLevel
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The level that this entry describes."
+::= { dellNetIsisSysLevelEntry 1 }
+
+dellNetIsisSysLevelOverloadState OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Overload state of the database at this level.
+         If the value is true, it indicates a database that is
+         low on an essential resource, such as memory.
+         The administrator may indirectly force the state to
+         overloaded by setting the object dellNetIsisSysOloadSetOverload.
+         If the state is overloaded, we
+         originate LSPs with the Overload bit set."
+::= { dellNetIsisSysLevelEntry 2 }
+
+dellNetIsisSysLevelV6OverloadState OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Overload state of the IPV6 database at this level.
+         If the value is true, it indicates a database that is
+         low on an essential resource, such as memory.
+         The administrator may indirectly force the state to
+         overloaded by setting the object dellNetIsisSysOloadV6SetOverload.
+         If the state is overloaded, we
+         originate LSPs with the Overload bit set."
+::= { dellNetIsisSysLevelEntry 3 }
+
+-- ------------------------------------------------------------
+-- Adjacency Traps
+-- ------------------------------------------------------------
+
+dellNetIsisAdjChanges NOTIFICATION-TYPE
+    STATUS current
+    DESCRIPTION
+        "This notification is generated when adjacency related
+        changes take place"
+::= {dellNetIsisNotifications 1}    
+
+-- ------------------------------------------------------------
+-- Agent Conformance Definitions
+-- ------------------------------------------------------------
+
+dellNetIsisGroups      OBJECT IDENTIFIER ::= { dellNetIsisConformance 1 }
+dellNetIsisCompliances OBJECT IDENTIFIER ::= { dellNetIsisConformance 2 }
+
+-- ------------------------------------------------------------
+-- compliance statements
+-- ------------------------------------------------------------
+
+dellNetIsisCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for agents that support
+        the IS-IS MIB"
+
+    MODULE
+        MANDATORY-GROUPS {
+            dellNetIsisSystemGroup,
+            dellNetIsisNotificationGroup
+        }
+::= { dellNetIsisCompliances 1 }
+
+-- ------------------------------------------------------------
+-- MIB Grouping
+-- ------------------------------------------------------------
+
+dellNetIsisSystemGroup OBJECT-GROUP
+    OBJECTS {
+        dellNetIsisSysOloadSetOverload,
+        dellNetIsisSysOloadSetOloadOnStartupUntil,
+        dellNetIsisSysOloadWaitForBgp,
+        dellNetIsisSysOloadV6SetOverload,
+        dellNetIsisSysOloadV6SetOloadOnStartupUntil,
+        dellNetIsisSysLevelOverloadState,
+        dellNetIsisSysLevelV6OverloadState,
+        dellNetIsisSysOloadV6WaitForBgp
+    }
+    STATUS current
+    DESCRIPTION
+        "The collection of objects used to manage an
+        IS-IS router."
+::= { dellNetIsisGroups 1 }
+
+dellNetIsisNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        dellNetIsisAdjChanges
+    }
+    STATUS current
+    DESCRIPTION
+        "The collections of notifications sent by an IS."
+::= { dellNetIsisGroups 2 }    
+
+END

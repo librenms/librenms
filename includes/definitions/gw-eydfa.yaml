@@ -1,0 +1,48 @@
+os: gw-eydfa
+text: 'Glass Way WDM EYDFA'
+type: network
+icon: glassway
+over:
+    - { graph: device_temperature, text: 'Temperatures' }
+    - { graph: device_dbm, text: 'Optics' }
+mib_dir:
+    - glassway
+discovery:
+- sysObjectID:
+  - .1.3.6.1.4.1.17409.1.11
+poller_modules:
+  bgp-peers: false
+  entity-physical: false
+  hr-mib: false
+  ipSystemStats: false
+  mempools: false
+  netstats: false
+  ntp: false
+  ospf: false
+  ports: false
+  processors: false
+  storage: false
+  stp: false
+  ucd-diskio: false
+  ucd-mib: false
+discovery_modules:
+  ports: false
+  ports-stack: false
+  entity-physical: false
+  processors: false
+  mempools: false
+  cisco-vrf-lite: false
+  ipv4-addresses: false
+  ipv6-addresses: false
+  storage: false
+  hr-device: false
+  discovery-protocols: false
+  arp-table: false
+  bgp-peers: false
+  vlans: false
+  ucd-diskio: false
+  services: false
+  stp: false
+  ntp: false
+  wireless: false
+  fdb-table: false

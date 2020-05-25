@@ -9,13 +9,22 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-if ($device['os'] == 'sonicwall') {
-    echo 'SonicWALL-MEMORY-POOL: ';
-    $perc = str_replace('"', "", snmp_get($device, 'SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentRAMUtil.0', '-OvQ'));
-    if (is_numeric($perc)) {
-        $mempool['perc'] = $perc;
-        $mempool['used'] = $perc;
-        $mempool['total'] = 100;
-        $mempool['free'] = 100 - $perc;
-    }
+
+use Illuminate\Support\Str;
+
+echo 'SonicWALL-MEMORY-POOL: ';
+if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.8741.6')) {
+    $usage = snmp_get($device, 'SNWL-SSLVPN-MIB::memoryUtilization.0', '-Ovq');
+} else {
+    $usage = snmp_get($device, 'SONICWALL-FIREWALL-IP-STATISTICS-MIB::sonicCurrentRAMUtil.0', '-Ovq');
+}
+
+$perc = str_replace('"', "", $usage);
+
+
+if (is_numeric($perc)) {
+    $mempool['perc'] = $perc;
+    $mempool['used'] = $perc;
+    $mempool['total'] = 100;
+    $mempool['free'] = 100 - $perc;
 }

@@ -1,0 +1,185 @@
+
+NBS-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    Unsigned32, Counter64, MODULE-IDENTITY, OBJECT-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    ;
+
+
+
+nbsMib  MODULE-IDENTITY
+    LAST-UPDATED  "201706280000Z" -- June 28, 2017
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "Textual conventions for NBS mibs.
+
+       Some informal NBS conventions used include the following:
+
+         A DESCRIPTION specifying 'Persistent' indicates a user-
+         configured attribute that can be stored in the Agent's
+         non-volatile file system as a configuration file such as
+         'startup-config'.
+
+         A DESCRIPTION specifying 'Impulse' indicates a user setting
+         that the Agent will immediately attempt but will not store
+         persistently.
+
+         An object name containing 'Admin' indicates a setting
+         requested by the user which may be overridden by the system.
+         Admin objects should be updated in the Agent immediately, so
+         a GET request immediately after the SET is accepted will
+         be answered with a GET-RESPONSE indicating the new value.
+
+         An object name containing 'Oper' indicates an attribute's
+         actual state.
+
+         An object name containing 'Caps' is a bitmask which refers to
+         the capabilities of an entity to support corresponding entries
+         in a specified feature table."
+    ::= { nbs 250 }
+
+
+-- *******************************************************************
+-- NBS-MIB Object Identifier Definition
+-- *******************************************************************
+
+nbs OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+      "Root OID of NBS mibs"
+    ::= { enterprises 629 }
+
+
+-- *******************************************************************
+-- NBS-MIB defines and textual conventions
+-- *******************************************************************
+
+
+Unsigned16TC ::= TEXTUAL-CONVENTION
+     STATUS       current
+     DESCRIPTION
+        "Used to represent an unsigned two-octet integer"
+     SYNTAX     Unsigned32 (0..65535)
+
+Unsigned64TC ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to represent an unsigned eight-octet integer"
+    SYNTAX      Counter64
+
+WritableU64 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to represent an unsigned eight-octet integer which can
+         be SET in SNMPv1"
+    SYNTAX      OCTET STRING (SIZE(8))
+
+NbsTcTemperature ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Temperature in degrees Celsius.  When writable, persistent.
+        Not supported value: 0x80000000
+        (decimal -2147483648)"
+    SYNTAX      INTEGER (-2147483648..1000)
+
+NbsTcMilliVolt ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Voltage in units of milliVolts.  When writable, persistent.
+        Not supported value: -1"
+    SYNTAX      INTEGER (-1..1000000)
+
+NbsTcMilliAmp ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Amperage in units of milliAmps.  When writable, persistent.
+        Not supported value: -1"
+    SYNTAX      INTEGER (-1..1000000)
+
+NbsTcMicroAmp ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Electrical current in units of micro amperes. When writable, persistent.
+        Not supported value: -1"
+    SYNTAX      INTEGER (-1..2147483647)
+
+NbsTcMilliDb ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Decibels in thousandths.  When writable, persistent.
+
+        The reserved value -1,000,000 indicates that the signal is
+        blocked from passing through.
+
+        Blocked value:       -1000000
+        Not supported value: 0x80000000
+        (decimal -2147483648)"
+    SYNTAX      INTEGER (-2147483648..100000)
+
+NbsTcMilliWatts ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Electrical Power, in milliwatts.
+
+        Not supported value: -1"
+    SYNTAX      INTEGER
+
+NbsTcMHz ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Frequency in units of MHz.  When writable, persistent.
+        Not supported value: 0"
+    SYNTAX      Unsigned32 (1..4294967295)
+
+NbsTcStatusSimple ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Basic operating status"
+    SYNTAX      INTEGER {
+        notSupported (1),
+        bad          (2),
+        good         (3),
+        notInstalled (4)
+    }
+
+NbsTcStatusLevel ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Severity level"
+    SYNTAX      INTEGER {
+        notSupported      (1),
+        statusLowError    (2),
+        statusLowWarning  (3),
+        statusGood        (4),
+        statusHighWarning (5),
+        statusHighError   (6)
+    }
+
+NbsTcPartIndex ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+       "Unique ID within scope of an ifIndex"
+    SYNTAX       Unsigned32
+
+NbsTcStagingCommit ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+       "Staging commit command"
+    SYNTAX      INTEGER {
+        notSupported      (1),
+        supported         (2),
+        revertToCommitted (3),
+        apply             (4)
+    }
+
+END
+

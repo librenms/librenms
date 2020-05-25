@@ -1,0 +1,120 @@
+--- ArubaOS 8.5.0.0_70258
+-- vim:set ts=4 sw=4:
+WLSX-STATS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Unsigned32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB;
+
+   wlsxStatsMIB MODULE-IDENTITY 
+       LAST-UPDATED "0712100006Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            information about the Statistics in the 
+			Aruba controller."
+       REVISION        "0712100006Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 15 }
+
+   wlsxStatsOpGroup     	OBJECT IDENTIFIER ::= { wlsxStatsMIB 1 }
+
+   wlsxStatsRequestTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF WlsxStatsRequestEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"
+		"
+	::= { wlsxStatsOpGroup 1 }
+
+	wlsxStatsRequestEntry OBJECT-TYPE
+		SYNTAX WlsxStatsRequestEntry
+		MAX-ACCESS not-accessible
+		STATUS	current
+		DESCRIPTION
+			""
+		INDEX { wlsxStatsIndex }
+		::= { wlsxStatsRequestTable 1 }
+
+	WlsxStatsRequestEntry ::=
+		SEQUENCE {
+			wlsxStatsIndex	    Integer32,
+			wlsxStatsReqType    Integer32,
+			wlsxStatsInterval	Integer32,
+			wlsxStatsCookie	    DisplayString
+		}
+
+	wlsxStatsIndex OBJECT-TYPE
+		SYNTAX 	Integer32
+		MAX-ACCESS not-accessible
+		STATUS	current
+		DESCRIPTION
+			"
+				Stats Index
+			"
+		::= { wlsxStatsRequestEntry 1 }
+
+	wlsxStatsReqType OBJECT-TYPE
+		SYNTAX 	Integer32
+		MAX-ACCESS read-write
+		STATUS	current
+		DESCRIPTION
+			"
+				Request Type
+			"
+		::= { wlsxStatsRequestEntry 2 }
+
+	wlsxStatsInterval OBJECT-TYPE
+		SYNTAX 	Integer32
+		MAX-ACCESS read-write
+		STATUS	current
+		DESCRIPTION
+			"
+				Stats Interval
+			"
+		::= { wlsxStatsRequestEntry 3 }
+
+	wlsxStatsCookie OBJECT-TYPE
+		SYNTAX 	DisplayString
+		MAX-ACCESS read-write
+		STATUS	current
+		DESCRIPTION
+			"
+				Cookie for the config sync operation
+			"
+		::= { wlsxStatsRequestEntry 4 }
+
+END

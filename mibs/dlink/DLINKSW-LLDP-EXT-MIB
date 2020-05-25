@@ -1,0 +1,267 @@
+--  *****************************************************************
+--  DLINKSW-LLDP-EXT-MIB.mib : LLDP Extension MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-LLDP-EXT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,Integer32
+            FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF			
+        TruthValue
+		    FROM SNMPv2-TC
+        lldpLocPortNum
+            FROM LLDP-MIB
+		dlinkIndustrialCommon           
+            FROM DLINK-ID-REC-MIB;	
+           
+    dlinkSwLldpExtMIB MODULE-IDENTITY
+        LAST-UPDATED "201305290000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for DLINK LLDP private function."
+        REVISION "201302250000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file.
+            "
+        ::= { dlinkIndustrialCommon 20 }
+
+-- -----------------------------------------------------------------------------
+    dLldpExtMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwLldpExtMIB 0 }
+    dLldpExtMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwLldpExtMIB 1 }
+    dLldpExtMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwLldpExtMIB 2 }
+-- ----------------------------------------------------------------------------- 
+    
+    dLldpExtLldpEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the LLDP feature is
+            globally enabled.
+            " 
+        ::= { dLldpExtMIBObjects 1 }
+		
+	dLldpExtLldpForward OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the LLDP Forward feature is
+            globally enabled.
+            " 
+        ::= { dLldpExtMIBObjects 2 }
+		
+	dLldpExtLldpTrapEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the LLDP Trap feature is
+            globally enabled.
+            " 
+        ::= { dLldpExtMIBObjects 3 }
+	
+	dLldpExtLldpMedTrapEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the LLDP MED Trap feature is
+            globally enabled.
+            " 
+        ::= { dLldpExtMIBObjects 4 }
+
+-- -----------------------------------------------------------------------------          
+	dLldpExtClearStats  OBJECT IDENTIFIER   ::= { dLldpExtMIBObjects 5 }
+ 
+    dLldpExtClearGlobalStats OBJECT-TYPE
+        SYNTAX	    INTEGER {
+            clear(1),
+            noOp(2)                    
+        }
+	    MAX-ACCESS      read-write
+	    STATUS	        current
+	    DESCRIPTION		    
+        	"This object is used to clear global LLDP statistics when set
+        	to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned.
+			"           
+        ::= { dLldpExtClearStats 1 }
+
+   dLldpExtClearAllPortsStats OBJECT-TYPE
+        SYNTAX	    INTEGER {
+            clear(1),
+            noOp(2)                    
+        }
+	    MAX-ACCESS      read-write
+	    STATUS	        current
+	    DESCRIPTION		    
+        	"This object is used to clear LLDP counter information for all
+            ports when set to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned.
+			"           
+        ::= { dLldpExtClearStats 2 }
+    
+    dLldpExtClearCounterByPort     OBJECT-TYPE
+        SYNTAX          Integer32(0..4096)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the lldpLocPortNum of the port on which
+            LLDP counter information will be cleared.
+            When read, a value of 0 is returned."                     
+        ::= { dLldpExtClearStats 3 }
+
+    dLldpExtClearAllNeighbors OBJECT-TYPE
+        SYNTAX	    INTEGER {
+            clear(1),
+            noOp(2)                    
+        }
+	    MAX-ACCESS      read-write
+	    STATUS	        current
+	    DESCRIPTION		    
+        	"This object is used to clear LLDP neighboring information for all
+            ports when set to 'clear'.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned.
+			"           
+        ::= { dLldpExtClearStats 4 }
+	 
+    dLldpExtClearNeighborsByPort     OBJECT-TYPE
+        SYNTAX          Integer32(0..4096)
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the lldpLocPortNum of the port on which
+            the LLDP neighboring information will be cleared when set to
+            'clear'.            
+            When read, a value of 0 is returned."                     
+        ::= { dLldpExtClearStats 5 }
+
+-- -----------------------------------------------------------------------------
+	dLldpExtPortSubTypeTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DLldpExtPortSubTypeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table is used to configure the subtype of Port ID TLV for ports."
+        ::= { dLldpExtMIBObjects 6 }
+	
+	dLldpExtPortSubTypeEntry OBJECT-TYPE
+        SYNTAX          DLldpExtPortSubTypeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry contains the information of subtype of Port ID TLV on a port."
+        INDEX   { lldpLocPortNum }
+        ::= { dLldpExtPortSubTypeTable 1 }
+
+    DLldpExtPortSubTypeEntry ::= SEQUENCE {		
+		dLldpExtPortSubType 			INTEGER
+    }
+    		         
+ 	dLldpExtPortSubType OBJECT-TYPE
+        SYNTAX          INTEGER {
+            localPortNumber(1),
+            macAddress(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object represents how to encode the port ID in Port ID TLV.
+            localPortNumber - The 'port ID' will be encoded with local port number.
+            macAddress(2) -The 'port ID' will be encoded with MAC address. 
+            "
+        ::= { dLldpExtPortSubTypeEntry 1 } 	
+
+-- ------------------------------------------------------------------------------------
+-- MIB Conformance statements
+-- ------------------------------------------------------------------------------------
+	dLldpExtMIBCompliances  OBJECT IDENTIFIER    ::= { dLldpExtMIBConformance 1 }	
+	dLldpExtMIBGroups  OBJECT IDENTIFIER    ::= { dLldpExtMIBConformance 2 } 	
+-- compliance statements
+
+    dLldpExtMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION
+            "The compliance statement for entities which
+             implement the DLINKSW-LLDP-EXT-MIB."
+        MODULE      -- this module
+        MANDATORY-GROUPS       {
+            dLldpExtBasicCfgGroup,
+            dLldpExtClearStatsCounterGroup          
+        }        
+        GROUP dLldpExtClearNeighborGroup
+		    DESCRIPTION 
+		        "Implementation of this group is optional."	
+				
+		GROUP dLldpExtPortSubtypeGroup
+		    DESCRIPTION 
+		        "Implementation of this group is optional."
+				
+		    ::= { dLldpExtMIBCompliances 1 }
+	
+    dLldpExtBasicCfgGroup OBJECT-GROUP
+		OBJECTS   {   
+            dLldpExtLldpEnabled,
+			dLldpExtLldpForward,
+			dLldpExtLldpTrapEnabled,
+			dLldpExtLldpMedTrapEnabled 		    
+		}
+		STATUS      current
+		DESCRIPTION 
+		    "A collection of objects configures the LLDP feature."
+		::= { dLldpExtMIBGroups 1 }
+    
+
+	dLldpExtClearStatsCounterGroup OBJECT-GROUP
+		OBJECTS   {   
+            dLldpExtClearGlobalStats, 
+		    dLldpExtClearAllPortsStats, 		             
+			dLldpExtClearCounterByPort
+		}
+		STATUS      current
+		DESCRIPTION 
+		    "A collection of objects clears the LLDP statistics of system
+            and ports."
+		::= { dLldpExtMIBGroups 2 }
+		
+	dLldpExtClearNeighborGroup OBJECT-GROUP
+		OBJECTS 		        {   
+			dLldpExtClearAllNeighbors,
+            dLldpExtClearNeighborsByPort
+		}
+		STATUS      current
+		DESCRIPTION 
+			"A collection of objects clears the information learned from
+            neighbor(s)."
+			::= { dLldpExtMIBGroups 3 }			    
+		
+	dLldpExtPortSubtypeGroup OBJECT-GROUP
+		OBJECTS 			{ 
+			dLldpExtPortSubType
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects configures the subtype of Port ID TLV."		
+		::= { dLldpExtMIBGroups 4 }
+    
+END	
+
+
+
+

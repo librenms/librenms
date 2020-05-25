@@ -1,0 +1,223 @@
+mib: EPPC-MIB
+modules:
+    sensors:
+        runtime:
+            data:
+                -
+                    oid: upsEBatteryEstimatedMinutesRemaining
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.3.{{ $index }}'
+                    index: 'upsEBatteryEstimatedMinutesRemaining.{{ $index }}'
+                    descr: Battery time remaining
+        voltage:
+            options:
+                skip_values_lt: 0
+                divisor: 10
+            data:
+                -
+                    oid: upsEPositiveBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.5.{{ $index }}'
+                    index: 'upsEPositiveBatteryVoltage.{{ $index }}'
+                    descr: Postitive Battery Voltage
+                -
+                    oid: upsENegativeBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.6.{{ $index }}'
+                    index: 'upsENegativeBatteryVoltage.{{ $index }}'
+                    descr: Negative Battery Voltage
+                -
+                    oid: upsESystemInputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.16.1.3.{{ $index }}'
+                    value: upsESystemInputVoltage
+                    index: 'upsESystemInputVoltage.{{ $index }}'
+                    descr: Input
+                -
+                    oid: upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.3.{{ $index }}'
+                    value: upsESystemOutputVoltage
+                    index: 'upsESystemOutputVoltage.{{ $index }}'
+                    descr: Output
+                -
+                    oid: upsESystemBypassTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.20.1.3.{{ $index }}'
+                    value: upsESystemBypassVoltage
+                    index: 'upsESystemBypassVoltage.{{ $index }}'
+                    descr: System Bypass
+                -
+                    oid: upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.3.{{ $index }}'
+                    value: positiveChargeVotlage
+                    index: 'positiveChargeVotlage.{{ $index }}'
+                    descr: Positive Charge
+                -
+                    oid: upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.4.{{ $index }}'
+                    value: negativeChargeVotlage
+                    index: 'negativeChargeVotlage.{{ $index }}'
+                    descr: Negative Charge
+                -
+                    oid: upsEModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.4.2.1.3.{{ $index }}'
+                    value: upsEModulePositiveBusVolt
+                    index: 'upsEModulePositiveBusVolt.{{ $index }}'
+                    descr: Module Positive Charge
+                -
+                    oid: upsEModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.4.2.1.4.{{ $index }}'
+                    value: upsEModuleNegativeBusVolt
+                    index: 'upsEModuleNegativeBusVolt.{{ $index }}'
+                    descr: Module Negative Charge
+        frequency:
+            options:
+                skip_values_lt: 0
+                divisor: 10
+            data:
+                -
+                    oid: upsESystemInputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.16.1.2.{{ $index }}'
+                    value: upsESystemInputFrequency
+                    index: 'upsESystemInputFrequency.{{ $index }}'
+                    descr: System Input
+                -
+                    oid: upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.2.{{ $index }}'
+                    value: upsESystemOutputFrequency
+                    index: 'upsESystemOutputFrequency.{{ $index }}'
+                    descr: System Output
+                -
+                    oid: upsESystemBypassTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.20.1.2.{{ $index }}'
+                    value: upsESystemBypassFrequency
+                    index: 'upsESystemBypassFrequency.{{ $index }}'
+                    descr: System Bypass
+        charge:
+            data:
+                -
+                    oid: upsEBatteryEstimatedChargeRemaining
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.4.{{ $index }}'
+                    index: 'upsEBatteryEstimatedChargeRemaining.{{ $index }}'
+                    descr: Battery charge remaining
+        temperature:
+            options:
+                skip_values_lt: 0
+                divisor: 10
+            data:
+                -
+                    oid: upsESystemTemperature
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.4.{{ $index }}'
+                    index: 'upsESystemTemperature.{{ $index }}'
+                    descr: Ambient Temperature
+                -
+                    oid: upsEBatteryTemperature
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.8.{{ $index }}'
+                    index: 'upsEBatteryTemperature.{{ $index }}'
+                    descr: Battery
+                -
+                    oid: upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.8.{{ $index }}'
+                    value: chargerModulesTemperature
+                    index: 'chargerModulesTemperature.{{ $index }}'
+                    descr: Charger Module
+                -
+                    oid: upsEModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.4.2.1.5.{{ $index }}'
+                    value: upsEModuleTemperature
+                    index: 'upsEModuleTemperature.{{ $index }}'
+                    descr: Module
+                -
+                    oid: upsEEnvironmentTemperature
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.6.1.{{ $index }}'
+                    value: upsEEnvironmentCurrentTemperature
+                    index: 'upsEEnvironmentCurrentTemperature.{{ $index }}'
+                    descr: Env Current Temp
+                    low_limit: upsEEnvironmentTemperatureLowSetPoint
+                    high_limit: upsEEnvironmentTemperatureHighSetPoint
+        current:
+            options:
+                skip_values_lt: 0
+                divisor: 10
+            data:
+                -
+                    oid: upsESystemInputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.16.1.4.{{ $index }}'
+                    value: upsESystemInputCurrent
+                    index: 'upsESystemInputCurrent.{{ $index }}'
+                    descr: System Input Current
+                -
+                    oid: upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.4.{{ $index }}'
+                    value: upsESystemOutputCurrent
+                    index: 'upsESystemOutputCurrent.{{ $index }}'
+                    descr: System Output Current
+                -
+                    oid: upsESystemBypassTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.20.1.4.{{ $index }}'
+                    value: upsESystemBypassCurrent
+                    index: 'upsESystemBypassCurrent.{{ $index }}'
+                    descr: System Bypass
+                -
+                    oid: upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.5.{{ $index }}'
+                    value: positiveChargeCurrent
+                    index: 'positiveChargeCurrent.{{ $index }}'
+                    descr: Postitive Charge
+                -
+                    oid: upsEChargerModulesTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.12.1.6.{{ $index }}'
+                    value: negativeChargeCurrent
+                    index: 'negativeChargeCurrent.{{ $index }}'
+                    descr: Negative Charge
+        humidity:
+            options:
+                skip_values_lt: 0
+            data:
+                -
+                    oid: upsEEnvironmentHumidity
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.6.2.1.{{ $index }}'
+                    value: upsEEnvironmentCurrentHumidity
+                    index: 'upsEEnvironmentCurrentHumidity.{{ $index }}'
+                    descr: Environment Current
+        power:
+            options:
+                skip_values_lt: 0
+            data:
+                -
+                    oid: upsESystemInputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.16.1.5.{{ $index }}'
+                    value: upsESystemInputWatts
+                    index: 'upsESystemInputWatts.{{ $index }}'
+                    descr: System Input Watts
+                -
+                    oid: upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.5.{{ $index }}'
+                    value: upsESystemOutputWatts
+                    index: 'upsESystemOutputWatts.{{ $index }}'
+                    descr: System Output Watts
+                -
+                    oid: upsESystemBypassTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.20.1.5.{{ $index }}'
+                    value: upsESystemBypassWatts
+                    index: 'upsESystemBypassWatts.{{ $index }}'
+                    descr: System Bypass
+                    divisor: 10
+        load:
+            data:
+                -
+                    oid: upsESystemOutputTable
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.2.18.1.7.{{ $index }}'
+                    value: upsESystemOutputLoad
+                    index: 'upsESystemOutputLoad.{{ $index }}'
+                    descr: System Output Load
+        state:
+            data:
+                -
+                    oid: upsEBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.935.10.1.1.3.1.{{ $index }}'
+                    index: 'upsEBatteryStatus.{{ $index }}'
+                    descr: Battery Status
+                    state_name: upsEBatteryStatus
+                    states:
+                        - { descr: unknown, graph: 1, value: 1, generic: 3 }
+                        - { descr: batteryNormal, graph: 1, value: 2, generic: 0 }
+                        - { descr: batteryLow, graph: 1, value: 3, generic: 1 }
+                        - { descr: batteryDepleted, graph: 1, value: 4, generic: 2 }
+                        - { descr: batteryDischarging, graph: 1, value: 5, generic: 1 }
+                        - { descr: batteryFailure, graph: 1, value: 6, generic: 2 }

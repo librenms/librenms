@@ -1,0 +1,331 @@
+TRAPEZE-NETWORKS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    trpzMibs
+        FROM TRAPEZE-NETWORKS-ROOT-MIB
+        ;
+
+trpzSystemMib MODULE-IDENTITY
+    LAST-UPDATED "200708140012Z"
+    ORGANIZATION "Trapeze Networks"
+    CONTACT-INFO
+        "Trapeze Networks Technical Support
+         www.trapezenetworks.com
+         US:            866.TRPZ.TAC
+         International: 925.474.2400
+         support@trapezenetworks.com"
+    DESCRIPTION
+        "System objects for Trapeze Networks wireless switches.
+
+        Copyright 2007 Trapeze Networks, Inc.
+        All rights reserved.
+        This Trapeze Networks SNMP Management Information Base
+        Specification (Specification) embodies Trapeze Networks'
+        confidential and proprietary intellectual property.
+        Trapeze Networks retains all title and ownership in
+        the Specification, including any revisions.
+
+        This Specification is supplied 'AS IS' and Trapeze Networks
+        makes no warranty, either express or implied, as to the use,
+        operation, condition, or performance of the Specification."
+
+    REVISION "200708140012Z"
+    DESCRIPTION "v3.0.1: Added new objects to support
+                Power Supply status.
+                (for 6.2 release)"
+
+    REVISION "200705040010Z"
+    DESCRIPTION "v2.1.0: Obsoleted two previously deprecated objects
+                (for 6.2 release)"
+
+    REVISION "200703140007Z"
+    DESCRIPTION "v2.0.0: Added new objects to support CPU load
+                and memory (RAM) usage details:
+                for last few seconds (''instant''),
+                minute, 5 minutes, hour, day, 3 days
+                (for 6.0 release)"
+
+    REVISION "200611090004Z"
+    DESCRIPTION "v1.0.3: Removed unused imports"
+
+    REVISION "200606060003Z"
+    DESCRIPTION "v1.0.2: Initial version, for 5.0 release"
+
+    ::= { trpzMibs 8 }
+
+
+-- Textual Conventions
+
+TrpzSysCpuLoad ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "CPU load in percents"
+    SYNTAX      Unsigned32 (0..100)
+
+TrpzSysMemoryAmount ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Memory amount in KBytes (1024 octets)"
+    SYNTAX      Unsigned32
+
+TrpzSysPowerSupplyStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The status of a Power Supply."
+    SYNTAX      INTEGER {
+                    other        (1),
+                    unknown      (2),
+                    ac-failed    (3),
+                    dc-failed    (4),
+                    ac-ok-dc-ok  (5)
+                }
+
+
+-- Object definitions
+
+--
+-- The System MIB Tree
+--
+
+trpzSysObjects    OBJECT IDENTIFIER ::= { trpzSystemMib 1 }
+trpzSysDataObjects  OBJECT IDENTIFIER ::= { trpzSysObjects 1 }
+
+trpzSysCpuMemoryUsedBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "CPU memory used in bytes.
+        Obsoleted by trpzSysCpuMemoryInstantUsage."
+    ::= { trpzSysDataObjects 1 }
+
+trpzSysCpuMemoryTotalBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "CPU total physical memory in bytes.
+        Obsoleted by trpzSysCpuMemorySize."
+    ::= { trpzSysDataObjects 2 }
+
+trpzSysFlashMemoryUsedBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Flash memory used in bytes."
+    ::= { trpzSysDataObjects 3 }
+
+trpzSysFlashMemoryTotalBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Flash memory available in bytes."
+    ::= { trpzSysDataObjects 4 }
+
+trpzSysCpuAverageLoad OBJECT-TYPE
+    SYNTAX      TrpzSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load average since system startup."
+    ::= { trpzSysDataObjects 5 }
+
+-- Totals
+
+trpzSysCpuMemorySize OBJECT-TYPE
+    SYNTAX      TrpzSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Maximum available CPU Memory (RAM) in KBytes.
+        This is the memory available to the Wireless Switch software.
+        May be less than physical RAM size."
+    ::= { trpzSysDataObjects 6 }
+
+-- Reserving trpzSysDataObjects 7-10 for future scalars indicating totals
+
+
+trpzSysCpuLoadDetail         OBJECT IDENTIFIER ::= { trpzSysDataObjects 11 }
+trpzSysCpuMemoryUsageDetail  OBJECT IDENTIFIER ::= { trpzSysDataObjects 12 }
+trpzSysChassisComponents     OBJECT IDENTIFIER ::= { trpzSysDataObjects 13 }
+
+
+-- CPU load details:
+
+trpzSysCpuInstantLoad OBJECT-TYPE
+    SYNTAX      TrpzSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU instant load (for last few seconds)."
+    ::= { trpzSysCpuLoadDetail 1 }
+
+trpzSysCpuLastMinuteLoad OBJECT-TYPE
+    SYNTAX      TrpzSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last minute."
+    ::= { trpzSysCpuLoadDetail 2 }
+
+trpzSysCpuLast5MinutesLoad OBJECT-TYPE
+    SYNTAX      TrpzSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last 5 minutes."
+    ::= { trpzSysCpuLoadDetail 3 }
+
+trpzSysCpuLastHourLoad OBJECT-TYPE
+    SYNTAX      TrpzSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last hour."
+    ::= { trpzSysCpuLoadDetail 4 }
+
+trpzSysCpuLastDayLoad OBJECT-TYPE
+    SYNTAX      TrpzSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last day."
+    ::= { trpzSysCpuLoadDetail 5 }
+
+trpzSysCpuLast3DaysLoad OBJECT-TYPE
+    SYNTAX      TrpzSysCpuLoad
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "CPU load for last 3 days."
+    ::= { trpzSysCpuLoadDetail 6 }
+
+
+-- Memory usage details
+
+trpzSysCpuMemoryInstantUsage OBJECT-TYPE
+    SYNTAX      TrpzSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Instant memory usage (RAM) in KBytes (for last few seconds).
+        Ranges between 0 and trpzSysCpuMemorySize."
+    ::= { trpzSysCpuMemoryUsageDetail 1 }
+
+trpzSysCpuMemoryLastMinuteUsage OBJECT-TYPE
+    SYNTAX      TrpzSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last minute in KBytes.
+        Ranges between 0 and trpzSysCpuMemorySize."
+    ::= { trpzSysCpuMemoryUsageDetail 2 }
+
+trpzSysCpuMemoryLast5MinutesUsage OBJECT-TYPE
+    SYNTAX      TrpzSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last 5 minutes in KBytes.
+        Ranges between 0 and trpzSysCpuMemorySize."
+    ::= { trpzSysCpuMemoryUsageDetail 3 }
+
+trpzSysCpuMemoryLastHourUsage OBJECT-TYPE
+    SYNTAX      TrpzSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last hour in KBytes.
+        Ranges between 0 and trpzSysCpuMemorySize."
+    ::= { trpzSysCpuMemoryUsageDetail 4 }
+
+trpzSysCpuMemoryLastDayUsage OBJECT-TYPE
+    SYNTAX      TrpzSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last day in KBytes.
+        Ranges between 0 and trpzSysCpuMemorySize."
+    ::= { trpzSysCpuMemoryUsageDetail 5 }
+
+trpzSysCpuMemoryLast3DaysUsage OBJECT-TYPE
+    SYNTAX      TrpzSysMemoryAmount
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Memory usage (RAM) for last 3 days in KBytes.
+        Ranges between 0 and trpzSysCpuMemorySize."
+    ::= { trpzSysCpuMemoryUsageDetail 6 }
+
+
+-- Power Supplies Group
+
+trpzSysChasCompPowerSupplies OBJECT IDENTIFIER ::= { trpzSysChassisComponents 1 }
+
+trpzSysNumPowerSuppliesSupported OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of power supplies supported by the Wireless Switch.
+        This is the upper limit of the number of entries
+        in the power supply table, trpzSysPowerSupplyTable."
+    ::= { trpzSysChasCompPowerSupplies 1 }
+
+trpzSysPowerSupplyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TrpzSysPowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table of power supplies actually installed on the Wireless Switch."
+    ::= { trpzSysChasCompPowerSupplies 2 }
+
+trpzSysPowerSupplyEntry OBJECT-TYPE
+    SYNTAX      TrpzSysPowerSupplyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the trpzSysPowerSupplyTable table."
+    INDEX   { trpzSysPowerSupplyDeviceOID }
+    ::= { trpzSysPowerSupplyTable 1 }
+
+TrpzSysPowerSupplyEntry ::= SEQUENCE {
+    trpzSysPowerSupplyDeviceOID     OBJECT IDENTIFIER,
+    trpzSysPowerSupplyStatus        TrpzSysPowerSupplyStatus,
+    trpzSysPowerSupplyDescr         DisplayString
+    }
+
+trpzSysPowerSupplyDeviceOID OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "OID value used to identify this chassis component
+    as indicated in Registration MIB."
+    ::= { trpzSysPowerSupplyEntry 1 }
+
+trpzSysPowerSupplyStatus OBJECT-TYPE
+    SYNTAX      TrpzSysPowerSupplyStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the power supply."
+    ::= { trpzSysPowerSupplyEntry 2 }
+
+trpzSysPowerSupplyDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A human interpretable description of this power supply,
+        for example 'Left Power Supply'."
+    ::= { trpzSysPowerSupplyEntry 3 }
+
+END

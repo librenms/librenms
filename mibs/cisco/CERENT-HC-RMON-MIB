@@ -1,0 +1,2548 @@
+-- CERENT-HC-RMON-MIB.mib  
+-- Cerent High Capacity RMON MIB
+-- This MIB extends HC-RMON-MIB (RFC 3273)
+--
+-- Copyright (c) 2003 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CERENT-HC-RMON-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE,
+    Counter32, 
+    Integer32,
+    Counter64                       FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP FROM SNMPv2-CONF
+    EntryStatus, OwnerString
+                                    FROM RMON-MIB
+    mediaIndependentIndex           FROM HC-RMON-MIB                    
+    cerentModules,
+    cerentRequirements,
+    cerentGeneric         FROM CERENT-GLOBAL-REGISTRY;
+
+--  CERENT High Capacity Remote Network Monitoring MIB
+
+cerentHcRMON MODULE-IDENTITY
+    LAST-UPDATED "1201200000Z" -- 2012/Jan/20 
+    ORGANIZATION "Cisco Systems, Inc."
+    CONTACT-INFO
+         "support@Cisco.com
+
+                    Postal:
+                    Cisco Systems
+                    1450 N. McDowell Blvd.
+                    Petaluma, CA 94954
+
+                    Tel: +1-877-323-7368"
+    DESCRIPTION
+        "The MIB module for managing remote monitoring
+        device implementations. This MIB module
+        is a proprietary extension of the HC-RMON-MIB (rfc-3273)."
+
+    REVISION "1201200000Z" -- 2012/Jan/20
+    DESCRIPTION 
+        "The MIB module for managing remote monitoring 
+        device implementations. This MIB module is a proprietary 
+        extension of the HC-RMON-MIB."
+
+      ::= { cerentModules 110 }
+
+
+-- MIB Object Definitions
+
+cerentHcRmonMIBObjects    OBJECT IDENTIFIER ::= { cerentGeneric 70 }
+
+-- groups in this MIB module
+
+cerentHcRmon            OBJECT IDENTIFIER  
+                       ::= { cerentHcRmonMIBObjects 10 }
+
+      
+cMediaIndependentTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CMediaIndependentEntry
+    MAX-ACCESS not-accessible
+      STATUS     current
+    DESCRIPTION
+        "Media independent statistics for promiscuous monitoring of
+        any media.
+
+        The following table defines media independent statistics that
+        provide information for full and/or half-duplex links as well
+        as high capacity links.
+
+        This table is a proprietary extension of the
+        mediaIndependentTable (rfc-3273)."
+
+    ::= { cerentHcRmon 10 }
+
+cMediaIndependentEntry OBJECT-TYPE
+    SYNTAX     CMediaIndependentEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Media independent statistics for promiscuous
+        monitoring of any media."
+    INDEX { mediaIndependentIndex }
+    ::= { cMediaIndependentTable 1 }
+
+CMediaIndependentEntry ::= SEQUENCE {
+
+    cMediaIndependentInBadCRC                    Counter32,
+    cMediaIndependentOutBadCRC                   Counter32,
+    cMediaIndependentInFramesTruncated           Counter32,
+    cMediaIndependentInFramesTooLong             Counter32,
+    cMediaIndependentLinkRecoveries              Counter32,
+    cMediaIndependentInDistanceExtBuffers        Counter32,
+    cMediaIndependentOutDistanceExtBuffers       Counter32,
+    cMediaIndependentInCredits                   Counter32,
+    cMediaIndependentOutCredits                  Counter32,
+    cMediaIndependentOutZeroCredits              Counter32,
+    cMediaIndependentInGfpSBitErr                Counter32,
+    cMediaIndependentInGfpMBitErr	               Counter32,
+    cMediaIndependentInGfpCRCErr                 Counter32,	
+    cMediaIndependentInGfpFrames                 Counter32,	
+    cMediaIndependentInOverflowGfpFrames	       Counter32,
+    cMediaIndependentInHighCapacityGfpFrames     Counter64,
+    cMediaIndependentOutGfpFrames                Counter32,	
+    cMediaIndependentOutOverflowGfpFrames   	   Counter32,
+    cMediaIndependentOutHighCapacityGfpFrames    Counter64,	
+    cMediaIndependentInGfpOctets                 Counter32,	
+    cMediaIndependentInOverflowGfpOctets	       Counter32,
+    cMediaIndependentInHighCapacityGfpOctets     Counter64,
+    cMediaIndependentOutGfpOctets                Counter32,	
+    cMediaIndependentOutOverflowGfpOctets   	   Counter32,
+    cMediaIndependentOutHighCapacityGfpOctets    Counter64,
+    cMediaIndependentInGfpTypeInvalid            Counter32,
+    cMediaIndependentInGfpCIDInvalid             Counter32,
+    cMediaIndependentInGfpLFDRaised              Counter32,
+    cMediaIndependentInGfpCSFRaised              Counter32,
+    cMediaIndependentGfpRoundTripLatency         Counter32,
+    cMediaIndependent8b10bIdleSets               Counter32,
+    cMediaIndependentOverflow8b10bIdleSets       Counter32,
+    cMediaIndependentHighCapacity8b10bIdleSets   Counter64,
+    cMediaIndependent8b10bNonIdleSets            Counter32,
+    cMediaIndependentOverflow8b10bNonIdleSets    Counter32,
+    cMediaIndependentHighCapacity8b10bNonIdleSets Counter64,
+    cMediaIndependent8b10bDataSets               Counter32,
+    cMediaIndependentOverflow8b10bDataSets       Counter32,
+    cMediaIndependentHighCapacity8b10bDataSets   Counter64,
+    cMediaIndependent8b10bInvalidOrdSets         Counter32,
+    cMediaIndependent8b10bEncodingDispErr        Counter32,
+    cMediaIndependent8b10bLossOfSync             Counter32,
+    cMediaIndependentInPauseFrames               Counter32,
+    cMediaIndependentOutPauseFrames              Counter32,
+    cMediaIndependentInPktsDroppedInternalCongestion Counter32,
+    cMediaIndependentOutPktsDroppedInternalCongestion Counter32,
+    cMediaIndependentInControlFrames             Counter32,
+    cMediaIndependentInUnknownOpcodeFrames       Counter32,
+    cMediaIndependentHdlcPktDrops               Counter32,
+    cMediaIndependentHdlcInOctets                Counter32,
+    cMediaIndependentHdlcOutOctets               Counter32,
+    cMediaIndependentHdlcInAborts                Counter32,
+    cMediaIndependentInShortPkts                 Counter32,
+    cMediaIndependentOutShortPkts                 Counter32,
+    cMediaIndependentOversizeDropped             Counter32,
+    cMediaIndependentInErrorBytePkts             Counter32,
+    cMediaIndependentInFramingErrorPkts          Counter32,
+    cMediaIndependentInJunkInterPkts             Counter32,
+    cMediaIndependentOutOversizePkts             Counter32,
+    cMediaIndependentInPayloadCrcErrors          Counter32,
+    cMediaIndependentOutPayloadCrcErrors         Counter32,
+    cMediaIndependentInRecvrReady                Counter32,
+    cMediaIndependentOutRecvrReady               Counter32,
+    cMediaIndependent8b10bInvalidOrdSetsDispErrorsSum Counter32,
+    cMediaIndependentInGfpSblkCRCErr		Counter32,
+    cMediaIndependentOutFramesTooLong		Counter32,
+    cMediaIndependentPkts1519to1522Octets	Counter32,
+    cMediaIndependentOutFramesTruncated         Counter32,
+    cMediaIndependentPcsErrCount		Counter32,
+    cMediaIndependentPcsErrCount2               Counter32,
+    cMediaIndependentPcs49RxErrBer		Counter32,
+    cMediaIndependentPcs49RxErrDec		Counter32,
+    cMediaIndependentPkts1519toMaxOctets	Counter32,
+    cMediaIndependentRxLcvErrors  		Counter32,
+    cMediaIndependentTxLcvErrors  		Counter32,
+    cMediaIndependentGfpRxCmfFrame		Counter32,
+    cMediaIndependentGfpTxCmfFrame		Counter32,
+    cMediaIndependentPcsEgRxErrFrames           Counter32
+}
+
+
+cMediaIndependentInBadCRC OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames received on this interface
+         which contained CRC error.
+        "
+    ::= { cMediaIndependentEntry 10 }
+    
+cMediaIndependentOutBadCRC OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames transmitted on this interface
+         that contained CRC error.
+        "
+    ::= { cMediaIndependentEntry 20 }
+    
+cMediaIndependentInFramesTruncated OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames received on this interface
+         that were truncated.
+        "
+    ::= { cMediaIndependentEntry 30 }
+    
+cMediaIndependentInFramesTooLong OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object gives the number of frames received on 
+        this interface with a length greater than what was
+        agreed to.
+        "
+    ::= { cMediaIndependentEntry 40 }    
+
+cMediaIndependentLinkRecoveries OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of link recoveries observed on
+        this interface.
+        "
+    ::= { cMediaIndependentEntry 50 }
+
+cMediaIndependentInDistanceExtBuffers OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of distance extension buffers
+        received on this interface.
+        "
+    ::= { cMediaIndependentEntry 60 }
+
+cMediaIndependentOutDistanceExtBuffers OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of distance extension buffers
+        transmitted on this interface.
+        "
+    ::= { cMediaIndependentEntry 70 }
+
+cMediaIndependentInCredits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of credits received on
+        this interface.
+        "
+    ::= { cMediaIndependentEntry 80 }
+
+cMediaIndependentOutCredits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of credits transmitted on
+        this interface.
+        "
+    ::= { cMediaIndependentEntry 90 }
+
+cMediaIndependentOutZeroCredits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of zero credits transmitted on
+        this interface.
+        "
+    ::= { cMediaIndependentEntry 100 }
+    
+cMediaIndependentInGfpSBitErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Single Bit errors received on 
+        this interface.
+        "
+    ::= { cMediaIndependentEntry 110 }
+
+cMediaIndependentInGfpMBitErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP multi bit errors received on
+        this interface.
+        "
+    ::= { cMediaIndependentEntry 120 }
+    
+cMediaIndependentInGfpCRCErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP CRC errors received on 
+        this interface.
+        "
+    ::= { cMediaIndependentEntry 130 }
+    
+cMediaIndependentInGfpFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP data frames
+        received on this interface.
+        "
+    ::= { cMediaIndependentEntry 140 }
+    
+cMediaIndependentInOverflowGfpFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The higher word value of the total number of GFP data frames
+        received on this interface.
+        "
+    ::= { cMediaIndependentEntry 150 }
+    
+cMediaIndependentInHighCapacityGfpFrames OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP data frames received on this interface.
+        SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentEntry 160 }
+    
+cMediaIndependentOutGfpFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP data frames
+        transmitted on this interface.
+        "
+    ::= { cMediaIndependentEntry 170 }
+    
+cMediaIndependentOutOverflowGfpFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The higher word value of the total number of GFP data frames
+        transmitted on this interface.
+        "
+    ::= { cMediaIndependentEntry 180 }
+    
+cMediaIndependentOutHighCapacityGfpFrames OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP data frames transmitted on this
+        interface. 
+        SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentEntry 190 }
+
+cMediaIndependentInGfpOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Octets 
+        received on this interface.
+        "
+    ::= { cMediaIndependentEntry 200 }
+    
+cMediaIndependentInOverflowGfpOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The higher word value of the total number of GFP Octets
+         received on this interface.
+        "
+    ::= { cMediaIndependentEntry 210 }
+    
+cMediaIndependentInHighCapacityGfpOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Octets received on this interface.
+        SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentEntry 220 }
+    
+cMediaIndependentOutGfpOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Octets
+        transmitted on this interface.
+        "
+    ::= { cMediaIndependentEntry 230 }
+    
+cMediaIndependentOutOverflowGfpOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The higher word value of the total number of GFP Octets
+        transmitted on this interface.
+        "
+    ::= { cMediaIndependentEntry 240 }
+    
+cMediaIndependentOutHighCapacityGfpOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Octets transmitted on this
+        interface. 
+        SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentEntry 250 }
+    
+cMediaIndependentInGfpTypeInvalid OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP data frames received on this
+        interface with an invalid type.
+        "
+    ::= { cMediaIndependentEntry 260 }
+
+cMediaIndependentInGfpCIDInvalid OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP data frames received on this
+        interface with an invalid Channel Indentifier.
+        "
+    ::= { cMediaIndependentEntry 270 }
+
+cMediaIndependentInGfpLFDRaised OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of times GFP LFD alarm is raised on this
+        interface.
+        "
+    ::= { cMediaIndependentEntry 280 }
+
+cMediaIndependentInGfpCSFRaised OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of times GFP CSF alarm is raised on this
+        interface.
+        "
+    ::= { cMediaIndependentEntry 290 }
+
+cMediaIndependentGfpRoundTripLatency OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP round trip latencies observed
+        on this interface.
+        "
+    ::= { cMediaIndependentEntry 300 }
+   
+cMediaIndependent8b10bIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b Idle 
+         sets encountered on this interface.
+         "
+    ::= { cMediaIndependentEntry 310 }
+
+cMediaIndependentOverflow8b10bIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         8b10b idle sets encountered on this interface. 
+         "
+    ::= { cMediaIndependentEntry 320 }
+    
+cMediaIndependentHighCapacity8b10bIdleSets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8b10b idle sets 
+         encountered on this interface.
+
+         SNMP V2/V3 managers should use this object.
+         "
+    ::= { cMediaIndependentEntry 330 }
+
+cMediaIndependent8b10bNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b non idle 
+         sets encountered on this interface. 
+         "
+    ::= { cMediaIndependentEntry 340 }
+    
+cMediaIndependentOverflow8b10bNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         8b10b non idle sets encountered on this interface.
+         "
+    ::= { cMediaIndependentEntry 350 }
+    
+cMediaIndependentHighCapacity8b10bNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8b10b non-idle sets 
+         encountered on this interface.
+
+         SNMP V2/V3 managers should use this object.
+         "
+    ::= { cMediaIndependentEntry 360 }
+
+cMediaIndependent8b10bDataSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b data 
+         ordered sets encountered on this interface.
+         "
+    ::= { cMediaIndependentEntry 370 }   
+
+cMediaIndependentOverflow8b10bDataSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         8b10b data ordered sets encountered on this interface. 
+         "
+    ::= { cMediaIndependentEntry 380 }    
+
+cMediaIndependentHighCapacity8b10bDataSets OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8b10b data 
+        ordered sets encountered on this interface.
+
+        SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentEntry 390 }
+
+cMediaIndependent8b10bInvalidOrdSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b invalid 
+         ordered sets encountered on this interface.
+         "
+    ::= { cMediaIndependentEntry 400 }   
+
+cMediaIndependent8b10bEncodingDispErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b
+         encoding disparity errors encountered on this interface.
+         "
+    ::= { cMediaIndependentEntry 410 }  
+    
+cMediaIndependent8b10bLossOfSync OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b Loss
+        of Sync encountered on this interface.
+         "
+    ::= { cMediaIndependentEntry 420 }            
+    
+cMediaIndependentInPauseFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of received pause
+	frames.
+	"
+    ::= { cMediaIndependentEntry 430 }            
+    
+cMediaIndependentOutPauseFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of transmitted
+	pause frames.
+         "
+    ::= { cMediaIndependentEntry 440 }            
+    
+cMediaIndependentInPktsDroppedInternalCongestion OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of incoming
+	packeds dropped due to internal congestion.
+         "
+    ::= { cMediaIndependentEntry 450 }            
+    
+cMediaIndependentOutPktsDroppedInternalCongestion OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of outgoing
+	packets dropped due to internal congestion.
+         "
+    ::= { cMediaIndependentEntry 460 }            
+    
+cMediaIndependentInControlFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of received
+	control frames.
+         "
+    ::= { cMediaIndependentEntry 470 }            
+    
+cMediaIndependentInUnknownOpcodeFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of received
+	frames with unknown opcodes.
+         "
+    ::= { cMediaIndependentEntry 480 }            
+    
+cMediaIndependentHdlcPktDrops OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of dropped
+	hdlc packets.
+         "
+    ::= { cMediaIndependentEntry 490 }            
+    
+cMediaIndependentHdlcInOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of hdlc
+	octets received.
+         "
+    ::= { cMediaIndependentEntry 500 }            
+    
+cMediaIndependentHdlcOutOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of hdlc
+	octets transmitted.
+         "
+    ::= { cMediaIndependentEntry 510 }            
+    
+cMediaIndependentHdlcInAborts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of hdlc
+	receive aborts.
+         "
+    ::= { cMediaIndependentEntry 520 }            
+    
+cMediaIndependentInShortPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of short
+	packets received.
+         "
+    ::= { cMediaIndependentEntry 530 }
+
+cMediaIndependentOutShortPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of short
+	packets transmitted.
+         "
+    ::= { cMediaIndependentEntry 535 }
+    
+cMediaIndependentOversizeDropped OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of packet
+	drops due to oversize.
+         "
+    ::= { cMediaIndependentEntry 540 }            
+    
+cMediaIndependentInErrorBytePkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of error
+	byte packets received.
+         "
+    ::= { cMediaIndependentEntry 550 }            
+    
+cMediaIndependentInFramingErrorPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of packets
+	with framing errors.
+         "
+    ::= { cMediaIndependentEntry 560 }            
+    
+cMediaIndependentInJunkInterPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of junk 
+	inter packets.
+         "
+    ::= { cMediaIndependentEntry 570 }            
+    
+cMediaIndependentOutOversizePkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of oversized
+	outbound packets.
+         "
+    ::= { cMediaIndependentEntry 580 }            
+    
+cMediaIndependentInPayloadCrcErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of inbound
+	packets with payload CRC errors.
+         "
+    ::= { cMediaIndependentEntry 590 }            
+    
+cMediaIndependentOutPayloadCrcErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of outbound
+	packets with payload CRC errors.
+         "
+    ::= { cMediaIndependentEntry 600 }            
+
+cMediaIndependentInRecvrReady OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the inbound receiver ready count.
+         "
+    ::= { cMediaIndependentEntry 610 }            
+
+cMediaIndependentOutRecvrReady OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the outbound receiver ready count.
+         "
+    ::= { cMediaIndependentEntry 620 }            
+
+cMediaIndependent8b10bInvalidOrdSetsDispErrorsSum OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the sum of the number of 8b10b
+         encoding disparity errors and invalid ordered sets 
+	 encountered on this interface.
+         "
+    ::= { cMediaIndependentEntry 630 }            
+
+cMediaIndependentInGfpSblkCRCErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The number of GFP single block crc errors observed 
+	on this interface.
+         "
+    ::= { cMediaIndependentEntry 640 }            
+
+cMediaIndependentOutFramesTooLong OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of outbound frames on 
+        this interface with a length greater than what was
+        agreed to.
+        "
+    ::= { cMediaIndependentEntry 650 }            
+    
+cMediaIndependentPkts1519to1522Octets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         1519 and 1522 octets in length inclusive
+         (excluding framing bits but including FCS octets).
+	 "
+    ::= { cMediaIndependentEntry 660 }
+ 
+cMediaIndependentOutFramesTruncated OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames received on this interface
+         that were truncated.
+        "
+    ::= { cMediaIndependentEntry 670 }
+    
+cMediaIndependentPcsErrCount OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Pcs error count.
+        "
+    ::= { cMediaIndependentEntry 680 }
+    
+cMediaIndependentPcsErrCount2 OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Pcs error count2.
+        "
+    ::= { cMediaIndependentEntry 690 }
+    
+cMediaIndependentPcs49RxErrBer OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Pcs49RxErrBer count.
+        "
+    ::= { cMediaIndependentEntry 700 }
+
+cMediaIndependentPcs49RxErrDec OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Pcs49RxErrDec count.
+        "
+    ::= { cMediaIndependentEntry 710 }
+    
+cMediaIndependentPkts1519toMaxOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Ether packets 1519 to Max Octates"
+    ::= { cMediaIndependentEntry 720 }
+    
+cMediaIndependentRxLcvErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Lcv Errors"
+    ::= { cMediaIndependentEntry 730 }
+
+cMediaIndependentTxLcvErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx Lcv Errors"
+    ::= { cMediaIndependentEntry 740 }
+
+cMediaIndependentGfpRxCmfFrame OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "GFP Rx Cmf Frames"
+    ::= { cMediaIndependentEntry 750 }
+    
+cMediaIndependentGfpTxCmfFrame OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "GFP Tx Cmf Frames"
+    ::= { cMediaIndependentEntry 760 }
+
+cMediaIndependentPcsEgRxErrFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "PcsEgRxErrFrames count.
+        "
+    ::= { cMediaIndependentEntry 770 }
+    
+ -- The cMediaIndependentHistoryControlTable
+
+ -- cMediaIndependentHistoryControlTable stores configuration entries
+ -- that each define an interface, polling period, and other parameters.
+ -- Once samples are taken, their data is stored in an entry
+ -- in a media-specific table.  Each such entry defines one
+ -- sample, and is associated with the cMediaIndependentHistoryControlEntry
+ -- that caused the sample to be taken.  
+ 
+
+cMediaIndependentHistoryControlTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CMediaIndependentHistoryControlEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of cMediaIndependentHistoryControl entries."
+     ::= { cerentHcRmon 20 }
+
+cMediaIndependentHistoryControlEntry OBJECT-TYPE
+     SYNTAX     CMediaIndependentHistoryControlEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of parameters that set up a periodic sampling of
+         statistics."
+     INDEX { cMediaIndependentHistoryControlIndex }
+     ::= { cMediaIndependentHistoryControlTable 1 }
+
+CMediaIndependentHistoryControlEntry ::= SEQUENCE {
+     cMediaIndependentHistoryControlIndex             Integer32,
+     cMediaIndependentHistoryControlDataSource        OBJECT IDENTIFIER,
+     cMediaIndependentHistoryControlBucketsRequested  Integer32,
+     cMediaIndependentHistoryControlBucketsGranted    Integer32,
+     cMediaIndependentHistoryControlInterval          Integer32,
+     cMediaIndependentHistoryControlOwner             OwnerString,
+     cMediaIndependentHistoryControlStatus            EntryStatus
+ }
+
+cMediaIndependentHistoryControlIndex OBJECT-TYPE
+     SYNTAX     Integer32 (1..65535)
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "An index that uniquely identifies an entry in the
+         cMediaIndependentHistoryControl table.  Each such entry defines a
+         set of samples at a particular interval for an
+         interface on the device.
+         "
+     ::= { cMediaIndependentHistoryControlEntry 10 }
+
+cMediaIndependentHistoryControlDataSource OBJECT-TYPE
+     SYNTAX     OBJECT IDENTIFIER
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "This object identifies the source of the data for
+         which historical data was collected and
+         placed in a media-specific table on behalf of this
+         cMediaIndependentHistoryControlEntry.  This source
+         can be any interface on this device. 
+         In order to identify a particular interface, 
+         this object shall identify
+         the instance of the ifIndex object, defined
+         in  RFC 2233 [17], for the desired interface.
+         For example, if an entry were to receive data from
+         interface #1, this object would be set to ifIndex.1.
+
+         This object may not be modified if the associated
+         cMediaIndependentHistoryControlStatus object is equal
+         to valid(1).
+         "
+     ::= { cMediaIndependentHistoryControlEntry 20 }
+
+cMediaIndependentHistoryControlBucketsRequested OBJECT-TYPE
+     SYNTAX     Integer32 (1..65535)
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "The requested number of discrete time intervals
+         over which data is to be saved in the part of the
+         media-specific table associated with this
+         cMediaIndependentHistoryControlEntry.
+
+         When this object is created or modified, the probe
+         should set cMediaIndependentHistoryControlBucketsGranted
+         as closely to this object as is possible for the particular
+         implementation and available resources.
+         "
+     DEFVAL { 50 }
+     ::= { cMediaIndependentHistoryControlEntry 30 }
+
+cMediaIndependentHistoryControlBucketsGranted OBJECT-TYPE
+     SYNTAX     Integer32 (1..65535)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of discrete sampling intervals
+         over which data shall be saved in the part of
+         the media-specific table associated with this
+         cMediaIndependentHistoryControlEntry.
+
+         When the associated
+         cMediaIndependentHistoryControlBucketsRequested
+         object is created or modified, the probe
+         should set this object as closely to the requested
+         value as is possible for the particular
+         probe implementation and available resources.  
+
+         When the number of buckets reaches the value of
+         this object and a new bucket is to be added to the
+         media-specific table, the oldest bucket associated
+         with this cMediaIndependentHistoryControlEntry shall
+         be deleted by the agent so that the new bucket
+         can be added.
+
+         When the value of this object changes to a value less
+         than the current value, entries are deleted
+         from the media-specific table associated with this
+         cMediaIndependentHistoryControlEntry.
+         Enough of the oldest of these entries shall be deleted
+         by the agent so that their number remains less than or
+         equal to the new value of this object.
+
+         When the value of this object changes to a value greater
+         than the current value, the number of associated media-
+         specific entries may be allowed to grow.
+         "
+     ::= { cMediaIndependentHistoryControlEntry 40 }
+
+cMediaIndependentHistoryControlInterval OBJECT-TYPE
+     SYNTAX     Integer32 (1..3600)
+     UNITS      "Seconds"
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "The interval in seconds over which the data is
+         sampled for each bucket in the part of the
+         media-specific table associated with this
+         cMediaIndependentHistoryControlEntry. 
+         This interval can be set to any number of seconds
+         between 1 and 3600 (1 hour).
+
+         This object may not be modified if the associated
+         cMediaIndependentHistoryControlStatus object
+         is equal to valid(1).
+         "
+     DEFVAL { 1800 }
+     ::= { cMediaIndependentHistoryControlEntry 50 }
+
+cMediaIndependentHistoryControlOwner OBJECT-TYPE
+     SYNTAX     OwnerString
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "The entity that configured this entry and is therefore
+         using the resources assigned to it.
+         "
+     ::= { cMediaIndependentHistoryControlEntry 60 }
+
+cMediaIndependentHistoryControlStatus OBJECT-TYPE
+     SYNTAX     EntryStatus
+     MAX-ACCESS read-create
+     STATUS     current
+     DESCRIPTION
+         "The status of this cMediaIndependentHistoryControl entry.
+
+         Each instance of the media-specific table associated
+         with this cMediaIndependentHistoryControlEntry will be 
+         deleted by the agent if this 
+         cMediaIndependentHistoryControlEntry is not equal to valid(1).
+         "
+     ::= { cMediaIndependentHistoryControlEntry 70 }
+
+
+    
+-- cMediaIndependentHistoryTable
+    
+cMediaIndependentHistoryTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF CMediaIndependentHistoryEntry
+    MAX-ACCESS not-accessible
+      STATUS     current
+    DESCRIPTION
+        "Collection of media independent statistics for promiscuous
+        monitoring of any media. This table reports  data for the
+        previous n intervals."
+
+
+    ::= { cerentHcRmon 30 }
+
+cMediaIndependentHistoryEntry OBJECT-TYPE
+    SYNTAX     CMediaIndependentHistoryEntry
+    MAX-ACCESS not-accessible
+    STATUS      current
+    DESCRIPTION
+        "History of media independent statistics.
+        "
+    INDEX { cMediaIndependentHistoryIndex,
+            cMediaIndependentHistorySampleIndex }
+            
+    ::= { cMediaIndependentHistoryTable 1 }
+
+CMediaIndependentHistoryEntry ::= SEQUENCE {
+
+    cMediaIndependentHistoryIndex                       Integer32,
+    cMediaIndependentHistorySampleIndex                 Integer32,
+    cMediaIndependentHistoryDropEvents                  Counter32,
+    cMediaIndependentHistoryDroppedFrames               Counter32,
+    cMediaIndependentHistoryInPkts                      Counter32,
+    cMediaIndependentHistoryInOverflowPkts              Counter32,
+    cMediaIndependentHistoryInHighCapacityPkts          Counter64,
+    cMediaIndependentHistoryOutPkts                     Counter32,
+    cMediaIndependentHistoryOutOverflowPkts             Counter32,
+    cMediaIndependentHistoryOutHighCapacityPkts         Counter64,
+    cMediaIndependentHistoryInOctets                    Counter32,
+    cMediaIndependentHistoryInOverflowOctets            Counter32,
+    cMediaIndependentHistoryInHighCapacityOctets        Counter64,
+    cMediaIndependentHistoryOutOctets                   Counter32,
+    cMediaIndependentHistoryOutOverflowOctets           Counter32,
+    cMediaIndependentHistoryOutHighCapacityOctets       Counter64,
+    cMediaIndependentHistoryInNUCastPkts                Counter32,
+    cMediaIndependentHistoryInNUCastOverflowPkts        Counter32,
+    cMediaIndependentHistoryInNUCastHighCapacityPkts    Counter64,
+    cMediaIndependentHistoryOutNUCastPkts               Counter32,
+    cMediaIndependentHistoryOutNUCastOverflowPkts       Counter32,
+    cMediaIndependentHistoryOutNUCastHighCapacityPkts   Counter64,
+    cMediaIndependentHistoryInErrors                    Counter32,
+    cMediaIndependentHistoryOutErrors                   Counter32,
+    cMediaIndependentHistoryInBadCRC                    Counter32,
+    cMediaIndependentHistoryOutBadCRC                   Counter32,
+    cMediaIndependentHistoryInFramesTruncated           Counter32,
+    cMediaIndependentHistoryInFramesTooLong             Counter32,
+    cMediaIndependentHistoryLinkRecoveries              Counter32,
+    cMediaIndependentHistoryInDistanceExtBuffers        Counter32,
+    cMediaIndependentHistoryOutDistanceExtBuffers       Counter32,
+    cMediaIndependentHistoryInCredits                   Counter32,
+    cMediaIndependentHistoryOutCredits                  Counter32,
+    cMediaIndependentHistoryOutZeroCredits              Counter32,
+    cMediaIndependentHistoryInGfpSBitErr                Counter32,
+    cMediaIndependentHistoryInGfpMBitErr	              Counter32,
+    cMediaIndependentHistoryInGfpCRCErr                 Counter32,	
+    cMediaIndependentHistoryInGfpFrames                 Counter32,	
+    cMediaIndependentHistoryInOverflowGfpFrames	        Counter32,
+    cMediaIndependentHistoryInHighCapacityGfpFrames     Counter64,
+    cMediaIndependentHistoryOutGfpFrames                Counter32,
+    cMediaIndependentHistoryOutOverflowGfpFrames	      Counter32,
+    cMediaIndependentHistoryOutHighCapacityGfpFrames    Counter64,
+    cMediaIndependentHistoryInGfpOctets                 Counter32,	
+    cMediaIndependentHistoryInOverflowGfpOctets	        Counter32,
+    cMediaIndependentHistoryInHighCapacityGfpOctets     Counter64,
+    cMediaIndependentHistoryOutGfpOctets                Counter32,
+    cMediaIndependentHistoryOutOverflowGfpOctets	      Counter32,
+    cMediaIndependentHistoryOutHighCapacityGfpOctets    Counter64,
+    cMediaIndependentHistoryInGfpTypeInvalid            Counter32,
+    cMediaIndependentHistoryInGfpCIDInvalid             Counter32,
+    cMediaIndependentHistoryInGfpLFDRaised              Counter32,
+    cMediaIndependentHistoryInGfpCSFRaised              Counter32,
+    cMediaIndependentHistoryGfpRoundTripLatency         Counter32,
+    cMediaIndependentHistory8b10bIdleSets               Counter32,
+    cMediaIndependentHistoryOverflow8b10bIdleSets       Counter32,
+    cMediaIndependentHistoryHighCapacity8b10bIdleSets   Counter64,
+    cMediaIndependentHistory8b10bNonIdleSets            Counter32,
+    cMediaIndependentHistoryOverflow8b10bNonIdleSets    Counter32,
+    cMediaIndependentHistoryHighCapacity8b10bNonIdleSets Counter64,
+    cMediaIndependentHistory8b10bDataSets               Counter32,
+    cMediaIndependentHistoryOverflow8b10bDataSets       Counter32,
+    cMediaIndependentHistoryHighCapacity8b10bDataSets   Counter64,
+    cMediaIndependentHistory8b10bInvalidOrdSets         Counter32,
+    cMediaIndependentHistory8b10bEncodingDispErr        Counter32,
+    cMediaIndependentHistory8b10bLossOfSync             Counter32,
+    cMediaIndependentHistoryInPauseFrames               Counter32,
+    cMediaIndependentHistoryOutPauseFrames              Counter32,
+    cMediaIndependentHistoryInPktsDroppedInternalCongestion Counter32,
+    cMediaIndependentHistoryOutPktsDroppedInternalCongestion Counter32,
+    cMediaIndependentHistoryInControlFrames             Counter32,
+    cMediaIndependentHistoryInUnknownOpcodeFrames       Counter32,
+    cMediaIndependentHistoryHdlcPktDrops               Counter32,
+    cMediaIndependentHistoryHdlcInOctets                Counter32,
+    cMediaIndependentHistoryHdlcOutOctets               Counter32,
+    cMediaIndependentHistoryHdlcInAborts                Counter32,
+    cMediaIndependentHistoryInShortPkts                 Counter32,
+    cMediaIndependentHistoryOutShortPkts                 Counter32,
+    cMediaIndependentHistoryOversizeDropped             Counter32,
+    cMediaIndependentHistoryInErrorBytePkts             Counter32,
+    cMediaIndependentHistoryInFramingErrorPkts          Counter32,
+    cMediaIndependentHistoryInJunkInterPkts             Counter32,
+    cMediaIndependentHistoryOutOversizePkts             Counter32,
+    cMediaIndependentHistoryInPayloadCrcErrors          Counter32,
+    cMediaIndependentHistoryOutPayloadCrcErrors         Counter32,
+    cMediaIndependentHistoryInRecvrReady                Counter32,
+    cMediaIndependentHistoryOutRecvrReady               Counter32,
+    cMediaIndependentHistory8b10bInvalidOrdSetsDispErrorsSum Counter32,
+    cMediaIndependentHistoryInGfpSblkCRCErr		Counter32,
+    cMediaIndependentHistoryOutFramesTooLong		Counter32,
+    cMediaIndependentHistoryPkts1519to1522Octets	Counter32,
+    cMediaIndependentHistoryOutFramesTruncated          Counter32,
+    cMediaIndependentHistoryPcsErrCount			Counter32,
+    cMediaIndependentHistoryPcsErrCount2		Counter32,
+    cMediaIndependentHistoryPcs49RxErrBer		Counter32,
+    cMediaIndependentHistoryPcs49RxErrDec		Counter32,
+    cMediaIndependentHistoryPkts1519toMaxOctets		Counter32,
+    cMediaIndependentHistoryRxLcvErrors			Counter32,
+    cMediaIndependentHistoryTxLcvErrors			Counter32,
+    cMediaIndependentHistoryPcsEgRxErrFrames		Counter32
+
+}
+
+cMediaIndependentHistoryIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The history of which this entry is a part.  The
+        history identified by a particular value of this
+        index is the same history as identified
+        by the same value of cMediaIndependentHistoryControlIndex."
+    ::= { cMediaIndependentHistoryEntry 10 }
+
+cMediaIndependentHistorySampleIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies the particular
+        sample this entry represents among all samples
+        associated with the same 
+        cMediaIndependentHistoryControlEntry.
+
+        This index starts at 1 and increases by one
+        as each new sample is taken."
+    ::= { cMediaIndependentHistoryEntry 20 }
+
+cMediaIndependentHistoryDropEvents OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of events, in this interval,
+        in which packets were dropped by the probe due to lack
+        of resources.
+        Note that this number is not necessarily the number of
+        packets dropped; it is just the number of times this
+        condition has been detected.
+        "
+    ::= { cMediaIndependentHistoryEntry 30 }
+
+cMediaIndependentHistoryDroppedFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+       "The total number of frames, in this interval,
+        which were received by the probe and therefore not accounted 
+        for in the cMediaIndependentHistoryDropEvents,
+        but for which the probe chose not to count for this entry
+        for whatever reason.  Most often, this
+        event occurs when the probe is out of some resources and
+        decides to shed load from this collection.
+
+        This count does not include packets that were not counted
+        because they had MAC-layer errors.
+
+        Note that, unlike the dropEvents counter, this number is the
+        exact number of frames dropped.
+        "
+    ::= { cMediaIndependentHistoryEntry 40 }
+
+cMediaIndependentHistoryInPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received,
+        in this interval,
+        on a half-duplex link or on the inbound connection of a
+        full-duplex link.
+        "
+    ::= { cMediaIndependentHistoryEntry 50 }
+
+cMediaIndependentHistoryInOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        cMediaIndependentHistoryInPkts counter has overflowed
+        in the particular interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 60 }
+
+cMediaIndependentHistoryInHighCapacityPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received
+        in this interval,
+        on a half-duplex link or on the inbound connection of a
+        full-duplex link.
+        "
+    ::= { cMediaIndependentHistoryEntry 70 }
+
+cMediaIndependentHistoryOutPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received,
+        in this interval, on a
+        full-duplex link in the direction of the network.
+        "
+    ::= { cMediaIndependentHistoryEntry 80 }
+
+cMediaIndependentHistoryOutOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        cMediaIndependentHistoryOutPkts counter has overflowed
+        in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 90 }
+
+cMediaIndependentHistoryOutHighCapacityPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets,
+        broadcast packets, and multicast packets) received,
+        in this interval, on a
+        full-duplex link in the direction of the network.
+        "
+    ::= { cMediaIndependentHistoryEntry 100 }
+
+cMediaIndependentHistoryInOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets of data (including those in bad
+        packets) received, in this interval,
+        (excluding framing bits but including FCS octets)
+        on a half-duplex link or on the inbound connection of
+        a full-duplex link.
+        "
+    ::= { cMediaIndependentHistoryEntry 110 }
+
+cMediaIndependentHistoryInOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        cMediaIndependentHistoryInOctets counter has overflowed
+        in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 120 }
+
+cMediaIndependentHistoryInHighCapacityOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets of data (including those in bad
+        packets) received, in this interval,
+        (excluding framing bits but including FCS octets)
+        on a half-duplex link or on the inbound
+        connection of a full-duplex link.
+        "
+    ::= { cMediaIndependentHistoryEntry 130 }
+
+cMediaIndependentHistoryOutOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets of data (including those in bad
+        packets) received, in this interval, 
+        on a full-duplex link in the direction of
+        the network (excluding framing bits but including FCS
+        octets).
+        "
+    ::= { cMediaIndependentHistoryEntry 140 }
+
+cMediaIndependentHistoryOutOverflowOctets OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        cMediaIndependentHistoryOutOctets counter has overflowed
+        in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 150 }
+
+cMediaIndependentHistoryOutHighCapacityOctets OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of octets of data (including those in bad
+        packets) received, in this interval,
+        on a full-duplex link in the direction of
+        the network (excluding framing bits but including FCS
+        octets).
+        "
+    ::= { cMediaIndependentHistoryEntry 160 }
+
+cMediaIndependentHistoryInNUCastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of non-unicast packets (including bad
+        packets) received, in this interval,
+        on a half-duplex link or on the inbound
+        connection of a full-duplex link.
+        "
+    ::= { cMediaIndependentHistoryEntry 170 }
+
+cMediaIndependentHistoryInNUCastOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        cMediaIndependentHistoryInNUCastPkts counter has overflowed
+        in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 180 }
+
+cMediaIndependentHistoryInNUCastHighCapacityPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of non-unicast packets (including bad
+        packets) received, in this interval,
+        on a half-duplex link or on the inbound
+        connection of a full-duplex link.
+        "
+    ::= { cMediaIndependentHistoryEntry 190 }
+
+cMediaIndependentHistoryOutNUCastPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of non-unicast packets (including bad
+        packets) received, in this interval,
+        on a full-duplex link in the direction of the network.
+        "
+    ::= { cMediaIndependentHistoryEntry 200 }
+
+cMediaIndependentHistoryOutNUCastOverflowPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of times the associated
+        cMediaIndependentHistoryOutNUCastPkts counter has overflowed
+        in this interval."
+    ::= { cMediaIndependentHistoryEntry 210 }
+
+cMediaIndependentHistoryOutNUCastHighCapacityPkts OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets (including bad packets)
+        received, in this interval, on a full-duplex link in the 
+        direction of the network."
+    ::= { cMediaIndependentHistoryEntry 220 }
+
+cMediaIndependentHistoryInErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of bad packets received, in this interval,
+        on a half-duplex link or on the inbound connection of a
+        full-duplex link."
+    ::= { cMediaIndependentHistoryEntry 230 }
+
+cMediaIndependentHistoryOutErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of bad packets received, in this interval,
+        on a full-duplex link in the direction of the network."
+    ::= { cMediaIndependentHistoryEntry 240 }
+
+cMediaIndependentHistoryInBadCRC OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames with invalid CRC observed on this
+        interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 250 }
+
+ cMediaIndependentHistoryOutBadCRC OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames transmitted on this interface,
+        in this interval, that had a CRC error.
+        "
+    ::= { cMediaIndependentHistoryEntry 260 }
+
+cMediaIndependentHistoryInFramesTruncated OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames received, in this interval,
+        on this interface that were truncated.
+        "
+    ::= { cMediaIndependentHistoryEntry 270 }
+    
+cMediaIndependentHistoryInFramesTooLong OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object gives the number of 
+         frames received, in this interval, on this interface
+         with a length greater than what was agreed to.
+        "
+    ::= { cMediaIndependentHistoryEntry 280 }
+
+cMediaIndependentHistoryLinkRecoveries OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of link recoveries observed in this
+        interval, on this interface.
+        "
+    ::= { cMediaIndependentHistoryEntry 290 }
+
+cMediaIndependentHistoryInDistanceExtBuffers OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of distance extension buffers
+        received on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 300 }
+
+cMediaIndependentHistoryOutDistanceExtBuffers OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of distance extension buffers
+        transmitted on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 310 }
+
+cMediaIndependentHistoryInCredits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of credits received on
+        this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 320 }
+
+cMediaIndependentHistoryOutCredits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of credits transmitted on
+        this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 330 }
+
+cMediaIndependentHistoryOutZeroCredits OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of zero credits transmitted on
+        this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 340 }
+
+cMediaIndependentHistoryInGfpSBitErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Single Bit errors received
+        on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 350 }
+    
+cMediaIndependentHistoryInGfpMBitErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Multiple Bit errors received
+        on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 360 }    
+
+cMediaIndependentHistoryInGfpCRCErr OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP CRC errors received
+        on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 370 }
+    
+cMediaIndependentHistoryInGfpFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of GFP frames
+        received on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 380 }
+    
+cMediaIndependentHistoryInOverflowGfpFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The higher word value of the total number of GFP frames
+         received on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 390 }
+    
+cMediaIndependentHistoryInHighCapacityGfpFrames OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP frames received on this interface.
+        SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentHistoryEntry 400 }
+    
+cMediaIndependentHistoryOutGfpFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP frames transmitted on this
+        interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 410 }
+    
+cMediaIndependentHistoryOutOverflowGfpFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The higher word value of the total number of GFP frames
+         transmitted on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 420 }
+    
+cMediaIndependentHistoryOutHighCapacityGfpFrames OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP frames transmitted on this 
+         interface, in this interval.
+
+         SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentHistoryEntry 430 }
+
+cMediaIndependentHistoryInGfpOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of GFP Octets
+        received on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 440 }
+    
+cMediaIndependentHistoryInOverflowGfpOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The higher word value of the total number of GFP Octets
+         received on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 450 }
+    
+cMediaIndependentHistoryInHighCapacityGfpOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Octets received on this interface.
+        SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentHistoryEntry 460 }
+    
+cMediaIndependentHistoryOutGfpOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Octets transmitted on this
+        interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 470 }
+    
+cMediaIndependentHistoryOutOverflowGfpOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The higher word value of the total number of GFP Octets
+         transmitted on this interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 480 }
+    
+cMediaIndependentHistoryOutHighCapacityGfpOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP Octets transmitted on this 
+         interface, in this interval.
+
+         SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentHistoryEntry 490 }
+    
+cMediaIndependentHistoryInGfpTypeInvalid OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP data frames receieved on this 
+         interface, in the spcified interval, which carried an
+         invalid type.
+        "
+    ::= { cMediaIndependentHistoryEntry 500 }
+
+cMediaIndependentHistoryInGfpCIDInvalid OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of GFP data frames receieved on this 
+         interface, in the spcified interval, which carried an
+         invalid channel Identifier.
+        "
+    ::= { cMediaIndependentHistoryEntry 510 }
+
+cMediaIndependentHistoryInGfpLFDRaised OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of times GFP LFD alarm is raised on this
+        interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 520 }
+
+cMediaIndependentHistoryInGfpCSFRaised OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of times GFP CSF alarm is raised on this
+        interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 530 }
+
+cMediaIndependentHistoryGfpRoundTripLatency OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of GFP round trip latencies observed on this
+        interface, in this interval.
+        "
+    ::= { cMediaIndependentHistoryEntry 540 }    
+
+cMediaIndependentHistory8b10bIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b Idle 
+         sets encountered on the interface for this particular
+         interval. 
+         "
+    ::= { cMediaIndependentHistoryEntry 550 }
+
+cMediaIndependentHistoryOverflow8b10bIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         8b10b idle sets encountered on this interface for this
+         particular interval. 
+         "
+    ::= { cMediaIndependentHistoryEntry 560 }
+    
+cMediaIndependentHistoryHighCapacity8b10bIdleSets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8b10b idle sets 
+         encountered on this interface in this particular interval.
+         
+         SNMP V2/V3 managers should use this object.
+         "
+    ::= { cMediaIndependentHistoryEntry 570 }
+
+cMediaIndependentHistory8b10bNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b non idle 
+         sets encountered on this interface for this particular
+         interval. 
+         "
+    ::= { cMediaIndependentHistoryEntry 580 }
+    
+cMediaIndependentHistoryOverflow8b10bNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         8b10b non idle sets encountered on this interface for the 
+         particular interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 590 }
+    
+cMediaIndependentHistoryHighCapacity8b10bNonIdleSets OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of 8b10b non-idle sets 
+         encountered on this interface in the particular interval.
+         
+         SNMP V2/V3 managers should use this object.
+         "
+    ::= { cMediaIndependentHistoryEntry 600 }
+
+cMediaIndependentHistory8b10bDataSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b data 
+         ordered sets encountered on this interface for this particular
+         interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 610 }   
+
+cMediaIndependentHistoryOverflow8b10bDataSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the higher word value the number of 
+         8b10b data ordered sets encountered on this interface for this 
+         particular interval. 
+         "
+    ::= { cMediaIndependentHistoryEntry 620 }    
+
+cMediaIndependentHistoryHighCapacity8b10bDataSets OBJECT-TYPE
+    SYNTAX        Counter64 
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The counter associated with the number of  8b10b data 
+        ordered sets encountered on this interface in this particular 
+        interval.
+         
+        SNMP V2/V3 managers should use this object.
+        "
+    ::= { cMediaIndependentHistoryEntry 630 }
+
+cMediaIndependentHistory8b10bInvalidOrdSets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b invalid 
+         ordered sets encountered on this interface for this particular
+         interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 640 }   
+
+cMediaIndependentHistory8b10bEncodingDispErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b
+         encoding disparity errors encountered on this interface
+         for this particular interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 650 }       
+    
+cMediaIndependentHistory8b10bLossOfSync OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of 8b10b Loss 
+         of Sync encountered on this interface for this particular
+         interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 660 }     
+
+cMediaIndependentHistoryInPauseFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of received pause
+	frames for this interval.
+	"
+    ::= { cMediaIndependentHistoryEntry 670 }            
+    
+cMediaIndependentHistoryOutPauseFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of transmitted
+	pause frames.
+         "
+    ::= { cMediaIndependentHistoryEntry 680 }            
+    
+cMediaIndependentHistoryInPktsDroppedInternalCongestion OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of incoming
+	packeds dropped due to internal congestion in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 690 }            
+    
+cMediaIndependentHistoryOutPktsDroppedInternalCongestion OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of outgoing
+	packets dropped due to internal congestion in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 700 }            
+    
+cMediaIndependentHistoryInControlFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of received
+	control frames in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 710 }            
+    
+cMediaIndependentHistoryInUnknownOpcodeFrames OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of received
+	frames with unknown opcodes in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 720 }            
+    
+cMediaIndependentHistoryHdlcPktDrops OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of dropped
+	hdlc packets in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 730 }            
+    
+cMediaIndependentHistoryHdlcInOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of hdlc
+	octets received in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 740 }            
+    
+cMediaIndependentHistoryHdlcOutOctets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of hdlc
+	octets transmitted in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 750 }            
+    
+cMediaIndependentHistoryHdlcInAborts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of hdlc
+	receive aborts in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 760 }            
+    
+cMediaIndependentHistoryInShortPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of short
+	packets received in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 770 }
+ 
+ cMediaIndependentHistoryOutShortPkts OBJECT-TYPE
+     SYNTAX        Counter32
+     MAX-ACCESS    read-only        
+     STATUS        current
+     DESCRIPTION
+         "This object gives the value of the number of short
+ 	packets transmitted in this interval.
+          "
+    ::= { cMediaIndependentHistoryEntry 775 }
+    
+cMediaIndependentHistoryOversizeDropped OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of packet
+	drops due to oversize in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 780 }            
+    
+cMediaIndependentHistoryInErrorBytePkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of error
+	byte packets received in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 790 }            
+    
+cMediaIndependentHistoryInFramingErrorPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of packets
+	with framing errors.
+         "
+    ::= { cMediaIndependentHistoryEntry 800 }            
+    
+cMediaIndependentHistoryInJunkInterPkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of junk 
+	inter packets in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 810 }            
+    
+cMediaIndependentHistoryOutOversizePkts OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of oversized
+	outbound packets.
+         "
+    ::= { cMediaIndependentHistoryEntry 820 }            
+    
+cMediaIndependentHistoryInPayloadCrcErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of inbound
+	packets with payload CRC errors in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 830 }            
+    
+cMediaIndependentHistoryOutPayloadCrcErrors OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the value of the number of outbound
+	packets with payload CRC errors.
+         "
+    ::= { cMediaIndependentHistoryEntry 840 }            
+
+cMediaIndependentHistoryInRecvrReady OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the inbound receiver ready count for
+	this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 850 }            
+
+cMediaIndependentHistoryOutRecvrReady OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the outbound receiver ready count for
+	this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 860 }            
+
+cMediaIndependentHistory8b10bInvalidOrdSetsDispErrorsSum OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the sum of the number of 8b10b
+         encoding disparity errors and invalid ordered sets 
+	 encountered, in this interval, on this interface.
+         "
+    ::= { cMediaIndependentHistoryEntry 870 }            
+  
+cMediaIndependentHistoryInGfpSblkCRCErr OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "The number of GFP single block crc errors observed 
+	on this interface, in this interval.
+         "
+    ::= { cMediaIndependentHistoryEntry 880 }            
+
+cMediaIndependentHistoryOutFramesTooLong OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+        "This object gives the number of outbound frames
+         in this interval, on this interface with a length
+	 greater than what was agreed to.
+        "
+    ::= { cMediaIndependentHistoryEntry 890 }            
+
+cMediaIndependentHistoryPkts1519to1522Octets OBJECT-TYPE
+    SYNTAX        Counter32
+    MAX-ACCESS    read-only        
+    STATUS        current
+    DESCRIPTION
+         "The total number of packets (including bad
+         packets) received that were between
+         1519 and 1522 octets in length inclusive
+         (excluding framing bits but including FCS octets).
+	 "
+    ::= { cMediaIndependentHistoryEntry 900 }
+    
+cMediaIndependentHistoryOutFramesTruncated OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The total number of frames received, in this interval,
+        on this interface that were truncated.
+        "
+    ::= { cMediaIndependentHistoryEntry 910 }
+    
+cMediaIndependentHistoryPcsErrCount OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Pcs error count.
+        "
+    ::= { cMediaIndependentHistoryEntry 920 }
+    
+cMediaIndependentHistoryPcsErrCount2 OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Pcs error count2.
+        "
+    ::= { cMediaIndependentHistoryEntry 930 }
+    
+cMediaIndependentHistoryPcs49RxErrBer OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Pcs49RxErrBer error count.
+        "
+    ::= { cMediaIndependentHistoryEntry 940 }
+
+cMediaIndependentHistoryPcs49RxErrDec OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Pcs49RxErrDec error count.
+        "
+    ::= { cMediaIndependentHistoryEntry 950 }
+    
+cMediaIndependentHistoryPkts1519toMaxOctets OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Packets 1519 to Max Octetes."
+    ::= { cMediaIndependentHistoryEntry 960 }
+    
+cMediaIndependentHistoryRxLcvErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Rx Lcv Errors"
+    ::= { cMediaIndependentHistoryEntry 970 }
+
+
+cMediaIndependentHistoryTxLcvErrors OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Tx Lcv Errors"
+    ::= { cMediaIndependentHistoryEntry 980 }
+    
+cMediaIndependentHistoryPcsEgRxErrFrames OBJECT-TYPE
+    SYNTAX     Counter32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "PcsEgRxErrFrames count.
+        "
+    ::= { cMediaIndependentHistoryEntry 990 }
+    
+-- Conformance Macros
+
+cerentHcRmonMIBConformance OBJECT IDENTIFIER ::= { cerentRequirements 60}
+cerentHcRmonMIBCompliances OBJECT IDENTIFIER ::= { cerentHcRmonMIBConformance 10 }
+cerentHcRmonMIBGroups      OBJECT IDENTIFIER ::= { cerentHcRmonMIBConformance 20 }
+
+cerentHcMediaIndependentCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+        "Describes the requirements for conformance to the
+        High Capacity Media Independent Group."
+    MODULE  -- this module
+--    MANDATORY-GROUPS { cMediaIndependentGroup}
+    ::= { cerentHcRmonMIBCompliances 10 }
+
+cMediaIndependentGroup OBJECT-GROUP
+    OBJECTS {
+        cMediaIndependentInBadCRC,
+        cMediaIndependentOutBadCRC,
+        cMediaIndependentInFramesTruncated,
+        cMediaIndependentInFramesTooLong,
+        cMediaIndependentLinkRecoveries,
+        cMediaIndependentInDistanceExtBuffers,
+        cMediaIndependentOutDistanceExtBuffers,
+        cMediaIndependentInCredits,
+        cMediaIndependentOutCredits,
+        cMediaIndependentOutZeroCredits,
+        cMediaIndependentInGfpSBitErr,
+        cMediaIndependentInGfpMBitErr,
+        cMediaIndependentInGfpCRCErr,	
+        cMediaIndependentInGfpFrames,	
+        cMediaIndependentInOverflowGfpFrames,
+        cMediaIndependentInHighCapacityGfpFrames,
+        cMediaIndependentOutGfpFrames,	
+        cMediaIndependentOutOverflowGfpFrames,
+        cMediaIndependentOutHighCapacityGfpFrames,
+        cMediaIndependentInGfpOctets,	
+        cMediaIndependentInOverflowGfpOctets,
+        cMediaIndependentInHighCapacityGfpOctets,
+        cMediaIndependentOutGfpOctets,	
+        cMediaIndependentOutOverflowGfpOctets,
+        cMediaIndependentOutHighCapacityGfpOctets,
+        cMediaIndependentInGfpTypeInvalid,
+        cMediaIndependentInGfpCIDInvalid,
+        cMediaIndependentInGfpLFDRaised,
+        cMediaIndependentInGfpCSFRaised,
+        cMediaIndependentGfpRoundTripLatency,
+        cMediaIndependent8b10bIdleSets,
+        cMediaIndependentOverflow8b10bIdleSets,
+        cMediaIndependentHighCapacity8b10bIdleSets,
+        cMediaIndependent8b10bNonIdleSets,
+        cMediaIndependentOverflow8b10bNonIdleSets,
+        cMediaIndependentHighCapacity8b10bNonIdleSets,
+        cMediaIndependent8b10bDataSets,
+        cMediaIndependentOverflow8b10bDataSets,
+        cMediaIndependentHighCapacity8b10bDataSets,
+        cMediaIndependent8b10bInvalidOrdSets,
+        cMediaIndependent8b10bEncodingDispErr,
+        cMediaIndependent8b10bLossOfSync,
+	cMediaIndependentInPauseFrames,
+	cMediaIndependentOutPauseFrames,
+	cMediaIndependentInPktsDroppedInternalCongestion,
+	cMediaIndependentOutPktsDroppedInternalCongestion,
+	cMediaIndependentInControlFrames,
+	cMediaIndependentInUnknownOpcodeFrames,
+	cMediaIndependentHdlcPktDrops,
+	cMediaIndependentHdlcInOctets,
+	cMediaIndependentHdlcOutOctets,
+	cMediaIndependentHdlcInAborts,
+	cMediaIndependentInShortPkts,
+	cMediaIndependentOutShortPkts,
+	cMediaIndependentOversizeDropped,
+	cMediaIndependentInErrorBytePkts,
+	cMediaIndependentInFramingErrorPkts,
+	cMediaIndependentInJunkInterPkts,
+	cMediaIndependentOutOversizePkts,
+	cMediaIndependentInPayloadCrcErrors,
+	cMediaIndependentOutPayloadCrcErrors,
+	cMediaIndependentInRecvrReady,
+	cMediaIndependentOutRecvrReady,
+	cMediaIndependent8b10bInvalidOrdSetsDispErrorsSum,
+	cMediaIndependentInGfpSblkCRCErr,
+	cMediaIndependentOutFramesTooLong,
+	cMediaIndependentPkts1519to1522Octets,
+	cMediaIndependentOutFramesTruncated,
+	cMediaIndependentPcsErrCount,
+	cMediaIndependentPcsErrCount2,
+	cMediaIndependentPcs49RxErrBer,
+	cMediaIndependentPcs49RxErrDec,
+	cMediaIndependentPkts1519toMaxOctets,
+	cMediaIndependentRxLcvErrors,
+	cMediaIndependentTxLcvErrors,
+        cMediaIndependentGfpRxCmfFrame,
+	cMediaIndependentGfpTxCmfFrame,
+	cMediaIndependentPcsEgRxErrFrames
+        }
+    STATUS current
+    DESCRIPTION
+        "Collects utilization statistics for any type of network.
+        "
+    ::= { cerentHcRmonMIBGroups 10 }
+
+cMediaIndependenHistoryControlGroup OBJECT-GROUP
+    OBJECTS {
+     cMediaIndependentHistoryControlDataSource,
+     cMediaIndependentHistoryControlBucketsRequested,
+     cMediaIndependentHistoryControlBucketsGranted, 
+     cMediaIndependentHistoryControlInterval,
+     cMediaIndependentHistoryControlOwner,
+     cMediaIndependentHistoryControlStatus
+         }
+     STATUS current
+     DESCRIPTION
+         "The History Control Group."
+    ::= { cerentHcRmonMIBGroups 20 }
+
+cMediaIndependentHistoryGroup OBJECT-GROUP
+    OBJECTS {
+    cMediaIndependentHistoryDropEvents,
+    cMediaIndependentHistoryDroppedFrames,
+    cMediaIndependentHistoryInPkts,
+    cMediaIndependentHistoryInOverflowPkts,
+    cMediaIndependentHistoryInHighCapacityPkts,
+    cMediaIndependentHistoryOutPkts,
+    cMediaIndependentHistoryOutOverflowPkts,
+    cMediaIndependentHistoryOutHighCapacityPkts,
+    cMediaIndependentHistoryInOctets,
+    cMediaIndependentHistoryInOverflowOctets,
+    cMediaIndependentHistoryInHighCapacityOctets,
+    cMediaIndependentHistoryOutOctets,
+    cMediaIndependentHistoryOutOverflowOctets,
+    cMediaIndependentHistoryOutHighCapacityOctets,
+    cMediaIndependentHistoryInNUCastPkts,
+    cMediaIndependentHistoryInNUCastOverflowPkts,
+    cMediaIndependentHistoryInNUCastHighCapacityPkts,
+    cMediaIndependentHistoryOutNUCastPkts,
+    cMediaIndependentHistoryOutNUCastOverflowPkts,
+    cMediaIndependentHistoryOutNUCastHighCapacityPkts,
+    cMediaIndependentHistoryInErrors,
+    cMediaIndependentHistoryOutErrors,
+    cMediaIndependentHistoryInBadCRC,
+    cMediaIndependentHistoryOutBadCRC,
+    cMediaIndependentHistoryInFramesTruncated,
+    cMediaIndependentHistoryInFramesTooLong,
+    cMediaIndependentHistoryLinkRecoveries,
+    cMediaIndependentHistoryInDistanceExtBuffers,
+    cMediaIndependentHistoryOutDistanceExtBuffers,
+    cMediaIndependentHistoryInCredits,
+    cMediaIndependentHistoryOutCredits,
+    cMediaIndependentHistoryOutZeroCredits,
+    cMediaIndependentHistoryInGfpSBitErr,
+    cMediaIndependentHistoryInGfpMBitErr,
+    cMediaIndependentHistoryInGfpCRCErr,	
+    cMediaIndependentHistoryInGfpFrames,	
+    cMediaIndependentHistoryInOverflowGfpFrames,
+    cMediaIndependentHistoryInHighCapacityGfpFrames,
+    cMediaIndependentHistoryOutGfpFrames,
+    cMediaIndependentHistoryOutOverflowGfpFrames,
+    cMediaIndependentHistoryOutHighCapacityGfpFrames,
+    cMediaIndependentHistoryInGfpOctets,	
+    cMediaIndependentHistoryInOverflowGfpOctets,
+    cMediaIndependentHistoryInHighCapacityGfpOctets,
+    cMediaIndependentHistoryOutGfpOctets,
+    cMediaIndependentHistoryOutOverflowGfpOctets,
+    cMediaIndependentHistoryOutHighCapacityGfpOctets,
+    cMediaIndependentHistoryInGfpTypeInvalid,
+    cMediaIndependentHistoryInGfpCIDInvalid,
+    cMediaIndependentHistoryInGfpLFDRaised,
+    cMediaIndependentHistoryInGfpCSFRaised,
+    cMediaIndependentHistoryGfpRoundTripLatency,
+    cMediaIndependentHistory8b10bIdleSets,
+    cMediaIndependentHistoryOverflow8b10bIdleSets,
+    cMediaIndependentHistoryHighCapacity8b10bIdleSets,
+    cMediaIndependentHistory8b10bNonIdleSets,
+    cMediaIndependentHistoryOverflow8b10bNonIdleSets,
+    cMediaIndependentHistoryHighCapacity8b10bNonIdleSets,
+    cMediaIndependentHistory8b10bDataSets,
+    cMediaIndependentHistoryOverflow8b10bDataSets,
+    cMediaIndependentHistoryHighCapacity8b10bDataSets,
+    cMediaIndependentHistory8b10bInvalidOrdSets,
+    cMediaIndependentHistory8b10bEncodingDispErr,
+    cMediaIndependentHistory8b10bLossOfSync,
+    cMediaIndependentHistoryInPauseFrames,
+    cMediaIndependentHistoryOutPauseFrames,
+    cMediaIndependentHistoryInPktsDroppedInternalCongestion,
+    cMediaIndependentHistoryOutPktsDroppedInternalCongestion,
+    cMediaIndependentHistoryInControlFrames,
+    cMediaIndependentHistoryInUnknownOpcodeFrames,
+    cMediaIndependentHistoryHdlcPktDrops,
+    cMediaIndependentHistoryHdlcInOctets,
+    cMediaIndependentHistoryHdlcOutOctets,
+    cMediaIndependentHistoryHdlcInAborts,
+    cMediaIndependentHistoryInShortPkts,
+    cMediaIndependentHistoryOutShortPkts,
+    cMediaIndependentHistoryOversizeDropped,
+    cMediaIndependentHistoryInErrorBytePkts,
+    cMediaIndependentHistoryInFramingErrorPkts,
+    cMediaIndependentHistoryInJunkInterPkts,
+    cMediaIndependentHistoryOutOversizePkts,
+    cMediaIndependentHistoryInPayloadCrcErrors,
+    cMediaIndependentHistoryOutPayloadCrcErrors,
+    cMediaIndependentHistoryInRecvrReady,
+    cMediaIndependentHistoryOutRecvrReady,
+    cMediaIndependentHistory8b10bInvalidOrdSetsDispErrorsSum,
+    cMediaIndependentHistoryInGfpSblkCRCErr,
+    cMediaIndependentHistoryOutFramesTooLong,
+    cMediaIndependentHistoryPkts1519to1522Octets,
+    cMediaIndependentHistoryOutFramesTruncated,
+    cMediaIndependentHistoryPcsErrCount,
+    cMediaIndependentHistoryPcsErrCount2,
+    cMediaIndependentHistoryPcs49RxErrBer,
+    cMediaIndependentHistoryPcs49RxErrDec,
+    cMediaIndependentHistoryPkts1519toMaxOctets,
+    cMediaIndependentHistoryRxLcvErrors,
+    cMediaIndependentHistoryTxLcvErrors,
+    cMediaIndependentHistoryPcsEgRxErrFrames
+
+        }
+    STATUS current
+    DESCRIPTION
+        "Collects  history of utilization statistics for any 
+        type of network.
+        "
+    ::= { cerentHcRmonMIBGroups 30 }
+
+    
+END

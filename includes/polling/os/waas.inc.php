@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -10,7 +10,9 @@
  * the source code distribution for details.
  */
 
-$oids = 'entPhysicalContainedIn.1 entPhysicalSoftwareRev.1 entPhysicalSerialNum.1 entPhysicalModelName.1';
+use LibreNMS\RRD\RrdDefinition;
+
+$oids = ['entPhysicalContainedIn.1', 'entPhysicalSoftwareRev.1', 'entPhysicalSerialNum.1', 'entPhysicalModelName.1'];
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
 if ($data[1]['entPhysicalContainedIn'] == '0') {
     if (!empty($data[1]['entPhysicalSoftwareRev'])) {
@@ -27,7 +29,7 @@ if ($data[1]['entPhysicalContainedIn'] == '0') {
 $connections = snmp_get($device, 'CISCO-WAN-OPTIMIZATION-MIB::cwoTfoStatsActiveOptConn.0', '-OQv');
 
 if (is_numeric($connections)) {
-    $rrd_def = 'DS:connections:GAUGE:600:0:U';
+    $rrd_def = RrdDefinition::make()->addDataset('connections', 'GAUGE', 0);
 
     $fields = array(
         'connections' => $connections

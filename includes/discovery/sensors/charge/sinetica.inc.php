@@ -23,33 +23,31 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if ($device['os'] == 'sinetica') {
-    $charge_oid = '.1.3.6.1.4.1.13891.101.2.4.0';
-    $charge = snmp_get($device, $charge_oid, '-Osqnv');
+$charge_oid = '.1.3.6.1.4.1.13891.101.2.4.0';
+$charge = snmp_get($device, $charge_oid, '-Osqnv');
 
-    if (!empty($charge)) {
-        $type = 'sinetica';
-        $index = 0;
-        $limit = 100;
-        $lowlimit = 0;
-        $lowwarnlimit = 10;
-        $descr = 'Battery Charge';
+if (!empty($charge)) {
+    $type = 'sinetica';
+    $index = 0;
+    $limit = 100;
+    $lowlimit = 0;
+    $lowwarnlimit = 10;
+    $descr = 'Battery Charge';
 
-        discover_sensor(
-            $valid['sensor'],
-            'charge',
-            $device,
-            $charge_oid,
-            $index,
-            $type,
-            $descr,
-            1,
-            1,
-            $lowlimit,
-            $lowwarnlimit,
-            null,
-            $limit,
-            $charge
-        );
-    }
+    discover_sensor(
+        $valid['sensor'],
+        'charge',
+        $device,
+        $charge_oid,
+        $index,
+        $type,
+        $descr,
+        1,
+        1,
+        $lowlimit,
+        $lowwarnlimit,
+        null,
+        $limit,
+        $charge
+    );
 }

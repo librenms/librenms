@@ -1,0 +1,128 @@
+mib: NSCRTV-ROOT
+modules:
+  sensors:
+    state:
+      data:
+        -
+          oid: commonDeviceResetCause
+          num_oid: '.1.3.6.1.4.1.17409.1.3.3.2.2.1.13.{{ $index }}'
+          descr: "Last Reset Cause"
+          group: Common
+          state_name: commonDeviceResetCause
+          states:
+            - { value: 1, generic: 3, graph: 1, descr: 'other' }
+            - { value: 2, generic: 2, graph: 1, descr: 'powerup' }
+            - { value: 3, generic: 1, graph: 1, descr: 'command' }
+            - { value: 4, generic: 1, graph: 1, descr: 'watchdog' }
+            - { value: 5, generic: 1, graph: 1, descr: 'craft' }
+        -
+          oid: commonDeviceTamperStatus
+          num_oid: '.1.3.6.1.4.1.17409.1.3.3.2.2.1.11.{{ $index }}'
+          descr: "Safety Switch"
+          group: Common
+          state_name: commonDeviceTamperStatus
+          states:
+            - { value: 1, generic: 1, graph: 1, descr: 'intact' }
+            - { value: 2, generic: 0, graph: 1, descr: 'compromised' }
+        -
+          oid: commonDeviceCraftStatus
+          num_oid: '.1.3.6.1.4.1.17409.1.3.3.2.2.1.14.{{ $index }}'
+          descr: "RS232 or RS485 Status"
+          group: Common
+          state_name: commonDeviceCraftStatus
+          states:
+            - { value: 1, generic: 2, graph: 1, descr: 'disconnected' }
+            - { value: 2, generic: 0, graph: 1, descr: 'connected' }
+        -
+          oid: powerSupplyStatusA
+          num_oid: '.1.3.6.1.4.1.17409.1.11.32.{{ $index }}'
+          descr: "Power Supply A"
+          group: Power
+          state_name: powerSupplyStatusA
+          states:
+            - { value: 0, generic: 3, graph: 1, descr: 'undefined' }
+            - { value: 1, generic: 0, graph: 1, descr: 'nominal' }
+            - { value: 2, generic: 2, graph: 1, descr: 'failure' }
+            - { value: 3, generic: 1, graph: 1, descr: 'notInstalled' }
+        -
+          oid: powerSupplyStatusB
+          num_oid: '.1.3.6.1.4.1.17409.1.11.33.{{ $index }}'
+          descr: "Power Supply B"
+          group: Power
+          state_name: powerSupplyStatusB
+          states:
+            - { value: 0, generic: 3, graph: 1, descr: 'undefined' }
+            - { value: 1, generic: 0, graph: 1, descr: 'nominal' }
+            - { value: 2, generic: 2, graph: 1, descr: 'failure' }
+            - { value: 3, generic: 1, graph: 1, descr: 'notInstalled' }
+        -
+          oid:  oaDCPowerSupplyMode
+          num_oid: '.1.3.6.1.4.1.17409.1.11.6.{{ $index }}'
+          descr: "Power Supply Mode"
+          group: Power
+          state_name: oaDCPowerSupplyMode
+          states:
+            - { value: 1, generic: 0, graph: 1, descr: 'loadsharing' }
+            - { value: 2, generic: 0, graph: 1, descr: 'switchRedundant' }
+            - { value: 3, generic: 1, graph: 1, descr: 'aloneSupply' }
+    temperature:
+      data:
+        -
+          oid: commonDeviceInfoEntry
+          value: commonDeviceInternalTemperature
+          num_oid: '.1.3.6.1.4.1.17409.1.3.3.2.2.1.12.{{ $index }}'
+          index: 'commonDeviceInternalTemperature.{{ $index }}'
+          descr: Internal Temperature
+          group: Device
+        -
+          oid: oaPumpEntry
+          value: oaPumpTemp
+          num_oid: '.1.3.6.1.4.1.17409.1.11.4.1.4.{{ $index }}'
+          index: 'oaPumpTemp.{{ $index }}'
+          descr: "Laser Temperature {{ $index }}"
+          group: Laser
+          divisor: 10
+    voltage:
+      data:
+        -
+          oid: oaDCPowerEntry
+          value: oaDCPowerVoltage
+          num_oid: '.1.3.6.1.4.1.17409.1.11.7.1.2.{{ $index }}'
+          index: 'oaDCPowerVoltage.{{ $index }}'
+          descr: oaDCPowerName
+          group: Power
+          divisor: 10
+    current:
+      data:
+        -
+          oid: oaDCPowerEntry
+          value: oaDCPowerCurrent
+          num_oid: '.1.3.6.1.4.1.17409.1.11.7.1.3.{{ $index }}'
+          index: 'oaDCPowerCurrent.{{ $index }}'
+          descr: oaDCPowerName
+          group: Power
+          divisor: 100
+        -
+          oid: oaPumpEntry
+          value: oaPumpBIAS
+          num_oid: '.1.3.6.1.4.1.17409.1.11.4.1.2.{{ $index }}'
+          index: 'oaPumpBIAS.{{ $index }}'
+          descr: "BIAS {{ $index }}"
+          group: Laser
+          multiplier: 100
+    dbm:
+      data:
+        -
+          oid: oaOutputOpticalPower
+          num_oid: '.1.3.6.1.4.1.17409.1.11.2.{{ $index }}'
+          index: 'oaOutputOpticalPower.{{ $index }}'
+          descr: Total Output Optical Power
+          group: Output
+          divisor: 10
+        -
+          oid: oaInputOpticalPower
+          num_oid: '.1.3.6.1.4.1.17409.1.11.3.{{ $index }}'
+          index: 'oaInputOpticalPower.{{ $index }}'
+          descr: Input Optical Power
+          group: Input
+          divisor: 10

@@ -1,0 +1,493 @@
+
+NSCRTV-EPON-STP-MGM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	BridgeId, Timeout
+      	FROM BRIDGE-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Unsigned32, TimeTicks
+        FROM SNMPv2-SMI
+    DateAndTime, MacAddress, TimeStamp, RowStatus, TruthValue, DisplayString, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    EponDeviceIndex, EponCardIndex, EponPortIndex, EponAlarmCode, EponAlarmInstance, EponSeverityType,
+    AutoNegotiationTechAbility, TAddress, EponStats15MinRecordType, EponStats24HourRecordType, EponStatsThresholdType
+		FROM NSCRTV-EPONEOC-EPON-MIB
+    stpManagementObjects
+        FROM NSCRTV-EPONEOC-EPON-MIB;
+     
+--------------------------------------------------------------------------------
+--  stpManagementObjects[STP管理项](1.3.6.1.4.1.17409.2.3.9)
+-------------------------------------------------------------------------------- 
+
+    stpGlobalSetTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF StpGlobalSetEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        STP全局表"
+      ::= { stpManagementObjects 1 }
+    
+    stpGlobalSetEntry OBJECT-TYPE
+      SYNTAX StpGlobalSetEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { stpGlobalSetIndex }
+      ::= { stpGlobalSetTable 1 }
+    
+    StpGlobalSetEntry ::=
+      SEQUENCE { 
+        stpGlobalSetIndex
+          EponDeviceIndex,
+        stpGlobalSetVersion
+          INTEGER,
+        stpGlobalSetPriority
+          INTEGER,
+        stpGlobalSetTimeSinceTopologyChange
+          TimeTicks,
+        stpGlobalSetTopChanges
+          Counter32,
+        stpGlobalSetDesignatedRoot
+          BridgeId,
+        stpGlobalSetRootCost
+          INTEGER,
+        stpGlobalSetRootPort
+          OCTET STRING,
+        stpGlobalSetMaxAge
+          Timeout,
+        stpGlobalSetHelloTime
+          Timeout,
+        stpGlobalSetHoldTime
+          INTEGER,
+        stpGlobalSetForwardDelay
+          Timeout,
+        stpGlobalSetBridgeMaxAge
+          Timeout,
+        stpGlobalSetBridgeHelloTime
+          Timeout,
+        stpGlobalSetBridgeForwardDelay
+          Timeout,
+        stpGlobalSetRstpTxHoldCount
+          INTEGER,
+        stpGlobalSetEnable
+          TruthValue
+       }
+
+    stpGlobalSetIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        索引号        
+        For OLT - Set to corresponding device
+        For ONU - Set to 0
+        "
+      ::= { stpGlobalSetEntry 1 }
+    
+    stpGlobalSetVersion OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        rstp(1),
+        stp(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        生成树协议版本。"
+      DEFVAL { rstp }
+      ::= { stpGlobalSetEntry 2 }
+    
+    stpGlobalSetPriority OBJECT-TYPE
+      SYNTAX INTEGER (0..65535)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        优先级。
+        在支持IEEE 802.1d或者IEEE 802.1w的网桥上，取值范围是0-61440，步长是4096。"
+      ::= { stpGlobalSetEntry 3 }
+    
+    stpGlobalSetTimeSinceTopologyChange OBJECT-TYPE
+      SYNTAX TimeTicks
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        变更时间，网桥实体检测到最近一次拓扑改变之后经历的时间。"
+      ::= { stpGlobalSetEntry 4 }    
+    stpGlobalSetTopChanges OBJECT-TYPE
+      SYNTAX Counter32
+      UNITS "topology changes"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        变更次数，网桥重启或初始化化拓扑的变更次数。"
+      ::= { stpGlobalSetEntry 5 }
+    
+    stpGlobalSetDesignatedRoot OBJECT-TYPE
+      SYNTAX BridgeId
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        根桥，指定根桥的BridgeId。"
+      ::= { stpGlobalSetEntry 6 }
+    
+    stpGlobalSetRootCost OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        根路径开销，网桥到根桥的路径消耗。"
+      ::= { stpGlobalSetEntry 7 }
+    
+    stpGlobalSetRootPort OBJECT-TYPE
+      SYNTAX OCTET STRING  (SIZE (3))
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        根端口，是连接本网桥和根网桥的端口，它提供的路径消耗最小
+        The port is presented by three octets, in sequence of device ID, slot,
+        and port.
+        For ONU, device ID is meaningless and shall set 0. Slot and port shall
+        be set to corresponding value.
+        For OLT, device ID, slot, and port shall be set to corresponding value.
+        For example, 
+        01 02 03 means device 1, slot 2, port 3 is root port.
+        0x00 04 05 means ONU slot 4, port 5 is root port.
+        "
+      ::= { stpGlobalSetEntry 8 }
+    
+    stpGlobalSetMaxAge OBJECT-TYPE
+      SYNTAX Timeout
+      UNITS "centi-seconds"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        老化时间，端口从网络中学习到的生成树协议信息的老化时间，单位：1/100 secs。"
+      ::= { stpGlobalSetEntry 9 }
+    
+    stpGlobalSetHelloTime OBJECT-TYPE
+      SYNTAX Timeout
+      UNITS "centi-seconds"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        报文发送间隔，网桥在任意端口发送配置网桥PDU的时间间隔。"
+      ::= { stpGlobalSetEntry 10 }
+    
+    stpGlobalSetHoldTime OBJECT-TYPE
+      SYNTAX INTEGER
+      UNITS "centi-seconds"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        维持时间，在这个时间间隔内，本网桥不会发送两个以上配置网桥PDU。"
+      ::= { stpGlobalSetEntry 11 }
+    
+    stpGlobalSetForwardDelay OBJECT-TYPE
+      SYNTAX Timeout
+      UNITS "centi-seconds"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        转换时延，控制一个端口多快地改变自己的生成状态，决定了本端口开始转发前，在监听状态和学习状态滞留多长时间。
+        当一个发现一个拓扑变更，并且正在处理时，这个值也用来控制动态过滤表的老化时间。
+        "
+      ::= { stpGlobalSetEntry 12 }
+    
+    stpGlobalSetBridgeMaxAge OBJECT-TYPE
+      SYNTAX Timeout (600..4000)
+      UNITS "centi-seconds"
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        如果本网桥是根网桥，那么所有网桥把这个值用作老化时间。"
+      ::= { stpGlobalSetEntry 13 }
+    
+    stpGlobalSetBridgeHelloTime OBJECT-TYPE
+      SYNTAX Timeout (100..1000)
+      UNITS "centi-seconds"
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        如果本网桥是根网桥，那么所有网桥把这个值用作报文发送的时间间隔。"
+      ::= { stpGlobalSetEntry 14 }
+    
+    stpGlobalSetBridgeForwardDelay OBJECT-TYPE
+      SYNTAX Timeout (400..3000)
+      UNITS "centi-seconds"
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        如果本网桥是根网桥，那么所有网桥把这个值用于转换时延。"
+      ::= { stpGlobalSetEntry 15 }
+    
+    stpGlobalSetRstpTxHoldCount OBJECT-TYPE
+      SYNTAX INTEGER (1..10)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        传输限速，对RSTP，用于限制端口的报文发送速率。"
+      DEFVAL { 3 }
+      ::= { stpGlobalSetEntry 16 }
+    
+    stpGlobalSetEnable OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        使能状态，启用或关闭STP。true(1)为开启。"
+      ::= { stpGlobalSetEntry 17 }
+    
+    stpPortTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF StpPortEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        STP端口表"
+      ::= { stpManagementObjects 2 }
+    
+    stpPortEntry OBJECT-TYPE
+      SYNTAX StpPortEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        ""
+      INDEX { stpPortStpIndex, stpPortCardIndex, stpPortIndex }
+      ::= { stpPortTable 1 }
+    
+    StpPortEntry ::=
+      SEQUENCE { 
+        stpPortStpIndex
+          EponDeviceIndex,
+        stpPortCardIndex
+          EponCardIndex,
+        stpPortIndex
+          EponPortIndex,
+        stpPortStatus
+          INTEGER,
+        stpPortPriority
+          INTEGER,
+        stpPortPathCost
+          INTEGER,
+        stpPortDesignatedRoot
+          BridgeId,
+        stpPortDesignatedCost
+          INTEGER,
+        stpPortDesignatedBridge
+          BridgeId,
+        stpPortDesignatedPort
+          Gauge32,
+        stpPortForwardTransitions
+          Unsigned32,
+        stpPortRstpProtocolMigration
+          TruthValue,
+        stpPortRstpAdminEdgePort
+          TruthValue,
+        stpPortRstpOperEdgePort
+          TruthValue,
+        stpPortPointToPointAdminStatus
+          INTEGER,
+        stpPortPointToPointOperStatus
+          TruthValue,
+        stpPortEnabled
+          TruthValue
+       }
+
+    stpPortStpIndex OBJECT-TYPE
+      SYNTAX EponDeviceIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        索引号。        
+        For OLT - Set to corresponding device/SLOT/PORT
+        For ONU - Set to 0
+        "
+      ::= { stpPortEntry 1 }
+    
+    stpPortCardIndex OBJECT-TYPE
+      SYNTAX EponCardIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        Epon板卡索引号        
+        For OLT, set to 0
+        For ONU, set to correspond card index"
+      ::= { stpPortEntry 2 }
+    
+    stpPortIndex OBJECT-TYPE
+      SYNTAX EponPortIndex
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "
+        端口号，对OLT为SNI/PON port，对ONU为UNI端口号。        
+        For OLT, set to 0
+        For ONU, set to correspond port index"
+      ::= { stpPortEntry 3 }
+    
+    stpPortStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        disabled(1),
+        blocking(2),
+        listening(3),
+        learning(4),
+        forwarding(5),
+        broken(6)
+        }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+端口状态，由生成树协议的应用程序定义，对于被禁用STP的端口，这个状态应该为disable。"
+      ::= { stpPortEntry 4 }
+    
+    stpPortPriority OBJECT-TYPE
+      SYNTAX INTEGER (0..255)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        端口优先级"
+      ::= { stpPortEntry 5 }
+    
+    stpPortPathCost OBJECT-TYPE
+      SYNTAX INTEGER (1..200000000)
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+端口路径开销，本端口在通往生成树根的路径上增加的路径消耗802.1D-1998推荐这个参数的默认值跟连接LAN的速度成反比。"
+      ::= { stpPortEntry 6 }
+    
+    stpPortDesignatedRoot OBJECT-TYPE
+      SYNTAX BridgeId
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+指定根网桥，在配置BPDU中被记录为根的网桥的标识符，这些配置BPDU由指定网桥发送，而指定网桥用于跟这个端口相连的网段。"
+      ::= { stpPortEntry 7 }
+    
+    stpPortDesignatedCost OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+指定路径开销，跟本端口相连的网段的指定端口的路径消耗，这个值会跟接受到的网桥PDU中的根路径消耗字段进行比较。"
+      ::= { stpPortEntry 8 }
+    
+    stpPortDesignatedBridge OBJECT-TYPE
+      SYNTAX BridgeId
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        指定网桥ID，本端口认为的本端口的网段的指定网桥的标识符。"
+      ::= { stpPortEntry 9 }
+    
+    stpPortDesignatedPort OBJECT-TYPE
+      SYNTAX Gauge32
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        指定端口，指定网桥上用于本端口网段的端口的标识符。"
+      ::= { stpPortEntry 10 }
+    
+    stpPortForwardTransitions OBJECT-TYPE
+      SYNTAX Unsigned32
+      UNITS "seconds"
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        本端口已经从学习状态转变到转发状态的时间。"
+      ::= { stpPortEntry 11 }
+    
+    stpPortRstpProtocolMigration OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+协议迁移，如果操作在RSTP模式，将这个节点设置为TRUE(1)会强制这个端口发送RSTP BPDU，读操作无意，总返回FALSE(2)。"
+      ::= { stpPortEntry 12 }
+    
+    stpPortRstpAdminEdgePort OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+边缘端口管理状态，指定该端口是否为边缘端口，设置该节点将导致相应的stpPortRstpOperEdgePort节点设置成同样的值。
+        当设置成true(1)，但端口上收到一个BPDU时，stpPortRstpOperEdgePort将变成false(2)。
+        "
+      ::= { stpPortEntry 13 }
+    
+    stpPortRstpOperEdgePort OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+边缘端口状态，这个节点被初始化成stpPortRstpAdminEdgePort的值，接收到一个BPDU时被设置成false(2)。"
+      ::= { stpPortEntry 14 }    
+    stpPortPointToPointAdminStatus OBJECT-TYPE
+      SYNTAX INTEGER
+        {
+        forceFalse(0),
+        forceTrue(1),
+        auto(2)
+        }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        连接到本端口网段的点对点管理状态。"
+      ::= { stpPortEntry 15 }
+    
+    stpPortPointToPointOperStatus OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+        "
+        连接到本端口网段的点对点实际状态。"
+      ::= { stpPortEntry 16 }
+    
+    stpPortEnabled OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+        "
+        端口使能状态，true(1)为开启。"
+      ::= { stpPortEntry 17 }
+      
+--
+-- END of NSCRTV-EPON-STP-MGM-MIB
+--
+
+END

@@ -1,0 +1,384 @@
+-- *****************************************************************
+-- TN-HQOS-MIB:  TN HQOS private MIB
+--
+-- Copyright (c) 2015 by Transition Networks, Inc.
+-- All Rights Reserved.
+--
+-- ****************************************************************
+
+TN-HQOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    tnProducts
+        FROM TRANSITION-SMI
+    Integer32 FROM SNMPv2-SMI
+    Unsigned32 FROM SNMPv2-SMI
+    TruthValue FROM SNMPv2-TC
+    TNInterfaceIndex FROM TN-TC
+    TNRowEditorState FROM TN-TC
+    TNUnsigned8 FROM TN-TC
+    ;
+
+tnHqosMib MODULE-IDENTITY
+    LAST-UPDATED "201504200000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for HQOS settings."
+
+        REVISION "201504200000Z"
+        DESCRIPTION
+        "Initial Revision of this module"
+    ::= { tnProducts 145 }
+
+
+TNhqosSchMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The HQoS scheduling mode."
+    SYNTAX      INTEGER { normal(0), basic(1), hierarchical(2) }
+
+tnHqosMibObjects OBJECT IDENTIFIER
+    ::= { tnHqosMib 1 }
+
+tnHqosConfig OBJECT IDENTIFIER
+    ::= { tnHqosMibObjects 2 }
+
+tnHqosConfigInterface OBJECT IDENTIFIER
+    ::= { tnHqosConfig 2 }
+
+tnHqosConfigInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNHqosConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table provides HQoS configuration for interfaces"
+    ::= { tnHqosConfigInterface 1 }
+
+tnHqosConfigInterfaceEntry OBJECT-TYPE
+    SYNTAX      TNHqosConfigInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row contains the configuration for an interface"
+    INDEX       { tnHqosConfigInterfaceIfIndex }
+    ::= { tnHqosConfigInterfaceTable 1 }
+
+TNHqosConfigInterfaceEntry ::= SEQUENCE {
+    tnHqosConfigInterfaceIfIndex      TNInterfaceIndex,
+    tnHqosConfigInterfaceSchMode      TNhqosSchMode
+}
+
+tnHqosConfigInterfaceIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface index."
+    ::= { tnHqosConfigInterfaceEntry 1 }
+
+tnHqosConfigInterfaceSchMode OBJECT-TYPE
+    SYNTAX      TNhqosSchMode
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "HQoS scheduling mode."
+    ::= { tnHqosConfigInterfaceEntry 2 }
+
+tnHqosConfigInterfaceHqosTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNHqosConfigInterfaceHqosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the configuration for HQoS entries"
+    ::= { tnHqosConfigInterface 2 }
+
+tnHqosConfigInterfaceHqosEntry OBJECT-TYPE
+    SYNTAX      TNHqosConfigInterfaceHqosEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row contains the configuration for an HQoS entry"
+    INDEX       { tnHqosConfigInterfaceHqosIfIndex, tnHqosConfigInterfaceHqosHqosId }
+    ::= { tnHqosConfigInterfaceHqosTable 1 }
+
+TNHqosConfigInterfaceHqosEntry ::= SEQUENCE {
+    tnHqosConfigInterfaceHqosIfIndex      TNInterfaceIndex,
+    tnHqosConfigInterfaceHqosHqosId   Integer32,
+    tnHqosConfigInterfaceHqosDwrrCount    TNUnsigned8,
+    tnHqosConfigInterfaceHqosShaperEnable     TruthValue,
+    tnHqosConfigInterfaceHqosShaperRate   Unsigned32,
+    tnHqosConfigInterfaceHqosMinRate      Unsigned32,
+    tnHqosConfigInterfaceHqosAction   TNRowEditorState
+}
+
+tnHqosConfigInterfaceHqosIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface index."
+    ::= { tnHqosConfigInterfaceHqosEntry 1 }
+
+tnHqosConfigInterfaceHqosHqosId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "HQoS ID, allowed range depends on platform."
+    ::= { tnHqosConfigInterfaceHqosEntry 2 }
+
+tnHqosConfigInterfaceHqosDwrrCount OBJECT-TYPE
+    SYNTAX      TNUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Number of queues using DWRR."
+    ::= { tnHqosConfigInterfaceHqosEntry 3 }
+
+tnHqosConfigInterfaceHqosShaperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable shaper."
+    ::= { tnHqosConfigInterfaceHqosEntry 4 }
+
+tnHqosConfigInterfaceHqosShaperRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shaper rate in kbps."
+    ::= { tnHqosConfigInterfaceHqosEntry 5 }
+
+tnHqosConfigInterfaceHqosMinRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Minimum guaranteed bandwidth in kbps."
+    ::= { tnHqosConfigInterfaceHqosEntry 6 }
+
+tnHqosConfigInterfaceHqosAction OBJECT-TYPE
+    SYNTAX      TNRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { tnHqosConfigInterfaceHqosEntry 10000 }
+
+tnHqosConfigInterfaceHqosTableRowEditor OBJECT IDENTIFIER
+    ::= { tnHqosConfigInterface 3 }
+
+tnHqosConfigInterfaceHqosTableRowEditorIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface index."
+    ::= { tnHqosConfigInterfaceHqosTableRowEditor 1 }
+
+tnHqosConfigInterfaceHqosTableRowEditorHqosId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "HQoS ID, allowed range depends on platform."
+    ::= { tnHqosConfigInterfaceHqosTableRowEditor 2 }
+
+tnHqosConfigInterfaceHqosTableRowEditorDwrrCount OBJECT-TYPE
+    SYNTAX      TNUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Number of queues using DWRR."
+    ::= { tnHqosConfigInterfaceHqosTableRowEditor 3 }
+
+tnHqosConfigInterfaceHqosTableRowEditorShaperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable shaper."
+    ::= { tnHqosConfigInterfaceHqosTableRowEditor 4 }
+
+tnHqosConfigInterfaceHqosTableRowEditorShaperRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shaper rate in kbps."
+    ::= { tnHqosConfigInterfaceHqosTableRowEditor 5 }
+
+tnHqosConfigInterfaceHqosTableRowEditorMinRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Minimum guaranteed bandwidth in kbps."
+    ::= { tnHqosConfigInterfaceHqosTableRowEditor 6 }
+
+tnHqosConfigInterfaceHqosTableRowEditorAction OBJECT-TYPE
+    SYNTAX      TNRowEditorState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Action"
+    ::= { tnHqosConfigInterfaceHqosTableRowEditor 10000 }
+
+tnHqosConfigInterfaceHqosQueueTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TNHqosConfigInterfaceHqosQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains the configuration for HQoS queues"
+    ::= { tnHqosConfigInterface 4 }
+
+tnHqosConfigInterfaceHqosQueueEntry OBJECT-TYPE
+    SYNTAX      TNHqosConfigInterfaceHqosQueueEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row contains the configuration for a queue of an HQoS entry"
+    INDEX       { tnHqosConfigInterfaceHqosQueueIfIndex, tnHqosConfigInterfaceHqosQueueHqosId, tnHqosConfigInterfaceHqosQueueQueue }
+    ::= { tnHqosConfigInterfaceHqosQueueTable 1 }
+
+TNHqosConfigInterfaceHqosQueueEntry ::= SEQUENCE {
+    tnHqosConfigInterfaceHqosQueueIfIndex     TNInterfaceIndex,
+    tnHqosConfigInterfaceHqosQueueHqosId      Integer32,
+    tnHqosConfigInterfaceHqosQueueQueue   Integer32,
+    tnHqosConfigInterfaceHqosQueueShaperEnable    TruthValue,
+    tnHqosConfigInterfaceHqosQueueShaperRate      Unsigned32,
+    tnHqosConfigInterfaceHqosQueueSchedulerWeight     TNUnsigned8
+}
+
+tnHqosConfigInterfaceHqosQueueIfIndex OBJECT-TYPE
+    SYNTAX      TNInterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Logical interface index."
+    ::= { tnHqosConfigInterfaceHqosQueueEntry 1 }
+
+tnHqosConfigInterfaceHqosQueueHqosId OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "HQoS ID, allowed range depends on platform."
+    ::= { tnHqosConfigInterfaceHqosQueueEntry 2 }
+
+tnHqosConfigInterfaceHqosQueueQueue OBJECT-TYPE
+    SYNTAX      Integer32 (0..7)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Queue number."
+    ::= { tnHqosConfigInterfaceHqosQueueEntry 3 }
+
+tnHqosConfigInterfaceHqosQueueShaperEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Enable or disable shaper."
+    ::= { tnHqosConfigInterfaceHqosQueueEntry 4 }
+
+tnHqosConfigInterfaceHqosQueueShaperRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Shaper rate in kbps."
+    ::= { tnHqosConfigInterfaceHqosQueueEntry 5 }
+
+tnHqosConfigInterfaceHqosQueueSchedulerWeight OBJECT-TYPE
+    SYNTAX      TNUnsigned8
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Scheduler weight, 1-100."
+    ::= { tnHqosConfigInterfaceHqosQueueEntry 6 }
+
+tnHqosConfigHqos OBJECT IDENTIFIER
+    ::= { tnHqosConfig 4 }
+
+tnHqosMibConformance OBJECT IDENTIFIER
+    ::= { tnHqosMib 2 }
+
+tnHqosMibCompliances OBJECT IDENTIFIER
+    ::= { tnHqosMibConformance 1 }
+
+tnHqosMibGroups OBJECT IDENTIFIER
+    ::= { tnHqosMibConformance 2 }
+
+tnHqosConfigInterfaceTableInfoGroup OBJECT-GROUP
+    OBJECTS     { tnHqosConfigInterfaceSchMode }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnHqosMibGroups 1 }
+
+tnHqosConfigInterfaceHqosTableInfoGroup OBJECT-GROUP
+    OBJECTS     { tnHqosConfigInterfaceHqosDwrrCount, 
+                  tnHqosConfigInterfaceHqosShaperEnable, 
+                  tnHqosConfigInterfaceHqosShaperRate, 
+                  tnHqosConfigInterfaceHqosMinRate, 
+                  tnHqosConfigInterfaceHqosAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnHqosMibGroups 2 }
+
+tnHqosConfigInterfaceHqosTableRowEditorInfoGroup OBJECT-GROUP
+    OBJECTS     { tnHqosConfigInterfaceHqosTableRowEditorIfIndex, 
+                  tnHqosConfigInterfaceHqosTableRowEditorHqosId, 
+                  tnHqosConfigInterfaceHqosTableRowEditorDwrrCount, 
+                  tnHqosConfigInterfaceHqosTableRowEditorShaperEnable, 
+                  tnHqosConfigInterfaceHqosTableRowEditorShaperRate, 
+                  tnHqosConfigInterfaceHqosTableRowEditorMinRate, 
+                  tnHqosConfigInterfaceHqosTableRowEditorAction }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnHqosMibGroups 3 }
+
+tnHqosConfigInterfaceHqosQueueTableInfoGroup OBJECT-GROUP
+    OBJECTS     { tnHqosConfigInterfaceHqosQueueShaperEnable, 
+                  tnHqosConfigInterfaceHqosQueueShaperRate, 
+                  tnHqosConfigInterfaceHqosQueueSchedulerWeight }
+    STATUS      current
+    DESCRIPTION
+        "A collection of objects suitable for bulk operations."
+    ::= { tnHqosMibGroups 4 }
+
+tnHqosMibCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the implementation."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { tnHqosConfigInterfaceTableInfoGroup, 
+                  tnHqosConfigInterfaceHqosTableInfoGroup, 
+                  tnHqosConfigInterfaceHqosTableRowEditorInfoGroup, 
+                  tnHqosConfigInterfaceHqosQueueTableInfoGroup }
+
+    ::= { tnHqosMibCompliances 1 }
+
+END

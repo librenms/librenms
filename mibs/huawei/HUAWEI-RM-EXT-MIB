@@ -1,0 +1,2545 @@
+-- ============================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description:  This mib file is used for Manage the static route table configuration.
+-- Reference:  
+-- Version:      V2.18
+-- 
+-- ============================================================================
+
+	HUAWEI-RM-EXT-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			entPhysicalIndex, entPhysicalName			
+				FROM ENTITY-MIB			
+			hwDatacomm			
+				FROM HUAWEI-MIB			
+			Ipv6Address			
+				FROM IPV6-TC			
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP			
+				FROM SNMPv2-CONF			
+			IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, 
+			NOTIFICATION-TYPE			
+				FROM SNMPv2-SMI			
+			RowStatus			
+				FROM SNMPv2-TC;
+	
+	
+		-- 1.3.6.1.4.1.2011.5.25.145
+		hwRmExt MODULE-IDENTITY 
+			LAST-UPDATED "201708172055Z"
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+				"Huawei Industrial Base
+				Bantian, Longgang
+				 Shenzhen 518129
+				 People's Republic of China
+				 Website: http://www.huawei.com
+				 Email: support@huawei.com
+				"
+			DESCRIPTION 
+				"This mib file is used for Manage the static route table configuration."
+
+                                                          REVISION "201708172055Z"		 -- Aug 17, 2017 at 20:55 GMT
+			DESCRIPTION "modify hwRouteStatTable,hwIpv6PrefixLimitValue,hwRouteStatVpnName,hwTunnelGroupUp,hwTunnelGroupDown,hwIpv4PrefixExceed,hwIpv4PrefixExceedClear,hwIpv6PrefixExceed,hwIpv6PrefixExceedClear discription"
+
+
+                                                         REVISION "201703290000Z"		 -- JULY 28, 2017 at 00:00 GMT
+			DESCRIPTION
+                                                                                        "Version V2.17, add hwIpv6StaticRoutePermanent node"  
+
+                                                          REVISION "201703290000Z"		 -- JUNE 5, 2017 at 00:00 GMT
+			DESCRIPTION                     											
+                                                                                        "Version V2.16, modify table's description"  
+
+                                                                  -- Revision history	
+                                                          REVISION "201703290000Z"		 -- JUNE 5, 2017 at 00:00 GMT
+			DESCRIPTION                     											
+                                                                                        "Version V2.15, modify table's description"  
+
+
+                                                          REVISION "201703290000Z"		-- JUNE 4, 2017 at 00:00 GMT
+			DESCRIPTION                     											
+                                                                                        "Version V2.14, modify hwL3vpnVrfV6Up's description"  
+
+                                                          REVISION "201703290000Z"		-- JUNE 4, 2017 at 00:00 GMT
+			DESCRIPTION                     											
+                                                                                        "Version V2.13, Add hwL3vpnVrfV6Up,hwL3vpnVrfV6Down"  												  
+			
+                                                          REVISION "201703290000Z"		-- Mar 30, 2017 at 00:00 GMT
+			DESCRIPTION                     											
+                                                                                        "Version V2.12, Modify the description of  hwIpv4PrefixExceed,hwIpv4PrefixExceedClear,hwIpv6PrefixExceed,hwIpv6PrefixExceedClear"        
+												
+                                                         REVISION "201703290000Z"		-- Mar 29, 2017 at 00:00 GMT
+			DESCRIPTION                     											
+                                                                                        "Version V2.11, add hwFibStatisticObject"        
+                                                            REVISION "201612290000Z"		-- Dec 29, 2016 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.10, Add hwVlinkTraps,hwVlinkImportExceed."
+
+                                                           REVISION "201602290000Z"		-- Feb 29, 2016 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.09, Chang hwNhmRestrain,hwNhmRestrainClear."
+
+                                                          REVISION "201602180000Z"		-- Feb 18, 2016 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.08, Add hwNhmRestrain,hwNhmRestrainClear."
+
+		                      REVISION "201511180000Z"		-- Nov  18, 2015 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.07, Change the description of hwTunnelGroupUp and hwTunnelGroupDown."
+
+                                                                  REVISION "201412110000Z"		-- Dec  11, 2014 at 00:00 GMT
+			DESCRIPTION 
+                                                                                         "Version: V2.06, modify hwEvpnMacLimitTrapObjects to hwEvpnMacObjects, 
+                                                                                                                       modify hwEvpnMacLimitTraps,
+                                                                                                                       add hwEvpnMacUpperLimitValue, hwEvpnMacLowerLimitValue, hwEvpnMacLimitValue."
+		                      REVISION "201412100000Z"		-- Dec  10, 2014 at 00:00 GMT
+			DESCRIPTION 
+                                                                                        "Version: V2.05, Add hwEvpnMacLimitTrapObjects, hwEvpnMacLimitTraps, hwEvpnMacLimitConformance."
+                                                                  REVISION "201412090000Z"
+			DESCRIPTION 
+				"updated the static-route description text , it's length change from 35 to 80."
+			REVISION "201406300000Z"
+			DESCRIPTION 
+				"golbal->global."
+			REVISION "201406200000Z"		-- June 20, 2014 at 00:00 GMT
+			DESCRIPTION 
+				"add hwRmInfo, hwIpv6PrefixLimitVpnName, hwL3vpnIpv6PrefixLimitTraps."
+			REVISION "201306090000Z"		-- June 09, 2013 at 00:00 GMT
+			DESCRIPTION 
+				"V1.4, destionation->destination."
+			REVISION "201304221526Z"		-- April 22, 2013 at 15:26 GMT
+			DESCRIPTION 
+				"V1.3, add IPv6 static route table mib."
+			REVISION "201011250000Z"		-- November 25, 2010 at 00:00 GMT
+			DESCRIPTION 
+				"V1.2, updated the description."
+			REVISION "201008200000Z"		-- August 20, 2010 at 00:00 GMT
+			DESCRIPTION 
+				"V1.1, modify format of enumerations and description."
+			REVISION "200811100000Z"		-- November 10, 2008 at 00:00 GMT
+			DESCRIPTION 
+				"V1.0, the first draft"
+			::= { hwDatacomm 145 }
+
+		
+	
+	
+--
+-- Node definitions
+--
+	
+		-- 1.3.6.1.4.1.2011.5.25.145.1
+		hwRmExtObjects OBJECT IDENTIFIER ::= { hwRmExt 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1
+		hwStaticRouteTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwStaticRouteEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table is used for creating static routes."
+			::= { hwRmExtObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1
+		hwStaticRouteEntry OBJECT-TYPE
+			SYNTAX HwStaticRouteEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The table is used for creating static routes."
+			INDEX { hwStaticRouteSourceVpnName, hwStaticRouteDestIpAddr, hwStaticRouteDestMaskAddr, hwStaticRouteDestVpnName, hwStaticRouteNextHop, 
+				hwStaticRouteOutIfIndex }
+			::= { hwStaticRouteTable 1 }
+
+		
+		HwStaticRouteEntry ::=
+			SEQUENCE { 
+				hwStaticRouteSourceVpnName
+					OCTET STRING,
+				hwStaticRouteDestIpAddr
+					IpAddress,
+				hwStaticRouteDestMaskAddr
+					IpAddress,
+				hwStaticRouteDestVpnName
+					OCTET STRING,
+				hwStaticRouteNextHop
+					IpAddress,
+				hwStaticRouteOutIfIndex
+					Unsigned32,
+				hwStaticRouteBfdName
+					OCTET STRING,
+				hwStaticRoutePrefer
+					Integer32,
+				hwStaticRouteDescrip
+					OCTET STRING,
+				hwStaticRouteRowStatus
+					RowStatus
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.1
+		hwStaticRouteSourceVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of a static route's source VPN."
+			::= { hwStaticRouteEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.2
+		hwStaticRouteDestIpAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The destination IP address of this route."
+			::= { hwStaticRouteEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.3
+		hwStaticRouteDestMaskAddr OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Indicate the mask of the destination address."
+			::= { hwStaticRouteEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.4
+		hwStaticRouteDestVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of a destination VPN."
+			::= { hwStaticRouteEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.5
+		hwStaticRouteNextHop OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The next hop of static routes."
+			::= { hwStaticRouteEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.6
+		hwStaticRouteOutIfIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The out interface ifnet index of static routes."
+			::= { hwStaticRouteEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.7
+		hwStaticRouteBfdName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..15))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of a BFD session to which 
+				static routes are to be bound."
+			::= { hwStaticRouteEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.8
+		hwStaticRoutePrefer OBJECT-TYPE
+			SYNTAX Integer32 (1..255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The preference of static routes."
+			::= { hwStaticRouteEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.9
+		hwStaticRouteDescrip OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..80))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The description of the static routes."
+			::= { hwStaticRouteEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.1.1.10
+		hwStaticRouteRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Indicates the row status. 
+				Options: 
+				1. active(1)      -when this leaf is queried, the value is fixed to active(1)
+				2. createAndGo(4) -create a static route
+				3. destroy(6)     -delete a static route 
+				"
+			::= { hwStaticRouteEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2
+		hwRouteStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwRouteStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table shows the information, such as the syntax, description, access, and status, about various objects of hwIpv6RouteStatTable."
+			::= { hwRmExtObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2.1
+		hwRouteStatEntry OBJECT-TYPE
+			SYNTAX HwRouteStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entity is a route statistics table."
+			INDEX { hwRouteStatVpnName, hwRouteStatProtocolId }
+			::= { hwRouteStatTable 1 }
+
+		
+		HwRouteStatEntry ::=
+			SEQUENCE { 
+				hwRouteStatVpnName
+					OCTET STRING,
+				hwRouteStatProtocolId
+					INTEGER,
+				hwRouteStatTotal
+					Unsigned32,
+				hwRouteStatActive
+					Unsigned32,
+				hwRouteStatAdded
+					Unsigned32,
+				hwRouteStatDeleted
+					Unsigned32,
+				hwRouteStatFreed
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2.1.1
+		hwRouteStatVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of the IPv4 VPN instance to which a static route belongs."
+			::= { hwRouteStatEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2.1.2
+		hwRouteStatProtocolId OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				direct(1),
+				static(2),
+				ospf(3),
+				isis(6),
+				rip(7),
+				bgp(8)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Specifies the protocol ID of the route.
+				Options:
+				1. direct(1)        -indicates the direct route
+				2. static(2)        -indicates the static route
+				3. ospf(3)          -indicates the OSPF route
+				4. isis(6)          -indicates the IS-IS route
+				5. rip(7)           -indicates the RIP route
+				6. bgp(8)           -indicates the BGP route"
+			::= { hwRouteStatEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2.1.3
+		hwRouteStatTotal OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of routes of a protocol."
+			::= { hwRouteStatEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2.1.4
+		hwRouteStatActive OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of active routes of a protocol."
+			::= { hwRouteStatEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2.1.5
+		hwRouteStatAdded OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of added routes of a protocol."
+			::= { hwRouteStatEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2.1.6
+		hwRouteStatDeleted OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of deleted routes of a protocol."
+			::= { hwRouteStatEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.2.1.7
+		hwRouteStatFreed OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of released routes of a protocol."
+			::= { hwRouteStatEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3
+		hwIpv6RouteStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwIpv6RouteStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entity is an IPv6 route statistics table.
+				Supports the statistics of DIRECT/STATIC/BGP/OSPFv3/ISIS/RIPng routes."
+			::= { hwRmExtObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3.1
+		hwIpv6RouteStatEntry OBJECT-TYPE
+			SYNTAX HwIpv6RouteStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entity is an IPv6 route statistics table.
+				Supports the statistics of DIRECT/STATIC/BGP/OSPFv3/ISIS/RIPng routes."
+			INDEX { hwIpv6RouteStatVpnName, hwIpv6RouteStatProtocolId }
+			::= { hwIpv6RouteStatTable 1 }
+
+		
+		HwIpv6RouteStatEntry ::=
+			SEQUENCE { 
+				hwIpv6RouteStatVpnName
+					OCTET STRING,
+				hwIpv6RouteStatProtocolId
+					INTEGER,
+				hwIpv6RouteStatTotal
+					Unsigned32,
+				hwIpv6RouteStatActive
+					Unsigned32,
+				hwIpv6RouteStatAdded
+					Unsigned32,
+				hwIpv6RouteStatDeleted
+					Unsigned32,
+				hwIpv6RouteStatFreed
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3.1.1
+		hwIpv6RouteStatVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The name of the IPv6 VPN instance for static routes."
+			::= { hwIpv6RouteStatEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3.1.2
+		hwIpv6RouteStatProtocolId OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				direct(1),
+				static(2),
+				ospf(3),
+				isis(6),
+				rip(7),
+				bgp(8)
+				}
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Specifies the protocol ID of the route.
+				Options:
+				1. direct(1)        -indicates the IPv6 direct route
+				2. static(2)        -indicates the IPv6 static route
+				3. ospf(3)          -indicates the IPv6 OSPF route
+				4. isis(6)          -indicates the IPv6 IS-IS route
+				5. rip(7)           -indicates the IPv6 RIP route
+				6. bgp(8)           -indicates the IPv6 BGP route"
+			::= { hwIpv6RouteStatEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3.1.3
+		hwIpv6RouteStatTotal OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of routes of a protocol."
+			::= { hwIpv6RouteStatEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3.1.4
+		hwIpv6RouteStatActive OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of active routes of a protocol."
+			::= { hwIpv6RouteStatEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3.1.5
+		hwIpv6RouteStatAdded OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of added routes of a protocol."
+			::= { hwIpv6RouteStatEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3.1.6
+		hwIpv6RouteStatDeleted OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of deleted routes of a protocol."
+			::= { hwIpv6RouteStatEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.3.1.7
+		hwIpv6RouteStatFreed OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of released routes of a protocol."
+			::= { hwIpv6RouteStatEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4
+		hwStaticRouteExtTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwStaticRouteExtEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entity is a static route table.
+				Supports the create/destroy/modify/display operation on static routes and BFD session binding/unbinding with static routes. "
+			::= { hwRmExtObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1
+		hwStaticRouteExtEntry OBJECT-TYPE
+			SYNTAX HwStaticRouteExtEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entity is a static route table.
+				Supports the create/destroy/modify/display operation on static routes and BFD session binding/unbinding with static routes. "
+			INDEX { hwStaticRouteSourceVpnNameExt, hwStaticRouteDestIpAddrExt, hwStaticRouteDestMaskAddrExt, hwStaticRouteNextHopExt, hwStaticRouteOutIfIndexExt
+				 }
+			::= { hwStaticRouteExtTable 1 }
+
+		
+		HwStaticRouteExtEntry ::=
+			SEQUENCE { 
+				hwStaticRouteSourceVpnNameExt
+					OCTET STRING,
+				hwStaticRouteDestIpAddrExt
+					IpAddress,
+				hwStaticRouteDestMaskAddrExt
+					IpAddress,
+				hwStaticRouteNextHopExt
+					IpAddress,
+				hwStaticRouteOutIfIndexExt
+					Unsigned32,
+				hwStaticRouteDestVpnNameExt
+					OCTET STRING,
+				hwStaticRouteBfdNameExt
+					OCTET STRING,
+				hwStaticRoutePreferExt
+					Unsigned32,
+				hwStaticRouteDescripExt
+					OCTET STRING,
+				hwStaticRouteRowStatusExt
+					RowStatus,
+				hwStaticRoutePermanentExt
+					INTEGER,
+				hwStaticRouteLdpSyncExt
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.1
+		hwStaticRouteSourceVpnNameExt OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The name of source VPN for static route."
+			::= { hwStaticRouteExtEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.2
+		hwStaticRouteDestIpAddrExt OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The destination IP address of this route."
+			::= { hwStaticRouteExtEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.3
+		hwStaticRouteDestMaskAddrExt OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The mask of the destination address."
+			::= { hwStaticRouteExtEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.4
+		hwStaticRouteNextHopExt OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The next hop of static route."
+			::= { hwStaticRouteExtEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.5
+		hwStaticRouteOutIfIndexExt OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The ifnet index of the outgoing interface of static route."
+			::= { hwStaticRouteExtEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.6
+		hwStaticRouteDestVpnNameExt OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The name of the destination VPN for gateway address."
+			::= { hwStaticRouteExtEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.7
+		hwStaticRouteBfdNameExt OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..15))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of a BFD session to which 
+				static routes are to be bound."
+			::= { hwStaticRouteExtEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.8
+		hwStaticRoutePreferExt OBJECT-TYPE
+			SYNTAX Unsigned32 (1..255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The preference of static route."
+			::= { hwStaticRouteExtEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.9
+		hwStaticRouteDescripExt OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..80))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The description of static route."
+			::= { hwStaticRouteExtEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.10
+		hwStaticRouteRowStatusExt OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This object indicates the row status."
+			::= { hwStaticRouteExtEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.11
+		hwStaticRoutePermanentExt OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				permanent(1)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Specifies the permanent-Advertising attribute of the static route:
+				Options:
+				1. none(0)          -indicates that the permanent-Advertising attribute is not specified  
+				2. permanent(1)     -indicates that the permanent-Advertising attribute is specified"
+			::= { hwStaticRouteExtEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.4.1.12
+		hwStaticRouteLdpSyncExt OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				ldpsync(1)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Specifies the LdpSync-Advertising attribute of the static route:
+				Options:
+				1. none(0)       -indicates that the LdpSync-Advertising attribute is not specified 
+				2. ldpsync(1)    -indicates that the LdpSync-Advertising attribute is specified"
+			::= { hwStaticRouteExtEntry 12 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5
+		hwIpv6StaticRouteTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwIpv6StaticRouteEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entity is an IPv6 static route table.
+				Supports the create/destroy/modify/display operation on static routes and BFD session binding/unbinding with static routes. "
+			::= { hwRmExtObjects 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1
+		hwIpv6StaticRouteEntry OBJECT-TYPE
+			SYNTAX HwIpv6StaticRouteEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This entity is an IPv6 static route table.
+				Supports the create/destroy/modify/display operation on Ipv6 static routes and BFD session binding/unbinding with static routes. "
+			INDEX { hwIpv6StaticRouteSourceVpnName, hwIpv6StaticRouteDestIpAddr, hwIpv6StaticRoutePrefixLen, hwIpv6StaticRouteNextHop, hwIpv6StaticRouteOutIfIndex
+				 }
+			::= { hwIpv6StaticRouteTable 1 }
+
+		
+		HwIpv6StaticRouteEntry ::=
+			SEQUENCE { 
+				hwIpv6StaticRouteSourceVpnName
+					OCTET STRING,
+				hwIpv6StaticRouteDestIpAddr
+					Ipv6Address,
+				hwIpv6StaticRoutePrefixLen
+					Unsigned32,
+				hwIpv6StaticRouteNextHop
+					Ipv6Address,
+				hwIpv6StaticRouteOutIfIndex
+					Unsigned32,
+				hwIpv6StaticRouteDestVpnName
+					OCTET STRING,
+				hwIpv6StaticRouteBfdName
+					OCTET STRING,
+				hwIpv6StaticRouteNqaAdminName
+					OCTET STRING,
+				hwIpv6StaticRouteNqaTestName
+					OCTET STRING,
+				hwIpv6StaticRoutePrefer
+					Unsigned32,
+				hwIpv6StaticRouteTag
+					Unsigned32,
+				hwIpv6StaticRouteDescr
+					OCTET STRING,
+				hwIpv6StaticRouteRowStatus
+					RowStatus,
+				hwIpv6StaticRoutePermanent
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.1
+		hwIpv6StaticRouteSourceVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The name of source VPN for IPv6 static route."
+			::= { hwIpv6StaticRouteEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.2
+		hwIpv6StaticRouteDestIpAddr OBJECT-TYPE
+			SYNTAX Ipv6Address
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The destination IPv6 address of this route."
+			::= { hwIpv6StaticRouteEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.3
+		hwIpv6StaticRoutePrefixLen OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The mask length of the IPv6 address."
+			::= { hwIpv6StaticRouteEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.4
+		hwIpv6StaticRouteNextHop OBJECT-TYPE
+			SYNTAX Ipv6Address
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The next hop of an IPv6 static route."
+			::= { hwIpv6StaticRouteEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.5
+		hwIpv6StaticRouteOutIfIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The interface index of the outgoing interface of an IPv6 static route."
+			::= { hwIpv6StaticRouteEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.6
+		hwIpv6StaticRouteDestVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The name of the destination VPN for IPv6 static route."
+			::= { hwIpv6StaticRouteEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.7
+		hwIpv6StaticRouteBfdName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..15))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The name of a BFD session to which IPv6 static routes are to be bound."
+			::= { hwIpv6StaticRouteEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.8
+		hwIpv6StaticRouteNqaAdminName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The admin name of a NQA to which IPv6 static routes are to be bound."
+			::= { hwIpv6StaticRouteEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.9
+		hwIpv6StaticRouteNqaTestName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The test name of a NQA to which IPv6 static routes are to be bound."
+			::= { hwIpv6StaticRouteEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.10
+		hwIpv6StaticRoutePrefer OBJECT-TYPE
+			SYNTAX Unsigned32 (1..255)
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The preference of an IPv6 static route."
+			::= { hwIpv6StaticRouteEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.11
+		hwIpv6StaticRouteTag OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The tag of an IPv6 static route."
+			::= { hwIpv6StaticRouteEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.12
+		hwIpv6StaticRouteDescr OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..80))
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"The description of an IPv6 static route."
+			::= { hwIpv6StaticRouteEntry 12 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.13
+		hwIpv6StaticRouteRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"This object indicates the row status."
+			::= { hwIpv6StaticRouteEntry 13 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.145.1.5.1.14
+		hwIpv6StaticRoutePermanent OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				none(0),
+				permanent(1)
+				}
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Specifies the permanent-Advertising attribute of the static route:
+				Options:
+				1. none(0)          -indicates that the permanent-Advertising attribute is not specified  
+				2. permanent(1)     -indicates that the permanent-Advertising attribute is specified"
+			::= { hwIpv6StaticRouteEntry 14 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.145.1.6
+		hwRmInfo OBJECT IDENTIFIER ::= { hwRmExtObjects 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.6.1
+		hwIpv4PrefixNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of IPv4 prefix."
+			::= { hwRmInfo 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.1.6.2
+		hwIpv6PrefixNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Total number of IPv6 prefix."
+			::= { hwRmInfo 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2
+		hwRmExtConformance OBJECT IDENTIFIER ::= { hwRmExt 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.1
+		hwRmExtCompliances OBJECT IDENTIFIER ::= { hwRmExtConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.1.1
+		hwRmExtCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"The compliance statement for Route Management MIB."
+			MODULE -- this module
+				MANDATORY-GROUPS { hwStaticRouteGroup, hwRouteStatGroup, hwStaticRouteExtGroup, hwIpv6RouteStatGroup }
+			::= { hwRmExtCompliances 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.2
+		hwRmExtGroups OBJECT IDENTIFIER ::= { hwRmExtConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.2.1
+		hwStaticRouteGroup OBJECT-GROUP
+			OBJECTS { hwStaticRouteBfdName, hwStaticRoutePrefer, hwStaticRouteDescrip, hwStaticRouteRowStatus }
+			STATUS current
+			DESCRIPTION 
+				"Static routes table group."
+			::= { hwRmExtGroups 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.2.2
+		hwRouteStatGroup OBJECT-GROUP
+			OBJECTS { hwRouteStatTotal, hwRouteStatActive, hwRouteStatAdded, hwRouteStatDeleted, hwRouteStatFreed
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Route statistic table group."
+			::= { hwRmExtGroups 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.2.3
+		hwIpv6RouteStatGroup OBJECT-GROUP
+			OBJECTS { hwIpv6RouteStatTotal, hwIpv6RouteStatActive, hwIpv6RouteStatAdded, hwIpv6RouteStatDeleted, hwIpv6RouteStatFreed
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Route statistic table group."
+			::= { hwRmExtGroups 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.2.4
+		hwStaticRouteExtGroup OBJECT-GROUP
+			OBJECTS { hwStaticRouteDestVpnNameExt, hwStaticRouteBfdNameExt, hwStaticRoutePreferExt, hwStaticRouteRowStatusExt, hwStaticRouteDescripExt, 
+				hwStaticRoutePermanentExt, hwStaticRouteLdpSyncExt }
+			STATUS current
+			DESCRIPTION 
+				"Static route table group."
+			::= { hwRmExtGroups 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.2.5
+		hwIpv6StaticRouteGroup OBJECT-GROUP
+			OBJECTS { hwIpv6StaticRouteDestVpnName, hwIpv6StaticRouteBfdName, hwIpv6StaticRoutePrefer, hwIpv6StaticRouteTag, hwIpv6StaticRouteRowStatus, hwIpv6StaticRoutePermanent,
+				hwIpv6StaticRouteNqaAdminName, hwIpv6StaticRouteNqaTestName, hwIpv6StaticRouteDescr }
+			STATUS current
+			DESCRIPTION 
+				"IPv6 static route table group."
+			::= { hwRmExtGroups 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.2.2.6
+		hwRmInfoGroup OBJECT-GROUP
+			OBJECTS { hwIpv4PrefixNum, hwIpv6PrefixNum }
+			STATUS current
+			DESCRIPTION 
+				"Route resource group."
+			::= { hwRmExtGroups 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3
+		hwTunnelExtObjects OBJECT IDENTIFIER ::= { hwRmExt 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.1
+		hwTnl2L3vpnTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTnl2L3vpnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the tunnel ID and L3VPN table of this entity."
+			::= { hwTunnelExtObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.1.1
+		hwTnl2L3vpnEntry OBJECT-TYPE
+			SYNTAX HwTnl2L3vpnEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the tunnel ID and L3VPN table of this entity."
+			INDEX { hwL3vpnTnlId, hwVpnIndex }
+			::= { hwTnl2L3vpnTable 1 }
+
+		
+		HwTnl2L3vpnEntry ::=
+			SEQUENCE { 
+				hwL3vpnTnlId
+					Unsigned32,
+				hwVpnIndex
+					Unsigned32,
+				hwVpnName
+					OCTET STRING
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.3.1.1.1
+		hwL3vpnTnlId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID."
+			::= { hwTnl2L3vpnEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.1.1.2
+		hwVpnIndex OBJECT-TYPE
+			SYNTAX Unsigned32 (0..4096)
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VRF index of a VPN."
+			::= { hwTnl2L3vpnEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.1.1.3
+		hwVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VPN name."
+			::= { hwTnl2L3vpnEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2
+		hwTnl2VplsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTnl2VplsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID and VPLS table of this entity."
+			::= { hwTunnelExtObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2.1
+		hwTnl2VplsEntry OBJECT-TYPE
+			SYNTAX HwTnl2VplsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID and VPLS table of this entity."
+			INDEX { hwVplsTnlId, hwVplsVcId }
+			::= { hwTnl2VplsTable 1 }
+
+		
+		HwTnl2VplsEntry ::=
+			SEQUENCE { 
+				hwVplsTnlId
+					Unsigned32,
+				hwVplsVcId
+					Unsigned32,
+				hwVsiIndex
+					Unsigned32,
+				hwVsiId
+					Unsigned32,
+				hwVsiName
+					OCTET STRING,
+				hwVplsVcType
+					Unsigned32,
+				hwVplsPeerIp
+					IpAddress
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2.1.1
+		hwVplsTnlId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID."
+			::= { hwTnl2VplsEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2.1.2
+		hwVplsVcId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VC ID of a VPLS."
+			::= { hwTnl2VplsEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2.1.3
+		hwVsiIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VSI index of a VPLS."
+			::= { hwTnl2VplsEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2.1.4
+		hwVsiId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VSI ID of a VPLS."
+			::= { hwTnl2VplsEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2.1.5
+		hwVsiName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VSI name of a VPLS."
+			::= { hwTnl2VplsEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2.1.6
+		hwVplsVcType OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VC type of a VPLS."
+			::= { hwTnl2VplsEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.2.1.7
+		hwVplsPeerIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the peer IP address of a VPLS."
+			::= { hwTnl2VplsEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3
+		hwTnl2Pwe3VllTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTnl2Pwe3VllEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID and PWE3/VLL table of this entity."
+			::= { hwTunnelExtObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1
+		hwTnl2Pwe3VllEntry OBJECT-TYPE
+			SYNTAX HwTnl2Pwe3VllEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID and PWE3/VLL table of this entity."
+			INDEX { hwPwVllTnlId, hwAcIndex }
+			::= { hwTnl2Pwe3VllTable 1 }
+
+		
+		HwTnl2Pwe3VllEntry ::=
+			SEQUENCE { 
+				hwPwVllTnlId
+					Unsigned32,
+				hwAcIndex
+					Unsigned32,
+				hwPwVllIfName
+					OCTET STRING,
+				hwMasterSlaveFlag
+					Unsigned32,
+				hwPwVllPeerIp
+					IpAddress,
+				hwPwVllVcId
+					Unsigned32,
+				hwPwVllSvcFlag
+					Unsigned32,
+				hwPwVcType
+					INTEGER,
+				hwSvcReceiveLabel
+					Unsigned32,
+				hwSvcTransmitLabel
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.1
+		hwPwVllTnlId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID."
+			::= { hwTnl2Pwe3VllEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.2
+		hwAcIndex OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the AC index of a PWE3."
+			::= { hwTnl2Pwe3VllEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.3
+		hwPwVllIfName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the interface name of a PWE3."
+			::= { hwTnl2Pwe3VllEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.4
+		hwMasterSlaveFlag OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the master and slave flags of a PWE3."
+			::= { hwTnl2Pwe3VllEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.5
+		hwPwVllPeerIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the peer IP address of a PWE3."
+			::= { hwTnl2Pwe3VllEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.6
+		hwPwVllVcId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VC ID of a PWE3."
+			::= { hwTnl2Pwe3VllEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.7
+		hwPwVllSvcFlag OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of a PWE3. 
+				Static PWs (1)
+				Dynamic PWs (0)"
+			::= { hwTnl2Pwe3VllEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.8
+		hwPwVcType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				frameRelayDlciMartini(1),
+				atmAal5SduVccTransport(2),
+				atmTransparentCellTransport(3),
+				vlan(4),
+				ethernet(5),
+				hdlc(6),
+				ppp(7),
+				cem(8),
+				atmN2OneVccCellTransport(9),
+				atmN2OneVpcCellTransport(10),
+				ipLayer2Transport(11),
+				atmOne2OneVccCellMode(12),
+				atmOne2OneVpcCellMode(13),
+				atmAal5PduVccTransport(14),
+				frameRelayPortMode(15),
+				cep(16),
+				saE1oP(17),
+				saT1oP(18),
+				saE3oP(19),
+				saT3oP(20),
+				cESoPsnBasicMode(21),
+				tDMoIPbasicMode(22),
+				l2VpnCESoPSNTDMwithCAS(23),
+				l2VpnTDMoIPTDMwithCAS(24),
+				frameRelayDlci(25),
+				ipInterworking(64),
+				unknown(255)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Specifies an indication of the L2Vpn's VC encapsulation type:
+				Options:
+				1: frameRelayDlciMartini(1)       -indicates that the encapsulation type is Frame Relay DLCI(Martini Mode).
+				2: atmAal5SduVccTransport(2)      -indicates that the encapsulation type is ATM AAL5 SDU VCC transport.
+				3: atmTransparentCellTransport(3) -indicates that the encapsulation type is ATM transparent cell transport.
+				4: vlan(4)                        -indicates that the encapsulation type is Vlan.
+				5: ethernet(5)                    -indicates that the encapsulation type is Ethernet.
+				6: hdlc(6)                        -indicates that the encapsulation type is HDLC.
+				7: ppp(7)                         -indicates that the encapsulation type is PPP.
+				8: cem(8)                         -indicates that the encapsulation type is SONET/SDH Circuit Emulation Service Over MPLS(CEM).
+				9: atmN2OneVccCellTransport(9)    -indicates that the encapsulation type is ATM n-to-one VCC cell transport.
+				10: atmN2OneVpcCellTransport(10)  -indicates that the encapsulation type is ATM n-to-one VPC cell transport.
+				11: ipLayer2Transport(11)         -indicates that the encapsulation type is IP Layer2 Transport.
+				12: atmOne2OneVccCellMode(12)     -indicates that the encapsulation type is ATM one-to-one VCC Cell Mode.
+				13: atmOne2OneVpcCellMode(13)     -indicates that the encapsulation type is ATM one-to-one VPC Cell Mode.
+				14: atmAal5PduVccTransport(14)    -indicates that the encapsulation type is ATM AAL5 PDU VCC transport.
+				15: frameRelayPortMode(15)        -indicates that the encapsulation type is Frame-Relay Port mode.
+				16: cep(16)                       -indicates that the encapsulation type is SONET/SDH Circuit Emulation over Packet (CEP).
+				17: saE1oP(17)                    -indicates that the encapsulation type is Structure-agnostic E1 over Packet (SAE1oP).
+				18: saT1oP(18)                    -indicates that the encapsulation type is Structure-agnostic T1 (DS1) over Packet (SAT1oP).
+				19: saE3oP(19)                    -indicates that the encapsulation type is Structure-agnostic E3 over Packet (SAE3oP).
+				20: saT3oP(20)                    -indicates that the encapsulation type is Structure-agnostic T3 (DS3) over Packet (SAT3oP).
+				21: cESoPsnBasicMode(21)          -indicates that the encapsulation type is CESoPSN basic mode.
+				22: tDMoIPbasicMode(22)           -indicates that the encapsulation type is TDMoIP basic mode.
+				23: l2VpnCESoPSNTDMwithCAS(23)    -indicates that the encapsulation type is CESoPSN TDM with CAS.
+				24: l2VpnTDMoIPTDMwithCAS(24)     -indicates that the encapsulation type is TDMoIP TDM with CAS.
+				25: frameRelayDlci(25)            -indicates that the encapsulation type is Frame Relay DLCI.
+				26: ipInterworking(64)            -indicates that the encapsulation type is IP-interworking.
+				27: unknown(255)                  -indicates the unknown encapsulation type.
+				"
+			::= { hwTnl2Pwe3VllEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.9
+		hwSvcReceiveLabel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the inbound label."
+			::= { hwTnl2Pwe3VllEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.3.1.10
+		hwSvcTransmitLabel OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the outbound label."
+			::= { hwTnl2Pwe3VllEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.4
+		hwTnlIf2TnlIdTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTnlIf2TnlIdEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the tunnel interface and tunnel ID table of this entity."
+			::= { hwTunnelExtObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.4.1
+		hwTnlIf2TnlIdEntry OBJECT-TYPE
+			SYNTAX HwTnlIf2TnlIdEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the tunnel interface and tunnel ID table of this entity."
+			INDEX { hwTunnelIf }
+			::= { hwTnlIf2TnlIdTable 1 }
+
+		
+		HwTnlIf2TnlIdEntry ::=
+			SEQUENCE { 
+				hwTunnelIf
+					OCTET STRING,
+				hwTunnelId
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.3.4.1.1
+		hwTunnelIf OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..64))
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel interface name."
+			::= { hwTnlIf2TnlIdEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.4.1.2
+		hwTunnelId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID."
+			::= { hwTnlIf2TnlIdEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.5
+		hwTnl2MultiHopPwe3Table OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwTnl2MultiHopPwe3Entry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the tunnel ID and Multi-hop PWE3 table of this entity."
+			::= { hwTunnelExtObjects 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.5.1
+		hwTnl2MultiHopPwe3Entry OBJECT-TYPE
+			SYNTAX HwTnl2MultiHopPwe3Entry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the tunnel ID and Multi-hop PWE3 table of this entity."
+			INDEX { hwMultiHopPwe3TnlId, hwMultiHopPwe3VcType, hwMultiHopPwe3VcId }
+			::= { hwTnl2MultiHopPwe3Table 1 }
+
+		
+		HwTnl2MultiHopPwe3Entry ::=
+			SEQUENCE { 
+				hwMultiHopPwe3TnlId
+					Unsigned32,
+				hwMultiHopPwe3VcType
+					Unsigned32,
+				hwMultiHopPwe3VcId
+					Unsigned32,
+				hwMultiHopPwe3PeerIp
+					IpAddress
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.3.5.1.1
+		hwMultiHopPwe3TnlId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the tunnel ID."
+			::= { hwTnl2MultiHopPwe3Entry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.5.1.2
+		hwMultiHopPwe3VcType OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VC type of a Multi-hop PWE3."
+			::= { hwTnl2MultiHopPwe3Entry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.5.1.3
+		hwMultiHopPwe3VcId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The object indicates the VC ID of a Multi-hop PWE3."
+			::= { hwTnl2MultiHopPwe3Entry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.3.5.1.4
+		hwMultiHopPwe3PeerIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The object indicates the peer IP address of a Multi-hop PWE3."
+			::= { hwTnl2MultiHopPwe3Entry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4
+		hwTunnelExtConformance OBJECT IDENTIFIER ::= { hwRmExt 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4.1
+		hwTunnelExtCompliances OBJECT IDENTIFIER ::= { hwTunnelExtConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4.1.1
+		hwTunnelExtCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the compliance statement for route management MIB."
+			MODULE -- this module
+				MANDATORY-GROUPS { hwTnl2L3vpnGroup, hwTnl2VplsGroup, hwTnl2Pwe3VllGroup, hwTnlIf2TnlIdGroup, hwTnl2MultiHopPwe3Group
+					 }
+			::= { hwTunnelExtCompliances 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4.2
+		hwTunnelExtGroups OBJECT IDENTIFIER ::= { hwTunnelExtConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4.2.1
+		hwTnl2L3vpnGroup OBJECT-GROUP
+			OBJECTS { hwVpnName }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the tunnel ID and L3VPN table group."
+			::= { hwTunnelExtGroups 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4.2.2
+		hwTnl2VplsGroup OBJECT-GROUP
+			OBJECTS { hwVsiIndex, hwVsiId, hwVsiName, hwVplsVcType, hwVplsPeerIp
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the tunnel ID and VPLS table group."
+			::= { hwTunnelExtGroups 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4.2.3
+		hwTnl2Pwe3VllGroup OBJECT-GROUP
+			OBJECTS { hwMasterSlaveFlag, hwPwVllIfName, hwPwVllVcId, hwPwVllSvcFlag, hwPwVcType, 
+				hwSvcReceiveLabel, hwSvcTransmitLabel, hwPwVllPeerIp }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the tunnel ID and PWE3/VLL table group."
+			::= { hwTunnelExtGroups 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4.2.4
+		hwTnlIf2TnlIdGroup OBJECT-GROUP
+			OBJECTS { hwTunnelId }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the tunnel interface name and tunnel ID table group."
+			::= { hwTunnelExtGroups 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.4.2.5
+		hwTnl2MultiHopPwe3Group OBJECT-GROUP
+			OBJECTS { hwMultiHopPwe3PeerIp }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the tunnel ID and Multi-hop PWE3 table group."
+			::= { hwTunnelExtGroups 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.5
+		hwTnlGroupTrapObjects OBJECT IDENTIFIER ::= { hwRmExt 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.5.1
+		hwTnlDestination OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The destination of the tunnel group."
+			::= { hwTnlGroupTrapObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.5.2
+		hwTnlPolicy OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..39))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Tunnel policy name."
+			::= { hwTnlGroupTrapObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.6
+		hwTnlGroupTraps OBJECT IDENTIFIER ::= { hwRmExt 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.6.1
+		hwTunnelGroupUp NOTIFICATION-TYPE
+			OBJECTS { hwTnlDestination, hwTnlPolicy }
+			STATUS current
+			DESCRIPTION 
+				"The hwTunnelGroupUp alarm is reported when one or multiple tunnels in a tunnel group recover from a fault. "
+			::= { hwTnlGroupTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.6.2
+		hwTunnelGroupDown NOTIFICATION-TYPE
+			OBJECTS { hwTnlDestination, hwTnlPolicy }
+			STATUS current
+			DESCRIPTION 
+				"The hwTunnelGroupDown alarm is generated if all tunnels in a tunnel group are faulty."
+			::= { hwTnlGroupTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.7
+		hwTnlGroupTrapConformance OBJECT IDENTIFIER ::= { hwRmExt 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.7.1
+		hwTnlGroupNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwTunnelGroupUp, hwTunnelGroupDown }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the Up/Down state of the tunnel group."
+			::= { hwTnlGroupTrapConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.7.2
+		hwTnlGroupObjectGroup OBJECT-GROUP
+			OBJECTS { hwTnlDestination, hwTnlPolicy }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the compliance statement for tunnel group trap."
+			::= { hwTnlGroupTrapConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.8
+		hwIpv4PrefixLimitTrapObjects OBJECT IDENTIFIER ::= { hwRmExt 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.8.1
+		hwCurIpv4PrefixNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current number of IPv4 prefix."
+			::= { hwIpv4PrefixLimitTrapObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.8.2
+		hwIpv4PrefixLimitValue OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the maximum number of IPv4 prefix can be added."
+			::= { hwIpv4PrefixLimitTrapObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.9
+		hwIpv6PrefixLimitTrapObjects OBJECT IDENTIFIER ::= { hwRmExt 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.9.1
+		hwCurIpv6PrefixNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current number of IPv6 prefix."
+			::= { hwIpv6PrefixLimitTrapObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.9.2
+		hwIpv6PrefixLimitValue OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the number of public-network IPv6 prefixes that are supported."
+			::= { hwIpv6PrefixLimitTrapObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.9.3
+		hwIpv6PrefixLimitVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The name of the IPv6 VPN instance for prefix limit."
+			::= { hwIpv6PrefixLimitTrapObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.10
+		hwIpv4PrefixLimitTraps OBJECT IDENTIFIER ::= { hwRmExt 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.10.1
+		hwIpv4PrefixExceed NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The number of IPv4 route prefixes on the device exceeds the alarm threshold."
+			::= { hwIpv4PrefixLimitTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.10.2
+		hwIpv4PrefixExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The number of IPv4 route prefixes on the device falls below the alarm threshold."
+			::= { hwIpv4PrefixLimitTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.10.3
+		hwIpv4PrefixThresholdExceed NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The number of IPv4 prefixes exceeded the threshold."
+			::= { hwIpv4PrefixLimitTraps 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.10.4
+		hwIpv4PrefixThresholdExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The number of IPv4 prefixes falls below the threshold. "
+			::= { hwIpv4PrefixLimitTraps 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.11
+		hwIpv6PrefixLimitTraps OBJECT IDENTIFIER ::= { hwRmExt 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.11.1
+		hwIpv6PrefixExceed NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The number of IPv6 route prefixes on the device exceeds the alarm threshold."
+			::= { hwIpv6PrefixLimitTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.11.2
+		hwIpv6PrefixExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The number of IPv6 route prefixes on the device falls below the alarm threshold."
+			::= { hwIpv6PrefixLimitTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.11.3
+		hwIpv6PrefixThresholdExceed NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The number of IPv6 prefixes exceeded the threshold. "
+			::= { hwIpv6PrefixLimitTraps 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.11.4
+		hwIpv6PrefixThresholdExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The number of IPv6 prefixes falls below the threshold. "
+			::= { hwIpv6PrefixLimitTraps 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.12
+		hwIpv4PrefixLimitConformance OBJECT IDENTIFIER ::= { hwRmExt 12 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.12.1
+		hwIpv4PrefixLimitNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwIpv4PrefixExceed, hwIpv4PrefixExceedClear, hwIpv4PrefixThresholdExceed, hwIpv4PrefixThresholdExceedClear }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates alarm of ipv4 prefixs."
+			::= { hwIpv4PrefixLimitConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.12.2
+		hwIpv4PrefixLimitObjectGroup OBJECT-GROUP
+			OBJECTS { hwIpv4PrefixLimitValue, hwCurIpv4PrefixNum }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the number of ipv4 prefixs."
+			::= { hwIpv4PrefixLimitConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.13
+		hwIpv6PrefixLimitConformance OBJECT IDENTIFIER ::= { hwRmExt 13 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.13.1
+		hwIpv6PrefixLimitNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwIpv6PrefixExceed, hwIpv6PrefixExceedClear, hwIpv6PrefixThresholdExceed, hwIpv6PrefixThresholdExceedClear }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates alarm of ipv4 prefixs."
+			::= { hwIpv6PrefixLimitConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.13.2
+		hwIpv6PrefixLimitObjectGroup OBJECT-GROUP
+			OBJECTS { hwIpv6PrefixLimitValue, hwCurIpv6PrefixNum }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the number of ipv6 prefixs."
+			::= { hwIpv6PrefixLimitConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.14
+		hwRmGresmTokenObjects OBJECT IDENTIFIER ::= { hwRmExt 14 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.14.1
+		hwGresmTokenTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwGresmTokenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Gresm token table."
+			::= { hwRmGresmTokenObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.14.1.1
+		hwGresmTokenEntry OBJECT-TYPE
+			SYNTAX HwGresmTokenEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Gresm token table."
+			INDEX { hwGresmTokenMode, entPhysicalIndex }
+			::= { hwGresmTokenTable 1 }
+
+		
+		HwGresmTokenEntry ::=
+			SEQUENCE { 
+				hwGresmTokenMode
+					INTEGER,
+				hwGresmTokenUsedNum
+					Integer32,
+				hwGresmTokenMaxValue
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.14.1.1.1
+		hwGresmTokenMode OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				global1(1),
+				global2(2),
+				global3(3),
+				global4(4),
+				perborad(5)
+				}
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Specifies the aolloc mode of token.        
+				  Options:           
+				  1. global1(1)    -indicates that the global table 1     
+				  2. global2(2)    -indicates that the global table 2    
+				  3. global3(3)    -indicates that the global table 3    
+				  4. global4(4)    -indicates that the global table 4   
+				  5. perborad(5)   -indicates that the per borad"
+			::= { hwGresmTokenEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.14.1.1.2
+		hwGresmTokenUsedNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The object identifies the number of tokens used currently."
+			::= { hwGresmTokenEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.14.1.1.3
+		hwGresmTokenMaxValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the max value of Token"
+			::= { hwGresmTokenEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.15
+		hwGresmTokenTraps OBJECT IDENTIFIER ::= { hwRmExt 15 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.15.1
+		hwGresmTokenExceed NOTIFICATION-TYPE
+			OBJECTS { entPhysicalName, hwGresmTokenUsedNum, hwGresmTokenMaxValue }
+			STATUS current
+			DESCRIPTION 
+				"The token count reaches the upper limit."
+			::= { hwGresmTokenTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.15.2
+		hwGresmTokenExceedClear NOTIFICATION-TYPE
+			OBJECTS { entPhysicalName, hwGresmTokenUsedNum, hwGresmTokenMaxValue }
+			STATUS current
+			DESCRIPTION 
+				"The token count falls from the upper limit."
+			::= { hwGresmTokenTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.15.3
+		hwGresmTokenThresholdExceed NOTIFICATION-TYPE
+			OBJECTS { entPhysicalName, hwGresmTokenUsedNum, hwGresmTokenMaxValue }
+			STATUS current
+			DESCRIPTION 
+				"The token usage exceeds the threshold."
+			::= { hwGresmTokenTraps 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.15.4
+		hwGresmTokenThresholdExceedClear NOTIFICATION-TYPE
+			OBJECTS { entPhysicalName, hwGresmTokenUsedNum, hwGresmTokenMaxValue }
+			STATUS current
+			DESCRIPTION 
+				"The token usage falls from the threshold."
+			::= { hwGresmTokenTraps 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.16
+		hwGresmTokenTrapConformance OBJECT IDENTIFIER ::= { hwRmExt 16 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.16.1
+		hwGresmTokenNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwGresmTokenExceed, hwGresmTokenExceedClear, hwGresmTokenThresholdExceed, hwGresmTokenThresholdExceedClear }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates alarm of Token."
+			::= { hwGresmTokenTrapConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.16.2
+		hwGresmTokenGroup OBJECT-GROUP
+			OBJECTS { hwGresmTokenMode, hwGresmTokenUsedNum, hwGresmTokenMaxValue }
+			STATUS current
+			DESCRIPTION 
+				"A collection of objects for Token alarm."
+			::= { hwGresmTokenTrapConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.17
+		hwRmExtRouteObjects OBJECT IDENTIFIER ::= { hwRmExt 17 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.18
+		hwRmExtRouteTrapObjects OBJECT IDENTIFIER ::= { hwRmExt 18 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19
+		hwRmExtRouteTraps OBJECT IDENTIFIER ::= { hwRmExt 19 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.1
+		hwPublicIpv4PrefixLimitTraps OBJECT IDENTIFIER ::= { hwRmExtRouteTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.1.1
+		hwPublicIpv4PrefixExceed NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the public IPv4 prefixes has exceeded the maximum value."
+			::= { hwPublicIpv4PrefixLimitTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.1.2
+		hwPublicIpv4PrefixExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the public IPv4 prefixes have resumed from exceeding the  maximum vlaue."
+			::= { hwPublicIpv4PrefixLimitTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.1.3
+		hwPublicIpv4PrefixThresholdExceed NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the public IPv4 prefixes has exceeded the threshold."
+			::= { hwPublicIpv4PrefixLimitTraps 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.1.4
+		hwPublicIpv4PrefixThresholdExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the public IPv4 prefixes have resumed from exceeding the threshold. "
+			::= { hwPublicIpv4PrefixLimitTraps 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.2
+		hwPublicIpv6PrefixLimitTraps OBJECT IDENTIFIER ::= { hwRmExtRouteTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.2.1
+		hwPublicIpv6PrefixExceed NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the public IPv6 prefixes has exceeded the maximum vlaue."
+			::= { hwPublicIpv6PrefixLimitTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.2.2
+		hwPublicIpv6PrefixExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the public IPv6 prefixes have resumed from exceeding the maximum vlaue."
+			::= { hwPublicIpv6PrefixLimitTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.2.3
+		hwPublicIpv6PrefixThresholdExceed NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the public IPv6 prefixes has exceeded the threshold. "
+			::= { hwPublicIpv6PrefixLimitTraps 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.2.4
+		hwPublicIpv6PrefixThresholdExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the public IPv6 prefixes have resumed from exceeding the threshold. "
+			::= { hwPublicIpv6PrefixLimitTraps 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.3
+		hwL3vpnIpv6PrefixLimitTraps OBJECT IDENTIFIER ::= { hwRmExtRouteTraps 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.3.1
+		hwL3vpnIpv6PrefixExceed NOTIFICATION-TYPE
+			OBJECTS { hwIpv6PrefixLimitVpnName, hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the vpn instance IPv6 prefixes has exceeded the maximum vlaue."
+			::= { hwL3vpnIpv6PrefixLimitTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.3.2
+		hwL3vpnIpv6PrefixExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwIpv6PrefixLimitVpnName, hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the vpn instance IPv6 prefixes have resumed from exceeding the maximum vlaue."
+			::= { hwL3vpnIpv6PrefixLimitTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.19.3.3
+		hwL3vpnIpv6PrefixThresholdExceed NOTIFICATION-TYPE
+			OBJECTS { hwIpv6PrefixLimitVpnName, hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the vpn instance IPv6 prefixes has exceeded the threshold. "
+			::= { hwL3vpnIpv6PrefixLimitTraps 3 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.145.20
+		hwRmExtRouteConformance OBJECT IDENTIFIER ::= { hwRmExt 20 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.1
+		hwRmExtRouteCompliances MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"The compliance statement for HUAWEI-RM-EXT-MIB."
+			MODULE -- this module
+				MANDATORY-GROUPS { hwPublicIpv4PrefixLimitNotificationGroup, hwPublicIpv4PrefixLimitObjectGroup, hwPublicIpv6PrefixLimitNotificationGroup, hwPublicIpv6PrefixLimitObjectGroup }
+			::= { hwRmExtRouteConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2
+		hwRmExtRouteGroup OBJECT IDENTIFIER ::= { hwRmExtRouteConformance 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.1
+		hwPublicIpv4PrefixLimitGroup OBJECT IDENTIFIER ::= { hwRmExtRouteGroup 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.1.1
+		hwPublicIpv4PrefixLimitNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwPublicIpv4PrefixExceed, hwPublicIpv4PrefixExceedClear, hwPublicIpv4PrefixThresholdExceed, hwPublicIpv4PrefixThresholdExceedClear }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates alarm of public ipv4 prefixs."
+			::= { hwPublicIpv4PrefixLimitGroup 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.1.2
+		hwPublicIpv4PrefixLimitObjectGroup OBJECT-GROUP
+			OBJECTS { hwCurIpv4PrefixNum, hwIpv4PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the number of ipv4 prefixs."
+			::= { hwPublicIpv4PrefixLimitGroup 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.2
+		hwPublicIpv6PrefixLimitGroup OBJECT IDENTIFIER ::= { hwRmExtRouteGroup 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.2.1
+		hwPublicIpv6PrefixLimitNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwPublicIpv6PrefixExceed, hwPublicIpv6PrefixExceedClear, hwPublicIpv6PrefixThresholdExceed, hwPublicIpv6PrefixThresholdExceedClear }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates alarm of ipv6 prefixs."
+			::= { hwPublicIpv6PrefixLimitGroup 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.2.2
+		hwPublicIpv6PrefixLimitObjectGroup OBJECT-GROUP
+			OBJECTS { hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the number of ipv6 prefixs."
+			::= { hwPublicIpv6PrefixLimitGroup 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.3
+		hwL3vpnIpv6PrefixLimitGroup OBJECT IDENTIFIER ::= { hwRmExtRouteGroup 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.3.1
+		hwL3vpnIpv6PrefixLimitNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwL3vpnIpv6PrefixExceed, hwL3vpnIpv6PrefixExceedClear, hwL3vpnIpv6PrefixThresholdExceed }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates alarm of ipv6 VPN instance prefixs."
+			::= { hwL3vpnIpv6PrefixLimitGroup 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.20.2.3.2
+		hwL3vpnIpv6PrefixLimitObjectGroup OBJECT-GROUP
+			OBJECTS { hwIpv6PrefixLimitVpnName, hwCurIpv6PrefixNum, hwIpv6PrefixLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the number of ipv6 VPN instance prefixs."
+			::= { hwL3vpnIpv6PrefixLimitGroup 2 }
+
+
+                                             -- 1.3.6.1.4.1.2011.5.25.145.21
+		hwEvpnMacObjects OBJECT IDENTIFIER ::= { hwRmExt 21 }
+		
+
+		-- 1.3.6.1.4.1.2011.5.25.145.21.1
+		hwMacLimitEvpnName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..31))
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The name of the EVPN instance for MAC limit."
+			::= { hwEvpnMacObjects 1 }
+			
+				
+		-- 1.3.6.1.4.1.2011.5.25.145.21.2
+		hwCurMacNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current number of MAC addresses of the EVPN instance."
+			::= { hwEvpnMacObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.21.3
+		hwEvpnMacUpperLimitValue OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the upper limit value of MAC addresses of the EVPN instance."
+			::= { hwEvpnMacObjects 3 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.145.21.4
+		hwEvpnMacLowerLimitValue OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the lower limit value of MAC addresses of the EVPN instance."
+			::= { hwEvpnMacObjects 4 }
+			
+
+		-- 1.3.6.1.4.1.2011.5.25.145.21.5
+		hwEvpnMacLimitValue OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the max value of MAC addresses of the EVPN instance."
+			::= { hwEvpnMacObjects 5 }
+			
+				
+	                       -- 1.3.6.1.4.1.2011.5.25.145.22
+		hwEvpnMacLimitTraps OBJECT IDENTIFIER ::= { hwRmExt 22 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.22.1
+		hwEvpnMacExceed NOTIFICATION-TYPE
+			OBJECTS { hwMacLimitEvpnName, hwCurMacNum, hwEvpnMacLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the number of MAC addresses of the EVPN instance has exceeded the maximum value."
+			::= { hwEvpnMacLimitTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.22.2
+		hwEvpnMacExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwMacLimitEvpnName, hwCurMacNum, hwEvpnMacLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the number of MAC addresses of the EVPN instance has resumed from exceeding the maximum value."
+			::= { hwEvpnMacLimitTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.22.3
+		hwEvpnMacThresholdExceed NOTIFICATION-TYPE
+			OBJECTS { hwMacLimitEvpnName, hwCurMacNum, hwEvpnMacLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the number of MAC addresses of the EVPN instance has exceeded the threshold value."
+			::= { hwEvpnMacLimitTraps 3 } 
+			
+		-- 1.3.6.1.4.1.2011.5.25.145.22.3	
+		hwEvpnMacThresholdExceedClear NOTIFICATION-TYPE
+			OBJECTS { hwMacLimitEvpnName, hwCurMacNum, hwEvpnMacLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the number of MAC addresses of the EVPN instance has resumed from exceeding the threshold value."
+			::= { hwEvpnMacLimitTraps 4 }	
+			
+			
+		-- 1.3.6.1.4.1.2011.5.25.145.23
+		hwEvpnMacLimitConformance OBJECT IDENTIFIER ::= { hwRmExt 23 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.145.23.1
+		hwEvpnMacLimitNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwEvpnMacExceed, hwEvpnMacExceedClear, hwEvpnMacThresholdExceed,  hwEvpnMacThresholdExceedClear}
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the alarm of MAC addresses of the EVPN instance."
+			::= { hwEvpnMacLimitConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.23.2
+		hwEvpnMacLimitObjectGroup OBJECT-GROUP
+			OBJECTS { hwMacLimitEvpnName, hwCurMacNum, hwEvpnMacUpperLimitValue, hwEvpnMacLowerLimitValue, hwEvpnMacLimitValue }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the number of MAC addresses of the EVPN instance."
+			::= { hwEvpnMacLimitConformance 2 }	
+                                 -- 1.3.6.1.4.1.2011.5.25.145.24
+		hwNhmRestrainObjects OBJECT IDENTIFIER ::= { hwRmExt 24 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.24.1
+		hwNhmRestrainType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				routerelay(1),
+				tunnelrelay(2),
+				ipv6routerelay(3)
+				}
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the type of cyclic iteration that is suppressed."
+			::= { hwNhmRestrainObjects 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.24.2
+		hwNhmRestrainKey OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The value of this object identifies the key of cyclic iteration that is suppressed."
+			::= { hwNhmRestrainObjects 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.24.3
+		hwNhmRestrainVpnName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VPN to which the iteration next hop belongs."
+			::= { hwNhmRestrainObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.24.4
+		hwNhmRestrainNextHop OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the iteration next hop."
+			::= { hwNhmRestrainObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.25
+		hwNhmRestrainTraps OBJECT IDENTIFIER ::= { hwRmExt 25 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.25.1
+		hwNhmRestrain NOTIFICATION-TYPE
+			OBJECTS { hwNhmRestrainType, hwNhmRestrainKey, hwNhmRestrainVpnName, hwNhmRestrainNextHop }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that cyclic iteration is suppressed."
+			::= { hwNhmRestrainTraps 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.25.2
+		hwNhmRestrainClear NOTIFICATION-TYPE
+			OBJECTS { hwNhmRestrainType, hwNhmRestrainKey }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that cyclic iteration suppression is removed."
+			::= { hwNhmRestrainTraps 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.26
+		hwNhmRestrainTrapConformance OBJECT IDENTIFIER ::= { hwRmExt 26 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.26.1
+		hwNhmRestrainNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwNhmRestrain, hwNhmRestrainClear }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the content of the cyclic iteration that is suppressed."
+			::= { hwNhmRestrainTrapConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.26.2
+		hwNhmRestrainObjectGroup OBJECT-GROUP
+			OBJECTS { hwNhmRestrainType, hwNhmRestrainKey, hwNhmRestrainVpnName, hwNhmRestrainNextHop }
+			STATUS current
+			DESCRIPTION 
+				"This object represents iterative information suppressed the content."
+			::= { hwNhmRestrainTrapConformance 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.27
+		hwVlinkImportObjects OBJECT IDENTIFIER ::= { hwRmExt 27 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.27.1		
+		hwVlinkImportCurNumber OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current number of import vlink route number."
+			::= { hwVlinkImportObjects 1 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.145.27.2		
+		hwVlinkImportMaxNumber OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the upper limit value of import vlink route number."
+			::= { hwVlinkImportObjects 2 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.28
+		hwVlinkTraps OBJECT IDENTIFIER ::= { hwRmExt 28 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.28.1
+		hwVlinkImportExceed NOTIFICATION-TYPE
+			OBJECTS { hwVlinkImportCurNumber, hwVlinkImportMaxNumber }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the number of import vlink items exceeded the maximum number."
+			::= { hwVlinkTraps 1 }		
+
+		-- 1.3.6.1.4.1.2011.5.25.145.29
+		hwVlinkImportConformance OBJECT IDENTIFIER ::= { hwRmExt 29 }
+
+
+		-- 1.3.6.1.4.1.2011.5.25.145.29.1
+		hwVlinkImportNotificationGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwVlinkImportExceed }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the alarm of import vlink route."
+			::= { hwVlinkImportConformance 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.145.29.2
+		hwVlinkImportObjectGroup OBJECT-GROUP
+			OBJECTS { hwVlinkImportCurNumber, hwVlinkImportMaxNumber }
+			STATUS current
+			DESCRIPTION 
+				"The object indicates the number of import vlink route."
+			::= { hwVlinkImportConformance 2 }
+				
+			
+		-- 1.3.6.1.4.1.2011.5.25.145.30
+		--	hwFibStatisticObject  
+		hwFibStatisticObject OBJECT IDENTIFIER ::= { hwRmExt 30 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.30.1	  
+		--	hwFibStatisticsTable 
+		hwFibStatisticsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwFibStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Table that contains fib statistics information."
+			::= { hwFibStatisticObject 1 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.30.1.1
+		hwFibStatisticsEntry OBJECT-TYPE
+			SYNTAX HwFibStatisticsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry for fib flow statistics information."
+				INDEX { hwFibSlot}
+			::= { hwFibStatisticsTable 1 }
+			
+			HwFibStatisticsEntry ::= 
+			SEQUENCE {
+				hwFibSlot				  
+					Unsigned32,
+				hwIPv4FibNum			   
+					Unsigned32,
+				hwIPv4FibUsage			 
+					Unsigned32,
+				hwIPv6FibNum			   
+					Unsigned32,
+				hwIPv6FibUsage			 
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.30.1.1.1
+		hwFibSlot OBJECT-TYPE
+			SYNTAX Unsigned32 (1..255)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Slot index."
+			::= { hwFibStatisticsEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.30.1.1.2			
+		hwIPv4FibNum OBJECT-TYPE
+			SYNTAX Unsigned32 (0..100000000)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPv4 fib number."
+			::= { hwFibStatisticsEntry 2 }	
+
+		-- 1.3.6.1.4.1.2011.5.25.145.30.1.1.3	
+		hwIPv4FibUsage OBJECT-TYPE
+			SYNTAX Unsigned32 (0..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPv4 fib utilization percentage."
+			::= { hwFibStatisticsEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.30.1.1.4	
+		hwIPv6FibNum OBJECT-TYPE
+			SYNTAX Unsigned32 (0..100000000)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPv6 fib number."
+			::= { hwFibStatisticsEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.5.25.145.30.1.1.5	
+		hwIPv6FibUsage OBJECT-TYPE
+			SYNTAX Unsigned32 (0..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IPv6 fib utilization percentage."
+			::= { hwFibStatisticsEntry 5 }
+
+
+	
+	END

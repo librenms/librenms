@@ -1,0 +1,208 @@
+-- This module defines enterprise MIBs for VPN Phase two
+-- negotiation.
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VPN-PHASETWO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenVpnPhasetwoMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs for VPN Phase two
+         negotiation."
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "no comment"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVpnMibModule 6 }
+
+NsVpnPhTwoEntry ::= SEQUENCE
+{
+    nsVpnPhTwoIndex           Integer32,
+    nsVpnPhTwoName            DisplayString,
+    nsVpnPhTwoPFS             Integer32,
+    nsVpnPhTwoEncapMethod     INTEGER,
+    nsVpnPhTwoESPEncryp       INTEGER,
+    nsVpnPhTwoESPAuth         INTEGER,
+    nsVpnPhTwoAhAuth          INTEGER,
+    nsVpnPhTwoLifetime        Integer32,
+    nsVpnPhTwoLifetimeMeasure INTEGER,
+    nsVpnPhTwoLifetimeKb      Integer32,
+    nsVpnPhTwoVsys            Integer32
+}
+
+nsVpnPhaseTwoCfg OBJECT IDENTIFIER ::= { netscreenVpn 6 }
+
+nsVpnPhTwoTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnPhTwoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "To establish an IKE IPSec tunnel, two phases of negotiation
+         are required. This table specifies the configuration attributes
+         for Phase Two negotiation. In Phase 2, the participants
+         negotiate the IPSec SAs for encrypting and  authenticating the
+         ensuing exchanges of user data."
+    ::= { nsVpnPhaseTwoCfg 1 }
+
+nsVpnPhTwoEntry OBJECT-TYPE
+    SYNTAX        NsVpnPhTwoEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnPhTwoTable holds a set of configuration
+         parameters associated with an instance of Phase 2 setting."
+    INDEX
+        { nsVpnPhTwoIndex }
+    ::= { nsVpnPhTwoTable 1 }
+
+nsVpnPhTwoIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for phase Two table.  Its value ranges between
+         1 and 65535 and may not be contiguous.  The index has no other
+         meaning but a pure index"
+    ::= { nsVpnPhTwoEntry 1 }
+
+nsVpnPhTwoName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase two proposal name."
+    ::= { nsVpnPhTwoEntry 2 }
+
+nsVpnPhTwoPFS OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Perfect Forward Secrecy - Diffie-Hellman exchange group."
+    ::= { nsVpnPhTwoEntry 3 }
+
+nsVpnPhTwoEncapMethod OBJECT-TYPE
+    SYNTAX        INTEGER {
+        ah(0),
+        esp(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase two proposal encapsulation method."
+    ::= { nsVpnPhTwoEntry 4 }
+
+nsVpnPhTwoESPEncryp OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        des(1),
+        triple-des(2),
+        aes(3),
+        aes-192(4),
+        aes-256(5)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase two proposal ESP encryption algorithm."
+    ::= { nsVpnPhTwoEntry 5 }
+
+nsVpnPhTwoESPAuth OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        md5(1),
+        sha(2),
+        sha-256(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase two proposal ESP authentication Algorithm."
+    ::= { nsVpnPhTwoEntry 6 }
+
+nsVpnPhTwoAhAuth OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        md5(1),
+        sha(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Phase two proposal AH authentication Algorithm."
+    ::= { nsVpnPhTwoEntry 7 }
+
+nsVpnPhTwoLifetime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Lifetime in time"
+    ::= { nsVpnPhTwoEntry 8 }
+
+nsVpnPhTwoLifetimeMeasure OBJECT-TYPE
+    SYNTAX        INTEGER {
+        second(0),
+        minute(1),
+        hours(2),
+        days(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "life time measurement."
+    ::= { nsVpnPhTwoEntry 9 }
+
+nsVpnPhTwoLifetimeKb OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Lifetime in KBytes"
+    ::= { nsVpnPhTwoEntry 10 }
+
+nsVpnPhTwoVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys this proposal configuration belongs to."
+    ::= { nsVpnPhTwoEntry 11 }
+
+END
+
+

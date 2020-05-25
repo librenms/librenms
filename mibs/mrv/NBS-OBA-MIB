@@ -1,0 +1,369 @@
+NBS-OBA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs, NbsTcMHz
+        FROM NBS-MIB
+
+    DisplayString, RowStatus
+        FROM SNMPv2-TC;
+
+nbsObaMib  MODULE-IDENTITY
+    LAST-UPDATED "201503270000Z"  -- March 27, 2015
+    ORGANIZATION "NBS"
+    CONTACT-INFO
+       "For technical support, please contact your service channel"
+
+    DESCRIPTION
+       "Optical bandwidth allocation (OBA) information."
+    ::= { nbs 240 }
+
+-- *******************************************************************
+-- NBS-OBA-MIB local defines
+-- *******************************************************************
+
+nbsObaInfoGrp OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "For users to know if OBA is accessible"
+    ::= { nbsObaMib 1 }
+
+nbsObaDefineGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "For users to configure OBAs"
+    ::= { nbsObaMib 2 }
+
+nbsObaAlsGrp OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+       "For users to configure the Automatic Laser Shut-down (ALS) feature"
+    ::= { nbsObaMib 3 }
+
+
+-- *******************************************************************
+--
+-- the nbsObaInfoGrp
+--
+-- *******************************************************************
+nbsObaInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsObaInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Optical bandwidth allocation (OBA) definition(s); table entries
+       are expected to be configured and viewed from the port-level."
+    ::= { nbsObaInfoGrp 1 }
+
+NbsObaInfoEntry ::= SEQUENCE {
+    nbsObaInfoLineIfIndex            InterfaceIndex,
+    nbsObaInfoAvails                 DisplayString,
+    nbsObaInfoUnitSize               NbsTcMHz,
+    nbsObaInfoMaxUnits               INTEGER,
+    nbsObaInfoMaxUnitsPerClientPort  INTEGER
+}
+
+nbsObaInfoEntry      OBJECT-TYPE
+    SYNTAX      NbsObaInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Optical bandwidth allocation (OBA) definition."
+    INDEX { nbsObaInfoLineIfIndex }
+    ::= { nbsObaInfoTable 1 }
+
+nbsObaInfoLineIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The trunk or line port ifindex."
+    ::= { nbsObaInfoEntry 1 }
+
+nbsObaInfoAvails    OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The comma separated list of bandwidth units available to the
+        user"
+    ::= { nbsObaInfoEntry 2 }
+
+nbsObaInfoUnitSize    OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Shows the unit size in MHz"
+    ::= { nbsObaInfoEntry 3 }
+
+
+nbsObaInfoMaxUnits    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Shows the maximum number of OBA units allowed on this port"
+    ::= { nbsObaInfoEntry 4 }
+
+nbsObaInfoMaxUnitsPerClientPort    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Shows the maximum number of OBA units allowed on client ports"
+    ::= { nbsObaInfoEntry 5 }
+
+
+-- *******************************************************************
+--
+-- the nbsObaDefineGrp
+--
+-- *******************************************************************
+
+nbsObaDefineTableSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of entries for the nbsObaDefineTable in this port "
+    ::= { nbsObaDefineGrp 1 }
+
+nbsObaDefineTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsObaDefineEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Optical bandwidth allocation (OBA) definition(s); table entries
+       are expected to be configured and viewed from the port-level."
+    ::= { nbsObaDefineGrp 2 }
+
+NbsObaDefineEntry ::= SEQUENCE {
+    nbsObaDefineLinePort              InterfaceIndex,
+    nbsObaDefineOrdinalIndex          INTEGER,
+    nbsObaDefineLabel                 DisplayString,
+    nbsObaDefineOduType               INTEGER,
+    nbsObaDefineOduList               DisplayString,
+    nbsObaDefineOduCount              INTEGER,
+    nbsObaDefineMapType               INTEGER,
+    nbsObaDefineClientPort            InterfaceIndex,
+    nbsObaDefineCoupledWith           DisplayString,
+    nbsObaDefinePresentState          INTEGER,
+    nbsObaDefineAllocationInfo        INTEGER,
+    nbsObaDefineRowStatus             RowStatus
+}
+
+nbsObaDefineEntry      OBJECT-TYPE
+    SYNTAX      NbsObaDefineEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Optical bandwidth allocation (OBA) definition."
+    INDEX { nbsObaDefineLinePort, nbsObaDefineOrdinalIndex }
+    ::= { nbsObaDefineTable 1 }
+
+nbsObaDefineLinePort    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The line port (aka trunk port) associated with this entry."
+    ::= { nbsObaDefineEntry 1 }
+
+nbsObaDefineOrdinalIndex    OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "Ordinal index for this entry; arbitrarily picked, starting from
+       1. It is hidden from the CLI."
+    ::= { nbsObaDefineEntry 2 }
+
+nbsObaDefineLabel  OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "User defined label that uniquely identifies this OBA."
+    ::= { nbsObaDefineEntry 10 }
+
+nbsObaDefineOduType    OBJECT-TYPE
+    SYNTAX       INTEGER {
+        unconfigured (1),
+        odu0         (2)
+    }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "The information structure data unit (data rate):
+         * ODU0 (1.24416 Gb/s)"
+    DEFVAL { unconfigured }
+    ::= { nbsObaDefineEntry 11 }
+
+nbsObaDefineOduList   OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..64))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "A comma separated list of data unit identifiers assigned to
+       this OBA; an identifier may be assigned to one OBA only. ODU0
+       identifiers are the letters a-h.
+
+        The count of identifiers determines the maximum bandwidth
+        available, based on nbsObaDefineOduType. Just enough should be
+        assigned to convey the desired protocol; an overly generous
+        assignment wastes a limited resource and reduces overall
+        service capacity."
+    ::= { nbsObaDefineEntry 12 }
+
+nbsObaDefineOduCount  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The count of identifiers found in nbsObaDefineOduList."
+    ::= { nbsObaDefineEntry 13 }
+
+nbsObaDefineMapType    OBJECT-TYPE
+    SYNTAX       INTEGER {
+        unconfigured (1),
+        express      (2), -- express could represent the OTN switching
+        standAlone   (3), -- all by itself no redundant service
+        primary      (4), -- to be used for redundant service to show the primary selection
+        secondary    (5)  -- to be used for redundant service to show the standby selection
+    }
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "Specifies the OBA traffic mapping type:
+         * an express OBA passes from one line port to the other;
+         * a standAlone OBA has no redundant backup;
+         * a primary OBA is the first choice for redundant service;
+         * a secondary OBA provides service when the primary OBA fails."
+    DEFVAL { unconfigured }
+    ::= { nbsObaDefineEntry 20 }
+
+nbsObaDefineClientPort    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "The add/drop client port (aka user or access port) associated
+       with this entry."
+    ::= { nbsObaDefineEntry 21 }
+
+nbsObaDefineCoupledWith    OBJECT-TYPE
+    SYNTAX       DisplayString(SIZE(0..64))
+    MAX-ACCESS   read-create
+    STATUS       current
+    DESCRIPTION
+       "This object's content depends on the 'nbsObaDefineMapType'
+       value:
+         * express -- the associated OBA on the other line port;
+         * standAlone -- N/A
+         * primary -- label of the associated secondary OBA;
+         * secondary -- label of the associated primary OBA.
+
+        Using an OBA's label instead of its ordinal index avoids
+        unexpected and unintential associations after create/delete
+        activities."
+    ::= { nbsObaDefineEntry 22 }
+
+nbsObaDefinePresentState    OBJECT-TYPE
+    SYNTAX       INTEGER {
+        unknown  (1),
+        down     (2),
+        active   (3),
+        standby  (4)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "Current OBA status."
+    DEFVAL { unknown }
+    ::= { nbsObaDefineEntry 29 }
+
+nbsObaDefineAllocationInfo    OBJECT-TYPE
+    SYNTAX       INTEGER {
+        unknown                          (1),
+        unitsExceedProtocolSpec          (2),
+        additionalUnitsNeededForProtocol (3),
+        unitsMatchProtocolSpec           (4),
+        unitsExceedExpress               (5),
+        additionalUnitsNeededForExpress  (6),
+        unitsMatchExpress                (7)
+    }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "Indicates if the number of units (ODUs) exceed, are under, or
+       match the port protocol specifications."
+    DEFVAL { unknown }
+    ::= { nbsObaDefineEntry 30 }
+
+nbsObaDefineRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+       "Used to create and delete OBAs"
+    DEFVAL { notInService }
+    ::= { nbsObaDefineEntry 99 }
+
+
+-- *******************************************************************
+--
+-- the nbsObaAlsGrp
+--
+-- *******************************************************************
+
+nbsObaAlsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsObaAlsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "The Automatic Laser Shutdown (ALS) setting for each port."
+    ::= { nbsObaAlsGrp 1 }
+
+NbsObaAlsEntry ::= SEQUENCE {
+    nbsObaAlsIfIndex                  InterfaceIndex,
+    nbsObaAlsState                    INTEGER
+}
+
+nbsObaAlsEntry      OBJECT-TYPE
+    SYNTAX      NbsObaAlsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "Optical bandwidth allocation (OBA) port."
+    INDEX { nbsObaAlsIfIndex }
+    ::= { nbsObaAlsTable 1 }
+
+nbsObaAlsIfIndex    OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The ifindex associated with this entry."
+    ::= { nbsObaAlsEntry 1 }
+
+nbsObaAlsState  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+	enable       (2),
+	disable      (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Defines whether the Automatic Laser Shut-down (ALS) feature is enabled or disabled."
+    ::= { nbsObaAlsEntry 10 }
+
+
+END

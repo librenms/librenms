@@ -1,0 +1,887 @@
+BCS-IDENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+            DisplayString   FROM SNMPv2-TC
+            OBJECT-TYPE     FROM SNMPv2-SMI
+            MODULE-IDENTITY FROM SNMPv2-SMI;
+
+gi      MODULE-IDENTITY
+        LAST-UPDATED "201008250000Z"
+
+        ORGANIZATION "Motorola Broadband Home Solutions"
+        CONTACT-INFO "Motorola Technical Response Center
+                      Inside USA     1-888-944-HELP (1-888-944-4357)
+                      Outside USA    1-215-323-0044
+                      TRC Hours:
+                      Monday through Friday 8am - 7pm Eastern Standard Time
+                      Saturdays            10am - 5pm Eastern Standard Time"
+
+        DESCRIPTION  "The SMIv2 MIB module for the MOTOROLA BCS common ident objects.
+                      The MIB Tree for this is shown below."
+
+         ::= {iso org(3) dod(6) internet(1)  private(4) enterprises(1) 1166}
+
+                
+      giproducts    OBJECT IDENTIFIER      ::= { gi 1   } 
+         acc4000d   OBJECT IDENTIFIER         ::= { giproducts 1    }
+         anicd      OBJECT IDENTIFIER         ::= { giproducts 2    } 
+         item1000   OBJECT IDENTIFIER         ::= { giproducts 4    }
+         irt1000    OBJECT IDENTIFIER         ::= { giproducts 5    }
+         nc1500     OBJECT IDENTIFIER         ::= { giproducts 6    }
+-- OM-2000 shares same OID as OM-1000
+         om1000     OBJECT IDENTIFIER         ::= { giproducts 7    } 
+         im1000     OBJECT IDENTIFIER         ::= { giproducts 8    } 
+         mps        OBJECT IDENTIFIER         ::= { giproducts 9    } 
+
+         rpd1000    OBJECT IDENTIFIER         ::= { giproducts 10   }
+
+-- Access Control Processors; TSODAs and other ACPs in various products.
+         acpStatus  OBJECT IDENTIFIER         ::= { giproducts 11   } 
+-- Heartbeat MIB used in the Satellite environment
+         heartbeat  OBJECT IDENTIFIER         ::= { giproducts 12   }
+-- Entitlement Key Common MIB - used by SDM/SEM
+    entitlementKey  OBJECT IDENTIFIER         ::= { giproducts 13   }
+
+         arpd       OBJECT IDENTIFIER         ::= { giproducts 14   }
+         svom       OBJECT IDENTIFIER         ::= { giproducts 15   }
+         svm        OBJECT IDENTIFIER         ::= { giproducts 16   }
+         erm        OBJECT IDENTIFIER         ::= { giproducts 17   }
+    
+-- GI SURBboard BNH      
+         surfBbnh   OBJECT IDENTIFIER         ::= { giproducts 18   } 
+
+-- GI SURFboard cable modem
+         sb2100     OBJECT IDENTIFIER         ::= { giproducts 19   } 
+         sb2100D    OBJECT IDENTIFIER         ::= { giproducts 20   } 
+         sb2000     OBJECT IDENTIFIER         ::= { giproducts 21   } 
+
+-- CHS digital video headend equipment
+--
+         saDANIS    OBJECT IDENTIFIER         ::= { giproducts 30   } 
+         apex       OBJECT IDENTIFIER         ::= { giproducts 31   } 
+         rem        OBJECT IDENTIFIER         ::= { giproducts 32   } 
+         mpe        OBJECT IDENTIFIER         ::= { giproducts 33   }
+         spe        OBJECT IDENTIFIER         ::= { giproducts 34   }
+         ne2000     OBJECT IDENTIFIER         ::= { giproducts 35   } 
+         apex1500   OBJECT IDENTIFIER         ::= { giproducts 36   }
+         agb        OBJECT IDENTIFIER         ::= { giproducts 37   }
+         ne2500     OBJECT IDENTIFIER         ::= { giproducts 38   } 
+--
+         hdd2000    OBJECT IDENTIFIER         ::= { giproducts 40   } 
+--
+         merlin     OBJECT IDENTIFIER         ::= { giproducts 50   } 
+--
+         rsr        OBJECT IDENTIFIER         ::= { giproducts 60   } 
+         gsrm       OBJECT IDENTIFIER         ::= { giproducts 61   } 
+         gom        OBJECT IDENTIFIER         ::= { giproducts 62   }
+         b3         OBJECT IDENTIFIER         ::= { giproducts 63   } 
+         adm        OBJECT IDENTIFIER         ::= { giproducts 64   } 
+
+-- San Diego Headend devices
+
+         sem	    OBJECT IDENTIFIER	      ::= { giproducts 70   }
+         ecmg       OBJECT IDENTIFIER         ::= { giproducts 71   } 
+         bsiAdapter OBJECT IDENTIFIER         ::= { giproducts 72   }
+         oles       OBJECT IDENTIFIER         ::= { giproducts 73   } 
+         ne 	    OBJECT IDENTIFIER	      ::= { giproducts 74   }
+         tmxCommTrap OBJECT IDENTIFIER        ::= { giproducts 75   }
+         drmenginekskdc OBJECT IDENTIFIER     ::= { giproducts 76   }
+         drmenginerte OBJECT IDENTIFIER       ::= { giproducts 77   }
+         drmengineecmg OBJECT IDENTIFIER      ::= { giproducts 78   }
+         drmengineskgpkg OBJECT IDENTIFIER    ::= { giproducts 79   }
+         tmx	    OBJECT IDENTIFIER         ::= { giproducts 80   }
+         prs        OBJECT IDENTIFIER         ::= { giproducts 81   }
+         se2000     OBJECT IDENTIFIER         ::= { giproducts 82   }
+         dem        OBJECT IDENTIFIER         ::= { giproducts 83   }
+         ncs        OBJECT IDENTIFIER         ::= { giproducts 84   }
+         ucs        OBJECT IDENTIFIER         ::= { giproducts 85   }
+         lmm        OBJECT IDENTIFIER         ::= { giproducts 86   }
+         se4000     OBJECT IDENTIFIER         ::= { giproducts 87   }
+         rc         OBJECT IDENTIFIER         ::= { giproducts 88   }
+
+--       
+-- Element Management System Range
+--
+         netSentry  OBJECT IDENTIFIER         ::= { giproducts 99   }
+         sdm	    OBJECT IDENTIFIER 	      ::= { giproducts 100  } 
+         hfcEms     OBJECT IDENTIFIER         ::= { giproducts 101  }
+         bnc        OBJECT IDENTIFIER         ::= { giproducts 102  }
+         drmenginecm OBJECT IDENTIFIER        ::= { giproducts 103  }
+         stdc	    OBJECT IDENTIFIER 	      ::= { giproducts 104  } 
+         tview	    OBJECT IDENTIFIER 	      ::= { giproducts 105  } 
+--
+-- OIDS 106 thru 110 reserved for other EMS
+--
+--
+--
+-- OIDS 150 thru 225 reserved for TNS/NIS
+--
+         ponOa      OBJECT IDENTIFIER         ::= { giproducts 150   }
+         mwtea200   OBJECT IDENTIFIER         ::= { giproducts 151   }
+
+         bti        OBJECT IDENTIFIER         ::= { giproducts 200   }
+         rfModMIB   OBJECT IDENTIFIER         ::= { giproducts 201   }
+         btiIntMIB  OBJECT IDENTIFIER         ::= { giproducts 202   }
+		 sg4000     OBJECT IDENTIFIER         ::= { giproducts 203   }
+
+         ponEm870   OBJECT IDENTIFIER         ::= { giproducts 210   }
+-- 
+-- OIDS 250 thru 290 reserved for TAS
+--
+         rpa        OBJECT IDENTIFIER         ::= { giproducts 250   }
+         rpc        OBJECT IDENTIFIER         ::= { giproducts 251   }
+--
+-- OIDS 300 thru 310 reserved for ASTBs
+--       
+         dct5000    OBJECT IDENTIFIER         ::= { giproducts 300   } 
+         dct5100    OBJECT IDENTIFIER         ::= { giproducts 301   }
+         dct5200    OBJECT IDENTIFIER         ::= { giproducts 302   }
+--
+-- OIDS 314 thru 320 reserved for other CPEs
+--
+         edfaMIB    OBJECT IDENTIFIER         ::= { giproducts 311   }
+         corvusMIB  OBJECT IDENTIFIER         ::= { giproducts 312   }
+         oa600      OBJECT IDENTIFIER         ::= { giproducts 313   }
+--
+-- Range 321-330 reserved for DSRs
+--
+         dsr350f    OBJECT IDENTIFIER         ::= { giproducts 321   }
+
+         radd6000   OBJECT IDENTIFIER	      ::= { giproducts 400   } 
+         cs1000     OBJECT IDENTIFIER         ::= { giproducts 401   }
+         kls        OBJECT IDENTIFIER         ::= { giproducts 402   }
+         dac6000    OBJECT IDENTIFIER         ::= { giproducts 403   }
+         sdi	    OBJECT IDENTIFIER         ::= { giproducts 404   }
+         cpms	    OBJECT IDENTIFIER         ::= { giproducts 405   }
+         ap 	    OBJECT IDENTIFIER         ::= { giproducts 406   }
+         ps		    OBJECT IDENTIFIER         ::= { giproducts 407   }
+--
+-- Range 350-359 reserved for Cable Cards
+--
+         cableCard  OBJECT IDENTIFIER         ::= { giproducts 350   }
+--
+-- The following branch identifies the BCS/IPNS Devices MIB.
+--
+      motoIPNSprodID OBJECT IDENTIFIER        ::= { giproducts 450 }
+--
+-- Range 500-510 reserved for Simulcrypt
+--
+--
+-- Range 600-650 reserved for IRDs
+--
+      ird4500x      OBJECT IDENTIFIER         ::= { giproducts 610   }
+      ird4520x      OBJECT IDENTIFIER	      ::= { giproducts 620   }
+
+         
+      giproxies     OBJECT IDENTIFIER         ::= { gi 3    } 
+
+      gicommon      OBJECT IDENTIFIER         ::= { gi 4    } 
+         identity   OBJECT IDENTIFIER         ::= { gicommon 1 }
+         state      OBJECT IDENTIFIER         ::= { gicommon 2 }
+         traps      OBJECT IDENTIFIER         ::= { gicommon 3 }
+         logs       OBJECT IDENTIFIER         ::= { gicommon 4 }
+--
+--    nlsbbn		OBJECT IDENTIFIER         ::= { gi 5    }
+-- 	added to create new path for gx2 hfc common and device mibs
+      motproxies    OBJECT IDENTIFIER         ::= { gi 6    } 
+
+--
+-- The following is the SMIv2 COMMON MIB branch
+--
+      bcs           OBJECT IDENTIFIER         ::= { gi 7   } 
+          bcsIdent  OBJECT IDENTIFIER      	  ::= { bcs 1 }
+--        bcsState  OBJECT IDENTIFIER    	  ::= { bcs 2 }
+--        bcsTraps  OBJECT IDENTIFIER     	  ::= { bcs 3 }
+          bcsLogs   OBJECT IDENTIFIER     	  ::= { bcs 4 }
+
+--        dms       OBJECT IDENTIFIER         ::= { bcs 5 }
+--
+-- New OID for SMIv2 of ACP MIB
+--
+--        bcs_acp   OBJECT IDENTIFIER         ::= { bcs 6 }
+--
+-- bcs OID 7 - 10  reserved for Simulcrypt
+--
+          bcsSimulcryptScs  OBJECT IDENTIFIER ::= { bcs 7 }
+          bcsSimulcryptMux  OBJECT IDENTIFIER ::= { bcs 8 }
+          bcsSimulcrypt     OBJECT IDENTIFIER ::= { bcs 9 }
+
+-- bcs OID 11 - 20  reserved for common BCS infrastructure MIBs
+--
+          bcsDatabase       OBJECT IDENTIFIER ::= { bcs 11 }
+          bcsRedundancy     OBJECT IDENTIFIER ::= { bcs 12 }
+
+          bcsMsgGeneration  OBJECT IDENTIFIER ::= { bcs 21 }
+--
+--    Reserved for TNS
+          mea       OBJECT IDENTIFIER         ::= { gi 8    }
+--
+-- Reserved for common Addressable Control MIBs
+      addressablecontrol OBJECT IDENTIFIER      ::= { gi 9   } 
+          acCommon     OBJECT IDENTIFIER      ::= { addressablecontrol 1 }
+          acSecurity   OBJECT IDENTIFIER      ::= { addressablecontrol 2 }
+          acServices   OBJECT IDENTIFIER      ::= { addressablecontrol 3 }
+          acBsi        OBJECT IDENTIFIER      ::= { addressablecontrol 4 }
+          acOperations OBJECT IDENTIFIER      ::= { addressablecontrol 5 }
+          acTopology   OBJECT IDENTIFIER      ::= { addressablecontrol 6 }
+
+--
+-- Reserved for common CHS internal MIBs
+      chsInternal      OBJECT IDENTIFIER      ::= { gi 10   } 
+          emLogin      OBJECT IDENTIFIER      ::= { chsInternal 1 }
+          radiusClient OBJECT IDENTIFIER      ::= { chsInternal 2 }
+                     
+-- Need to explicitly define EntryStatus since most do not recognize
+-- the version 1 format.
+EntryStatus ::= INTEGER
+                         { valid(1),
+                           createRequest(2),
+                           underCreation(3),
+                           invalid(4)
+                         }
+  
+        -- groups in the GI-IDENT MIB
+
+--  MIB Tree
+--
+--  The following diagram defining the objects in this MIB is for
+--  reference purposes only.
+--
+--    bcs
+--        |
+--        +..bcsIdent
+--        |    |
+--        |    +..identSerialNumber
+--        |    |
+--        |    +..identChassisNumber
+--        |    |
+--        |    +..identIfIndex
+--        |    |
+--        |    +..identHardwareVersion
+--        |    |
+--        |    +..identHardwareFeatures
+--        |    |
+--        |    +..identInventoryCode
+--        |    |
+--        |    +..identSoftwareVersion
+--        |    |
+--        |    +..identLocationArea
+--        |    |
+--        |    +..identLocationRack
+--        |    |
+--        |    +..identLocationShelf
+--        |    |
+--        |    +..identMIBVersion
+--        |    |
+--        |    +..identAgentVersion
+--        |    |
+--        |    +..identCommand
+--        |    |
+--        |    +..identIfExtensionTable
+--        |    |      |
+--        |    |      +..identIfExtensionEntry
+--        |    |           |
+--        |    |           +..identIfExtensionIndex
+--        |    |           |
+--        |    |           +..identIfSerialNumber
+--        |    |           |
+--        |    |           +..identIfHardwareVersion
+--        |    |           |
+--        |    |           +..identIfHardwareFeatures
+--        |    |           |
+--        |    |           +..identIfInventoryCode
+--        |    |           |
+--        |    |           +..identIfFirmwareVersion1
+--        |    |           |
+--        |    |           +..identIfFirmwareVersion2
+--        |    |           |
+--        |    |           +..identIfFirmwareVersion3
+--        |    |           |
+--        |    |           +..identIfFirmwareVersion4
+--        |    |           |
+--        |    |           +..identIfSlotId
+--        |    |           |
+--        |    |           +..identIfCommand
+--        |    |           |
+--        |    |           +..identIfAdministrativeState
+--        |    |           |
+--        |    |           +..identIfOperationalState
+--        |    |           |
+--        |    |           +..identIfAlarmStatus
+--        |    |           |
+--        |    |           +..identIfAvailabilityStatus
+--        |    |           |
+--        |    |           +..identIfSpecific
+--        |    |           |
+--        |    |           +..identIfEntryStatus
+--        |    |
+--        |    +..identUnitModel         
+         
+
+
+-- The Identification Group.
+
+-- This group of objects contains the identification of the software
+-- and hardware for a specific unit.
+
+    identSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains the serial number of the unit.  There is no 
+             specification of the internal format of the serial number. 
+             The serial number is entered into either permanent or non-
+             volatile memory of the unit at the time of manufacture. 
+             Note - the unit itself supplies the serial number."
+        REFERENCE   " -- "
+    ::= { bcsIdent 1 }
+
+    identChassisNumber OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains the chassis number of the unit.  This is
+             applicable only to a limited number of products, 
+             currently, only the ITEM-1000.  For products for which
+             this is not applicable, this will be a null object.
+             There is no specification of the internal format of 
+             the chassis number.  The means by which any product
+             determines its chassis number is to be determined by
+             each individual product."
+        REFERENCE   " -- "
+    ::= { bcsIdent 2 }
+
+
+    identIfIndex OBJECT-TYPE
+        SYNTAX      INTEGER (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains the IfIndex of the OAM&P port."
+        REFERENCE   " -- " 
+        DEFVAL { 2147483647 }
+    ::= { bcsIdent 3 }
+
+
+    identHardwareVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the hardware
+             version of this particular unit. There is no specification 
+             of the internal format of the hardware version.  The 
+             hardware version is entered into the either permanent or 
+             non-volatile memory of the unit at the time of 
+             manufacture."
+        REFERENCE   " -- "
+    ::= { bcsIdent 4 }
+
+
+    identHardwareFeatures OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the features
+             of this particular unit. There is no specification of the 
+             internal format of the hardware features.  The hardware
+             features is entered into the either permanent or 
+             non-volatile memory of the unit at the time of 
+             manufacture."
+        REFERENCE   " -- "
+    ::= { bcsIdent 5 }
+
+
+    identInventoryCode OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the inventory 
+             code for this unit.
+             Once an inventory code has been set, it should be kept in 
+             non-volatile memory.  The unit should only allow this object 
+             to be set when it is in the 'configuration' mode.  There is 
+             no specification of the internal format of  the inventory 
+             Code."
+        REFERENCE   " -- "
+    ::= { bcsIdent 6 }
+
+
+    identSoftwareVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the current 
+             version of the software for this unit.  The format of the 
+             software version is a fully qualified directory name.  This 
+             value is received by a unit as within a BOOTP response from 
+             the BOOTP server.  It is available to the network manager 
+             for applications that track the installed software.  Once 
+             the software  version has been set, it should be kept in 
+             non-volatile memory."
+        REFERENCE   " -- "
+    ::= { bcsIdent 7 }
+
+
+    identLocationArea OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This is different from the MIB II sysLocation variable as it
+            contains only the location area and does not describe the
+            precise location.
+            This contains a display string that defines the area in 
+             which the unit is installed.  Location is defined by a set 
+             of three objects: 'Area', 'Rack', and 'Shelf'.    These 
+             location objects cannot be determined by the unit itself, 
+             but can only be determined by the network manager.  It is 
+             available to the unit for display on a front panel.  Display 
+             of the location on the front panel is useful in validating 
+             the configuration established by the network manager.  The 
+             unit should only allow this object to be set when it is in 
+             the 'configuration' mode.  Once the Location Area has been 
+             set, it should be kept in non-volatile memory."
+        REFERENCE   " -- "
+    ::= { bcsIdent 8 }
+
+
+    identLocationRack OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the rack in
+             which the unit is installed.  Location is defined by a set
+             of three objects: 'Area', 'Rack', and 'Shelf'.    These 
+             location objects cannot be determined by the unit itself,
+             but can only be determined by the network manager.  It is
+             available to the unit for display on a front panel.  Display
+             of the location on the front panel is useful in validating
+             the configuration established by the network manager.  The
+             unit should only allow this object to be set when it is in
+             the 'configuration' mode.  Once the Location Area has been
+             set, it should be kept in non-volatile memory."
+        REFERENCE   " -- "
+    ::= { bcsIdent 9 }
+
+
+    identLocationShelf OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the shelf in 
+             which the unit is installed.  Location is defined by a set 
+             of three objects: 'Area', 'Rack', and 'Shelf'.    These 
+             location objects cannot be determined by the unit itself, 
+             but can only be determined by the network manager.  It is 
+             available to the unit for display on a front panel.  Display 
+             of the location on the front panel is useful in validating 
+             the configuration established by the network manager.  The 
+             unit should only allow this object to be set when it is in 
+             the 'configuration' mode.  Once the Location Area has been 
+             set, it should be kept in non-volatile memory."
+        REFERENCE   " -- "
+    ::= { bcsIdent 10 }
+
+
+
+    identMIBVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            " The version number of this MIB."
+        REFERENCE   " -- "
+    ::= { bcsIdent 11 }
+
+
+    identAgentVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "The version number of the Agent."
+        REFERENCE   " -- "
+    ::= { bcsIdent 12 }
+
+
+    identCommand OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+              restart(1),
+              currentlyRestarting(2),
+              unspecified(3),
+	          purgeAndRestart(4),
+	          currentlyPurgingAndRestarting(5),
+	          purgeNvramAndRestart(6),
+              currentlyPurgingNvramAndRestarting(7)
+            }
+                      
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This is the command to be executed by the resource
+            managed by the agent.
+            The value unspecified is always returned on SNMP
+            Get/GetNext while the resource is running. If the
+            restart(1) command is given, currentlyRestarting(2)
+            is returned while the resource is preparing to
+            restart (reboot)."
+        REFERENCE   " -- "
+    ::= { bcsIdent 13 }
+
+
+    identIfExtensionTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF IdentIfExtensionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+        "This table contains extensions to the MIB II ifTable which  contains
+            the definitions of all interfaces. An ifTable entry may be a board
+            or just a port on a board. Any ifTable entry can have an extension
+            in the identIfExtensionTable. The corrsponding entry in that table
+            will have the identIfIndex = ifIndex. Within the ifTable the presence
+            of such an entry is indicated by setting the variable ifSpecific
+            to the OBJECT IDENTIFIER value of identIfExtensionTable. Otherwise
+            iFSpecific is set to {0 0}.
+            The ifType - other - is used for all board types not envisoned by
+            MIB II."
+        REFERENCE   " -- "
+    ::= { bcsIdent 14 }
+
+
+    identIfExtensionEntry OBJECT-TYPE
+        SYNTAX      IdentIfExtensionEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION 
+            "An entry (conceptual row) in the Board Table."
+        REFERENCE   " -- "
+       INDEX           { identIfExtensionIndex }
+    ::= { identIfExtensionTable 1 }
+
+
+
+    IdentIfExtensionEntry ::= SEQUENCE 
+    {
+        identIfExtensionIndex       INTEGER,
+        identIfSerialNumber         DisplayString,
+        identIfHardwareVersion      DisplayString,
+        identIfHardwareFeatures     DisplayString,
+        identIfInventoryCode        DisplayString,
+        identIfFirmwareVersion1     DisplayString,
+        identIfFirmwareVersion2     DisplayString,
+        identIfFirmwareVersion3     DisplayString,
+        identIfFirmwareVersion4     DisplayString,
+        identIfSlotId               INTEGER,
+        identIfCommand              INTEGER,
+        identIfAdministrativeState  INTEGER,
+        identIfOperationalState     INTEGER,
+        identIfAlarmStatus          INTEGER,
+        identIfAvailabilityStatus   INTEGER,
+        identIfSpecific             OBJECT IDENTIFIER,
+        identIfEntryStatus          EntryStatus
+    }
+
+
+    identIfExtensionIndex OBJECT-TYPE
+        SYNTAX      INTEGER  (1..2147483647)
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "Same value as ifIndex of MIB II for the same board."
+        REFERENCE   " -- " 
+        DEFVAL { 2147483647 }
+    ::= { identIfExtensionEntry 1 }
+
+
+    identIfSerialNumber OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains the serial number of the board.  There is no 
+             specification of the internal format of the serial number.  
+             The serial number is entered into either permanent or 
+             non-volatile memory of the unit at the time of manufacture.  
+             Note - the unit itself supplies the serial number."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 2 }
+
+
+
+    identIfHardwareVersion OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the version
+             of this particular board. There is no specification of the 
+             internal format of the hardware version.  The hardware
+             version is entered into the either permanent or 
+             non-volatile memory of the unit at the time of 
+             manufacture."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 3 }
+
+
+    identIfHardwareFeatures OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the features of 
+             this particular board. There is no specification of the 
+             internal format of the hardware features.  The hardware 
+             features is entered into the either permanent or 
+             non-volatile memory of the unit at the time of manufacture."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 4 }
+
+
+    identIfInventoryCode OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This contains a display string that defines the inventory 
+             code for this board.  This is an optional value; if there is 
+             no inventory code, The unit will respond with a null string.  
+             Once an inventory code has been set, it should be kept in 
+             non-volatile memory.  The unit should only allow this object 
+             to be set when it is in the 'configuration' mode.  There is 
+             no specification of the internal format of the inventory 
+             Code."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 5 }
+
+
+
+    identIfFirmwareVersion1 OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "Within a product, there may be several identifiers of such 
+             firmware, boot proms, kernel versions, flash versions, etc.  
+             This field (and the 3 that follow) are used to hold the 
+             identification of these items.  These values must be entered 
+             into the board at the time of manufacturing.  Unused fields 
+             are reported as null values. These fields are available to 
+             the network manager for applications that keep track of the
+             firmware related identification.  There is no specification 
+             of the internal format of firmware version identifiers."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 6 }
+
+
+    identIfFirmwareVersion2 OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "Firmware related identification field # 2."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 7 }
+
+
+    identIfFirmwareVersion3 OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "Firmware related identification field # 3."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 8 }
+
+
+    identIfFirmwareVersion4 OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "Firmware related identification field # 4"
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 9 }
+
+
+    identIfSlotId OBJECT-TYPE
+        SYNTAX      INTEGER  (1..2147483647)
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This variable identifies the board slot."
+        REFERENCE   " -- "
+        DEFVAL { 2147483647 }
+    ::= { identIfExtensionEntry 10 }
+
+
+    identIfCommand OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+             unspecified(1),
+             reset(2),
+             restart(3),
+             halt(4)
+            }
+             
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "This is the command to be executed by the resource
+            managed by the agent.
+            The value unspecified(10 is always returned on SNMP
+            Get/GetNext while the other values are set by the manager
+            and executed by the resource."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 11 }
+
+
+    identIfAdministrativeState  OBJECT-TYPE
+        SYNTAX      INTEGER
+          {
+             locked(1),
+             unlocked(2),
+             shuttingDown(3)
+          }
+
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            " The current Adminsitrative state of the interface as defined in
+                          ISO/IEC 10164-2."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 12 }
+
+
+    identIfOperationalState  OBJECT-TYPE
+        SYNTAX      INTEGER
+          {
+             enabled(1),
+             disabled(2)
+          }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "       The current Operational state of the interface as defined in
+                          ISO/IEC 10164-2"
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 13 }
+
+
+    identIfAlarmStatus    OBJECT-TYPE
+        SYNTAX      INTEGER
+          {
+              underRepair(1),
+              critical(2),
+              major(3),
+              minor(4),
+              alarmOutstanding(5),
+              idle(6)
+          }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION 
+            "       This object defines the Alarm status of the interface
+                   as defined in ISO/IEC 10164-2 and state-machine"
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 14 }        
+
+
+    identIfAvailabilityStatus    OBJECT-TYPE
+        SYNTAX      INTEGER
+            {
+               inTest(1),
+               failed(2),
+               powerOff(3),
+               offLine(4),
+               offDuty(5),
+               dependency(6),
+               degraded(7),
+               notInstalled(8),
+               logFull(9),
+               available(10)
+            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+             "       This object controls the Availability status of the interface
+              as defined in ISO/IEC 10164-2 and state-machine"
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 15 }        
+
+
+    identIfSpecific OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            " The object identifier of a board type specific
+             extension to the ifTable if necessary. Otherwise,
+             identIfSpecific is set to {0 0}."
+        REFERENCE   " -- "
+    ::= { identIfExtensionEntry 16 }
+
+
+   identIfEntryStatus OBJECT-TYPE
+       SYNTAX     EntryStatus
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+        "This object is used to create, delete or
+         modify a row in this table.  To create a
+         a new network element, this object is initially
+         set to 'createRequest'.  After completion of the
+         configuration of the new entry, the  manager
+         must set the appropriate instance of this object
+         to the value valid(1) or aborts, setting this object
+         to invalid(4).  This object must not be set to
+         'active' unless the following columnar objects
+         exist in this row:
+               identIfExtensionIndex
+               identIfSerialNumber
+               identIfHardwareVersion
+               identIfInventoryCode
+               identIfFirmwareVersion1
+              identIfSpecific
+         To delete an existing entry in this table,
+         the manager must set the appropriate
+         instance of this object to the value invalid(4).
+         Creation of an instance of this object has the
+         effect of creating the supplemental object instances
+         to complete the conceptual row.  An existing instance
+         of this entry cannot be created.  If circumstances 
+         occur which cause an entry to become invalid, the 
+         agent modifies the value of the appropriate instance 
+         of this object to invalid(4).  Whenever, the value of 
+         this object for a particular entry becomes 
+         invalid(4), the conceptual row for that instance may 
+         be removed from the table at any time, either
+         immediately or subsequently."
+         DEFVAL { valid }
+    ::= { identIfExtensionEntry 17 }
+
+
+
+    identUnitModel OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION 
+            "This contains the model of the product.  For example,
+             the ITEM-1000 would contain 'ITEM1000'. "
+        REFERENCE   " -- "
+    ::= { bcsIdent 15 }
+
+
+
+
+END

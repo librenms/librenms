@@ -1,0 +1,710 @@
+--- ArubaOS 8.5.0.0_70258
+-- vim:set ts=4 sw=4:
+WLSX-HA-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Unsigned32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB
+
+	   ArubaEnableValue,
+       ArubaHaRole,
+       ArubaHaConnectivityStatus
+	   		FROM ARUBA-TC;
+
+   wlsxHaMIB MODULE-IDENTITY 
+       LAST-UPDATED "1606072030Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089	
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide 
+            information about High Availability on Aruba controller."
+       REVISION        "1606072030Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 20 }
+
+   wlsxHighAvalabilityInfoGroup     	OBJECT IDENTIFIER ::= { wlsxHaMIB 1 }
+   wlsxHighAvalabilityTraps     	    OBJECT IDENTIFIER ::= { wlsxHaMIB 2 }
+
+-- wlsxHighAvalabilityInfoGroup contains information about the High Availability on Aruba controller
+
+   wlsxHighAvalabilityConfigTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxHighAvalabilityConfigEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists High Avalability configuration on the Aruba controller.
+		"
+	
+      ::= { wlsxHighAvalabilityInfoGroup 1 } 
+
+   wlsxHighAvalabilityConfigEntry OBJECT-TYPE 
+	  SYNTAX       WlsxHighAvalabilityConfigEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             " HA profile config entry " 
+	  INDEX { haProfileName }
+      ::= { wlsxHighAvalabilityConfigTable 1 } 
+
+   WlsxHighAvalabilityConfigEntry ::=
+     SEQUENCE {
+
+		haProfileName 					DisplayString,
+		haMembership				    DisplayString,
+		haState    					    ArubaEnableValue,
+		haRole    					    ArubaHaRole,
+		haPreemption				    ArubaEnableValue,
+		haOversubscription			    ArubaEnableValue,
+		haStateSync					    ArubaEnableValue,
+		haPresharedKey				    DisplayString,
+		haIntercontrollerHbt		    ArubaEnableValue,
+		haHbtThreshold					Unsigned32,
+		haHbtInterval        			Unsigned32
+     }
+
+    haProfileName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..63))
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The name of the HA profile.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 1 }
+
+    haMembership OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..63))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The name of the HA profile enabled.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 2 }
+
+    haState OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The HA state.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 3 }
+    haRole OBJECT-TYPE
+         SYNTAX       ArubaHaRole
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The HA role of the controller.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 4 }
+
+    haPreemption OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			HA preemption.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 5 }
+
+    haOversubscription OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Standby capacity extension.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 6 }
+
+    haStateSync OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The HA state sync.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 7 }
+
+    haPresharedKey OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(8..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The IPSec key for statesync.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 8 }
+
+    haIntercontrollerHbt OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The state of intercontroller heart beat.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 9 }
+
+    haHbtThreshold OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Intercontroller hbt threshold above which it can trigger HA failover.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 10 }
+
+    haHbtInterval OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The frequency of inter controller heart beat.
+            "
+        ::= { wlsxHighAvalabilityConfigEntry 11 }
+
+
+-- HA AP table --
+   wlsxHighAvalabilityApTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxHighAvalabilityApEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists High Avalability AP counts on the Aruba controller.
+		"
+	
+      ::= { wlsxHighAvalabilityInfoGroup 2 } 
+
+   wlsxHighAvalabilityApEntry OBJECT-TYPE 
+	  SYNTAX       WlsxHighAvalabilityApEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             " HA AP entry " 
+	  INDEX { haProfileName }
+      ::= { wlsxHighAvalabilityApTable 1 } 
+
+   WlsxHighAvalabilityApEntry ::=
+     SEQUENCE {
+
+		haActiveAPs					Gauge,
+		haStandbyAPs       		    Gauge,
+		haTotalAPs       			Gauge
+     }
+
+    haActiveAPs OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of active APs.
+            "
+        ::= { wlsxHighAvalabilityApEntry 1 }
+
+    haStandbyAPs OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of standby APs.
+            "
+        ::= { wlsxHighAvalabilityApEntry 2 }
+
+    haTotalAPs OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of APs.
+            "
+        ::= { wlsxHighAvalabilityApEntry 3 }
+
+
+-- HA intercontroller hbt status table --
+
+   wlsxIntercontrollerHbtTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxIntercontrollerHbtEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists inter controller heart beat status.
+		"
+	
+      ::= { wlsxHighAvalabilityInfoGroup 3 } 
+
+   wlsxIntercontrollerHbtEntry OBJECT-TYPE 
+	  SYNTAX       WlsxIntercontrollerHbtEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             " HA hbt entry " 
+	  INDEX { haActiveCtrl }
+      ::= { wlsxIntercontrollerHbtTable 1 } 
+
+   WlsxIntercontrollerHbtEntry ::=
+     SEQUENCE {
+        haActiveCtrl				DisplayString,
+        haActiveCtrlIp				DisplayString,
+		haReferenceCnt	  			Gauge,
+		haTotalHbtRequestsSent		Counter32,
+		haTotalHbtResponsesRcvd	    Counter32,
+		haLastMissedHbtCnt			Gauge,
+		haLastHbtMissedTime			DisplayString
+     }
+
+    haActiveCtrl OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			The IP address of the actve controller(Key).
+            "
+        ::= { wlsxIntercontrollerHbtEntry 1 }
+
+    haActiveCtrlIp OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The IP address of the actve controller.
+            "
+        ::= { wlsxIntercontrollerHbtEntry 2 }
+
+
+    haReferenceCnt OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of standby APs.
+            "
+        ::= { wlsxIntercontrollerHbtEntry 3 }
+
+    haTotalHbtRequestsSent OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of hbt requests sent.
+            "
+        ::= { wlsxIntercontrollerHbtEntry 4 }
+
+    haTotalHbtResponsesRcvd OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of heart beat responses received.
+            "
+        ::= { wlsxIntercontrollerHbtEntry 5 }
+
+    haLastMissedHbtCnt OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of heart beat last missed.
+            "
+        ::= { wlsxIntercontrollerHbtEntry 6 }
+
+    haLastHbtMissedTime OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The timestamp of last missed hbt.
+            "
+        ::= { wlsxIntercontrollerHbtEntry 7 }
+
+
+-- State sync table --
+
+   wlsxStateSyncTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxStateSyncEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+        "
+            This Table lists the counts of active/replicated pmk-cache and
+            key-cache entries related to HA state sync.
+        "
+	
+      ::= { wlsxHighAvalabilityInfoGroup 4 } 
+
+   wlsxStateSyncEntry OBJECT-TYPE 
+	  SYNTAX       WlsxStateSyncEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             " HA state sync entry " 
+	  INDEX { haProfileName }
+      ::= { wlsxStateSyncTable 1 } 
+
+   WlsxStateSyncEntry ::=
+     SEQUENCE {
+
+		haActivePmkCacheEntries  		Gauge,
+		haReplicatedPmkCacheEntries  	Gauge,
+		haTotalPmkCacheEntries  		Gauge,
+		haActiveKeyCacheEntries 	 	Gauge,
+		haReplicatedKeyCacheEntries 	Gauge,
+		haTotalKeyCacheEntries  		Gauge
+     }
+
+    haActivePmkCacheEntries OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of active pmk cache entries.
+            "
+        ::= { wlsxStateSyncEntry 1 }
+
+
+    haReplicatedPmkCacheEntries OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of replicated pmk cache entries.
+            "
+        ::= { wlsxStateSyncEntry 2 }
+
+    haTotalPmkCacheEntries OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of pmk cache entries.
+            "
+        ::= { wlsxStateSyncEntry 3 }
+
+    haActiveKeyCacheEntries OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of active key cache entries.
+            "
+        ::= { wlsxStateSyncEntry 4 }
+
+    haReplicatedKeyCacheEntries OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The nuber of replicated key cache entries.
+            "
+        ::= { wlsxStateSyncEntry 5 }
+
+    haTotalKeyCacheEntries OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of key cache entries.
+            "
+        ::= { wlsxStateSyncEntry 6 }
+
+
+-- HA tunnel table --
+
+   wlsxHighAvalabilityTunnelTable  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxHighAvalabilityTunnelEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+        "
+            This table lists the total number of High Availability acitve/standby tunnels
+            and AP heart beat tunnels on the Aruba controller.
+        "
+	
+      ::= { wlsxHighAvalabilityInfoGroup 5 } 
+
+   wlsxHighAvalabilityTunnelEntry OBJECT-TYPE 
+	  SYNTAX       WlsxHighAvalabilityTunnelEntry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             " HA tunnel entry " 
+	  INDEX { haProfileName }
+      ::= { wlsxHighAvalabilityTunnelTable 1 } 
+
+   WlsxHighAvalabilityTunnelEntry ::=
+     SEQUENCE {
+
+		haActiveVapTunnels				Gauge,
+		haStandbyVapTunnels  			Gauge,
+		haTotalVapTunnels      			Gauge,
+		haAPHbtTunnels	 				Gauge
+     }
+
+    haActiveVapTunnels OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of active per VAP GRE tunnels.
+            "
+        ::= { wlsxHighAvalabilityTunnelEntry 1 }
+
+    haStandbyVapTunnels OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of standby per VAP GRE tunnels.
+            "
+        ::= { wlsxHighAvalabilityTunnelEntry 2 }
+
+    haTotalVapTunnels OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The total number of per VAP GRE tunnels.
+            "
+        ::= { wlsxHighAvalabilityTunnelEntry 3 }
+
+    haAPHbtTunnels OBJECT-TYPE
+         SYNTAX       Gauge
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The number of AP hbt GRE tunnels.
+            "
+        ::= { wlsxHighAvalabilityTunnelEntry 4 }
+
+-- High Availability Traps
+-- This group defines all the traps related to High Availability. 
+wlsxHaTrapObjectsGroup      OBJECT IDENTIFIER ::= { wlsxHighAvalabilityTraps 1 }
+wlsxHaTrapDefinitionGroup   OBJECT IDENTIFIER ::= { wlsxHighAvalabilityTraps 2 }
+
+    wlsxHaV4Status OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 This object is used in the traps to indicate the
+             IPv4 status of High Availability.
+            "
+        ::= { wlsxHaTrapObjectsGroup 1 }
+    wlsxHaV4Role OBJECT-TYPE
+         SYNTAX       ArubaHaRole
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object is used in the traps to indicate the
+            IPv4 HA role of the controller.
+            "
+        ::= { wlsxHaTrapObjectsGroup 2 }
+
+    wlsxHaV6Status OBJECT-TYPE
+         SYNTAX       ArubaEnableValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object is used in the traps to indicate the
+            IPv6 status of High Availability.
+            "
+        ::= { wlsxHaTrapObjectsGroup 3 }
+
+    wlsxHaV6Role OBJECT-TYPE
+         SYNTAX       ArubaHaRole
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object is used in the traps to indicate the
+            IPv6 HA role of the controller.
+            "
+        ::=  { wlsxHaTrapObjectsGroup 4 }
+
+    wlsxHaAPName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..63))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object is used in the traps to indicate name of an AP.
+            "
+        ::= { wlsxHaTrapObjectsGroup 5 }
+
+
+    wlsxHaActiveControllerIp OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..63))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object is used in the traps to indicate the active controller IP address.
+            "
+        ::= { wlsxHaTrapObjectsGroup 6 }
+
+    wlsxHaStandbyControllerIp OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..63))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object is used in the traps to indicate the standby controller IP address.
+            "
+        ::= { wlsxHaTrapObjectsGroup 7 }
+
+     wlsxTrapHaConnectivityStatus OBJECT-TYPE
+         SYNTAX       ArubaHaConnectivityStatus
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object is used in the traps to indicate standby controller connectivity status
+            of an AP.
+            "
+        ::=  { wlsxHaTrapObjectsGroup 8 }
+
+     wlsxTrapHaIntercontrollerHbtMissCnt OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object is used in the traps to indicate the number of intercontroller heart beat miss. 
+            "
+        ::=  { wlsxHaTrapObjectsGroup 9 }
+
+     wlsxTrapHaHbtMissTimeStamp OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..63))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object is used in the traps to indicate the time stamp of 
+            intercontroller heart beat miss. 
+            "
+        ::=  { wlsxHaTrapObjectsGroup 10 }
+
+      wlsxTrapHaStandbyApCnt OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object is used in the traps to indicate the number of standby APs on standby controller.
+            "
+        ::=  { wlsxHaTrapObjectsGroup 11 }
+
+
+--Trap Definition
+         wlsxHaState  NOTIFICATION-TYPE
+         OBJECTS {wlsxHaV4Status, wlsxHaV4Role, wlsxHaV6Status, wlsxHaV6Role}
+         STATUS  current
+         DESCRIPTION
+            "This trap indicates that HA state has changed."
+         ::= { wlsxHaTrapDefinitionGroup 1 }
+
+         wlsxHaStandbyIpSentFailed  NOTIFICATION-TYPE
+         OBJECTS {wlsxHaStandbyControllerIp, wlsxHaAPName}
+         STATUS  current
+         DESCRIPTION
+            "This trap indicates that standby IP is sent to an AP failed"
+         ::= { wlsxHaTrapDefinitionGroup 2 }
+
+         wlsxHaStandbyConnectivityState  NOTIFICATION-TYPE
+         OBJECTS {wlsxHaAPName, wlsxHaStandbyControllerIp, wlsxTrapHaConnectivityStatus}
+         STATUS  current
+         DESCRIPTION
+            "This trap indicates the standby connectivity status for an AP."
+         ::= { wlsxHaTrapDefinitionGroup 3 }
+
+         wlsxHaIntercontrollerHbtMiss  NOTIFICATION-TYPE
+         OBJECTS {wlsxTrapHaIntercontrollerHbtMissCnt, wlsxHaActiveControllerIp, wlsxTrapHaHbtMissTimeStamp}
+         STATUS  current
+         DESCRIPTION
+            "This trap indicates around half of the threshold intercontroller hearbeat 
+             missed with serving controller.
+            "
+         ::= { wlsxHaTrapDefinitionGroup 4 }
+
+         wlsxHaFailoverTrigger  NOTIFICATION-TYPE
+         OBJECTS {wlsxHaActiveControllerIp, wlsxTrapHaStandbyApCnt}
+         STATUS  current
+         DESCRIPTION
+            "This trap indicates that standby controller has triggered HA failover to aps belonging to a
+            particular serving controller with which intercontroller heart beat missed above threshold."
+
+         ::= { wlsxHaTrapDefinitionGroup 5 }
+
+          wlsxHaFailoverRequestFromAp NOTIFICATION-TYPE
+         OBJECTS {wlsxHaAPName}
+         STATUS  current
+         DESCRIPTION
+            "This trap indicates that an ap sent failover request to the controller.
+             This could be because of AP missing hbt with serving controller, on receiving failover 
+             request from standby controller or AP trying to preempt back to active controller"
+         ::= { wlsxHaTrapDefinitionGroup 6 }
+END

@@ -1,0 +1,47 @@
+mib: DELLEMC-OS10-CHASSIS-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: os10ChassisTable
+                    value: os10ChassisTemp
+                    num_oid: '.1.3.6.1.4.1.674.11000.5000.100.4.1.1.3.1.11.{{ $index }}'
+                    descr: 'Chassis {{ $index }}'
+                -
+                    oid: os10CardTable
+                    value: os10CardTemp
+                    num_oid: '.1.3.6.1.4.1.674.11000.5000.100.4.1.1.4.1.5.{{ $index }}'
+                    descr: 'Card {{ $index }}'
+        state:
+            data:
+                -
+                    oid: os10FanTable
+                    value: os10FanOperStatus
+                    num_oid: '.1.3.6.1.4.1.674.11000.5000.100.4.1.2.3.1.7.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    group: Fans
+                    state_name: os10FanOperStatus
+                    states:
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: abnormal, graph: 1, generic: 2 }
+                -
+                    oid: os10FanTrayTable
+                    value: os10FanTrayOperStatus
+                    num_oid: '.1.3.6.1.4.1.674.11000.5000.100.4.1.2.2.1.4.{{ $index }}'
+                    descr: 'Fan Tray {{ $index }}'
+                    group: Fans
+                    state_name: os10FanTrayOperStatus
+                    states:
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: abnormal, graph: 1, generic: 2 }
+                -
+                    oid: os10PowerSupplyTable
+                    value: os10PowerSupplyOperStatus
+                    num_oid: '.1.3.6.1.4.1.674.11000.5000.100.4.1.2.1.1.4.{{ $index }}'
+                    descr: 'PSU {{ $index }}'
+                    group: PSUs
+                    state_name: os10PowerSupplyOperStatus
+                    states:
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: abnormal, graph: 1, generic: 2 }

@@ -1,0 +1,1617 @@
+-- **********************************************************
+-- Copyright 2016-2017 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-VRNI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+       FROM SNMPv2-SMI
+   SnmpAdminString
+       FROM SNMP-FRAMEWORK-MIB
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+       FROM SNMPv2-CONF
+   TEXTUAL-CONVENTION, DateAndTime
+       FROM SNMPv2-TC
+   vmwNetworkInsight
+       FROM VMWARE-ROOT-MIB
+   VmwLongSnmpAdminString
+       FROM VMWARE-TC-MIB;
+
+    vmwNetworkInsightMIB MODULE-IDENTITY
+    LAST-UPDATED "201709050000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://kb.vmware.com/kb/1013445
+    "
+    DESCRIPTION
+     "This MIB module is for VMware vRealize Network Insight as described here:
+     https://www.vmware.com/support/pubs/vrealize-network-insight-pubs.html
+     "
+
+    REVISION      "201709050000Z"
+    DESCRIPTION
+    "This is the fourth revsion of VMware vRealize Network Insight Manager SNMP notifications.
+    It adds fourteen new notifications, see vmwNetworkInsightNotificationGroup4.
+    "
+
+   REVISION     "201706010000Z"
+   DESCRIPTION
+    "This is the third revsion of VMware vRealize Network Insight Manager SNMP notifications.
+     This version added nineteen new notifications, see vmwNetworkInsightNotificationGroup3
+     for complete listing."
+
+    REVISION      "201702200000Z"
+    DESCRIPTION
+    "This is the second revision of VMware vRealize Network Insight Manager SNMP notifications.
+     It introduces new notifications, see vmwNetworkInsightNotificationGroup2,
+     and updates existing notifications to append the vmwEventName managed object."
+
+
+    REVISION      "201610260000Z"
+    DESCRIPTION
+    "This is the first revision of VMware vRealize Network Insight Manager SNMP notifications."
+    ::= { vmwNetworkInsight 1 }
+
+vmwVRNIEvents OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "All notifications from vRealize Network Insight fall under this oid."
+    ::= { vmwNetworkInsightMIB 0 }
+
+vmwVRNIData OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "All variables that are sent in notifications fall under this oid."
+    ::= { vmwNetworkInsightMIB 1 }
+
+-- **********************************************************
+-- Type definitions
+-- **********************************************************
+
+VmwVrniSeverity ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Event Severity
+        For Problems, Major - Opens and alarms, Cleared Closes it
+        For Notifications - All are Info
+        "
+    SYNTAX          INTEGER { cleared(0), info(1), major(2) }
+
+
+-- **********************************************************
+-- Notifications by an agent that implements this mib module
+-- **********************************************************
+
+vmwSnmpTrapsAreConfigured NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Initial trap to notify receiver that vRNI is now configured to send SNMP traps"
+   ::= { vmwVRNIEvents 101}
+
+
+vmwSnmpTrapsAreDisabled NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Trap to notify receiver that vRNI is no longer configured to send SNMP traps"
+   ::= { vmwVRNIEvents 102}
+
+vmwTestTrap NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Test Trap"
+   ::= { vmwVRNIEvents 103}
+
+vmwEntityDiscoveryChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Discovery Event"
+   ::= { vmwVRNIEvents 20001}
+
+vmwEntityPropertiesChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Property Change Event"
+   ::= { vmwVRNIEvents 20002}
+
+vmwFirewallNotInstalledOnHostEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Firewall Not Installed On Host Event"
+   ::= { vmwVRNIEvents 20003}
+
+vmwHostWithStaleFirewallRulesEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host With Stale Firewall Rules Event"
+   ::= { vmwVRNIEvents 20004}
+
+vmwIpAddressChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Ip Address Change"
+   ::= { vmwVRNIEvents 20005}
+
+vmwL2GatewayAnomalyEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "L2 Gateway Anomaly Event"
+   ::= { vmwVRNIEvents 20006}
+
+vmwL2NetworkAddressAnomalyEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "L2 Network Address Anomaly Event"
+   ::= { vmwVRNIEvents 20007}
+
+vmwL2NetworkDiameterExceededEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "L2 Network Diameter Exceeded Event"
+   ::= { vmwVRNIEvents 20008}
+
+vmwL2NetworkUplinkMissingEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "L2 Network Uplink Missing Event"
+   ::= { vmwVRNIEvents 20009}
+
+vmwL2NetworkWithNoVMsEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "L2 Network With No VMs Event"
+   ::= { vmwVRNIEvents 20010}
+
+vmwLayer2NetworkDiameterChangedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Layer2 Network Diameter Changed Event"
+   ::= { vmwVRNIEvents 20011}
+
+vmwMTUMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "MTU Mismatch Event"
+   ::= { vmwVRNIEvents 20012}
+
+vmwNetworkIsolationEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Network Isolation Event"
+   ::= { vmwVRNIEvents 20013}
+
+vmwNoPathEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "No Path Event"
+   ::= { vmwVRNIEvents 20014}
+
+vmwSpoofguardDisabledEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Spoofguard Disabled Event"
+   ::= { vmwVRNIEvents 20015}
+
+vmwVMotionEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VMotion Event"
+   ::= { vmwVRNIEvents 20018}
+
+vmwVMWithDisconnectedVnicsEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VM With Disconnected Vnics Event"
+   ::= { vmwVRNIEvents 20019}
+
+vmwVMWithMulipleVnicsOnDifferentVxlansEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VM With Multiple Vnics On Different Vxlans Event"
+   ::= { vmwVRNIEvents 20020}
+
+vmwVMWithMulipleVnicsOnSameL2Event NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VM With Multiple Vnics On Same L2 Event"
+   ::= { vmwVRNIEvents 20021}
+
+vmwVMWithNoIpAddressEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VM With No Ip Address Event"
+   ::= { vmwVRNIEvents 20022}
+
+vmwVTEPMissingEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VTEP Missing Event"
+   ::= { vmwVRNIEvents 20023}
+
+vmwL2Event NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "L2 Event"
+   ::= { vmwVRNIEvents 20024}
+
+vmwMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Membership Change"
+   ::= { vmwVRNIEvents 20025}
+
+vmwSecurityGroupMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Security Group Membership Change"
+   ::= { vmwVRNIEvents 20026}
+
+vmwFirewallRuleMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Firewall Rule Membership Change"
+   ::= { vmwVRNIEvents 20027}
+
+vmwVlanMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Vlan Membership Change"
+   ::= { vmwVRNIEvents 20028}
+
+vmwVxlanMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Vxlan Membership Change"
+   ::= { vmwVRNIEvents 20029}
+
+vmwDeleteChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Delete Event"
+   ::= { vmwVRNIEvents 20030}
+
+vmwVtepFailedPingEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VTEP Ping Failure Event"
+   ::= { vmwVRNIEvents 20031}
+
+vmwEmptySearchStreamChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Search with no results"
+   ::= { vmwVRNIEvents 20034}
+
+vmwSearchStreamMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Search results changed"
+   ::= { vmwVRNIEvents 20035}
+
+vmwEmptySearchStreamProblemEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Search with no results (Problem)"
+   ::= { vmwVRNIEvents 20036}
+
+vmwSearchStreamMembershipProblemEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Search results changed (Problem)"
+   ::= { vmwVRNIEvents 20037}
+
+vmwOspfConfigurationMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "OSPF Mismatch Event"
+   ::= { vmwVRNIEvents 20038}
+
+vmwServiceVMNotHealthyEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Service VM Not Healthy Event"
+   ::= { vmwVRNIEvents 20039}
+
+vmwServiceVMNotPoweredOnEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Service VM Not Powered On Event"
+   ::= { vmwVRNIEvents 20040}
+
+vmwServiceVMHighCPUUsageEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Service VM High CPU Usage Event"
+   ::= { vmwVRNIEvents 20041}
+
+vmwServiceVMHighMemoryUsageEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Service VM High Memory Usage Event"
+   ::= { vmwVRNIEvents 20042}
+
+vmwServiceVMHighDiskUsageEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Service VM High Disk Usage Event"
+   ::= { vmwVRNIEvents 20043}
+
+vmwIPSetPropertiesChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "IPSet Change"
+   ::= { vmwVRNIEvents 20050}
+
+vmwFirewallRulePropertiesChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Firewall Rule Change"
+   ::= { vmwVRNIEvents 20051}
+
+vmwSecurityGroupPropertiesChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Security Group Change"
+   ::= { vmwVRNIEvents 20052}
+
+vmwIPSetMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "IPSet Membership Change"
+   ::= { vmwVRNIEvents 20053}
+
+vmwFirewallRuleMaskEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Firewall Rule Masked Event"
+   ::= { vmwVRNIEvents 20054}
+
+vmwSecurityMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Security Membership Change"
+   ::= { vmwVRNIEvents 20056}
+
+vmwSecurityTagPropertiesChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Security Tag Change"
+   ::= { vmwVRNIEvents 20057}
+
+vmwSecurityTagMembershipChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Security Tag Membership Change"
+   ::= { vmwVRNIEvents 20058}
+
+vmwHostDatastoreChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host datastores changed"
+   ::= { vmwVRNIEvents 20059}
+
+vmwVMDatastoreChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VM datastores changed"
+   ::= { vmwVRNIEvents 20060}
+
+vmwVMSnapshotChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VM snapshot changed"
+   ::= { vmwVRNIEvents 20061}
+
+vmwVMVirtualDiskChangeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Virtual disk migrated"
+   ::= { vmwVRNIEvents 20062}
+
+vmwIPSetDefinitionMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "IPSET Definition Mismatch Event"
+   ::= { vmwVRNIEvents 20063}
+
+vmwSegmentMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Segment Mismatch Event"
+   ::= { vmwVRNIEvents 20064}
+
+vmwVtepEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Vtep Event"
+   ::= { vmwVRNIEvents 20065}
+
+vmwVtepConfigurationFaultEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Vtep Configuration Fault Event"
+   ::= { vmwVRNIEvents 20066}
+
+vmwVtepSubnetMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Vtep Subnet Mismatch Event"
+   ::= { vmwVRNIEvents 20068}
+
+vmwVtepCountMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Vtep Count Mismatch Event"
+   ::= { vmwVRNIEvents 20069}
+
+vmwDLRNetworksNotReachableEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "DLR Routing event"
+   ::= { vmwVRNIEvents 20067}
+
+vmwEdgeNetworksNotReachableEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Edge Routing event"
+   ::= { vmwVRNIEvents 20070}
+
+vmwThresholdExceededEventCpuReady NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded Cpu Ready"
+   ::= { vmwVRNIEvents 30001}
+
+vmwThresholdExceededEventCpuCoStop NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded Cpu Co Stop"
+   ::= { vmwVRNIEvents 30002}
+
+vmwThresholdExceededEventDiskCommandAbortRule NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded Disk Command Abort Rule"
+   ::= { vmwVRNIEvents 30003}
+
+vmwThresholdExceededEventIODeviceLatencyRule NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded IO Device Latency Rule"
+   ::= { vmwVRNIEvents 30004}
+
+vmwThresholdExceededEventIOKernelLatencyRule NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded IO Kernel Latency Rule"
+   ::= { vmwVRNIEvents 30005}
+
+vmwThresholdExceededEventMemorySwapInRule NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded Memory Swap In Rule"
+   ::= { vmwVRNIEvents 30006}
+
+vmwThresholdExceededEventMemorySwapOutRule NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded Memory Swap Out Rule"
+   ::= { vmwVRNIEvents 30007}
+
+vmwThresholdExceededEventNetworkRxDropRule NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded Memory Rx Drop Rule"
+   ::= { vmwVRNIEvents 30008}
+
+vmwThresholdExceededEventNetworkTxDropRule NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Threshold Exceeded Memory Tx Drop Rule"
+   ::= { vmwVRNIEvents 30009}
+
+vmwPacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Packet Drop Event"
+   ::= { vmwVRNIEvents 30100}
+
+vmwSwitchPortPacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Switch Port Packet Drop"
+   ::= { vmwVRNIEvents 30101}
+
+vmwRouterInterfacePacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Router Interface Packet Drop"
+   ::= { vmwVRNIEvents 30102}
+
+vmwVnicPacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Vnic Packet Drop"
+   ::= { vmwVRNIEvents 30103}
+
+vmwVTEPUnderlayPacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "VTEP Underlay Packet Drop"
+   ::= { vmwVRNIEvents 30104}
+
+vmwPnicUnderlyingSwitchPortPacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "PNIC Underlying Switch Port Packet Drop"
+   ::= { vmwVRNIEvents 30105}
+
+vmwDevicePacketDropEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Device Packet Drop"
+   ::= { vmwVRNIEvents 30106}
+
+vmwThresholdExceededEventDatastoreFreeSpaceWarning NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "ThresholdExceededEventDatastoreFreeSpaceWarning"
+   ::= { vmwVRNIEvents 30203}
+
+vmwThresholdExceededEventDatastoreFreeSpaceCritical NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "ThresholdExceededEventDatastoreFreeSpaceCritical"
+   ::= { vmwVRNIEvents 30204}
+
+vmwThresholdExceededEventDatastoreReadLatency NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "ThresholdExceededEventDatastoreReadLatency"
+   ::= { vmwVRNIEvents 30205}
+
+vmwThresholdExceededEventDatastoreWriteLatency NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "ThresholdExceededEventDatastoreWriteLatency"
+   ::= { vmwVRNIEvents 30206}
+
+vmwDistributedFirewallApplyHostEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Distributed Firewall Apply Host Event"
+   ::= { vmwVRNIEvents 35001}
+
+vmwDistributedFirewallApplyVMEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Distributed Firewall Apply VM Event"
+   ::= { vmwVRNIEvents 35002}
+
+vmwNsxEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Nsx Event"
+   ::= { vmwVRNIEvents 35003}
+
+vmwFeatureImpactedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Feature Impacted Event"
+   ::= { vmwVRNIEvents 35004}
+
+vmwClusterFeatureVersionMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Cluster Feature Mismatch Event"
+   ::= { vmwVRNIEvents 36022}
+
+vmwHostFeatureVersionMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Feature Mismatch Event"
+   ::= { vmwVRNIEvents 36023}
+
+vmwFeatureVersionMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Feature Version Mismatch Event"
+   ::= { vmwVRNIEvents 36024}
+
+vmwHostFeatureEnabledMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Feature Enabled Mismatch Event"
+   ::= { vmwVRNIEvents 36025}
+
+vmwHostFeatureInstalledMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Feature Installed Mismatch Event"
+   ::= { vmwVRNIEvents 36026}
+
+vmwHostVtepNotFoundEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Vtep Not Found Event"
+   ::= { vmwVRNIEvents 36027}
+
+vmwHostVtepDisconnectedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Vtep Disconnected Event"
+   ::= { vmwVRNIEvents 36028}
+
+vmwHostVtepEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Vtep Event"
+   ::= { vmwVRNIEvents 36029}
+
+vmwClusterHostsVtepMTUMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Vtep Mtu Mismatch Event"
+   ::= { vmwVRNIEvents 36030}
+
+vmwFeatureUnhealthyEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Feature Health Event"
+   ::= { vmwVRNIEvents 36031}
+
+vmwEdgeHANotConfiguredEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Edge High Availability is not enabled Event"
+   ::= { vmwVRNIEvents 36032}
+
+vmwEdgeInterfacesDownEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "One or More NSX Edge Interfaces are down Event"
+   ::= { vmwVRNIEvents 36033}
+
+vmwModuleUnhealthyEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Module Unhealthy Event"
+   ::= { vmwVRNIEvents 36041}
+
+vmwModuleNotLoadedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Module Not Loaded Event"
+   ::= { vmwVRNIEvents 36042}
+
+vmwModuleNetworkConnectionFailureEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Module Network Connection Failure Event"
+   ::= { vmwVRNIEvents 36043}
+
+vmwHostNetworkControlPlaneMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Control Plane Network Mismatch Event"
+   ::= { vmwVRNIEvents 36044}
+
+vmwHostNetworkControlPlaneConnectionFailureEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Control Plane Network Connection Failure Event"
+   ::= { vmwVRNIEvents 36045}
+
+vmwHostNetworkControlPlaneNotSyncedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Control Plane Sync Failure Event"
+   ::= { vmwVRNIEvents 36046}
+
+vmwNSXControllerClusterMajorityEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Controller Cluster Majority Event"
+   ::= { vmwVRNIEvents 36047}
+
+vmwNSXControllersVMOnSameHostEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Controllers VM On Same Host Event"
+   ::= { vmwVRNIEvents 36048}
+
+vmwVxLanRangeExhaustEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Vxlan range exhaust  Event"
+   ::= { vmwVRNIEvents 36049}
+
+vmwNSXFirewallDefaultAllowAllRulesEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Firewall Allow All Rules Event"
+   ::= { vmwVRNIEvents 36050}
+
+vmwLogicalRouterNoUplinkEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Logical Router does not have an uplink interface configured Event"
+   ::= { vmwVRNIEvents 36051}
+
+vmwEdgeNotHAEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Edge not Highly Available Event"
+   ::= { vmwVRNIEvents 36052}
+
+vmwEdgeNotDeployedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Edge not deployed Event"
+   ::= { vmwVRNIEvents 36053}
+
+vmwEcmpIsEnabledAndStatefulServicesAreUpEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Edge Running with both ECMP and Stateful Edge Services Event"
+   ::= { vmwVRNIEvents 36054}
+
+vmwLogicalRouterDeployedOnEcmpEdgeHostEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Logical Router and ECMP Edge on Same Host Event"
+   ::= { vmwVRNIEvents 36055}
+
+vmwEdgeMissingInterfaceOSPFAreaMappingEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Edge Interface to OSPF Area Mapping Missing Event"
+   ::= { vmwVRNIEvents 36056}
+
+vmwOspfInsecureAuthRouterEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "One or more OSPF areas on the NSX Edge are using insecure authentication Event"
+   ::= { vmwVRNIEvents 36057}
+
+vmwNSXControllersDeployedCountEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Controller count  Event"
+   ::= { vmwVRNIEvents 36058}
+
+vmwNSXControllerNotActiveCountEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Controller Not Active  Event"
+   ::= { vmwVRNIEvents 36059}
+
+vmwNSXControllerEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Nsx Controller Event"
+   ::= { vmwVRNIEvents 36060}
+
+vmwNSXEcmpEdgeDownEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "One or more NSX Edges in the ECMP Cluster are currently down"
+   ::= { vmwVRNIEvents 36061}
+
+vmwNSXMajorityEcmpEdgesDownEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "The majority of NSX Edges in the ECMP Cluster are currently down"
+   ::= { vmwVRNIEvents 36062}
+
+vmwNSXAllEcmpEdgesDownEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "All NSX Edges in the ECMP Cluster are currently down"
+   ::= { vmwVRNIEvents 36063}
+
+vmwNSXEdgeMtuMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "The MTU configured on one or more interfaces on the Edge does not match the MTU on the next hop router"
+   ::= { vmwVRNIEvents 36064}
+
+vmwNSXEdgeSplitBrainEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Both VMs of Edge HA are in active state"
+   ::= { vmwVRNIEvents 36065}
+
+vmwNSXComponentEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Service not running event"
+   ::= { vmwVRNIEvents 35221}
+
+vmwNSXBackupEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Backup not configured"
+   ::= { vmwVRNIEvents 35222}
+
+vmwNSXBackupAuditLogExcludedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Audit Log excluded from NSX Backup"
+   ::= { vmwVRNIEvents 35223}
+
+vmwNSXUnsecureBackupEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX Backups not using secure FTP"
+   ::= { vmwVRNIEvents 35224}
+
+vmwNSXBackupSystemEventsExcludedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "System Event excluded from NSX Backup"
+   ::= { vmwVRNIEvents 35225}
+
+vmwNSXBackupNotScheduledEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Scheduled backups are not enabled"
+   ::= { vmwVRNIEvents 35226}
+
+vmwNSXBackupNotRecordedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "No backup of the environment has been recorded"
+   ::= { vmwVRNIEvents 35227}
+
+vmwNSXNtpServerEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NTP Server not configured"
+   ::= { vmwVRNIEvents 35228}
+
+vmwNSXSysLogServerEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Syslog Server not configured"
+   ::= { vmwVRNIEvents 35229}
+
+vmwControllerSysLogServerEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Syslog Server not configured"
+   ::= { vmwVRNIEvents 35230}
+
+vmwNSXIpV6EnabledEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "IPv6 is enabled for NSX Manager"
+   ::= { vmwVRNIEvents 35231}
+
+vmwNSXOspfNeighborDownEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "One or more OSPF Neighbors down"
+   ::= { vmwVRNIEvents 35232}
+
+vmwGenericNSXSystemEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX System Events (Warning)"
+   ::= { vmwVRNIEvents 70000}
+
+vmwOtherCriticalNSXEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "NSX System Events (Critical)"
+   ::= { vmwVRNIEvents 71000}
+
+vmwFilterConfigApplyOnHostFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Filter Config Apply On Host Failed Event"
+   ::= { vmwVRNIEvents 70001}
+
+vmwRulesetLoadOnHostFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Ruleset Load On Host Failed Event"
+   ::= { vmwVRNIEvents 70002}
+
+vmwConfigUpdateOnHostFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Config Update On Host Failed Event"
+   ::= { vmwVRNIEvents 70003}
+
+vmwSpoofguardConfigUpdateOnHostFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Spoofguard Config Update On Host Failed Event"
+   ::= { vmwVRNIEvents 70004}
+
+vmwApplyRuleToVnicFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Apply Rule To Vnic Failed Event"
+   ::= { vmwVRNIEvents 70005}
+
+vmwContainerConfigUpdateOnVnicFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Container Config Update On Vnic Failed Event"
+   ::= { vmwVRNIEvents 70006}
+
+vmwSpoofguardApplyToVnicFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Spoofguard Apply To Vnic Failed Event"
+   ::= { vmwVRNIEvents 70007}
+
+vmwHostMessagingConfigurationFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Messaging Configuration Failed Event"
+   ::= { vmwVRNIEvents 70008}
+
+vmwHostMessagingConnectionReconfigurationFailedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Messaging Connection Reconfiguration Failed Event"
+   ::= { vmwVRNIEvents 70009}
+
+vmwHostMessagingConfigurationFailedNotificationSkippedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Messaging Configuration Failed Notification Skipped Event"
+   ::= { vmwVRNIEvents 70010}
+
+vmwHostMessagingInfrastructureDownEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host Messaging Infrastructure Down Event"
+   ::= { vmwVRNIEvents 70011}
+
+vmwEdgeVMNotRespondingEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Edge VM Responding Event"
+   ::= { vmwVRNIEvents 70012}
+
+vmwEdgeUnhealthyEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Edge Health Event"
+   ::= { vmwVRNIEvents 70013}
+
+vmwEdgeVMCommunicationFailureEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Edge communication failure Event"
+   ::= { vmwVRNIEvents 70014}
+
+vmwNSXEdgeEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Nsx Edge Event"
+   ::= { vmwVRNIEvents 70015}
+
+vmwPanEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Palo Alto Event"
+   ::= { vmwVRNIEvents 80000}
+
+vmwPanNsxNotInRegisteredStateEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Palo Alto Nsx Registration Event"
+   ::= { vmwVRNIEvents 80001}
+
+vmwPanNsxDynamicUpdateDelayedEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Palo Alto Nsx Dynamic Update Event"
+   ::= { vmwVRNIEvents 80002}
+
+vmwPanDeviceInDisconnectedStateEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Palo Alto Device Disconnect Event"
+   ::= { vmwVRNIEvents 80003}
+
+vmwPanNsxServiceApplianceViewMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Palo Alto Service Device Mismatch Event"
+   ::= { vmwVRNIEvents 80004}
+
+vmwPanNsxFabricAgentNotFoundOnHostEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Nsx Fabric Agent Not Found Event"
+   ::= { vmwVRNIEvents 80005}
+
+vmwPanNsxServiceVMNotFoundOnHostEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Palo Alto Service VM Not Found Event"
+   ::= { vmwVRNIEvents 80006}
+
+vmwCheckpointEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Check Point Event"
+   ::= { vmwVRNIEvents 80100}
+
+vmwCheckpointNsxFabricAgentNotFoundOnHostEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Check Point Nsx Fabric Agent Not Found Event"
+   ::= { vmwVRNIEvents 80102}
+
+vmwCheckpointNsxServiceVMNotFoundOnHostEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Check Point Service VM Not Found Event"
+   ::= { vmwVRNIEvents 80103}
+
+vmwCheckpointGatewaySicStatusNotCommunicatingEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Check Point Gateway Sic Status Not Communicating Event"
+   ::= { vmwVRNIEvents 80104}
+
+vmwCheckpointNsxServiceApplianceViewMismatchEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Check Point Service VM Mismatch Event"
+   ::= { vmwVRNIEvents 80105}
+
+vmwCriticalHostNotAccessibleEvent NOTIFICATION-TYPE
+   OBJECTS { vmwAffectedObject, vmwEventSeverity, vmwVrniUrl, vmwTimestamp, vmwOperatorDesc, vmwEventName }
+   STATUS current
+   DESCRIPTION
+      "Host with VMs running critical services is not accessible"
+   ::= { vmwVRNIEvents 40001}
+
+-- **********************************************************
+-- Notification parameters
+-- **********************************************************
+
+vmwAffectedObject OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Object affected by this event"
+    ::= { vmwVRNIData 102}
+
+
+vmwEventSeverity OBJECT-TYPE
+    SYNTAX          VmwVrniSeverity
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Event Severity
+        For Problems, Major - Opens and alarms, Cleared Closes it
+        For Notifications - All are Info
+        "
+    ::= { vmwVRNIData 103}
+
+vmwVrniUrl OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "URL to vRNI for this exact event"
+    ::= { vmwVRNIData 104}
+
+
+vmwTimestamp OBJECT-TYPE
+    SYNTAX          DateAndTime
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Time of first detection of event"
+    ::= { vmwVRNIData 105}
+
+vmwOperatorDesc OBJECT-TYPE
+    SYNTAX          VmwLongSnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "Human readable message of the event"
+    ::= { vmwVRNIData 106}
+
+vmwEventName OBJECT-TYPE
+    SYNTAX          VmwLongSnmpAdminString
+    MAX-ACCESS      accessible-for-notify
+    STATUS          current
+    DESCRIPTION
+        "This is the search string an operator as entered into VRNI. For example:
+         top 20 vms where cpu utilization > 50%"
+    ::= { vmwVRNIData 107}
+
+
+-- conformance information
+vmwNetworkInsightMIBConformance OBJECT IDENTIFIER ::= { vmwNetworkInsightMIB 99 }
+vmwNetworkInsightMIBCompliances OBJECT IDENTIFIER ::=
+                                        { vmwNetworkInsightMIBConformance 1 }
+vmwNetworkInsightMIBGroups OBJECT IDENTIFIER ::= { vmwNetworkInsightMIBConformance 2 }
+
+-- compliance statements
+vmwNetworkInsightMIBBasicCompliance MODULE-COMPLIANCE
+    STATUS     deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup1,
+                             vmwNetworkInsightNotificationGroup1 }
+    ::= { vmwNetworkInsightMIBCompliances 3 }
+
+vmwNetworkInsightNotificationInfoGroup1 OBJECT-GROUP
+    OBJECTS {
+    vmwAffectedObject,
+    vmwEventSeverity,
+    vmwVrniUrl,
+    vmwTimestamp,
+    vmwOperatorDesc
+    }
+    STATUS deprecated
+    DESCRIPTION
+    "These objects provide details in VRNI notifications."
+    ::= { vmwNetworkInsightMIBGroups 2 }
+
+vmwNetworkInsightNotificationGroup1 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+        vmwSnmpTrapsAreConfigured,
+        vmwSnmpTrapsAreDisabled,
+        vmwTestTrap,
+        vmwEntityDiscoveryChangeEvent,
+        vmwEntityPropertiesChangeEvent,
+        vmwFirewallNotInstalledOnHostEvent,
+        vmwHostWithStaleFirewallRulesEvent,
+        vmwIpAddressChangeEvent,
+        vmwL2GatewayAnomalyEvent,
+        vmwL2NetworkAddressAnomalyEvent,
+        vmwL2NetworkDiameterExceededEvent,
+        vmwL2NetworkUplinkMissingEvent,
+        vmwL2NetworkWithNoVMsEvent,
+        vmwLayer2NetworkDiameterChangedEvent,
+        vmwMTUMismatchEvent,
+        vmwNetworkIsolationEvent,
+        vmwNoPathEvent,
+        vmwSpoofguardDisabledEvent,
+        vmwVMotionEvent,
+        vmwVMWithDisconnectedVnicsEvent,
+        vmwVMWithMulipleVnicsOnDifferentVxlansEvent,
+        vmwVMWithMulipleVnicsOnSameL2Event,
+        vmwVMWithNoIpAddressEvent,
+        vmwVTEPMissingEvent,
+        vmwL2Event,
+        vmwMembershipChangeEvent,
+        vmwSecurityGroupMembershipChangeEvent,
+        vmwFirewallRuleMembershipChangeEvent,
+        vmwVlanMembershipChangeEvent,
+        vmwVxlanMembershipChangeEvent,
+        vmwDeleteChangeEvent,
+        vmwVtepFailedPingEvent,
+        vmwEmptySearchStreamChangeEvent,
+        vmwSearchStreamMembershipChangeEvent,
+        vmwEmptySearchStreamProblemEvent,
+        vmwSearchStreamMembershipProblemEvent,
+        vmwOspfConfigurationMismatchEvent,
+        vmwServiceVMNotHealthyEvent,
+        vmwServiceVMNotPoweredOnEvent,
+        vmwServiceVMHighCPUUsageEvent,
+        vmwServiceVMHighMemoryUsageEvent,
+        vmwServiceVMHighDiskUsageEvent,
+        vmwIPSetPropertiesChangeEvent,
+        vmwFirewallRulePropertiesChangeEvent,
+        vmwSecurityGroupPropertiesChangeEvent,
+        vmwIPSetMembershipChangeEvent,
+        vmwFirewallRuleMaskEvent,
+        vmwSecurityMembershipChangeEvent,
+        vmwSecurityTagPropertiesChangeEvent,
+        vmwSecurityTagMembershipChangeEvent,
+        vmwHostDatastoreChangeEvent,
+        vmwVMDatastoreChangeEvent,
+        vmwVMSnapshotChangeEvent,
+        vmwVMVirtualDiskChangeEvent,
+        vmwIPSetDefinitionMismatchEvent,
+        vmwSegmentMismatchEvent,
+        vmwVtepEvent,
+        vmwVtepConfigurationFaultEvent,
+        vmwVtepSubnetMismatchEvent,
+        vmwVtepCountMismatchEvent,
+        vmwDLRNetworksNotReachableEvent,
+        vmwEdgeNetworksNotReachableEvent,
+        vmwThresholdExceededEventCpuReady,
+        vmwThresholdExceededEventCpuCoStop,
+        vmwThresholdExceededEventDiskCommandAbortRule,
+        vmwThresholdExceededEventIODeviceLatencyRule,
+        vmwThresholdExceededEventIOKernelLatencyRule,
+        vmwThresholdExceededEventMemorySwapInRule,
+        vmwThresholdExceededEventMemorySwapOutRule,
+        vmwThresholdExceededEventNetworkRxDropRule,
+        vmwThresholdExceededEventNetworkTxDropRule,
+        vmwPacketDropEvent,
+        vmwSwitchPortPacketDropEvent,
+        vmwRouterInterfacePacketDropEvent,
+        vmwVnicPacketDropEvent,
+        vmwVTEPUnderlayPacketDropEvent,
+        vmwPnicUnderlyingSwitchPortPacketDropEvent,
+        vmwDevicePacketDropEvent,
+        vmwThresholdExceededEventDatastoreFreeSpaceWarning,
+        vmwThresholdExceededEventDatastoreFreeSpaceCritical,
+        vmwThresholdExceededEventDatastoreReadLatency,
+        vmwThresholdExceededEventDatastoreWriteLatency,
+        vmwDistributedFirewallApplyHostEvent,
+        vmwDistributedFirewallApplyVMEvent,
+        vmwNsxEvent,
+        vmwFeatureImpactedEvent,
+        vmwClusterFeatureVersionMismatchEvent,
+        vmwHostFeatureVersionMismatchEvent,
+        vmwFeatureVersionMismatchEvent,
+        vmwHostFeatureEnabledMismatchEvent,
+        vmwHostFeatureInstalledMismatchEvent,
+        vmwHostVtepNotFoundEvent,
+        vmwHostVtepDisconnectedEvent,
+        vmwHostVtepEvent,
+        vmwClusterHostsVtepMTUMismatchEvent,
+        vmwFeatureUnhealthyEvent,
+        vmwEdgeHANotConfiguredEvent,
+        vmwEdgeInterfacesDownEvent,
+        vmwModuleUnhealthyEvent,
+        vmwModuleNotLoadedEvent,
+        vmwModuleNetworkConnectionFailureEvent,
+        vmwHostNetworkControlPlaneMismatchEvent,
+        vmwHostNetworkControlPlaneConnectionFailureEvent,
+        vmwHostNetworkControlPlaneNotSyncedEvent,
+        vmwNSXControllerClusterMajorityEvent,
+        vmwNSXControllersVMOnSameHostEvent,
+        vmwVxLanRangeExhaustEvent,
+        vmwNSXFirewallDefaultAllowAllRulesEvent,
+        vmwEdgeNotHAEvent,
+        vmwEdgeNotDeployedEvent,
+        vmwEcmpIsEnabledAndStatefulServicesAreUpEvent,
+        vmwLogicalRouterDeployedOnEcmpEdgeHostEvent,
+        vmwEdgeMissingInterfaceOSPFAreaMappingEvent,
+        vmwOspfInsecureAuthRouterEvent,
+        vmwNSXControllersDeployedCountEvent,
+        vmwNSXControllerNotActiveCountEvent,
+        vmwNSXControllerEvent,
+        vmwNSXBackupEvent,
+        vmwNSXUnsecureBackupEvent,
+        vmwNSXBackupSystemEventsExcludedEvent,
+        vmwNSXBackupNotScheduledEvent,
+        vmwNSXBackupNotRecordedEvent,
+        vmwNSXNtpServerEvent,
+        vmwNSXSysLogServerEvent,
+        vmwControllerSysLogServerEvent,
+        vmwGenericNSXSystemEvent,
+        vmwOtherCriticalNSXEvent,
+        vmwFilterConfigApplyOnHostFailedEvent,
+        vmwRulesetLoadOnHostFailedEvent,
+        vmwConfigUpdateOnHostFailedEvent,
+        vmwSpoofguardConfigUpdateOnHostFailedEvent,
+        vmwApplyRuleToVnicFailedEvent,
+        vmwContainerConfigUpdateOnVnicFailedEvent,
+        vmwSpoofguardApplyToVnicFailedEvent,
+        vmwHostMessagingConfigurationFailedEvent,
+        vmwHostMessagingConnectionReconfigurationFailedEvent,
+        vmwHostMessagingConfigurationFailedNotificationSkippedEvent,
+        vmwHostMessagingInfrastructureDownEvent,
+        vmwEdgeVMNotRespondingEvent,
+        vmwEdgeUnhealthyEvent,
+        vmwEdgeVMCommunicationFailureEvent,
+        vmwNSXEdgeEvent,
+        vmwPanEvent,
+        vmwPanNsxNotInRegisteredStateEvent,
+        vmwPanNsxDynamicUpdateDelayedEvent,
+        vmwPanDeviceInDisconnectedStateEvent,
+        vmwPanNsxServiceApplianceViewMismatchEvent,
+        vmwPanNsxFabricAgentNotFoundOnHostEvent,
+        vmwPanNsxServiceVMNotFoundOnHostEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of notifications (traps, informs) supported in this first version."
+        ::= { vmwNetworkInsightMIBGroups 3 }
+
+vmwNetworkInsightMIBBasicCompliance2 MODULE-COMPLIANCE
+    STATUS     deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB second version."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup2,
+                       vmwNetworkInsightNotificationGroup1,
+                       vmwNetworkInsightNotificationGroup2
+                      }
+    ::= { vmwNetworkInsightMIBCompliances 30 }
+
+vmwNetworkInsightNotificationInfoGroup2 OBJECT-GROUP
+    OBJECTS {
+    vmwAffectedObject,
+    vmwEventSeverity,
+    vmwVrniUrl,
+    vmwTimestamp,
+    vmwOperatorDesc,
+    vmwEventName
+    }
+    STATUS current
+    DESCRIPTION
+    "These events provide details in NSX Manager notifications."
+    ::= { vmwNetworkInsightMIBGroups 20 }
+
+vmwNetworkInsightNotificationGroup2 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwLogicalRouterNoUplinkEvent,
+       vmwNSXComponentEvent,
+       vmwNSXBackupEvent,
+       vmwNSXBackupAuditLogExcludedEvent,
+       vmwNSXUnsecureBackupEvent,
+       vmwNSXBackupSystemEventsExcludedEvent,
+       vmwNSXBackupNotScheduledEvent,
+       vmwNSXBackupNotRecordedEvent,
+       vmwNSXNtpServerEvent,
+       vmwNSXSysLogServerEvent,
+       vmwControllerSysLogServerEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of added notifications (traps, informs) since last revision."
+        ::= { vmwNetworkInsightMIBGroups 30 }
+
+vmwNetworkInsightMIBBasicCompliance3 MODULE-COMPLIANCE
+    STATUS     deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB second version."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup2,
+                       vmwNetworkInsightNotificationGroup1,
+                       vmwNetworkInsightNotificationGroup2,
+                       vmwNetworkInsightNotificationGroup3
+                      }
+    ::= { vmwNetworkInsightMIBCompliances 35 }
+
+vmwNetworkInsightNotificationGroup3 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+        vmwMTUMismatchEvent,
+        vmwVMWithMulipleVnicsOnSameL2Event,
+        vmwMembershipChangeEvent,
+        vmwSecurityGroupMembershipChangeEvent,
+        vmwFirewallRuleMembershipChangeEvent,
+        vmwVlanMembershipChangeEvent,
+        vmwVxlanMembershipChangeEvent,
+        vmwSearchStreamMembershipChangeEvent,
+        vmwIPSetMembershipChangeEvent,
+        vmwSecurityMembershipChangeEvent,
+        vmwVtepEvent,
+        vmwPacketDropEvent,
+        vmwSwitchPortPacketDropEvent,
+        vmwRouterInterfacePacketDropEvent,
+        vmwVnicPacketDropEvent,
+        vmwVTEPUnderlayPacketDropEvent,
+        vmwPnicUnderlyingSwitchPortPacketDropEvent,
+        vmwHostFeatureVersionMismatchEvent,
+        vmwSpoofguardConfigUpdateOnHostFailedEvent,
+        vmwNSXEcmpEdgeDownEvent,
+        vmwNSXMajorityEcmpEdgesDownEvent,
+        vmwNSXAllEcmpEdgesDownEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of added notifications (traps, informs) since last revision."
+        ::= { vmwNetworkInsightMIBGroups 40 }
+
+vmwNetworkInsightMIBBasicCompliance4 MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+         VMWARE-VRNI-MIB second version."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNetworkInsightNotificationInfoGroup2,
+                       vmwNetworkInsightNotificationGroup1,
+                       vmwNetworkInsightNotificationGroup2,
+                       vmwNetworkInsightNotificationGroup3,
+                       vmwNetworkInsightNotificationGroup4
+                      }
+    ::= { vmwNetworkInsightMIBCompliances 45 }
+
+vmwNetworkInsightNotificationGroup4 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNSXEdgeSplitBrainEvent,
+       vmwNSXIpV6EnabledEvent,
+       vmwNSXOspfNeighborDownEvent,
+       vmwCheckpointEvent,
+       vmwNSXEdgeMtuMismatchEvent,
+       vmwCheckpointNsxFabricAgentNotFoundOnHostEvent,
+       vmwCheckpointNsxServiceVMNotFoundOnHostEvent,
+       vmwCheckpointGatewaySicStatusNotCommunicatingEvent,
+       vmwCheckpointNsxServiceApplianceViewMismatchEvent,
+       vmwCriticalHostNotAccessibleEvent,
+       vmwVlanMembershipChangeEvent,
+       vmwClusterFeatureVersionMismatchEvent,
+       vmwHostFeatureVersionMismatchEvent,
+       vmwConfigUpdateOnHostFailedEvent
+       }
+       STATUS current
+       DESCRIPTION
+            "Set of added notifications (traps, informs) since last revision."
+        ::= { vmwNetworkInsightMIBGroups 50 }
+
+END

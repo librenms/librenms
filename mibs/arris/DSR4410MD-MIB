@@ -1,0 +1,2194 @@
+--
+-- ***************************************************************************
+--
+--
+-- Document Title:    SPECIFICATION,MIB,DCII COMML IRD,DSR4410MD,V1.1.2.13
+-- Version:           1.1.2.13
+-- Date:              23 Apr, 2014
+--
+--
+--
+--
+-- Copyright (c) 2004-2014 ARRIS Group, Inc.  All rights reserved.
+--
+--
+-- ************************ PROPRIETARY INFORMATION *************************
+--
+-- This document is the property of ARRIS Group, Inc.  This document may only be distributed to:
+-- (i) an ARRIS employee having a legitimate business need for the information contained herein,
+-- or (ii) a non-ARRIS party having a legitimate business need for the information contained herein.
+-- No license, expressed or implied, under any patent, copyright or trade secret right is granted or
+-- implied by the conveyance of this document. No part of this document may be reproduced, transmitted,
+-- transcribed, stored in a retrieval system, translated into any language or computer language,
+-- in any form or by any means, electronic, mechanical, magnetic, optical, chemical, manual, or
+-- otherwise without the prior written permission of ARRIS Group, Inc.
+-- (See Document Security Standard, 320190-000 for details.)
+--
+-- The ARRIS Logo and all other trademarks indicated as such herein are trademarks of ARRIS Group, Inc.
+-- All other product or service names are the property of their respective owners.
+--
+--
+-- *************************** REVISION HISTORY ****************************
+--
+-- $Header: /fweng/cird/neptune/CVSDB/src/app/SNMPAgent/Attic/DSR4410MD.mib,v 1.1.2.13 2014/04/24 18:24:31 a17763 Exp $
+--
+--
+-- $Log: DSR4410MD.mib,v $
+-- Revision 1.1.2.13  2014/04/24 18:24:31  a17763
+-- Updated the Max DVB-S2 Symbol Rate to 33MSPS on FrontPanel/SNMP and Web.
+--
+-- CC ID: 2129
+--
+-- Revision 1.1.2.12  2011/08/11 22:30:30  mgi8231
+-- DSR4410MD BRANCH_19A
+-- Code Collaborator #576
+-- Added byte27 & pkt27 options to ASI format rate
+--
+-- Revision 1.1.2.11  2011/02/09 06:45:11  jtwc43
+-- port testmib to 4410MD
+--
+-- Revision 1.1.2.10  2011/02/08 09:39:48  a21357
+-- DSR4410MD : Fix to SCRs 267,268,269,271 : Updated desciptions for contrast,audio1LeftGain,audio2LeftGain audio1RightGain,audio2RightGain,tvPasscard and signalPower leaves.
+--
+-- Revision 1.1.2.9  2011/01/10 04:58:14  a21357
+-- Fix to SCR 247: Corrected the descriptions for acpAuthState and acpEncryptMode.
+--
+-- Revision 1.1.2.8  2010/12/15 11:41:15  a21357
+-- Added two new options TS-DSMCC and DSMCC to GigE outputmode.Necessary changes are made to FP,SNMP and HTTP.
+--
+-- Revision 1.1.2.7  2010/12/09 04:22:40  a21357
+-- Updated the signalpower range from (-80 - 0) to (-800 - 0).
+--
+-- Revision 1.1.2.6  2010/12/07 04:58:09  a21357
+-- Modified the description of ACP mib elements.
+-- Changed string length of portSatellite from 2-4 to 2-3.
+--
+-- Revision 1.1.2.5  2010/07/06 17:57:16  a21357
+-- 1] Added Module-identity block
+-- 2] Removed following mib elements that are not supported
+--     a] pidAliasing
+--     b] asiFormat
+--     c] frontPanelLockoutStatus
+--     d] bypassMode
+--     e] relayTest
+-- 3] Corrected the description of some mib elements.
+--
+-- Revision 1.1.2.4  2008/06/06 17:31:45  dwalson
+-- Checkins that support new FP choice for gigE output mode: gigE (over TS), DSM-CC, or Disabled.  Therefore, you can run with either gigE or DSM-CC, but not both.  Affected FP, osd, web browser, MIB, and supporting software.
+--
+-- Revision 1.1.2.3  2008/04/23 00:14:33  dwalson
+-- Audio 1 Right Language should match the read-write capability of Audio 2 Right Language.  Both the 4530 and 6050 mibs agree.
+--
+-- Revision 1.1.2.2  2008/04/22 23:07:18  dwalson
+-- Independent = 0 and joint = 1 for audio 1 & 2 Gain Control.
+--
+-- Revision 1.1.2.1  2007/10/15 23:17:34  dwalson
+-- Developed new mib file which removed extraneous ports, subcarrier descriptions and the DVT test MIB area.  This solved problem of "GetNext", "GetBulk" or walking, crashing the SNMP task.
+--
+-- Revision 1.8.4.5  2007/08/29 21:55:31  dwalson
+-- Fixed compiler errors.
+--
+-- Revision 1.8.4.4  2007/08/24 12:30:49  a21357
+-- 1]  Updated the MIB to fix SNMP SCRs.
+-- 2]  Added  "manual8pskDvbS2 option to Modulation.
+-- 3]  Added following "PSK8symbolRate" , "PSK8codeRate", "DVBS2symbolRate" and  "DVBS2codeRate"  to ManualTune.
+-- 4] Added "subtitleDisplay" leaf to textSetup.
+--
+-- Revision 1.8.4.3  2007/07/10 20:08:43  dwalson
+-- Variable rate ASI and mib support
+--
+-- Revision 1.8.4.2  2007/06/22 23:41:48  dwalson
+-- Added reset IRD options under the unitControl package, which mimics the front panel functions.  Get always returns 0 (no), while set allows for no(0), powercycle(1) and factorydefaults(2)
+--
+-- Revision 1.8.4.1  2007/04/24 11:59:25  a21357
+-- Modified access control for GigE parameters  from Read-Only to Read-Write.
+--
+-- Revision 1.8  2007/02/05 19:09:12  eqa001
+-- Fix for DSR4530 SCR#164. Changed the auido1RightLanguage field to read-only.
+--
+-- Revision 1.7  2007/02/05 18:34:59  eqa001
+-- Removed 5/11,3/5 and 4/5 code rate definitions for DVB-MAN in order to bring MIB inline with the front panel
+--
+-- Revision 1.6  2007/02/02 19:34:11  eqa001
+-- Fix for DSR4530 SCR#96. Changed "codeRate" to "DVBCodeRate"
+--
+-- Revision 1.5  2007/02/02 19:09:58  eqa001
+-- Fix for DSR4530 SCR#95. Changed "symbolRateSelect" to DVBsymbolRate
+--
+-- Revision 1.4  2007/02/01 22:07:32  eqa001
+-- Removed 5/11 symbolCodeBit option except for 19.51 and 29.27 symbol rate to bring it inline with the front panel as per specification INF14.3.
+--
+-- Revision 1.3  2007/01/31 21:56:58  eqa001
+-- Fix for SCR#330. Replaced "digicipher" with "signal"  in order to make the names on the leaves in MIB consistent with the Front panel.
+--
+-- Revision 1.2  2007/01/16 12:11:43  a21357
+-- Added TestMib which contains test features for DVT team.
+--
+-- Revision 1.1  2006/11/28 19:49:58  dwalson
+-- Initial checkins to support 4410-MD and SNMP/MIB
+--
+-- Revision 1.19  2006/10/25 23:43:47  dwalson
+-- Conform FEC rates to SEM-2003-001A.doc
+--
+-- Revision 1.18  2006/10/18 22:09:41  dwalson
+-- Make SNMP/MIB conform to 8psk choices.
+--
+-- Revision 1.17  2006/09/06 14:19:45  gparamasivam
+-- Chages for backward compatibility with 4410 mib
+--
+-- Revision 1.16  2006/06/02 09:37:12  a22333
+-- Modified to correctly display the authorization state for the current service. This is done to ensure that SNMP, FP and OSD are all in sync. Fixes SCR 127.
+--
+-- Revision 1.15  2006/05/17 00:42:32  mgi610
+-- Updates to the headers to reflect the correct version of MIB.
+--
+-- Revision 1.14  2006/05/02 05:05:35  a22333
+-- 1. Added Lock-off value to asiEnable Mib attribute.     2. Added lock-on value to pidAliasing mib attribute. Fixes SCR 181 & 182
+--
+-- Revision 1.13  2006/04/24 10:48:19  a22333
+-- Relabled providerID mib attribute to emmID to match  FrontPanel labeling. Fixes SCR 101.
+--
+-- Revision 1.12  2006/04/21 09:37:32  a22333
+-- Added support for Relay2Test and Relay3Test in the MIB
+--
+-- Revision 1.11  2006/04/21 05:11:34  a22333
+-- Removed relay3Test and relay3Purpose mib attributes
+--
+-- Revision 1.10  2006/04/20 12:45:39  a22333
+-- Relabled vits waveform ire100ModRamp to ire100Ramp as FrontPanel calls it. Fixes SCR 121
+--
+-- Revision 1.9  2006/04/20 11:36:52  a22333
+-- Changed testToneA & testToneB labels to testToneA-1000 and testToneB-4040-3960 to match FrontPanel labeling. Fixes SCR 122
+--
+-- Revision 1.8  2006/04/20 10:16:38  a22333
+-- 1. Changed the range of subCarrierL/RFreq to vary between 5.00 and 6.80. This fixes SCR 160.       2. Changed the range of subCarrierGain to range between 0 and -15dB. fixes SCR 159
+--
+-- Revision 1.7  2006/04/17 03:35:50  gparamasivam
+-- Changes the activePort enum's from port0-port7 to port1-port8 to match FrontPanel
+--
+-- Revision 1.6  2006/04/17 03:04:22  gparamasivam
+-- Change the name of port0-port7 to port1-port8
+--
+-- Revision 1.5  2006/04/16 13:26:23  gparamasivam
+-- Added individual port setup mode for all 8 ports
+--
+-- Revision 1.4  2006/04/15 07:01:17  gparamasivam
+-- Changed the enum for output aspect-retio to match the 4530 Front Panel
+--
+-- Revision 1.3  2006/04/15 06:44:36  gparamasivam
+-- Changed the name of LED MIB attributes to match the 4530 Front Panel
+--
+-- Revision 1.2  2006/04/15 05:42:48  gparamasivam
+-- Change the product id from DSR4410 to DSR4530. Also MIB name changed to DSR4530
+--
+-- Revision 1.1  2006/04/15 03:29:01  gparamasivam
+-- Changing DSR4410.mib to DSR4530.mib
+--
+-- Revision 1.37  2006/04/14 18:28:26  dwalson
+-- Tip checkins for retune monitoring.
+--
+-- Revision 1.36  2006/04/11 12:00:46  a22333
+-- Modified to support(query/set) the new Fast Facts 5 diagnostics Screen. This fixes SCR 119.
+--
+-- Revision 1.35  2006/04/11 09:58:29  a22333
+-- Changed the range of audio1LeftGain & audio2LeftGain to vary from 0 to -20.
+--
+-- Revision 1.34  2006/04/04 10:29:52  a22577
+-- Added support for 5/11 code rate for 14.63, 11.71, 9.76, 7.32, 4.88, and 3.25.
+-- symbol rates
+--
+-- Revision 1.33  2006/04/03 10:16:13  a22333
+-- Checking back revision 1.31
+--
+-- Revision 1.31  2006/01/30 08:07:09  a22333
+-- Added relay3Test and relay3Purpose mib attributes
+--
+-- Revision 1.30  2006/01/23 07:00:20  a22333
+-- Renamed dataSetup branch to textSetup. This fixes SCR 972.
+--
+-- Revision 1.29  2006/01/23 05:54:56  a22333
+-- Renamed frequencyPlan mib attribute to mode(as FrontPanel calls it)
+--
+-- Revision 1.28  2006/01/23 04:35:36  a22333
+-- Removed graphicDisplay Attribute
+--
+-- Revision 1.27  2005/12/29 06:13:12  a22333
+-- MIB changes for 4530 Phase 1
+--
+-- Revision 1.26  2005/09/11 11:45:09  gparamasivam
+-- added new mib attributes symbolRateSelect codeRate bitstreamMultiplex
+--
+-- Revision 1.25  2005/09/05 12:12:34  gparamasivam
+-- Added the language status mib attributes for audio and sub-title. These new attributes will return the language currently being presented by the IRD
+--
+-- Revision 1.24  2005/09/03 11:05:34  gparamasivam
+-- Changed the name of audio1Language and audio2Language to audio1LeftLanguage and audio2LeftLanguage respectively.This fixes SCR's 247 and 248
+--
+-- Revision 1.23  2005/09/02 12:37:50  gparamasivam
+-- Added relayTest MIB attribute. Fixes SCR 862
+--
+-- Revision 1.22  2005/08/29 12:03:44  gparamasivam
+-- Added the upgradeFirmwareVersion MIB attribute. Takes care of SCR 845
+--
+-- Revision 1.21  2005/08/29 07:17:11  gparamasivam
+-- Added LNB-Power (on/off) MIB attribute. Fixes SCR 832
+--
+-- Revision 1.20  2005/08/26 13:08:16  gparamasivam
+-- Added the asiEnable MIB attribute. Fixes SCR839
+--
+-- Revision 1.19  2005/08/26 11:35:58  gparamasivam
+-- Removes the option off from asiFormat. Will be added as a seperate MIB attribute asiEnabled. This fixes SCR 840
+--
+-- Revision 1.18  2005/08/26 11:10:00  gparamasivam
+-- Remove Factory Reset option from MIB. Fixes SCR 830
+--
+-- Revision 1.17  2005/08/25 15:30:36  gparamasivam
+-- Removed 16x9 from aspectRatioOut. This is to fix SCR 844
+--
+-- Revision 1.16  2005/08/25 15:04:21  gparamasivam
+-- Added diag screen E option to the MIB. This fixes SCR 741
+--
+-- Revision 1.15  2005/08/25 12:17:34  gparamasivam
+-- Changes the frequencyPlan enum values to match with the front panel options of xpndr and lfreq.This fixes SCR 837
+--
+-- Revision 1.14  2005/05/26 11:46:03  gparamasivam
+-- Added 4x3 Zoomed, panned and letter-box options for output aspect ratio
+--
+-- Revision 1.13  2005/04/20 06:57:22  gparamasivam
+-- Changed the Video Test Pattern to match the Front Panel values
+--
+-- Revision 1.12  2005/04/19 07:25:42  gparamasivam
+-- Added MIB attribute for port setup mode manual/auto
+--
+-- Revision 1.11  2005/04/15 12:43:45  gparamasivam
+-- Added support for MPEG service selection, ASI Input port selection, DVB Modulation mode selection, new VITS enumeration in the MIB
+--
+-- Revision 1.9  2004/08/05 18:53:20  dwalson
+-- Limit mib choices on diag screens to Fast Facts 1,2,A,B,C,D.  Other screens are not implemented yet
+--
+-- Revision 1.8  2004/08/03 23:21:05  dwalson
+-- display status-firmware-version numbers in hex
+--
+--
+-- *************************************************************************
+--
+DSR4410MD-MIB      DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE, IpAddress    FROM SNMPv2-SMI
+        DisplayString                             FROM SNMPv2-TC
+        ;
+
+    dsr            MODULE-IDENTITY 
+    LAST-UPDATED   "201404231000Z"     -- 23 Apr,2014 at 10:00 GMT
+    ORGANIZATION   "ARRIS Group INC"
+    CONTACT-INFO   "ARRIS Technical Response Center
+                    Inside USA     1-888-944-HELP (1-888-044-4357)
+                    Outside USA    1-215-323-0044
+                    TRC Hours:
+                    Monday through Friday 8am - 7pm Eastern Standard Time
+                    Saturdays            10am - 5pm Eastern Standard Time" 
+    DESCRIPTION    "The managed objects for the dsr mib."
+
+    REVISION	"201404231000Z"     -- 23 Apr, 2014 at 10:00 GMT
+    DESCRIPTION	"DSR mib version 1.1.2.13: Max DVB-S2 SymbolRate 
+                 updated to 33MSPS.  "
+
+    REVISION	"201108101000Z"     -- 10 Aug, 2011 at 10:00 GMT
+    DESCRIPTION	"DSR mib version 1.1.2.12: Added byte27 and packet27
+                 options to (ASI)format rate.  "
+
+    REVISION	"201102041000Z"     -- 04 Feb, 2011 at 10:00 GMT
+    DESCRIPTION	"DSR mib version 1.1.2.11: Add testMib"
+
+    REVISION	"201102021000Z"     -- 02 Feb, 2011 at 10:00 GMT
+    DESCRIPTION	"DSR mib version 1.1.2.10: Updated desciptions for contrast,audio1LeftGain,audio2LeftGain 
+                 audio1RightGain,audio2RightGain,tvPasscard and signalPower leaves."
+
+    REVISION	"201101071000Z"     -- 07 Jan, 2011 at 10:00 GMT
+ 	  DESCRIPTION	"DSR mib version 1.1.2.9: Updated acpAuthState and acpEncryptMode descriptions"
+
+    REVISION	"201012091000Z"     -- 09 Dec, 2010 at 10:00 GMT
+ 	  DESCRIPTION	"DSR mib version 1.1.2.8: Added ts-dsmcc option to GigEMode"
+
+    REVISION	"201012081000Z"     -- 08 Dec, 2010 at 10:00 GMT
+ 	  DESCRIPTION	"DSR mib version 1.1.2.7: Fix to SCR 232"
+
+    REVISION	"201011291000Z"     -- 29 Nov, 2010 at 10:00 GMT
+   	DESCRIPTION	"DSR mib version 1.1.2.6: Fix to SCR 228,229 and 213"
+
+    REVISION	"201006221000Z"     -- 22 June, 2010 at 10:00 GMT
+	   DESCRIPTION	"DSR mib version 1.1.2.5: Added GigE TS port in Manual Tune"
+	
+	    ::=  {  giproducts  621  } 
+
+     
+
+    org           OBJECT IDENTIFIER
+        ::=  {  iso  3  }
+
+    dod           OBJECT IDENTIFIER
+        ::=  {  org  6  }
+
+    internet      OBJECT IDENTIFIER
+        ::=  {  dod  1  }
+
+    private       OBJECT IDENTIFIER
+        ::=  {  internet  4  }
+
+    enterprises   OBJECT IDENTIFIER
+        ::=  {  private  1  }
+
+    giMIB         OBJECT IDENTIFIER
+        ::=  {  enterprises  1166  }
+
+    giproducts    OBJECT IDENTIFIER
+        ::=  {  giMIB  1  }
+
+   
+
+-- The Control Group.
+-- This group of objects provides for control of the unit to be
+-- managed by SNMPv2 controllers.
+
+    videoMib      OBJECT IDENTIFIER
+    --      Allows an SNMP manager to select the format of the output
+    --      video."
+        ::=  {  dsr  1  }
+
+    videoOutput525Lines   OBJECT-TYPE
+        SYNTAX        INTEGER  { ntsc ( 0 ) , palm ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The format of the output video that the unit renders when
+            the unit is tuned to a 525 line video broadcast signal."
+        ::=  {  videoMib  1  }
+
+    videoOutput625Lines   OBJECT-TYPE
+        SYNTAX        INTEGER  { pal-d-g-b ( 0 ) , pali ( 1 ) , paln ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The format of the output video that the unit renders
+            when the unit is tuned to a 625 line video broadcast signal."
+        ::=  {  videoMib  2  }
+
+    aspectRatioInput     OBJECT-TYPE
+        SYNTAX        INTEGER  { ar4x3 ( 0 ) , ar16x9 ( 1 ), unknown ( 2 ) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The aspect ratio of the video that is carried in the
+            broadcast signal."
+        ::=  {  videoMib  3  }
+
+    aspectRatioOutput     OBJECT-TYPE
+        SYNTAX        INTEGER  { ar4x3-Zoom ( 0 ), ar4x3-PanScan ( 1 ) , ar4x3-LetterBox ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The aspect ratio of the output video signal."
+        ::=  {  videoMib  4  }
+
+
+    rfPortsMib        OBJECT IDENTIFIER
+    --      Allows an SNMP manager to configure the RF inputs so the unit
+    --      can lock to a signal and begin downloading network data
+    --      required for operation.
+        ::=  {  dsr   2  }
+
+    rfPortsSetup     OBJECT IDENTIFIER
+    --      Configuration settings for the 2 RF input ports
+        ::=  { rfPortsMib  1 }
+
+    port1     OBJECT IDENTIFIER
+    --      Configuration settings for Port 0
+        ::=  { rfPortsSetup  1 }
+
+
+    port1SetupMode     OBJECT-TYPE
+        SYNTAX        INTEGER { manual ( 0 ) , auto ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "When the setup mode is set to manual the satellite name and polarity has
+            to befined by the user. When the port mode is set to auto the Satellite
+            name and polarity will be automatically set during the first channel change."
+        ::=  {  port1 1  }
+
+    port1Satellite     OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 2 .. 3  ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "A 2 to 3 character abbreviation of the name of the
+            satellite to which the RF port is associated."
+        ::=  {  port1 2  }
+
+
+    port1Polarity      OBJECT-TYPE
+        SYNTAX        INTEGER  { horizontal ( 0 ) , vertical ( 1 ) , notDefined( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The polarity of the RF input applied to the RF port.  The
+            undefined value is not writeable; instead, undefined can only
+            be set by the uplink."
+        ::=  {  port1 3  }
+
+    port2     OBJECT IDENTIFIER
+    --      Configuration settings for Port 1
+        ::=  { rfPortsSetup  2 }
+
+    port2SetupMode     OBJECT-TYPE
+        SYNTAX        INTEGER { manual ( 0 ) , auto ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "When the setup mode is set to manual the satellite name and polarity has
+            to befined by the user. When the port mode is set to auto the Satellite
+            name and polarity will be automatically set during the first channel change."
+        ::=  {  port2 1  }
+
+    port2Satellite     OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 2 .. 3  ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "A 2 to 3 character abbreviation of the name of the
+            satellite to which the RF port is associated."
+        ::=  {  port2 2  }
+
+
+    port2Polarity      OBJECT-TYPE
+        SYNTAX        INTEGER  { horizontal ( 0 ) , vertical ( 1 ), notDefined( 2 )}
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The polarity of the RF input applied to the RF port.  The
+            undefined value is not writeable; instead, undefined can only
+            be set by the uplink."
+        ::=  {  port2 3  }
+
+
+
+
+    manualTune    OBJECT IDENTIFIER
+    --      "Allows an SNMP manager to initially acquire a DigiCipher II
+    --      signal and download virtual channel tables by selecting a
+    --      transponder frequency, symbol rate, coding rate, and
+    --      bitstream for an L-band input at one of the eight ports."
+        ::=  {  rfPortsMib  2  }
+
+    activePort    OBJECT-TYPE
+        SYNTAX        INTEGER  {  port1    ( 0 )
+                                , port2    ( 1 )
+                                , asiInput ( 8 )
+                                }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The RF port that is active during a manual tune."
+        ::=  {  manualTune  1  }
+
+    mode     OBJECT-TYPE
+        SYNTAX        INTEGER  { xpndr(0) , lfreq(1) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The frequency plan of the satellite to which the unit tunes during
+            installation. The unit accepts a C-Band satellite transponder number
+            when the selection is xpndr. The unit accepts a discrete frequency value
+            when the selection is lfreq"
+        ::=  {  manualTune  2  }
+
+    transponderNumber    OBJECT-TYPE
+        SYNTAX        INTEGER ( 1 .. 24 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The transponder number to which the unit tunes during installation
+            This in turn specifies the L-Band frequency to which the unit tunes
+            during installation. This value is valid only when the FrequencyPlan
+            selection is xpndr. Value -1 indicates its Not applicable."
+        ::=    { manualTune 3 }
+
+    frequency     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 950 .. 2150  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The L-band frequency, in MHz, during a manual tune.  A new
+            manual tune is initiated when this object is set.This value is
+            valid only of the Frequency Plan selection is lfreq.
+             Value -1 indicates its Not applicable."
+        ::=  {  manualTune  4  }
+
+    dvbSymbolRate     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 99999999  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The symbol-rate to be tuned to in units of sps. A new
+             manual tune is initiated when this object is set.
+             Value -1 indicates its Not applicable."
+        ::=  {  manualTune  5  }
+
+    dvbCodeRate     OBJECT-TYPE
+        SYNTAX        INTEGER  {  cr1-2 ( 0 ),  cr2-3 ( 1 ),
+                                  cr3-4 ( 2 ),  cr5-6 ( 3 ),
+                                  cr7-8 ( 4 )
+                               }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The code rate of the channel being tuned to. A new
+             manual tune is initiated when this object is set.
+             Value -1 indicates its Not applicable."
+        ::=  {  manualTune  6  }
+
+    
+    symbolCodeBit     OBJECT-TYPE
+        SYNTAX        INTEGER  {
+                    sr29Cm5-11Combined ( 0 ) ,  sr29Cm1-2Combined ( 1 ) ,
+                    sr29Cm3-5Combined ( 2 ) ,   sr29Cm2-3Combined ( 3 ) ,
+                    sr29Cm3-4Combined ( 4 ) ,   sr29Cm4-5Combined ( 5 ) ,
+                    sr29Cm5-6Combined ( 6 ) ,   sr29Cm7-8Combined ( 7 ) ,
+
+                    sr29Cm5-11Split ( 8 ) ,     sr29Cm1-2Split ( 9 ) ,
+                    sr29Cm3-5Split ( 10 ) ,     sr29Cm2-3Split ( 11 ) ,
+                    sr29Cm3-4Split ( 12 ) ,     sr29Cm4-5Split ( 13 ) ,
+                    sr29Cm5-6Split ( 14 ) ,     sr29Cm7-8Split ( 15 ) ,
+
+                    sr19Cm5-11Combined ( 16 ) , sr19Cm1-2Combined ( 17 ) ,
+                    sr19Cm3-5Combined ( 18 ) ,  sr19Cm2-3Combined ( 19 ) ,
+                    sr19Cm3-4Combined ( 20 ) ,  sr19Cm4-5Combined ( 21 ) ,
+                    sr19Cm5-6Combined ( 22 ) ,  sr19Cm7-8Combined ( 23 ) ,
+
+                    sr19Cm5-11Split ( 24 ) ,    sr19Cm1-2Split ( 25 ) ,
+                    sr19Cm3-5Split ( 26 ) ,     sr19Cm2-3Split ( 27 ) ,
+                    sr19Cm3-4Split ( 28 ) ,     sr19Cm4-5Split ( 29 ) ,
+                    sr19Cm5-6Split ( 30 ) ,     sr19Cm7-8Split ( 31 ) ,
+
+
+                    sr14Cm1-2Combined ( 32 ) ,  sr14Cm3-5Combined ( 33 ) ,
+                    sr14Cm2-3Combined ( 34 ) ,  sr14Cm3-4Combined ( 35 ) ,
+                    sr14Cm4-5Combined ( 36 ) ,  sr14Cm5-6Combined ( 37 ) ,
+                    sr14Cm7-8Combined ( 38 ) ,
+
+
+                    sr11Cm1-2Combined ( 39 ) ,  sr11Cm3-5Combined ( 40 ) ,
+                    sr11Cm2-3Combined ( 41 ) ,  sr11Cm3-4Combined ( 42 ) ,
+                    sr11Cm4-5Combined ( 43 ) ,  sr11Cm5-6Combined ( 44 ) ,
+                    sr11Cm7-8Combined ( 45 ) ,
+
+
+                    sr9Cm1-2Combined ( 46 ) ,   sr9Cm3-5Combined ( 47 ) ,
+                    sr9Cm2-3Combined ( 48 ) ,   sr9Cm3-4Combined ( 49 ) ,
+                    sr9Cm4-5Combined ( 50 ) ,   sr9Cm5-6Combined ( 51 ) ,
+                    sr9Cm7-8Combined ( 52 ) ,
+
+
+                    sr7Cm1-2Combined ( 53 ) ,   sr7Cm3-5Combined ( 54 ) ,
+                    sr7Cm2-3Combined ( 55 ) ,   sr7Cm3-4Combined ( 56 ) ,
+                    sr7Cm4-5Combined ( 57 ) ,   sr7Cm5-6Combined ( 58 ) ,
+                    sr7Cm7-8Combined ( 59 ) ,
+
+
+                    sr4Cm1-2Combined ( 60 ) ,   sr4Cm3-5Combined ( 61 ) ,
+                    sr4Cm2-3Combined ( 62 ) ,   sr4Cm3-4Combined ( 63 ) ,
+                    sr4Cm4-5Combined ( 64 ) ,   sr4Cm5-6Combined ( 65 ) ,
+                    sr4Cm7-8Combined ( 66 ) ,
+
+
+                    sr3Cm1-2Combined ( 67 ) ,   sr3Cm3-5Combined ( 68 ) ,
+                    sr3Cm2-3Combined ( 69 ) ,   sr3Cm3-4Combined ( 70 ) ,
+                    sr3Cm4-5Combined ( 71 ) ,   sr3Cm5-6Combined ( 72 ) ,
+                    sr3Cm7-8Combined ( 73 ) }
+
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The symbol, code rate, and bitstream select combination
+            during a manual tune.  A new manual tune is initiated when
+            this object is set.
+            The symbol rate takes eight possible values: 29.3, 19.5, 14.6,
+            11.7, 9.76, 7.32, 4.88, and 3.25 Msps.
+            The code rate also takes eight possible values: 7/8, 5/6, 4/5,
+            3/4, 2/3, 3/5, 1/2, and 5/11.
+            The bitstream select takes two possible    values: combined and
+            split.
+            Value -1 indicates its Not applicable."
+        ::=  {  manualTune  8  }
+
+
+      modulationMode     OBJECT-TYPE
+        SYNTAX        INTEGER  { dciiManual ( 0 ) , dvbManual  ( 1 ) ,
+                                 dciiAuto ( 2 )   , manual8pskTC ( 3 ) ,
+                                 manual8pskDvbS2 ( 4 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            " The modulation mode to be used for the manual tune.  A new
+              manual tune is initiated when this object is set."
+        ::=  {  manualTune  9  }
+
+      psk8SymbolRate     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 1000000 .. 30000000  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The symbol-rate to be tuned to in units of sps. A new
+             manual tune is initiated when this object is set.
+             Value -1 indicates its Not applicable."
+        ::=  {  manualTune  10  }
+
+     psk8CodeRate     OBJECT-TYPE
+        SYNTAX        INTEGER  {  cr2-3-192  ( 0 ), cr3-4-205 ( 1 ),
+                                  cr3-4-211  ( 2 ), cr3-4-219 ( 3 ),
+                                  cr5-6-230  ( 4 ), cr8-9-240 ( 5 )
+                               }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The code rate of the channel being tuned to. A new
+             manual tune is initiated when this object is set.
+             Value -1 indicates its Not applicable."
+        ::=  {  manualTune  11  }
+
+
+     dvbS2symbolRate     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 1000000 .. 33000000  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The symbol-rate to be tuned to in units of sps. A new
+             manual tune is initiated when this object is set.
+             Value -1 indicates its Not applicable."
+        ::=  {  manualTune  12  }
+
+     dvbS2codeRate     OBJECT-TYPE
+        SYNTAX        INTEGER  {  cr3-5 ( 0 ),  cr2-3  ( 1 ),
+                                  cr3-4 ( 2 ),  cr5-6  ( 3 ),
+                                  cr8-9 ( 4 ),  cr9-10 ( 5 )
+                               }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The code rate of the channel being tuned to. A new
+             manual tune is initiated when this object is set.
+             Value -1 indicates its Not applicable. "
+        ::=  {  manualTune  13  }
+
+
+    channelMib    OBJECT IDENTIFIER
+    --      Allows an SNMP manager to select the virtual channel to which
+    --      the unit is tuned and to read information about the channel.
+        ::=  {  dsr  3  }
+
+    channelSelect     OBJECT IDENTIFIER
+        ::=  {  channelMib  1  }
+
+    vctID    OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The virtual channel table number."
+        ::=  {  channelSelect  1  }
+
+    channelNumber     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 4095  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The virtual channel."
+        ::=  {  channelSelect  2  }
+
+    
+    channelStatus     OBJECT IDENTIFIER
+        ::=  {  channelMib  2  }
+
+    transponder   OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 0 .. 31  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The current transponder name (alpha/numeric) as received
+            from the uplink.A Blank string is returned if the name is not available ."
+        ::=  {  channelStatus  1  }
+
+    source    OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 0 .. 255  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of the current source signal as received from the
+            uplink.A Blank string is returned if the name is not available ."
+        ::=  {  channelStatus  2  }
+
+    satelliteStatus   OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 0 .. 15  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The name of the current satellite as received from the uplink.
+            A Blank string is returned if the name is not available ."
+        ::=  {  channelStatus  3  }
+
+    serviceSelectionMib    OBJECT IDENTIFIER
+    --      "Allows an SNMP manager to select the MPEG service number which
+    --      has to be played by the IRD"
+        ::=  {  dsr  4  }
+
+    mpegServiceNumber      OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The MPEG service number which the IRD has to play. "
+        ::=  {  serviceSelectionMib  1  }
+
+
+    unitControlMib    OBJECT IDENTIFIER
+    --      Allows an SNMP manager to change the front panel LCD contrast,
+    --      set the acquisition recovery mode, reset the unit to the
+    --      factory programmed values, change the PID aliasing setting,
+    --      and read the lockout status.
+        ::=  {  dsr  5  }
+
+    unitControl       OBJECT IDENTIFIER
+        ::=  {  unitControlMib  1  }
+
+    contrast      OBJECT-TYPE
+        SYNTAX        INTEGER  (0 .. 30)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The LCD contrast, with 0 representing the least contrast and
+            30 representing the most."
+        ::=  {  unitControl  1  }
+
+   
+    asiEnable  OBJECT-TYPE
+        SYNTAX        INTEGER  { on ( 0 ) , off ( 1 ) , lock-off ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Option to enable or disbale the ASI output.
+             Note that lock-off is a read only value used by the uplink to
+             lock asiEnable. It cannot be set via SNMP.
+             Also, when this value is lock-off, this entire field is read
+            only."
+        ::=  {  unitControl  3  }
+
+    
+    lnbPower  OBJECT-TYPE
+        SYNTAX        INTEGER  { on ( 0 ) , off ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Option to enable or disable LNB Power."
+        ::=  {  unitControl  6  }
+
+    resetIRD  OBJECT-TYPE
+        SYNTAX        INTEGER  { no ( 0 ) , powercycle ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Option to reboot the box."
+        ::=  {  unitControl  7  }
+
+    formatRate  OBJECT-TYPE
+        SYNTAX        INTEGER  { byte54    ( 0 ) , 
+                                 packet54  ( 1 ) , 
+                                 packet81  ( 2 ) , 
+                                 packet160 ( 3 ) ,
+                                 byte27    ( 4 ) ,
+                                 packet27  ( 5 )
+                                 }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Format and rate of the ASI output"
+        ::=  {  unitControl  8  }
+
+    audioMib     OBJECT IDENTIFIER
+    --      Allows an SNMP manager to customize the audio output
+        ::=  {  dsr  6  }
+
+    audioConfig  OBJECT IDENTIFIER
+    --       Configuration settings for both audio outputs.
+        ::=  { audioMib  1 }
+
+    audio1Config OBJECT IDENTIFIER
+    --    Configuration Settings for the first audio output
+        ::=  { audioConfig 1 }
+
+    audio1GainControl   OBJECT-TYPE
+        SYNTAX        INTEGER  {  joint ( 1 )   }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "In audio gain control joint, only the left audio channel is edited. The
+             right audio channel gain will be set to the left. "
+        ::=  {  audio1Config  1  }
+
+    audio1LeftGain     OBJECT-TYPE
+        SYNTAX        INTEGER  ( -20 .. 0  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The left audio signal output level from -20 dB to 0 dB,
+            in 1 dB increments."
+        ::=  {  audio1Config  2  }
+
+    audio1RightGain    OBJECT-TYPE
+        SYNTAX        INTEGER  ( -20 .. 0  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The right audio signal output level from -20 dB to 0 dB,
+            in 1 dB increments."
+        ::=  {  audio1Config 3  }
+
+    audio1DiagNorm    OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , on ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "This varaiables enables and diables the audio dialog normalization"
+        ::=  {  audio1Config 4  }
+
+    audio1DownMix    OBJECT-TYPE
+        SYNTAX        INTEGER  { mono ( 0 ) , dualMono ( 1 ) , stereo ( 2 ) , surround ( 3 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The mode of the audio output.  The unit downmixes the input audio
+            to the selected channel mode."
+        ::=  {  audio1Config 5  }
+
+    audio1Compression   OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , moderate ( 1 ) , heavy ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The degree of audio level compression."
+        ::=  {  audio1Config 6  }
+
+    audio2Config OBJECT IDENTIFIER
+    --    Configuration Settings for the second audio output
+        ::=  { audioConfig 2 }
+
+    audio2GainControl   OBJECT-TYPE
+        SYNTAX        INTEGER  { joint ( 1 ) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "In audio gain control joint, only the left audio channel is edited. The
+             right audio channel gain will be set to the left. "
+        ::=  {  audio2Config 1  }
+
+    audio2LeftGain     OBJECT-TYPE
+        SYNTAX        INTEGER  ( -20 .. 0  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The left audio signal output level from -20 dB to 0 dB,
+            in 1 dB increments."
+        ::=  {  audio2Config  2  }
+
+    audio2RightGain    OBJECT-TYPE
+        SYNTAX        INTEGER  ( -20 .. 0  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The right audio signal output level from -20 dB to 0 dB,
+            in 1 dB increments."
+        ::=  {  audio2Config 3  }
+
+    audio2DiagNorm    OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , on ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "This varaiables enables and diables the audio dialog normalization"
+        ::=  {  audio2Config 4  }
+
+    audio2DownMix    OBJECT-TYPE
+        SYNTAX        INTEGER  { mono ( 0 ) , dualMono ( 1 ) , stereo ( 2 ) , surround ( 3 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The mode of the audio output. The unit downmixes the input audio to
+            the selected channel mode ."
+        ::=  {  audio2Config 5  }
+
+    audio2Compression   OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , moderate ( 1 ) , heavy ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The degree of audio level compression."
+        ::=  {  audio2Config 6  }
+
+    audioOutput      OBJECT IDENTIFIER
+        --    Output settings for both audio outputs.
+        ::=  { audioMib  2 }
+
+    audio1Output  OBJECT IDENTIFIER
+        --  Output settings for audio1 ( primary output )
+        ::=  { audioOutput 1 }
+
+    audio1LeftLanguage      OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 3 | 5  ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The language for the audio1 . This 5-character language
+            string is formatted as three letters followed by two numbers. The
+            2-digit number represents the order of the 3-letter language in the
+            service, e.g., eng01 denotes the second English component that is
+            carried in the active service. The unit processes the default language
+            when the preferred language setting is def (In this case the string is only 
+            3 character wide). Note that the language string is converted to lower case 
+            automatically when this configuration is to be applied"
+        ::=  {  audio1Output 1  }
+
+    audio1RightLanguage    OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 3 | 5  ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The language for the right audio channel when the AudioDownMix selection
+            is dualMono. When the AudioDownMix is not dualMono the value
+            mirrors the audio1LeftLanguage and any changes to this value does not have any
+            effect. This is a 3(def) or 5(e.g., eng01) character string similar to the left 
+            language string. Note that the language string is converted to lower case 
+            automatically when this configuration is to be applied"
+        ::=  {  audio1Output 2  }
+
+    audio1LeftLanguageStatus      OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 3 | 5  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The language of the left audio channel being presented by the IRD. This is a 3(def)
+            or 5(e.g., eng01) character string of the similar format as of the audio1LeftLanguage."
+        ::=  {  audio1Output 3  }
+
+    audio1RightLanguageStatus      OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 3 | 5  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+           "The language of the right audio channel being presented by the IRD. This is a 3(def)
+            or 5(e.g., eng01) character string of the similar format as of the audio1LeftLanguage.
+            Note that the language string is converted to lower case 
+            automatically when this configuration is to be applied"
+        ::=  {  audio1Output 4  }
+
+    audio2Output  OBJECT IDENTIFIER
+        --  Output settings for audio 2 ( secondary output )
+        ::=  { audioOutput 2 }
+
+    audio2LeftLanguage      OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 3 | 5  ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The language for the audio1 . This 5-character language
+            string is formatted as three letters followed by two numbers. The
+            2-digit number represents the order of the 3-letter language in the
+            service, e.g., eng01 denotes the second English component that is
+            carried in the active service. The unit processes the default language
+            when the preferred language setting is def(in this case. string is 3 
+            letters wide). Note that the language string is converted to lower case 
+            automatically when this configuration is to be applied"
+        ::=  {  audio2Output 1  }
+
+    audio2RightLanguage    OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 3 | 5  ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The language for the right audio channel when the AudioDownMix selection
+            is dualMono. When the AudioDownMix is not dualMono the value
+            mirrors the audio2LeftLanguage and any changes to this value does not have any
+            effect. This is a 3(def) or 5(e.g., eng01) character string of the similar format as of the 
+            audio2LeftLanguage. Note that the language string is converted to lower case 
+            automatically when this configuration is to be applied"
+        ::=  {  audio2Output 2  }
+
+    audio2LeftLanguageStatus      OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 3 | 5  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The language of the left audio channel being presented by the IRD. This is a 3(def)
+            or 5(e.g., eng01) character string of the similar format as of the audio2LeftLanguage.
+            Note that the language string is converted to lower case 
+            automatically when this configuration is to be applied"
+        ::=  {  audio2Output 3  }
+
+    audio2RightLanguageStatus      OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 3 | 5  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The language of the right audio channel being presented by the IRD. This is a 3(def)
+            or 5(e.g., eng01) character string of the similar format as of the audio2LeftLanguage.
+            Note that the language string is converted to lower case 
+            automatically when this configuration is to be applied"
+        ::=  {  audio2Output 4  }
+
+    dataMib       OBJECT IDENTIFIER
+    --      Allows an SNMP manager to configure and read the status of the
+    --      data channels.
+        ::=  {  dsr  7  }
+
+    dataStatus    OBJECT IDENTIFIER
+        ::=  {  dataMib  1  }
+
+    ethernetIP    OBJECT-TYPE
+        SYNTAX        INTEGER  { defined ( 0 ) , notDefined ( 1 ) , unknown ( 2 ) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Retrieves whether the select channel contains IP data,
+            as defined in the downloaded network data from the
+            uplink."
+        ::=  {  dataStatus  1  }
+
+    textSetup     OBJECT IDENTIFIER
+        ::=  {  dataMib  2  }
+
+    subtitleLanguage      OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 1 .. 5  ) )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The selected subtitle track.  Applicable when the selected
+            channel carries multiple subtitle tracks.  The 5-character
+            string has the following representation:
+                sssdd  where
+
+                sss = 3-char ISO 639 code for the subtitle language
+                dd  = 2-digits indicating the occurrence of the
+                      specified language
+            'ENG02' would select, for example, the subtitle track for
+            the second occurrence of English subtitles.
+
+            To turn the subtitle off, enter 'Off01' or 'Off00' at the
+            browser.  The user must enter the ordinal."
+        ::=  {  textSetup  1  }
+
+    subtitleLanguageStatus      OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 1 .. 5  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The subtitle language currently being presented by the IRD"
+        ::=  {  textSetup  2  }
+
+    subtitleDisplay      OBJECT-TYPE
+        SYNTAX        INTEGER  { all    ( 0 ) ,  avail ( 1 ),
+                                 status ( 2 ) ,  off   ( 3 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The subtitle language currently being presented by the IRD"
+        ::=  {  textSetup  3  }
+
+
+    ethernet10-100  OBJECT IDENTIFIER
+        ::=  {  dataMib  3  }
+
+    ipAddress     OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The IP address of the snmp port 1, in the common
+            dotted-decimal format."
+        ::=  {  ethernet10-100  1  }
+
+    subnetMask    OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The subnet mask of the snmp port 1, in the dotted-decimal
+            format."
+        ::=  {  ethernet10-100  2  }
+
+    defaultGateway    OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The IP address of the gateway that is used by the snmp
+            port 1, in the dotted-decimal format."
+        ::=  {  ethernet10-100  3  }
+
+    macAddr     OBJECT-TYPE
+        SYNTAX        OCTET STRING ( SIZE ( 17 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The ethernet 1 MAC address in hh:hh:hh:hh:hh:hh
+            format."
+        ::=  {  ethernet10-100  4  }
+
+
+    ethernetGigE  OBJECT IDENTIFIER
+        ::=  {  dataMib  4  }
+
+    gigEipAddress     OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The IP address of the gigE port, in the common
+            dotted-decimal format."
+        ::=  {  ethernetGigE  1  }
+
+    gigEsubnetMask    OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The subnet mask of the gigE port, in the dotted-decimal
+            format."
+        ::=  {  ethernetGigE  2  }
+
+    gigEgateway    OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The IP address of the gateway that is used by the gigE
+            port, in the dotted-decimal format."
+        ::=  {  ethernetGigE  3  }
+
+    gigEmacAddr     OBJECT-TYPE
+        SYNTAX        OCTET STRING ( SIZE ( 17 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The gigEthernet MAC address in hh:hh:hh:hh:hh:hh
+            format."
+        ::=  {  ethernetGigE  4  }
+
+    gigEmode     OBJECT-TYPE
+        SYNTAX        INTEGER { mpts ( 0 ) ,disabled ( 1 ) , tsdsmcc ( 2 ) , dsmcc ( 3 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The gigEthernet mode is one of the following values 
+              MPTS,disabled,TS-DSMCC or  DSM-CC."
+        ::=  {  ethernetGigE  5  }
+
+    mptsIpAddr    OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The MPTS IP address of the gigE port in the dotted-decimal
+             format."
+        ::=  {  ethernetGigE  6  }
+
+    mptsPort    OBJECT-TYPE
+        SYNTAX        INTEGER ( 0 .. 65535 )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The port associated with the MPTS IP address."
+        ::=  {  ethernetGigE  7  }
+
+
+    extHardwareMib    OBJECT IDENTIFIER
+    --      Allows an SNMP manager to configure the contact closures
+    --      (relays), alarms, and the bypass.
+        ::=  {  dsr  8  }
+
+    alarms    OBJECT IDENTIFIER
+        ::=  {  extHardwareMib  1  }
+
+    
+    alarmTrigger      OBJECT-TYPE
+        SYNTAX        INTEGER  { noSignal ( 0 ) ,
+                    noVideoPresent ( 1 ) ,
+                                noAuthorization ( 2 ) ,
+                                auto ( 3 ),
+                                disabled ( 4 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The trigger condition for which the alarm is activated. When the
+            alarm is activated the Alarm LED illuminates and the alrm relay indicates
+            an alarm condition. The alarm is activated for any of the following conditions
+            1. The tuner loses lock when the input is RF
+            2. The unit is not authorized to access the selected service
+            3. The unit loses video
+            When Auto is selected the alarm activates for any of these conditions and when
+            Disabled is selected the alarm does not activate for any condition."
+        ::=  {  alarms  2  }
+
+    alarmTest    OBJECT-TYPE
+        SYNTAX        INTEGER  { on ( 0 ) , off ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "A manual test of the alarm indicators.  Setting ON places the unit in the alarm condition."
+        ::=  {  alarms  3  }
+
+
+    statusMib     OBJECT IDENTIFIER
+    --      Allows an SNMP manager to read the current status of the unit.
+        ::=  {  dsr  9  }
+
+
+    accessControl     OBJECT IDENTIFIER
+        ::=  {  statusMib  1  }
+
+    unitAddress   OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 19  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's electronic address in the following format:
+                ddd-ddddd-ddddd-ddd  where d = decimal digit."
+        ::=  {  accessControl  1  }
+
+    tvPasscard    OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 26  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The electronic address of the TV Pass Card, if present, in
+            the unit address format.  When no TV Pass Card is present
+            the value returned is 'Not inserted'."
+        ::=  {  accessControl  2  }
+
+    firmware      OBJECT IDENTIFIER
+        ::=  {  statusMib  2  }
+
+    bootVersion     OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 6  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The version of the boot code."
+        ::=  {  firmware  1  }
+
+    fpgaVersion     OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 6  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The version of the fpga."
+        ::=  {  firmware  2  }
+
+    firmwareVersion     OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 6  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The version of firmware code."
+        ::=  {  firmware  3  }
+
+    upgradeFirmwareVersion     OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 6  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The upgrade version of firmware code."
+        ::=  {  firmware  4  }
+
+    diagnosticMib     OBJECT IDENTIFIER
+    --      Allows an SNMP manager to perform several diagnostic tests and
+    --      read diagnostic information.
+        ::=  {  dsr  10  }
+
+    screenDisplay     OBJECT IDENTIFIER
+        ::=  {  diagnosticMib  1  }
+
+    diagnosticScreen      OBJECT-TYPE
+        SYNTAX        INTEGER  {     off(0)
+                                  , fastFacts1(1)
+                                  , fastFacts2(2)
+                                  , fastFacts3(3)
+                                  , fastFacts4(4)
+                                  , fastFacts5(5)
+                                  , diagA(6)
+                                  , diagB(7)
+                                  , diagBMD(8)
+                                  , diagC(9)
+                                  , diagD(10)
+                                  , diagE(11)
+--                              diagF ( 10 ),          diagG ( 11 ),
+--                              downloadDiag ( 12 ),   fastFacts5(13)
+                   }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The diagnostic screen that is to be presented by the unit
+            on the video output."
+        ::=  {  screenDisplay  1  }
+
+    clearCounters     OBJECT-TYPE
+        SYNTAX        INTEGER  { yes ( 0 ) , no ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Clears the counters in the on-screen diagnostics to zero."
+        ::=  {  screenDisplay  2  }
+
+    testSignals  OBJECT IDENTIFIER
+        ::=  {  diagnosticMib  2  }
+
+    videoTestPattern   OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) ,
+                     colorBar525 ( 1 ) ,      ire100Ramp( 2 ) ,
+                                 ntsc7Combination ( 3 ) , redField( 4 ) ,
+                                 ntsc7Composite ( 5 ) ,   fiveStepStair ( 6 ) ,
+                                 unModulatedYRamp ( 7 )
+                               }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The full-field video test pattern that is presented by the
+            unit on the video output."
+
+        ::=  {  testSignals  1  }
+
+    audio1TestPattern     OBJECT-TYPE
+        SYNTAX        INTEGER  { testToneA-1000 ( 0 ) , testToneB-4040-3960 ( 1 ) ,
+                                off ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The audio test signal that is outputted by the unit for
+            audio 1.  The following options are available:
+                o 1000 Hz @ +16 dBm (for mono)
+                o 4040, 3960 Hz @ + 4dBm each (for left and right)
+                o OFF"
+        ::=  {  testSignals  2  }
+
+    audio2TestPattern     OBJECT-TYPE
+        SYNTAX        INTEGER  { testToneA-1000 ( 0 ) , testToneB-4040-3960 ( 1 ) ,
+                                off ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "See the DESCRIPTION for the audio1TestPattern object."
+        ::=  {  testSignals  3  }
+
+    cueToneSignal     OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , on ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The cue tone test signal.The unit generates 
+             a cue test tone sequence consisting of 
+             0, 1, 2, 3, 4, 5, 6, 7, 8, 9, *, #, A, B, C, D.
+             The unit repeats the cue test tone sequence when enabled.
+             The unit generates a cue tone test tone sequence with a 50 
+             msec tone and inter-tone duration, a 2 second interval between 
+             sequences, and immediate activation.
+             When the users set it to On via SNMP.
+             Cuetones are played continuously."
+        ::=  {  testSignals  4  }
+
+    
+    vits          OBJECT IDENTIFIER
+        ::=  {  diagnosticMib  3  }
+
+    waveform      OBJECT-TYPE
+        SYNTAX        INTEGER  { transmitted ( 0 ) , disabled ( 1 ) ,
+                                 colorBar525 ( 2 ) , ire100Ramp( 3 ) ,
+                                 ntsc7Combination ( 4 ) , redField( 5 ) ,
+                                 ntsc7Composite ( 6 ) , fiveStepStair ( 7 ) ,
+                                 unModulatedYRamp ( 8 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The VITS test pattern that is presented by the unit on the
+            the video output."
+
+        ::=  {  vits  1  }
+
+    field     OBJECT-TYPE
+        SYNTAX        INTEGER  { field1 ( 0 ) , field2 ( 1 ) , na ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The field on which the VITS test pattern is presented
+            by the unit on the video output. 'n/a' is a read-only
+            value that the unit returns when the waveform object
+            is set to 'transmitted' or 'disabled'."
+        ::=  {  vits  2  }
+
+    line      OBJECT-TYPE
+        SYNTAX        INTEGER  { line17 ( 0 ) , line18 ( 1 ) , na ( 2 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "The line into which the VITS test pattern is presented
+            by the unit on the video output. 'n/a' is a read-only
+            value that the unit returns when the waveform object
+            is set to 'transmitted' or 'disabled'."
+        ::=  {  vits  3  }
+
+    signalStatus  OBJECT IDENTIFIER
+    --      Allows an SNMP manager to read the attributes and status
+    --      of the current DigiCipher II signal.
+        ::=  {  dsr  11 }
+
+    acquisitionState      OBJECT-TYPE
+        SYNTAX        INTEGER  { locked ( 0 ) , unLocked ( 1 )  }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The acquisition state for the active signal"
+        ::=  {  signalStatus  1  }
+
+    authorizationState    OBJECT-TYPE
+            SYNTAX        INTEGER  { missingMap ( 0 ) ,
+                                     undefinedChannel ( 1 ) ,
+                                     undefinedService ( 2 ) ,
+                                     notInSync ( 3 ) ,
+                                     noProgramRekey ( 4 ) ,
+                                     noWorkingKey ( 5 ) ,
+                                     noEventBlackOut ( 6 ) ,
+                                     noCategoryKey ( 7 ) ,
+                                     oldCategorySequence ( 8 ) ,
+                                     programBought ( 9 ),
+                                     programBoughtWithoutTaping ( 10 ),
+                                     subscribedWithTaping ( 11 ),
+                                     subscribedWithoutTaping ( 12 ),
+                                     subscribedWithTapingPurchasable ( 13 ),
+                                     ippvWithTaping ( 14 ) ,
+                                     ippvWithoutTaping ( 15 ),
+                                     badSeedChecksum ( 16 ),
+                                     badDebitChecksum ( 17 ),
+                                     ippvNotEnabled ( 18 ),
+                                     insufficientCreditToPurchase ( 19 ),
+                                     showCountLimitExceeded ( 20 ),
+                                     debitRegisterWillOverflow ( 21 ),
+                                     noAnytimeFreePreviewRecordsAvailable ( 22 ),
+                                     maximumPackageCostExceeded ( 23 ),
+                                     noIPPVOverlayInMessage ( 24 ),
+                                     notSubscribed ( 25 ),
+                                     regionalBlackout ( 26 ),
+                                     eventBlackout ( 27 ),
+                                     circulatBlackout ( 28 ) ,
+                                     authorized ( 29 ) ,
+                                     unencrypted ( 30 ),
+                                     unknown ( 31 )
+
+                                   }
+
+
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The authorization state for viewing the current signal.
+            This object mirrors the 'Auth State' field in the
+            Fast Facts 1 OSD."
+        ::=  {  signalStatus  2  }
+
+    encryptionMode    OBJECT-TYPE
+        SYNTAX        INTEGER  { encrypted ( 0 ), fixedWorkingKey ( 1 ),
+                     fixedProgramKey ( 2 ), unencrypted ( 3 ), na ( 4 ) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The encryption mode of the current signal.    This
+            object mirrors the 'Encryption' field in the Fast
+            Facts 1 OSD."
+        ::=  {  signalStatus  3  }
+
+    unitAddr  OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 19  ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit's electronic address in the following format:
+                ddd-ddddd-ddddd-ddd  where d = decimal digit.
+            This object mirrors the 'Unit' field in the Fast Facts 1
+            OSD."
+        ::=  {  signalStatus  4  }
+
+    vctIDFast     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The current virtual channel table number. This object
+            mirrors the 'VCT ID' field in the Fast Facts 1 OSD."
+        ::=  {  signalStatus  5  }
+
+    channelNum    OBJECT-TYPE
+        SYNTAX        INTEGER  ( 1 .. 4095  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The virtual channel number of the current signal. This
+            object mirrors the 'VC #' field in the Fast Facts 1 OSD."
+        ::=  {  signalStatus  6  }
+
+    serviceNumber     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 1 .. 65535  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The MPEG-2 service number, as indicated in the virtual
+            channel map, for the current signal. This object mirrors
+            the 'Service #' field in the Fast Facts 1 OSD."
+        ::=  {  signalStatus  7  }
+
+    signalQuality     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 100  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The RF quality level of the current signal.
+            This object mirrors the 'Signal Quality' field in
+            the Fast Facts 1 OSD."
+        ::=  {  signalStatus  8  }
+
+    signalPower   OBJECT-TYPE
+        SYNTAX        INTEGER  ( -800 .. 0  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The RF power level of the current signal, and measured in
+            units of 0.1 dBm.  For example, '-650' represents -65.0 dBm."
+        ::=  {  signalStatus  9  }
+
+    ebNo          OBJECT-TYPE
+        SYNTAX        INTEGER  ( -30 .. 150  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The signal to noise ration, Eb/No, of the current signal,
+            and measured in units of 0.1 dB.  For example,
+                '-20' represents -2.0 dB
+                '150' represents +15.0 dB
+            This object mirrors the 'Eb/No' field in the Fast Facts 1
+            OSD."
+        ::=  {  signalStatus  10  }
+
+    symbolRate    OBJECT-TYPE
+        SYNTAX        INTEGER  { sr29Msps ( 0 ) , sr19Msps ( 1 ) ,
+                                 sr14Msps ( 2 ) , sr11Msps ( 3 ) ,
+                                  sr9Msps ( 4 ) ,  sr7Msps ( 5 ) ,
+                                  sr4Msps ( 6 ) ,  sr3Msps ( 7 ) ,
+                                  unknown ( 8 ) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The symbol rate of the current signal.  This object
+            mirrors the 'Symbol Rate' field in the Fast Facts 1
+            OSD."
+        ::=  {  signalStatus  11  }
+
+    fecRate       OBJECT-TYPE
+        SYNTAX        INTEGER  { cr5-11 ( 0 ) ,
+                                  cr1-2 ( 1 ) , cr1-92-8PSK ( 2 ) ,
+                                  cr3-5 ( 3 ) , cr2-05-8PSK ( 4 ) ,
+                                  cr2-3 ( 5 ) , cr2-11-8PSK ( 6 ) ,
+                                  cr3-4 ( 7 ) , cr4-5 ( 8 ) ,
+                                  cr5-6 ( 9 ) , cr2-19-8PSK ( 10 ) ,
+                                  cr7-8 ( 11 ) , cr2-30-8PSK ( 12 ) ,
+                                  cr2-40-8PSK ( 13 ) , unknown ( 14 ) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The FEC rate of the current signal.  This object
+            mirrors the 'FEC Rate' field in the Fast Facts 1
+            OSD."
+        ::=  {  signalStatus  12  }
+
+    freq          OBJECT-TYPE
+        SYNTAX        INTEGER  ( 950000 .. 2150000  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The frequency of the L-band signal, in kHz, that is
+            applied to the antenna connector on the unit's back panel.
+            This object mirrors the 'Frequency' field in the Fast
+            Facts 1 OSD."
+        ::=  {  signalStatus  13  }
+
+    satelliteName     OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE ( 1 .. 4 ) )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A 2 to 4 character satellite reference name, as indicated
+            in the virtual channel map, for the current signal. This
+            object mirrors the 'Sat' field in the Fast Facts 1 OSD."
+        ::=  {  signalStatus  14  }
+
+    xpndrNumber   OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 63  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The transponder number of the satellite, as indicated
+            in the virtual channel map, for the current signal. A
+            value of zero indicates the first transponder, and so
+            on. This object mirrors the '/Xpndr' field in the Fast
+            Facts 1 OSD."
+        ::=  {  signalStatus  15  }
+
+    polarization  OBJECT-TYPE
+        SYNTAX        INTEGER  { h ( 0 ) , v ( 1 ) , unknown ( 2 ) }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The polarization, as indicated in the virtual channel
+            map, for the current signal. This object mirrors the
+            'Polarization' field in the Fast Facts 1 OSD."
+        ::=  {  signalStatus  16  }
+
+    muxStatus  OBJECT-TYPE
+        SYNTAX        INTEGER  { combined ( 0 ) , split ( 1 ) ,unknown ( 2 )}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The multiplex format of the active L-Band signal"
+        ::=  {  signalStatus  17  }
+
+
+    ledStatus     OBJECT IDENTIFIER
+    --      Allows an SNMP manager to read the current
+    --      LED status of the unit.
+        ::=  {  dsr  12 }
+
+    signalLED     OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , on ( 1 ) , blink ( 2 )}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Signal LED is on (illuminated) when the unit
+            recognizes the signal as a DigiCipher II signal. This object
+            mirrors the LED on the front panel"
+        ::=  {  ledStatus  1  }
+
+    authorizedLED     OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , on ( 1 ) , blink ( 2 )}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Authorized LED is on (illuminated) when the Signal
+            LED is on and either (1) the programmer has transmitted the
+            access messages to allow the unit to decrypt the signal or
+            (2) the signal has been transmitted in an unencrypted of
+            fixed encrypted mode. This object mirrors the LED on the
+            front panel"
+        ::=  {  ledStatus  2  }
+
+    alarmConditionLED     OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , on ( 1 ) , blink ( 2 )}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Alarm condition LED is on (illuminated) when the IRD is in alarm state"
+        ::=  {  ledStatus  3  }
+
+    
+    downloadLED     OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , on ( 1 ) , blink ( 2 )}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Download LED is on ( illuminated ) when an active download is in
+            progress"
+        ::=  {  ledStatus  8  }
+
+    retuneMonitorMIB      OBJECT IDENTIFIER
+    --      Allows an SNMP manager to monitor and control retune message
+    --      statistics.
+        ::=  {  dsr  13  }
+
+    retuneMonitorEnable  OBJECT-TYPE
+        SYNTAX        INTEGER  { off ( 0 ) , on ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Enables retune monitoring by the IRD. When read, this leaf
+            provides the actual enable/disable status of the retune monitoring
+            function in the IRD, and not just the last value that was written
+            to this leaf.  The IRD resets retuneMsgStatistic and all entries in
+            the retuneMsgTable each time it receives an enable message;
+            toggling enable/disable/enable is not required for this reset."
+        ::=  {  retuneMonitorMIB  1  }
+
+    retuneMsgStatistic  OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of new retune messages.  This counter is
+            incremented whenever the IRD detects a new retune message, but
+            is not incremented by each instance (duplicate) of a retune
+            message.  This counter provides a useful troubleshooting tool for
+            determining whether the IRD is detecting any retune messages.
+            Range = 0x0000 - 0xFFFF.  Note: This counter is not incremented for
+            every possible retune message.  This counter is only incremented
+            when a retune becomes active.  The IRD ignores retune messages in
+            which the activation time is still in the future.  The IRD also
+            ignores any retune message if the activation time is further in the
+            past than the current retune for the same virtual network."
+        ::=  {  retuneMonitorMIB  2  }
+
+     retuneMsgVirtNetworkIDindex  OBJECT-TYPE
+        SYNTAX        INTEGER  (  0  ..  255  )
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "A table of retune messages is indexed by this target virtual network
+            ID.  This table does not have entries for each instance
+            (duplicate) of a retune message that the IRD receives because the
+            uplink repeatedly broadcasts instances of each retune message for
+            the duration of the virtual network program.  Instead, this table
+            presents select metrics describing the retune message, as described
+            below.
+            Each table entry pertains to the most recent active retune message.
+            A retune message is considered active when the activation time is
+            in the past.  The IRD replaces the current retuneMsgEntry when a
+            new retune message is received having an activation time that is in
+            the past but nearer to the present time than is the activation time
+            of the current retuneMsgEntry.  The IRD ignores retune messages in
+            which the activation time is in the future.
+            The virtual network ID indicates which retune message is targeted.
+            This leaf serves as the index for the table.  Make sure this index
+            is set prior to accessing the following retune message parameters.
+            Range = 1 - 256."
+        ::=  {  retuneMonitorMIB  3  }
+
+     retuneMsgVCTid  OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The target virtual channel map ID of the most recent active retune
+            message.  Range = 0 - 0xFFFF."
+        ::=  {  retuneMonitorMIB  4  }
+
+     retuneMsgVirtChannel  OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 4095  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The target virtual channel of the most recent active retune
+            message.  Range = 0 - 4095."
+        ::=  {  retuneMonitorMIB  5  }
+
+     retuneMsgActivationTime  OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE  (  1 .. 4  )  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The activation time of the most recent active retune message.
+            The activation time is a 32-bit count of GPS seconds since
+            January 6, 1980, representing the time at which the retune is
+            scheduled to occur.  Past activation times are interpreted as
+            immediate activation."
+        ::=  {  retuneMonitorMIB  6  }
+
+     retuneMsgCRC  OBJECT-TYPE
+        SYNTAX        OCTET STRING  ( SIZE  (  1 .. 4  )  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The 4-byte CRC value of the most recent active retune message."
+        ::=  {  retuneMonitorMIB  7  }
+
+     retuneMsgCnt  OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The total number of instances that the IRD has received for the
+            most recent active retune message.  Range = 0 - 0xFFFF.  Note:
+            this counter is incremented when a retune message is received for
+            which the CRC of that retune message matches the CRC of the current
+            retune message (i.e., the value of retuneMsgCRC)."
+        ::=  {  retuneMonitorMIB  8  }
+
+    identificationGroup      OBJECT IDENTIFIER
+    -- This group of objects contains the identification of the software
+    -- and hardware for a specific unit.
+        ::=  {  dsr  14  }
+
+    identMIBVersion   OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The version number of this MIB."
+        REFERENCE        " -- "
+        ::=  {  identificationGroup  1  }
+
+    identUnitModel    OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The unit model of this IRD."
+        REFERENCE        " -- "
+        ::=  {  identificationGroup  2  }
+
+
+    acpMib      OBJECT IDENTIFIER
+    -- This group of objects contains the setup for the ACPs
+        ::=  {  dsr  15  }
+
+    acpMode OBJECT-TYPE
+       SYNTAX   INTEGER { auto ( 0 ), manual ( 1 ) }
+       MAX-ACCESS    read-write
+       STATUS    current
+       DESCRIPTION
+          "Setup mode for the authorization control processor."
+          ::= { acpMib 1 }
+
+    acpIndex OBJECT-TYPE
+        SYNTAX  INTEGER ( 0 .. 63 )
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+              "Number uniquely identifying the ACP and keystream pair."
+        ::= { acpMib 2 }
+
+    acpProgram OBJECT-TYPE
+        SYNTAX INTEGER ( 0 .. 65535 )
+    MAX-ACCESS read-write
+    STATUS  current
+    DESCRIPTION
+            "The MPEG service number of the program."
+        ::= { acpMib 3 }
+
+    acpUnitAddress OBJECT-TYPE
+        SYNTAX OCTET STRING ( SIZE ( 15 ) )
+        MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+            "The electronic address of the selected ACP in the following format:
+                ddd-ddddd-ddddd where d = decimal digit."
+        ::= { acpMib 4 }
+
+    acpKeyStream OBJECT-TYPE
+        SYNTAX  INTEGER ( 0 .. 3 )
+        MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+              "The selected keystream."
+        ::= { acpMib 5 }
+
+    acpAuthState           OBJECT-TYPE
+        SYNTAX          OCTET STRING ( SIZE ( 2 )  )
+        MAX-ACCESS      read-only
+    STATUS     current
+    DESCRIPTION
+              " This field displays the authorization status of the ACP 
+                for the current Service association.
+                AU -- Authorization
+                NA -- Not Authorized
+                The unit presents dashes when no information is available "
+        ::= { acpMib 6 }
+
+    acpEncryptMode OBJECT-TYPE
+        SYNTAX  OCTET STRING ( SIZE ( 1 .. 2 )  )
+        MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+              "This field displays the Encryption Mode of 
+               the service being decrypted by the selected ACP.
+               The different values are
+               FP - Fixed Program Key
+               FW - Fixed Working Key
+               S  - Scrambled
+               ZK - Unencrypted
+               The unit presents dashes when no information is available "
+        ::= { acpMib 7 }
+
+   testMib      OBJECT IDENTIFIER
+    -- This group of objects contains test features for DVT team
+        ::=  {  dsr  16  }
+    audio  OBJECT IDENTIFIER
+    -- This group of objects contains audio pid & checks for audio lock
+        ::=  {  testMib  1  }
+    primaryAudioLock  OBJECT-TYPE
+    SYNTAX        INTEGER { unLocked ( 0 ) , locked ( 1 ) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Primary Audio is locked or not"
+         ::=  {  audio  1  }
+    secondaryAudioLock  OBJECT-TYPE
+    SYNTAX        INTEGER { unLocked ( 0 ) , locked ( 1 ) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Secondary Audio is locked or not"
+         ::=  {  audio  2  }
+   
+   
+    primaryAudioPID  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 8191 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Primary Audio PID "
+         ::=  {  audio  4  }
+    secondaryAudioPID  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 8191 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Secondary Audio PID "
+         ::=  {  audio  5 }
+  
+    
+    video  OBJECT IDENTIFIER
+    -- This group of objects contains video pid & checks for video lock
+        ::=  {  testMib  2  }
+
+    videoLock  OBJECT-TYPE
+    SYNTAX        INTEGER { unLocked ( 0 ) , locked ( 1 ) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Video is locked or not"
+         ::=  {  video  1  }
+    videoPID  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 8191 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives video PID "
+         ::=  {  video  2  }
+
+    codeDownload  OBJECT IDENTIFIER
+    -- This object contains code down status
+        ::=  {  testMib  3  }
+    codeDownloadBit  OBJECT-TYPE
+    SYNTAX        INTEGER { off ( 0 ) , on ( 1 ) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Monitor the Code Download process
+           0 - off
+           1 - on
+        "
+         ::=  {  codeDownload  1  }
+
+   irdStatus  OBJECT IDENTIFIER
+    -- This object contains ird (ledStatus) status
+        ::=  {  testMib  4  }
+
+    falseLock  OBJECT IDENTIFIER
+    -- This object contains false lock status
+        ::=  {  irdStatus  1  }
+    falseLockStatus  OBJECT-TYPE
+    SYNTAX        INTEGER { unLocked ( 0 ) , locked ( 1 ) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Checks for false lock"
+         ::=  {  falseLock  1  }
+
+   alarmLedStatus  OBJECT IDENTIFIER
+    -- This object contains alarmConditionLED status
+        ::=  {  irdStatus  2 }
+    alarmLEDBlinkStatus  OBJECT-TYPE
+    SYNTAX        INTEGER  { notBlinking ( 0 ) , blinking ( 1 ) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "0 - LED is not blinking(OFF/ON)
+         1 - LED is blinking   "
+         ::=  {  alarmLedStatus  1  }
+    messages  OBJECT IDENTIFIER
+    -- This object contains message counts for Subtitle Messages and Finger print messages
+        ::=  {  testMib  5  }
+
+    patMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives PAT Message Count "
+         ::=  {  messages  1  }
+
+    caMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives CA Message Count "
+         ::=  {  messages  2  }
+    pmtMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives PMT message Count "
+         ::=  {  messages  3  }
+    niMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Network Information Message Count "
+         ::=  {  messages  4  }
+
+    networkTextMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Network text Message Count "
+         ::=  {  messages  5  }
+    virtualChannelMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Virtual channel message Count "
+         ::=  {  messages  6  }
+    subtitleMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Subtitle Message Count "
+         ::=  {  messages  7  }
+
+    coMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Channel Override Message Count "
+         ::=  {  messages  8  }
+    dwnldPreMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Download preamble message Count "
+         ::=  {  messages  9  }
+    dwnldMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Download Message Count "
+         ::=  {  messages  10  }
+
+    emmMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives EMM Message Count "
+         ::=  {  messages  11  }
+    fingerPrintMessageCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Finger Print message Count "
+         ::=  {  messages  12  }
+    hcmMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives hardware control Message Count "
+         ::=  {  messages  13  }
+
+    uimMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Unit information message Count "
+         ::=  {  messages  14  }
+    evenBlkoutMsgCount  OBJECT-TYPE
+    SYNTAX        INTEGER ( 0 .. 65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        " Gives Event Blckout Message message Count "
+         ::=  {  messages  15  }
+    rf  OBJECT IDENTIFIER
+    -- This object contains RF diagnostic data
+        ::=  {  testMib  6  }
+    frequencyOffset     OBJECT-TYPE
+        SYNTAX        INTEGER  ( -100 .. 100  )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The acquired offset of the L-band frequency in MHz. " 
+        ::=  {  rf 1  }
+    
+    ber     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This displays Bit Errors. " 
+        ::=  {  rf 2  }
+    ebno     OBJECT-TYPE
+        SYNTAX        INTEGER  ( -10 .. 50 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This displays the Eb/No measured in the IRD. " 
+        ::=  {  rf 3  }
+    rserror     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This displays the Reed Solomon Errors. " 
+        ::=  {  rf 4  }
+    lostlockcount     OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This displays the number of times tuner lost lock. " 
+        ::=  {  rf 5  }
+    clearrserror      OBJECT-TYPE
+        SYNTAX        INTEGER  { yes ( 0 ) , no ( 1 ) }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "Clears the rserror counter to zero. " 
+        ::=  {  rf 6  }
+    clearlostlockcount      OBJECT-TYPE
+        SYNTAX				INTEGER  { yes ( 0 ) , no ( 1 ) }
+        MAX-ACCESS			read-write
+        STATUS				current
+        DESCRIPTION
+            "Clears the lostlockcount counter to zero. " 
+        ::=  {  rf 7  }
+    snr	    	      OBJECT-TYPE
+        SYNTAX        INTEGER  ( 0 .. 65535 )
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This displays the SNR value. " 
+        ::=  {  rf 8  }
+
+END

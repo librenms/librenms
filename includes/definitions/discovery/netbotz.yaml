@@ -1,0 +1,89 @@
+mib: NETBOTZV2-MIB
+modules:
+    sensors:
+        airflow:
+            data:
+                -
+                    oid: airFlowSensorTable
+                    value: airFlowSensorValue
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.5.1.2.{{ $index }}'
+                    descr: airFlowSensorLabel
+                    group: Airflow
+                    index: 'airFlowSensorValue.{{ $index }}'
+        temperature:
+            data:
+                -
+                    oid: dewPointSensorTable
+                    value: dewPointSensorValue
+                    divisor: 10
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.3.1.2.{{ $index }}'
+                    descr: dewPointSensorLabel
+                    group: Dew Point
+                    index: 'dewPointSensorValue.{{ $index }}'
+                -
+                    oid: tempSensorTable
+                    value: tempSensorValueInt
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.1.1.8.{{ $index }}'
+                    descr: tempSensorLabel
+                    index: '{{ $index }}'
+        humidity:
+            data:
+                -
+                    oid: humiSensorTable
+                    value: humiSensorValue
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.1.2.1.8.{{ $index }}'
+                    descr: humiSensorLabel
+                    index: '{{ $index }}'
+        state:
+            data:
+                -
+                    oid: dryContactSensorTable
+                    value: dryContactSensorValue
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.1.1.2.{{ $index }}'
+                    descr: dryContactSensorLabel
+                    group: Dry Contacts
+                    index: 'dryContactSensor.{{ $index }}'
+                    state_name: dryContactSensor
+                    states:
+                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                        - { descr: open, graph: 0, value: 0, generic: 0 }
+                        - { descr: closed, graph: 0, value: 1, generic: 2 }
+                -
+                    oid: doorSwitchSensorTable
+                    value: doorSwitchSensorValue
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.2.1.2.{{ $index }}'
+                    descr: doorSwitchSensorLabel
+                    group: Door Switches
+                    index: 'doorSwitchSensor.{{ $index }}'
+                    state_name: doorSwitchSensor
+                    states:
+                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                        - { descr: open, graph: 0, value: 0, generic: 0 }
+                        - { descr: closed, graph: 0, value: 1, generic: 2 }
+                -
+                    oid: cameraMotionSensorTable
+                    value: cameraMotionSensorValue
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.3.1.2.{{ $index }}'
+                    descr: cameraMotionSensorLabel
+                    group: Camera Motion Sensors
+                    index: 'cameraMotionSensor.{{ $index }}'
+                    state_name: cameraMotionSensor
+                    states:
+                        - { descr: 'null', graph: 0, value: -1, generic: 3 }
+                        - { descr: noMotion, graph: 0, value: 0, generic: 0 }
+                        - { descr: motionDetected, graph: 0, value: 1, generic: 2 }
+                -
+                    oid: otherStateSensorTable
+                    value: otherStateSensorErrorStatus
+                    num_oid: '.1.3.6.1.4.1.5528.100.4.2.10.1.3.{{ $index }}'
+                    descr: otherStateSensorLabel
+                    index: '{{ $index }}'
+                    state_name: otherStateSensorErrorStatus
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: info, graph: 0, value: 1, generic: 1 }
+                        - { descr: warning, graph: 0, value: 2, generic: 1 }
+                        - { descr: error, graph: 0, value: 3, generic: 2 }
+                        - { descr: critical, graph: 0, value: 4, generic: 2 }
+                        - { descr: failure, graph: 0, value: 5, generic: 2 }

@@ -1,0 +1,739 @@
+F3-AMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, IpAddress
+             FROM SNMPv2-SMI
+    TruthValue, RowStatus, StorageType, DisplayString,
+    DateAndTime, VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    fsp150cm
+             FROM  ADVA-MIB 
+    VlanId
+             FROM  CM-COMMON-MIB
+    IpSourceAddrType, IpManagementTunnelType, IpManagementTunnelEncapsulationType
+             FROM  CM-IP-MIB;
+
+f3AMPMIB MODULE-IDENTITY
+    LAST-UPDATED        "201209310000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jakub Zalewski
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 411
+             E-mail: jzalewski@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the Automatic Management Provisioning MIB definitions
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201209300000Z"
+    DESCRIPTION
+        "
+         Notes from release 201209300000Z,
+         (1)MIB version ready for release FSP150CC 5.6CC." 
+
+    ::= {fsp150cm 24}
+
+--
+-- Textual Conventions
+--
+AMPRole ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Defines client or server role."
+    SYNTAX       INTEGER {
+                   client (1),
+                   server (2)
+                 }
+
+AMPStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Defines AMP Status."
+    SYNTAX       INTEGER {
+                   notAvailable (1),
+                   disabled (2),
+                   associatingActive (3),
+                   associatingPassive (4),
+                   associated (5),
+                   noPeer (6)
+                 }
+
+AMPConfigStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Defines AMP Configuration Status."
+    SYNTAX       INTEGER {
+                   none (1),           -- none
+                   provision (2),      -- provision request sent to Client
+                   noPeer (3),         -- no EFM peer
+                   request (4),        -- provisioning request received by Client
+                   configSuccess (5),  -- configuration succeeded on Client
+                   configFail (6),     -- congiguration failed on Client
+                   timeout (7)         -- response timeout
+                 }
+
+AMPProtocol ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Defines protocol over which AMP messages are sent."
+    SYNTAX       INTEGER {
+                   efmOam (1)
+                 }
+
+AMPConfigAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Defines Actions available for f3AmpConfig object"
+    SYNTAX       INTEGER {
+                   noAction (1),
+                   clearStats (2)
+                 }
+
+-- 
+-- OID definitions
+-- 
+f3AmpConfigObjects      OBJECT IDENTIFIER ::= {f3AMPMIB 1}
+f3AmpStatsObjects       OBJECT IDENTIFIER ::= {f3AMPMIB 2}
+f3AmpConformance        OBJECT IDENTIFIER ::= {f3AMPMIB 3}
+
+
+--
+--  AMP Client/Server Configuration table
+--
+f3AmpConfigTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3AmpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Automatic Management Provisioning
+             configuration instance for configuration purposes."
+    ::= { f3AmpConfigObjects 1 }
+
+f3AmpConfigEntry OBJECT-TYPE
+    SYNTAX      F3AmpConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3AmpConfigTable."
+    INDEX { f3AmpConfigIndex }
+    ::= { f3AmpConfigTable 1 }
+
+F3AmpConfigEntry ::= SEQUENCE {
+    f3AmpConfigIndex                           Integer32,
+    f3AmpConfigRole                            AMPRole,
+    f3AmpConfigProtocol                        AMPProtocol,
+    f3AmpConfigEnabled                         TruthValue,
+    f3AmpConfigPort                            VariablePointer,
+    f3AmpConfigStatus                          AMPStatus,
+    f3AmpConfigRemSysName                      DisplayString,
+    f3AmpConfigRemSysIpAddr                    IpAddress,
+    f3AmpConfigRemSysIpMask                    IpAddress,
+    f3AmpConfigRemSysDefGateway                IpAddress,
+    f3AmpConfigRemSysSNMPV1IfName              DisplayString,
+    f3AmpConfigRemSysSrcIpAddrType             IpSourceAddrType,
+    f3AmpConfigRemSysSrcIpAddrIfName           DisplayString,
+    f3AmpConfigRemTunnelIndex                  Integer32,
+    f3AmpConfigRemTunnelName                   DisplayString,
+    f3AmpConfigRemTunnelType                   IpManagementTunnelType, 
+    f3AmpConfigRemTunnelIpAddr                 IpAddress,
+    f3AmpConfigRemTunnelIpMask                 IpAddress,
+    f3AmpConfigRemTunnelVlanId                 VlanId,
+    f3AmpConfigRemTunnelSVlanId                VlanId,
+    f3AmpConfigRemTunnelSVlanIdEnabled         TruthValue,
+    f3AmpConfigRemTunnelRip2PktsEnabled        TruthValue,
+    f3AmpConfigRemTunnelCOS                    Integer32,
+    f3AmpConfigRemTunnelCIR                    Unsigned32,
+    f3AmpConfigRemTunnelEIR                    Unsigned32,
+    f3AmpConfigRemTunnelBufferSize             Unsigned32,
+    f3AmpConfigRemTunnelEncapType              IpManagementTunnelEncapsulationType,
+    f3AmpConfigRemTunnelMtu                    Integer32,
+    f3AmpConfigAction                          AMPConfigAction,
+    f3AmpConfigStorageType                     StorageType,
+    f3AmpConfigRowStatus                       RowStatus
+}
+
+f3AmpConfigIndex OBJECT-TYPE
+    SYNTAX        Integer32 (1..255)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "An integer index value used to uniquely identify
+             this AMP Config within the System."
+    ::= { f3AmpConfigEntry 1 }
+
+f3AmpConfigRole OBJECT-TYPE
+    SYNTAX        AMPRole
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Configures AMP instance to be either Client or Server."
+    ::= { f3AmpConfigEntry 2 }
+
+f3AmpConfigProtocol OBJECT-TYPE
+    SYNTAX        AMPProtocol
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Configures protocol over which AMP message will be transported."
+    ::= { f3AmpConfigEntry 3 }
+
+f3AmpConfigEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Enables or Disables AMP on a Port."
+    ::= { f3AmpConfigEntry 4 }
+
+f3AmpConfigPort OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Port on which AMP Server or Client will operate. This port will 
+          transmit/receive AMP messages. The AMP can operate on Access Ports and
+          Network Port and f3AmpConfigPort shall point to either cmEthernetAccPortIndex 
+          or cmEthernetNetPortIndex."
+    ::= { f3AmpConfigEntry 5 }
+
+f3AmpConfigStatus OBJECT-TYPE
+    SYNTAX        AMPStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "The Status of AMP."
+    ::= { f3AmpConfigEntry 6 }
+
+f3AmpConfigRemSysName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies sysName which is sent
+          in a AMP message to be configfured on a AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the sysName
+          value which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 7 }
+
+f3AmpConfigRemSysIpAddr OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies System IP address 
+          which is sent in a AMP message to be configfured on a AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          System IP address value which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 8 }
+
+f3AmpConfigRemSysIpMask OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies System IP mask 
+          which is sent in a AMP message to be configfured on a AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          System IP mask value which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 9 }
+
+f3AmpConfigRemSysDefGateway OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies System Default Gateway 
+          which is sent in a AMP message to be configfured on a AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          System Default Gateway value which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 10 }
+
+f3AmpConfigRemSysSNMPV1IfName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          System SNMPV1 Interface Name which is sent
+          in a AMP message to be configfured on a AMP Client device.
+          When f3AmpConfigRole is 'client' this object shows the 
+          System SNMPV1 Interface Name value which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 11 }
+
+f3AmpConfigRemSysSrcIpAddrType OBJECT-TYPE
+    SYNTAX        IpSourceAddrType
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies System Source IP Address 
+          type which is sent in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          System Source IP Address Type value which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 12 }
+
+f3AmpConfigRemSysSrcIpAddrIfName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies System Source IP
+          Interface name sent in an AMP message to be configured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object shows the  SystemSource IP Interface 
+          value which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 13 }
+
+f3AmpConfigRemTunnelIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..255)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          index of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          index of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 14 }
+
+f3AmpConfigRemTunnelName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          a Management Tunnel name which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          Management Tunnel name which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 15 }
+
+f3AmpConfigRemTunnelType OBJECT-TYPE
+    SYNTAX        IpManagementTunnelType 
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          a Management Tunnel type value which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          Management Tunnel type value which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 16 }
+
+f3AmpConfigRemTunnelIpAddr OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          IP Address of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          IP Address of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 17 }
+
+f3AmpConfigRemTunnelIpMask OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          IP Mask of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          IP Mask of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 18 }
+
+f3AmpConfigRemTunnelVlanId OBJECT-TYPE
+    SYNTAX        VlanId
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          VlanId of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          VlanId of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 19 }
+
+f3AmpConfigRemTunnelSVlanId OBJECT-TYPE
+    SYNTAX        VlanId
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          S-TAG VlanId of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          S-TAG VlanId of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 20 }
+
+f3AmpConfigRemTunnelSVlanIdEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          a Management Tunnel S-TAG VlanId Enable value which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          a Management Tunnel S-TAG VlanId Enabled value which was received 
+          from the AMP Server."
+    ::= { f3AmpConfigEntry 21 }
+
+f3AmpConfigRemTunnelRip2PktsEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          a Management Tunnel RIP2 Packates Enabled value which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          a Management Tunnel RIP2 Packates Enabled value which was received 
+          from the AMP Server."
+    ::= { f3AmpConfigEntry 22 }
+
+f3AmpConfigRemTunnelCOS OBJECT-TYPE
+    SYNTAX        Integer32 (0..7)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          COS of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          COS of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 23 }
+
+f3AmpConfigRemTunnelCIR OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          CIR of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          CIR of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 24 }
+
+f3AmpConfigRemTunnelEIR OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          EIR of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          EIR of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 25 }
+
+f3AmpConfigRemTunnelBufferSize OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          Buffer Size of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          Buffer Size of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 26 }
+
+f3AmpConfigRemTunnelEncapType OBJECT-TYPE
+    SYNTAX        IpManagementTunnelEncapsulationType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          Encapsulation Type of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          Encapsulation Type of a Management Tunnel which was received from 
+          the AMP Server."
+    ::= { f3AmpConfigEntry 27 }
+
+f3AmpConfigRemTunnelMtu OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "When f3AmpConfigRole is 'server' this object specifies 
+          MTU of a Management Tunnel which is sent
+          in an AMP message to be configfured on an AMP Client device.
+          When f3AmpConfigRole is 'client' this object is read-only and shows the 
+          MTU of a Management Tunnel which was received from the AMP Server."
+    ::= { f3AmpConfigEntry 28 }
+
+f3AmpConfigAction OBJECT-TYPE
+    SYNTAX        AMPConfigAction
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "This object may be used to initiate user action on this AMP Config instance."
+    ::= { f3AmpConfigEntry 29 }
+
+f3AmpConfigStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3AmpConfigEntry 30 }
+
+f3AmpConfigRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3AmpConfigRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            neRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3AmpConfigRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+
+    ::= { f3AmpConfigEntry 31 }
+
+--
+--  AMP Stats
+--
+f3AmpStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3AmpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Automatic Management Provisioning
+             Statistics"
+    ::= { f3AmpStatsObjects 1 }
+
+f3AmpStatsEntry OBJECT-TYPE
+    SYNTAX      F3AmpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3AmpStatsTable."
+    INDEX { f3AmpConfigIndex }
+    ::= { f3AmpStatsTable 1 }
+
+F3AmpStatsEntry ::= SEQUENCE {
+    f3AmpStatsProvDataTx                           Unsigned32,
+    f3AmpStatsProvDataRx                           Unsigned32,
+    f3AmpStatsProvRequestTx                        Unsigned32,
+    f3AmpStatsProvRequestRx                        Unsigned32,
+    f3AmpStatsConfigSuccessTx                      Unsigned32,
+    f3AmpStatsConfigSuccessRx                      Unsigned32,
+    f3AmpStatsConfigFailTx                         Unsigned32,
+    f3AmpStatsConfigFailRx                         Unsigned32,
+    f3AmpStatsSpuriousMessageRx                    Unsigned32,
+    f3AmpStatsTimeoutRx                            Unsigned32,
+    f3AmpStatsLastRxStatus                         AMPConfigStatus,
+    f3AmpStatsRxTimeStamp                          DateAndTime,
+    f3AmpStatsLastTxStatus                         AMPConfigStatus,
+    f3AmpStatsTxTimeStamp                          DateAndTime
+}
+
+f3AmpStatsProvDataTx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Provisioning Data messages sent by AMP Server."
+    ::= { f3AmpStatsEntry 1 }
+
+f3AmpStatsProvDataRx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Provisioning Data messages received by AMP Client."
+    ::= { f3AmpStatsEntry 2 }
+
+f3AmpStatsProvRequestTx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Provisioning Request messages sent by AMP Client."
+    ::= { f3AmpStatsEntry 3 }
+
+f3AmpStatsProvRequestRx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Provisioning Request received sent by AMP Server."
+    ::= { f3AmpStatsEntry 4 }
+
+f3AmpStatsConfigSuccessTx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Configuration Success messages sent sent by AMP Client."
+    ::= { f3AmpStatsEntry 5 }
+
+f3AmpStatsConfigSuccessRx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Configuration Success messages received by AMP Server."
+    ::= { f3AmpStatsEntry 6 }
+
+f3AmpStatsConfigFailTx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Configuration Success messages received by AMP Client."
+    ::= { f3AmpStatsEntry 7 }
+
+f3AmpStatsConfigFailRx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Configuration Success messages received by AMP Server."
+    ::= { f3AmpStatsEntry 8 }
+
+f3AmpStatsSpuriousMessageRx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of Spurious messages received by AMP Client or Server"
+    ::= { f3AmpStatsEntry 9 }
+
+f3AmpStatsTimeoutRx OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "The number of messages which were not received within the time out value.
+           AMP Client can time out while waiting for Prov Data message. 
+           AMP Server can time out while waiting for Config Fail or Config Success
+           message."
+    ::= { f3AmpStatsEntry 10 }
+
+f3AmpStatsLastRxStatus OBJECT-TYPE
+    SYNTAX        AMPConfigStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "Last received Configuration Status."
+    ::= { f3AmpStatsEntry 11 }
+
+f3AmpStatsRxTimeStamp OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "Time of last received Configuration Status."
+    ::= { f3AmpStatsEntry 12 }
+
+f3AmpStatsLastTxStatus OBJECT-TYPE
+    SYNTAX        AMPConfigStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "Last sent Configuration Status."
+    ::= { f3AmpStatsEntry 13 }
+
+f3AmpStatsTxTimeStamp OBJECT-TYPE
+    SYNTAX        DateAndTime
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+          "Time of last sent Configuration Status."
+    ::= { f3AmpStatsEntry 14 }
+
+--
+-- Conformance
+--
+f3AmpCompliances OBJECT IDENTIFIER ::= {f3AmpConformance 1}
+f3AmpGroups      OBJECT IDENTIFIER ::= {f3AmpConformance 2}
+
+f3AmpCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-AMP-MIB compilance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3AmpConfigGroup, f3AmpStatsGroup
+        }
+    ::= { f3AmpCompliances 1 }
+
+f3AmpConfigGroup OBJECT-GROUP
+   OBJECTS {
+      f3AmpConfigRole,
+      f3AmpConfigProtocol,
+      f3AmpConfigEnabled,
+      f3AmpConfigPort,
+      f3AmpConfigStatus,
+      f3AmpConfigRemSysName,
+      f3AmpConfigRemSysIpAddr,
+      f3AmpConfigRemSysIpMask,
+      f3AmpConfigRemSysDefGateway,
+      f3AmpConfigRemSysSNMPV1IfName,
+      f3AmpConfigRemSysSrcIpAddrType,
+      f3AmpConfigRemSysSrcIpAddrIfName,
+      f3AmpConfigRemTunnelIndex,
+      f3AmpConfigRemTunnelName,
+      f3AmpConfigRemTunnelType,
+      f3AmpConfigRemTunnelIpAddr,
+      f3AmpConfigRemTunnelIpMask,
+      f3AmpConfigRemTunnelVlanId,
+      f3AmpConfigRemTunnelSVlanId,
+      f3AmpConfigRemTunnelSVlanIdEnabled,
+      f3AmpConfigRemTunnelRip2PktsEnabled,
+      f3AmpConfigRemTunnelCOS,
+      f3AmpConfigRemTunnelCIR,
+      f3AmpConfigRemTunnelEIR,
+      f3AmpConfigRemTunnelBufferSize,
+      f3AmpConfigRemTunnelEncapType,
+      f3AmpConfigRemTunnelMtu,
+      f3AmpConfigAction,
+      f3AmpConfigStorageType,
+      f3AmpConfigRowStatus
+   }
+   STATUS  current
+   DESCRIPTION
+             "A collection of objects used to manage the AMP Configuration."
+    ::= { f3AmpGroups 1 }
+
+f3AmpStatsGroup OBJECT-GROUP
+   OBJECTS {
+      f3AmpStatsProvDataTx,
+      f3AmpStatsProvDataRx,
+      f3AmpStatsProvRequestTx,
+      f3AmpStatsProvRequestRx,
+      f3AmpStatsConfigSuccessTx,
+      f3AmpStatsConfigSuccessRx,
+      f3AmpStatsConfigFailTx,
+      f3AmpStatsConfigFailRx,
+      f3AmpStatsSpuriousMessageRx,
+      f3AmpStatsTimeoutRx,
+      f3AmpStatsLastRxStatus,
+      f3AmpStatsRxTimeStamp,
+      f3AmpStatsLastTxStatus,
+      f3AmpStatsTxTimeStamp
+   }
+   STATUS  current
+   DESCRIPTION
+             "A collection of objects used to manage the AMP Statistics."
+    ::= { f3AmpGroups 2 }
+
+END

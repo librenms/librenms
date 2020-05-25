@@ -1,0 +1,56 @@
+mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: hpSwitchCpuStat
+                  num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.{{ $index }}'
+                  type: procurve-fixed
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: hpicfPsTable
+                    value: hpicfPsTemp
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.4.{{ $index }}'
+                    index: 'hpicfPsTemp.{{ $index }}'
+                    descr: 'Power Supply #{{ $index }}'
+        power:
+            data:
+                -
+                    oid: hpicfPsTable
+                    value: hpicfPsWattageCur
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.6.{{ $index }}'
+                    index: 'hpicfPsWattageCur.{{ $index }}'
+                    high_limit: hpicfPsWattageMax
+                    descr: 'Power Supply #{{ $index }}'
+        state:
+            data:
+                -
+                    oid: hpicfFanTable
+                    value: hpicfFanState
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.54.2.1.1.4.{{ $index }}'
+                    descr: 'Fan #{{ $index }}'
+                    index: 'hpicfFanState.{{ $index }}'
+                    state_name: hpicfFanState
+                    states:
+                        - { descr: removed, graph: 1, value: 1, generic: 3 }
+                        - { descr: off, graph: 1, value: 2, generic: 3 }
+                        - { descr: underspeed, graph: 1, value: 3, generic: 1 }
+                        - { descr: overspeed, graph: 1, value: 4, generic: 1 }
+                        - { descr: ok, graph: 1, value: 5, generic: 0 }
+                        - { descr: maxstate, graph: 1, value: 6, generic: 3 }
+                -
+                    oid: hpicfPsTable
+                    value: hpicfPsState
+                    num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.55.1.1.1.2.{{ $index }}'
+                    descr: 'Power Supply #{{ $index }}'
+                    index: 'hpicfPsState.{{ $index }}'
+                    state_name: hpicfPsState
+                    states:
+                        - { descr: psNotPresent, graph: 1, value: 1, generic: 3 }
+                        - { descr: psNotPlugged, graph: 1, value: 2, generic: 2 }
+                        - { descr: psPowered, graph: 1, value: 3, generic: 0 }
+                        - { descr: psFailed, graph: 1, value: 4, generic: 2 }
+                        - { descr: psPermFailure, graph: 1, value: 5, generic: 2 }
+                        - { descr: psMax, graph: 1, value: 6, generic: 3 }

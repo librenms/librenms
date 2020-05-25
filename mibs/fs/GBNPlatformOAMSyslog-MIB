@@ -1,0 +1,434 @@
+------------------------------------------------------------------------------
+--
+--  File              : gbnPlatformOAMSyslog-MIB.mi2
+--  Description       : Syslog configuration MIB 
+--  Version           : 1.0  
+--  Date              : Oct 10, 2004     
+--  Author            : wukaijian
+--  Copyright (c) 2001-2008 admin Co. Ltd.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+
+    GBNPlatformOAMSyslog-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Gauge32,
+        Unsigned32, Integer32,
+        IpAddress, NOTIFICATION-TYPE            FROM SNMPv2-SMI
+        
+        RowStatus, TruthValue, 
+        DisplayString, MacAddress               FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        snmpTraps                               FROM SNMPv2-MIB
+        
+        gbnPlatformOAM                          FROM GBNPlatformOAM-MIB;
+    
+    gbnPlatformOAMSyslog  MODULE-IDENTITY
+        LAST-UPDATED    "0410100000Z"  -- October 10, 2004
+        ORGANIZATION    "Admin Co. Ltd"
+        CONTACT-INFO    "Admin Co. Ltd
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "Syslog mib definition."
+
+        REVISION        "0410100000Z"  -- October 10, 2004
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnPlatformOAM 9 }
+
+	syslogState OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable or disable Syslog."
+            --打开或关闭Syslog功能。
+        ::= { gbnPlatformOAMSyslog 1 }   
+        
+    syslogSeqNoEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "display or not display sequence number in output messages."
+            --在输出信息中显示或不显示序列号。
+        ::= { gbnPlatformOAMSyslog 2 } 
+        
+    syslogTimestampType OBJECT-TYPE
+        SYNTAX INTEGER {
+            notime(1),
+            uptime(2),
+            datetime(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "set timestamp type shown in output messages.
+             notime:   not show timestamp;
+             uptime:   show elapse time as timestamp;
+             datetime: show datetime as timestamp."
+            --配置输出信息中显示的时间戳类型。
+            --notime:   不显示时间戳；
+            --uptime:   显示开机时间作为时间戳；
+            --datetime: 显示绝对时间作为时间戳。
+        ::= { gbnPlatformOAMSyslog 3 }     
+        
+    syslogLanguageType OBJECT-TYPE
+        SYNTAX INTEGER {
+            english(1),
+            chinese(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "set language type used in output messages."
+            --配置输出信息中使用的语言类型。
+        ::= { gbnPlatformOAMSyslog 4 }                                               
+                               
+	syslogFacility OBJECT-TYPE
+        SYNTAX INTEGER {
+            kernel(0),
+            userlevel(1),
+            mail(2),
+            system(3),
+            security1(4),
+            syslogd(5),
+            lineprinter(6),
+            networknews(7),
+            uucp(8),
+            clock1(9),
+            security2(10),
+            ftp(11),
+            ntp(12),
+            logaudit(13),
+            logalert(14),
+            clock2(15),
+            localuse0(16),
+            localuse1(17),
+            localuse2(18),
+            localuse3(19),
+            localuse4(20),
+            localuse5(21),
+            localuse6(22),
+            localuse7(23)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "set loghost facility code."
+            --配置日志主机(Syslog服务器)记录工具代号。
+        ::= { gbnPlatformOAMSyslog 5 }
+        
+    syslogSourceIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "specify source address used in syslog.
+             0 means no source address used.
+             the ip address must belong to the device."
+            --指定Syslog使用的固定源地址，发至Syslog服务器的报文将使用此地址作为源地址。
+            --0代表不使用固定源地址，此时系统将使用出接口的地址作为源地址。
+            --指定的源地址必须为设备上某一接口的地址，否则设置不成功。
+        ::= { gbnPlatformOAMSyslog 6 } 
+        
+	syslogInfo OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..256))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "node that used to bind infomation to send trap by syslog."
+            --Syslog使用此节点绑定信息发送Trap。
+        ::= { gbnPlatformOAMSyslog 7 } 
+        
+------------------------------------------------------------------------------     
+--  syslogOutputDevInfoTable:
+------------------------------------------------------------------------------
+
+    syslogOutputDevInfoTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF SyslogOutputDevInfoEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "syslog output device infomation table."
+            --Syslog输出设备信息表。描述各输出方向的相关信息。
+        ::= { gbnPlatformOAMSyslog 8 }   
+        
+    syslogOutputDevInfoEntry OBJECT-TYPE
+        SYNTAX   SyslogOutputDevInfoEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "syslog output device infomation entry."
+            --Syslog输出设备信息条目。描述某一输出方向的相关信息。
+        INDEX { syslogOutputDevInfoName }
+        ::= { syslogOutputDevInfoTable 1 }
+        
+    SyslogOutputDevInfoEntry ::=
+	    SEQUENCE {
+	        syslogOutputDevInfoName
+	            OCTET STRING,
+	        syslogOutputDevInfoSwitch
+	            INTEGER,
+	        syslogOutputDevInfoLogged
+	            Gauge32,
+	        syslogOutputDevInfoDiscard
+	        	Gauge32,
+	        syslogOutputDevInfoOverflow
+	        	Gauge32     	            
+	        }
+                 
+	syslogOutputDevInfoName OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..32))
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "output device name."
+            --输出设备名。
+            --设备名由系统指定，用户不可设置。
+            --输出设备包括控制台、Telnet终端、历史缓冲区、Flash存储器、日志主机和SNMP Agent。
+            --除日志主机（Syslog服务器）外，其他输出设备使用固定的名字。日志主机使用IP地址作为
+            --其设备名，用户已配置的日志主机显示在表中，未配置的不显示。用户可通过命令行或者
+            --MIB表syslogLoghostAddrTable配置日志主机地址。
+        ::= { syslogOutputDevInfoEntry 1 }  
+                 
+	syslogOutputDevInfoSwitch OBJECT-TYPE
+        SYNTAX   INTEGER {
+        	enable(1),
+        	disable(2)
+        }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "output device switch."
+            --输出设备信息开关。配置是否允许信息输出至该方向。
+        ::= { syslogOutputDevInfoEntry 2 }          
+                 
+	syslogOutputDevInfoLogged OBJECT-TYPE
+        SYNTAX   Gauge32 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "number of messages logged in this output device."
+            --该输出方向已记录的信息个数。
+            --系统统计信息，用户不可配置。
+        ::= { syslogOutputDevInfoEntry 3 }             
+                 
+	syslogOutputDevInfoDiscard OBJECT-TYPE
+        SYNTAX   Gauge32 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "number of messages discard in this output device."
+            --该输出方向已丢弃的信息个数。
+            --系统统计信息，用户不可配置。
+        ::= { syslogOutputDevInfoEntry 4 }               
+                 
+	syslogOutputDevInfoOverflow OBJECT-TYPE
+        SYNTAX   Gauge32 
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "number of messages overflowed in this output device."
+            --该输出方向已覆盖的信息个数。
+            --系统统计信息，用户不可配置。
+        ::= { syslogOutputDevInfoEntry 5 }  
+        
+------------------------------------------------------------------------------     
+--  syslogLoghostAddrTable:
+------------------------------------------------------------------------------
+
+    syslogLoghostAddrTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF SyslogLoghostAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "loghost address table."
+            --日志主机地址表。记录已配置的日志主机条目。
+        ::= { gbnPlatformOAMSyslog 9 }   
+        
+    syslogLoghostAddrEntry OBJECT-TYPE
+        SYNTAX   SyslogLoghostAddrEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "loghost address entry."
+            --日志主机地址条目。记录已配置的日志主机。
+        INDEX { syslogLoghostAddrIp }
+        ::= { syslogLoghostAddrTable 1 }
+        
+    SyslogLoghostAddrEntry ::=
+	    SEQUENCE {
+	        syslogLoghostAddrIp
+	            IpAddress,
+	        syslogLoghostAddrRowstatus
+	        	RowStatus       	            
+	        }
+                 
+	syslogLoghostAddrIp OBJECT-TYPE
+        SYNTAX   IpAddress
+        MAX-ACCESS   read-create
+        STATUS   current
+        DESCRIPTION
+            "loghost ip address."
+            --日志主机IP地址。
+            --用户可添加或者删除日志主机。
+        ::= { syslogLoghostAddrEntry 1 }               
+                 
+	syslogLoghostAddrRowstatus OBJECT-TYPE
+        SYNTAX   RowStatus
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "row status."
+            --行状态。
+            --添加日志主机时，必须首先设置日志主机地址，此时行状态自动设为notInService(2)，
+            --然后设置行状态为createAndGo(4)或者createAndWait(5)。
+            --删除日志主机时，只需将行状态设置为destroy(6)即可。
+        ::= { syslogLoghostAddrEntry 2 }      
+        
+------------------------------------------------------------------------------     
+--  syslogFilterRuleTable:
+------------------------------------------------------------------------------
+
+    syslogFilterRuleTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF SyslogFilterRuleEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "syslog filter rule table."
+            --Syslog过滤规则表。
+        ::= { gbnPlatformOAMSyslog 10 }   
+        
+    syslogFilterRuleEntry OBJECT-TYPE
+        SYNTAX   SyslogFilterRuleEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "syslog filter rule entry."
+            --Syslog过滤规则条目。
+        INDEX { syslogFilterRuleDevname, syslogFilterRuleModname }
+        ::= { syslogFilterRuleTable 1 }
+        
+    SyslogFilterRuleEntry ::=
+	    SEQUENCE {
+	        syslogFilterRuleDevname
+	            OCTET STRING,
+	        syslogFilterRuleModname
+	            OCTET STRING,
+	        syslogFilterRuleLevelmask
+	            BITS      	            
+	        }
+                 
+	syslogFilterRuleDevname OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..32))
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "output device name."
+            --输出设备名。
+            --设备名由系统指定，用户不可设置。
+            --输出设备包括控制台、Telnet终端、历史缓冲区、Flash存储器、日志主机和SNMP Agent。
+            --除日志主机（Syslog服务器）外，其他输出设备使用固定的名字。日志主机使用IP地址作为
+            --其设备名，用户已配置的日志主机显示在表中，未配置的不显示。用户可通过命令行或者
+            --MIB表syslogLoghostAddrTable配置日志主机地址。
+        ::= { syslogFilterRuleEntry 1 }        
+                 
+	syslogFilterRuleModname OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..32))
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "module name."
+            --模块名。
+            --用户不可设置，由系统根据系统中已有的模块显示。
+        ::= { syslogFilterRuleEntry 2 }            
+                 
+	syslogFilterRuleLevelmask OBJECT-TYPE
+        SYNTAX   BITS
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "a 8 bits mask used to decide whether the infomation output to the device.
+             every bit corresponds to a level, 1 means output allowed."
+            --一个8位的掩码，决定信息是否输出到某一设备。
+            --每一位对应一个信息级别，该位为1则该级别信息允许输出到设备。
+            --第0至7位（最低位位第0位）分别对应的信息级别为：emergencies，alerts，critical，
+            --errors，warnings，notifications，informational，debugging。
+            ::= { syslogFilterRuleEntry 3 }        
+        
+------------------------------------------------------------------------------     
+--  syslogDbgTable:
+------------------------------------------------------------------------------
+
+    syslogDbgTable OBJECT-TYPE
+        SYNTAX   SEQUENCE OF SyslogDbgEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "syslog debug switch table."
+            --Syslog调试开关状态表。
+        ::= { gbnPlatformOAMSyslog 11 }   
+        
+    syslogDbgEntry OBJECT-TYPE
+        SYNTAX   SyslogDbgEntry
+        MAX-ACCESS   not-accessible
+        STATUS   current
+        DESCRIPTION
+            "syslog debug switch entry."
+            --Syslog调试开关状态条目。
+        INDEX { syslogDbgModname }
+        ::= { syslogDbgTable 1 }
+        
+    SyslogDbgEntry ::=
+	    SEQUENCE {
+	        syslogDbgModname
+	            OCTET STRING,
+	        syslogDbgState
+	            INTEGER      	            
+	        }
+                 
+	syslogDbgModname OBJECT-TYPE
+        SYNTAX   OCTET STRING (SIZE (0..32))
+        MAX-ACCESS   read-only
+        STATUS   current
+        DESCRIPTION
+            "module name."
+            --模块名。
+            --用户不可设置，由系统根据系统中已有的模块显示。
+        ::= { syslogDbgEntry 1 }        
+                 
+	syslogDbgState OBJECT-TYPE
+        SYNTAX   INTEGER {
+        	enable(1),
+        	disable(2)
+        }
+        MAX-ACCESS   read-write
+        STATUS   current
+        DESCRIPTION
+            "debug switch state."
+            --调试开关状态。用户可打开或关闭模块的调试开关。
+        ::= { syslogDbgEntry 2 }   
+        
+------------------------------------------------------------------------------     
+--  syslogTrap:
+------------------------------------------------------------------------------        
+        
+    syslogTrap NOTIFICATION-TYPE
+    	OBJECTS { syslogInfo }
+    	STATUS  current
+    	DESCRIPTION
+    		"trap node that used to send syslog messages."  
+    		--发送Syslog信息的Trap节点。
+    	::= { gbnPlatformOAMSyslog 12 }    
+                                       
+   END

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == 'cisco') {
     $serverfarm_array = snmpwalk_cache_oid($device, 'slbVServerInfoTable', array(), 'CISCO-SLB-MIB');
     $serverfarm_db = dbFetchRows('SELECT * FROM `loadbalancer_vservers` WHERE `device_id` = ?', array($device['device_id']));
@@ -43,10 +45,10 @@ if ($device['os_group'] == 'cisco') {
         }
 
         $rrd_name = array('vserver', $classmap_id);
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
         foreach ($oids as $oid) {
-            $oid_ds = substr(str_replace('slbVServer', '', $oid), 0, 19);
-            $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:1000000000";
+            $oid_ds = str_replace('slbVServer', '', $oid);
+            $rrd_def->addDataset($oid_ds, 'COUNTER', null, 1000000000);
         }
 
         $fields = array();
@@ -67,3 +69,8 @@ if ($device['os_group'] == 'cisco') {
 
     unset($rrd_name, $rrd_def, $oids, $oid, $vserver);
 }
+
+unset(
+    $serverfarm_array,
+    $serverfarm_db
+);

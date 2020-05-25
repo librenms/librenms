@@ -1,0 +1,40 @@
+mib: EATON-ATS2-MIB
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: ats2OutputVoltage
+                    value: ats2OutputVoltage
+                    num_oid: '.1.3.6.1.4.1.534.10.2.2.3.1.{{ $index }}'
+                    divisor: 10
+                    descr: 'Output'
+                    index: 'ats2OutputVoltage.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: ats2OperationMode
+                    value: ats2OperationMode
+                    num_oid: '.1.3.6.1.4.1.534.10.2.2.4.{{ $index }}'
+                    descr: 'ats2OperationMode'
+                    index: 'ats2OperationMode.{{ $index }}'
+                    state_name: ats2OperationMode
+                    states:
+                        - { descr: initialization, graph: 0, value: 1, generic: 1 }
+                        - { descr: diagnosis, graph: 0, value: 2, generic: 1 }
+                        - { descr: off, graph: 0, value: 3, generic: 2 }
+                        - { descr: source1, graph: 0, value: 4, generic: 0 }
+                        - { descr: source2, graph: 0, value: 5, generic: 0 }
+                        - { descr: safe, graph: 0, value: 6, generic: 1 }
+                        - { descr: fault, graph: 0, value: 7, generic: 2 }
+                -
+                    oid: ats2InputStatusDephasing
+                    value: ats2InputStatusDephasing
+                    num_oid: '.1.3.6.1.4.1.534.10.2.3.1.1.{{ $index }}'
+                    descr: 'ats2InputStatusDephasing'
+                    index: 'ats2InputStatusDephasing.{{ $index }}'
+                    state_name: ats2InputStatusDephasing
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: outOfRange, graph: 0, value: 2, generic: 1 }
+

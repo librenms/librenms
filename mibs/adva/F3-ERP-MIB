@@ -1,0 +1,1085 @@
+F3-ERP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32
+             FROM SNMPv2-SMI
+    TruthValue, RowStatus, StorageType, DisplayString,
+    MacAddress, VariablePointer, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    neIndex
+             FROM CM-ENTITY-MIB
+    fsp150cm
+             FROM  ADVA-MIB 
+    AdminState, OperationalState, SecondaryState,
+    VlanId, VlanPriority, VlanEthertype
+             FROM  CM-COMMON-MIB
+    Dot1agCfmMDLevel 
+             FROM  IEEE8021-CFM-MIB
+    CmProtUnitType, CmProtUnitState
+             FROM  CM-PROTECTION-MIB;
+
+f3ErpMIB MODULE-IDENTITY
+    LAST-UPDATED        "201209130000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jakub Zalewski
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 411
+             E-mail: jzalewski@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the G.8032 Ethernet Ring Protection MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201209130000Z"
+    DESCRIPTION
+        "
+         Notes from release 201209130000Z,
+         (1)MIB version ready for release FSP150CC 5.6CC." 
+
+    ::= {fsp150cm 25}    
+
+
+--
+-- Textual Conventions
+--
+G8032Version ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Version of G.8032 ERP protocol"
+    SYNTAX       INTEGER {
+                   v1 (1),
+                   v2 (2)
+                 }
+
+RPLRole ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Ring Protocol Link role"
+    SYNTAX       INTEGER {
+                   none (1),
+                   neighbor (2),
+                   owner (3)
+                 }
+
+RingPortStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Status of Ring Port"
+    SYNTAX       INTEGER {
+                   unblocked (1),
+                   unblockedSF (2),
+                   unblockedSD (3),
+                   blockedRPL (4),
+                   blockedSF (5),
+                   blockedSD (6),
+                   blockedMS (7),
+                   blockedFS (8),
+                   blockedPending (9),
+                   subringInterConnect (10),
+                   subringInterConnectSF (11)
+                 }
+
+RingNodeState ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "State of Ring Port"
+    SYNTAX       INTEGER {
+                   idle (1),
+                   protection (2),
+                   manual (3),
+                   forced (4),
+                   pending (5)
+                 }
+
+RAPSRequest ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Ring Automatic Protection Switch Request"
+    SYNTAX       INTEGER {
+                   noRequest (1),
+                   manual (2),
+                   forced (3),
+                   signailFail (4),
+                   signailDegrade (5),
+                   notApplicable (6)
+                 }
+
+ERPGroupAction ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "User action initiated on ERP group"
+    SYNTAX       INTEGER {
+                   noAction (1),
+                   forcedSwitch (2),
+                   manualSwitch (3),
+                   clearSwitch (4),
+                   resetStats (5)
+                 }
+
+RapsInterconnectionNode ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Role of the sub-ring interconnection node"
+    SYNTAX       INTEGER {
+                   none (1),
+                   primary (2),
+                   secondary (3)
+                 }
+
+RapsMultipleFailure ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Indicates the interconnection node that has to perform the
+         Manual Switch for minimizing interconnected ring segmentation"
+    SYNTAX       INTEGER {
+                   disabled (1),
+                   primary (2),
+                   secondary (3)
+                 }
+                 
+-- 
+-- OID definitions
+-- 
+f3ErpConfigObjects      OBJECT IDENTIFIER ::= {f3ErpMIB 1}
+f3ErpStatsObjects       OBJECT IDENTIFIER ::= {f3ErpMIB 2}
+f3ErpConformance        OBJECT IDENTIFIER ::= {f3ErpMIB 3}
+
+--
+--  Ethernet Ring Protection Group
+--
+f3ErpGroupTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ErpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Ethernet Ring Protection 
+             instance for configuration purposes."
+    ::= { f3ErpConfigObjects 1 }
+
+f3ErpGroupEntry OBJECT-TYPE
+    SYNTAX      F3ErpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ErpGroupTable."
+    INDEX { neIndex, f3ErpGroupIndex }
+    ::= { f3ErpGroupTable 1 }
+
+F3ErpGroupEntry ::= SEQUENCE {
+    f3ErpGroupIndex                           Integer32,
+    f3ErpGroupAdminState                      AdminState,
+    f3ErpGroupOperationalState                OperationalState,
+    f3ErpGroupSecondaryState                  SecondaryState,
+    f3ErpGroupRapsRingId                      Integer32,
+    f3ErpGroupRapsNodeId                      MacAddress,
+    f3ErpGroupRapsVlanId                      VlanId,
+    f3ErpGroupRapsVlanPrio                    VlanPriority,
+    f3ErpGroupRapsVlanEtherType               Unsigned32,
+    f3ErpGroupRapsMdLevel                     Dot1agCfmMDLevel, 
+    f3ErpGroupCompatibleVersion               G8032Version, 
+    f3ErpGroupRevertive                       TruthValue, 
+    f3ErpGroupSubRingWithoutVirtChan          TruthValue,  
+    f3ErpGroupGuardTime                       Integer32,  
+    f3ErpGroupWaitToRestore                   Integer32,  
+    f3ErpGroupHoldOffTime                     Integer32,  
+    f3ErpGroupRingPort0                       VariablePointer,  
+    f3ErpGroupRingPort0MEP                    VariablePointer,  
+    f3ErpGroupRingPort0Role                   RPLRole,  
+    f3ErpGroupRingPort1                       VariablePointer,  
+    f3ErpGroupRingPort1MEP                    VariablePointer,  
+    f3ErpGroupRingPort1Role                   RPLRole,  
+    f3ErpGroupProtectMgmtTunnel               TruthValue,  
+    f3ErpGroupNodeState                       RingNodeState,  
+    f3ErpGroupWTRRemainingTime                Integer32,  
+    f3ErpGroupTxRapsRequest                   RAPSRequest,  
+    f3ErpGroupTxRapsRplBlocked                TruthValue,
+    f3ErpGroupTxRapsDNF                       TruthValue,  
+    f3ErpGroupTxRapsBPR                       Integer32,  
+    f3ErpGroupAction                          ERPGroupAction,   
+    f3ErpGroupActionObject                    VariablePointer,   
+    f3ErpGroupUserLabel                       DisplayString,
+    f3ErpGroupStorageType                     StorageType,
+    f3ErpGroupRowStatus                       RowStatus,
+    f3ErpGroupInterconnectionErp              VariablePointer,
+    f3ErpGroupInterconnectPropagateTc         TruthValue,
+    f3ErpGroupRapsVirtualChannelMep           VariablePointer,
+    f3ErpGroupMaxFpNum                        Integer32,
+    f3ErpGroupRapsInterconnectionNode         RapsInterconnectionNode,
+    f3ErpGroupRapsMultipleFailure             RapsMultipleFailure
+}
+
+f3ErpGroupIndex OBJECT-TYPE
+    SYNTAX        Integer32 (1..255)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "An integer index value used to uniquely identify
+             this ERP Group within Network Element."
+    ::= { f3ErpGroupEntry 1 }
+
+f3ErpGroupAdminState OBJECT-TYPE
+    SYNTAX        AdminState
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Administrative State of this ERP instance. 
+          INSERVICE is normal operation. 
+          MANAGEMENT suppresses alarms. 
+          DISABLED initiates blocking on ring port 0 and stops all RAPS processing 
+          and forwarding.
+          The ERP instance must be in the MANAGEMENT or DISABLED state when modifying 
+          the following ERP instance attributes: rapsVID, ringPort0, ringPort1, 
+          ringPort0RPLRole, ringPort1RPLRole,  rapsRingId, rapsMdLevel, 
+          subRingWithoutVirtualChannel, compatibleVersion."
+    ::= { f3ErpGroupEntry 2 }
+
+f3ErpGroupOperationalState OBJECT-TYPE
+    SYNTAX        OperationalState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Operational State of this ERP instance.  The ERP operational state is 
+          outage when there is an equipment failure causing the ERP to be non-functional;
+          otherwise the operational state is normal."
+    ::= { f3ErpGroupEntry 3 }
+
+f3ErpGroupSecondaryState OBJECT-TYPE
+    SYNTAX        SecondaryState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Secondary State of this ERP instance. The ERP secondary state is 
+          supporting entity outage (SGEO) when there is an equipment failure 
+          causing the ERP to be non-functional; otherwise the sescondary state is active."
+    ::= { f3ErpGroupEntry 4 }
+
+f3ErpGroupRapsRingId OBJECT-TYPE
+    SYNTAX        Integer32 (1..255)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Ring ID of this ERP instance. The value is used in the destination 
+         address of the RAPS PDU."
+    ::= { f3ErpGroupEntry 5 }
+
+f3ErpGroupRapsNodeId OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Node ID of the local system for this ERP instance. 
+         The value is used as the Node ID in the RAPS PDU."
+    ::= { f3ErpGroupEntry 6 }
+
+f3ErpGroupRapsVlanId OBJECT-TYPE
+    SYNTAX        VlanId
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "VID value of the VLAN tag for transmitted/received RAPS PDUs for this 
+          ERP instance."
+    ::= { f3ErpGroupEntry 7 }
+
+f3ErpGroupRapsVlanPrio OBJECT-TYPE
+    SYNTAX        VlanPriority
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "P-bit value of the VLAN tag for transmitted RAPS PDUs for this ERP instance." 
+    ::= { f3ErpGroupEntry 8 }
+
+f3ErpGroupRapsVlanEtherType OBJECT-TYPE
+    SYNTAX       Unsigned32 
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "VID value of the VLAN tag for transmitted/received RAPS PDUs for this 
+          ERP instance."
+    ::= { f3ErpGroupEntry 9 }
+
+f3ErpGroupRapsMdLevel OBJECT-TYPE
+    SYNTAX        Dot1agCfmMDLevel
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "MD (or MEG) level of the transmitted/received RAPS PDUs for this ERP instance."
+    ::= { f3ErpGroupEntry 10 }
+
+f3ErpGroupCompatibleVersion  OBJECT-TYPE
+    SYNTAX        G8032Version
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "Indicates compatability with a version of G.8032 for this ring instance."
+    ::= { f3ErpGroupEntry 11 }
+
+f3ErpGroupRevertive OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "Revertive control for the ring. Only applicable on the RPL Owner node."
+    ::= { f3ErpGroupEntry 12 }
+
+f3ErpGroupSubRingWithoutVirtChan OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Indicates whether R-APS channel forms a closed loop around the ring
+          ENABLED: no RAPS Virtual Channel (i.e., open ring)
+          DISABLED: RAPS forms a closed loop (major ring or sub-ring with virtual 
+                    channel)"
+    ::= { f3ErpGroupEntry 13 }
+
+f3ErpGroupGuardTime  OBJECT-TYPE
+    SYNTAX        Integer32 (10..2000)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The Guard Time value in milliseconds for this ERP instance."
+    ::= { f3ErpGroupEntry 14 }
+
+f3ErpGroupWaitToRestore OBJECT-TYPE
+    SYNTAX        Integer32 (1..12)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The Wait-to-Restore time value in minutes for this ERP instance."
+    ::= { f3ErpGroupEntry 15 }
+
+f3ErpGroupHoldOffTime OBJECT-TYPE
+    SYNTAX        Integer32 (0..10000)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The Hold-off Time value in milliseconds for this ERP instance."
+    ::= { f3ErpGroupEntry 16 }
+
+f3ErpGroupRingPort0 OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a Port instance which represents Ring Port 0 in the ERP Group.
+          The pointer must be set to cmEthernetAccPortIndex instance if the Ring 
+          Port is an Access Port or to cmEthernetNetPortIndex if the Ring Port 
+          is a Network Port."
+    ::= { f3ErpGroupEntry 17 }
+
+f3ErpGroupRingPort0MEP OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a CFM MEP instance monitoring Ring Port 0 for this ERP instance.
+          The pointer must be set to dot1agCfmMepIfIndex instance."
+    ::= { f3ErpGroupEntry 18 }
+
+f3ErpGroupRingPort0Role OBJECT-TYPE
+    SYNTAX        RPLRole
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "RPL Role of Ring Port 0. When f3ErpGroupRingPort1Role is NEIGHBOR or OWNER, 
+          this value MUST be NONE."
+    ::= { f3ErpGroupEntry 19 }
+
+f3ErpGroupRingPort1 OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a Port instance which represents Ring Port 1 in the ERP Group.
+          The pointer must be set to cmEthernetAccPortIndex instance if the Ring 
+          Port is an Access Port or to cmEthernetNetPortIndex if the Ring Port 
+          is a Network Port."
+    ::= { f3ErpGroupEntry 20 }
+
+f3ErpGroupRingPort1MEP OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a CFM MEP instance monitoring Ring Port 1 for this ERP instance.
+          The pointer must be set to dot1agCfmMepIfIndex instance."
+    ::= { f3ErpGroupEntry 21 }
+
+f3ErpGroupRingPort1Role OBJECT-TYPE
+    SYNTAX        RPLRole
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "RPL Role of Ring Port 1. When f3ErpGroupRingPort0Role is NEIGHBOR or OWNER, 
+          this value MUST be NONE."
+    ::= { f3ErpGroupEntry 22 }
+
+f3ErpGroupProtectMgmtTunnel OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Indication of whether this ERP instance is protecting management Tunnels 
+          on the ring ports."
+    ::= { f3ErpGroupEntry 23 }
+
+f3ErpGroupNodeState OBJECT-TYPE
+    SYNTAX        RingNodeState
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "ERP Node state."
+    ::= { f3ErpGroupEntry 24 }
+
+f3ErpGroupWTRRemainingTime OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "The time remaining (in seconds) for this ERP instance to wait to restore."
+    ::= { f3ErpGroupEntry 25 }
+
+f3ErpGroupTxRapsRequest OBJECT-TYPE
+    SYNTAX        RAPSRequest
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Request/State field fo the last generated R-APS message on the Ring Ports. 
+          Valid when the node is blocking."
+    ::= { f3ErpGroupEntry 26 }
+
+f3ErpGroupTxRapsRplBlocked OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "RPL Blocked field fo the last generated R-APS message on the Ring Ports. 
+          Valid when the node is blocking."
+    ::= { f3ErpGroupEntry 27 }
+
+f3ErpGroupTxRapsDNF OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Do Not Flush field fo the last generated R-APS message on the Ring Ports. 
+          Valid when the node is blocking."
+    ::= { f3ErpGroupEntry 28 }
+ 
+f3ErpGroupTxRapsBPR OBJECT-TYPE 
+    SYNTAX        Integer32 (0..1)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Blocked Port Reference field fo the last generated R-APS message on the 
+          Ring Ports. Valid when the node is blocking."
+    ::= { f3ErpGroupEntry 29 }
+
+f3ErpGroupAction OBJECT-TYPE
+    SYNTAX        ERPGroupAction
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "User action performed on this ERP instance.
+          For manualSwitch and forcedSwitch actions f3ErpGroupActionObject has to
+          be specified prior to settng this object."
+    ::= { f3ErpGroupEntry 30 }
+
+f3ErpGroupActionObject OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "Object identfier used to specify the OID of a port on which 
+          f3ErpGroupAction should occur. Applicable for manualSwitch and forcedSwitch
+          actions.
+          The pointer must be set to cmEthernetAccPortIndex instance if the Ring 
+          Port is an Access Port or to cmEthernetNetPortIndex if the Ring Port 
+          a Network Port."
+    ::= { f3ErpGroupEntry 31}
+
+f3ErpGroupUserLabel OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "User Label associated with the ERP Group."
+     ::= { f3ErpGroupEntry 32 }
+
+f3ErpGroupStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3ErpGroupEntry 33 }
+
+f3ErpGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3ErpGroupRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            neRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3ErpGroupRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3ErpGroupEntry 34 }
+
+f3ErpGroupInterconnectionErp OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Oid of the associated Loop Avoidance instance at an interconnect 
+            node. Current only ERP instances are supported for this; 
+            in the future, STP instances may be as well."
+    ::= { f3ErpGroupEntry 35 }
+
+f3ErpGroupInterconnectPropagateTc OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Allows for propgation of Topology Change information in the 
+            protocol of the associated Loop Avoidance instance at an 
+            interconnect node. Derived from  MI_RAPS_Propagate_TC in [G8032]"
+    ::= { f3ErpGroupEntry 36 }
+
+f3ErpGroupRapsVirtualChannelMep OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "ID of MEP monitoring an UP MEP Monitoring the R-APS VID."
+    ::= { f3ErpGroupEntry 37 }
+
+f3ErpGroupMaxFpNum OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "The max number of flow point which the erp supports.
+             This object is not supported - setting its value will 
+             not have any effect on the System."
+
+    ::= { f3ErpGroupEntry 38 }
+
+f3ErpGroupRapsInterconnectionNode OBJECT-TYPE
+    SYNTAX        RapsInterconnectionNode
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Type of sub-ring interconnection node. PRIMARY/SECONDARY role
+          for minimizing interconnected ring segmentation."
+    ::= { f3ErpGroupEntry 39 }
+
+f3ErpGroupRapsMultipleFailure OBJECT-TYPE
+    SYNTAX        RapsMultipleFailure
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "Sub-ring interconnection node that is designated to perform the Manual
+          Switch for minimizing interconnected ring segmentation."
+    ::= { f3ErpGroupEntry 40 }
+
+
+--
+--  Ethernet Ring Protection Protected Flows
+--
+f3ErpGroupProtectedFlowTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ErpGroupProtectedFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Flows which are protected by 
+             an ERP group instance. These flows can be access flows or multipoint
+             flows depending on the traffic model of the ERP Ring Port."
+    ::= { f3ErpConfigObjects 2 }
+
+f3ErpGroupProtectedFlowEntry OBJECT-TYPE
+    SYNTAX      F3ErpGroupProtectedFlowEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ErpGroupProtectedFlowsTable."
+    INDEX { neIndex, f3ErpGroupIndex, f3ErpGroupProtectedFlow } 
+    ::= { f3ErpGroupProtectedFlowTable 1 }
+
+F3ErpGroupProtectedFlowEntry ::= SEQUENCE {
+    f3ErpGroupProtectedFlow                   VariablePointer
+}
+
+f3ErpGroupProtectedFlow OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a Flow instance which is protected by an ERP instance.
+          The pointer must be set to cmFlowIndex or cmMPFlowIndex instance."
+    ::= { f3ErpGroupProtectedFlowEntry 1 }
+
+--
+--  Ethernet Ring Protection Unit
+--
+f3ErpUnitTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ErpUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Ethernet Ring Protection Unit"
+    ::= { f3ErpConfigObjects 3 }
+
+f3ErpUnitEntry OBJECT-TYPE
+    SYNTAX      F3ErpUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ErpUnitTable."
+    INDEX { neIndex, f3ErpGroupIndex, f3ErpUnitIndex }
+    ::= { f3ErpUnitTable 1 }
+
+F3ErpUnitEntry ::= SEQUENCE {
+    f3ErpUnitIndex                           Integer32,
+    f3ErpUnitPort                            VariablePointer,
+    f3ErpUnitPortMEP                         VariablePointer,  
+    f3ErpUnitPortRole                        RPLRole,  
+    f3ErpUnitPortStatus                      RingPortStatus,  
+    f3ErpUnitPortRxRapsRequest               RAPSRequest,  
+    f3ErpUnitPortRxRapsRplBlocked            TruthValue,
+    f3ErpUnitPortRxRapsDNF                   TruthValue,  
+    f3ErpUnitPortRxRapsBPR                   Integer32,  
+    f3ErpUnitPortRxRapsNodeId                MacAddress,
+    f3ErpUnitPortRapsFp                      VariablePointer  
+}
+ 
+f3ErpUnitIndex OBJECT-TYPE
+    SYNTAX        Integer32 (1..2)
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "An integer index value used to uniquely identify
+             this ERP Unit within ERP Group."
+    ::= { f3ErpUnitEntry 1 }
+
+f3ErpUnitPort OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "ERP Unit's points to a facility (port). 
+          This object represents the facility Network Element port."
+     ::= { f3ErpUnitEntry 2 }
+
+f3ErpUnitPortMEP OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a CFM MEP instance monitoring Ring Port."
+    ::= { f3ErpUnitEntry 3 }
+
+f3ErpUnitPortRole OBJECT-TYPE
+    SYNTAX        RPLRole
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "RPL Role of Ring Port 1. When f3ErpGroupRingPort2Role is NEIGHBOR or OWNER, 
+          this value MUST be NONE."
+    ::= { f3ErpUnitEntry 4 }
+
+f3ErpUnitPortStatus OBJECT-TYPE
+    SYNTAX        RingPortStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Status of Ring Port."
+    ::= { f3ErpUnitEntry 5 }
+
+f3ErpUnitPortRxRapsRequest OBJECT-TYPE
+    SYNTAX        RAPSRequest
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Request/State field fo the last received R-APS message on Ring Port."
+    ::= { f3ErpUnitEntry 6 }
+
+f3ErpUnitPortRxRapsRplBlocked OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "RPL Blocked  field fo the last received R-APS message on Ring Port."
+    ::= { f3ErpUnitEntry 7 }
+
+f3ErpUnitPortRxRapsDNF OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Do Not Flush field fo the last received R-APS message on Ring Port."
+    ::= { f3ErpUnitEntry 8 }
+ 
+f3ErpUnitPortRxRapsBPR OBJECT-TYPE 
+    SYNTAX        Integer32 (0..1)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Blocked Port Reference field fo the last received R-APS message on Ring Port."
+    ::= { f3ErpUnitEntry 9 }
+
+f3ErpUnitPortRxRapsNodeId OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Node ID of the local system for this ERP instance. 
+         The value is used as the Node ID in the RAPS PDU."
+    ::= { f3ErpUnitEntry 10 }
+
+f3ErpUnitPortRapsFp OBJECT-TYPE
+    SYNTAX        VariablePointer
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Pointer to a R-APS FlowPoint associated with this Ring Port."
+    ::= { f3ErpUnitEntry 11 }
+
+--
+--  Ethernet Ring Protection Unit Stats
+--
+f3ErpUnitStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3ErpUnitStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Ethernet Ring Protection Unit Statistics"
+    ::= { f3ErpStatsObjects 1 }
+
+f3ErpUnitStatsEntry OBJECT-TYPE
+    SYNTAX      F3ErpUnitStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3ErpUnitStatsTable."
+    INDEX { neIndex, f3ErpGroupIndex, f3ErpUnitIndex }
+    ::= { f3ErpUnitStatsTable 1 }
+
+F3ErpUnitStatsEntry ::= SEQUENCE {
+    f3ErpUnitNumBlockedStateTrans                           Unsigned32,
+    f3ErpUnitRapsPDUsTx                                     Unsigned32,
+    f3ErpUnitRapsPDUsRx                                     Unsigned32,
+    f3ErpUnitRapsPDUsDiscarded                              Unsigned32,
+    f3ErpUnitRapsNoReqPDUsTx                                Unsigned32,
+    f3ErpUnitRapsNoReqRBPDUsTx                              Unsigned32,
+    f3ErpUnitRapsSignalFailPDUsTx                           Unsigned32,
+    f3ErpUnitRapsManualSwitchPDUsTx                         Unsigned32,
+    f3ErpUnitRapsForcedSwitchPDUsTx                         Unsigned32,
+    f3ErpUnitRapsEventPDUsTx                                Unsigned32,
+    f3ErpUnitRapsNoReqPDUsRx                                Unsigned32,
+    f3ErpUnitRapsNoReqRBPDUsRx                              Unsigned32,
+    f3ErpUnitRapsSignalFailPDUsRx                           Unsigned32,
+    f3ErpUnitRapsManualSwitchPDUsRx                         Unsigned32,
+    f3ErpUnitRapsForcedSwitchPDUsRx                         Unsigned32,
+    f3ErpUnitRapsEventPDUsRx                                Unsigned32,
+    f3ErpUnitRapsInvalidOamVersionPDUsRx                    Unsigned32,
+    f3ErpUnitRapsRsvdRequestPDUsRx                          Unsigned32,
+    f3ErpUnitRapsRsvdEventSubcode                           Unsigned32
+}
+
+f3ErpUnitNumBlockedStateTrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Total number of transitions into a blocking state for Ring Port."
+    ::= { f3ErpUnitStatsEntry 1 }
+
+f3ErpUnitRapsPDUsTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of all RAPS PDUs transmitted on the port where the PDU contains 
+             the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 2 }
+
+f3ErpUnitRapsPDUsRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of all RAPS PDUs received on the port where the PDU contains 
+             the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 3 }
+
+f3ErpUnitRapsPDUsDiscarded OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of all RAPS PDUs received on the port and discarded where the PDU 
+             contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 4 }
+
+f3ErpUnitRapsNoReqPDUsTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of No Request RAPS PDUs transmitted on the port where the PDU 
+             contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 5 }
+
+f3ErpUnitRapsNoReqRBPDUsTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of No Request, RPL Blocked RAPS PDUs transmitted on the port where 
+             the PDU contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 6 }
+
+f3ErpUnitRapsSignalFailPDUsTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Signal Fail RAPS PDUs transmitted on the port where the 
+             PDU contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 7 }
+
+f3ErpUnitRapsManualSwitchPDUsTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Manual Switch RAPS PDUs transmitted on the port where the 
+             PDU contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 8 }
+
+f3ErpUnitRapsForcedSwitchPDUsTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Forced Switch RAPS PDUs transmitted on the port where the 
+             PDU contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 9 }
+
+f3ErpUnitRapsEventPDUsTx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Event RAPS PDUs transmitted on the port where the PDU contains 
+             the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 10 }
+
+f3ErpUnitRapsNoReqPDUsRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of No Request RAPS PDUs received on the port where the PDU 
+             contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 11 }
+
+f3ErpUnitRapsNoReqRBPDUsRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of No Request, RPL Blocked RAPS PDUs received on the port where 
+             the PDU contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 12 }
+
+f3ErpUnitRapsSignalFailPDUsRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Signal Fail RAPS PDUs received on the port where the PDU 
+             contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 13 }
+
+f3ErpUnitRapsManualSwitchPDUsRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Manual Switch RAPS PDUs received on the port where the PDU 
+             contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 14 }
+
+f3ErpUnitRapsForcedSwitchPDUsRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Forced Switch RAPS PDUs received on the port where the PDU 
+             contains the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 15 }
+
+f3ErpUnitRapsEventPDUsRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of Event RAPS PDUs received on the port where the PDU contains 
+             the MEG Level, Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 16 }
+
+f3ErpUnitRapsInvalidOamVersionPDUsRx OBJECT-TYPE 
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of OAM PDUs received on the port where the PDU contains the MEG Level, 
+             Ring ID and VID for the ERP instance and an OAM Version field other 
+             than 0 or 1."
+    ::= { f3ErpUnitStatsEntry 17 }
+
+f3ErpUnitRapsRsvdRequestPDUsRx OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of OAM PDUs received on the port where the PDU contains the MEG Level, 
+             Ring ID and VID for the ERP instance."
+    ::= { f3ErpUnitStatsEntry 18 }
+
+f3ErpUnitRapsRsvdEventSubcode OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Count of OAM PDUs received on the port where the PDU contains the MEG Level, 
+             Ring ID and VID for the ERP instance, an OAM Opcode field of 40 (R-APS), 
+             a request/state value of 14 (EVT) and a sub-code value that is not 0." 
+    ::= { f3ErpUnitStatsEntry 19 }
+
+--
+-- Conformance
+--
+f3ErpCompliances OBJECT IDENTIFIER ::= {f3ErpConformance 1}
+f3ErpGroups      OBJECT IDENTIFIER ::= {f3ErpConformance 2}
+
+f3ErpCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-ERP-MIB compilance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3ErpGroupGroup, f3ErpUnitGroup, f3ErpUnitStatsGroup
+        }
+    ::= { f3ErpCompliances 1 }
+
+f3ErpGroupGroup OBJECT-GROUP
+    OBJECTS {
+       f3ErpGroupAdminState,
+       f3ErpGroupOperationalState,
+       f3ErpGroupSecondaryState,
+       f3ErpGroupRapsRingId,
+       f3ErpGroupRapsNodeId,
+       f3ErpGroupRapsVlanId,
+       f3ErpGroupRapsVlanPrio,
+       f3ErpGroupRapsVlanEtherType,
+       f3ErpGroupRapsMdLevel, 
+       f3ErpGroupCompatibleVersion, 
+       f3ErpGroupRevertive, 
+       f3ErpGroupSubRingWithoutVirtChan,  
+       f3ErpGroupGuardTime,  
+       f3ErpGroupWaitToRestore,  
+       f3ErpGroupHoldOffTime,  
+       f3ErpGroupRingPort0,  
+       f3ErpGroupRingPort0MEP,  
+       f3ErpGroupRingPort0Role,  
+       f3ErpGroupRingPort1,  
+       f3ErpGroupRingPort1MEP,  
+       f3ErpGroupRingPort1Role,  
+       f3ErpGroupProtectMgmtTunnel,  
+       f3ErpGroupNodeState,  
+       f3ErpGroupWTRRemainingTime,  
+       f3ErpGroupTxRapsRequest,  
+       f3ErpGroupTxRapsRplBlocked,
+       f3ErpGroupTxRapsDNF,  
+       f3ErpGroupTxRapsBPR,  
+       f3ErpGroupAction,   
+       f3ErpGroupActionObject,   
+       f3ErpGroupUserLabel,
+       f3ErpGroupStorageType,
+       f3ErpGroupRowStatus,
+       f3ErpGroupProtectedFlow,
+       f3ErpGroupInterconnectionErp,
+       f3ErpGroupInterconnectPropagateTc,
+       f3ErpGroupRapsVirtualChannelMep,
+       f3ErpGroupMaxFpNum,
+       f3ErpGroupRapsInterconnectionNode,
+       f3ErpGroupRapsMultipleFailure
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the ERP Group."
+    ::= { f3ErpGroups 1 }
+
+f3ErpUnitGroup OBJECT-GROUP
+    OBJECTS {
+       f3ErpUnitPort,
+       f3ErpUnitPortMEP,  
+       f3ErpUnitPortRole,  
+       f3ErpUnitPortStatus,  
+       f3ErpUnitPortRxRapsRequest,  
+       f3ErpUnitPortRxRapsRplBlocked,
+       f3ErpUnitPortRxRapsDNF,  
+       f3ErpUnitPortRxRapsBPR,  
+       f3ErpUnitPortRxRapsNodeId,
+       f3ErpUnitPortRapsFp
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the ERP Unit."
+    ::= { f3ErpGroups 2 }
+
+f3ErpUnitStatsGroup OBJECT-GROUP
+    OBJECTS {
+       f3ErpUnitNumBlockedStateTrans,
+       f3ErpUnitRapsPDUsTx,
+       f3ErpUnitRapsPDUsRx,
+       f3ErpUnitRapsPDUsDiscarded,
+       f3ErpUnitRapsNoReqPDUsTx,
+       f3ErpUnitRapsNoReqRBPDUsTx,
+       f3ErpUnitRapsSignalFailPDUsTx,
+       f3ErpUnitRapsManualSwitchPDUsTx,
+       f3ErpUnitRapsForcedSwitchPDUsTx,
+       f3ErpUnitRapsEventPDUsTx,
+       f3ErpUnitRapsNoReqPDUsRx,
+       f3ErpUnitRapsNoReqRBPDUsRx,
+       f3ErpUnitRapsSignalFailPDUsRx,
+       f3ErpUnitRapsManualSwitchPDUsRx,
+       f3ErpUnitRapsForcedSwitchPDUsRx,
+       f3ErpUnitRapsEventPDUsRx,
+       f3ErpUnitRapsInvalidOamVersionPDUsRx,
+       f3ErpUnitRapsRsvdRequestPDUsRx,
+       f3ErpUnitRapsRsvdEventSubcode
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the ERP Unit Statistics."
+    ::= { f3ErpGroups 3 }
+
+END
+

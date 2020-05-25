@@ -1,0 +1,342 @@
+NETGEAR-QOS-ISCSI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    TEXTUAL-CONVENTION,
+    RowStatus, DisplayString, DateAndTime, TruthValue    FROM SNMPv2-TC
+    NOTIFICATION-TYPE, MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, TimeTicks, IpAddress                     FROM SNMPv2-SMI
+    fastPathQOS                                          FROM NETGEAR-QOS-MIB;
+
+    fastPathIscsiFlowAcceleration MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions for Quality of Service - iSCSI Flow Acceleration Flex package."
+          
+        -- Revision history.	  
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200904300000Z" -- 30 Apr 2009 12:00:00 GMT
+        DESCRIPTION
+          "Initial revision."
+
+    ::= { fastPathQOS 5 }
+
+-------------------------------------------------------------------------------
+
+agentIscsiFlowAccelerationGlobalConfigGroup    OBJECT IDENTIFIER ::= { fastPathIscsiFlowAcceleration 1 }
+
+agentIscsiFlowAccelerationEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable iSCSI Flow Acceleration globally on the system."
+    ::= { agentIscsiFlowAccelerationGlobalConfigGroup 1 }
+
+
+-------------------------------------------------------------------------------
+agentIscsiFlowAccelerationAgingTimeOut OBJECT-TYPE
+    SYNTAX      INTEGER (60..2592000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds that should pass before session is aged out
+         after the last frame detected for the session."
+    ::= { agentIscsiFlowAccelerationGlobalConfigGroup 2 }
+
+
+-------------------------------------------------------------------------------
+QosType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Type of QoS: VPT or DSCP."
+    SYNTAX  INTEGER {
+        vpt(0),
+        dscp(1)
+}
+
+agentIscsiFlowAccelerationQosType OBJECT-TYPE
+    SYNTAX      QosType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Current type of QoS for iSCSI packets"
+    ::= { agentIscsiFlowAccelerationGlobalConfigGroup 3 }
+
+agentIscsiFlowAccelerationQosVptValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of VPT or DSCP, depends on agentIscsiFlowAccelerationQosType, that will be assigned to each iSCSI packet.
+        The range of VPT value is 0..7"
+    ::= { agentIscsiFlowAccelerationGlobalConfigGroup 4 }
+
+agentIscsiFlowAccelerationQosDscpValue OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..63)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of VPT or DSCP, depends on agentIscsiFlowAccelerationQosType, that will be assigned to each iSCSI packet.
+        The range of DSCP value is 0..63"
+    ::= { agentIscsiFlowAccelerationGlobalConfigGroup 5 }
+
+agentIscsiFlowAccelerationQosRemark OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether iSCSI frames with the configured VPT or DSCP when egressing the switch."
+    ::= { agentIscsiFlowAccelerationGlobalConfigGroup 6 }
+
+-------------------------------------------------------------------------------
+agentIscsiFlowAccelerationCosEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable CoS mode for iSCSI Flow Acceleration globally on the system."
+    ::= { agentIscsiFlowAccelerationGlobalConfigGroup 7 }
+
+-------------------------------------------------------------------------------
+agentIscsiFlowAccelerationTargetConfigTable OBJECT-TYPE
+   SYNTAX  SEQUENCE OF AgentIscsiFlowAccelerationTargetConfigEntry
+    MAX-ACCESS   not-accessible
+    STATUS   current
+    DESCRIPTION
+       "The table for configuration of iSCSI target TCP port number,
+        IP address, and name.  It is indexed by 
+        agentIscsiFlowAccelerationTargetConfigTcpPort and
+        agentIscsiFlowAccelerationTargetConfigAddr."
+    ::= {  fastPathIscsiFlowAcceleration 2 }
+
+agentIscsiFlowAccelerationTargetConfigEntry OBJECT-TYPE
+    SYNTAX      AgentIscsiFlowAccelerationTargetConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Row in the iSCSI Target configuration table."
+    INDEX  { agentIscsiFlowAccelerationTargetConfigTcpPort, 
+             agentIscsiFlowAccelerationTargetConfigAddr}
+    ::= { agentIscsiFlowAccelerationTargetConfigTable 1 }
+
+AgentIscsiFlowAccelerationTargetConfigEntry::= SEQUENCE {
+   agentIscsiFlowAccelerationTargetConfigTcpPort                Unsigned32,
+   agentIscsiFlowAccelerationTargetConfigAddr                   IpAddress,
+   agentIscsiFlowAccelerationTargetConfigName                   DisplayString,
+   agentIscsiFlowAccelerationTargetConfigStatus                 RowStatus
+}
+
+agentIscsiFlowAccelerationTargetConfigTcpPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The TCP port of configured target."
+    ::= { agentIscsiFlowAccelerationTargetConfigEntry 1}
+
+agentIscsiFlowAccelerationTargetConfigAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies the target address. If the target
+        address is to be ignored the address should be 0.0.0.0."
+
+    ::= { agentIscsiFlowAccelerationTargetConfigEntry 2 }
+
+agentIscsiFlowAccelerationTargetConfigName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(0..223))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The target IQN name.  This text is not used to match
+         on network traffic.  It serves as an identifying comment
+         for administrative convenience."
+    DEFVAL {""}
+    ::=  { agentIscsiFlowAccelerationTargetConfigEntry 3 }
+
+agentIscsiFlowAccelerationTargetConfigStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of the target. It's used to add/delete a target.
+        
+        active(1)      - this ACL instance is active
+        createAndGo(4) - set to this value to create an instance
+        destroy(6)     - set to this value to delete an instance"
+    ::= { agentIscsiFlowAccelerationTargetConfigEntry  4}
+
+-------------------------------------------------------------------------------
+agentIscsiFlowAccelerationSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AgentIscsiFlowAccelerationSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A table that contains iSCSI sessions.
+        It is indexed as assigned by system."
+    ::= { fastPathIscsiFlowAcceleration 3 }
+
+agentIscsiFlowAccelerationSessionEntry OBJECT-TYPE
+    SYNTAX      AgentIscsiFlowAccelerationSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the agentIscsiFlowAccelerationSessionTable."
+    INDEX  { agentIscsiFlowAccelerationSessionIndex }
+    ::= { agentIscsiFlowAccelerationSessionTable 1 }
+
+AgentIscsiFlowAccelerationSessionEntry ::= SEQUENCE {
+    agentIscsiFlowAccelerationSessionIndex                    Unsigned32,
+    agentIscsiFlowAccelerationTargetName                      DisplayString,
+    agentIscsiFlowAccelerationInitiatorName                   DisplayString,
+    agentIscsiFlowAccelerationSessionISID                     OCTET STRING,
+    agentIscsiFlowAccelerationSessAgingTime                   Unsigned32,
+    agentIscsiFlowAccelerationSessionUpTime                   Unsigned32
+}
+
+agentIscsiFlowAccelerationSessionIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Numerical index of session table entry assigned by system. "
+    ::= { agentIscsiFlowAccelerationSessionEntry 1 }
+
+agentIscsiFlowAccelerationTargetName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(0..223))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The target name"
+    ::=  { agentIscsiFlowAccelerationSessionEntry 2 }
+
+agentIscsiFlowAccelerationInitiatorName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(0..223))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The initiator name"
+    ::=  { agentIscsiFlowAccelerationSessionEntry 3 }
+
+agentIscsiFlowAccelerationSessionISID   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ISID of current session."
+    ::= { agentIscsiFlowAccelerationSessionEntry 4 }
+
+agentIscsiFlowAccelerationSessAgingTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The elapsed time in seconds since the traffic was detected
+         on any connections associated with this session."
+    ::= { agentIscsiFlowAccelerationSessionEntry 5 }
+
+agentIscsiFlowAccelerationSessionUpTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION       
+        "Time elapsed since the session was detected, in seconds."
+    ::= { agentIscsiFlowAccelerationSessionEntry 6 }
+
+-------------------------------------------------------------------------------
+agentIscsiFlowAccelerationConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AgentIscsiFlowAccelerationConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "A table that contains iSCSI connections. 
+        It is indexed as assigned by system."
+    ::= { fastPathIscsiFlowAcceleration 4 }
+
+
+agentIscsiFlowAccelerationConnectionEntry OBJECT-TYPE
+    SYNTAX      AgentIscsiFlowAccelerationConnectionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the agentIscsiFlowAccelerationConnectionTable."
+    INDEX  { agentIscsiFlowAccelerationConnectionIndex }
+    ::= { agentIscsiFlowAccelerationConnectionTable 1 }
+
+AgentIscsiFlowAccelerationConnectionEntry ::= SEQUENCE {
+    agentIscsiFlowAccelerationConnectionIndex                         Unsigned32,
+    agentIscsiFlowAccelerationConnectionTargetAddr                    IpAddress,
+    agentIscsiFlowAccelerationConnectionTargetPort                    Unsigned32,
+    agentIscsiFlowAccelerationConnectionInitiatorAddr                 IpAddress,
+    agentIscsiFlowAccelerationConnectionInitiatorPort                 Unsigned32,
+    agentIscsiFlowAccelerationConnectionCID                           Unsigned32,
+    agentIscsiFlowAccelerationConnectionSessionIndex                  Unsigned32
+}
+
+agentIscsiFlowAccelerationConnectionIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Numerical index of connection table entry assigned by system. "
+    ::= { agentIscsiFlowAccelerationConnectionEntry 1 }
+
+ agentIscsiFlowAccelerationConnectionTargetAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The connection target address."
+    ::= { agentIscsiFlowAccelerationConnectionEntry 2 }
+
+agentIscsiFlowAccelerationConnectionTargetPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TCP port of connection target."
+    ::= { agentIscsiFlowAccelerationConnectionEntry 3 }
+
+ agentIscsiFlowAccelerationConnectionInitiatorAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The connection initiator address."
+    ::= { agentIscsiFlowAccelerationConnectionEntry 4 }
+
+agentIscsiFlowAccelerationConnectionInitiatorPort OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TCP port of connection initiator."
+    ::= { agentIscsiFlowAccelerationConnectionEntry 5 }
+
+agentIscsiFlowAccelerationConnectionCID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The iSCSI CID for this connection."
+    ::= { agentIscsiFlowAccelerationConnectionEntry 6 }
+
+agentIscsiFlowAccelerationConnectionSessionIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the session associated with this connection.
+        Refers to the index of agentIscsiFlowAccelerationSessionIndex in 
+        agentIscsiFlowAccelerationSessionTable."
+    ::= { agentIscsiFlowAccelerationConnectionEntry 7 }
+
+END

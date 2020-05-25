@@ -1,0 +1,78 @@
+-- ****************************************************************************
+--  COLUBRIS-SMI definitions
+--
+--  Copyright (c) 2004, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Network enterprise Structure of Management Information.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI
+;
+
+colubris MODULE-IDENTITY
+    LAST-UPDATED    "200402100000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Structure of Management Information for Colubris Networks
+                     enterprise MIBs."
+
+    ::= { enterprises 8744 }    -- assigned by IANA
+
+
+colubrisProducts OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Root OID from which sysObjectID values are assigned. Actual
+                 values are defined in COLUBRIS-PRODUCTS-MIB."
+    ::= { colubris 1 }
+
+colubrisMgmt OBJECT-IDENTITY
+    STATUS      deprecated
+    DESCRIPTION "Main subtree for new mib development. This tree is deprecated.
+                 New products will use the colubrisMgmtV2 as the root OID."
+    ::= { colubris 2 }
+
+colubrisExperiment OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Main subtree for experimental mib development."
+    ::= { colubris 3 }
+
+colubrisModules OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Root OID from which colubris MODULE-IDENTITY values may be
+                 assigned."
+    ::= { colubris 4 }
+
+colubrisMgmtV2 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Main subtree for new mib development. Replaces the old management
+                 subtree."
+    ::= { colubris 5 }
+
+extensions OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Main subtree for OEM products extensions. The features under this
+                 subtree are only available for specific vendors that OEM colubris
+		 products."
+    ::= { colubris 6 }
+
+variation OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION "Main subtree for variation MIBs development."
+    ::= { colubris 7 }
+
+END

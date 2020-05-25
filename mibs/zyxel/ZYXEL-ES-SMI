@@ -1,0 +1,80 @@
+-- **********************************************
+-- ZyXEL Communications Corporation
+--
+-- Enterprise Solution MIB definitions
+-- Structure of Management Information (SMI)
+--
+-- Julian Wu
+--
+-- Copyright by ZyXEL Communications Corp.
+-- All rights reserved.
+-- **********************************************
+
+ZYXEL-ES-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises		FROM SNMPv2-SMI;
+		
+
+
+zyxel		OBJECT IDENTIFIER ::= { enterprises 890 }
+products	OBJECT IDENTIFIER ::= { zyxel 1 }
+                                                  
+                                                                                                                                                                         
+                                                  
+enterpriseSolution MODULE-IDENTITY 
+	LAST-UPDATED	"201009200000Z"
+	ORGANIZATION "Enterprise Solution ZyXEL"     
+	CONTACT-INFO
+		""	     
+	DESCRIPTION
+		"The Structure of Management Information
+		for Enterprise Solution ZyXEL"
+	::= { products 15 }  
+	            
+	
+esAgentCapability	OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"The root object identifier for
+		AGENT-CAPABILITIES values"
+	::= { enterpriseSolution 1 }
+
+esConformance		OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"The root object identifier for
+		MODULE-COMPLIANCE values"
+	::= { enterpriseSolution 2 }
+                                            
+esMgmt			OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"The main subtree for MIBs"
+	::= { enterpriseSolution 3 }
+
+esProductSpecific           OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"The root of product-specific OID subtrees"
+	::= { enterpriseSolution 4 }
+
+esPartnerProducts           OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"The root for MIBs from partner products.
+		Followed by partner sysObjectID values"
+	::= { enterpriseSolution 5 }                                            
+
+tenders	OBJECT IDENTIFIER ::= { esProductSpecific 4 }
+
+zyxelNAS           OBJECT-IDENTITY
+	STATUS		current
+	DESCRIPTION
+		"The root object identifier for zyxelNAS"
+	::= { tenders 5 }
+
+END

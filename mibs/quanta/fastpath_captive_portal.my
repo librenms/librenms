@@ -1,0 +1,1617 @@
+NETGEAR-CAPTIVE-PORTAL-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Captive Portal MIB
+-- Copyright Netgear Inc (2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property. Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, IpAddress,
+        IpAddress,Integer32, Counter32, Counter64, TimeTicks, Unsigned32
+                                            FROM SNMPv2-SMI
+        RowStatus,MacAddress,TEXTUAL-CONVENTION
+                                            FROM SNMPv2-TC
+        DisplayString                       FROM RFC1213-MIB
+        ifIndex                             FROM IF-MIB
+        InterfaceIndex                      FROM IF-MIB
+        InetAddressType, InetAddress        FROM INET-ADDRESS-MIB
+        lb6m                            FROM QUANTA-LB6M-REF-MIB;
+
+    fastPathCaptivePortal MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "Private MIB for Captive Portal"
+
+        -- Revision history.
+        REVISION
+          "201101260000Z" -- 26 January 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200707090000Z" -- 09 July 2007 12:00:00 GMT
+        DESCRIPTION
+          "Initial version."
+
+    ::= { lb6m 38 }
+
+
+   -- 
+   -- ***********************************************************
+   -- 
+   -- Textual Conventions
+   -- 
+   -- ***********************************************************
+   
+    CpCaptivePortalIntfCapabilitiesMap ::= TEXTUAL-CONVENTION
+        STATUS      current
+        DESCRIPTION
+                "Description of the interface capabilities.
+    
+                The bit 'other(0)' indicates that the interface has capabilities
+                other than those listed below.
+   
+                The bit 'sessionTimeout(1)' indicates that the interface supports timeout
+                when traffic is not received or sent within the idle timeout period.
+ 
+                The bit 'idleTimeout(2)' indicates that the interface supports timeout
+                when traffic is not received or sent within the idle timeout period.
+    
+                The bit 'maxBytesReceivedCounter(3)' indicates that the interface 
+                supports displaying the number of bytes received from each client.
+    
+                The bit 'maxBytesTransmittedCounter(4)' indicates that the interface 
+                supports displaying the number of bytes transmittted from each client.
+
+                The bit 'maxPacketsReceivedCounter(5)' indicates that the interface 
+                supports displaying the number of packets received from each client.
+    
+                The bit 'maxPacketsTransmittedCounter(6)' indicates that the interface 
+                supports displaying the number of packets transmitted from each client.
+    
+                The bit 'clientRoaming(7)' indicates that the interfacesupports client
+                roaming.  This is supported by wireless interfaces only"
+        SYNTAX  BITS {
+                other(0),
+                sessionTimeout(1),
+                idleTimeout(2),
+                maxBytesReceivedCounter(3),
+                maxBytesTransmittedCounter(4),
+                maxPacketsReceivedCounter(5),
+                maxPacketsTransmittedCounter(6),
+                clientRoaming(7)
+        }
+
+
+   --**************************************************************************************
+   --    cpConfigGroup
+   --**************************************************************************************
+   
+   cpConfigGroup                      OBJECT IDENTIFIER ::= { fastPathCaptivePortal 1 }
+
+    --**************************************************************************************
+    --    cpGlobalConfigGroup
+    --**************************************************************************************
+    
+    cpGlobalConfigGroup                      OBJECT IDENTIFIER ::= { cpConfigGroup 1 }
+
+    cpAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable or disable the captive portal feature on the system."
+         DEFVAL { disable }
+         ::= { cpGlobalConfigGroup 1 }
+
+    cpAdditionalHttpPort OBJECT-TYPE
+         SYNTAX      Integer32 (0..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The additional captive portal authentication server port for 
+                     HTTP web connection. The HTTP port default is 0 which denotes 
+                     no specific port and the default port (80) is used."
+         DEFVAL { 0 }
+         ::= { cpGlobalConfigGroup 2 }
+
+-- object support based on L7_SSLT_PACKAGE inclusion
+    cpAdditionalHttpSecurePort OBJECT-TYPE
+         SYNTAX      Integer32 (0..65535)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The additional captive portal authentication server secure
+                     port for HTTPS web connection. This additional HTTPS port default
+                     is 0 which denotes no specific port and the default port (443) is used."
+         DEFVAL { 0 }
+         ::= { cpGlobalConfigGroup 3 }
+
+-- object support based on cluster support
+    cpPeerStatsReportingInterval OBJECT-TYPE
+         SYNTAX      Integer32 ( 0 | 15..3600)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The time interval between statistics reports to the cluster controller.
+                     A value of 0 indicates reporting is disabled.
+                     The value is represented in seconds."
+         DEFVAL { 120 }
+         ::= { cpGlobalConfigGroup 4 }
+
+    cpAuthTimeout OBJECT-TYPE
+         SYNTAX      Integer32 (60..600)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The length of time to maintain an authentication session from a client. 
+                     This time is measured from when a client initiates an authentication request.
+                     The value is represented in seconds."
+         DEFVAL { 300 }
+         ::= { cpGlobalConfigGroup 5 }
+
+
+    --**************************************************************************************
+    -- cpCaptivePortalConfigGroup
+    --
+    --**************************************************************************************
+    cpCaptivePortalConfigGroup               OBJECT IDENTIFIER ::= { cpConfigGroup 2 }
+
+    cpCaptivePortalTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of config parms for instances of captive portal."
+         ::= { cpCaptivePortalConfigGroup 1 }
+
+    cpCaptivePortalEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Captive Portal instance entry."
+         INDEX       { cpCaptivePortalInstanceId }
+         ::= { cpCaptivePortalTable 1 }
+
+    CpCaptivePortalEntry ::= SEQUENCE {
+                        cpCaptivePortalInstanceId
+                           Unsigned32,
+                        cpCaptivePortalConfigName
+                           DisplayString,
+                        cpCaptivePortalAdminMode
+                           INTEGER,
+                        cpCaptivePortalProtocolMode
+                           INTEGER,
+                        cpCaptivePortalVerificationMode
+                           INTEGER,
+                        cpCaptivePortalUserLogoutMode
+                           INTEGER,
+                        cpCaptivePortalURLRedirectMode
+                           INTEGER,
+                        cpCaptivePortalRedirectURL
+                            DisplayString,
+                        cpCaptivePortalSessionTimeout
+                           Unsigned32,
+                        cpCaptivePortalIdleTimeout
+                           Unsigned32,
+                        cpCaptivePortalRadiusAuthServer
+                           DisplayString,
+                        cpCaptivePortalMaxBandwidthUp
+                           Unsigned32,
+                        cpCaptivePortalMaxBandwidthDown
+                           Unsigned32,
+                        cpCaptivePortalMaxInputOctets
+                           Unsigned32,
+                        cpCaptivePortalMaxOutputOctets
+                           Unsigned32,
+                        cpCaptivePortalMaxTotalOctets
+                           Unsigned32,
+                        cpCaptivePortalUserGroup
+                           Unsigned32,
+                        cpCaptivePortalRowStatus
+                           RowStatus
+           }
+
+    cpCaptivePortalInstanceId      OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The identifier associated with this instance of captive portal."
+         ::= { cpCaptivePortalEntry 1 }
+
+    cpCaptivePortalConfigName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..32))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The name, in alpha-numeric characters, assigned to this captive portal configuration."
+         ::= { cpCaptivePortalEntry 2 }
+
+    cpCaptivePortalAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Enable or disable this instance of captive portal on the system."
+         DEFVAL { enable }
+         ::= { cpCaptivePortalEntry 3 }
+
+    cpCaptivePortalProtocolMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     https(0),
+                     http(1)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The protocol mode to be used."
+         DEFVAL { http }
+         ::= { cpCaptivePortalEntry 4 }
+
+    cpCaptivePortalVerificationMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     guest(0),
+                     local(1),
+                     radius(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The type of user verification to perform."
+         DEFVAL { guest }
+         ::= { cpCaptivePortalEntry 5 }
+
+    cpCaptivePortalUserGroup OBJECT-TYPE
+         SYNTAX      Unsigned32(1..10)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The group ID for this captive portal user database."
+         DEFVAL { 1 }
+         ::= { cpCaptivePortalEntry 6 }
+
+    cpCaptivePortalURLRedirectMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Whether the captive portal should redirect newly authenticated 
+                     clients to the configured URL. If this mode is disabled, the 
+                     default locale specific welcome page is used. If enabled, the 
+                     client is redirected to a configured URL."
+         DEFVAL { disable }
+         ::= { cpCaptivePortalEntry 7 }
+
+    cpCaptivePortalRedirectURL OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..256))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The URL to which the newly authenticated client is redirected 
+                     if cpCaptivePortalURLRedirectMode is enabled."
+         ::= { cpCaptivePortalEntry 8 }
+
+    cpCaptivePortalSessionTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32(0..86400)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The session timeout. After this limit has been reached the user 
+                     will be disconnected. If this value is set to 0, no timeout is enforced.
+                     This value is represented in seconds."
+         DEFVAL { 0 }
+         ::= { cpCaptivePortalEntry 9 }
+
+    cpCaptivePortalIdleTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32(0..900)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The idle timeout of the session. After this limit has been reached the user 
+                     will be disconnected. If this value is set to 0, no timeout is enforced. 
+                     This value is represented in seconds."
+         DEFVAL { 0 }
+         ::= { cpCaptivePortalEntry 10 }
+
+    cpCaptivePortalRadiusAuthServer OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..32))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The RADIUS authentication server name assigned to this captive portal configuration. 
+                     RADIUS server name may only contain alphanumeric plus dash, underline, and space characters."
+         ::= { cpCaptivePortalEntry 11 }
+
+    cpCaptivePortalMaxBandwidthUp OBJECT-TYPE
+         SYNTAX      Unsigned32(0..536870911)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum bandwidth, in bytes per second, that a client can transmit traffic 
+                     when using Captive Portal. This setting limits the bandwidth at which the client 
+                     can send data into the network. If this value is set to 0, no rate limiting is enforced.
+                     This value is represented in bytes (however; converted & stored as bits/sec)."
+         DEFVAL { 0 }
+         ::= { cpCaptivePortalEntry 12 }
+
+    cpCaptivePortalMaxBandwidthDown OBJECT-TYPE
+         SYNTAX      Unsigned32(0..536870911)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum bandwidth, in bytes per second, that a client can receive traffic 
+                     when using Captive Portal. This setting limits the bandwidth at which the client 
+                     can receive data from the network. If this value is set to 0, no rate limiting is enforced.
+                     This value is represented in bytes (however; converted & stored as bits/sec)."
+         DEFVAL { 0 }
+         ::= { cpCaptivePortalEntry 13 }
+
+    cpCaptivePortalMaxInputOctets OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum input octets (bytes) allowed for the session.
+                     After this limit has been reached the user will be disconnected.
+                     If this value is set to 0, no rate limiting is enforced. 
+                     This value is represented in bytes."
+         DEFVAL { 0 }
+         ::= { cpCaptivePortalEntry 14 }
+
+    cpCaptivePortalMaxOutputOctets OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum Output octets (bytes) allowed for the session.
+                     After this limit has been reached the user will be disconnected.
+                     If this value is set to 0, no rate limiting is enforced. 
+                     This value is represented in bytes."
+         DEFVAL { 0 }
+         ::= { cpCaptivePortalEntry 15 }
+
+    cpCaptivePortalMaxTotalOctets OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum input/output octets (bytes) allowed for the session.
+                     After this limit has been reached the user will be disconnected.
+                     If this value is set to 0, no rate limiting is enforced. 
+                     This value is represented in bytes."
+         DEFVAL { 0 }
+         ::= { cpCaptivePortalEntry 16 }
+
+    cpCaptivePortalUserLogoutMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Provides the captive portal authenticated user the ability to
+                     logout of their session through the use of a logout page. The
+                     connection will be terminated as a result of submitting the
+                     logout request."
+
+         DEFVAL { disable }
+         ::= { cpCaptivePortalEntry 17 }
+
+    cpCaptivePortalRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus 
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The captive portal instance status. 
+
+                     Supported values:
+                     active(1)      - This status is displayed after a valid Captive Portal instance is created.
+                     createAndGo(4) - Set to this value to create a new Captive Portal instance.
+                     destroy(6)     - Set to this value to remove an existing Captive Portal instance."
+         ::= { cpCaptivePortalEntry 18 }
+
+    --**************************************************************************************
+    --    cpLocalUserDatabaseGroup
+    --**************************************************************************************
+    
+    cpLocalUserDatabaseGroup            OBJECT IDENTIFIER ::= { cpConfigGroup 3 }
+
+    -- ---------------------------------
+    -- cpLocalUserGroupTable
+    -- ---------------------------------
+
+    cpLocalUserGroupTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpLocalUserGroupEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of group definitions for the local users. This database is 
+                     used by captive portal instances and local users if the verification mode is set to LOCAL."
+         ::= { cpLocalUserDatabaseGroup 1 }
+
+    cpLocalUserGroupEntry OBJECT-TYPE
+         SYNTAX      CpLocalUserGroupEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The user group entry."
+         INDEX       { cpLocalUserGroupIndex }
+         ::= { cpLocalUserGroupTable 1 }
+
+    CpLocalUserGroupEntry ::= SEQUENCE {
+                        cpLocalUserGroupIndex
+                           Integer32,
+                        cpLocalUserGroupName
+                           DisplayString,
+                        cpLocalUserGroupRowStatus
+                           RowStatus
+           }
+
+    cpLocalUserGroupIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The user group entry index."
+         ::= { cpLocalUserGroupEntry 1 }
+
+    cpLocalUserGroupName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..32))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The user group name, limited to alpha-numeric strings (including the '-' and '_' characters)."
+         ::= { cpLocalUserGroupEntry 2 }
+
+    cpLocalUserGroupRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus 
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The user group entry status. 
+
+                     Supported values:
+                     active(1)      - This status is displayed after a valid user group is created.
+                     createAndGo(4) - Set to this value to create a new user group.
+                     destroy(6)     - Set to this value to remove an existing user group."
+         ::= { cpLocalUserGroupEntry 3 }
+
+    -- ---------------------------------
+    -- cpLocalUserTable
+    -- ---------------------------------
+
+    cpLocalUserTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpLocalUserEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of user definitions for the local database. This database is 
+                     used by a captive portal instance if its verification mode is set to LOCAL."
+         ::= { cpLocalUserDatabaseGroup 2 }
+
+    cpLocalUserEntry OBJECT-TYPE
+         SYNTAX      CpLocalUserEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The local user entry."
+         INDEX       { cpLocalUserIndex }
+         ::= { cpLocalUserTable 1 }
+
+    CpLocalUserEntry ::= SEQUENCE {
+                        cpLocalUserIndex
+                           Integer32,
+                        cpLocalUserName
+                           DisplayString,
+                        cpLocalUserPassword
+                           DisplayString,
+                        cpLocalUserSessionTimeout
+                           Unsigned32,
+                        cpLocalUserIdleTimeout
+                           Unsigned32,
+                        cpLocalUserMaxBandwidthUp
+                           Unsigned32,
+                        cpLocalUserMaxBandwidthDown
+                           Unsigned32,
+                        cpLocalUserMaxInputOctets
+                           Unsigned32,
+                        cpLocalUserMaxOutputOctets
+                           Unsigned32,
+                        cpLocalUserMaxTotalOctets
+                           Unsigned32,
+                        cpLocalUserRowStatus
+                           RowStatus
+           }
+
+    cpLocalUserIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The local user entry index."
+         ::= { cpLocalUserEntry 1 }
+
+    cpLocalUserName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(1..32))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The user name, limited to alpha-numeric strings (including the '-' and '_' characters)."
+         ::= { cpLocalUserEntry 2 }
+
+    cpLocalUserPassword OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(8..64))
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The user password. This object will return an empty string even if a password is set."
+         ::= { cpLocalUserEntry 3 }
+
+    cpLocalUserSessionTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The session timeout in seconds. After this limit is reached, the user is disconnected. 
+                     If this value is set to 0, the default value for the captive portal is used."
+         DEFVAL { 0 }
+         ::= { cpLocalUserEntry 4 }
+
+    cpLocalUserIdleTimeout OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The idle timeout of the session in seconds. After this limit is reached, the user is disconnected. 
+                     If this value is set to 0, the default value for the captive portal is used."
+         DEFVAL { 0 }
+         ::= { cpLocalUserEntry 5 }
+
+    cpLocalUserMaxBandwidthUp OBJECT-TYPE
+         SYNTAX      Unsigned32(0..536870911)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum bandwidth, in bytes per second, that the user can transmit traffic 
+                     when using Captive Portal. This setting limits the bandwidth at which the user 
+                     can send data into the network. If this value is set to 0, no rate limiting is enforced.
+                     This value is represented in bytes (however; converted & stored as bits/sec)."
+         DEFVAL { 0 }
+         ::= { cpLocalUserEntry 6 }
+
+    cpLocalUserMaxBandwidthDown OBJECT-TYPE
+         SYNTAX      Unsigned32(0..536870911)
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum bandwidth, in bytes per second, that the user can receive traffic 
+                     when using Captive Portal. This setting limits the bandwidth at which the user 
+                     can receive data from the network. If this value is set to 0, no rate limiting is enforced. 
+                     This value is represented in bytes (however; converted & stored as bits/sec)."
+         DEFVAL { 0 }
+         ::= { cpLocalUserEntry 7 }
+
+    cpLocalUserMaxInputOctets OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum input octets (bytes) allowed for the session.
+                     After this limit has been reached the user will be disconnected.
+                     If this value is set to 0, no rate limiting is enforced. 
+                     This value is represented in bytes."
+         DEFVAL { 0 }
+         ::= { cpLocalUserEntry 8 }
+
+    cpLocalUserMaxOutputOctets OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum Output octets (bytes) allowed for the session.
+                     After this limit has been reached the user will be disconnected.
+                     If this value is set to 0, no rate limiting is enforced. 
+                     This value is represented in bytes."
+         DEFVAL { 0 }
+         ::= { cpLocalUserEntry 9 }
+
+    cpLocalUserMaxTotalOctets OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "The maximum input/output octets (bytes) allowed for the session.
+                     After this limit has been reached the user will be disconnected.
+                     If this value is set to 0, no rate limiting is enforced. 
+                     This value is represented in bytes."
+         DEFVAL { 0 }
+         ::= { cpLocalUserEntry 10 }
+
+    cpLocalUserRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus 
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The user entry status. 
+
+                     Supported values:
+                     active(1)      - This status is displayed after a valid user is created.
+                     createAndGo(4) - Set to this value to create a new user.
+                     destroy(6)     - Set to this value to remove an existing user."
+         ::= { cpLocalUserEntry 11 }
+
+    -- ---------------------------------
+    -- cpLocalUserGroupAssociationTable
+    -- ---------------------------------
+
+    cpLocalUserGroupAssociationTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpLocalUserGroupAssociationEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The mapping of local user assignments to a user group."
+         ::= { cpLocalUserDatabaseGroup 3 }
+
+    cpLocalUserGroupAssociationEntry OBJECT-TYPE
+         SYNTAX      CpLocalUserGroupAssociationEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The local user group association entry."
+         INDEX       { cpLocalUserGroupAssociationUserIndex, cpLocalUserGroupAssociationGroupIndex }
+         ::= { cpLocalUserGroupAssociationTable 1 }
+
+    CpLocalUserGroupAssociationEntry ::= SEQUENCE {
+                        cpLocalUserGroupAssociationUserIndex
+                           Integer32,
+                        cpLocalUserGroupAssociationGroupIndex
+                           Integer32,
+                        cpLocalUserGroupAssociationRowStatus
+                           RowStatus
+           }
+
+    cpLocalUserGroupAssociationUserIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The local user entry index associated with a user group."
+         ::= { cpLocalUserGroupAssociationEntry 1 }
+
+    cpLocalUserGroupAssociationGroupIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The user group entry index associated with a local user."
+         ::= { cpLocalUserGroupAssociationEntry 2 }
+
+    cpLocalUserGroupAssociationRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus 
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The local user to user group association entry status. 
+
+                     Supported values:
+                     active(1)      - This status is displayed after a valid association 
+                                      between a local user and a user group is created.
+                     createAndGo(4) - Set to this value to create a new association 
+                                      between a local user and a user group.
+                     destroy(6)     - Set to this value to remove an existing association 
+                                      between a local user and a user group."
+         ::= { cpLocalUserGroupAssociationEntry 3 }
+
+
+    --**************************************************************************************
+    --    cpInterfaceAssociationGroup
+    --**************************************************************************************
+    
+    cpInterfaceAssociationGroup            OBJECT IDENTIFIER ::= { cpConfigGroup 4 }
+
+    cpInterfaceAssociationTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpInterfaceAssociationEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The mapping of interface assignments to a captive portal instance."
+         ::= { cpInterfaceAssociationGroup 1 }
+
+    cpInterfaceAssociationEntry OBJECT-TYPE
+         SYNTAX      CpInterfaceAssociationEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The Captive Portal interface association entry."
+         INDEX       { cpIntfAssociationCPID, cpIntfAssociationIfIndex }
+         ::= { cpInterfaceAssociationTable 1 }
+
+    CpInterfaceAssociationEntry ::= SEQUENCE {
+                        cpIntfAssociationCPID
+                           Unsigned32,
+                        cpIntfAssociationIfIndex
+                           InterfaceIndex,
+                        cpIntfAssociationRowStatus
+                            RowStatus
+           }
+
+    cpIntfAssociationCPID OBJECT-TYPE
+         SYNTAX      Unsigned32 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The Captive Portal instance identifier associated with an interface."
+         ::= { cpInterfaceAssociationEntry 1 }
+
+    cpIntfAssociationIfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex 
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The interface ifIndex to which the Captive Portal instance is associated."
+         ::= { cpInterfaceAssociationEntry 2 }
+
+    cpIntfAssociationRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The Captive Portal instance to interface association status. 
+
+                     Supported values:
+                     active(1)      - This status is displayed after a valid association 
+                                      between a Captive Portal instance and an interface is created.
+                     createAndGo(4) - Set to this value to create a new association 
+                                      between a Captive Portal instance and an interface.
+                     destroy(6)     - Set to this value to remove an existing association 
+                                      between a Captive Portal instance and an interface."
+         ::= { cpInterfaceAssociationEntry 3 }
+
+
+   --**************************************************************************************
+   --    cpStatusGroup
+   --**************************************************************************************
+   
+   cpStatusGroup                      OBJECT IDENTIFIER ::= { fastPathCaptivePortal 2 }
+
+    --**************************************************************************************
+    --    cpCaptivePortalGlobalStatusGroup
+    --**************************************************************************************
+    
+    cpCaptivePortalGlobalStatusGroup            OBJECT IDENTIFIER ::= { cpStatusGroup 1 }
+
+    cpCaptivePortalOperStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enablePending(0),
+                     enabled(1),
+                     disablePending(2),
+                     disabled(3)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indication of the current operational state of the captive portal feature."
+         ::= { cpCaptivePortalGlobalStatusGroup 1 }
+
+    cpCaptivePortalOperDisabledReason OBJECT-TYPE
+         SYNTAX      INTEGER { 
+                     none(0),
+                     adminDisabled(1),
+                     noIPAddress(2),
+                     noIPRoutingIntf(3),
+                     routingDisabled(4)
+                  }
+
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The reason for the captive portal feature being operationally disabled."
+         ::= { cpCaptivePortalGlobalStatusGroup 2 }
+
+    cpCaptivePortalIpv4Address OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The IP address of this captive portal."
+         ::= { cpCaptivePortalGlobalStatusGroup 3 }
+
+    cpCaptivePortalInstanceMaxCount OBJECT-TYPE
+         SYNTAX      Integer32(0..10)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The maximum number of captive portal instances supported by the system."
+         ::= { cpCaptivePortalGlobalStatusGroup 4}
+
+    cpCaptivePortalInstanceConfiguredCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of captive portal instances currently configured in the system."
+         ::= { cpCaptivePortalGlobalStatusGroup 5 }
+
+    cpCaptivePortalInstanceActiveCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of captive portal instances currently active in the system."
+         ::= { cpCaptivePortalGlobalStatusGroup 6 }
+
+    cpCaptivePortalAuthenUserMaxCount OBJECT-TYPE
+         SYNTAX      Integer32(0..1024)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The maximum number of authenticated users that the system can support."
+         ::= { cpCaptivePortalGlobalStatusGroup 7 }
+
+    cpCaptivePortalLocalUserMaxCount OBJECT-TYPE
+         SYNTAX      Integer32(0..1024)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The maximum number of local users that the system can support."
+         ::= { cpCaptivePortalGlobalStatusGroup 8 }
+
+    cpCaptivePortalConfiguredLocalUserCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of local users currently configured in the system."
+         ::= { cpCaptivePortalGlobalStatusGroup 9 }
+
+    cpCaptivePortalAuthenUserCurrentCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of currently authenticated users across all captive portal instances."
+         ::= { cpCaptivePortalGlobalStatusGroup 10 }
+
+
+    --**************************************************************************************
+    --    cpCaptivePortalInstanceStatusGroup
+    --**************************************************************************************
+    
+    cpCaptivePortalInstanceStatusGroup            OBJECT IDENTIFIER ::= { cpStatusGroup 2 }
+
+    cpCaptivePortalInstanceStatusTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalInstanceStatusEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This database is used to report status for a captive portal instance."
+         ::= { cpCaptivePortalInstanceStatusGroup 1 }
+
+    cpCaptivePortalInstanceStatusEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalInstanceStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Captive portal instance status entry."
+         INDEX       { cpCaptivePortalInstanceId }
+         ::= { cpCaptivePortalInstanceStatusTable 1 }
+
+    CpCaptivePortalInstanceStatusEntry ::= SEQUENCE {
+                        cpCaptivePortalInstanceOperStatus
+                           INTEGER,
+                        cpCaptivePortalInstanceOperDisabledReason
+                           INTEGER,                       
+                        cpCaptivePortalInstanceBlockStatus
+                           INTEGER,                                                 
+                        cpCaptivePortalInstanceAuthUserCount
+                           Integer32
+           }
+
+    cpCaptivePortalInstanceOperStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indication of the current operational state of the captive portal instance."
+         DEFVAL { disable }
+         ::= { cpCaptivePortalInstanceStatusEntry 1 }
+
+    cpCaptivePortalInstanceOperDisabledReason OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     none(0),
+                     adminDisabled(1),
+                     noRadiusServer(2),
+                     noAccountingServer(3),
+                     noIntfAssociation(4),
+                     noActiveIntf(5),
+                     noValidCert(6)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The reason the captive portal instance is not currently operational."
+         ::= { cpCaptivePortalInstanceStatusEntry 2 }
+
+    cpCaptivePortalInstanceBlockStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     blockPending(0),
+                     blocked(1),
+                     notBlockPending(2),
+                     notBlocked(3)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Block or unblock the captive portal instance for authentications 
+                      using the following values:
+                      
+                      blockPending(0)    - Set to this value to block the captive portal instance for authentications.
+                                           After setting this value, the status displayed is blocked(1).
+                      notBlockPending(2) - Set to this value to unblock the captive portal instance for authentications.
+                                           After setting this value, the status displayed is notBlocked(3)."
+         DEFVAL { notBlocked }
+         ::= { cpCaptivePortalInstanceStatusEntry 3 }
+
+    cpCaptivePortalInstanceAuthUserCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of currently authenticated users for this captive portal."
+         ::= { cpCaptivePortalInstanceStatusEntry 4 }
+
+
+    --**************************************************************************************
+    --    cpCaptivePortalIntfStatusGroup
+    --**************************************************************************************
+    
+    cpCaptivePortalIntfStatusGroup            OBJECT IDENTIFIER ::= { cpStatusGroup 3 }
+
+    cpCaptivePortalIntfStatusTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalIntfStatusEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This database is used to report status for a captive portal instance interface."
+         ::= { cpCaptivePortalIntfStatusGroup 1 }
+
+    cpCaptivePortalIntfStatusEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalIntfStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Captive portal instance interface status entry."
+         INDEX       { cpCaptivePortalInstanceId, cpCaptivePortalIntfIfIndex }
+         ::= { cpCaptivePortalIntfStatusTable 1 }
+
+    CpCaptivePortalIntfStatusEntry ::= SEQUENCE {
+                        cpCaptivePortalIntfIfIndex
+                           InterfaceIndex,
+                        cpCaptivePortalIntfActivationStatus
+                           INTEGER,
+                        cpCaptivePortalIntfActivationDisabledReason
+                           INTEGER,
+                        cpCaptivePortalIntfBlockStatus
+                           INTEGER,
+                        cpCaptivePortalIntfAuthUserCount
+                           Integer32
+           }
+
+    cpCaptivePortalIntfIfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The ifIndex of the interface associated with this entry."
+         ::= { cpCaptivePortalIntfStatusEntry 1 }
+
+    cpCaptivePortalIntfActivationStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indication of whether captive portal instance is active on the interface."
+         DEFVAL { disable }
+         ::= { cpCaptivePortalIntfStatusEntry 2 }
+
+    cpCaptivePortalIntfActivationDisabledReason OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     none(0),
+                     intfNotAttached(1),
+                     adminDisabled(2)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The reason for the captive portal instance interface not being currently active."
+         ::= { cpCaptivePortalIntfStatusEntry 3 }
+
+    cpCaptivePortalIntfBlockStatus OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     blocked(0),
+                     notBlocked(1)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Indication of whether the captive portal instance interface is 
+                     currently blocked for authentications."
+         DEFVAL { notBlocked }
+         ::= { cpCaptivePortalIntfStatusEntry 4 }
+
+    cpCaptivePortalIntfAuthUserCount OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The number of currently authenticated users for this captive portal instance interface."
+         ::= { cpCaptivePortalIntfStatusEntry 5 }
+
+
+    --**************************************************************************************
+    --    cpCaptivePortalIntfDatabaseGroup
+    --**************************************************************************************
+    
+    cpCaptivePortalIntfDatabaseGroup            OBJECT IDENTIFIER ::= { cpStatusGroup 4 }
+
+    cpCaptivePortalIntfDatabaseTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalIntfDatabaseEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of definitions for interfaces that are captive portal capable. 
+                     This table identifies services that are provided on this interface."
+         ::= { cpCaptivePortalIntfDatabaseGroup 1 }
+
+    cpCaptivePortalIntfDatabaseEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalIntfDatabaseEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     ""
+         INDEX       { cpCaptivePortalIntfIfIndex }
+         ::= { cpCaptivePortalIntfDatabaseTable 1 }
+
+    CpCaptivePortalIntfDatabaseEntry ::= SEQUENCE {
+                        cpCaptivePortalIntfCapabilities
+                           CpCaptivePortalIntfCapabilitiesMap
+           }
+
+    cpCaptivePortalIntfCapabilities OBJECT-TYPE
+         SYNTAX      CpCaptivePortalIntfCapabilitiesMap 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+            "The bitmap value used to identify which capabilities are available on the interface."
+         ::= { cpCaptivePortalIntfDatabaseEntry 1 }
+
+
+    --**************************************************************************************
+    --    cpCaptivePortalClientStatusGroup
+    --**************************************************************************************
+    
+    cpCaptivePortalClientStatusGroup            OBJECT IDENTIFIER ::= { cpStatusGroup 5 }
+
+    cpCaptivePortalClientStatusTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalClientStatusEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This database is used to report status of authenticated clients."
+         ::= { cpCaptivePortalClientStatusGroup 1 }
+
+    cpCaptivePortalClientStatusEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalClientStatusEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Captive portal client status entry."
+         INDEX       { cpCaptivePortalClientMacAddress }
+         ::= { cpCaptivePortalClientStatusTable 1 }
+
+    CpCaptivePortalClientStatusEntry ::= SEQUENCE {
+                         cpCaptivePortalClientMacAddress
+                           MacAddress,
+                         cpCaptivePortalClientIpAddress
+                           IpAddress,
+                         cpCaptivePortalClientUserName
+                           DisplayString,                                      
+                         cpCaptivePortalClientProtocolMode
+                           INTEGER,                                      
+                         cpCaptivePortalClientVerificationMode
+                           INTEGER,                                      
+                         cpCaptivePortalClientAssocIfIndex
+                           InterfaceIndex,                                      
+                         cpCaptivePortalClientCPID
+                           Integer32,                                      
+                         cpCaptivePortalClientSessionTime
+                           TimeTicks,
+                         cpCaptivePortalClientSwitchMacAddress
+                           MacAddress,
+                         cpCaptivePortalClientSwitchIpAddress
+                           IpAddress,
+                         cpCaptivePortalClientSwitchType
+                           INTEGER,                                      
+                         cpCaptivePortalClientDeauthAction
+                           INTEGER
+           }
+
+    cpCaptivePortalClientMacAddress OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The MAC address of the workstation from which the client is authenticated."
+         ::= { cpCaptivePortalClientStatusEntry 1 }
+
+    cpCaptivePortalClientIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The IP address of the workstation from which the client is authenticated."
+         ::= { cpCaptivePortalClientStatusEntry 2 }
+
+    cpCaptivePortalClientUserName OBJECT-TYPE
+         SYNTAX      DisplayString (SIZE(0..32))
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "User name (or Guest ID) of the connected client."
+         ::= { cpCaptivePortalClientStatusEntry 3 }
+
+    cpCaptivePortalClientProtocolMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     https(0),
+                     http(1)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Protocol mode used for the client authentication."
+         ::= { cpCaptivePortalClientStatusEntry 4 }
+
+    cpCaptivePortalClientVerificationMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     guest(0),
+                     local(1),
+                     radius(2)
+                  }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Type of user verification performed for the client authentication."
+         ::= { cpCaptivePortalClientStatusEntry 5 }
+
+    cpCaptivePortalClientAssocIfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The interface on which the client was authenticated."
+         ::= { cpCaptivePortalClientStatusEntry 6 }
+
+    cpCaptivePortalClientCPID     OBJECT-TYPE
+         SYNTAX      Integer32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The captive portal instance on which the client was authenticated."
+         ::= { cpCaptivePortalClientStatusEntry 7 }
+
+    cpCaptivePortalClientSessionTime OBJECT-TYPE
+         SYNTAX      TimeTicks
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The time (in seconds) since the client was authenticated."
+         ::= { cpCaptivePortalClientStatusEntry 8 }
+
+-- object support based on cluster support
+    cpCaptivePortalClientSwitchMacAddress OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The MAC address of the switch to which the client is authenticated."
+         ::= { cpCaptivePortalClientStatusEntry 9 }
+
+-- object support based on cluster support
+    cpCaptivePortalClientSwitchIpAddress OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The IP address of the switch to which the client is authenticated."
+         ::= { cpCaptivePortalClientStatusEntry 10 }
+
+-- object support based on cluster support
+    cpCaptivePortalClientSwitchType OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     peer(1),
+                     local(2)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The switch (peer or local) to which the client is authenticated."
+         ::= { cpCaptivePortalClientStatusEntry 11 }
+
+    cpCaptivePortalClientDeauthAction OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     none(1),
+                     start(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This is an action object. Setting this object to start will initiate the 
+                     deauthentication of authenticated client. Read on this object will always return none."
+         ::= { cpCaptivePortalClientStatusEntry 12 }
+
+
+    -- ------------------------------------
+    -- cpCaptivePortalClientStatisticsTable
+    -- ------------------------------------
+
+    cpCaptivePortalClientStatisticsTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalClientStatisticsEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "A table of statistics for each active session."
+         ::= { cpCaptivePortalClientStatusGroup 2 }
+
+    cpCaptivePortalClientStatisticsEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalClientStatisticsEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Captive portal client statistics entry."
+         AUGMENTS    { cpCaptivePortalClientStatusEntry }
+         ::= { cpCaptivePortalClientStatisticsTable 1 }
+
+    CpCaptivePortalClientStatisticsEntry ::= SEQUENCE {
+                        cpCaptivePortalClientBytesReceived
+                           Counter64,
+                        cpCaptivePortalClientBytesTransmitted
+                           Counter64,
+                        cpCaptivePortalClientPacketsReceived
+                           Counter64,
+                        cpCaptivePortalClientPacketsTransmitted
+                           Counter64
+           }
+
+    cpCaptivePortalClientBytesReceived OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of bytes received by this client."
+         ::= { cpCaptivePortalClientStatisticsEntry 1 }
+
+    cpCaptivePortalClientBytesTransmitted OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of bytes transmitted by this client."
+         ::= { cpCaptivePortalClientStatisticsEntry 2 }
+
+    cpCaptivePortalClientPacketsReceived OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of packets received by this client."
+         ::= { cpCaptivePortalClientStatisticsEntry 3 }
+
+    cpCaptivePortalClientPacketsTransmitted OBJECT-TYPE
+         SYNTAX      Counter64
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "Number of packets transmitted by this client."
+         ::= { cpCaptivePortalClientStatisticsEntry 4 }
+
+
+    --**************************************************************************************
+    --    cpCaptivePortalIntfClientAssocGroup
+    --**************************************************************************************
+    
+    cpCaptivePortalIntfClientAssocGroup          OBJECT IDENTIFIER ::= { cpStatusGroup 6 }
+
+    cpCaptivePortalIntfClientAssocTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalIntfClientAssocEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This database is used to report clients associated with a
+                     particular captive portal interface."
+         ::= { cpCaptivePortalIntfClientAssocGroup 1 }
+
+    cpCaptivePortalIntfClientAssocEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalIntfClientAssocEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Captive portal interface client status entry."
+         INDEX       { cpCaptivePortalIntfClientIfIndex, cpCaptivePortalIntfClientAssocMacAddress }
+         ::= { cpCaptivePortalIntfClientAssocTable 1 }
+
+    CpCaptivePortalIntfClientAssocEntry ::= SEQUENCE {
+                        cpCaptivePortalIntfClientIfIndex
+                           InterfaceIndex,
+                        cpCaptivePortalIntfClientAssocMacAddress
+                           MacAddress,                           
+                        cpCaptivePortalIntfClientAssocRowStatus
+                           RowStatus
+           }
+
+    cpCaptivePortalIntfClientIfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The interface on which the client was authenticated."
+         ::= { cpCaptivePortalIntfClientAssocEntry 1 }
+
+   cpCaptivePortalIntfClientAssocMacAddress OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The MAC address of the workstation from which the client is authenticated."
+         ::= { cpCaptivePortalIntfClientAssocEntry 2 }
+
+    cpCaptivePortalIntfClientAssocRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the row-status of this entry. For a valid entry, 
+                     the row-status will return active(1). This is the only supported value."
+         ::= { cpCaptivePortalIntfClientAssocEntry 3 }
+
+
+    --**************************************************************************************
+    --    cpCaptivePortalInstanceClientAssocGroup
+    --**************************************************************************************
+    
+    cpCaptivePortalInstanceClientAssocGroup          OBJECT IDENTIFIER ::= { cpStatusGroup 7 }
+
+    cpCaptivePortalInstanceClientAssocTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalInstanceClientAssocEntry  
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This database is used to report clients associated with a
+                     particular captive portal instance."
+         ::= { cpCaptivePortalInstanceClientAssocGroup 1 }
+
+    cpCaptivePortalInstanceClientAssocEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalInstanceClientAssocEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Captive Portal instance client status entry."
+         INDEX       { cpCaptivePortalInstanceClientAssocInstanceId, cpCaptivePortalInstanceClientAssocMacAddress }
+         ::= { cpCaptivePortalInstanceClientAssocTable 1 }
+
+    CpCaptivePortalInstanceClientAssocEntry ::= SEQUENCE {
+                        cpCaptivePortalInstanceClientAssocInstanceId
+                           Integer32,                           
+                        cpCaptivePortalInstanceClientAssocMacAddress
+                           MacAddress,                           
+                        cpCaptivePortalInstanceClientAssocRowStatus
+                           RowStatus
+           }
+
+    cpCaptivePortalInstanceClientAssocInstanceId      OBJECT-TYPE
+         SYNTAX      Integer32 (1..10)
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The instance ID associated with this client."
+         ::= { cpCaptivePortalInstanceClientAssocEntry 1 }
+
+   cpCaptivePortalInstanceClientAssocMacAddress OBJECT-TYPE
+         SYNTAX      MacAddress
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The MAC address of the workstation from which the client is authenticated."
+         ::= { cpCaptivePortalInstanceClientAssocEntry 2 }
+
+    cpCaptivePortalInstanceClientAssocRowStatus OBJECT-TYPE
+         SYNTAX      RowStatus 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "This specifies the row-status of this entry. For a valid entry, 
+                     the row-status will return active(1). This is the only supported value."
+         ::= { cpCaptivePortalInstanceClientAssocEntry 3 }
+
+
+--**************************************************************************************
+-- cpTrapsConfig
+--**************************************************************************************
+
+    cpTrapsConfig                        OBJECT IDENTIFIER ::= { fastPathCaptivePortal 3 }
+
+    cpTrapMode    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This object enables/disables the global Captive Portal trap mode. 
+                     If this object is disabled, the Captive Portal Client Authentication Failure traps, 
+                     Client Connection traps, Client Database Full traps, and Client Disconnection traps 
+                     are not sent regardless of their setting."
+         DEFVAL      { disable }
+         ::= { cpTrapsConfig 1 }
+
+    cpClientAuthenticationFailureTrapMode    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Flag to enable/disable client authentication failure SNMP traps."
+         DEFVAL      { disable }
+         ::= { cpTrapsConfig 2 }
+
+    cpClientConnectTrapMode    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Flag to enable/disable client connection SNMP traps."
+         DEFVAL      { disable }
+         ::= { cpTrapsConfig 3 }
+
+    cpClientDatabaseFullTrapMode    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Flag to enable/disable client database full SNMP traps."
+         DEFVAL      { disable }
+         ::= { cpTrapsConfig 4 }
+
+    cpClientDisconnectTrapMode    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                     }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "Flag to enable/disable client disconnection SNMP traps."
+         DEFVAL      { disable }
+         ::= { cpTrapsConfig 5 }
+
+
+   --**************************************************************************************
+   --    cpTraps
+   --**************************************************************************************
+
+   cpTraps                                    OBJECT IDENTIFIER ::= { fastPathCaptivePortal 4 }
+
+   cpClientAuthenticationFailure NOTIFICATION-TYPE
+       OBJECTS { cpCaptivePortalClientMacAddress,cpCaptivePortalClientIpAddress,cpCaptivePortalClientCPID,cpCaptivePortalClientAssocIfIndex,cpCaptivePortalClientSwitchMacAddress,cpCaptivePortalClientUserName }
+       STATUS  current
+       DESCRIPTION
+          "A cpClientAuthenticationFailure trap signifies that the SNMP entity, 
+          acting in an agent role, has detected a client authentication failure."
+       ::= { cpTraps 1 }
+
+   cpClientConnect NOTIFICATION-TYPE
+       OBJECTS { cpCaptivePortalClientMacAddress,cpCaptivePortalClientAssocIfIndex,cpCaptivePortalClientIpAddress,cpCaptivePortalClientCPID,cpCaptivePortalClientSwitchMacAddress }
+       STATUS  current
+       DESCRIPTION
+          "A cpClientConnect trap signifies that the SNMP entity, 
+          acting in an agent role, has detected a client connection."
+       ::= { cpTraps 2 }
+
+   cpClientDatabaseFull NOTIFICATION-TYPE
+       OBJECTS { cpCaptivePortalClientMacAddress }
+       STATUS  current
+       DESCRIPTION
+          "A cpClientDatabaseFull trap signifies that the SNMP entity, 
+          acting in an agent role, has detected that client authentication database is full."
+       ::= { cpTraps 3 }
+
+   cpClientDisconnect NOTIFICATION-TYPE
+       OBJECTS { cpCaptivePortalClientMacAddress,cpCaptivePortalClientAssocIfIndex,cpCaptivePortalClientIpAddress,cpCaptivePortalClientCPID,cpCaptivePortalClientSwitchMacAddress }
+       STATUS  current
+       DESCRIPTION
+          "A cpClientDisconnect trap signifies that the SNMP entity, 
+          acting in an agent role, has detected a client disconnection."
+       ::= { cpTraps 4 }
+
+    --**************************************************************************************
+    --    cpCaptivePortalConfigWebGroup
+    --**************************************************************************************
+
+    cpCaptivePortalConfigWebGroup          OBJECT IDENTIFIER ::= { fastPathCaptivePortal 5 }
+
+    cpCaptivePortalConfigWebTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF CpCaptivePortalConfigWebEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "This database is used to web config."
+         ::= { cpCaptivePortalConfigWebGroup 1 }
+
+    cpCaptivePortalConfigWebEntry OBJECT-TYPE
+         SYNTAX      CpCaptivePortalConfigWebEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Captive Portal instance client status entry."
+         INDEX       {cpCaptivePortalConfigWebInstanceId,cpCaptivePortalConfigWebWebId}
+         ::= { cpCaptivePortalConfigWebTable 1 }
+
+    CpCaptivePortalConfigWebEntry ::= SEQUENCE {
+                        cpCaptivePortalConfigWebInstanceId
+                           Unsigned32,
+                        cpCaptivePortalConfigWebWebId
+                           Unsigned32
+                     	}
+
+   cpCaptivePortalConfigWebInstanceId OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "TThe identifier associated with instance of Captive Portal."
+         ::= { cpCaptivePortalConfigWebEntry 1 }
+
+   cpCaptivePortalConfigWebWebId OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+                     "The Web ID associated with this client."
+         ::= { cpCaptivePortalConfigWebEntry 2 }
+
+END

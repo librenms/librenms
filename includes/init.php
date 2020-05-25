@@ -23,130 +23,126 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-
 /**
- * @param array $modules
+ * @param array $modules Which modules to initialize
  */
-//function librenms_init($init_modules = array())
-//{
-//global $console_color, $config;
+
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
+
+global $vars, $console_color;
+
+error_reporting(E_ERROR|E_PARSE|E_CORE_ERROR|E_COMPILE_ERROR);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 
 $install_dir = realpath(__DIR__ . '/..');
-$config['install_dir'] = $install_dir;
 chdir($install_dir);
 
-// Libraries
-require('Net/IPv4.php');
-require('Net/IPv6.php');
-
 # composer autoload
-require $install_dir . '/vendor/autoload.php';
-if (version_compare(PHP_VERSION, '5.4', '>=')) {
-    require $install_dir . '/lib/influxdb-php/vendor/autoload.php';
+if (!is_file($install_dir . '/vendor/autoload.php')) {
+    require_once $install_dir . '/includes/common.php';
+    c_echo("%RError: Missing dependencies%n, run: %B./scripts/composer_wrapper.php install --no-dev%n\n\n");
+}
+require_once $install_dir . '/vendor/autoload.php';
+
+if (!function_exists('module_selected')) {
+    function module_selected($module, $modules)
+    {
+        return in_array($module, (array) $modules);
+    }
 }
 
 // function only files
 require_once $install_dir . '/includes/common.php';
-require $install_dir . '/includes/dbFacile.php';
-require $install_dir . '/includes/rrdtool.inc.php';
-require $install_dir . '/includes/influxdb.inc.php';
-require $install_dir . '/includes/datastore.inc.php';
-require $install_dir . '/includes/billing.php';
-require $install_dir . '/includes/syslog.php';
-require $install_dir . '/includes/snmp.inc.php';
-require $install_dir . '/includes/services.inc.php';
-require $install_dir . '/includes/mergecnf.inc.php';
-require $install_dir . '/includes/functions.php';
-require $install_dir . '/includes/rewrites.php';  // FIXME both definitions and functions
+require_once $install_dir . '/includes/dbFacile.php';
+require_once $install_dir . '/includes/rrdtool.inc.php';
+require_once $install_dir . '/includes/datastore.inc.php';
+require_once $install_dir . '/includes/billing.php';
+require_once $install_dir . '/includes/syslog.php';
+if (module_selected('mocksnmp', $init_modules)) {
+    require_once $install_dir . '/tests/mocks/mock.snmp.inc.php';
+} elseif (!in_array($install_dir . '/tests/mocks/mock.snmp.inc.php', get_included_files())) {
+    require_once $install_dir . '/includes/snmp.inc.php';
+}
+require_once $install_dir . '/includes/services.inc.php';
+require_once $install_dir . '/includes/functions.php';
+require_once $install_dir . '/includes/rewrites.php';
 
 if (module_selected('web', $init_modules)) {
-    chdir($install_dir . '/html');
-    require $install_dir . '/html/includes/functions.inc.php';
+    require_once $install_dir . '/includes/html/functions.inc.php';
 }
 
 if (module_selected('discovery', $init_modules)) {
-    require $install_dir . '/includes/discovery/functions.inc.php';
+    require_once $install_dir . '/includes/discovery/functions.inc.php';
 }
 
 if (module_selected('polling', $init_modules)) {
-    require_once $install_dir . '/includes/device-groups.inc.php';
-    require $install_dir . '/includes/polling/functions.inc.php';
+    require_once $install_dir . '/includes/polling/functions.inc.php';
 }
 
 if (module_selected('alerts', $init_modules)) {
-    require_once $install_dir . '/includes/device-groups.inc.php';
-    require $install_dir . '/includes/alerts.inc.php';
+    require_once $install_dir . '/LibreNMS/Alert/RunAlerts.php';
 }
 
-
-// variable definitions
-require $install_dir . '/includes/cisco-entities.php';
-require $install_dir . '/includes/vmware_guestid.inc.php';
-require $install_dir . '/includes/defaults.inc.php';
-require $install_dir . '/includes/definitions.inc.php';
-include $install_dir . '/config.php';
-
-// init memcached
-if ($config['memcached']['enable'] === true) {
-    if (class_exists('Memcached')) {
-        $config['memcached']['ttl'] = 60;
-        $config['memcached']['resource'] = new Memcached();
-        $config['memcached']['resource']->addServer($config['memcached']['host'], $config['memcached']['port']);
-    } else {
-        echo "WARNING: You have enabled memcached but have not installed the PHP bindings. Disabling memcached support.\n";
-        echo "Try 'apt-get install php5-memcached' or 'pecl install memcached'. You will need the php5-dev and libmemcached-dev packages to use pecl.\n\n";
-        $config['memcached']['enable'] = 0;
-    }
+// Boot Laravel
+if (module_selected('auth', $init_modules)) {
+    \LibreNMS\Util\Laravel::bootWeb();
+} else {
+    \LibreNMS\Util\Laravel::bootCli();
 }
+
+set_debug(false); // disable debug initially (hides legacy errors too)
 
 if (!module_selected('nodb', $init_modules)) {
-    // Connect to database
-    $database_link = mysqli_connect('p:' . $config['db_host'], $config['db_user'], $config['db_pass']);
-    if (!$database_link) {
-        echo '<h2>MySQL Error</h2>';
-        echo mysqli_connect_error();
-        die;
+    \LibreNMS\DB\Eloquent::boot();
+
+    if (!\LibreNMS\DB\Eloquent::isConnected()) {
+        echo "Could not connect to database, check logs/librenms.log.\n";
+
+        if (!extension_loaded('mysqlnd') || !extension_loaded('pdo_mysql')) {
+            echo "\nYour PHP is missing required mysql extension(s), please install and enable.\n";
+            echo "Check the install docs for more info: https://docs.librenms.org/Installation/\n";
+        }
+
+        exit;
     }
-    $database_db = mysqli_select_db($database_link, $config['db_name']);
-
-    // pull in the database config settings
-    mergedb();
-
-    // load graph types from the database
-    require $install_dir . '/includes/load_db_graph_types.inc.php';
 }
 
-if (file_exists($config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php')) {
-    require $config['install_dir'] . '/html/includes/authentication/'.$config['auth_mechanism'].'.inc.php';
-} else {
+// Display config.php errors instead of http 500
+$display_bak = ini_get('display_errors');
+ini_set('display_errors', 1);
+
+// Load config if not already loaded (which is the case if inside Laravel)
+if (!Config::has('install_dir')) {
+    Config::load();
+}
+
+// set display_errors back
+ini_set('display_errors', $display_bak);
+
+
+if (is_numeric(Config::get('php_memory_limit')) && Config::get('php_memory_limit') > 128) {
+    ini_set('memory_limit', Config::get('php_memory_limit') . 'M');
+}
+
+try {
+    LegacyAuth::get();
+} catch (Exception $exception) {
     print_error('ERROR: no valid auth_mechanism defined!');
+    echo $exception->getMessage() . PHP_EOL;
     exit();
 }
 
+if (module_selected('discovery', $init_modules) && !\LibreNMS\Util\OS::updateCache(false)) {
+    // OS::loadAllDefinitions() is called by update_os_cache() if updated, no need to call twice
+    \LibreNMS\Util\OS::loadAllDefinitions(false, true);
+} elseif (module_selected('web', $init_modules)) {
+    \LibreNMS\Util\OS::loadAllDefinitions(!module_selected('nodb', $init_modules), true);
+}
+
 if (module_selected('web', $init_modules)) {
-    umask(0002);
-    require $install_dir . '/html/includes/vars.inc.php';
-    $tmp_list = dbFetchRows('SELECT DISTINCT(`os`) FROM `devices`');
-    $os_list = array();
-    foreach ($tmp_list as $k => $v) {
-        $os_list[] = $config['install_dir'].'/includes/definitions/'. $v['os'] . '.yaml';
-    }
-    load_all_os($os_list);
+    require $install_dir . '/includes/html/vars.inc.php';
 }
 
 $console_color = new Console_Color2();
-
-if (module_selected('auth', $init_modules) ||
-    (
-        module_selected('graphs', $init_modules) &&
-        isset($config['allow_unauth_graphs']) &&
-        $config['allow_unauth_graphs'] != true
-    )
-) {
-    require $install_dir . '/html/includes/authenticate.inc.php';
-}
-
-function module_selected($module, $modules)
-{
-    return in_array($module, (array) $modules);
-}

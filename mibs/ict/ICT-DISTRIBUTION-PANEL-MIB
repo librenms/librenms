@@ -1,0 +1,321 @@
+-- MIB file for ICT Distribution Panel Series
+--
+-- Date         Version
+-- =============================
+-- 9/5/13       1.01
+--
+-- Renamed from ICT-MIB to ICT-DISTRIBUTION-PANEL-MIB
+
+ICT-DISTRIBUTION-PANEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, IpAddress	FROM RFC1155-SMI
+	DisplayString		FROM RFC1213-MIB
+	OBJECT-TYPE		FROM RFC-1212
+	TRAP-TYPE		FROM RFC-1215;
+
+ictPower			OBJECT IDENTIFIER ::= { enterprises 39145 }
+
+distPanel			OBJECT IDENTIFIER ::= { ictPower 10 }
+
+deviceModel			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Model Number"
+	::= { distPanel 1 }
+
+deviceName			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Site Name"
+	::= { distPanel 2 }
+
+deviceHardware			OBJECT-TYPE
+	SYNTAX			INTEGER (0..127)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Hardware Version"
+	::= { distPanel 3 }
+
+deviceFirmware			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Firmware Version"
+	::= { distPanel 4 }
+
+deviceMacAddress		OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"MAC Address"
+	::= { distPanel 5 }
+
+systemVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"System Voltage (Volts)"
+	::= { distPanel 6 }
+
+systemCurrent			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"System Current (Amps)"
+	::= { distPanel 7 }
+
+outputTable			OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutputEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION		"Output Table"
+	::= { distPanel 8 }
+
+outputEntry			OBJECT-TYPE
+	SYNTAX			OutputEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	INDEX { outputNumber }
+	::= { outputTable 1 }
+
+OutputEntry ::=
+	SEQUENCE {
+		outputNumber		INTEGER,
+		outputName		DisplayString,
+		outputCurrent		DisplayString,
+		outputFuseStatus	INTEGER,
+		outputEnable		INTEGER
+	}
+
+outputNumber			OBJECT-TYPE
+	SYNTAX			INTEGER (0..11)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Number"
+	::= { outputEntry 1 }
+
+outputName			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Label"
+	::= { outputEntry 2 }
+
+outputCurrent			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Current (Amps)"
+	::= { outputEntry 3 }
+
+outputFuseStatus		OBJECT-TYPE
+	SYNTAX			INTEGER { OK(1), OPEN(2) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Fuse Status ('1' indicates Fuse is OK, and '2' indicates Fuse is OPEN)"
+	::= { outputEntry 4 }
+
+outputEnable			OBJECT-TYPE
+	SYNTAX			INTEGER { ENABLED(1), DISABLED(2) }
+	ACCESS			read-write
+	STATUS			mandatory
+	DESCRIPTION		"Output Relay Enable ('1' indicates the Output is ENABLED, and '2' indicates the Output is DISABLED)"
+	::= { outputEntry 5 }
+
+alarmTable			OBJECT-TYPE
+	SYNTAX SEQUENCE OF AlarmEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION		"Alarm Input Table"
+	::= { distPanel 9 }
+
+alarmEntry			OBJECT-TYPE
+	SYNTAX			AlarmEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	INDEX { alarmNumber }
+	::= { alarmTable 1 }
+
+AlarmEntry ::=
+	SEQUENCE {
+		alarmNumber		INTEGER,
+		alarmName		DisplayString,
+		alarmStatus		INTEGER
+	}
+
+alarmNumber			OBJECT-TYPE
+	SYNTAX			INTEGER (0..4)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Alarm Input Number"
+	::= { alarmEntry 1 }
+
+alarmName			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Alarm Input Name"
+	::= { alarmEntry 2 }
+
+alarmStatus			OBJECT-TYPE
+	SYNTAX			INTEGER { INACTIVE(1), READY(2), ALARM(3) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Alarm Input Status ('1' indicates Alarm is INACTIVE,'2' indicates Alarm is READY, and '3' indicates Alarm is in an ALARM condition)"
+	::= { alarmEntry 3 }
+
+busTable			OBJECT-TYPE
+	SYNTAX SEQUENCE OF OutputEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION		"Output Table"
+	::= { distPanel 10 }
+
+busEntry			OBJECT-TYPE
+	SYNTAX			BusEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	INDEX { busNumber }
+	::= { busTable 1 }
+
+BusEntry ::=
+	SEQUENCE {
+		busNumber		INTEGER,
+		busName			DisplayString,
+		busVoltage		DisplayString,
+		busCurrent		DisplayString
+	}
+
+busNumber			OBJECT-TYPE
+	SYNTAX			INTEGER (0..1)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Bus Number"
+	::= { busEntry 1 }
+
+busName				OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Bus Name"
+	::= { busEntry 2 }
+
+busVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Bus Voltage (Volts)"
+	::= { busEntry 3 }
+
+busCurrent			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Total Bus Current (Amps)"
+	::= { busEntry 4 }
+
+
+--
+-- Trap definitions:
+--
+
+sysUndervoltageAlarmTrap	TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ busNumber }
+	DESCRIPTION		"Trap generated when a System/Bus Undervoltage Alarm is triggered"
+	::= 101
+
+sysOvervoltageAlarmTrap		TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ busNumber }
+	DESCRIPTION		"Trap generated when a System/Bus Overvoltage Alarm is triggered"
+	::= 102
+
+sysOvercurrentAlarmTrap		TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ busNumber }
+	DESCRIPTION		"Trap generated when a System/Bus Overcurrent Alarm is triggered"
+	::= 103
+
+fuseAlarmTrap			TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ outputNumber }
+	DESCRIPTION		"Trap generated when an Output Fuse Alarm is triggered"
+	::= 104
+
+undercurrentAlarmTrap		TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ outputNumber }
+	DESCRIPTION		"Trap generated when an Output Undercurrent Alarm is triggered"
+	::= 105
+
+overcurrentAlarmTrap		TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ outputNumber }
+	DESCRIPTION		"Trap generated when an Output Overcurrent Alarm is triggered"
+	::= 106
+
+loadshedTrap			TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ outputNumber }
+	DESCRIPTION		"Trap generated when Load-Shedding is activated on an Output"
+	::= 107
+
+alarmInputTrap			TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ alarmNumber }
+	DESCRIPTION		"Trap generated when an Alarm Input is activated"
+	::= 108
+
+sysUndervoltageAlarmClear	TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ busNumber }
+	DESCRIPTION		"Trap generated when a System/Bus Undervoltage Alarm is cleared"
+	::= 111
+
+sysOvervoltageAlarmClear	TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ busNumber }
+	DESCRIPTION		"Trap generated when a System/Bus Overvoltage Alarm is cleared"
+	::= 112
+
+sysOvercurrentAlarmClear	TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ busNumber }
+	DESCRIPTION		"Trap generated when a System/Bus Overcurrent Alarm is cleared"
+	::= 113
+
+fuseAlarmClear			TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ outputNumber }
+	DESCRIPTION		"Trap generated when an Output Fuse Alarm is cleared"
+	::= 114
+
+undercurrentAlarmClear		TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ outputNumber }
+	DESCRIPTION		"Trap generated when an Output Undercurrent Alarm is cleared"
+	::= 115
+
+overcurrentAlarmClear		TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ outputNumber }
+	DESCRIPTION		"Trap generated when an Output Overcurrent Alarm is cleared"
+	::= 116
+
+loadshedClear			TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ outputNumber }
+	DESCRIPTION		"Trap generated when an Output has recovered from a Load-Shedding condition"
+	::= 117
+
+alarmInputClear			TRAP-TYPE
+	ENTERPRISE		distPanel
+	VARIABLES		{ alarmNumber }
+	DESCRIPTION		"Trap generated when an Alarm Input is cleared"
+	::= 118
+
+END

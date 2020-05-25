@@ -1,0 +1,162 @@
+mib: XMUX4-PLUS
+modules:
+  sensors:
+    pre-cache:
+      data:
+      - oid:
+        - muxLeftPowerIdenti
+        - muxRightPowerIdenti
+    temperature:
+      data:
+      -
+        oid: muxFanTemp
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.4.{{ $index }}'
+        descr: 'Fan Temperature'
+        index: 'muxFanTemp.{{ $index }}'
+        low_limit: -5
+        high_limit: 55
+        low_warn_limit: 0
+        warn_limit: 40
+      -
+        oid: muxInteriorTemp
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.5.{{ $index }}'
+        descr: 'Internal Temperature'
+        index: 'muxInteriorTemp.{{ $index }}'
+        low_limit: -5
+        high_limit: 55
+        low_warn_limit: 0
+        warn_limit: 40
+    voltage:
+      data:
+      -
+        oid: muxVolt3v3
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.6.{{ $index }}'
+        descr: 'Channel s 3,3 voltage'
+        index: 'muxVolt3v3.{{ $index }}'
+      -
+        oid: muxVolt2v5
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.7.{{ $index }}'
+        descr: 'Channel s 2,5 voltage'
+        index: 'muxVolt2v5.{{ $index }}'
+      -
+        oid: muxVolt1v2
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.8.{{ $index }}'
+        descr: 'Channel s 1,2 voltage'
+        index: 'muxVolt1v2.{{ $index }}'
+    state:
+      data:
+      -
+        oid: muxLeftPower
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.9.{{ $index }}'
+        descr: 'Left power -  {{ $muxLeftPowerIdenti }}'
+        index: 'muxLeftPower.{{ $index }}'
+        state_name: muxLeftPower
+        states:
+            - { descr: PowerOn, graph: 0, value: 0, generic: 0 }
+            - { descr: PowerOff, graph: 0, value: 1, generic: 2 }
+            - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+      -
+        oid: muxRightPower
+        value: muxRightPower
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.1.9.1.10.{{ $index }}'
+        descr: 'Right power - {{ $muxRightPowerIdenti }} '
+        index: 'muxRightPower.{{ $index }}'
+        state_name: muxRightPower
+        states:
+            - { descr: PowerOn, graph: 0, value: 0, generic: 0 }
+            - { descr: PowerOff, graph: 0, value: 1, generic: 2 }
+            - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+      -
+        oid: channelTable
+        value: channelPresent
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.3.{{ $index }}'
+        descr: 'Channel {{ $subindex1 }} present'
+        index: 'channelPresent.{{ $index }}'
+        group: 'Channel {{ $subindex1 }}'
+        state_name: channelPresent
+        states:
+            - { descr: Missing, graph: 0, value: 0, generic: 1 }
+            - { descr: Present, graph: 0, value: 1, generic: 0 }
+      -
+        oid: channelTable
+        value: channelLocalTx
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.4.{{ $index }}'
+        descr: 'Channel {{ $subindex1 }} Local TX'
+        index: 'channelLocalTx.{{ $index }}'
+        group: 'Channel {{ $subindex1 }}'
+        state_name: channelLocalTx
+        states:
+            - { descr: Off, graph: 0, value: 0, generic: 1 }
+            - { descr: On, graph: 0, value: 1, generic: 0 }
+            - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+      -
+        oid: channelTable
+        value: channelLocalRx
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.5.{{ $index }}'
+        descr: 'Channel {{ $subindex1 }} Local RX'
+        index: 'channelLocalRx.{{ $index }}'
+        group: 'Channel {{ $subindex1 }}'
+        state_name: channelLocalRx
+        states:
+            - { descr: Off, graph: 0, value: 0, generic: 1 }
+            - { descr: On, graph: 0, value: 1, generic: 0 }
+            - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+      -
+        oid: channelTable
+        value: channelRemoteTx
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.6.{{ $index }}'
+        descr: 'Channel {{ $subindex1 }} Remote TX'
+        index: 'channelRemoteTx.{{ $index }}'
+        group: 'Channel {{ $subindex1 }}'
+        state_name: channelRemoteTx
+        states:
+            - { descr: Off, graph: 0, value: 0, generic: 1 }
+            - { descr: On, graph: 0, value: 1, generic: 0 }
+            - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+      -
+        oid: channelTable
+        value: channelRemoteRx
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.7.{{ $index }}'
+        descr: 'Channel {{ $subindex1 }} Remote RX'
+        index: 'channelRemoteRx.{{ $index }}'
+        group: 'Channel {{ $subindex1 }}'
+        state_name: channelRemoteRx
+        states:
+            - { descr: Off, graph: 0, value: 0, generic: 1 }
+            - { descr: On, graph: 0, value: 1, generic: 0 }
+            - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+      -
+        oid: channelTable
+        value: channelLocalSfpPresent
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.8.{{ $index }}'
+        descr: 'Channel {{ $subindex1 }} Local SFP present'
+        index: 'channelLocalSfpPresent.{{ $index }}'
+        group: 'Channel {{ $subindex1 }}'
+        state_name: channelLocalSfpPresent
+        states:
+            - { descr: Missing, graph: 0, value: 0, generic: 1 }
+            - { descr: Present, graph: 0, value: 1, generic: 0 }
+      -
+        oid: channelTable
+        value: channelRemoteXfpPresent
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.9.{{ $index }}'
+        descr: 'Channel {{ $subindex1 }} Remote XFP present'
+        index: 'channelRemoteXfpPresent.{{ $index }}'
+        group: 'Channel {{ $subindex1 }}'
+        state_name: channelRemoteXfpPresent
+        states:
+            - { descr: Missing, graph: 0, value: 0, generic: 1 }
+            - { descr: Present, graph: 0, value: 1, generic: 0 }
+      -
+        oid: channelTable
+        value: channelLocalByPass
+        num_oid: '.1.3.6.1.4.1.29003.2.44.1.2.1.11.{{ $index }}'
+        descr: 'Channel {{ $subindex1 }} Local bypass'
+        index: 'channelLocalByPass.{{ $index }}'
+        group: 'Channel {{ $subindex1 }}'
+        state_name: channelRemoteRx
+        states:
+            - { descr: Off, graph: 0, value: 0, generic: 1 }
+            - { descr: On, graph: 0, value: 1, generic: 0 }
+            - { descr: Unknown, graph: 0, value: 8, generic: 3 }
+

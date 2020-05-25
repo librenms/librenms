@@ -1,0 +1,152 @@
+-- *****************************************************************
+-- DLINKSW-WEB-COMMON-MIB:  D-Link WEB Common MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *****************************************************************
+
+DLINKSW-WEB-COMMON-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE,
+	    Unsigned32
+		    FROM SNMPv2-SMI
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+	        FROM SNMPv2-TC
+	    MODULE-COMPLIANCE,	OBJECT-GROUP
+		    FROM SNMPv2-CONF
+	    dlinkIndustrialCommon
+		    FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwWebCommonMIB MODULE-IDENTITY
+	    LAST-UPDATED	"201310280000Z"
+	    ORGANIZATION	"D-Link Corp."
+	    CONTACT-INFO
+		    "        D-Link Corporation
+
+                Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                        Taipei City 114, Taiwan, R.O.C
+                Tel:     +886-2-66000123
+                E-mail: tsd@dlink.com.tw
+            "
+	DESCRIPTION
+		"The MIB module	for configuring Web common feature.
+		This MIB module contains HTTP and HTTPS configuration."
+	REVISION	 "201310280000Z"
+	DESCRIPTION
+		"This is the first version of the MIB file."  
+	::= { dlinkIndustrialCommon 162 }
+
+-- ******************************************************************
+-- Object Definition
+-- ******************************************************************
+    dWebCommonMIBNotifications 	OBJECT IDENTIFIER ::= { dlinkSwWebCommonMIB 0 }        
+    dWebMIBObjects    			OBJECT IDENTIFIER ::= { dlinkSwWebCommonMIB 1 }
+    dWebCommonMIBConformance	OBJECT IDENTIFIER ::= { dlinkSwWebCommonMIB 2 }
+    
+-- ----------------------------------------------------------------------------- 
+    dHttpServerObjects    		OBJECT IDENTIFIER ::= { dWebMIBObjects 1 }
+    dSslServerObjects    		OBJECT IDENTIFIER ::= { dWebMIBObjects 2 }
+
+-- -----------------------------------------------------------------------------
+-- dHttpServerObjects
+-- -----------------------------------------------------------------------------
+	dHttpServerStatus OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the HTTP server feature is support or not."
+		DEFVAL   { true }
+        ::= {  dHttpServerObjects 1  }
+ -- -----------------------------------------------------------------------------        
+	dHttpTcpPort OBJECT-TYPE
+    	SYNTAX     Unsigned32 (1..65535)
+    	MAX-ACCESS  read-write
+    	STATUS      current
+        DESCRIPTION
+            "This object is Used to configure the TCP port number for HTTP server.
+			The well-known TCP port for the HTTP server is 80."
+		DEFVAL   { 80 }
+        ::= { dHttpServerObjects 2}
+ -- -----------------------------------------------------------------------------        
+	dHttpIdleTimeoutVal OBJECT-TYPE
+    	SYNTAX     Unsigned32 (60..36000)
+    	MAX-ACCESS  read-write
+    	STATUS      current
+        DESCRIPTION
+            "This object is Used to set idle timeout of a http server connection in seconds."
+		DEFVAL   { 180 }
+        ::= { dHttpServerObjects 3}
+		
+-- -----------------------------------------------------------------------------
+-- dSslServerObjects
+-- -----------------------------------------------------------------------------
+    dSslServicePolicyName OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE (0..32))
+        MAX-ACCESS  	read-write
+        STATUS          current
+        DESCRIPTION   
+            "Indicates the name of the policy for SSL application.
+			This node is volatile; that is, it is lost if the SNMP 
+            agent is rebooted."
+        ::= { dSslServerObjects 1 }
+		
+	dSslServerStatus OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the SSL feature is support or not."
+		DEFVAL   { false }
+        ::= {  dSslServerObjects 2  }
+-- ******************************************************************
+-- Conformance and Compliance
+-- ******************************************************************
+
+    dWebCommonMIBCompliances  OBJECT IDENTIFIER ::= { dWebCommonMIBConformance 1 }
+    
+    dWebCommonGroups	      OBJECT IDENTIFIER ::= { dWebCommonMIBConformance 2 }
+
+    dWebMIBCompliance MODULE-COMPLIANCE
+	    STATUS	    current
+	    DESCRIPTION
+	        "The compliance statement for entities which implement the 
+	        DLINKSW-WEB-COMMON-MIB.
+	        "
+	    MODULE	    -- this module
+	    MANDATORY-GROUPS
+	    {
+	      dHttpServerGroups,
+		  dSslServerGroups
+	    }
+   	    ::= { dWebCommonMIBCompliances 1 }
+
+
+-- units of conformance
+
+    dHttpServerGroups OBJECT-GROUP
+        OBJECTS {
+            dHttpServerStatus,
+			dHttpTcpPort,
+			dHttpIdleTimeoutVal
+        }
+        STATUS      current
+        DESCRIPTION
+            "Objects for globally configuring HTTP server feature.
+	        "
+        ::= { dWebCommonGroups 1 }
+		
+    dSslServerGroups OBJECT-GROUP
+        OBJECTS {
+			dSslServicePolicyName,
+            dSslServerStatus
+        }
+        STATUS      current
+        DESCRIPTION
+            "Objects for globally configuring SSL server feature.
+	        "
+        ::= { dWebCommonGroups 2 }
+END
+

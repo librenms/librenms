@@ -1,0 +1,253 @@
+--  ============================================================================
+-- AT-ALMMON-MIB, Allied Telesis enterprise MIB:
+-- Alarm Monitoring MIB objects.
+--
+-- Copyright (c) 2014 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-ALMMON-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            DisplayStringUnsized
+                FROM AT-SMI-MIB
+            sysinfo
+                FROM AT-SYSINFO-MIB
+            Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            TEXTUAL-CONVENTION
+                FROM SNMPv2-TC;
+
+
+        atAlmMon MODULE-IDENTITY
+            LAST-UPDATED "201702080000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The AT Alarm Monitoring MIB for managing and
+                reporting device alarms."
+            REVISION "201702080000Z"
+            DESCRIPTION
+                "Added g8032 as an alarm type."
+            REVISION "201405120015Z"
+            DESCRIPTION
+                "Changes from maintainer review"
+            REVISION "201312131146Z"
+            DESCRIPTION
+                "Initial Revision"
+
+            ::= { sysinfo 26 }
+
+
+
+--
+-- Textual conventions
+--
+
+        AtAlmMonAlarmType ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Indicates the type of a monitored alarm."
+            SYNTAX INTEGER
+                {
+                alarmTypeInvalid(0),
+                externalPSU(1),
+                epsr(2), 
+                contactInput(3),
+                portLinkDown(4),
+                loopDetect(5),
+                mainPse(6),
+                portPoeFailure(7),
+                temperature(8),
+                g8032(9)
+                }
+
+
+        AtAlmMonActionUseOutput ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Indicates whether or not the output device (relay or fault LED) is used for this alarm."
+            SYNTAX INTEGER
+                {
+                unused(1),
+                used(2)
+                }
+
+
+        AtAlmMonAbnormalState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Indicates the abnormal (i.e. alarm active) state for a contact input alarm monitor."
+            SYNTAX INTEGER
+                {
+                open(1),
+                closed(2)
+                }
+
+        AtAlmMonActionState ::= TEXTUAL-CONVENTION
+            STATUS current
+            DESCRIPTION
+                "Indicates the current state of this alarm monitor."
+            SYNTAX INTEGER
+                {
+                inactive(1),
+                active(2)
+                }
+
+--
+-- Node definitions
+--
+-- ---------------------------------------------------------- --
+-- The Alarm Monitoring actions table
+-- ---------------------------------------------------------- --
+
+        atAlmMonActionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtAlmMonActionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of information describing alarm monitoring inputs
+                and consequent actions (i.e. fault LED & relay outputs)."
+            ::= { atAlmMon 1 }
+
+
+        atAlmMonActionEntry OBJECT-TYPE
+            SYNTAX AtAlmMonActionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The description and configuration of what to do for a specific monitored alarm."
+            INDEX { atAlmMonActionStackMemberId, atAlmMonActionIndex }
+            ::= { atAlmMonActionTable 1 }
+
+        AtAlmMonActionEntry ::=
+            SEQUENCE {
+                atAlmMonActionStackMemberId
+                    Unsigned32,
+                atAlmMonActionIndex
+                    Unsigned32,
+                atAlmMonAlarmType
+                    AtAlmMonAlarmType,
+                atAlmMonAlarmTypeSelection
+                    Unsigned32,
+                atAlmMonActionDescription
+                    DisplayStringUnsized,
+                atAlmMonActionUseRelay1
+                    AtAlmMonActionUseOutput,
+                atAlmMonActionUseRelay2
+                    AtAlmMonActionUseOutput,
+                atAlmMonActionUseRelay3
+                    AtAlmMonActionUseOutput,
+                atAlmMonActionUseFaultLed
+                    AtAlmMonActionUseOutput,
+                atAlmMonAbnormalState
+                    AtAlmMonAbnormalState,
+                atAlmMonActionState
+                    AtAlmMonActionState
+             }
+
+        atAlmMonActionStackMemberId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the stack member of this alarm action."
+            ::= { atAlmMonActionEntry 1 }
+
+
+        atAlmMonActionIndex OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The numeric identifier of this alarm action."
+            ::= { atAlmMonActionEntry 2 }
+
+
+        atAlmMonAlarmType OBJECT-TYPE
+            SYNTAX AtAlmMonAlarmType
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of alarm that this action monitors."
+            ::= { atAlmMonActionEntry 3 }
+
+
+         atAlmMonAlarmTypeSelection OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The 1-based index of the alarm of the particular type (as catagorised by atAlmMonAlarmType)."
+            ::= { atAlmMonActionEntry 4 }
+
+
+        atAlmMonActionDescription OBJECT-TYPE
+            SYNTAX DisplayStringUnsized (SIZE (0..30))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The description of this alarm monitoring entry."
+            ::= { atAlmMonActionEntry 5 }
+
+
+       atAlmMonActionUseRelay1 OBJECT-TYPE
+            SYNTAX AtAlmMonActionUseOutput
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates/controls whether or not this alarm monitor drives the first relay output."
+            ::= { atAlmMonActionEntry 6 }
+
+
+       atAlmMonActionUseRelay2 OBJECT-TYPE
+            SYNTAX AtAlmMonActionUseOutput
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates/controls whether or not this alarm monitor drives the second relay output."
+            ::= { atAlmMonActionEntry 7 }
+
+       atAlmMonActionUseRelay3 OBJECT-TYPE
+            SYNTAX AtAlmMonActionUseOutput
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates/controls whether or not this alarm monitor drives the third relay output."
+            ::= { atAlmMonActionEntry 8 }
+
+
+       atAlmMonActionUseFaultLed OBJECT-TYPE
+            SYNTAX AtAlmMonActionUseOutput
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates/controls whether or not this alarm monitor drives the fault LED."
+            ::= { atAlmMonActionEntry 9 }
+
+       atAlmMonAbnormalState OBJECT-TYPE
+            SYNTAX AtAlmMonAbnormalState
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Indicates/sets the abnormal (i.e. alarm active) state for a contact input.
+                 Only used for contactInput alarm monitors, ignored for all other types."
+            ::= { atAlmMonActionEntry 10 }
+
+
+       atAlmMonActionState OBJECT-TYPE
+            SYNTAX AtAlmMonActionState
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Indicates the current state of this alarm monitor."
+            ::= { atAlmMonActionEntry 11 }
+
+    END
+
+--
+-- at-almmon.mib
+--

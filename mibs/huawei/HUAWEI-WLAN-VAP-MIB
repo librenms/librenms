@@ -1,0 +1,1066 @@
+-- ============================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: The mib is used for VAP.
+-- Reference: 
+-- Version: V1.10
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-VAP-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.17
+		hwWlanVap MODULE-IDENTITY
+			LAST-UPDATED "201607071030Z"		                      -- July 7, 2016 at 10:30 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+                                                                                       "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+			DESCRIPTION 
+				"The MIB module defines the VAP operation."
+			REVISION "201607071030Z"		                      -- July 7, 2016 at 10:30 GMT
+			DESCRIPTION 
+				"
+				V1.10, Add the table of hwWlanVapIGMPSnoopingCacInfoTable, hwVapIGMPSnoopingBandwidthExceedTrap and hwVapIGMPSnoopingUserExceedTrap.
+				"				
+			REVISION "201602162030Z"		                      -- Feb 16, 2016 at 20:30 GMT
+			DESCRIPTION 
+				"
+				V1.09, Add the table of hwWlanMacRfSsidStatisticTable.
+				"
+			REVISION "201602162030Z"		                      -- Feb 16, 2016 at 20:30 GMT
+			DESCRIPTION 
+				"
+				V1.08, Add the table of hwWlanRfSsidStatisticTable.
+				"
+			REVISION "201512182030Z"		                      -- Nov 18, 2015 at 20:30 GMT
+			DESCRIPTION 
+				"
+				V1.07, Add the node of hwWlanVapTrapInfo.
+				"
+			REVISION "201511052030Z"		                      -- Oct 5, 2015 at 20:30 GMT
+			DESCRIPTION 
+				"
+				V1.06, Add Value list in the hwWlanVapAuthType.
+				"
+			REVISION "201508261530Z"		                      -- Aug 26, 2015 at 15:30 GMT
+			DESCRIPTION 
+				"
+				V1.05, Add the node of hwWlanVapApId in the hwWlanVapInfoTable.
+				"
+			REVISION "201505131530Z"		                      -- May 13, 2015 at 15:30 GMT
+			DESCRIPTION 
+				"
+				V1.04, Add three mib nodes: hwWlanSsidPeriodRecvFrames, hwWlanSsidSendRate, hwWlanSsidRecvRate.
+				"
+			REVISION "201505111510Z"		                      -- May 11, 2015 at 15:10 GMT
+			DESCRIPTION 
+				"
+				V1.03, Add the description of mib nodes.
+				"
+		        REVISION "201504131510Z"		                      -- April 13, 2015 at 15:10 GMT
+			DESCRIPTION 
+				"
+				V1.02, Modify the name of the node of hwWlanVapInfoEntry.
+				"
+			REVISION "201502021452Z"		                      -- February 2, 2015 at 14:52 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			::= { hwWlan 17 }
+
+--
+--Node definitions
+--
+
+		--1.3.6.1.4.1.2011.6.139.17.1
+		hwWlanVapObjects OBJECT IDENTIFIER ::= { hwWlanVap 1 }
+
+		--1.3.6.1.4.1.2011.6.139.17.1.1
+		hwWlanVapInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanVapInfoEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query VAP information."
+			::= { hwWlanVapObjects 1 }
+
+		--1.3.6.1.4.1.2011.6.139.17.1.1.1
+		hwWlanVapInfoEntry OBJECT-TYPE
+			SYNTAX HwWlanVapInfoEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The indexes of this table are hwWlanVapApMac, hwWlanVapRadioIndex, and hwWlanVapWlanId."
+			INDEX { hwWlanVapApMac, hwWlanVapRadioIndex, hwWlanVapWlanId }
+			::= { hwWlanVapInfoTable 1 }
+
+
+		HwWlanVapInfoEntry ::=
+			SEQUENCE {				
+				hwWlanVapApMac
+					MacAddress,
+				hwWlanVapRadioIndex
+					Integer32,
+				hwWlanVapWlanId
+					Integer32,
+				hwWlanVapProfileName
+					OCTET STRING,
+				hwWlanVapBssid
+					MacAddress,
+				hwWlanVapSSID
+					OCTET STRING,
+				hwWlanVapApName
+					OCTET STRING,
+				hwWlanVapAuthType
+					INTEGER,
+				hwWlanVapStaOnlineCnt
+					Integer32,
+				hwWlanVapStatus
+					INTEGER,
+				hwWlanVapApId
+					Unsigned32
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.1
+		hwWlanVapApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the MAC address of the AP."
+			::= { hwWlanVapInfoEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.2
+		hwWlanVapRadioIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the radio index."
+			::= { hwWlanVapInfoEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.3
+		hwWlanVapWlanId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the WLAN ID."
+			::= { hwWlanVapInfoEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.4
+		hwWlanVapProfileName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the ESS name."
+			::= { hwWlanVapInfoEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.5
+		hwWlanVapBssid OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the BSSID, that is, the physical address of the VAP on an 802.11 network."
+			::= { hwWlanVapInfoEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.6
+		hwWlanVapSSID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the current SSID of the AP."
+			::= { hwWlanVapInfoEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.7
+		hwWlanVapApName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the AP name."
+			::= { hwWlanVapInfoEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.8
+		hwWlanVapAuthType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				wepOpenSystem(1),
+				wepOpenSystemMac(2),
+				wepOpenSystem8021X(3),
+				wepOpenSystemPortal(4),
+				wepShareKey(5), 
+				wepShareKeyMac(6),
+				wepShareKey8021X(7),
+				wepShareKeyPortal(8),
+				wpa8021X(9),
+				wpaPreShareKey(10),
+				wpaPskMac(11),
+				wpaPskPortal(12),
+				wpa2Dot1x(13),
+				wpa2PreShareKey(14),
+				wpa2PskMac(15),
+				wpa2PskPortal(16),  
+				wapiCertification(17),
+				wapiPreShareKey(18), 
+				wpaWpa2PreShareKey(19),
+				wpaWpa2PskMac(20),
+				wpaWpa2PskPortal(21),
+				wpaWpa2Dot1x(22),
+				wapiPskPortal(23)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the user authentication method."
+			::= { hwWlanVapInfoEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.9
+		hwWlanVapStaOnlineCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of online users."
+			::= { hwWlanVapInfoEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.1.1.10
+		hwWlanVapStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				up(1),
+				down(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the VAP state."
+			::= { hwWlanVapInfoEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.1.1.11
+		hwWlanVapApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP ID."
+			::= { hwWlanVapInfoEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.2
+		hwWlanSsidStatisticTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanSsidStatisticEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This table is used to query SSID-based air interface statistics."
+			::= { hwWlanVapObjects 2 }
+
+		--1.3.6.1.4.1.2011.6.139.17.1.2.1
+		hwWlanSsidStatisticEntry OBJECT-TYPE
+			SYNTAX HwWlanSsidStatisticEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"The index of this table is hwWlanSsid."
+			INDEX { hwWlanSsid }
+			::= { hwWlanSsidStatisticTable 1 }
+
+
+		HwWlanSsidStatisticEntry ::=
+			SEQUENCE {				
+				hwWlanSsid
+					OCTET STRING,
+				hwWlanSsid2gStaCnt
+					Integer32,
+				hwWlanSsid5gStaCnt
+					Integer32,
+				hwWlanSsidApCnt
+					Integer32,
+				hwWlanSsidRecvBytes
+					Counter64,
+				hwWlanSsidPeriodRecvErrorFrames
+					Counter64,
+				hwWlanSsidRecvFrames
+					Counter64,
+				hwWlanSsidPeriodRecvDropFrames
+					Counter64,
+				hwWlanSsidSendBytes
+					Counter64,
+				hwWlanSsidSendFrames
+					Counter64,
+				hwWlanSsidPeriodSendDropFrames
+					Counter64,
+				hwWlanSsidPeriodReSendFrames
+					Counter64,
+				hwWlanSsidPeriodSendFrames
+					Counter64,
+				hwWlanSsidPeriodRecvFrames
+					Counter64,
+				hwWlanSsidSendRate
+					Counter64,
+				hwWlanSsidRecvRate
+					Counter64
+			 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.1
+		hwWlanSsid OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the table index."
+			::= { hwWlanSsidStatisticEntry 1 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.2
+		hwWlanSsid2gStaCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of users at 2.4G frequency band."
+			::= { hwWlanSsidStatisticEntry 2 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.3
+		hwWlanSsid5gStaCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of users at 5G frequency band."
+			::= { hwWlanSsidStatisticEntry 3 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.4
+		hwWlanSsidApCnt OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of APs."
+			::= { hwWlanSsidStatisticEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.5
+		hwWlanSsidRecvBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of bytes received at the wireless side."
+			::= { hwWlanSsidStatisticEntry 5 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.6
+		hwWlanSsidPeriodRecvErrorFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of error frames received at the wireless side within the echo interval."
+			::= { hwWlanSsidStatisticEntry 6 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.7
+		hwWlanSsidRecvFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of frames received at the wireless side."
+			::= { hwWlanSsidStatisticEntry 7 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.8
+		hwWlanSsidPeriodRecvDropFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of frames failed to be received at the wireless side within the echo interval."
+			::= { hwWlanSsidStatisticEntry 8 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.9
+		hwWlanSsidSendBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of bytes in packets sent at the wireless side."
+			::= { hwWlanSsidStatisticEntry 9 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.10
+		hwWlanSsidSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of frames sent at the wireless side."
+			::= { hwWlanSsidStatisticEntry 10 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.11
+		hwWlanSsidPeriodSendDropFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of frames failed to be sent at the wireless side within the echo interval."
+			::= { hwWlanSsidStatisticEntry 11 }
+
+		 --1.3.6.1.4.1.2011.6.139.17.1.2.1.12
+		hwWlanSsidPeriodReSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the number of downstream frames retransmitted at the wireless side within the echo interval."
+			::= { hwWlanSsidStatisticEntry 12 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.2.1.13
+		hwWlanSsidPeriodSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of frames sent at the wireless side within the echo interval."
+			::= { hwWlanSsidStatisticEntry 13 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.2.1.14
+		hwWlanSsidPeriodRecvFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the number of frames received at the wireless side within the echo interval."
+			::= { hwWlanSsidStatisticEntry 14 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.2.1.15
+		hwWlanSsidSendRate OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the rate of bits in packets sent at the wireless side."
+			::= { hwWlanSsidStatisticEntry 15 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.2.1.16
+		hwWlanSsidRecvRate OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the rate of bits in packets received at the wireless side."
+			::= { hwWlanSsidStatisticEntry 16 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3
+		hwWlanRfSsidStatisticTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanRfSsidStatisticEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanVapObjects 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1
+		hwWlanRfSsidStatisticEntry OBJECT-TYPE
+			SYNTAX HwWlanRfSsidStatisticEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanRfSsidStatisticApId, hwWlanRfSsidStatisticRadioId, hwWlanRfSsidStatisticEssSsid }
+			::= { hwWlanRfSsidStatisticTable 1 }
+
+		
+		HwWlanRfSsidStatisticEntry ::=
+			SEQUENCE { 
+				hwWlanRfSsidStatisticApId
+					Integer32,
+				hwWlanRfSsidStatisticRadioId
+					Integer32,
+				hwWlanRfSsidStatisticEssSsid
+					OCTET STRING,
+				hwWlanRfSsidCurrentStaNum
+					Unsigned32,
+				hwWlanRfSsidRecvBytes
+					Counter64,
+				hwWlanRfSsidRecvFrames
+					Counter64,
+				hwWlanRfSsidSendBytes
+					Counter64,
+				hwWlanRfSsidSendFrames
+					Counter64,
+				hwWlanRfSsidSendDropFrames
+					Counter64,
+				hwWlanRfSsidReSendFrames
+					Counter64,
+				hwWlanRfSsidPeriodSendFrames
+					Integer32,
+				hwWlanRfSsidPeriodSendDropFrames
+					Integer32,
+				hwWlanRfSsidPeriodReSendFrames
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.1
+		hwWlanRfSsidStatisticApId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.2
+		hwWlanRfSsidStatisticRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.3
+		hwWlanRfSsidStatisticEssSsid OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.4
+		hwWlanRfSsidCurrentStaNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.5
+		hwWlanRfSsidRecvBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.6
+		hwWlanRfSsidRecvFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.7
+		hwWlanRfSsidSendBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.8
+		hwWlanRfSsidSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.9
+		hwWlanRfSsidSendDropFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.10
+		hwWlanRfSsidReSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.11
+		hwWlanRfSsidPeriodSendFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.12
+		hwWlanRfSsidPeriodSendDropFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 12 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.3.1.13
+		hwWlanRfSsidPeriodReSendFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanRfSsidStatisticEntry 13 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4
+		hwWlanMacRfSsidStatisticTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanMacRfSsidStatisticEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanVapObjects 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1
+		hwWlanMacRfSsidStatisticEntry OBJECT-TYPE
+			SYNTAX HwWlanMacRfSsidStatisticEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanMacRfSsidStatisticApMac, hwWlanMacRfSsidStatisticRadioId, hwWlanMacRfSsidStatisticEssSsid }
+			::= { hwWlanMacRfSsidStatisticTable 1 }
+
+		
+		HwWlanMacRfSsidStatisticEntry ::=
+			SEQUENCE { 
+				hwWlanMacRfSsidStatisticApMac
+					MacAddress,
+				hwWlanMacRfSsidStatisticRadioId
+					Integer32,
+				hwWlanMacRfSsidStatisticEssSsid
+					OCTET STRING,
+				hwWlanMacRfSsidCurrentStaNum
+					Unsigned32,
+				hwWlanMacRfSsidRecvBytes
+					Counter64,
+				hwWlanMacRfSsidRecvFrames
+					Counter64,
+				hwWlanMacRfSsidSendBytes
+					Counter64,
+				hwWlanMacRfSsidSendFrames
+					Counter64,
+				hwWlanMacRfSsidSendDropFrames
+					Counter64,
+				hwWlanMacRfSsidReSendFrames
+					Counter64,
+				hwWlanMacRfSsidPeriodSendFrames
+					Integer32,
+				hwWlanMacRfSsidPeriodSendDropFrames
+					Integer32,
+				hwWlanMacRfSsidPeriodReSendFrames
+					Integer32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.1
+		hwWlanMacRfSsidStatisticApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 1 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.2
+		hwWlanMacRfSsidStatisticRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 2 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.3
+		hwWlanMacRfSsidStatisticEssSsid OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 3 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.4
+		hwWlanMacRfSsidCurrentStaNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 4 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.5
+		hwWlanMacRfSsidRecvBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 5 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.6
+		hwWlanMacRfSsidRecvFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 6 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.7
+		hwWlanMacRfSsidSendBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 7 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.8
+		hwWlanMacRfSsidSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 8 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.9
+		hwWlanMacRfSsidSendDropFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 9 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.10
+		hwWlanMacRfSsidReSendFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 10 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.11
+		hwWlanMacRfSsidPeriodSendFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 11 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.12
+		hwWlanMacRfSsidPeriodSendDropFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 12 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.1.4.1.13
+		hwWlanMacRfSsidPeriodReSendFrames OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanMacRfSsidStatisticEntry 13 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5
+		hwWlanVapIGMPSnoopingCacInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanVapIGMPSnoopingCacInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to query VAP information."
+			::= { hwWlanVapObjects 5 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1
+		hwWlanVapIGMPSnoopingCacInfoEntry OBJECT-TYPE
+			SYNTAX HwWlanVapIGMPSnoopingCacInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanVapIGMPSnoopingCacApId, hwWlanVapIGMPSnoopingCacRadioId, and hwWlanVapIGMPSnoopingCacWlanId."
+			INDEX { hwWlanVapIGMPSnoopingCacApId, hwWlanVapIGMPSnoopingCacRadioId, hwWlanVapIGMPSnoopingCacWlanId }
+			::= { hwWlanVapIGMPSnoopingCacInfoTable 1 }
+
+		
+		HwWlanVapIGMPSnoopingCacInfoEntry ::=
+			SEQUENCE { 
+				hwWlanVapIGMPSnoopingCacApId
+					Unsigned32,
+				hwWlanVapIGMPSnoopingCacRadioId
+					Unsigned32,
+				hwWlanVapIGMPSnoopingCacWlanId
+					Unsigned32,
+				hwWlanVapIGMPSnoopingCacApName
+					OCTET STRING,
+				hwWlanVapIGMPSnoopingCacCurBw
+					Unsigned32,
+				hwWlanVapIGMPSnoopingCacMaxBw
+					Unsigned32,
+				hwWlanVapIGMPSnoopingCacCurUser
+					Unsigned32,
+				hwWlanVapIGMPSnoopingCacMaxUser
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1.1
+		hwWlanVapIGMPSnoopingCacApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP ID."
+			::= { hwWlanVapIGMPSnoopingCacInfoEntry 1 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1.2
+		hwWlanVapIGMPSnoopingCacRadioId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the radio index."
+			::= { hwWlanVapIGMPSnoopingCacInfoEntry 2 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1.3
+		hwWlanVapIGMPSnoopingCacWlanId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the WLAN ID."
+			::= { hwWlanVapIGMPSnoopingCacInfoEntry 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1.4
+		hwWlanVapIGMPSnoopingCacApName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP name."
+			::= { hwWlanVapIGMPSnoopingCacInfoEntry 4 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1.5
+		hwWlanVapIGMPSnoopingCacCurBw OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP IGMP snooping current bandwidth."
+			::= { hwWlanVapIGMPSnoopingCacInfoEntry 5 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1.6
+		hwWlanVapIGMPSnoopingCacMaxBw OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP IGMP snooping max bandwidth."
+			::= { hwWlanVapIGMPSnoopingCacInfoEntry 6 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1.7
+		hwWlanVapIGMPSnoopingCacCurUser OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP IGMP snooping current user number."
+			::= { hwWlanVapIGMPSnoopingCacInfoEntry 7 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.1.5.1.8
+		hwWlanVapIGMPSnoopingCacMaxUser OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the VAP IGMP snooping max user number."
+			::= { hwWlanVapIGMPSnoopingCacInfoEntry 8 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2
+		hwWlanVapTrapInfo OBJECT IDENTIFIER ::= { hwWlanVap 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1
+		hwWlanVapTrap OBJECT IDENTIFIER ::= { hwWlanVapTrapInfo 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.1
+		hwVapNumExceedSpecTrap NOTIFICATION-TYPE
+			OBJECTS { hwVapMaxNum }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVapTrap 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.2
+		hwVapIGMPSnoopingBandwidthExceedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanVapApMac, hwWlanVapRadioIndex, hwWlanVapWlanId, hwWlanVapApName, hwVapMulticastCacMaxBw, 
+				hwWlanVapApId }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVapTrap 2 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2.1.3
+		hwVapIGMPSnoopingUserExceedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanVapApMac, hwWlanVapRadioIndex, hwWlanVapWlanId, hwWlanVapApName, hwVapMulticastCacMaxUser, 
+				hwWlanVapApId }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVapTrap 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2.2
+		hwWlanVapTrapObjects OBJECT IDENTIFIER ::= { hwWlanVapTrapInfo 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.2.2.1
+		hwVapMaxNum OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanVapTrapObjects 1 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2.2.2
+		hwVapMulticastCacMaxBw OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanVapTrapObjects 2 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.2.2.3
+		hwVapMulticastCacMaxUser OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanVapTrapObjects 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.3
+		hwWlanVapConformance OBJECT IDENTIFIER ::= { hwWlanVap 3 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.3.1
+		hwWlanVapCompliances OBJECT IDENTIFIER ::= { hwWlanVapConformance 1 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.3.1.1
+		hwWlanVapCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE
+					MANDATORY-GROUPS { hwWlanVapInfoGroup, hwWlanSsidStatisticGroup }
+			::= { hwWlanVapCompliances 1 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.3.2
+		hwWlanVapObjectGroups OBJECT IDENTIFIER ::= { hwWlanVapConformance 2 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.3.2.1
+		hwWlanVapInfoGroup OBJECT-GROUP
+			OBJECTS {hwWlanVapProfileName, hwWlanVapBssid, 
+			hwWlanVapSSID, hwWlanVapApName, hwWlanVapAuthType, hwWlanVapStaOnlineCnt, hwWlanVapStatus, hwWlanVapApId }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVapObjectGroups 1 }
+
+		-- 1.3.6.1.4.1.2011.6.139.17.3.2.2
+		hwWlanSsidStatisticGroup OBJECT-GROUP
+			OBJECTS {hwWlanSsid2gStaCnt, hwWlanSsid5gStaCnt, hwWlanSsidApCnt, hwWlanSsidRecvBytes, 
+			hwWlanSsidPeriodRecvErrorFrames, hwWlanSsidRecvFrames, hwWlanSsidPeriodRecvDropFrames, hwWlanSsidSendBytes, hwWlanSsidSendFrames, 
+			hwWlanSsidPeriodSendDropFrames, hwWlanSsidPeriodReSendFrames, hwWlanSsidPeriodSendFrames, hwWlanSsidPeriodRecvFrames, hwWlanSsidSendRate, hwWlanSsidRecvRate }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVapObjectGroups 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.3.2.3
+		hwWlanVapTrapGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwVapNumExceedSpecTrap }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVapObjectGroups 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.17.3.2.4
+		hwWlanVapTrapObjectsGroup OBJECT-GROUP
+			OBJECTS { hwVapMaxNum }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanVapObjectGroups 4 }
+		
+	
+	END
+--
+-- HUAWEI-WLAN-VAP-MIB.mib
+--

@@ -8,20 +8,36 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: cisco
 poller_modules:
-    cisco-cbqos: 1
-    cisco-cef: 1
-    cisco-mac-accounting: 1
-    cisco-voice: 1
-    cisco-remote-access-monitor: 1
-    cisco-sla: 1
-    cisco-ipsec-flow-monitor: 1
-    cipsec-tunnels: 1
-    cisco-otv: 1
+    applications: false
+    bgp-peers: false
+    cipsec-tunnels: false
+    cisco-cbqos: false
+    cisco-cef: false
+    cisco-ipsec-flow-monitor: false
+    cisco-mac-accounting: false
+    cisco-otv: false
+    cisco-remote-access-monitor: false
+    cisco-sla: false
+    cisco-voice: false
+    ipmi: false
+    ospf: false
+    toner: false
+    ucd-diskio: false
+    ucd-mib: false
 discovery_modules:
-    cisco-cef: 1
-    cisco-sla: 1
-    cisco-mac-accounting: 1
-    cisco-otv: 1
-    cisco-pw: 1
-    cisco-vrf: 1
-    cisco-vrf-lite: 1
+    bgp-peers: false
+    cisco-cef: false
+    cisco-mac-accounting: false
+    cisco-otv: false
+    cisco-pw: false
+    cisco-sla: false
+    cisco-vrf-lite: false
+    vrf: false
+    libvirt-vminfo: false
+    ntp: false
+    stp: false
+    toner: false
+    ucd-diskio: false
+    vlans: false
+discovery:
+    - { sysDescr_regex: ['/^Cisco Wide Area Application Services/'] }

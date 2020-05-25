@@ -1,0 +1,181 @@
+-- *****************************************************************
+-- TN-PROV-MIB.my : TN Provision(backup/restore) MIB
+--
+-- Copyright (c) 2009 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *****************************************************************
+TN-PROV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString
+                FROM SNMPv2-TC
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    entPhysicalIndex FROM ENTITY-MIB
+    InetAddressType,InetAddress 
+        FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    tnProducts
+        FROM TRANSITION-SMI;
+
+tnProvMIB MODULE-IDENTITY
+    LAST-UPDATED    "201204051930Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+                  Technical Support
+
+                  10900 Red Circle Drive
+                  Minnetonka, MN 55343 USA
+                  Tel: +1-800-526-9267
+
+                  E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib for configuration backup and restore of the device."
+    REVISION        "201204200000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 110 }
+
+tnProvObjects  OBJECT IDENTIFIER
+    ::= { tnProvMIB 1 }
+
+tnProvGroup       OBJECT IDENTIFIER ::= { tnProvObjects 1 }
+
+tnProvTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnProvEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table displays and sets backup/restore configuration of
+         individual device."
+    ::= { tnProvGroup 1 }
+
+tnProvEntry OBJECT-TYPE
+    SYNTAX          TnProvEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This entry represents a provision configuration of individual
+        device."
+    INDEX           { entPhysicalIndex }
+    ::= { tnProvTable 1 }
+
+TnProvEntry ::= SEQUENCE {
+        tnProvType                    INTEGER,
+        tnProvAddrType                InetAddressType,
+        tnProvAddr                    InetAddress,
+        tnProvFile                    DisplayString,
+        tnProvDstFile                 DisplayString,
+        tnProvOper                    INTEGER,
+        tnProvResult                  INTEGER
+}
+
+tnProvType    OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  backup(1),
+                  restore(2),
+                  saveStartupConfig(3),
+                  activate(4),
+                  delete(5)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Provision operation type:
+         backup/download(1) : backup/download the configuration of the device.
+         restore/upload(2) : restore/upload the configuration onto the device.
+         saveStartupConfig(3) : copies running-config to startup-config, thereby ensuring
+                                that the currently active configuration will be used at
+                                the next reboot.
+         activate(4) : It is possible to activate any of the configuration files present
+                       on the switch, except for running-config which represents the
+                       currently active configuration.
+         delete(5) : It is possible to delete any of the writable files stored in flash,
+                     including startup-config. If this is done and the switch is rebooted
+                     without a prior Save operation, this effectively resets the switch
+                     to default configuration. running-config and default-config cannot be
+                     deleted.
+        "
+    ::= { tnProvEntry 1 }
+
+tnProvAddrType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The target device IP address type. "
+    ::= { tnProvEntry 2 }
+    
+tnProvAddr  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The target device IP address. "
+    ::= { tnProvEntry 3 }
+
+tnProvFile  OBJECT-TYPE
+    SYNTAX          DisplayString 
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "tnProvFile is used to specify the configuration file. This field is used in combination with tnProvType as below:
+
+         For Download/backup(1), source file name on the switch.
+         For Upload/restore(2),  source file name on the ftp server.
+         For saveStartupConfig(3), it is ignored.
+         For activate(4), it is the file on the switch to be actiavted (except running-config file).
+         For delete(5), it is the file wname to be delete from the switch.
+        "
+    ::= { tnProvEntry 4 }
+
+
+    
+
+tnProvOper    OBJECT-TYPE
+    SYNTAX     INTEGER { start(1), doNothing(2) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Provision operation type:
+         start(1) : start provision operation.
+         doNothing(2) : just read value.
+         tnProvOper should be the last object to be set for the operation.
+         That means when you set it to 'start', the operation specified in tnProvType will
+         be triggerd. "
+    ::= { tnProvEntry 5 }
+
+tnProvResult    OBJECT-TYPE
+    SYNTAX     INTEGER { success(1), fail(2), inProgress(3) }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Provision operation type:
+         success(1) : provision process succeeded.
+         fail(2) : provision process failed.
+         inProgress(3): provision is in progress.
+        "
+    ::= { tnProvEntry 6 }
+
+tnProvDstFile  OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "tnProvDstFile specifies the target file name.
+         For Download/backup(1), destination file name on the ftp server.
+         For Upload/restore(2),  destination file name on the switch.
+         For saveStartupConfig(3), it is ignored.
+         For activate(4), it is ignored.
+         For delete(5), it is ignored.
+        "
+    ::= { tnProvEntry 7 }
+END

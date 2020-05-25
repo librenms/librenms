@@ -1,0 +1,3257 @@
+LIEBERT-GP-ENVIRONMENTAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY, 
+    OBJECT-TYPE,
+    Unsigned32, 
+    Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    lgpEnvironmental, 
+    liebertEnvironmentalModuleReg
+        FROM LIEBERT-GP-REGISTRATION-MIB
+    ;
+
+-- =============================================================================
+-- Module Identification and Registration
+-- =============================================================================
+
+liebertGlobalProductsEnvironmentalModule MODULE-IDENTITY
+  LAST-UPDATED "201507210000Z"
+  ORGANIZATION "Liebert Corporation"
+  CONTACT-INFO
+      "Contact:   Technical Support
+
+      Postal:
+      Liebert Corporation
+      1050 Dearborn Drive
+      P.O. Box 29186
+      Columbus OH, 43229
+      US
+
+      Tel: +1 (800) 222-5877
+
+      E-mail: liebert.monitoring@vertivco.com
+      Web:    www.vertivco.com
+
+      Author:  Gregory M. Hoge"
+
+   DESCRIPTION
+      "The MIB module used to register Liebert SNMP OIDs.
+
+      Copyright 2000-2015 Liebert Corporation. All rights reserved.
+      Reproduction of this document is authorized on the condition
+      that the forgoing copyright notice is included.
+
+      This Specification is supplied 'AS IS' and Liebert Corporation
+      makes no warranty, either express or implied, as to the use,
+      operation, condition, or performance of the Specification."
+
+   REVISION "200811170000Z"
+   DESCRIPTION
+    "Added support for NXL unit."
+
+   REVISION "200807020000Z"
+   DESCRIPTION
+    "SMIv2 changes (INTEGER to Integer32.
+     Corrected spelling errors."
+
+   REVISION "200801100000Z"
+   DESCRIPTION
+    "Modified contact email address."
+
+   REVISION "200705290000Z"
+   DESCRIPTION
+    "Added support for XDF Unit."
+
+   REVISION "200608150000Z"
+   DESCRIPTION
+    "Added support for HP release."
+
+   REVISION "200602220000Z"
+   DESCRIPTION
+    "Added support for Liebert DS Unit."
+
+   ::= { liebertEnvironmentalModuleReg 1 }
+
+-- =============================================================================
+--  lgpEnvironmental - Liebert Environmental Registrations
+-- =============================================================================
+
+lgpEnvTemperature OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert temperature object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental
+        Temperature Group."
+    ::= { lgpEnvironmental 1 }
+
+lgpEnvHumidity OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert humidity object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental
+        Humidity Group."
+    ::= { lgpEnvironmental 2 }
+
+lgpEnvState OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert environmental state object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental
+        State Group."
+    ::= { lgpEnvironmental 3 }
+
+lgpEnvConfig OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert environmental configuration
+        object identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental
+        Configuration Group."
+    ::= { lgpEnvironmental 4 }
+
+lgpEnvControl OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert environmental control
+         object identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental
+        Control Group."
+    ::= { lgpEnvironmental 5 }
+
+lgpEnvStatistics OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert environmental statistic
+        object identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental
+        Statistics Group."
+    ::= { lgpEnvironmental 6 }
+
+lgpEnvPoints OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert environmental point
+        object identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental
+        point Group."
+    ::= { lgpEnvironmental 7 }
+
+lgpEnvUnits OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert environmental unit
+        object identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental
+        units Group."
+    ::= { lgpEnvironmental 8 }
+
+lgpEnvRemoteSensors OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert environmental remote
+        sensor object identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Environmental 
+        Remote Sensor Group."
+    ::= { lgpEnvironmental 9 }
+
+-- =============================================================================
+-- lgpEnvTemperature - Liebert Environmental Temperature Group
+-- =============================================================================
+
+lgpEnvTemperatureWellKnown OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Liebert well known temperature objects are identified by OIDs that
+        reside in this sub-tree."
+    ::= { lgpEnvTemperature 1 }
+
+lgpEnvTemperatureFahrenheit OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree contains OIDs that are used to control and monitor
+        temperature using the Fahrenheit temperature scale."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are defined below
+        in the sub-section titled Liebert Environmental Fahrenheit Temperature
+        Group."
+    ::= { lgpEnvTemperature 2 }
+
+lgpEnvTemperatureCelsius OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree contains OIDs that are used to control and monitor
+        temperature using the Celsius temperature scale."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are defined below
+        in the sub-section titled Liebert Environmental Celsius Temperature
+        Group."
+    ::= { lgpEnvTemperature 3 }
+
+lgpEnvTemperatureControlMode OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A reference to a temperature description object. The object
+        referenced should not be accessible, but rather be used to provide
+        a unique description of the temperature object that is used for
+        control."
+    ::= { lgpEnvTemperature 4 }
+
+-- =============================================================================
+-- lgpEnvHumidity - Liebert Environmental Humidity Group
+-- =============================================================================
+
+lgpEnvHumidityWellKnown OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Liebert well known humidity objects are defined by OIDs that reside
+        in this sub-tree."
+    ::= { lgpEnvHumidity 1 }
+
+lgpEnvHumidityRelative OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree contains OIDs that are used to control and monitor
+        relative humidity."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are defined below
+        in the sub-section titled Liebert Environmental Relative Humidity
+        Group."
+    ::= { lgpEnvHumidity 2 }
+
+-- =============================================================================
+-- lgpEnvState - Liebert Environmental State Group
+-- =============================================================================
+
+lgpEnvStateSystem OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2), 
+        standby(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the system."
+    ::= { lgpEnvState 1 }
+
+lgpEnvStateCooling OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the cooling subsystem."
+    ::= { lgpEnvState 2 }
+
+lgpEnvStateHeating OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the heating subsystem."
+    ::= { lgpEnvState 3 }
+
+lgpEnvStateHumidifying OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the humidifier subsystem."
+    ::= { lgpEnvState 4 }
+
+lgpEnvStateDehumidifying OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the dehumidifier subsystem"
+    ::= { lgpEnvState 5 }
+
+lgpEnvStateEconoCycle OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the Econ-o-cycle subsystem."
+    ::= { lgpEnvState 6 }
+
+lgpEnvStateFan OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the system fan."
+    ::= { lgpEnvState 7 }
+
+lgpEnvStateGeneralAlarmOutput OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the general alarm output.  This indicates if
+        an alarm is active in the system."
+    ::= { lgpEnvState 8 }
+
+lgpEnvStateCoolingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of the cooling capacity presently in use."
+    ::= { lgpEnvState 9 }
+
+lgpEnvStateHeatingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of the heating capacity presently in use."
+    ::= { lgpEnvState 10 }
+
+lgpEnvStateAudibleAlarm OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the audible alarm output."
+    ::= { lgpEnvState 11 }
+
+lgpEnvStateCoolingUnits OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree contains OIDs that are used to indicate the status
+        of cooling units."
+    ::= { lgpEnvState 12 }
+
+    lgpEnvStateCoolingUnit1 OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            on(1), 
+            off(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present state of cooling unit 1."
+       ::= { lgpEnvStateCoolingUnits 2 }
+
+    lgpEnvStateCoolingUnit2 OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            on(1), 
+            off(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present state of cooling unit 2."
+       ::= { lgpEnvStateCoolingUnits 3 }
+
+    lgpEnvStateCoolingUnit3 OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            on(1), 
+            off(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present state of cooling unit 3."
+       ::= { lgpEnvStateCoolingUnits 4 }
+
+    lgpEnvStateCoolingUnit4 OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            on(1), 
+            off(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present state of cooling unit 4."
+       ::= { lgpEnvStateCoolingUnits 5 }
+
+lgpEnvStateHeatingUnits OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree contains OIDs that are used to indicate the status
+        of heating units."
+    ::= { lgpEnvState 13 }
+
+    lgpEnvStateHeatingUnit1 OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            on(1), 
+            off(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present state of heating unit 1."
+       ::= { lgpEnvStateHeatingUnits 2 }
+
+    lgpEnvStateHeatingUnit2 OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            on(1), 
+            off(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present state of heating unit 2."
+       ::= { lgpEnvStateHeatingUnits 3 }
+
+    lgpEnvStateHeatingUnit3 OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            on(1), 
+            off(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present state of heating unit 3."
+       ::= { lgpEnvStateHeatingUnits 4 }
+
+    lgpEnvStateHeatingUnit4 OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            on(1), 
+            off(2) 
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present state of heating unit 4."
+       ::= { lgpEnvStateHeatingUnits 5 }
+
+lgpEnvStateOperatingReason OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        none(1), 
+        localUser(2), 
+        alarm(3), 
+        schedule(4), 
+        remoteUser(5), 
+        externalDevice(6), 
+        localDisplay(7)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The reason for the current operating state of the system."
+    ::= { lgpEnvState 14 }
+
+lgpEnvStateOperatingMode OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        auto(1), 
+        manual(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present operating mode of the system."
+    ::= { lgpEnvState 15 }
+
+lgpEnvStateFanCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of the fan capacity presently in use."
+    ::= { lgpEnvState 16 }
+
+lgpEnvStateFreeCoolingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of the free cooling capacity presently in use."
+    ::= { lgpEnvState 17 }
+
+lgpEnvStateDehumidifyingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of the dehumidifying capacity presently in use."
+    ::= { lgpEnvState 18 }
+
+lgpEnvStateHumidifyingCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of the humidifying capacity presently in use."
+    ::= { lgpEnvState 19 }
+
+lgpEnvStateFreeCooling OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2), 
+        start(3), 
+        unavailable(4) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the system free cooling process of heat
+        exchange.  When 'off', free cooling is not in use. When 'on'
+        free cooling is in use.  When 'start', free cooling is preparing
+        to turn on.  When 'unavailable', the state information is
+        unavailable."
+    ::= { lgpEnvState 20 }
+
+lgpEnvStateElectricHeater OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the electric heaters."
+    ::= { lgpEnvState 21 }
+
+lgpEnvStateHotWater OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of hot water system."
+    ::= { lgpEnvState 22 }
+
+lgpEnvStateOperatingEfficiency OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ratio of cooling energy provided to the amount of total energy
+         being used."
+    ::= { lgpEnvState 23 }
+
+lgpEnvComponentStateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvComponentStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains a list of the units components that have
+        a state associated with them.
+        The table contains zero, one, or more rows, depending
+        upon the number of components associated with the unit.
+        The NMS cannot create or delete rows in the table. The rows are
+        created by the agent based upon the capabilities of the units
+        being monitored."
+    ::= { lgpEnvState 50 }
+
+    lgpEnvComponentStateEntry OBJECT-TYPE
+        SYNTAX      LgpEnvComponentStateEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the attributes to be populated in the
+            various columns of the 'lgpEnvComponentStateTable'."
+        INDEX       
+        { 
+            lgpEnvComponentStateIndex
+        }
+        ::= { lgpEnvComponentStateTable 1 }
+
+    LgpEnvComponentStateEntry ::= SEQUENCE 
+    {
+        lgpEnvComponentStateIndex                   Unsigned32,
+        lgpEnvComponentStateDescr                   OBJECT IDENTIFIER,
+        lgpEnvComponentState                        INTEGER
+    }
+
+    lgpEnvComponentStateIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the nth element of the table."
+        ::= { lgpEnvComponentStateEntry 1 }
+
+    lgpEnvComponentStateDescr OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A reference to a component description object. The object
+            referenced should not be accessible, but rather be used
+            to provide a unique description of the component being 
+            described in the row of the table."
+        ::= { lgpEnvComponentStateEntry 2 }
+
+    lgpEnvComponentState OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            not-specified(0),
+            on(1),
+            off(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "not-specified
+                The state of the component is unknown.
+             on
+                The component is on.
+             off
+                The component is off."
+        ::= { lgpEnvComponentStateEntry 3 }
+
+lgpEnvValveTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvValveEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains a list of the unit valves that have
+        information associated with them.
+        The table contains zero, one, or more rows, depending
+        upon the number of valves associated with the unit.
+        The NMS cannot create or delete rows in the table. The rows are
+        created by the agent based upon the capabilities of the units
+        being monitored."
+    ::= { lgpEnvState 70 }
+
+    lgpEnvValveEntry OBJECT-TYPE
+        SYNTAX      LgpEnvValveEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the attributes to be populated in the
+            various columns of the 'lgpEnvValveTable'."
+        INDEX       
+        { 
+            lgpEnvValveIndex
+        }
+        ::= { lgpEnvValveTable 1 }
+
+    LgpEnvValveEntry ::= SEQUENCE 
+    {
+        lgpEnvValveIndex                   Unsigned32,
+        lgpEnvValveDescr                   OBJECT IDENTIFIER,
+        lgpEnvValveState                   INTEGER,
+        lgpEnvValvePositionTenths          Unsigned32
+    }
+
+    lgpEnvValveIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the nth element of the table."
+        ::= { lgpEnvValveEntry 1 }
+
+    lgpEnvValveDescr OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A reference to a valve description object. The object
+            referenced should not be accessible, but rather be used
+            to provide a unique description of the valve being 
+            described in the row of the table."
+        ::= { lgpEnvValveEntry 2 }
+
+    lgpEnvValveState OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            not-specified(0),
+            open(1),
+            closed(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "not-specified
+                The state of the component is unknown.
+             open
+                The valve is open.
+             off
+                The valve is closed."
+        ::= { lgpEnvValveEntry 3 }
+
+    lgpEnvValvePositionTenths OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       ".1 percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This gives a value describing the position of the valve."
+        ::= { lgpEnvValveEntry 20 }
+
+-- =============================================================================
+-- lgpEnvConfig - Liebert Environmental Configuration Group
+-- =============================================================================
+
+lgpEnvConfigReheatLockout OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        lockedOut(1), 
+        notLockedOut(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If locked-out the reheats will not operate even if controller calls
+        for its operation."
+    ::= { lgpEnvConfig 1 }
+
+lgpEnvConfigHumLockout OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        lockedOut(1), 
+        notLockedOut(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If locked-out the humidifier will not operate even if controller
+        calls for its operation."
+    ::= { lgpEnvConfig 2 }
+
+lgpEnvConfigRestartDelay OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When utility power is disrupted, this is the delay interval to wait
+        before restarting the system after the utility power is restored.
+        A Restart Delay of zero denotes a manual restart, the unit will NOT
+        automatically restart."
+    ::= { lgpEnvConfig 4 }
+
+lgpEnvConfigRemoteShutdown OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(1), 
+        enabled(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "When in the disabled state, the remote shutdown feature should
+        be locked out.  The enabled state is self-describing."
+    ::= { lgpEnvConfig 7 }
+
+lgpEnvConfigCoolingServiceInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The amount of time, in hours, between scheduled maintenance
+        of the cooling system.  When the cooling service timer reaches
+        this value an lgpConditionServiceCooling will be activated.
+        Once service has been completed the cooling service timer
+        should be reset to 0."
+    ::= { lgpEnvConfig 8 }
+
+lgpEnvConfigHumidifierServiceInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The amount of time, in hours, between scheduled maintenance
+        of the humidifier.  When the humidifier service timer reaches
+        this value an lgpConditionServiceHumidifier will be activated.
+        Once service has been completed humidifier service timer
+        should be reset to 0."
+    ::= { lgpEnvConfig 9 }
+
+lgpEnvConfigFilterServiceInterval OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The amount of time, in hours, between scheduled maintenance
+        of the system filter.  When the filter service timer reaches this
+        value an lgpConditionChangeFilter will be activated.  Once service
+        has been completed the filter service timer should be reset to 0."
+    ::= { lgpEnvConfig 10 }
+
+lgpEnvConfigSleepModeDeadbandRangeDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The allowable deviation above and below the temperature set point used
+         to create a no control region, a dead-band, where  heating and
+         cooling  control are disabled.  This dead-band is applied only
+         when the system's sleep mode function is in operation."
+    ::= { lgpEnvConfig 11 }
+
+lgpEnvConfigSleepModeDeadbandRangeDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The allowable deviation above and below the temperature set point used
+         to create a no control region, a dead-band, where  heating and
+         cooling  control are disabled.  This dead-band is applied only
+         when the system's sleep mode function is in operation."
+    ::= { lgpEnvConfig 12 }
+
+lgpEnvConfigSupplyTempLowLimitDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum allowable supply temperature."
+    ::= { lgpEnvConfig 13 }
+
+lgpEnvConfigSupplyTempLowLimitDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum allowable supply temperature."
+    ::= { lgpEnvConfig 14 }
+
+lgpEnvConfigTemperatureIntegTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value used as the integration factor in the proportional
+        integral derivative (PID) temperature calculation."
+    ::= { lgpEnvConfig 15 }
+
+lgpEnvConfigLocalTemperatureUnit OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        degC(1), 
+        degF(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The local temperature unit of the system."
+    ::= { lgpEnvConfig 16 }
+
+lgpEnvConfigSleepMode OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        enabled(1), 
+        disabled(2), 
+        auto(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configured mode of the device's sleep function.  If 'enabled',
+        the device will sleep, or not operate, for each 'lgpEnvSleepDay' that
+        is enabled and also during the periods defined in the
+        'lgpEnvSleepTimeTable' each day.  If 'disabled', the device will
+        operate continually and not sleep at all.  If 'auto', the device will
+        sleep, or not operate, for each 'lgpEnvSleepDay' that is enabled and
+        also during the periods defined in the 'lgpEnvSleepTimeTable' each
+        day unless the environmental conditions fall outside the desired
+        operation ranges."
+    ::= { lgpEnvConfig 17 }
+
+lgpEnvConfigHumidityIntegTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value used as the integration factor in the proportional
+        integral derivative (PID) humidity calculation."
+    ::= { lgpEnvConfig 18 }
+
+lgpEnvConfigFreecoolingDeltaDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum temperature differential between the control
+        temperature measurement and the coolant required to utilize
+        free-cooling."
+    ::= { lgpEnvConfig 19 }
+
+lgpEnvConfigFreecoolingDeltaDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum temperature differential between the control
+        temperature measurement and the coolant required to utilize
+        free-cooling."
+    ::= { lgpEnvConfig 20 }
+
+lgpEnvConfigSupplyTempLowLimit OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(1), 
+        enabled(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system configuration parameter to enable or disable the supply
+        air low  temperature limit."
+    ::= { lgpEnvConfig 21 }
+
+lgpEnvConfigSensorEventsStandard OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(1), 
+        enabled(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system configuration parameter to enable or disable the standard
+        sensor events."
+    ::= { lgpEnvConfig 22 }
+
+lgpEnvConfigSensorEvents1 OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(1), 
+        enabled(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system configuration parameter to enable or disable sensor 1 events."
+    ::= { lgpEnvConfig 23 }
+
+lgpEnvConfigSleepModeDeadbandRange OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(1), 
+        enabled(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system configuration parameter to enable or disable the use of
+        the sleep interval dead-band range in the sleep mode temperature
+        calculations and control algorithm."
+    ::= { lgpEnvConfig 24 }
+
+lgpEnvConfigAutoConfiguration OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(1), 
+        enabled(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system configuration parameter to enable or disable the auto
+        configuration feature.  This feature configures temperature and
+        humidity control parameters."
+    ::= { lgpEnvConfig 25 }
+
+lgpEnvConfigDeltaGlycolType OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(1), 
+        contact(2), 
+        value(3) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system configuration parameter that specifies how the system
+        will determine if there is enough capacity to initiate free
+        cooling. If 'disabled', the system will use the valve temperature
+        to initiate free cooling.  If 'contact', a input to the system
+        will initiate free cooling.  If 'valve', the system compares the
+        room and glycol temperature differential with the valve temperature
+        to initiate free cooling.  If the temperature differential is
+        greater than or equal to the valve temperature, free cooling will
+        be initiated."
+
+    ::= { lgpEnvConfig 26 }
+
+lgpEnvConfigChillWaterControl OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(1), 
+        enabled(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system configuration parameter to enable or disable the minimum
+        chill water temperature control."
+
+    ::= { lgpEnvConfig 27 }
+
+lgpEnvConfigInfaredFlushRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Infrared humidifier pan overfill rate.  This parameter configures
+        the amount of water that flows into the humidifier pan when the
+        'humidifier is in operation."
+
+    ::= { lgpEnvConfig 28 }
+
+lgpEnvConfigHumidityControl OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        relative(1), 
+        compensated(2),     
+        predictive(3) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The present configured state of the automatic humidity compensation
+        algorithm."
+    ::= { lgpEnvConfig 29 }
+
+lgpEnvConfigCompressorLockout OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        lockedOut(1), 
+        notLockedOut(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system as locked out the compressor(s).  If locked-out, the
+        compressor(s) will not operate even if the controller calls for their
+        operation."
+
+    ::= { lgpEnvConfig 30 }
+
+lgpEnvConfigReheatAndHumidifierLockout OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        lockedOut(1), 
+        notLockedOut(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The system as locked out the compressor(s).  If locked-out, the
+        electrical reheats and humidifier will not operate even if the
+        controller calls for their operation."
+
+    ::= { lgpEnvConfig 31 }
+
+-- -----------------------------------------------------------------------------
+-- Operational Time Table
+-- -----------------------------------------------------------------------------
+
+lgpEnvOperationalTimeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvOperationalTimeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of environmental operational time ranges for a given
+        environmental unit.  The entries in this table may be duplicated from
+        values in the 'lgpEnvStatistics' group.
+
+        This table contains zero, one, or many rows, depending upon the number
+        of 'lgpEnvOperationTimePoint' and 'lgpEnvOperationTimeSubID' available
+        in the table.
+
+        The NMS cannot create or delete rows from the table.
+        The rows are created by the agent based upon the capabilities of
+        the managed device."
+    ::= { lgpEnvConfig 32 }
+
+    lgpEnvOperationalTimeEntry OBJECT-TYPE
+        SYNTAX      LgpEnvOperationalTimeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the contents of the columns for the table
+            'lgpEnvOperationalTimeTable'."
+        REFERENCE
+            "The 'lgpEnvOperationTimePoint' in this table corresponds to what
+            the operation time applies to."
+        INDEX       { lgpEnvOperationTimeIndex }
+        ::= { lgpEnvOperationalTimeTable 1 }
+
+    LgpEnvOperationalTimeEntry ::= SEQUENCE 
+    {
+        lgpEnvOperationTimeIndex            Unsigned32,
+        lgpEnvOperationTimePoint            OBJECT IDENTIFIER,
+        lgpEnvOperationTimeSubID            Integer32,
+        lgpEnvOperationTimeUnit             OBJECT IDENTIFIER,
+        lgpEnvOperationTimeValue            Integer32,
+        lgpEnvOperationTimeHighWarning      Integer32
+    }
+
+    lgpEnvOperationTimeIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the nth element of the table."
+        ::= { lgpEnvOperationalTimeEntry 1 }
+
+    lgpEnvOperationTimePoint OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An OID representing a well known operation point.
+            These object identifiers can indicate a point, location, or mode
+            of an operation for which a measurement is recorded.  The OID's
+            name usually implies a location of the measurement point such as
+            'fan', 'compressor', etc."
+        REFERENCE
+            "The object identifiers  in this column can be found in the sub-tree
+            'lgpEnvWellKnownPoints' and correspond to the entry in the table
+            'lgpEnvOperationalTimeTable'."
+        ::= { lgpEnvOperationalTimeEntry 2 }
+
+    lgpEnvOperationTimeSubID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is a sub identifier for the 'lgpEnvOperationPoint'.
+            It indicates the instance number of the well known operation
+            point.  For example, a system could have two fans installed.
+            This variable would identify fan 1 with a lgpEnvOperationSubID
+            equal to 1 and fan 2 with a lgpEnvOperationSubID equal to 2."
+        ::= { lgpEnvOperationalTimeEntry 3 }
+
+    lgpEnvOperationTimeUnit OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An OID representing a well known operation time unit type.
+            These object identifiers indicate the units of the operation time.
+            The OID's name usually implies a measurement type such as
+            'lgpEnvHours', etc."
+        REFERENCE
+            "The object identifiers  in this column can be found in the sub-tree
+            'lgpEnvWellKnownUnits' and correspond to the
+            entry in the table lgpEnvOperationalTimeTable."
+        ::= { lgpEnvOperationalTimeEntry 4 }
+
+    lgpEnvOperationTimeValue OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "hours"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The actual operation time value of the
+            'lgpEnvOperationTimePoint'.
+            If multiple operation times are available for a
+            'lgpEnvOperationTimePoint' the 'lgpEnvOperationTimeSubID' will
+            differentiate between them."
+        ::= { lgpEnvOperationalTimeEntry 5 }
+
+    lgpEnvOperationTimeHighWarning OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "hours"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high warning time of the operation designated by the
+            'lgpEnvOperationTimePoint'.  If operation times are available at
+            a single 'lgpEnvOperationTimePoint' the 'lgpEnvOperationTimeSubID'
+            will differentiate between them."
+        ::= { lgpEnvOperationalTimeEntry 6 }
+
+lgpEnvConfigTempControlAlgorithm OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        pi(1), 
+        pid(2), 
+        intelligent(3), 
+        proportional(4) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Selects the algorithm for controlling temperature."
+    ::= { lgpEnvConfig 33 }
+
+lgpEnvConfigFanSpeedMode OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        manual(1), 
+        auto(2) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Changes the function of the fan speed output.  If auto, then the fan
+        speed is modulated.  If manual, the fan speed output follows
+        lgpEnvConfigFanSpeedCapacity."
+    ::= { lgpEnvConfig 34 }
+
+lgpEnvConfigFanSpeedCapacity OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the fan speed output if lgpEnvConfigFanSpeedMode is set to
+        'manual'.  Typical values range from 0 to 100% (actual valid ranges may
+        differ from unit to unit)."
+    ::= { lgpEnvConfig 35 }
+
+lgpEnvConfigBmsResetTimer OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current count-down time for a BMS to continue controlling the fan
+        speed.  If this value reaches 0, then the condition
+        lgpConditionBmsResetTimerExpired will be generated.  If a BMS wants to
+        continue controlling the fan speed, it must reset this timer.  Typical
+        values range from 0 to 120 minutes (actual valid ranges may differ from
+        unit to unit)."
+    ::= { lgpEnvConfig 36 }
+
+lgpEnvConfigDisableSensorOffsetDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If any of the enclosure temperature sensors
+        (lgpEnvEnclosureTemperatureSensors) are outside the average reading by
+        this amount, that sensor's readings will not be used."
+    ::= { lgpEnvConfig 37 }
+
+lgpEnvConfigDisableSensorOffsetDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If any of the enclosure temperature sensors
+        (lgpEnvEnclosureTemperatureSensors) are outside the average reading by
+        this amount, that sensor's readings will not be used."
+    ::= { lgpEnvConfig 38 }
+
+lgpEnvConfigCabinetSensorAlarms OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(0), 
+        enabled(1) 
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable or Disable Cabinet Sensor Alarms."
+    ::= { lgpEnvConfig 39 }
+
+lgpEnvConfigAirTemperatureControlSensor OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        supply(1),
+        remote(2),
+        return(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sensor from which air temperature measurements will be used for
+        cooling and heating control."
+    ::= { lgpEnvConfig 42 }
+
+lgpEnvConfigFanSpeedControlSensor OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        supply(1),
+        remote(2),
+        return(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sensor from which air temperature measurements will be used for fan
+        speed control."
+    ::= { lgpEnvConfig 43 }
+
+lgpEnvConfigMinFanSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the minimum fan speed output if lgpEnvConfigFanSpeedMode is set
+         to 'Auto'."
+    ::= { lgpEnvConfig 44 }
+
+lgpEnvConfigMaxFanSpeed OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the maximum fan speed output if lgpEnvConfigFanSpeedMode is set
+         to 'Auto'."
+    ::= { lgpEnvConfig 45 }
+
+lgpEnvConfigFanSpeedPropBandDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Temperature control band above the temperature set point calculated
+         for proportional fan speed control.  If measured air temperature is
+         within this band, fan speed operations are proportionally controlled."
+    ::= { lgpEnvConfig 46 }
+
+lgpEnvConfigFanSpeedPropBandDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Temperature control band above the temperature set point calculated
+         for proportional fan speed control.  If measured air temperature is
+         within this band, fan speed operations are proportionally controlled."
+    ::= { lgpEnvConfig 47 }
+
+-- =============================================================================
+-- lgpEnvControl - Liebert Environmental Control Group
+-- =============================================================================
+
+lgpEnvControlShutdownAfterDelay OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object will shutdown (i.e., turn off)
+        the system after the indicated number of seconds. Setting
+        this object to 0 will cause the shutdown to occur
+        immediately.  Setting this object to -1 will abort the
+        countdown.  If the system is already in the desired
+        state at the time the countdown reaches 0, then
+        nothing will happen.  When read, lgpEnvControlShutdownAfterDelay
+        will return the number of seconds remaining until shutdown,
+        or -1 if no shutdown countdown is in effect.  On some systems,
+        if the agent is restarted while a shutdown countdown is in effect,
+        the countdown may be aborted.  Sets to this object
+        override any lgpEnvControlShutdownAfterDelay already in effect."
+    ::= { lgpEnvControl 1 }
+
+lgpEnvControlStartupAfterDelay OBJECT-TYPE
+    SYNTAX      Integer32 (-1..2147483647)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Setting this object will start the system after the
+        indicated number of seconds.  Setting this object to 0 will
+        cause the startup to occur immediately.  Setting this
+        object to -1 will abort the countdown.  If the system
+        is already on at the time the countdown reaches 0,
+        then nothing will happen.  Sets to this object
+        override the effect of any lgpEnvControlStartupAfterDelay
+        countdown in progress.  When read, lgpEnvControlStartupAfterDelay
+        will return the number of seconds until startup, or -1 if no
+        startup countdown is in effect.  On some systems, if the agent
+        is restarted while a startup countdown is in effect, the
+        countdown is aborted."
+    ::= { lgpEnvControl 2 }
+
+lgpEnvSleepIntervalTimeTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvSleepIntervalTimeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A sleep time interval table containing a list of the start and stop
+        times to be used to take a device online or offline.
+
+        The NMS cannot create or delete rows from the table.
+        The rows are created by the agent based upon the capabilities of
+        the managed device."
+    ::= { lgpEnvControl 3 }
+
+    lgpEnvSleepIntervalTimeEntry OBJECT-TYPE
+        SYNTAX      LgpEnvSleepIntervalTimeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the contents of the columns for the table
+            'lgpEnvSleepIntervalTimeTable'."
+        INDEX       { lgpEnvSleepTimeIndex }
+        ::= { lgpEnvSleepIntervalTimeTable 1 }
+
+    LgpEnvSleepIntervalTimeEntry ::= SEQUENCE 
+    {
+            lgpEnvSleepTimeIndex            Unsigned32,
+            lgpEnvSleepTimeSubID            Integer32,
+            lgpEnvSleepTimeStartHour        Integer32,
+            lgpEnvSleepTimeStartMinute      Integer32,
+            lgpEnvSleepTimeStopHour         Integer32,
+            lgpEnvSleepTimeStopMinute       Integer32
+    }
+
+    lgpEnvSleepTimeIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the row of the table
+             'lgpEnvSleepIntervalTimeTable'."
+        ::= { lgpEnvSleepIntervalTimeEntry 1 }
+
+    lgpEnvSleepTimeSubID OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is a sub identifier for each 'lgpEnvSleepIntervalTimeEntry'.
+            It indicates the instance number of the
+            'lgpEnvSleepIntervalTimeEntry'.
+            For example, a system could have two sleep intervals and the first
+            interval's sub ID would be 1 and the second interval's sub ID
+            would be 2."
+        ::= { lgpEnvSleepIntervalTimeEntry 2 }
+
+    lgpEnvSleepTimeStartHour OBJECT-TYPE
+        SYNTAX      Integer32(0..23)
+        UNITS       "hour"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the hours digit of the time when the system will be put
+            online."
+        ::= { lgpEnvSleepIntervalTimeEntry 3 }
+
+    lgpEnvSleepTimeStartMinute OBJECT-TYPE
+        SYNTAX      Integer32(0..59)
+        UNITS       "minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the minutes digit of the time when the system will be put
+            online."
+        ::= { lgpEnvSleepIntervalTimeEntry 4 }
+
+    lgpEnvSleepTimeStopHour OBJECT-TYPE
+        SYNTAX      Integer32(0..23)
+        UNITS       "hour"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the hours digit containing the time when the system will
+            be taken offline."
+        ::= { lgpEnvSleepIntervalTimeEntry 5 }
+
+    lgpEnvSleepTimeStopMinute OBJECT-TYPE
+        SYNTAX      Integer32(0..59)
+        UNITS       "minute"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the minutes digit containing the time when the system
+            will be taken offline."
+        ::= { lgpEnvSleepIntervalTimeEntry 6 }
+
+lgpEnvSleepDayTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvSleepDayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A sleep table containing a list of the days of the week the system
+        will be offline.
+
+        The NMS cannot create or delete rows from the table.
+        The rows are created by the agent based upon the capabilities of
+        the managed device."
+    ::= { lgpEnvControl 4 }
+
+    lgpEnvSleepDayEntry OBJECT-TYPE
+        SYNTAX      LgpEnvSleepDayEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the contents of the columns for the table
+            'lgpEnvSleepDayTable'."
+        INDEX       { lgpEnvSleepDayIndex }
+        ::= { lgpEnvSleepDayTable 1 }
+
+    LgpEnvSleepDayEntry ::= SEQUENCE 
+    {
+            lgpEnvSleepDayIndex             Unsigned32,
+            lgpEnvSleepDay                  INTEGER,
+            lgpEnvSleepAllDayEnabled        INTEGER
+    }
+
+    lgpEnvSleepDayIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the row of the table
+             'lgpEnvSleepDayTable'."
+        ::= { lgpEnvSleepDayEntry 1 }
+
+    lgpEnvSleepDay OBJECT-TYPE
+        SYNTAX      INTEGER 
+        {
+            sunday(1), 
+            monday(2), 
+            tuesday(3), 
+            wednesday(4),
+            thursday(5), 
+            friday(6), 
+            saturday(7)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is a sub identifier for the day of the week within
+            'lgpEnvSleepDayTable'."
+        ::= { lgpEnvSleepDayEntry 2 }
+
+    lgpEnvSleepAllDayEnabled OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+            yes(1), 
+            no(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The all day sleep functionality has been enabled for the
+            corresponding 'lgpEnvSleepDay' in the 'lgpEnvSleepDayTable'."
+        ::= { lgpEnvSleepDayEntry 3 }
+
+-- =============================================================================
+-- lgpEnvStatistics - Liebert Environmental Statistics Group
+-- =============================================================================
+
+lgpEnvStatisticsComp1RunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of compressor 1.  This value may be duplicated
+        in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 1 }
+
+lgpEnvStatisticsComp2RunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of compressor 2.  This value may be duplicated
+        in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 2 }
+
+lgpEnvStatisticsFanRunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Accumulated run hours of the main fan.  This value may be duplicated
+        in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 3 }
+
+lgpEnvStatisticsHumRunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Accumulated run hours of the humidifier.  This value may be
+        duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 4 }
+
+lgpEnvStatisticsReheat1RunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of reheat element 1.  This value may be
+        duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 7 }
+
+lgpEnvStatisticsReheat2RunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of reheat element 2.  This value may be
+        duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 8 }
+
+lgpEnvStatisticsReheat3RunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of reheat element 3.  This value may be
+        duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 9 }
+
+lgpEnvStatisticsCoolingModeHrs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours while lgpEnvStateCooling is on(1).
+        This value may be duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 10 }
+
+lgpEnvStatisticsHeatingModeHrs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours while lgpEnvStateHeating is on(1).
+        This value may be duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 11 }
+
+lgpEnvStatisticsHumidifyModeHrs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of the humidifying process of the system.
+        This value may be duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 12 }
+
+lgpEnvStatisticsDehumidifyModeHrs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of the dehumidifying process of the system.
+        This value may be duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 13 }
+
+lgpEnvStatisticsHotGasRunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of the hot gas system.  This value may be
+        duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 14 }
+
+lgpEnvStatisticsHotWaterRunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of the hot water system.  This value may be
+        duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 15 }
+
+lgpEnvStatisticsFreeCoolRunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Accumulated run hours of the free cooling process.  This value may
+        be duplicated in the 'lgpEnvOperationalTimeTable'."
+    ::= { lgpEnvStatistics 16 }
+
+lgpEnvStatisticsComp3RunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     " Accumulated run hours of compressor 3."
+    ::= { lgpEnvStatistics 17 }
+
+lgpEnvStatisticsComp4RunHr OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     " Accumulated run hours of compressor 4."
+    ::= { lgpEnvStatistics 18 }
+
+-- =============================================================================
+-- lgpEnvWellKnownPoints - Liebert "well-known" points
+-- =============================================================================
+
+lgpEnvWellKnownPoints OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree registers well known Liebert Environmental Points.
+         The object identifier names usually encompass a process, or location,
+         where measurements are recorded or where values are applied."
+        ::= { lgpEnvPoints 1  }
+
+    lgpEnvFanPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known fan measurement point."
+        ::= { lgpEnvWellKnownPoints 1 }
+
+    lgpEnvCompressorPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known compressor measurement
+            point."
+        ::= { lgpEnvWellKnownPoints 2 }
+
+    lgpEnvElectricHeaterPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known electric heater measurement
+            point."
+        ::= { lgpEnvWellKnownPoints 3 }
+
+    lgpEnvChilledWaterPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known chilled water measurement
+            point."
+        ::= { lgpEnvWellKnownPoints 4 }
+
+    lgpEnvHumidifierPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known humidifier measurement
+            point."
+        ::= { lgpEnvWellKnownPoints 5 }
+
+    lgpEnvDehumidifierPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known dehumidifier measurement
+            point."
+        ::= { lgpEnvWellKnownPoints 6 }
+
+    lgpEnvFreeCoolingPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known free-cooling measurement
+            process."
+        ::= { lgpEnvWellKnownPoints 7 }
+
+    lgpEnvHotWaterPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known hot water measurement
+            point."
+        ::= { lgpEnvWellKnownPoints 8 }
+
+    lgpEnvHotGasPoint      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a well known hot gas measurement
+            point."
+        ::= { lgpEnvWellKnownPoints 9 }
+
+    lgpEnvBatteryCabinetPoint OBJECT-IDENTITY
+        STATUS current
+        DESCRIPTION
+            "This identifier represents a well known cabinet point.
+            To determine the cabinet being described in a multi-cabinet system, 
+            this point implements two additional indexes. The first index 
+            describes the module being supplied with battery power. The second 
+            index identifies the number of the battery cabinet, which is 
+            typically a sequential number.
+
+            Example: lgpPwrMeasBatteryCabinet.2.4
+
+            'lgpEnvBatteryCabinetPoint' = Point is a battery cabinet.
+                                   '.2' = Cabinet is in the second module.
+                                   '.4' = Cabinet number 4"
+        ::= { lgpEnvWellKnownPoints 10 }
+
+    lgpEnvPumpPoints      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree identifies well-known pumps in the system."
+        ::= { lgpEnvWellKnownPoints 11 }
+
+        lgpEnvPump1Point      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents pump 1."
+            ::= { lgpEnvPumpPoints 1 }
+
+        lgpEnvPump2Point      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents pump 2."
+            ::= { lgpEnvPumpPoints 2 }
+
+    lgpEnvCompressorPoints      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree identifies well-known compressors in the system."
+        ::= { lgpEnvWellKnownPoints 12 }
+
+        lgpEnvCompressor1Point      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents compressor 1."
+            ::= { lgpEnvCompressorPoints 1 }
+
+            lgpEnvCompressor1APoint      OBJECT-IDENTITY
+                STATUS      current
+                DESCRIPTION
+                  "This identifier represents compressor 1A."
+                ::= { lgpEnvCompressor1Point 1 }
+
+            lgpEnvCompressor1BPoint      OBJECT-IDENTITY
+                STATUS      current
+                DESCRIPTION
+                    "This identifier represents compressor 1B."
+                ::= { lgpEnvCompressor1Point 2 }
+
+        lgpEnvCompressor2Point      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents compressor 2."
+            ::= { lgpEnvCompressorPoints 2 }
+
+            lgpEnvCompressor2APoint      OBJECT-IDENTITY
+                STATUS      current
+                DESCRIPTION
+                    "This identifier represents compressor 2A."
+                ::= { lgpEnvCompressor2Point 1 }
+
+            lgpEnvCompressor2BPoint      OBJECT-IDENTITY
+                STATUS      current
+                DESCRIPTION
+                    "This identifier represents compressor 2B."
+                ::= { lgpEnvCompressor2Point 2 }
+
+    lgpEnvValvePoints      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree identifies well-known valves in the system."
+        ::= { lgpEnvWellKnownPoints 13 }
+
+        lgpEnvHotGasValve1Point      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents hot gas valve 1."
+            ::= { lgpEnvValvePoints 1 }
+
+        lgpEnvHotGasValve2Point      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents hot gas valve 2."
+            ::= { lgpEnvValvePoints 2 }
+
+    lgpEnvRemoteSensorStatisticPoints      OBJECT-IDENTITY
+       STATUS      current
+       DESCRIPTION
+           "This sub-tree identifies well-known remote sensor statistics in the
+            system."
+       ::= { lgpEnvWellKnownPoints 14 }
+
+        lgpEnvRemoteSensorMinimumPoint      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents the minimum value for remote sensor
+                 readings."
+            ::= { lgpEnvRemoteSensorStatisticPoints 1 }
+
+        lgpEnvRemoteSensorMaximumPoint      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents the maximum value for remote sensor
+                 readings."
+            ::= { lgpEnvRemoteSensorStatisticPoints 2 }
+
+        lgpEnvRemoteSensorAveragePoint      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents the average value for remote sensor
+                 readings."
+            ::= { lgpEnvRemoteSensorStatisticPoints 3 }
+
+    -- =============================================================================
+    -- lgpEnvWellKnownUnits - Liebert "well-known" units
+    -- =============================================================================
+
+    lgpEnvWellKnownUnits OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree registers well known Liebert Environmental Units.
+             The object identifier names usually encompass a process, or location,
+             where measurements are recorded or where values are applied."
+            ::= { lgpEnvUnits 1  }
+
+        lgpEnvHours      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "This identifier represents well known time unit of hours."
+            ::= { lgpEnvWellKnownUnits 1 }
+
+    -- =============================================================================
+    -- lgpEnvTemperatureMeasurements - Liebert "well-known" temperature objects
+    -- =============================================================================
+
+    lgpEnvControlTemperature      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Temperature measurement used as control feedback."
+        ::= { lgpEnvTemperatureWellKnown 1 }
+
+    lgpEnvReturnAirTemperature    OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+        "Temperature measurement of return air."
+    ::= { lgpEnvTemperatureWellKnown 2 }
+
+lgpEnvSupplyAirTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurement of supply air."
+    ::= { lgpEnvTemperatureWellKnown 3 }
+
+lgpAmbientTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Ambient temperature measurement."
+    ::= { lgpEnvTemperatureWellKnown 4 }
+
+lgpInverterTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurement of the inverter."
+    ::= { lgpEnvTemperatureWellKnown 5 }
+
+lgpBatteryTempterature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurement of the battery."
+    ::= { lgpEnvTemperatureWellKnown 6 }
+
+lgpAcDcConverterTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurement of the AC-to-DC Converter."
+    ::= { lgpEnvTemperatureWellKnown 7 }
+
+lgpPfcTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurement of the power factor correction circuitry."
+    ::= { lgpEnvTemperatureWellKnown 8 }
+
+lgpTransformerTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurement of the transformer."
+    ::= { lgpEnvTemperatureWellKnown 9 }
+
+lgpLocalTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurement of local temperature sensor."
+    ::= { lgpEnvTemperatureWellKnown 10 }
+
+    lgpLocal1Temperature    OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Temperature and humidity measurements of Local Sensor 1."
+        ::= { lgpLocalTemperature 1 }
+
+    lgpLocal2Temperature    OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Temperature and humidity measurements of Local Sensor 2."
+        ::= { lgpLocalTemperature 2 }
+
+    lgpLocal3Temperature    OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Temperature and humidity measurements of Local Sensor 3."
+        ::= { lgpLocalTemperature 3 }
+
+lgpDigitalScrollCompressorTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature and humidity measurements of a digital Scroll Compressor."
+    ::= { lgpEnvTemperatureWellKnown 11 }
+
+    lgpDigitalScrollCompressor1Temperature    OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Temperature and humidity measurements of a digital Scroll
+            Compressor 1."
+        ::= { lgpDigitalScrollCompressorTemperature 1 }
+
+    lgpDigitalScrollCompressor2Temperature    OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Temperature and humidity measurements of a digital Scroll
+            Compressor 2."
+        ::= { lgpDigitalScrollCompressorTemperature 2 }
+
+lgpChillWaterTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurements of a chill water system."
+    ::= { lgpEnvTemperatureWellKnown 12 }
+
+lgpCoolantTemperature    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature measurements of an environmental system's coolant."
+    ::= { lgpEnvTemperatureWellKnown 13 }
+
+lgpEnvEnclosureTemperatureSensors OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Enclosure temperature sensors"
+    ::= { lgpEnvTemperatureWellKnown 14 }
+
+    lgpEnvEnclosureTemperatureSensor1 OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+                "Enclosure temperature sensor 1"
+        ::= { lgpEnvEnclosureTemperatureSensors 1 }
+
+    lgpEnvEnclosureTemperatureSensor2 OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+                "Enclosure temperature sensor 2"
+        ::= { lgpEnvEnclosureTemperatureSensors 2 }
+
+    lgpEnvEnclosureTemperatureSensor3 OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+                "Enclosure temperature sensor 3"
+        ::= { lgpEnvEnclosureTemperatureSensors 3 }
+
+    lgpEnvEnclosureTemperatureSensor4 OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+                "Enclosure temperature sensor 4"
+        ::= { lgpEnvEnclosureTemperatureSensors 4 }
+
+lgpEnvValueAmbientRoomTemperature OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature outside enclosure."
+    ::= { lgpEnvTemperatureWellKnown 15 }
+
+lgpEnvDewPointTemperature OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The calculated temperature outside of the enclosure at which
+        condensation is likely to occur."
+    ::= { lgpEnvTemperatureWellKnown 16 }
+
+lgpEnvEnclosureTemperature OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Temperature inside of enclosure."
+    ::= { lgpEnvTemperatureWellKnown 17 }
+
+lgpEnvAdjustedTemperature OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The current temperature set-point which is computed by the system and
+         may be temporarily different from the user set-point because of
+         external factors."
+    ::= { lgpEnvTemperatureWellKnown 18 }
+
+lgpEnvExternalSensors OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "External sensors to monitor environmental variables such as 
+        temperature and humidity"
+    ::= { lgpEnvTemperatureWellKnown 19 }
+
+    lgpEnvExternalAirSensorA OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+                "Temperature and humidity measurements from external air
+                sensor A."
+        ::= { lgpEnvExternalSensors 1 }
+
+    lgpEnvExternalAirSensorADewPoint OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+                "Dewpoint temperature for External Air Sensor A."
+        ::= { lgpEnvExternalSensors 2 }
+
+    lgpEnvExternalAirSensorB OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+                "Temperature and humidity measurements from external air
+                sensor B."
+        ::= { lgpEnvExternalSensors 3 }
+
+    lgpEnvExternalAirSensorBDewPoint OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+                "Dewpoint temperature for External Air Sensor B."
+        ::= { lgpEnvExternalSensors 4 }
+
+lgpEnvSupplyFluidTemperature OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The current temperature of the fluid being supplied."
+    ::= { lgpEnvTemperatureWellKnown 20 }
+
+lgpEnvSupplyRefrigerantTemperature OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The current temperature of the refrigerant being supplied."
+    ::= { lgpEnvTemperatureWellKnown 21 }
+
+lgpEnvMinDesiredRoomAirTemperature OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "The minimum desired room air temperature. If the room air temperature
+         falls below this set point, the unit will reduce the cooling."
+    ::= { lgpEnvTemperatureWellKnown 22 }
+
+lgpEnvDewPointTemperatures OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree identifies well-known dew point temperatures in the
+         system."
+    ::= { lgpEnvTemperatureWellKnown 23 }
+
+    lgpEnvInletDewPointTemperature OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "Dew point temperature measured at the inlet of the unit."
+        ::= { lgpEnvDewPointTemperatures 1 }
+
+-- =============================================================================
+-- lgpEnvTemperatureFahrenheit - Liebert Environmental Fahrenheit
+-- Temperature Group
+-- =============================================================================
+
+lgpEnvTemperatureSettingDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The temperature setting used to control the well known temperature
+        object 'lgpEnvControlTemperature'.  This setting is cloned in
+        'lgpEnvTemperatureSettingDegC' with the value converted to Celsius."
+    ::= { lgpEnvTemperatureFahrenheit 1 }
+
+lgpEnvTemperatureToleranceDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The acceptable variance from 'lgpEnvTemperatureSettingDegF', without
+        initiating a control action.  This setting is cloned in
+        'lgpEnvTemperatureToleranceDegC' with the value converted to Celsius."
+    ::= { lgpEnvTemperatureFahrenheit 2 }
+
+lgpEnvTemperatureTableDegF OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvTemperatureEntryDegF
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of temperature table entries.  The table contains zero, one,
+        or many rows, depending upon the number of temperature objects
+        available.  The NMS cannot create or delete rows from the table. The
+        rows are created by the agent based upon the capabilities of the
+        managed device.  The entries in this table are cloned in
+        'lgpEnvTemperatureTableDegC' where Fahrenheit values are converted to
+        Celsius."
+    ::= { lgpEnvTemperatureFahrenheit 3 }
+
+lgpEnvTemperatureDeadbandRangeDegF  OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The allowable deviation above and below the temperature set point
+         used to create a no control region, a dead-band, where  heating
+         and cooling  control are disabled."
+
+    ::= { lgpEnvTemperatureFahrenheit 4 }
+
+lgpEnvTemperatureEntryDegF OBJECT-TYPE
+    SYNTAX      LgpEnvTemperatureEntryDegF
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry defines the contents of the rows for the table
+        'lgpEnvTemperatureTableDegF'."
+    INDEX       { lgpEnvTemperatureIdDegF }
+    ::= { lgpEnvTemperatureTableDegF 1 }
+
+LgpEnvTemperatureEntryDegF ::= SEQUENCE 
+{
+    lgpEnvTemperatureIdDegF                     Unsigned32,
+    lgpEnvTemperatureDescrDegF                  OBJECT IDENTIFIER,
+    lgpEnvTemperatureMeasurementDegF            Integer32,
+    lgpEnvTemperatureHighThresholdDegF          Integer32,
+    lgpEnvTemperatureLowThresholdDegF           Integer32,
+    lgpEnvTemperatureSetPointDegF               Integer32,
+    lgpEnvTemperatureDailyHighDegF              Integer32,
+    lgpEnvTemperatureDailyLowDegF               Integer32,
+    lgpEnvTempDailyHighTimeHourDegF             Integer32,
+    lgpEnvTempDailyHighTimeMinuteDegF           Integer32,
+    lgpEnvTempDailyHighTimeSecondDegF           Integer32,
+    lgpEnvTempDailyLowTimeHourDegF              Integer32,
+    lgpEnvTempDailyLowTimeMinuteDegF            Integer32,
+    lgpEnvTempDailyLowTimeSecondDegF            Integer32,
+    lgpEnvTemperatureMeasurementTenthsDegF      Integer32,
+    lgpEnvTemperatureHighThresholdTenthsDegF    Integer32,
+    lgpEnvTemperatureLowThresholdTenthsDegF     Integer32,
+    lgpEnvTemperatureSetPointTenthsDegF         Integer32,
+    lgpEnvTemperatureDeadBandTenthsDegF         Integer32,
+    lgpEnvTempHeatingPropBandTenthsDegF         Integer32,
+    lgpEnvTempCoolingPropBandTenthsDegF         Integer32
+
+}
+
+lgpEnvTemperatureIdDegF OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This OID is used as an index to identify a row in the table
+        'lgpEnvTemperatureTableDegF'."
+    ::= { lgpEnvTemperatureEntryDegF 1 }
+
+lgpEnvTemperatureDescrDegF OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A reference to a temperature description object. The object
+        referenced should not be accessible, but rather be used to provide
+        a unique description of the temperature."
+    ::= { lgpEnvTemperatureEntryDegF 2 }
+
+lgpEnvTemperatureMeasurementDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The measured temperature value."
+    ::= { lgpEnvTemperatureEntryDegF 3 }
+
+lgpEnvTemperatureHighThresholdDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The high temperature notification threshold.  This is the maximum
+        value of 'lgpEnvTemperatureMeasurementDegF' before the agent sends a
+        notification."
+    ::= { lgpEnvTemperatureEntryDegF 4 }
+
+lgpEnvTemperatureLowThresholdDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The low temperature notification threshold.  This is the minimum
+        value of 'lgpEnvTemperatureMeasurementDegF' before the agent sends a
+        notification."
+    ::= { lgpEnvTemperatureEntryDegF 5 }
+
+lgpEnvTemperatureSetPointDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The temperature setting for the well known
+        'lgpEnvTemperatureDescrDegF' point.  This setting may or may not be
+        the setting used from control.  Some systems have the capability to
+        dynamically change the control setting based on environmental
+        conditions and/or user configuration."
+    ::= { lgpEnvTemperatureEntryDegF 6 }
+
+lgpEnvTemperatureDailyHighDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The daily high temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegF 7 }
+
+lgpEnvTemperatureDailyLowDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Fahrenheit"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The daily low temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegF 8 }
+
+lgpEnvTempDailyHighTimeHourDegF OBJECT-TYPE
+    SYNTAX      Integer32(0..23)
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hours digit of the time corresponding to the daily high
+         temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegF 9 }
+
+lgpEnvTempDailyHighTimeMinuteDegF OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minutes digit of the time corresponding to the daily high
+         temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegF 10 }
+
+lgpEnvTempDailyHighTimeSecondDegF OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The seconds digit of the time corresponding to the daily high
+         temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegF 11 }
+
+lgpEnvTempDailyLowTimeHourDegF OBJECT-TYPE
+    SYNTAX      Integer32(0..23)
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hours digit of the time corresponding to the daily low
+         temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegF 12 }
+
+lgpEnvTempDailyLowTimeMinuteDegF OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minutes digit of the time corresponding to the daily low
+         temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegF 13 }
+
+lgpEnvTempDailyLowTimeSecondDegF OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The seconds digit of the time corresponding to the daily low
+         temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegF 14 }
+
+lgpEnvTemperatureMeasurementTenthsDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The measured temperature value."
+    ::= { lgpEnvTemperatureEntryDegF 50 }
+
+lgpEnvTemperatureHighThresholdTenthsDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The high temperature notification threshold.  This is the maximum
+        value of 'lgpEnvTemperatureMeasurementTenthsDegF' before the agent sends a
+        notification."
+    ::= { lgpEnvTemperatureEntryDegF 51 }
+
+lgpEnvTemperatureLowThresholdTenthsDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The low temperature notification threshold.  This is the minimum
+        value of 'lgpEnvTemperatureMeasurementTenthsDegF' before the agent sends a
+        notification."
+    ::= { lgpEnvTemperatureEntryDegF 52 }
+
+lgpEnvTemperatureSetPointTenthsDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The temperature setting for the well known
+        'lgpEnvTemperatureDescrDegF' point.  This setting may or may not be
+        the setting used from control.  Some systems have the capability to
+        dynamically change the control setting based on environmental
+        conditions and/or user configuration."
+    ::= { lgpEnvTemperatureEntryDegF 53 }
+
+lgpEnvTemperatureDeadBandTenthsDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The deadband region around the setpoint value 
+        (lgpEnvTemperatureSetPointTenthsDegF) where no heating or cooling will occur."
+    ::= { lgpEnvTemperatureEntryDegF 60 }
+
+lgpEnvTempHeatingPropBandTenthsDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The proportional region below the setpoint value
+        (lgpEnvTemperatureSetPointTenthsDegF) where heating will be
+        proportionally controlled."
+    ::= { lgpEnvTemperatureEntryDegF 61 }
+
+lgpEnvTempCoolingPropBandTenthsDegF OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Fahrenheit"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The proportional region above the setpoint value
+        (lgpEnvTemperatureSetPointTenthsDegF) where cooling will be
+        proportionally controlled."
+    ::= { lgpEnvTemperatureEntryDegF 62 }
+
+-- =============================================================================
+-- lgpEnvTemperatureCelsius - Liebert Environmental Celsius
+-- Temperature Group
+-- =============================================================================
+
+lgpEnvTemperatureSettingDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The temperature setting used to control the well known temperature
+        object 'lgpEnvControlTemperature'.  This setting is cloned in
+        'lgpEnvTemperatureSettingDegF' with the value converted to Fahrenheit."
+    ::= { lgpEnvTemperatureCelsius 1 }
+
+lgpEnvTemperatureToleranceDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The acceptable variance from 'lgpEnvTemperatureSettingDegC', without
+        initiating a control action.  This setting is cloned in
+        'lgpEnvTemperatureToleranceDegF' with the value converted to Fahrenheit."
+    ::= { lgpEnvTemperatureCelsius 2 }
+
+lgpEnvTemperatureTableDegC OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvTemperatureEntryDegC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of temperature table entries.  The table contains zero, one,
+        or many rows, depending upon the number of temperature objects
+        available.  The NMS cannot create or delete rows from the table. The
+        rows are created by the agent based upon the capabilities of the
+        managed device.  The entries in this table are cloned in
+        'lgpEnvTemperatureTableDegF' where Celsius values are converted to
+        Fahrenheit."
+    ::= { lgpEnvTemperatureCelsius 3 }
+
+lgpEnvTemperatureDeadbandRangeDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The allowable deviation above and below the temperature set point
+         used to create a no control region, a dead-band, where  heating
+         and cooling  control are disabled."
+    ::= { lgpEnvTemperatureCelsius 4 }
+
+lgpEnvTemperatureEntryDegC OBJECT-TYPE
+    SYNTAX      LgpEnvTemperatureEntryDegC
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry defines the contents of the rows for the table
+        'lgpEnvTemperatureTableDegC'."
+    INDEX       { lgpEnvTemperatureIdDegC }
+    ::= { lgpEnvTemperatureTableDegC 1 }
+
+LgpEnvTemperatureEntryDegC ::= SEQUENCE 
+{
+    lgpEnvTemperatureIdDegC                     Unsigned32,
+    lgpEnvTemperatureDescrDegC                  OBJECT IDENTIFIER,
+    lgpEnvTemperatureMeasurementDegC            Integer32,
+    lgpEnvTemperatureHighThresholdDegC          Integer32,
+    lgpEnvTemperatureLowThresholdDegC           Integer32,
+    lgpEnvTemperatureSetPointDegC               Integer32,
+    lgpEnvTemperatureDailyHighDegC              Integer32,
+    lgpEnvTemperatureDailyLowDegC               Integer32,
+    lgpEnvTempDailyHighTimeHourDegC             Integer32,
+    lgpEnvTempDailyHighTimeMinuteDegC           Integer32,
+    lgpEnvTempDailyHighTimeSecondDegC           Integer32,
+    lgpEnvTempDailyLowTimeHourDegC              Integer32,
+    lgpEnvTempDailyLowTimeMinuteDegC            Integer32,
+    lgpEnvTempDailyLowTimeSecondDegC            Integer32,
+    lgpEnvTemperatureMeasurementTenthsDegC      Integer32,
+    lgpEnvTemperatureHighThresholdTenthsDegC    Integer32,
+    lgpEnvTemperatureLowThresholdTenthsDegC     Integer32,
+    lgpEnvTemperatureSetPointTenthsDegC         Integer32,
+    lgpEnvTemperatureDeadBandTenthsDegC         Integer32,
+    lgpEnvTempHeatingPropBandTenthsDegC         Integer32,
+    lgpEnvTempCoolingPropBandTenthsDegC         Integer32
+
+}
+
+lgpEnvTemperatureIdDegC OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This OID is used as an index to identify a row in the table
+        'lgpEnvTemperatureTableDegC'."
+    ::= { lgpEnvTemperatureEntryDegC 1 }
+
+lgpEnvTemperatureDescrDegC OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A reference to a temperature description object. The object
+        referenced should not be accessible, but rather be used to provide
+        a unique description of the temperature."
+    ::= { lgpEnvTemperatureEntryDegC 2 }
+
+lgpEnvTemperatureMeasurementDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The measured temperature value."
+    ::= { lgpEnvTemperatureEntryDegC 3 }
+
+lgpEnvTemperatureHighThresholdDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The high temperature notification threshold.  This is the maximum
+        value of 'lgpEnvTemperatureMeasurementDegC' before the agent sends a
+        notification."
+    ::= { lgpEnvTemperatureEntryDegC 4 }
+
+lgpEnvTemperatureLowThresholdDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The low temperature notification threshold.  This is the minimum
+        value of 'lgpEnvTemperatureMeasurementDegC' before the agent sends a
+        notification."
+    ::= { lgpEnvTemperatureEntryDegC 5 }
+
+lgpEnvTemperatureSetPointDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The temperature setting for the well known
+        'lgpEnvTemperatureDescrDegC' point.  This setting may or may not be
+        the setting used from control.  Some systems have the capability to
+        dynamically change the control setting based on environmental
+        conditions and/or user configuration."
+    ::= { lgpEnvTemperatureEntryDegC 6 }
+
+lgpEnvTemperatureDailyHighDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The daily high temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegC 7 }
+
+lgpEnvTemperatureDailyLowDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The daily low temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegC 8 }
+
+lgpEnvTempDailyHighTimeHourDegC OBJECT-TYPE
+    SYNTAX      Integer32(0..23)
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hours digit of the time corresponding to the daily high
+        temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegC 9 }
+
+lgpEnvTempDailyHighTimeMinuteDegC OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minutes digit of the time corresponding to the daily high
+        temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegC 10 }
+
+lgpEnvTempDailyHighTimeSecondDegC OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The seconds digit of the time corresponding to the daily high
+        temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegC 11 }
+
+lgpEnvTempDailyLowTimeHourDegC OBJECT-TYPE
+    SYNTAX      Integer32(0..23)
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hours digit of the time corresponding to the daily low
+        temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegC 12 }
+
+lgpEnvTempDailyLowTimeMinuteDegC OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minutes digit of the time corresponding to the daily low
+        temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegC 13 }
+
+lgpEnvTempDailyLowTimeSecondDegC OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The seconds digit of the time corresponding to the daily low
+        temperature measurement."
+    ::= { lgpEnvTemperatureEntryDegC 14 }
+
+lgpEnvTemperatureMeasurementTenthsDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The measured temperature value."
+    ::= { lgpEnvTemperatureEntryDegC 50 }
+
+lgpEnvTemperatureHighThresholdTenthsDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The high temperature notification threshold.  This is the maximum
+        value of 'lgpEnvTemperatureMeasurementTenthsDegC' before the agent sends a
+        notification."
+    ::= { lgpEnvTemperatureEntryDegC 51 }
+
+lgpEnvTemperatureLowThresholdTenthsDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The low temperature notification threshold.  This is the minimum
+        value of 'lgpEnvTemperatureMeasurementTenthsDegC' before the agent sends a
+        notification."
+    ::= { lgpEnvTemperatureEntryDegC 52 }
+
+lgpEnvTemperatureSetPointTenthsDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The temperature setting for the well known
+        'lgpEnvTemperatureDescrDegC' point.  This setting may or may not be
+        the setting used from control.  Some systems have the capability to
+        dynamically change the control setting based on environmental
+        conditions and/or user configuration."
+    ::= { lgpEnvTemperatureEntryDegC 53 }
+
+lgpEnvTemperatureDeadBandTenthsDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The deadband region around the setpoint value 
+        (lgpEnvTemperatureSetPointTenthsDegC) where no heating or cooling will occur."
+    ::= { lgpEnvTemperatureEntryDegC 60 }
+
+lgpEnvTempHeatingPropBandTenthsDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The proportional region below the setpoint value
+        (lgpEnvTemperatureSetPointTenthsDegC) where heating will be
+        proportionally controlled."
+    ::= { lgpEnvTemperatureEntryDegC 61 }
+
+lgpEnvTempCoolingPropBandTenthsDegC OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 degrees Celsius"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The proportional region above the setpoint value
+        (lgpEnvTemperatureSetPointTenthsDegC) where cooling will be
+        proportionally controlled."
+    ::= { lgpEnvTemperatureEntryDegC 62 }
+
+-- =============================================================================
+-- lgpEnvHumidityMeasurements - Liebert "well-known" Humidity objects
+-- =============================================================================
+
+lgpEnvControlHumidity      OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Humidity measurement used as control feedback."
+    ::= { lgpEnvHumidityWellKnown 1 }
+
+lgpEnvReturnAirHumidity    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Humidity measurement of return air."
+    ::= { lgpEnvHumidityWellKnown 2 }
+
+lgpEnvSupplyAirHumidity    OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Humidity measurement of supply air."
+    ::= { lgpEnvHumidityWellKnown 3 }
+
+lgpEnvValueAmbientHumidity OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "Humidity outside enclosure."
+    ::= { lgpEnvHumidityWellKnown 4 }
+
+-- =============================================================================
+-- lgpEnvRelativeHumidity - Liebert Environmental Relative Humidity Group
+-- =============================================================================
+
+lgpEnvHumiditySettingRel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The humidity setting used to control the well known humidity
+        point."
+    ::= { lgpEnvHumidityRelative 1 }
+
+lgpEnvHumidityToleranceRel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Acceptable variance from lgpEnvHumiditySettingRel, without
+        initiating a control action."
+    ::= { lgpEnvHumidityRelative 2 }
+
+lgpEnvHumidityTableRel OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvHumidityEntryRel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of humidity table entries.  The table contains zero, one,
+        or many rows, depending upon the number of humidity objects available.
+        The NMS cannot create or delete rows from the table. The rows are
+        created by the agent based upon the capabilities of the managed device."
+    ::= { lgpEnvHumidityRelative 3 }
+
+lgpEnvHumidityDeadbandRange OBJECT-TYPE
+       SYNTAX      Integer32
+       UNITS       ".1 percent RH"
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+       "The allowable deviation above and below the humidity set point used
+        to create a no control region, a dead-band, where humidifying and
+        dehumidifying control are disabled."
+       ::= { lgpEnvHumidityRelative 4 }
+
+lgpEnvHumidityEntryRel OBJECT-TYPE
+    SYNTAX      LgpEnvHumidityEntryRel
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+       "This entry defines the contents of the rows for the table
+       'lgpEnvHumidityTableRel'."
+    INDEX       { lgpEnvHumidityIdRel }
+    ::= { lgpEnvHumidityTableRel 1 }
+
+LgpEnvHumidityEntryRel ::= SEQUENCE 
+{
+    lgpEnvHumidityIdRel                         Unsigned32,
+    lgpEnvHumidityDescrRel                      OBJECT IDENTIFIER,
+    lgpEnvHumidityMeasurementRel                Integer32,
+    lgpEnvHumidityHighThresholdRel              Integer32,
+    lgpEnvHumidityLowThresholdRel               Integer32,
+    lgpEnvHumiditySetPoint                      Integer32,
+    lgpEnvHumidityDailyHigh                     Integer32,
+    lgpEnvHumidityDailyLow                      Integer32,
+    lgpEnvHumidityDailyHighTimeHour             Integer32,
+    lgpEnvHumidityDailyHighTimeMinute           Integer32,
+    lgpEnvHumidityDailyHighTimeSecond           Integer32,
+    lgpEnvHumidityDailyLowTimeHour              Integer32,
+    lgpEnvHumidityDailyLowTimeMinute            Integer32,
+    lgpEnvHumidityDailyLowTimeSecond            Integer32,
+    lgpEnvHumidityDeadBand                      Integer32,
+    lgpEnvHumidifyPropBand                      Integer32,
+    lgpEnvDehumidifyPropBand                    Integer32,
+    lgpEnvHumidityMeasurementRelTenths          Integer32,
+    lgpEnvHumidityHighThresholdRelTenths        Integer32,
+    lgpEnvHumidityLowThresholdRelTenths         Integer32
+}
+
+lgpEnvHumidityIdRel OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This OID is used as an index to identify a row in the table
+        'lgpEnvHumidityTableRel'."
+    ::= { lgpEnvHumidityEntryRel 1 }
+
+lgpEnvHumidityDescrRel OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A reference to a humidity description object. The object
+        referenced should not be accessible, but rather be used
+        to provide a unique description of the humidity."
+    ::= { lgpEnvHumidityEntryRel 2 }
+
+lgpEnvHumidityMeasurementRel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The measured humidity value."
+    ::= { lgpEnvHumidityEntryRel 3 }
+
+lgpEnvHumidityHighThresholdRel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The high humidity notification threshold.  This is the maximum
+        value of 'lgpEnvHumidityMeasurementRel' before the agent sends a
+        notification."
+    ::= { lgpEnvHumidityEntryRel 4 }
+
+lgpEnvHumidityLowThresholdRel OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The low humidity notification threshold.  This is the minimum
+        value of 'lgpEnvHumidityMeasurementRel' before the agent sends a
+        notification."
+    ::= { lgpEnvHumidityEntryRel 5 }
+
+lgpEnvHumiditySetPoint OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The humidity setting used to control the well known humidity
+        object 'lgpEnvHumidityDescrRel'.  This setting may or may not be
+        the setting used from control.  Some systems have the capability to
+        dynamically change the control setting based on environmental
+        conditions and/or user configuration."
+    ::= { lgpEnvHumidityEntryRel 6 }
+
+lgpEnvHumidityDailyHigh OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The daily high relative humidity measurement."
+    ::= { lgpEnvHumidityEntryRel 7 }
+
+ lgpEnvHumidityDailyLow OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The daily low relative humidity measurement."
+    ::= { lgpEnvHumidityEntryRel 8 }
+
+lgpEnvHumidityDailyHighTimeHour OBJECT-TYPE
+    SYNTAX      Integer32(0..23)
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hours digit of the time corresponding to the daily high
+        humidity measurement."
+    ::= { lgpEnvHumidityEntryRel 9 }
+
+lgpEnvHumidityDailyHighTimeMinute OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minutes digit of the time corresponding to the daily high
+        humidity measurement."
+    ::= { lgpEnvHumidityEntryRel 10 }
+
+lgpEnvHumidityDailyHighTimeSecond OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The seconds digit of the time corresponding to the daily high
+        humidity measurement."
+    ::= { lgpEnvHumidityEntryRel 11 }
+
+lgpEnvHumidityDailyLowTimeHour OBJECT-TYPE
+    SYNTAX      Integer32(0..23)
+    UNITS       "hours"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The hours digit of the time corresponding to the daily low humidity measurement."
+    ::= { lgpEnvHumidityEntryRel 12 }
+
+lgpEnvHumidityDailyLowTimeMinute OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minutes digit of the time corresponding to the daily low
+        humidity measurement."
+    ::= { lgpEnvHumidityEntryRel 13 }
+
+lgpEnvHumidityDailyLowTimeSecond OBJECT-TYPE
+    SYNTAX      Integer32(0..59)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The seconds digit of the time corresponding to the daily low humidity measurement."
+    ::= { lgpEnvHumidityEntryRel 14 }
+
+lgpEnvHumidityDeadBand OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The deadband region around the setpoint value 
+        (lgpEnvHumiditySetPoint) where no humidifying or dehumidifying will occur."
+    ::= { lgpEnvHumidityEntryRel 15 }
+
+lgpEnvHumidifyPropBand OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The proportional region below the setpoint value
+        (lgpEnvHumiditySetPoint) where humidifying will be
+        proportionally controlled."
+    ::= { lgpEnvHumidityEntryRel 16 }
+
+lgpEnvDehumidifyPropBand OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The proportional region above the setpoint value
+        (lgpEnvHumiditySetPoint) where dehumidifying will be
+        proportionally controlled."
+    ::= { lgpEnvHumidityEntryRel 17 }
+
+lgpEnvHumidityMeasurementRelTenths OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 percent Relative Humidity"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The measured humidity value."
+    ::= { lgpEnvHumidityEntryRel 50 }
+
+lgpEnvHumidityHighThresholdRelTenths OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The high humidity notification threshold.  This is the maximum
+        value of 'lgpEnvHumidityMeasurementRelTenths' before the agent sends a
+        notification."
+    ::= { lgpEnvHumidityEntryRel 51 }
+
+lgpEnvHumidityLowThresholdRelTenths OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       ".1 percent Relative Humidity"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The low humidity notification threshold.  This is the minimum
+        value of 'lgpEnvHumidityMeasurementRelTenths' before the agent sends a
+        notification."
+    ::= { lgpEnvHumidityEntryRel 52 }
+
+-- =============================================================================
+-- lgpEnvRemoteSensors - Liebert Environmental Remote Sensor Group
+-- =============================================================================
+
+lgpEnvRemoteSensorCalc OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        average(1),
+        maximum(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Calculation method applied to temperature readings from the remote
+        sensors to determine a single temperature measurement value for
+        cooling and heating control."
+    ::= { lgpEnvRemoteSensors 1 }
+
+lgpEnvRemoteSensorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpEnvRemoteSensorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains a list of remote sensors attached to the
+        environmental unit. The table contains zero, one, or more rows,
+        depending upon the number of sensors attached to the unit."
+    ::= { lgpEnvRemoteSensors 10 }
+
+    lgpEnvRemoteSensorEntry OBJECT-TYPE
+        SYNTAX      LgpEnvRemoteSensorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the attributes to be populated in the
+            various columns of the 'lgpEnvRemoteSensorTable'."
+        INDEX       
+        { 
+            lgpEnvRemoteSensorIndex
+        }
+        ::= { lgpEnvRemoteSensorTable 1 }
+
+    LgpEnvRemoteSensorEntry ::= SEQUENCE 
+    {
+        lgpEnvRemoteSensorIndex                   Unsigned32,
+        lgpEnvRemoteSensorId                      Unsigned32,
+        lgpEnvRemoteSensorMode                    Integer32,
+        lgpEnvRemoteSensorUsrLabel                DisplayString,
+        lgpEnvRemoteSensorTempMeasurementDegF     Integer32,
+        lgpEnvRemoteSensorTempMeasurementDegC     Integer32
+    }
+
+    lgpEnvRemoteSensorIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the nth element of the table."
+        ::= { lgpEnvRemoteSensorEntry 1 }
+
+    lgpEnvRemoteSensorId OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is the sensor number identifying the sensor."
+        ::= { lgpEnvRemoteSensorEntry 2 }
+
+    lgpEnvRemoteSensorMode OBJECT-TYPE
+        SYNTAX      INTEGER
+        {
+            disable(0),
+            reference(1),
+            control(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Function assigned to remote sensor.  When set to control(2) the
+            sensor will be used in calculation of remote sensor temperature which
+            may be used for heating and cooling control.  When set to disable(0)
+            the remote sensor reading is not available.  When set to reference(1)
+            the remote sensor reading is available but not used for control."
+        ::= { lgpEnvRemoteSensorEntry 3 }
+
+    lgpEnvRemoteSensorUsrLabel OBJECT-TYPE 
+        SYNTAX      DisplayString 
+        MAX-ACCESS  read-write 
+        STATUS      current 
+        DESCRIPTION 
+            "User assigned remote sensor label." 
+        ::= { lgpEnvRemoteSensorEntry 4 } 
+
+    lgpEnvRemoteSensorTempMeasurementDegF OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "degrees Fahrenheit"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Temperature measured at the temperature sensor reported in
+             degrees Fahrenheit."
+        ::= { lgpEnvRemoteSensorEntry 5 }
+
+    lgpEnvRemoteSensorTempMeasurementDegC OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "degrees Celsius"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Temperature measured at the temperature sensor reported in
+             degrees Celsius."
+        ::= { lgpEnvRemoteSensorEntry 6 }
+
+END
+

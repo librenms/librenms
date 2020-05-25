@@ -1,0 +1,136 @@
+ARRIS-C3-TFTPD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32
+        FROM SNMPv2-SMI
+    TruthValue, DisplayString
+        FROM SNMPv2-TC
+    cmtsC3
+        FROM ARRIS-MIB;
+
+    cmtsC3TFTPDMIB  MODULE-IDENTITY
+        LAST-UPDATED "200403300000Z" -- 30th March 2004
+        ORGANIZATION "Arris International"
+        CONTACT-INFO
+            "   Network Management
+                Postal: Arris International.
+                        4400 Cork Airport Business Park
+                        Cork Airport, Kinsale Road
+                        Cork, Ireland.
+                Tel:    +353 21 7305 800
+                Fax:    +353 21 4321 972"
+
+        DESCRIPTION
+            "This MIB manages the TFTP server on the Arris CMTS C3"
+        ::= { cmtsC3 9 }
+
+    dcxTFTPDObjects OBJECT IDENTIFIER ::= { cmtsC3TFTPDMIB 1 }
+
+    dcxTFTPDServerState        OBJECT-TYPE
+        SYNTAX      INTEGER {
+            inactive (0),
+            active (1)
+		}
+		MAX-ACCESS  read-write
+		STATUS      current
+		DESCRIPTION
+		    "Specifies whether the TFTP server is running and accepting requests (active), or not
+		    running (inactive)."
+		::= { dcxTFTPDObjects 1 }
+
+    dcxTFTPDCurrentDirectory    OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This is the directory that files are being retrieved from on the CMTS."
+        ::= { dcxTFTPDObjects 2 }
+    
+    dcxTFTPDIpVerification   OBJECT-TYPE
+        SYNTAX      INTEGER {
+            disabled (0),
+            enabled (1)
+        }
+        MAX-ACCESS  read-write        
+        STATUS      current
+        DESCRIPTION
+            "Specifies whether IP Address verification is enabled or not.  When IP Address verification
+            is enabled, TFTP requests will only be accepted from IP Addresses from cable modems that the
+            CMTS recognizes."
+        ::= { dcxTFTPDObjects 3 }
+            
+    dcxTFTPDClearCache          OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When set to true, the TFTP server cache will be cleared.  This should be done if you overwrite
+            a file in the TFTP directory, in order to ensure that the new file will be used.  Reading this
+            value always returns false."
+        ::= { dcxTFTPDObjects 4 }
+ 
+    dcxTFTPDReadRequests   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of TFTP read requests that have been made in total."
+        ::= { dcxTFTPDObjects 5 } 
+
+    dcxTFTPDReadRequestsDropped   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of TFTP read requests that were dropped by the CMTS.  Requests could be dropped for a few reasons, for example, being invalid, or IP verification failing."
+        ::= { dcxTFTPDObjects 6 }
+
+    dcxTFTPDReadRequestsFailed   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of TFTP read requests that failed.  This is ususally due to either an error during the file transfer."
+        ::= { dcxTFTPDObjects 7 }
+
+    dcxTFTPDReadBytes   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of bytes successfully transferred by the TFTP server on read requests.  This includes only completely transferred files."
+        ::= { dcxTFTPDObjects 8 }
+
+    dcxTFTPDWriteRequests   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of TFTP write requests that have been made in total."
+        ::= { dcxTFTPDObjects 9 } 
+
+    dcxTFTPDWriteRequestsDropped   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of TFTP write requests that were dropped by the CMTS.  Requests could be dropped for a few reasons, for example, being invalid, or IP verification failing."
+        ::= { dcxTFTPDObjects 10 }
+
+    dcxTFTPDWriteRequestsFailed   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of TFTP write requests that failed.  This is ususally due to either an error during the file transfer."
+        ::= { dcxTFTPDObjects 11 }
+
+    dcxTFTPDWriteBytes   OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of bytes successfully transferred by the TFTP server on write requests.  This includes only completely transferred files."
+        ::= { dcxTFTPDObjects 12 }
+
+ END

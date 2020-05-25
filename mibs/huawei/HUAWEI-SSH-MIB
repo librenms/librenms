@@ -1,0 +1,1486 @@
+
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: This mib which contains objects manages the 
+--              SSH server and SSH client configuration. 
+-- Reference:  
+-- Version: V2.19
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Varibles and types are imported
+--
+-- ==================================================================
+    HUAWEI-SSH-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm          
+                FROM HUAWEI-MIB         
+               OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP         
+                FROM SNMPv2-CONF            
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE          
+                FROM SNMPv2-SMI         
+            RowStatus, DisplayString            
+                FROM SNMPv2-TC;
+    
+        -- 1.3.6.1.4.1.2011.5.25.118
+            hwSSH MODULE-IDENTITY 
+            LAST-UPDATED "201708170000Z"         
+            ORGANIZATION "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO                                        
+                         "Huawei Industrial Base                
+                          Bantian, Longgang                     
+                          Shenzhen 518129                       
+                          People's Republic of China            
+                          Website: http://www.huawei.com        
+                          Email: support@huawei.com             
+                         "                                      
+            DESCRIPTION 
+                "This mib which contains objects manages the 
+                SSH server and SSH client configuration. 
+                "   
+--  Revision history
+            REVISION    "201708170000Z"
+            DESCRIPTION "V2.19, 
+                          1.modify hwStelnetServerEnable               OID:1.3.6.1.4.1.2011.5.25.118.1.1;
+                          2.modify hwSftpServerEnable                    OID:1.3.6.1.4.1.2011.5.25.118.1.2;
+                          3.modify hwSNetConfServerEnable         OID:1.3.6.1.4.1.2011.5.25.118.1.15;
+                          4.modify hwStelnetIPv4ServerEnable       OID:1.3.6.1.4.1.2011.5.25.118.1.21;
+                          5.modify hwStelnetIPv6ServerEnable       OID:1.3.6.1.4.1.2011.5.25.118.1.22;
+                          6.modify hwSftpIPv4ServerEnable             OID:1.3.6.1.4.1.2011.5.25.118.1.23;
+                          7.modify hwSftpIPv6ServerEnable             OID:1.3.6.1.4.1.2011.5.25.118.1.24;
+                          8.modify hwSCPIPv4ServerEnable            OID:1.3.6.1.4.1.2011.5.25.118.1.25;
+                          9.modify hwSCPIPv6ServerEnable            OID:1.3.6.1.4.1.2011.5.25.118.1.26;
+                          10.modify hwSNetConfIPv4ServerEnable         OID:1.3.6.1.4.1.2011.5.25.118.1.27;
+                          11.modify hwSNetConfIPv6ServerEnable         OID:1.3.6.1.4.1.2011.5.25.118.1.28;
+                          12.modify hwSSHFirstTimeAuthEnable            OID:1.3.6.1.4.1.2011.5.25.118.2.1;
+                          13.modify hwSSHUserName                              OID:1.3.6.1.4.1.2011.5.25.118.1.11.1.2;"
+
+             REVISION    "201705170000Z"
+             DESCRIPTION "V2.18, Modify the type of mib-node according to the field type in DOM" 
+
+             REVISION    "201703140000Z"
+             DESCRIPTION "V2.17, 
+                         1.Add hwSNetConfIPv4ServerEnable          OID:1.3.6.1.4.1.2011.5.25.118.1.27;
+                         2.Add hwSNetConfIPv6ServerEnable          OID:1.3.6.1.4.1.2011.5.25.118.1.28;" 
+
+             REVISION    "201701240000Z"
+             DESCRIPTION "V2.16, 
+                           1.Add hwSSHIPv4ServerPort                OID:1.3.6.1.4.1.2011.5.25.118.1.19;
+                           2.Add hwSSHIPv6ServerPort                OID:1.3.6.1.4.1.2011.5.25.118.1.20;
+                           3.Add hwStelnetIPv4ServerEnable        OID:1.3.6.1.4.1.2011.5.25.118.1.21;
+                           4.Add hwStelnetIPv6ServerEnable        OID:1.3.6.1.4.1.2011.5.25.118.1.22;
+                           5.Add hwSftpIPv4ServerEnable             OID:1.3.6.1.4.1.2011.5.25.118.1.23;
+                           6.Add hwSftpIPv6ServerEnable             OID:1.3.6.1.4.1.2011.5.25.118.1.24;
+                           7.Add hwSCPIPv4ServerEnable            OID:1.3.6.1.4.1.2011.5.25.118.1.25;
+                          8.Add hwSCPIPv6ServerEnable            OID:1.3.6.1.4.1.2011.5.25.118.1.26."
+
+             REVISION    "201409260000Z"
+             DESCRIPTION "V2.15, defect - DTS2014091709267 (default value in the description is updated)."
+
+
+             REVISION    "201406300000Z"
+             DESCRIPTION "V2.14, 
+                          1. Modify the value range of the node hwSSHServerTimeOut, hwSSHServerPort,hwSftpMaxUserNum,
+                             hwSftpOnLineUserNum,hwSSHUserName,hwSSHUserSftpDirectory,hwSSHServerName,hwSSHServerAssignKey.
+                          2. Modify the description of the node hwSSHServerTimeOut,hwSSHServerPort,hwSftpMaxUserNum,hwSSHUserName,
+                             hwSSHUserAuthorizationCMD,hwSSHSftpUserNumExceedMax.
+                          3. Add the following enums of the hwSSHUserAuthType:authDSA(6),authDSAandPASSWORD(7),authAny(8),authECC(9),
+                             authECCandPASSWORD(10).
+                          4. Add the following enums of the hwSSHUserServiceType:servicetypeSNetConf(5),servicetypeSftpSNetConf(6),
+                             servicetypeSTelnetSftp(7),servicetypeSTelnetSNetConf(8).
+                          5. Add the following enums of the hwSSHSessionConnectType:none(0),vty15(16),vty16(17),vty17(18),vty18(19),
+                             vty19(20),vty20(21).
+                          6. modified 'MAX-ACCESS read-only' to 'MAX-ACCESS read-write' of hwSftpMaxUserNum.
+                          7. Add hwSSHUserAssignKeyType in hwSSHUserTable.
+                          8. Add hwSSHSessionKeyType, hwSSHSessionConnectionIndex, hwSSHSessionCtosCompress, hwSSHSessionStocCompress 
+                             in hwSSHServerSessionTable.
+                          9. Add hwSNetConfMaxUserNum, hwSNetConfServerEnable, hwSSHKeepAliveEnable, hwSCPServerEnable, hwSCPMaxUserNum
+                             in hwSSHServer.
+                          10. Add hwSSHServerAssignDSAKey and hwSSHServerAssignECCKey in hwSSHServerInfoTable.
+                          11. Add hwSSHKeepAliveInterval and hwSSHKeepAliveMaxCount in hwSSHClient.
+                         "
+
+             REVISION    "201405060000Z"
+             DESCRIPTION "V1.08, 
+                          1. Add hwRSAPublicKeyFingerprint in hwRSAPublicKeyTable.
+                          2. Add hwRSALocalKeyTable."
+ 
+             REVISION    "201011090000Z"
+             DESCRIPTION "V1.07, The description of this MIB is modified according to the tool."
+             
+             REVISION    "201008250000Z"
+             DESCRIPTION "V1.06, modified the contact-info and the revision history. Modified the description of leaves."
+             
+             REVISION    "201006170000Z"
+             DESCRIPTION "V1.05, the description of hwSSHServerTimeOut, hwSSHServerPort, hwSSHServerKeyTimeOut, hwSSHUserTable, 
+                          hwSSHUserEntry, hwSSHUserAuthType and hwSSHUserServiceType were modified and supplemented." 
+
+             REVISION    "201004180000Z"
+             DESCRIPTION "V1.04, DT requirements were implemented and the syntax and semantics of SIMPLETEST were changed." 
+                          
+             REVISION    "201003030000Z"
+             DESCRIPTION "V1.03, DT requirements were implemented and the syntax and semantics of SIMPLETEST were changed."
+            
+             REVISION    "201001290000Z"        
+             DESCRIPTION "V1.02, hwRSAPublicKeyTable was added."  
+                
+             REVISION    "200609050000Z"
+             DESCRIPTION "V1.00, completed the draft."
+            ::= { hwDatacomm 118 }
+
+--
+-- Node definitions
+--
+    
+--  Node definitions
+-- 
+-- ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ==================================================================       
+        -- 1.3.6.1.4.1.2011.5.25.118.1
+        hwSSHServer OBJECT IDENTIFIER ::= { hwSSH 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.1
+        hwStelnetServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH stelnet server is enable.
+                Options:
+               1. enable(1) -The SSH stelnet server is enable.
+               2. disable(2)-The SSH stelnet server is disable.
+               The default value is disable.
+                "
+            ::= { hwSSHServer 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.2
+        hwSftpServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the sftp server is enable. 
+                Options:
+                1.enable(1) -the sftp server is enable.
+                2.disable(2)-the sftp server is disable.
+                The default value is disable.
+                "
+            -- DEFVAL { 2 }
+            ::= { hwSSHServer 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.3
+        hwSSHServerComp1x OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH server is compatible with SSH1.x.
+                The default is 2.
+                Options:
+                1. enable(1) -indicates that the version compatibility function of the SSH server is enabled 
+                              so that the SSH server is compatible with the SSHv1.x client.
+                2. disable(2)-indicates that the version compatibility function of the SSH server is disabled 
+                              and therefore the SSH server is incompatible with the SSHv1.x client.
+                "
+            ::= { hwSSHServer 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.4
+        hwSSHServerTimeOut OBJECT-TYPE
+            SYNTAX Integer32 (1..120)
+            UNITS      "second"       
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies the time when SSH authentication times out.
+                The unit is the second and the default is 60 seconds."
+            ::= { hwSSHServer 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.5
+        hwSSHServerRetry OBJECT-TYPE
+            SYNTAX Integer32 (1..5)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies authentication-retry times for SSH user. 
+                Default: 3
+                "
+            ::= { hwSSHServer 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.6
+        hwSSHServerPort OBJECT-TYPE
+            SYNTAX Integer32 (22 | 1025..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies port number for SSH server supporting.
+                The default value is 22."
+            ::= { hwSSHServer 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.7
+        hwSSHServerKeyTimeOut OBJECT-TYPE
+            SYNTAX Integer32 (0..24)
+            UNITS "hour"
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The interval of updating the SSH server key pair.    
+                By default, value is 0 hour, which means server key can't be updated forever.
+                Range: 0-24
+                Unit: hour
+                "
+            ::= { hwSSHServer 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.8
+        hwSSHServerAlarmEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether send trap information to NMS.
+                Options:
+                1.enable(1) -Only when its value enable, allowed to send trap informations to NMS.
+                2.disable(2)-Can not to send trap informations to NMS.
+                "
+            ::= { hwSSHServer 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.9
+        hwSftpMaxUserNum OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies the max number of sftp user that sftp server supporting.
+                The default is 5."
+            ::= { hwSSHServer 9 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.10
+        hwSftpOnLineUserNum OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the number of sftp user that has been connected to sftp server currently.
+                "
+            ::= { hwSSHServer 10 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11
+        hwSSHUserTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSSHUserEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                This table is used for querying and setting the information about SSH user.
+                "
+            ::= { hwSSHServer 11 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1
+        hwSSHUserEntry OBJECT-TYPE
+            SYNTAX HwSSHUserEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                This table is used for querying and setting the information about SSH user.
+                The index of this entry is hwSSHUserIndex.                 
+                "
+            INDEX { hwSSHUserIndex }
+            ::= { hwSSHUserTable 1 }
+
+        
+        HwSSHUserEntry ::=
+            SEQUENCE { 
+                hwSSHUserIndex
+                    Integer32,
+                hwSSHUserName
+                    OCTET STRING,
+                hwSSHUserAssignKey
+                    OCTET STRING,
+                hwSSHUserAuthType
+                    INTEGER,
+                hwSSHUserServiceType
+                    INTEGER,
+                hwSSHUserSftpDirectory
+                    OCTET STRING,
+                hwSSHUserAuthorizationCMD
+                    INTEGER,
+                hwSSHUserRowStatus
+                    RowStatus,
+                hwSSHUserAssignKeyType
+                    INTEGER
+                }
+
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.1
+        hwSSHUserIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..200)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the index of hwSSHUserTable.
+                "
+            ::= { hwSSHUserEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.2
+        hwSSHUserName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object specifies the name of a SSH user. The maximum length of the node is 255."
+            ::= { hwSSHUserEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.3
+        hwSSHUserAssignKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies is a peer public key for a SSH user.
+                This peer public key on the SSH server must exist and associate with hwRSAPublicKeyName.
+                "
+            ::= { hwSSHUserEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.4
+        hwSSHUserAuthType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                authNULL(1),
+                authPASSWORD(2),
+                authRSA(3),
+                authRSAorPASSWORD(4),
+                authRSAandPASSWORD(5),
+                authDSA(6),
+                authDSAandPASSWORD(7),
+                authAny(8),
+                authECC(9),
+                authECCandPASSWORD(10)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the authentication type of SSH user.
+                The default authentication type is authPASSWORD.
+                Options: 
+                1. authNULL(1)           -No authenticate.
+                2. authPASSWORD(2)       -Password authentication.
+                3. authRSA(3)            -RSA key authentication.
+                4. authRSAorPASSWORD(4)  -Password or RSA key authentication.
+                5. authRSAandPASSWORD(5) -Password and RSA key authentication.
+                6. authDSA(6),           -DSA key authentication.
+                7. authDSAandPASSWORD(7), -Password or DSA key authentication.
+                8. authAny(8),            -Any  authentication.
+                9. authECC(9),            -ECC key authentication.
+                10.authECCandPASSWORD(10) -Password and ECC key authentication.
+                "
+            DEFVAL { authPASSWORD }
+            ::= { hwSSHUserEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.5
+        hwSSHUserServiceType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                servicetypeNULL(1),
+                servicetypeSTELNET(2),
+                servicetypeSFTP(3),
+                servicetypeALL(4),
+                servicetypeSNetConf(5),
+                servicetypeSftpSNetConf(6),
+                servicetypeSTelnetSftp(7),
+                servicetypeSTelnetSNetConf(8)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the service type of SSH user. 
+                Options: 
+                1. servicetypeNULL(1)    -default service type.
+                2. servicetypeSTELNET(2) -The service type of the SSH user is STELNET.
+                3. servicetypeSFTP(3)    -The service type of the SSH user is SFTP.
+                4. servicetypeALL(4)     -The service type of the SSH user is all. 
+                5. servicetypeSNetConf(5),      -The service type of the SSH user is SNetConf.
+                6. servicetypeSftpSNetConf(6),   -The service type of the SSH user is Sftp and SNetConf.
+                7. servicetypeSTelnetSftp(7),    -The service type of the SSH user is STelnet and Sftp.
+                8. servicetypeSTelnetSNetConf(8) -The service type of the SSH user is STelnet and SNetConf."
+            DEFVAL { servicetypeNULL }
+            ::= { hwSSHUserEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.6
+        hwSSHUserSftpDirectory OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object specifies the working directory for the sftp user. 
+                The total length of absolute path is 128,the length of single directory is 128."
+            ::= { hwSSHUserEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.7
+        hwSSHUserAuthorizationCMD OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                authorizationNULL(1),
+                authorizationAAA(2)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the authorization type of SSH user. When authorizationAAA is specified,
+                the SSH user will be authorizated by HWTACACS server. The default authorization is authorizationNULL,
+                indicating SSH user doesn't need to be authorizated by HWTACACS server.
+                Options:
+                1.authorizationNULL(1)-The default authorization is authorizationNULL,indicating SSH user 
+                                       doesn't need to be authorizated by HWTACACS server.
+                2.authorizationAAA(2) -When authorizationAAA is specified,the SSH user will be 
+                                       authorizated by HWTACACS server. 
+                "
+            DEFVAL { authorizationNULL }
+            ::= { hwSSHUserEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.8
+        hwSSHUserRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the status of this entry.
+                When the status is active(1), hwSSHUserAssignKey, hwSSHUserAuthType, 
+                hwSSHUserServiceType, hwSSHUserSftpDirectory, and hwSSHUserAuthorizationCMD's 
+                value in the entry are allowed to be modified.
+                "
+            ::= { hwSSHUserEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.11.1.9
+        hwSSHUserAssignKeyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                keyTypeNULL(0),
+                keyTypeRSA(1),
+                keyTypeDSA(2),
+                keyTypeECC(3)
+                }
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object specifies the public key type of SSH user. "
+            ::= { hwSSHUserEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12
+        hwSSHServerSessionTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSSHServerSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The object shows current session information of the SSH server which includes username,
+                version information, retry times of online users currently.
+                The index of this table is hwSSHSessionIndex.
+                "
+            ::= { hwSSHServer 12 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1
+        hwSSHServerSessionEntry OBJECT-TYPE
+            SYNTAX HwSSHServerSessionEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The object shows current session information of the SSH server which includes username,
+                version information, retry times of online users currently.
+                The index of this entry is hwSSHSessionIndex.                
+                "
+            INDEX { hwSSHSessionIndex }
+            ::= { hwSSHServerSessionTable 1 }
+
+        
+        HwSSHServerSessionEntry ::=
+            SEQUENCE { 
+                hwSSHSessionIndex
+                    Integer32,
+                hwSSHSessionUserName
+                    DisplayString,
+                hwSSHSessionConnectType
+                    INTEGER,
+                hwSSHSessionVer
+                    DisplayString,
+                hwSSHSessionState
+                    INTEGER,
+                hwSSHSessionRetry
+                    Integer32,
+                hwSSHSessionCtosCipher
+                    DisplayString,
+                hwSSHSessionStocCipher
+                    DisplayString,
+                hwSSHSessionCtosHmac
+                    DisplayString,
+                hwSSHSessionStocHmac
+                    DisplayString,
+                hwSSHSessionKex
+                    DisplayString,
+                hwSSHSessionAuthType
+                    DisplayString,
+                hwSSHSessionServiceType
+                    DisplayString,
+                hwSSHSessionKeyType
+                    INTEGER,
+                hwSSHSessionConnectionIndex
+                    Integer32,
+                hwSSHSessionCtosCompress
+                    DisplayString,
+                hwSSHSessionStocCompress
+                    DisplayString
+                }
+
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.1
+        hwSSHSessionIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the index of hwSSHServerSessionTable.
+                "
+            ::= { hwSSHServerSessionEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.2
+        hwSSHSessionUserName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the name of a SSH user,
+                which has started a session.
+                "
+            ::= { hwSSHServerSessionEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.3
+        hwSSHSessionConnectType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                none(0),
+                vty0(1),
+                vty1(2),
+                vty2(3),
+                vty3(4),
+                vty4(5),
+                vty5(6),
+                vty6(7),
+                vty7(8),
+                vty8(9),
+                vty9(10),
+                vty10(11),
+                vty11(12),
+                vty12(13),
+                vty13(14),
+                vty14(15),
+                vty15(16),
+                vty16(17),
+                vty17(18),
+                vty18(19),
+                vty19(20),
+                vty20(21)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the line number supports a connection of SSH 
+                user which is in connection with SSH server. 
+                "
+            ::= { hwSSHServerSessionEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.4
+        hwSSHSessionVer OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the version information of a SSH 
+                user which is in connection with SSH server.
+                "
+            ::= { hwSSHServerSessionEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.5
+        hwSSHSessionState OBJECT-TYPE
+            SYNTAX INTEGER { started(1) }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the state of a SSH user 
+                which is in connection with SSH server.
+                Options:
+                1.started(1)-indicates the state is start.
+                "
+            ::= { hwSSHServerSessionEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.6
+        hwSSHSessionRetry OBJECT-TYPE
+            SYNTAX Integer32 (0..5)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies SSH user's retrying times in authentications.
+                "
+            ::= { hwSSHServerSessionEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.7
+        hwSSHSessionCtosCipher OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the cipher of custom to server.
+                "
+            ::= { hwSSHServerSessionEntry 7 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.8
+        hwSSHSessionStocCipher OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the cipher of server to custom.
+                "
+            ::= { hwSSHServerSessionEntry 8 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.9
+        hwSSHSessionCtosHmac OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the hmac of custom to server.
+                "
+            ::= { hwSSHServerSessionEntry 9 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.10
+        hwSSHSessionStocHmac OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the hmac of server to custom.
+                "
+            ::= { hwSSHServerSessionEntry 10 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.11
+        hwSSHSessionKex OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the key exchange.
+                "
+            ::= { hwSSHServerSessionEntry 11 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.12
+        hwSSHSessionAuthType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the authentication type of SSH session.
+                "
+            ::= { hwSSHServerSessionEntry 12 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.13
+        hwSSHSessionServiceType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the service type of SSH session.
+                "
+            ::= { hwSSHServerSessionEntry 13 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.14
+        hwSSHSessionKeyType OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                keyTypeRSA(1),
+                keyTypeDSA(2),
+                keyTypeECC(3)
+                }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The object specifies the public key type of SSH session."
+            ::= { hwSSHServerSessionEntry 14 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.15
+        hwSSHSessionConnectionIndex OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The object specifies the line number supports a connection of SSH user which is in connection with SSH(STelnet/Sftp/SNetConf) server."
+            ::= { hwSSHServerSessionEntry 15 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.16
+        hwSSHSessionCtosCompress OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The object specifies the Compression algorithm of SSH client to server."
+            ::= { hwSSHServerSessionEntry 16 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.12.1.17
+        hwSSHSessionStocCompress OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The object specifies the Compression algorithm of SSH Server to client."
+            ::= { hwSSHServerSessionEntry 17 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.13
+        hwRSAPublicKeyTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwRSAPublicKeyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                A table of configuration about RSA Public Key.
+                The index of this table is hwRSAPublicKeyName.  
+                hwRSAPublicKeyName is the name of RSA Public Key.              
+                "
+            ::= { hwSSHServer 13 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.13.1
+        hwRSAPublicKeyEntry OBJECT-TYPE
+            SYNTAX HwRSAPublicKeyEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                A table of configuration about RSA Public Key.
+                The index of this entry is hwRSAPublicKeyName.  
+                hwRSAPublicKeyName is the name of RSA Public Key.
+                "
+            INDEX { hwRSAPublicKeyName }
+            ::= { hwRSAPublicKeyTable 1 }
+
+        
+        HwRSAPublicKeyEntry ::=
+            SEQUENCE { 
+                hwRSAPublicKeyName
+                    OCTET STRING,
+                hwRSAPublicKeyCode
+                    OCTET STRING,
+                hwRSAPublicKeyRowStatus
+                    RowStatus,
+                hwRSAPublicKeyFingerprint
+                    OCTET STRING
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.118.1.13.1.1
+        hwRSAPublicKeyName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..30))
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the name of RSA Public Key.
+                "
+            ::= { hwRSAPublicKeyEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.13.1.2
+        hwRSAPublicKeyCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..2048))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies is RSA Public Key Code that in the format of ber, the maximum length of the node is 2048.             
+                When the RSA public key is created, the index value is the name of the public key, which uses the ASCII code.
+                The public key value must be generated through a tool. Firstly, use the PUTTYGEN.EXE tool to generate the matching 
+                public key and private key. Then, use the sshkey.exe tool to convert the generated public key to the required public key value.
+                "
+            ::= { hwRSAPublicKeyEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.13.1.3
+        hwRSAPublicKeyRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the status of this table entry.
+                When the status is active(1), hwRSAPublicKeyName, hwRSAPublicKeyCode's
+                value in the entry are allowed to be modified.  
+                createAndGo(4) is supplied to create a new instance of a conceptual row.
+                destroy(6) is supplied to delete the instances associated with an existing conceptual row.        
+                "
+            ::= { hwRSAPublicKeyEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.13.1.4
+        hwRSAPublicKeyFingerprint OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..60))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the fingerprint of RSA Public Key Code,
+                that including the public key algorithm, length and fingerprint.
+                "
+            ::= { hwRSAPublicKeyEntry 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.118.1.14
+        hwSNetConfMaxUserNum OBJECT-TYPE
+            SYNTAX Integer32 (0..15)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies the max number of SNetConf user that SNetConf Server supporting.
+                The default is 5."
+            ::= { hwSSHServer 14 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.15
+        hwSNetConfServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies whether the SSH SNetConf Server is enable.
+                The default is disable(2)."
+            ::= { hwSSHServer 15 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.16
+        hwSSHKeepAliveEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies whether the KeepAlive functionality on SSH Server is enable.
+                The default is 1."
+            ::= { hwSSHServer 16 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.17
+        hwSCPServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies whether the SSH SCP Server is enable.
+                The default is 2."
+            ::= { hwSSHServer 17 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.18
+        hwSCPMaxUserNum OBJECT-TYPE
+            SYNTAX Integer32 (0..5)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies the max number of SCP user that SCP Server supporting.
+                The default is 2."
+            ::= { hwSSHServer 18 }
+
+        -- 1.3.6.1.4.1.2011.5.25.118.1.19
+        hwSSHIPv4ServerPort OBJECT-TYPE
+            SYNTAX Unsigned32 (22 | 1025..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies port number for SSH IPv4 server supporting.
+                The default value is 22."
+            ::= { hwSSHServer 19 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.20
+        hwSSHIPv6ServerPort OBJECT-TYPE
+            SYNTAX Unsigned32 (22 | 1025..65535)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies port number for SSH IPv6 server supporting.
+                The default value is 22."
+            ::= { hwSSHServer 20 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.21
+        hwStelnetIPv4ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH stelnet IPv4 server is enable.
+                Options:
+                1. enable(1) -The SSH stelnet IPv4 server is enable.
+                2. disable(2)-The SSH stelnet IPv4 server is disable.
+                The default value is disable.
+                "
+            ::= { hwSSHServer 21 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.22
+        hwStelnetIPv6ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH stelnet IPv6 server is enable.
+                Options:
+                1. enable(1) -The stelnet IPv6 server is enable.
+                2. disable(2)-The stelnet IPv6 server is disable.
+                The default value is disable.
+                "
+            ::= { hwSSHServer 22 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.1.23
+        hwSftpIPv4ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the sftp IPv4 server is enable.
+                Options:
+                1.enable(1) -The sftp IPv4 server is enable
+                2.disable(2)-The sftp IPv4 server is disable.
+                The default value is disable.
+                "
+            ::= { hwSSHServer 23 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.24
+        hwSftpIPv6ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the sftp IPv6 server is enable.
+                Options:
+                1.enable(1) -the sftp IPv6 server is enable.
+                2.disable(2)-the sftp IPv6 server is disable.
+                The default value is disable.
+                "
+            ::= { hwSSHServer 24 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.25
+        hwSCPIPv4ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies whether the SCP IPv4 Server is enable. 
+                The default value is disable."
+            ::= { hwSSHServer 25 }
+            
+            
+        -- 1.3.6.1.4.1.2011.5.25.118.1.26
+        hwSCPIPv6ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies whether the SCP IPv6 Server is enable.
+                The default value is disable."
+            ::= { hwSSHServer 26 }
+
+
+         -- 1.3.6.1.4.1.2011.5.25.118.1.27
+         hwSNetConfIPv4ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH SNetConf IPv4 server is enable.
+                Options:
+                1.enable(1) -the SSH SNetConf IPv4 server is enable.
+                2.disable(2)-the SSH SNetConf IPv4 server is disable.
+                The default value is disable.
+                "
+            ::= { hwSSHServer 27 }
+
+        
+         -- 1.3.6.1.4.1.2011.5.25.118.1.28
+         hwSNetConfIPv6ServerEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies whether the SSH SNetConf IPv6 server is enable.
+                Options:
+                1. enable(1) -The SSH SNetConf IPv6 server is enable.
+                2. disable(2)-The SSH SNetConf IPv6 server is disable.
+                The default value is disable.
+                "
+            ::= { hwSSHServer 28 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2
+        hwSSHClient OBJECT IDENTIFIER ::= { hwSSH 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.1
+        hwSSHFirstTimeAuthEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enable(1),
+                disable(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies whether the SSH client
+                supports first-time-authentication.
+                Options:
+                1.enable(1) -indicates the SSH client supports first-time-authentication.
+                2.disable(2)-indicates the SSH client does not support first-time-authentication.
+                The default value is disable.
+                "
+            ::= { hwSSHClient 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.2
+        hwSSHServerInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwSSHServerInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                A table of configuration about the relation
+                between the SSH server and the rsa peerkey.
+                "
+            ::= { hwSSHClient 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.2.1
+        hwSSHServerInfoEntry OBJECT-TYPE
+            SYNTAX HwSSHServerInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                A table of configuration about the relation
+                between the SSH server and the rsa peerkey.
+                The index of this entry is hwSSHServerIndex.
+                "
+            INDEX { hwSSHServerIndex }
+            ::= { hwSSHServerInfoTable 1 }
+
+        
+        HwSSHServerInfoEntry ::=
+            SEQUENCE { 
+                hwSSHServerIndex
+                    Integer32,
+                hwSSHServerName
+                    OCTET STRING,
+                hwSSHServerAssignKey
+                    OCTET STRING,
+                hwSSHServerRowStatus
+                    RowStatus,
+                hwSSHServerAssignDSAKey
+                    OCTET STRING,
+                hwSSHServerAssignECCKey
+                    OCTET STRING
+             }
+
+        -- 1.3.6.1.4.1.2011.5.25.118.2.2.1.1
+        hwSSHServerIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..20)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the index of hwSSHServerInfoTable.
+                "
+            ::= { hwSSHServerInfoEntry 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.2.1.2
+        hwSSHServerName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..255))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the name of a SSH server.
+                "
+            ::= { hwSSHServerInfoEntry 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.2.1.3
+        hwSSHServerAssignKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies a peer public key for a 
+                SSH server. This peer public key must exist.
+                "
+            ::= { hwSSHServerInfoEntry 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.2.1.4
+        hwSSHServerRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the status of this entry.
+                When the status is active,  
+                hwSSHServerAssignKey's value in the entry is 
+                allowed to be modified.
+                "
+            ::= { hwSSHServerInfoEntry 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.2.1.5
+        hwSSHServerAssignDSAKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object specifies a DSA peer public key for a SSH server.This peer public key must exist."
+            ::= { hwSSHServerInfoEntry 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.2.1.6
+        hwSSHServerAssignECCKey OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..64))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The object specifies a ECC peer public key for a SSH server.This peer public key must exist."
+            ::= { hwSSHServerInfoEntry 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.3
+        hwSSHKeepAliveInterval OBJECT-TYPE
+            SYNTAX Integer32 (0..3600)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies KeepAlive Timeout interval on SSH Client.
+                The default is 0. 0 specify no KeepAlive packet should be sent to Server."
+            ::= { hwSSHClient 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.2.4
+        hwSSHKeepAliveMaxCount OBJECT-TYPE
+            SYNTAX Integer32 (1..30)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The object specifies maximum KeepAlive packet to send to SSH Server before disconnect.
+                The default is 3."
+            ::= { hwSSHClient 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.3
+        hwSSHNotifications OBJECT IDENTIFIER ::= { hwSSH 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.3.1
+        hwSSHSftpUserNumExceedMax NOTIFICATION-TYPE
+            OBJECTS { hwSftpOnLineUserNum, hwSftpMaxUserNum }
+            STATUS current
+            DESCRIPTION 
+                "This notification was sent when the total number of sftp users requesting sftp service
+                exceeds max user number configured."
+            ::= { hwSSHNotifications 1 }
+
+        
+--    Conformance information
+        -- 1.3.6.1.4.1.2011.5.25.118.4
+        hwSSHMIBConformance OBJECT IDENTIFIER ::= { hwSSH 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.4.1
+        hwSSHMIBCompliances OBJECT IDENTIFIER ::= { hwSSHMIBConformance 1 }
+
+        
+--    this module
+        -- 1.3.6.1.4.1.2011.5.25.118.4.1.1
+        hwSSHMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "
+                The compliance statement for systems supporting 
+                the HUAWEI-SSH-MIB.
+                "
+            MODULE -- this module
+                MANDATORY-GROUPS { hwSSHServerGroup, hwSSHUserGroup, hwSSHServerSessionGroup, hwSSHClientGroup, hwSSHServerInfoGroup, 
+                    hwSSHNotificationGroup }
+            ::= { hwSSHMIBCompliances 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.4.2
+        hwSSHMIBGroups OBJECT IDENTIFIER ::= { hwSSHMIBConformance 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.4.2.1
+        hwSSHServerGroup OBJECT-GROUP
+            OBJECTS { hwStelnetServerEnable, hwSftpServerEnable, hwSSHServerComp1x, hwSSHServerTimeOut, hwSSHServerRetry, 
+                hwSSHServerPort, hwSSHServerKeyTimeOut, hwSSHServerAlarmEnable, hwSftpMaxUserNum, hwSftpOnLineUserNum, 
+                hwSNetConfMaxUserNum, hwSNetConfServerEnable, hwSSHKeepAliveEnable, hwSCPServerEnable, 
+                hwSCPMaxUserNum }
+            STATUS current
+            DESCRIPTION 
+                "
+                The SSH server attribute group.
+                "
+            ::= { hwSSHMIBGroups 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.4.2.2
+        hwSSHUserGroup OBJECT-GROUP
+            OBJECTS { hwSSHUserName, hwSSHUserAssignKey, hwSSHUserAuthType, hwSSHUserServiceType, hwSSHUserSftpDirectory, 
+                hwSSHUserAuthorizationCMD, hwSSHUserRowStatus, hwSSHUserAssignKeyType }
+            STATUS current
+            DESCRIPTION 
+                "
+                The SSH user's group.
+                "
+            ::= { hwSSHMIBGroups 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.4.2.3
+        hwSSHServerSessionGroup OBJECT-GROUP
+            OBJECTS { hwSSHSessionUserName, hwSSHSessionConnectType, hwSSHSessionVer, hwSSHSessionState, hwSSHSessionRetry, 
+                hwSSHSessionCtosCipher, hwSSHSessionStocCipher, hwSSHSessionCtosHmac, hwSSHSessionStocHmac, hwSSHSessionKex, 
+                hwSSHSessionAuthType, hwSSHSessionServiceType, hwSSHSessionKeyType, hwSSHSessionConnectionIndex, hwSSHSessionCtosCompress, 
+                hwSSHSessionStocCompress 
+                }
+            STATUS current
+            DESCRIPTION 
+                "
+                The SSH server's session group.
+                "
+            ::= { hwSSHMIBGroups 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.4.2.4
+        hwSSHClientGroup OBJECT-GROUP
+            OBJECTS { hwSSHFirstTimeAuthEnable, hwSSHKeepAliveInterval, hwSSHKeepAliveMaxCount }
+            STATUS current
+            DESCRIPTION 
+                "
+                The SSH client's attribute group.
+                "
+            ::= { hwSSHMIBGroups 4 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.4.2.5
+        hwSSHServerInfoGroup OBJECT-GROUP
+            OBJECTS { hwSSHServerName, hwSSHServerAssignKey, hwSSHServerRowStatus, hwSSHServerAssignDSAKey }
+            STATUS current
+            DESCRIPTION 
+                "
+                The SSH serverInfo's group.
+                "
+            ::= { hwSSHMIBGroups 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.4.2.6
+        hwSSHNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwSSHSftpUserNumExceedMax }
+            STATUS current
+            DESCRIPTION 
+                "
+                The SSH Notification group.
+                "
+            ::= { hwSSHMIBGroups 6 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.5
+        hwRSALocalKeyTable OBJECT IDENTIFIER ::= { hwSSH 5 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.5.1
+        hwRSALocalHostPublicKeyCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..2048))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the local host RSA Public Key Code in the format of ber.
+                "
+            ::= { hwRSALocalKeyTable 1 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.5.2
+        hwRSALocalHostPublicKeyFingerprint OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..60))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the fingerprint of the local host RSA Public Key Code,
+                that including the public key algorithm, length and fingerprint.
+                "
+            ::= { hwRSALocalKeyTable 2 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.5.3
+        hwRSALocalServerPublicKeyCode OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..2048))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the local server RSA Public Key Code in the format of ber.
+                "
+            ::= { hwRSALocalKeyTable 3 }
+
+        
+        -- 1.3.6.1.4.1.2011.5.25.118.5.4
+        hwRSALocalServerPublicKeyFingerprint OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..60))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "
+                The object specifies the fingerprint of the local server RSA Public Key Code,
+                that including the public key algorithm, length and fingerprint.
+                "
+            ::= { hwRSALocalKeyTable 4 }
+
+        
+    
+    END

@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os'] != 'Snom') {
     echo ' SNMP';
 
@@ -39,12 +41,11 @@ if ($device['os'] != 'Snom') {
     $data = snmpwalk_cache_oid($device, 'snmp', array(), 'SNMPv2-MIB');
 
     if (isset($data[0]['snmpInPkts'])) {
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
         $fields = array();
         foreach ($oids as $oid) {
-            $oid_ds    = substr($oid, 0, 19);
-            $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:100000000000";
-            $fields[$oid] = isset($data[0][$oid]) ? $data[0][$oid] : 'U';
+            $rrd_def->addDataset($oid, 'COUNTER', null, 100000000000);
+            $fields[substr($oid, 0, 19)] = isset($data[0][$oid]) ? $data[0][$oid] : 'U';
         }
 
         $tags = compact('rrd_def');

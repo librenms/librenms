@@ -23,4 +23,4 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-list($hardware, $version) = preg_split('/ /', preg_replace('/([\\\"]+)/', '', $poll_device['sysDescr']));
+list($hardware, $version) = preg_split('/ /', preg_replace('/([\\\"]+)/', '', $device['sysDescr']));

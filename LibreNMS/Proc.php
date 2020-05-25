@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use Exception;
+use Illuminate\Support\Str;
 
 class Proc
 {
@@ -42,6 +43,11 @@ class Proc
      * @var bool if this process is synchronous (waits for output)
      */
     private $_synchronous;
+
+    /**
+     * @var int|null hold the exit code, we can only get this on the first process_status after exit
+     */
+    private $_exitcode = null;
 
     /**
      * Create and run a new process
@@ -184,10 +190,11 @@ class Proc
      * Please attempt to run close() instead of this
      * This will be called when this object is destroyed if the process is still running
      *
+     * @param int $timeout how many microseconds to wait before terminating (SIGKILL)
      * @param int $signal the signal to send
      * @throws Exception
      */
-    public function terminate($signal = 15)
+    public function terminate($timeout = 3000, $signal = 15)
     {
         $status = $this->getStatus();
 
@@ -195,9 +202,24 @@ class Proc
 
         $closed = proc_terminate($this->_process, $signal);
 
+        $time = 0;
+        while ($time < $timeout) {
+            $closed = !$this->isRunning();
+            if ($closed) {
+                break;
+            }
+
+            usleep(100);
+            $time += 100;
+        }
+
         if (!$closed) {
             // try harder
-            $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
+            if (function_exists('posix_kill')) {
+                $killed = posix_kill($status['pid'], 9); //9 is the SIGKILL signal
+            } else {
+                $killed = proc_terminate($this->_process, 9);
+            }
             proc_close($this->_process);
 
             if (!$killed && $this->isRunning()) {
@@ -214,7 +236,13 @@ class Proc
      */
     public function getStatus()
     {
-        return proc_get_status($this->_process);
+        $status = proc_get_status($this->_process);
+
+        if ($status['running'] === false && is_null($this->_exitcode)) {
+            $this->_exitcode = $status['exitcode'];
+        }
+
+        return $status;
     }
 
     /**
@@ -228,7 +256,18 @@ class Proc
             return false;
         }
         $st = $this->getStatus();
-        return isset($st['running']);
+        return isset($st['running']) && $st['running'];
+    }
+
+    /**
+     * Returns the exit code from the process.
+     * Will return null unless isRunning() or getStatus() has been run and returns false.
+     *
+     * @return int|null
+     */
+    public function getExitCode()
+    {
+        return $this->_exitcode;
     }
 
     /**
@@ -261,7 +300,7 @@ class Proc
      */
     private function checkAddEOL($string)
     {
-        if (!ends_with($string, PHP_EOL)) {
+        if (!Str::endsWith($string, PHP_EOL)) {
             $string .= PHP_EOL;
         }
         return $string;

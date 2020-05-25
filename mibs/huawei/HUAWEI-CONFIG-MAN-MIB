@@ -1,0 +1,1683 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+--
+-- Description: configuration mangement mib
+-- Reference:   huawei enterprise mib
+-- Version:     V2.17
+-- History:
+--                initial version 2002-12-20
+-- =================================================================
+
+HUAWEI-CONFIG-MAN-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        huaweiUtility            
+            FROM HUAWEI-MIB            
+        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+            FROM SNMPv2-CONF            
+        TimeTicks, IpAddress, Integer32, Unsigned32, Counter32, 
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+            FROM SNMPv2-SMI    
+        InetAddressType,InetAddress         FROM INET-ADDRESS-MIB  -- [RFC4001]        
+        DisplayString, TruthValue, RowStatus, TEXTUAL-CONVENTION, 
+        DateAndTime            
+            FROM SNMPv2-TC;
+
+
+    -- 1.3.6.1.4.1.2011.6.10
+    hwConfig MODULE-IDENTITY 
+        LAST-UPDATED"201708021727Z"         -- August 02, 2017 at 17:27GMT
+        ORGANIZATION
+              "Huawei Technologies Co.,Ltd."
+        CONTACT-INFO
+              "Huawei Industrial Base
+                Bantian, Longgang
+                 Shenzhen 518129
+                 People's Republic of China
+                 Website: http://www.huawei.com
+                 Email: support@huawei.com
+               "
+        DESCRIPTION 
+            "The HUAWEI-CONFIG-MAN-MIB contains objects to manage the system configuration. 
+            It defines the model used to represent configuration data that exists elsewhere 
+            in the system and in peripheral devices. The MIB is proper for system configuration.
+            NMS can query configuration change log information and operate configuration.
+            There are no constraints on this MIB."
+
+         REVISION "201708021727Z"         -- August 02, 2017 at 17:27GMT
+           DESCRIPTION 
+            "modified trap node value hwCfgAppDataInconsistent and hwCfgAppDataInconsistentResume."
+
+         REVISION "201605261925Z"         -- May 26, 2016 at 19:56GMT
+           DESCRIPTION 
+            "modified trap node value hwCfgRestoreErrCode ."
+
+
+         REVISION "201603251010Z"         -- March 25, 2016 at 10:10GMT
+           DESCRIPTION 
+            "modified trap node name hwConfigInconsistentResume."
+
+         REVISION "201602221010Z"         -- February 22, 2016 at 10:10GMT
+           DESCRIPTION 
+            "modified trap node hwConfigInconsistent and hwConfigConsistent."
+
+
+        REVISION "201504271402Z"         -- April 27, 2015 at 14:02GMT
+           DESCRIPTION 
+            "add trap node hwConfigInconsistent and hwConfigConsistent."
+
+        REVISION "201504131119Z"        -- April 13, 2015 at 11:19 GMT
+           DESCRIPTION 
+            "modified  trap node hwCfgRestoreFail, and  MIB node hwCfgRestoreErrCode for hwCfgRestoreFail."
+
+
+        REVISION "201502022300Z"        -- February 09, 2015 at 23:00 GMT
+        DESCRIPTION 
+            "Add new trap node hwCfgRestoreFail, and new MIB node hwCfgRestoreErrCode for hwCfgRestoreFail."
+        REVISION "201409182200Z"        -- Septembet 18, 2014 at 22:00 GMT
+        DESCRIPTION 
+            "Modify the length and description of hwCfgBackupPassword."
+        REVISION "201409161020Z"        -- Septembet 16, 2014 at 10:20 GMT
+        DESCRIPTION 
+            "Modify the description of hwCfgOperateFileName."
+        REVISION "201408211602Z"        -- August 21, 2014 at 16:02 GMT
+        DESCRIPTION 
+            "Modify the length and description of hwCfgBackupPassword."
+        REVISION "201405292230Z"        -- May 29, 2014 at 10:20 GMT
+        DESCRIPTION 
+            "Modify the length range of hwCfgLogTerminalUser."
+        REVISION "201405262230Z"        -- May 26, 2014 at 10:20 GMT
+        DESCRIPTION 
+            "Modify the length range of hwCfgLogTerminalUser."
+        REVISION "201309032230Z"        -- September 03, 2013 at 22:30 GMT
+        DESCRIPTION 
+            "Add new mib node hwCfgOperateVpnInstance of hwCfgOperateEntry."
+        REVISION "201308302230Z"        -- August 30, 2013 at 22:30 GMT
+        DESCRIPTION 
+            "Add new mib node hwCfgOperateServerAddressType and hwCfgOperateServerAddressNet of hwCfgOperateEntry."
+        REVISION  "200608222230Z"
+        DESCRIPTION 
+            "Add new mib node hwCfgBackupVpnInstance of table HwCfgBackup2ServerEntry."
+        REVISION  "200608222230Z"
+        DESCRIPTION 
+            "Modify the description of hwCfgBackupProtocol."
+        REVISION  "200608222230Z"
+        DESCRIPTION 
+            "Modify the description of hwCfgBackupPassword And hwCfgOperateUserPassword."
+        REVISION "200608222230Z"        -- August 22, 2006 at 22:30 GMT
+        DESCRIPTION 
+            "The initial revision of this MIB module ."
+        ::= { huaweiUtility 10 }
+
+    --
+    -- Textual conventions
+    --
+
+    ConfigOperationType ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION 
+            "Specify operation types on configuration.
+            Currently, following types of operation are provided:
+            running2Startup(1):refresh the saved configuration file used currently 
+                       with current configuration running in the system. The 
+                       operation is the same as that of 
+                       [save]  command from command line.(running->startup)
+            startup2Running(2):append the configration of the saved configuration file used currently 
+                       to current configuration running in the system.(running<-startup)
+            running2Net(3):Send the current configuration running in the system to the network
+                       through a certain protocol.(running->networkFile)
+            net2Running(4):append the configration of a remote file from network to current configuration running 
+       in the system through a certain protocol.(running<-networkFile)
+            net2Startup(5):Download a remote file to the local system to be the saved configuration file used currently
+                       through a certain protocol.(startup<-networkFile)
+            startup2Net(6):Send the saved configuration file used currently to the network 
+                         through a certain protocol. (startup ->networkFile)"
+        SYNTAX INTEGER
+            {
+            running2Startup(1),
+            startup2Running(2),
+            running2Net(3),
+            net2Running(4),
+            net2Startup(5),
+            startup2Net(6)
+            }
+
+    --
+    -- Node definitions
+    --
+
+    -- 1.3.6.1.4.1.2011.6.10.1
+    hwConfigManObjects OBJECT IDENTIFIER ::= { hwConfig 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1
+    hwCfgLog OBJECT IDENTIFIER ::= { hwConfigManObjects 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.1
+    hwCfgRunModifiedLast OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object records the value of sysUpTime when the current configuration
+             running in the system was last modified."
+        ::= { hwCfgLog 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.2
+    hwCfgRunSavedLast OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object records the value of sysUpTime when the current configuration
+             running in the system was last saved.
+                                 
+             If the value of the object is smaller than
+             hwCfgRunModifiedLast, the current configuration has been
+             modified but not saved."
+        ::= { hwCfgLog 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.3
+    hwCfgStartModifiedLast OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object records the value of sysUpTime when the saved configuration 
+             used currently was last modified. It may have been changed by a save of the     
+             current configuration running in the system or other methods such as copy."
+        ::= { hwCfgLog 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.4
+    hwCfgLogLimitedEntries OBJECT-TYPE
+        SYNTAX Integer32 (0..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object shows the maximum number of rows in
+            hwCfgLogTable. The value supported by the system is 10.
+            "
+        ::= { hwCfgLog 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.5
+    hwCfgLogDeletedEntries OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The total number of rows deleted from hwCfgLogTable.           
+            "
+        ::= { hwCfgLog 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.6
+    hwCfgLogWantBackup OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Decides whether or not to backup the configuration log information.
+            If the value is true, the data of configuration log on the master 
+            will be sent to slave. Otherwise the data of log will be lost when 
+            master switches to slave. Default value is true."
+        ::= { hwCfgLog 6 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7
+    hwCfgLogTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCfgLogEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of configuration log on this device.
+            "
+        ::= { hwCfgLog 7 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1
+    hwCfgLogEntry OBJECT-TYPE
+        SYNTAX HwCfgLogEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Information about a configuration log in this system."
+        INDEX { hwCfgLogIndex }
+        ::= { hwCfgLogTable 1 }
+
+    
+    HwCfgLogEntry ::=
+        SEQUENCE { 
+            hwCfgLogIndex
+                Integer32,
+            hwCfgLogTime
+                TimeTicks,
+            hwCfgLogSrcCmd
+                INTEGER,
+            hwCfgLogSrcData
+                INTEGER,
+            hwCfgLogDesData
+                INTEGER,
+            hwCfgLogTerminalType
+                INTEGER,
+            hwCfgLogTerminalUser
+                DisplayString,
+            hwCfgLogTerminalNum
+                Integer32,
+            hwCfgLogTerminalLocation
+                DisplayString,
+            hwCfgLogCmdSrcAddress
+                IpAddress,
+            hwCfgLogVirHost
+                DisplayString,
+            hwCfgLogUserName
+                DisplayString,
+            hwCfgLogServerAddress
+                IpAddress,
+            hwCfgLogFile
+                DisplayString,
+            hwCfgLogConfigChangeId  
+                Unsigned32,
+            hwCfgLogCfgBaselineTime   
+                DisplayString             
+         }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.1
+    hwCfgLogIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The index of hwCfgLogTable, which is a incremental integer.
+            The maximum value of the node is 2147483647.The table should wrap the
+            value to 1 and flush all the existing entries when the maximum value
+            is reached."
+        ::= { hwCfgLogEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.2
+    hwCfgLogTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the sysUpTime when the configuration log was generated."
+        ::= { hwCfgLogEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.3
+    hwCfgLogSrcCmd OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            cmdLine(1),
+            snmp(2),
+            netconf(3),
+            other(4)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the source command resulting in the log.
+            Currently we provide the types of source:
+            1.cmdLine(1):configuration log instigated by command line.
+            2.snmp(2):configuration log instigated by snmp.
+            3.other(3):configuration log instigated by other source unknown."
+        ::= { hwCfgLogEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.4
+    hwCfgLogSrcData OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            erase(1),
+            runningData(2),
+            commandSource(3),
+            startupData(4),
+            local(5),
+            netFtp(6),
+            hotPlugging(7)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The configuration data source for the event.
+            erase        erasing destination 
+            running        operational data alive
+            commandSource    the command source itself
+            startup        what the system will use next reboot
+            local        local NVRAM or flash
+            netFtp            FTP network transfer
+            hotPlugging     board is inserted or pulled out on line                
+            "
+        ::= { hwCfgLogEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.5
+    hwCfgLogDesData OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            unknown(1),
+            runningData(2),
+            commandSource(3),
+            startupData(4),
+            local(5),
+            netkFtp(6),
+            hotPlugging(7)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The configuration data destination for the event.
+            unknown        unknown 
+            running        operational data alive
+            commandSource    the command source itself
+            startup        what the system will use next reboot
+            local        local NVRAM or flash
+            netFtp            FTP network transfer
+            hotPlugging     board is inserted or pulled out on line"
+        ::= { hwCfgLogEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.6
+    hwCfgLogTerminalType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            notApplicable(1),
+            unknown(2),
+            console(3),
+            terminal(4),
+            virtual(5),
+            auxiliary(6)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the terminal type.
+            
+            If hwCfgLogSrcData is not 'cmdLine', the value of the object is 'notApplicable'.
+            
+            The value list:
+            notApplicable(1): no meaning at this time.
+            unknown(2): unknown terminal type.
+            console(3):
+            terminal(4)
+            virtual(5)
+            auxiliary(6)"
+        ::= { hwCfgLogEntry 6 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.7
+    hwCfgLogTerminalUser OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "
+            The name of a logging user which is available when hwCfgLogSrcCmd 
+            is 'cmdLine'. When hwCfgLogTerminalType is 'virtual' and user login
+            in authentication, the object will be the name of the user. 
+            Otherwise, it is a zero length string."
+        ::= { hwCfgLogEntry 7 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.8
+    hwCfgLogTerminalNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Specifies the terminal number.
+            
+            If hwCfgLogSrcCmd variable is not 'cmdLine'(such as 'snmp'or 'other'), the value of the object is '-1'.
+            If  hwCfgLogSrcCmd variable is  'cmdLine', the value '-1' means that it is not the active terminal user.
+            "
+        ::= { hwCfgLogEntry 8 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.9
+    hwCfgLogTerminalLocation OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The available location of the terminal when hwCfgLogSrcCmd 
+            is 'cmdLine'. Otherwise, it is a zero length string.
+            "
+        ::= { hwCfgLogEntry 9 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.10
+    hwCfgLogCmdSrcAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "                       
+            The address from which a request comes when the value of hwCfgLogSrcCmd is 'snmp(2)'.    
+            
+            The ip address of the remote system connected when the value of hwCfgLogTerminalType
+            is 'virtual'.
+                                                                       
+            Otherwise, the value of the object is 0.0.0.0.
+            "
+        ::= { hwCfgLogEntry 10 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.11
+    hwCfgLogVirHost OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The available host name of the remote system connected if 
+            hwCfgLogTerminalType has the value of 'virtual'.
+            Otherwise, the value of the object is a zero length string.
+            "
+        ::= { hwCfgLogEntry 11 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.12
+    hwCfgLogUserName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..256))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The user name used when hwCfgLogSrcData or hwCfgLogDesData has 
+            the value of 'netFtp'.
+            Otherwise, the value of the object is a zero length string.
+            "
+        ::= { hwCfgLogEntry 12 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.13
+    hwCfgLogServerAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The remote server address when hwCfgLogSrcData or hwCfgLogDesData 
+            has the value of 'netFtp'.
+            Otherwise, the value of the object is 0.0.0.0.
+            "
+        ::= { hwCfgLogEntry 13 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.14
+    hwCfgLogFile OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The remote file name when hwCfgLogSrcData or hwCfgLogDesData has
+             the value of 'netFtp'.
+             Otherwise, the value of the object is a zero length string.
+            "
+        ::= { hwCfgLogEntry 14 }
+       
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.15
+    hwCfgLogConfigChangeId OBJECT-TYPE
+        SYNTAX Unsigned32 (0..4294967294)
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "This is the sequence ID of configuration. When configuration is changed, ID is added.               
+            "
+        ::= { hwCfgLogEntry 15 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.1.7.1.16
+    hwCfgLogCfgBaselineTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..20))
+        MAX-ACCESS read-only
+        STATUS obsolete
+        DESCRIPTION
+            "Specifies the time of system confiuration was baseline.             
+            "
+        ::= { hwCfgLogEntry 16 }
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2
+    hwCfgOperate OBJECT IDENTIFIER ::= { hwConfigManObjects 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.1
+    hwCfgOperateGlobalEntryLimit OBJECT-TYPE
+        SYNTAX Integer32 (1..10)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The maximum number of copy entries that may be held
+            in hwCfgOperateTable.  A particular setting does not guarantee 
+            that much data can be held.
+            "
+         ::= { hwCfgOperate 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.2
+    hwCfgOperateEntryAgeOutTime OBJECT-TYPE
+        SYNTAX Integer32 (1..60)
+        UNITS "minute"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This value indicates the primary reference time of the hwCfgOperateEntry 
+            saved in the hwCfgOperateTable.This value is not valid if there is extra 
+            space in the hwCfgOperateTable, that is, the hwCfgOperateEntry is not deleted
+            periodically. 
+            If there is no space in the hwCfgOperateTable to save a new hwCfgOperateEntry,
+            the expired hwCfgOperateEntry that is unactivated or the hwCfgOperateEntry 
+            that is processed may be deleted. Default value is 5."
+        ::= { hwCfgOperate 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.3
+    hwCfgOperateResultGlobalEntryLimit OBJECT-TYPE
+        SYNTAX Integer32(1..50)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The maximum number of copy entries that may be held
+            in hwCfgOperateResultTable.  A particular setting does not guarantee 
+            that much data can be held. Default value is 5.
+            "
+        ::= { hwCfgOperate 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4
+    hwCfgOperateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCfgOperateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of config-operation requests.
+            "
+        ::= { hwCfgOperate 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1
+    hwCfgOperateEntry OBJECT-TYPE
+        SYNTAX HwCfgOperateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An operate request entry."
+        INDEX { hwCfgOperateIndex }
+        ::= { hwCfgOperateTable 1 }
+
+    
+    HwCfgOperateEntry ::=
+        SEQUENCE { 
+            hwCfgOperateIndex
+                Integer32,
+            hwCfgOperateType
+                ConfigOperationType,
+            hwCfgOperateProtocol
+                INTEGER,
+            hwCfgOperateFileName
+                DisplayString,
+            hwCfgOperateServerAddress
+                IpAddress,
+            hwCfgOperateUserName
+                DisplayString,
+            hwCfgOperateUserPassword
+                DisplayString,
+            hwCfgOperateEndNotificationSwitch
+                TruthValue,
+            hwCfgOperateRowStatus
+                RowStatus,
+            hwCfgOperateServerPort
+                Integer32,            
+            hwCfgOperateSourceAddress
+                IpAddress,
+            hwCfgOperateSourceInterface
+                OCTET STRING,
+            hwCfgOperateOnError
+                INTEGER,
+            hwCfgOperateServerAddressType
+                InetAddressType,
+            hwCfgOperateServerAddressNet
+                InetAddress, 
+            hwCfgOperateVpnInstance
+                DisplayString
+            }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.1
+    hwCfgOperateIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The unique index value of a row in this table."
+        ::= { hwCfgOperateEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.2
+    hwCfgOperateType OBJECT-TYPE
+        SYNTAX ConfigOperationType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Specifies the type of an operation on configuration.
+            For detailed information, please see the ConfigOperationType 
+            definition.
+            "
+        ::= { hwCfgOperateEntry 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.3
+    hwCfgOperateProtocol OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ftp(1),
+            tftp(2),
+            sftp(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "If the value of hwCfgOperateType is running2Net,net2Running,net2Startup
+             or startup2net,  this object specifies the protocol which is 
+            used for file transfer . 
+            The default protocol is ftp if no protocol is specified.  
+            And for other value of hwCfgOperateType , this object may   
+            be ignored by the implementation.
+            When hwCfgOperateProtocol is specified as SFTP, only password
+            authentication-type is valid. "
+        ::= { hwCfgOperateEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.4
+    hwCfgOperateFileName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..128))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "When the object of hwCfgOperateType has the value of net2Startup, net2Running or 
+            running2Net, the value must be specified. The file name may include the path if
+            applicable.
+            If the value of hwCfgOperateType is net2Startup or net2Running, this node specifies the
+            source file name of transfers. If the value of hwCfgOperateType is running2Net, this 
+            node specifies the destination file name of transfers. If the value of hwCfgOperateType 
+            is running2Startup, this node specifies the saved file name of current running 
+            configuration.
+
+            When hwCfgOperateType has the value of startup2Net or startup2Running, the object may not be
+            created instead of using the file name of startup configuration file.
+            "
+        ::= { hwCfgOperateEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.5
+    hwCfgOperateServerAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "When the operation type is running2Net,net2Running,net2Startup
+             or startup2net , the ip address of the FTP/TFTP/SFTP server from/to 
+            which to download/upload must be specified.  
+            Values of 0.0.0.0 or FF.FF.FF.FF are not permitted."
+        ::= { hwCfgOperateEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.6
+    hwCfgOperateUserName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..40))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "When the operation type is running2Net,net2Running,net2Startup
+             or startup2net , the user 
+            name for the FTP/SFTP server from/to which to download/upload
+            should be specified. The object must be created if hwCfgOperateProtocol
+            has the value of 'ftp'. "
+        ::= { hwCfgOperateEntry 6 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.7
+    hwCfgOperateUserPassword OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..40))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "When the operation type is running2Net,net2Running,net2Startup
+             or startup2net , the user 
+            password for the FTP/SFTP server from/to which to download/upload
+            should be specified. The object must be created if hwCfgOperateProtocol
+            has the value of 'ftp'. 
+           When get the value of the field, the device will return a zero-length string.
+           When set the field, its value cannot be a string that contains no character."
+        ::= { hwCfgOperateEntry 7 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.8
+    hwCfgOperateEndNotificationSwitch OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Specifies whether or not a notification should be 
+            issued on the completion of the operation."
+        DEFVAL { false }
+        ::= { hwCfgOperateEntry 8 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.9
+    hwCfgOperateRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of this table entry. 
+             When the status is active : 
+             (1) In the situation that the specified transfer operation by 
+             ftp/tftp is in progress, the transfer operation will be aborted 
+             if the status is set to notInService. 
+             (2) In any other situations, the specified operation will not be 
+             aborted even if the status is set to notInService. "
+        ::= { hwCfgOperateEntry 9 }
+        
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.10
+    hwCfgOperateServerPort OBJECT-TYPE
+        SYNTAX Integer32(1..65535)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object specifies the SFTP/FTP server port that is used for file transfer 
+             only if the value of hwCfgOperateProtocol is sftp/ftp.  
+             The default SFTP server port is 22 if no port is specified. 
+             The default FTP server port is 21 if no port is specified.  
+             If the value of hwCfgOperateProtocol is not sftp/ftp, this object is ignored by the 
+             implementation. "
+        ::= { hwCfgOperateEntry 10 } 
+    
+    hwCfgOperateSourceAddress OBJECT-TYPE 
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The source IP address. When the operation type is running2Net,
+        net2Running, net2Startup or startup2net, the source IP address 
+        of the client may be specified or not. Default is 0.0.0.0 .
+        If the source type is set to both of IP address and interface, 
+        the former has the priority."
+    DEFVAL { 0 }
+        ::= { hwCfgOperateEntry 11 }     
+    hwCfgOperateSourceInterface OBJECT-TYPE 
+    SYNTAX      OCTET STRING (SIZE (1..47))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of the interface.When the operation type is running2Net,
+        net2Running,net2Startup or startup2net, the source interface 
+        of the FTP/TFTP client may be specified or not. If the source 
+        type is set to both of IP address and interface,the former has 
+        the priority." 
+        ::= { hwCfgOperateEntry 12 } 
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.13
+    hwCfgOperateOnError OBJECT-TYPE 
+    SYNTAX INTEGER
+            {
+            continueOnError(1),
+            stopOnError(2),
+            rollbackOnError(3)
+            }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the action when a configuration command fails to be executed.
+         continueOnError: skips the failed configuration command and continues to run other configuration commands.
+         stopOnError: stops running the failed configuration command and does not run other configuration commands.
+         rollbackOnError: rolls back the configuration to that before the configuration file is executed." 
+        ::= { hwCfgOperateEntry 13 } 
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.17
+    hwCfgOperateServerAddressType OBJECT-TYPE 
+    SYNTAX InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The ip address type of the FTP/TFTP/SFTP server from/to which to download/upload must be specified. 1 is used for ipv4, 2 is used for ipv6." 
+        ::= { hwCfgOperateEntry 17 }  
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.18
+    hwCfgOperateServerAddressNet OBJECT-TYPE 
+    SYNTAX InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Address or host name of the FTP/TFTP/SFTP server from/to which to download/upload must be specified. " 
+        ::= { hwCfgOperateEntry 18 }
+
+      -- 1.3.6.1.4.1.2011.6.10.1.2.4.1.19
+     hwCfgOperateVpnInstance OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The VPN instance name that through which to transfer the file."
+        ::= { hwCfgOperateEntry 19 } 
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5
+    hwCfgOperateResultTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCfgOperateResultEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of config-operation requests result."
+        ::= { hwCfgOperate 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.7.1
+    hwCfgOperateResultEntry OBJECT-TYPE
+        SYNTAX HwCfgOperateResultEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The result entries of configuration operation requests."
+        INDEX { hwCfgOperateResultIndex }
+        ::= { hwCfgOperateResultTable 1 }
+
+    
+    HwCfgOperateResultEntry ::=
+        SEQUENCE { 
+            hwCfgOperateResultIndex
+                Integer32,
+            hwCfgOperateResultOptIndex
+                Integer32,
+            hwCfgOperateResultOpType
+                ConfigOperationType,
+            hwCfgOperateState
+                INTEGER,
+            hwCfgOperateTime
+                TimeTicks,
+            hwCfgOperateEndTime
+                TimeTicks,   
+            hwCfgOperateTransferProgress
+                Integer32, 
+            hwCfgOperateErrorReason
+                DisplayString 
+         }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.1
+    hwCfgOperateResultIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            The index of Table, which is an incremental integer.
+            The maximum value of the node is 2147483647.The agent should wrap the
+            value to 1 and flush all the existing entries when the maximum value
+            is reached."
+        ::= { hwCfgOperateResultEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.2
+    hwCfgOperateResultOptIndex OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The operation index in the hwCfgOperateTable."
+        ::= { hwCfgOperateResultEntry 2 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.3
+    hwCfgOperateResultOpType OBJECT-TYPE
+        SYNTAX ConfigOperationType
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The operation type in the hwCfgOperateTable."
+        ::= { hwCfgOperateResultEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.4
+    hwCfgOperateState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            opInProgress(1),
+            opSuccess(2),
+            opInvalidOperation(3),
+            opInvalidProtocol(4),
+            opInvalidSourceName(5),
+            opInvalidDestName(6),
+            opInvalidServerAddress(7),
+            opDeviceBusy(8),
+            opDeviceOpenError(9),
+            opDeviceError(10),
+            opDeviceNotProgrammable(11),
+            opDeviceFull(12),
+            opFileOpenError(13),
+            opFileTransferError(14),
+            opFileChecksumError(15),
+            opNoMemory(16),
+            opAuthFail(17),
+            opTimeOut(18),
+            opUnknownFailure(19),
+            opAbort(20),  
+            opInvalidSourceAddress(21),
+            opInvalidSourceInterface(22),
+            opCmdExecuteFail(23)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The status of the specified operation.
+            
+            opInProgress : 
+                specified operation is active
+            
+            opOperationSuccess : 
+                specified operation is supported and
+                completed successfully
+            
+            opInvalidOperation : 
+                command invalid or command/protocol/device 
+                combination unsupported
+            
+            opInvalidProtocol :
+                invalid protocol specified
+            
+            opInvalidSourceName :
+                invalid source file name specified.
+                
+            
+            opInvalidDestName :
+                invalid target name  specified.
+                
+            
+            opInvalidServerAddress :
+                invalid server address specified
+            
+            opDeviceBusy :
+                specified device is in use and locked by 
+                another process
+            
+            opDeviceOpenError :
+                invalid device name
+            
+            opDeviceError :
+                device read, write or erase error
+            
+            opDeviceNotProgrammable :
+                device is read-only but a write or erase 
+                operation was specified
+            
+            opDeviceFull :
+                device is filled to capacity
+            
+            opFileOpenError :
+                invalid file name; file not found in partition
+            
+            opFileTransferError :
+                file transfer was unsuccessfull; network failure
+            
+            opFileChecksumError :
+                file checksum in Flash failed
+            
+            opNoMemory :
+                system running low on memory
+            
+            opAuthFail:
+                invalid user name or password
+                
+            opTimeOut :
+                file transfer was timeout
+            
+            opUnknownFailure :
+                failure unknown
+            
+            opAbort :
+                transfer operation has been aborted
+
+            opInvalidSourceAdress :
+                invalid source address specified.
+
+            opInvalidSourceInterface :
+                invalid source interface specified.   
+            
+            opCmdExecuteFail :
+                execute command return error.          
+                "
+        ::= { hwCfgOperateResultEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.5
+    hwCfgOperateTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Records the time taken for the operation. This object will
+            be like a stopwatch, starting when the operation
+            starts, and stopping when the operation completes."
+        ::= { hwCfgOperateResultEntry 5 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.6
+    hwCfgOperateEndTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The value of sysUpTime when the configuration operation is finished."
+        ::= { hwCfgOperateResultEntry 6 }
+   
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.7
+    hwCfgOperateTransferProgress OBJECT-TYPE
+        SYNTAX Integer32 (1..100 | 65535)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object indicates progress of file transfer in the hwCfgOperateTable. 
+             When hwCfgOperateProtocol is specified as 2(tftp) or 3(sftp), and hwCfgOperateType is specified as net2Running or net2Startup, 
+             this object will be set as 65535, which indicates the progress can not be calculated. "
+        ::= { hwCfgOperateResultEntry 7}
+
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.5.1.8
+    hwCfgOperateErrorReason OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..255))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The failure reason of configuration operation."
+        ::= { hwCfgOperateResultEntry 8 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.6
+    hwCfgModuleChangeTimeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCfgModuleChangeTimeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table on changes of configuration."
+        ::= { hwCfgOperate 6 }
+ 
+     -- 1.3.6.1.4.1.2011.6.10.1.2.6.1
+    hwCfgModuleChangeTimeEntry OBJECT-TYPE
+        SYNTAX HwCfgModuleChangeTimeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Time entity on changes of the configuration module."
+        INDEX { hwCfgModuleId }
+        ::= { hwCfgModuleChangeTimeTable 1 }
+    
+    HwCfgModuleChangeTimeEntry ::=
+        SEQUENCE { 
+            hwCfgModuleId
+                Integer32 (0..2147483647),
+            hwCfgModuleChangeTime
+                TimeTicks 
+         }
+
+ 
+     -- 1.3.6.1.4.1.2011.6.10.1.2.6.1.1
+    hwCfgModuleId OBJECT-TYPE
+        SYNTAX Integer32 (1..2147483647)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Module index. It is an integer without enumeration. This is because the enumeration may expose the classification methods of modules. In addition, this field is uncertain in the beginning stage and once the value is determined, it cannot be modified."
+        ::= { hwCfgModuleChangeTimeEntry 1 }
+  
+     -- 1.3.6.1.4.1.2011.6.10.1.2.6.1.11
+    hwCfgModuleChangeTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Time on changes of the module."
+        ::= { hwCfgModuleChangeTimeEntry 11 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.7
+    hwCfgOperateCompareConfig OBJECT-TYPE
+            SYNTAX INTEGER {initial(0),same(1),different(2)} 
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "compare configuration of the files"
+            ::= { hwCfgOperate 7 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.2.8
+    hwCfgRestoreErrCode OBJECT-TYPE
+            SYNTAX INTEGER
+		{
+		warning(1),
+		fileOpenFail(2),
+		fileNotExist(3),
+		fileVerifyFail(4),
+		other(5)
+		}
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "ErrorCode: cause of an alarm.(1:Failed to restore some configurations. 2:Failed to restore all configurations because of a failure to open the configuration file. 3:Failed to restore all configurations because of the nonexistent configuration file. 4:Failed to restore all configurations because of the nonexistent configuration file. 5: Failed to restore all configurations because of other reasons.)"
+            ::= { hwCfgOperate 8 }
+
+    -- ==========================================================================
+    -- configuration save group
+    -- ==========================================================================
+    -- 1.3.6.1.4.1.2011.6.10.1.3 
+    hwCfgSave OBJECT IDENTIFIER ::= { hwConfigManObjects 3 }
+ 
+    -- 1.3.6.1.4.1.2011.6.10.1.3.1
+    hwCfgSaveAutoInterval OBJECT-TYPE
+        SYNTAX Integer32(0|30..43200)  --metric: minute
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The object records the interval minute of saving configuration automatically.
+the function of saving configuration automatically is disable when the interval is zero, else it is enable(the default is 30 minutes). "
+        ::= { hwCfgSave 1 } 
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.3.2
+    hwCfgSaveAutoTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object records the latest date and time when the current 
+            configurations were saved automatically in the system."
+        ::= { hwCfgSave 2 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.3.3
+    hwCfgSaveManualTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The object records the latest date and time when the current 
+            configurations were saved manually in the system."
+        ::= { hwCfgSave 3 }   
+
+      -- 1.3.6.1.4.1.2011.6.10.1.3.4
+    hwCfgSaveAutoCpuLimit OBJECT-TYPE
+        SYNTAX Integer32(1..60)  --metric: %
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates the upper limit of the CPU usage when configurations are  
+             automatically saved.If the function of saving configuration automatically is not 
+             enabled, the value is insignificant. Default value is 50."
+        ::= { hwCfgSave 4 } 
+
+    -- 1.3.6.1.4.1.2011.6.10.1.3.5
+    hwCfgSaveAutoNoCfgInterval OBJECT-TYPE
+        SYNTAX Integer32(30..43200)  --metric: minute
+        MAX-ACCESS read-write
+        STATUS obsolete
+        DESCRIPTION
+            "This object indicates the interval from the time configurations are automatically 
+             saved to now.If the function of saving configuration automatically is not enabled, 
+             the value is insignificant. Default value is 30."
+        ::= { hwCfgSave 5 }           
+
+    -- 1.3.6.1.4.1.2011.6.10.1.3.6
+    hwCfgSaveAutoDelay OBJECT-TYPE
+        SYNTAX Integer32(1..60)  --metric: minute
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "This object indicates the delay minute after some configurations change happens 
+            then configurations are automatically saved.If the function of saving configuration 
+            automatically is not enabled, the value is insignificant. Default value is 5."
+        ::= { hwCfgSave 6 }  
+                 
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7
+    hwCfgBackup2ServerTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCfgBackup2ServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of config-operation requests.
+            "
+        ::= { hwCfgSave 7 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1
+    hwCfgBackup2ServerEntry OBJECT-TYPE
+        SYNTAX HwCfgBackup2ServerEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An operate request entry."
+        INDEX { hwCfgBackupIndex }
+        ::= { hwCfgBackup2ServerTable 1 }
+
+    
+    HwCfgBackup2ServerEntry ::=
+        SEQUENCE { 
+            hwCfgBackupIndex
+                Integer32,
+            hwCfgBackupServerIp
+                IpAddress,
+            hwCfgBackupProtocol
+                INTEGER,
+            hwCfgBackupUser
+                DisplayString,
+            hwCfgBackupPassword
+                OCTET STRING,
+            hwCfgBackupServerPath
+                DisplayString,
+            hwCfgBackupRowStatus
+                RowStatus,
+            hwCfgBackupResult
+                DisplayString,
+            hwCfgBackupVpnInstance
+                DisplayString
+         }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.1
+    hwCfgBackupIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..4)
+        MAX-ACCESS accessible-for-notify
+        STATUS current
+        DESCRIPTION
+            "The unique index value of a row in this table."
+        ::= { hwCfgBackup2ServerEntry 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.2
+    hwCfgBackupServerIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The ip address of the FTP/TFTP/SFTP server to 
+            which to the device backup configuration automatically.  
+            Values of 0.0.0.0 or FF.FF.FF.FF are not permitted."
+        ::= { hwCfgBackup2ServerEntry 2 }
+        
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.3
+    hwCfgBackupProtocol OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ftp(1),
+            tftp(2),
+            sftp(3)
+            }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The protocol used to backup configuration to server automatically."
+        ::= { hwCfgBackup2ServerEntry 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.4
+    hwCfgBackupUser OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The length of the user name should range from 1 to 64."
+        ::= { hwCfgBackup2ServerEntry 4 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.5
+    hwCfgBackupPassword OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..392))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The password can be plain text or encripted text.
+             If the password is plain text, its length should range from 0 to 255.
+             If the password is in cipher text, its length is 24 or from 32 to 392.
+             When get the value of the field, the device will return a zero-length string.
+             When set the field, its value cannot be a string that contains no character."
+        ::= { hwCfgBackup2ServerEntry 5 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.6
+    hwCfgBackupServerPath OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (1..64))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The length of the path in the backup server should range from 1 to 64."
+        ::= { hwCfgBackup2ServerEntry 6 }
+
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.7
+    hwCfgBackupRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status of this table entry."
+        ::= { hwCfgBackup2ServerEntry 7 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.8
+    hwCfgBackupResult OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (1..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This object is only for trap information, and does not support get and get-next operation."
+        ::= { hwCfgBackup2ServerEntry 8 }  
+    
+    -- 1.3.6.1.4.1.2011.6.10.1.3.7.1.9
+    hwCfgBackupVpnInstance OBJECT-TYPE
+       SYNTAX DisplayString (SIZE (0..31))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The VPN instance name that through which to transfer the file."
+        ::= { hwCfgBackup2ServerEntry 9 }  
+   
+        
+    -- ==========================================================================
+    -- configuration lock group
+    -- ==========================================================================
+    -- 1.3.6.1.4.1.2011.6.10.1.4 
+    hwCfgLock OBJECT IDENTIFIER ::= { hwConfigManObjects 4 }
+    -- 1.3.6.1.4.1.2011.6.10.1.4.1
+    hwCfgOperateLockConfigDataStore OBJECT-TYPE
+        SYNTAX INTEGER
+               {
+                   inactive(1),
+                   active(2)
+               }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Config data unit lock/unlock controller,if set active(2),the lock will be locked if no one locked it before.
+            if set inactive(1),the lock will be unlocked if the currunt user locked it before.
+            "
+        ::= { hwCfgLock 1 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2
+    hwCfgOperateLevelUsersTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwCfgOperateLevelUsersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table on users of configuration lock or level."
+        ::= { hwCfgLock 2 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1
+    hwCfgOperateLevelUsersEntry OBJECT-TYPE
+        SYNTAX HwCfgOperateLevelUsersEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Users entity on lock or level of the configuration module."
+        INDEX { hwCfgOperateLevelUsersSessionID }
+        ::= { hwCfgOperateLevelUsersTable 1 }
+        
+    HwCfgOperateLevelUsersEntry ::=
+        SEQUENCE {
+            hwCfgOperateLevelUsersSessionID
+                Integer32,
+            hwCfgOperateLevelUsersSessionDesc
+                DisplayString,
+            hwCfgOperateLevelUsersName
+                DisplayString,
+            hwCfgOperateLevelUsersLockedTime
+                DisplayString,
+            hwCfgOperateLevelUsersIPAddr
+                DisplayString, 
+            hwCfgOperateLevelUsersLastCfgTime
+                DisplayString,
+            hwCfgOperateLevelUsersTimeout
+                Integer32       
+         }
+         
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.1
+    hwCfgOperateLevelUsersSessionID OBJECT-TYPE
+        SYNTAX Integer32 (-1..2147483647)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "SessionID of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 1 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.2
+    hwCfgOperateLevelUsersSessionDesc OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Description of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 2 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.3
+    hwCfgOperateLevelUsersName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "UserName of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 3 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.4
+    hwCfgOperateLevelUsersLockedTime OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "LoginTime of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 4 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.5
+    hwCfgOperateLevelUsersIPAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "IP Address of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 5 }
+        
+     -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.6
+    hwCfgOperateLevelUsersLastCfgTime  OBJECT-TYPE  
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The last configurate Time of users who have the configuration level or have locked the configuration."
+        ::= { hwCfgOperateLevelUsersEntry 6 }
+     -- 1.3.6.1.4.1.2011.6.10.1.4.2.1.7
+    hwCfgOperateLevelUsersTimeout  OBJECT-TYPE  
+        SYNTAX Integer32 (1..7200)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Unlock without configuration seconds, 1-7200, the default is 30"
+        ::= { hwCfgOperateLevelUsersEntry 7 }       
+
+    -- ==========================================================================
+    -- configuration save group
+    -- ==========================================================================
+        
+    -- 1.3.6.1.4.1.2011.6.10.2
+    hwConfigManNotifications OBJECT IDENTIFIER ::= { hwConfig 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.2.1
+    hwCfgManEventlog NOTIFICATION-TYPE
+        OBJECTS { hwCfgLogSrcCmd, hwCfgLogSrcData, hwCfgLogDesData, hwCfgLogTerminalUser, hwCfgLogCmdSrcAddress, hwCfgLogConfigChangeId, hwCfgLogTime, hwCfgLogCfgBaselineTime }
+        STATUS current
+        DESCRIPTION 
+            "If the system configuration is changed,
+            a notification is generated."
+        ::= { hwConfigManNotifications 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.2.2
+    hwCfgOperateCompletion NOTIFICATION-TYPE
+        OBJECTS { hwCfgOperateType, hwCfgOperateTime, hwCfgOperateState, hwCfgOperateEndTime }
+        STATUS current
+        DESCRIPTION 
+            "When a configuration operation has been done, a 
+            notification may be generated."
+        ::= { hwConfigManNotifications 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.2.3
+    hwCfgInconsistent NOTIFICATION-TYPE
+        STATUS obsolete
+        DESCRIPTION 
+            "When the system automatically detects 
+            that configurations of the AMB and the SMB are inconsistent, 
+            the trap is generated."
+        ::= { hwConfigManNotifications 3 }
+        
+        
+    -- 1.3.6.1.4.1.2011.6.10.2.4
+    hwCfgInconsistentResume  NOTIFICATION-TYPE
+        STATUS obsolete
+        DESCRIPTION 
+            "When the system automatically detects 
+            that configurations of the AMB and the SMB change 
+            from inconsistent to consistent, 
+            the trap is generated."
+        ::= { hwConfigManNotifications 4 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.2.5
+    hwCfgB2STransferFail  NOTIFICATION-TYPE
+        OBJECTS { hwCfgBackupIndex, hwCfgBackupServerIp, hwCfgBackupProtocol }
+        STATUS current
+        DESCRIPTION 
+            "When the system failed to backup current configuration to
+            specified server, this trap will generate to indicates the
+            details information."
+        ::= { hwConfigManNotifications 5 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.2.6
+    hwCfgB2SOperate  NOTIFICATION-TYPE
+        STATUS current
+        DESCRIPTION 
+            "When the system begin to backup current configuration to
+            servers, this trap will generate."
+        ::= { hwConfigManNotifications 6 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.7
+    hwCfgRestoreFail  NOTIFICATION-TYPE
+    		OBJECTS { hwCfgRestoreErrCode }
+        STATUS current
+        DESCRIPTION 
+            "When configuration restoration fails, this trap is generated."
+        ::= { hwConfigManNotifications 7 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.9
+    hwConfigInconsistent  NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+            "When system automatically detects that configurations of the main board and the slave board are inconsistent, this trap is generated."
+        ::= { hwConfigManNotifications 9 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.10
+    hwConfigInconsistentResume  NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+            "When system automatically detects that configurations of the main board and the slave board change from inconsistent to consistent, this trap is generated."
+        ::= { hwConfigManNotifications 10 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.11
+    hwCfgAppDataInconsistent  NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+           "When the system automatically detects 
+            that configurations of the application and the Master Main Board are inconsistent, 
+            the trap is generated."
+        ::= { hwConfigManNotifications 11 }
+
+    -- 1.3.6.1.4.1.2011.6.10.2.12
+    hwCfgAppDataInconsistentResume  NOTIFICATION-TYPE    		
+        STATUS current
+        DESCRIPTION 
+            "When the system automatically detects 
+            that configurations of the application and the Master Main Board  change 
+            from inconsistent to consistent, 
+            the trap is generated."
+        ::= { hwConfigManNotifications 12 }
+        
+    -- 1.3.6.1.4.1.2011.6.10.3
+    hwConfigManConformance OBJECT IDENTIFIER ::= { hwConfig 3 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.3.1
+    hwConfigManCompliances OBJECT IDENTIFIER ::= { hwConfigManConformance 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.3.1.1
+    hwConfigManCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION 
+            "The compliance statement for entities implementing
+            the Huawei Configuration Management MIB"
+        MODULE -- this module
+            MANDATORY-GROUPS { hwCfgManLogGroup, hwCfgOperateGroup, hwCfgManNotificationGroup, hwCfgSaveGroup }
+            OBJECT hwCfgOperateType
+                SYNTAX ConfigOperationType
+                WRITE-SYNTAX INTEGER
+                    {
+                        running2Startup(1),
+                        startup2Running(2),
+                        running2Net(3),
+                        net2Running(4),
+                        net2Startup(5),
+                        startup2Net(6)
+                    }
+                DESCRIPTION 
+                    "The compliance statement for entities implementing
+                     the Huawei Configuration Management MIB."
+        ::= { hwConfigManCompliances 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.3.2
+    hwConfigManGroups OBJECT IDENTIFIER ::= { hwConfigManConformance 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.3.2.1
+    hwCfgManLogGroup OBJECT-GROUP
+        OBJECTS { hwCfgRunModifiedLast, hwCfgRunSavedLast, hwCfgStartModifiedLast, hwCfgLogLimitedEntries, hwCfgLogDeletedEntries, 
+            hwCfgLogTime, hwCfgLogSrcCmd, hwCfgLogTerminalType, hwCfgLogTerminalNum, hwCfgLogTerminalUser, 
+            hwCfgLogTerminalLocation, hwCfgLogCmdSrcAddress, hwCfgLogVirHost, hwCfgLogServerAddress, hwCfgLogFile, 
+            hwCfgLogUserName, hwCfgLogWantBackup, hwCfgLogSrcData, hwCfgLogDesData, hwCfgLogConfigChangeId, hwCfgLogCfgBaselineTime }
+        STATUS current
+        DESCRIPTION 
+            "A collection of objects configuration log group."
+        ::= { hwConfigManGroups 1 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.3.2.2
+    hwCfgOperateGroup OBJECT-GROUP
+        OBJECTS { hwCfgOperateGlobalEntryLimit, hwCfgOperateEntryAgeOutTime, hwCfgOperateType, hwCfgOperateProtocol, hwCfgOperateFileName, 
+            hwCfgOperateServerAddress, hwCfgOperateUserName, hwCfgOperateUserPassword, hwCfgOperateTime, hwCfgOperateEndNotificationSwitch, 
+            hwCfgOperateResultGlobalEntryLimit, hwCfgOperateState, hwCfgOperateRowStatus, hwCfgOperateServerPort, hwCfgOperateSourceAddress, hwCfgOperateSourceInterface, hwCfgOperateOnError, hwCfgOperateServerAddressType, hwCfgOperateServerAddressNet,hwCfgOperateVpnInstance, 
+            hwCfgOperateResultOptIndex, hwCfgOperateResultOpType, hwCfgOperateEndTime,hwCfgOperateTransferProgress,hwCfgOperateErrorReason,
+            hwCfgModuleChangeTime, hwCfgOperateLockConfigDataStore, hwCfgOperateLevelUsersSessionID, hwCfgOperateLevelUsersSessionDesc,
+            hwCfgOperateLevelUsersName, hwCfgOperateLevelUsersLockedTime, hwCfgOperateLevelUsersIPAddr,hwCfgOperateLevelUsersLastCfgTime,hwCfgOperateLevelUsersTimeout, 
+            hwCfgOperateCompareConfig}
+        STATUS current
+        DESCRIPTION 
+            "A group of configuration operation."
+        ::= { hwConfigManGroups 2 }
+
+    
+    -- 1.3.6.1.4.1.2011.6.10.3.2.3
+    hwCfgManNotificationGroup NOTIFICATION-GROUP
+        NOTIFICATIONS { hwCfgManEventlog, hwCfgOperateCompletion ,hwCfgInconsistent, hwCfgInconsistentResume, hwCfgB2STransferFail, hwCfgB2SOperate, hwCfgRestoreFail, hwConfigInconsistent, hwConfigInconsistentResume, hwCfgAppDataInconsistent, hwCfgAppDataInconsistentResume}
+        STATUS current
+        DESCRIPTION 
+            "Collection of notification objects."
+        ::= { hwConfigManGroups 3 }
+    -- 1.3.6.1.4.1.2011.6.10.3.2.4
+    hwCfgSaveGroup OBJECT-GROUP
+        OBJECTS { hwCfgSaveAutoInterval, hwCfgSaveAutoTime, hwCfgSaveManualTime, hwCfgSaveAutoCpuLimit, hwCfgSaveAutoNoCfgInterval, hwCfgSaveAutoDelay, hwCfgRestoreErrCode }
+        STATUS current
+        DESCRIPTION 
+            "A group of configuration operation."
+        ::= { hwConfigManGroups 4 }        
+
+END
+
+--
+-- HUAWEI-CONFIG-MAN-MIB.mib
+--

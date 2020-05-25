@@ -1,0 +1,99 @@
+IBMAPPNMEMORY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+      enterprises
+            FROM RFC1155-SMI
+      OBJECT-TYPE
+            FROM RFC-1212
+      DisplayString
+            FROM RFC1213-MIB;
+
+
+-- ibmappnMemoryUse    MODULE-IDENTITY
+--    LAST-UPDATED "9610071830Z"
+--    ORGANIZATION "IBM"
+--    CONTACT-INFO "Bob Moore (remoore @ ralvm6)
+--                  IBM Corporation
+--                  800 Park Offices Drive
+--                  RHJA/664
+--                  P.O. Box 12195
+--                  Research Triangle Park, NC 27709, USA
+--                  Tel:    1 919 254 4436
+--                  E-mail: remoore@ralvm6.vnet.ibm.com"
+--
+--    DESCRIPTION
+--        "This MIB module represents the memory usage group from the
+--        original IBM-6611-APPN-MIB, updated to SNMPv2 SMI.  It is set
+--        up to use as its anchor point the same OID that identified the
+--        group in the IBM-6611-APPN MIB, so that existing manager
+--        applications will not need to change."
+--
+--    ::= { ibmappnNode 7 }
+--
+
+-- The following OID assignments result in the same OIDs for the
+-- objects in the memory usage group as those in the
+-- IBM-6611-APPN-MIB.
+ibm                     OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd                 OBJECT IDENTIFIER ::= { ibm 6 }
+ibm6611                 OBJECT IDENTIFIER ::= { ibmProd 2 }
+ibmappn                 OBJECT IDENTIFIER ::= { ibm6611 13 }
+ibmappnNode             OBJECT IDENTIFIER ::= { ibmappn 1 }
+ibmappnMemoryUse        OBJECT IDENTIFIER ::= { ibmappnNode 7 }
+
+
+
+-- This group reports on the APPN control point's storage utilization.
+
+ibmappnMemorySize OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+--    UNITS "bytes"
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Size of the shared memory chunk, as obtained by memory
+          management from the underlying operating system, that is
+          allocated to this APPN node."
+
+      ::=  { ibmappnMemoryUse 1 }
+
+ibmappnMemoryUsed OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+--    UNITS "bytes"
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Number of bytes in the shared memory chunk that are currently
+          allocated to the APPN process."
+
+      ::=  { ibmappnMemoryUse 2 }
+
+ibmappnMemoryWarnThresh OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+--    UNITS "bytes"
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Allocation threshold beyond which storage management considers
+          the storage resources to be constrained."
+
+      ::=  { ibmappnMemoryUse 3 }
+
+ibmappnMemoryCritThresh OBJECT-TYPE
+      SYNTAX INTEGER (0..2147483647)
+--    UNITS "bytes"
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION
+          "Allocation threshold beyond which storage management considers
+          the storage resources to be critically constrained."
+
+      ::=  { ibmappnMemoryUse 4 }
+
+
+-- ******************************************************************
+-- IBM APPN memory usage conformance
+-- ******************************************************************
+
+
+END

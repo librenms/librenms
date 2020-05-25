@@ -1,0 +1,174 @@
+-- ***********************************************************************************************
+-- TN-SAT-LOOPBACK-MIB.smi: Transition Networks, Inc. Enterprise MIB for 
+-- Ethernet SAT Loopback management.
+--
+-- Copyright (c) 2013 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+TN-SAT-LOOPBACK-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    TruthValue, MacAddress
+        FROM SNMPv2-TC
+    IEEE8021BridgePortNumberOrZero, IEEE8021VlanIndexOrWildcard
+        FROM IEEE8021-TC-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+
+tnEthSatLoopbackMIB MODULE-IDENTITY
+    LAST-UPDATED    "201303120000Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+         Technical Support
+
+         10900 Red Circle Drive
+         Minnetonka, MN 55343 USA
+         Tel: +1-800-526-9267
+
+         E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "This MIB is related to the management of SAT Loopback."
+
+    REVISION        "201303120000Z"
+    DESCRIPTION
+        "Defined in Mar 12th, 2013."
+    ::= { tnProducts 130 }
+
+tnEthSatLoopbackMIBNotifications  OBJECT IDENTIFIER ::= { tnEthSatLoopbackMIB 0 }
+tnEthSatLoopbackMIBObject         OBJECT IDENTIFIER ::= { tnEthSatLoopbackMIB 1 }
+tnEthSatLoopbackMIBConformance    OBJECT IDENTIFIER ::= { tnEthSatLoopbackMIB 2 }
+
+tnEthSatLoopBackCfgTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnEthSatLoopBackCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table defines the management of SAT Loopback."
+    ::= { tnEthSatLoopbackMIBObject 1 }
+
+tnEthSatLoopBackCfgEntry OBJECT-TYPE
+    SYNTAX        TnEthSatLoopBackCfgEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Indicates the entry of SAT Loopback table."
+    INDEX { tnEthSatLoopBackIndex }
+    ::= { tnEthSatLoopBackCfgTable 1 }
+
+TnEthSatLoopBackCfgEntry ::=
+    SEQUENCE {
+        tnEthSatLoopBackIndex      Unsigned32,
+        tnEthSatLoopBackEnabled    TruthValue,
+        tnEthSatLoopBackPort       IEEE8021BridgePortNumberOrZero,
+        tnEthSatLoopBackAddress    MacAddress,
+        tnEthSatLoopBackVid        IEEE8021VlanIndexOrWildcard,
+        tnEthSatLoopBackTimeOut    Unsigned32
+    }
+
+tnEthSatLoopBackIndex OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Indicates the index of table entry."
+   ::= { tnEthSatLoopBackCfgEntry 1 }
+
+tnEthSatLoopBackEnabled OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the current status of SAT Loopback.
+         true means the Loopback is active, else inactive"
+     ::= { tnEthSatLoopBackCfgEntry 2 }
+
+tnEthSatLoopBackPort OBJECT-TYPE
+    SYNTAX        IEEE8021BridgePortNumberOrZero
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the test port where Loopback will be enabled."
+    ::= { tnEthSatLoopBackCfgEntry 3 }
+
+tnEthSatLoopBackAddress OBJECT-TYPE
+    SYNTAX        MacAddress
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the source address to be matched."
+     ::= { tnEthSatLoopBackCfgEntry 4 }
+
+tnEthSatLoopBackVid OBJECT-TYPE
+    SYNTAX        IEEE8021VlanIndexOrWildcard
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the VLAN ID to be matched."
+    ::= { tnEthSatLoopBackCfgEntry 5 }
+
+tnEthSatLoopBackTimeOut OBJECT-TYPE
+    SYNTAX        Unsigned32
+    UNITS         "seconds"
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "Indicates the timeout period in seconds for aging out
+         the active about the Loopback."
+    DEFVAL        {300}
+    ::= { tnEthSatLoopBackCfgEntry 6 }
+
+tnEthSatLoopBackStatsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TnEthSatLoopBackStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table defines the statistics information of SAT Loopback."
+    ::= { tnEthSatLoopbackMIBObject 2 }
+
+tnEthSatLoopBackStatsEntry OBJECT-TYPE
+    SYNTAX        TnEthSatLoopBackStatsEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Indicates the entry of SAT Loopback statistics table."
+    INDEX { tnEthSatLoopBackIndex }
+    ::= { tnEthSatLoopBackStatsTable 1 }
+
+TnEthSatLoopBackStatsEntry ::=
+    SEQUENCE {
+        tnEthSatLoopBackTimeLeft    Unsigned32,
+        tnEthSatLoopBackFrames      Counter64,
+        tnEthSatLoopBackBytes       Counter64
+    }
+
+tnEthSatLoopBackTimeLeft OBJECT-TYPE
+    SYNTAX        Unsigned32
+    UNITS         "seconds"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the remaining time left for aging out
+         the active about the Loopback."
+    ::= { tnEthSatLoopBackStatsEntry 1 }
+
+tnEthSatLoopBackFrames OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the counter about the received frame. the unit is frame."
+    ::= { tnEthSatLoopBackStatsEntry 2 }
+
+tnEthSatLoopBackBytes OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the counter about the received frame. the unit is bytes."
+    ::= { tnEthSatLoopBackStatsEntry 3 }
+END

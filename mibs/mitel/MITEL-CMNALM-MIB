@@ -1,0 +1,299 @@
+-- Copyright 2004, 2005, 2006 MITEL Networks Corporation
+-- All rights reserved.
+-- This MITEL SNMP Management Information Base Specification
+-- (Specification) embodies MITEL's confidential and
+-- proprietary intellectual property. MITEL retains all
+-- title and ownership in the Specification, including any
+-- revisions.
+
+-- This Specification is supplied "AS IS", and MITEL makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+MITEL-CMNALM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Integer32,
+        NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, DateAndTime
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        mitelIdentification, mitelPropCommon, mitelConfGroups,
+        mitelConfCompliances
+           FROM MITEL-MIB;
+
+    mitelCmnAlarms        MODULE-IDENTITY
+        LAST-UPDATED      "201402111200Z"
+        ORGANIZATION      "MITEL Networks Corporation"
+        CONTACT-INFO      "Standards Group,
+                           Postal:    MITEL Networks Corporation
+                           350 Legget Drive, PO Box 13089
+                           Kanata, Ontario
+                           Canada  K2K 2W7
+                           Tel: +1 613 592 2122
+                           Fax: +1 613 592 4784
+                           URL: www.mitel.com"
+        DESCRIPTION       "Replaced E-Mail: std@mitel.com with URL: www.mitel.com."
+        REVISION          "201402111200Z"
+        DESCRIPTION       "The MITEL Alarms-Specific Common MIB module."
+        REVISION          "200502212134Z"
+        DESCRIPTION       "Added the mitelAlmActiveTblIndex to the mitelNotifActiveAlarm." 
+        REVISION          "200402230000Z"
+        DESCRIPTION       "MITEL Alarms-Specific Common MIB Version 1.0.0.1 - Draft" 
+    ::= { mitelPropCommon 1 }
+
+    -- ****************************************************************
+    -- MITEL Common Alarm-specific Textual Conventions
+    -- ****************************************************************
+
+    ItuPerceivedSeverity ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+               "ITU perceived severity values"
+       REFERENCE
+              "ITU Recommendation M.3100, 'Generic Network Information
+               Model', 1995
+               ITU Recommendation X.733, 'Information Technology - Open
+               Systems Interconnection - System Management: Alarm
+               Reporting Function', 1992"
+       SYNTAX         INTEGER
+              {
+              cleared        (1),
+              indeterminate  (2),
+              critical       (3),
+              major          (4),
+              minor          (5),
+              warning        (6)
+              }
+
+    -- MitelCmnAlarmClass ::= TEXTUAL-CONVENTION
+    --    STATUS   current
+    --    DESCRIPTION
+    --            "Classification of the possible alarms that can occur within a
+    --             MITEL-manageable system."
+    --    REFERENCE
+    --           "Mitel SNMP MIB Support Guide - DK113065"
+    --    SYNTAX         INTEGER
+    --           {
+    --           generic        (1)
+    --           }      
+
+    MitelCmnAlarmThresholdType ::= TEXTUAL-CONVENTION
+       STATUS   current
+       DESCRIPTION
+               "The different types of thresholds that can be supported.
+                "
+       REFERENCE
+              "Mitel SNMP MIB Support Guide - DK113065"
+       SYNTAX         INTEGER
+              {
+              percentage     (1),
+              absoluteValue  (2),
+              indeterminate  (3)
+              }      
+
+    -- ****************************************************************
+    -- The mitelCmnAlarms subtree... Common information for Manageable 
+    -- Alarms. 
+    -- ****************************************************************
+
+    mitelCmnAlmObjects    OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Overall system alarm information."
+    ::= { mitelCmnAlarms  1 }
+
+    mitelCmnAlmNotifications OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Alarms Notifications."
+    ::= { mitelCmnAlarms  2 }
+
+    mitelCmnAlmConformance OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Conformance statement."
+    ::= { mitelCmnAlarms  3 }
+
+
+    -- ****************************************************************
+    -- The mitelAlmSystem subtree... Common information for Manageable 
+    -- Alarms Objects as they relate to the overall health of the system. 
+    -- ****************************************************************
+
+     mitelAlmSystem        OBJECT-IDENTITY
+        STATUS            current
+        DESCRIPTION       "Overall system alarm information."
+        ::= { mitelCmnAlmObjects 1 }
+
+    mitelAlmSysSeverity   OBJECT-TYPE
+        SYNTAX            ItuPerceivedSeverity
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "Overall system alarm level severity.
+                           This relates to the alarms in the mitelAlmActiveTable."
+        ::= { mitelAlmSystem  1 }
+
+    mitelAlmSysSeverityDetectTime OBJECT-TYPE
+        SYNTAX            DateAndTime
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "The time that the overall system alarm level changed."
+        ::= { mitelAlmSystem 2 }
+
+    mitelAlmSysSeverityDescr OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "Additional details of what may have caused the system 
+                           severity to change."
+        ::= { mitelAlmSystem 3 }
+
+    -- ****************************************************************
+    -- The mitelAlmActiveTable subtree... Common information for Manageable 
+    -- Active Alarms that contribute to the overall health of the system. 
+    -- ****************************************************************
+
+    mitelAlmActiveTable  OBJECT-TYPE
+        SYNTAX           SEQUENCE OF MitelAlmActiveTableEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION      "A list of the MITEL-defined currently active alarmed 
+                          objects wihin the system. This table is typically 
+                          maintained in non-volatile memory, and is re-built 
+                          upon agent restart."
+        ::= { mitelCmnAlmObjects 2 }
+
+    mitelAlmActiveTableEntry OBJECT-TYPE
+        SYNTAX           MitelAlmActiveTableEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION      "An entry containing application information."
+        INDEX            { mitelAlmActiveTblIndex } 
+        ::= { mitelAlmActiveTable  1 }
+
+    MitelAlmActiveTableEntry ::=
+        SEQUENCE {
+            mitelAlmActiveTblIndex              OBJECT IDENTIFIER,
+            mitelAlmActiveTblClass              DisplayString,
+            mitelAlmActiveTblType               DisplayString,
+            mitelAlmActiveTblTypeName           DisplayString, 
+            mitelAlmActiveTblSeverity           ItuPerceivedSeverity,
+            mitelAlmActiveTblSeverityDetectTime DateAndTime,
+            mitelAlmActiveTblThresholdType      MitelCmnAlarmThresholdType, 
+            mitelAlmActiveTblThresholdValue     Integer32,
+            mitelAlmActiveTblDescr              DisplayString
+        }
+
+    -- Size of DisplayString will be set to a maximum value.
+
+    mitelAlmActiveTblIndex OBJECT-TYPE
+        SYNTAX            OBJECT IDENTIFIER
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "The index of this row. The unique object identifier
+                           of the application that is raising this alarm."
+        ::= { mitelAlmActiveTableEntry 1 }
+
+    mitelAlmActiveTblClass OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "The class that the active alarm belongs to."
+        ::= { mitelAlmActiveTableEntry 2 }
+
+    mitelAlmActiveTblType OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "The type of alarm within its Class."
+        ::= { mitelAlmActiveTableEntry 3 }
+
+    mitelAlmActiveTblTypeName OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "A unique descriptive name that represent the alarm
+                           type within the class."
+        ::= { mitelAlmActiveTableEntry 4 }
+    mitelAlmActiveTblSeverity OBJECT-TYPE
+        SYNTAX            ItuPerceivedSeverity
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "The current severity of the active alarm type."
+        ::= { mitelAlmActiveTableEntry 5 }
+
+    mitelAlmActiveTblSeverityDetectTime OBJECT-TYPE
+        SYNTAX            DateAndTime
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "When the alarm type trasitioned to the current
+                           Severity level."
+        ::= { mitelAlmActiveTableEntry 6 }
+
+    mitelAlmActiveTblThresholdType OBJECT-TYPE
+        SYNTAX            MitelCmnAlarmThresholdType
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "Threshold information as to the cause of the
+                           current severity of the alarm type."
+        ::= { mitelAlmActiveTableEntry 7 }
+
+    mitelAlmActiveTblThresholdValue OBJECT-TYPE
+        SYNTAX            Integer32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "The actual threshold value that caused the severity
+                           to change. This relates directly to the threshold type."
+        ::= { mitelAlmActiveTableEntry 8 }
+
+    mitelAlmActiveTblDescr OBJECT-TYPE
+        SYNTAX            DisplayString
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION       "A textual description of the cause of the 
+                           current alarm type's severity."
+        ::= { mitelAlmActiveTableEntry 9 }
+
+    -- ****************************************************************
+    -- The mitelCmnAlarmNotification subtree.
+    -- ****************************************************************
+
+    mitelNotifActiveAlarm   NOTIFICATION-TYPE
+        OBJECTS {
+          mitelAlmSysSeverity,
+          mitelAlmSysSeverityDetectTime,
+          mitelAlmActiveTblIndex,  
+          mitelAlmActiveTblClass,         
+          mitelAlmActiveTblType,          
+          mitelAlmActiveTblTypeName,      
+          mitelAlmActiveTblSeverity,
+          mitelAlmActiveTblThresholdType,
+          mitelAlmActiveTblThresholdValue 
+        }
+        STATUS            current
+        DESCRIPTION       "This notification is generated whenever
+                          an alarm condition is detected or cleared."
+        ::= { mitelCmnAlmNotifications 1 }
+
+
+    -- ****************************************************************
+    -- The mitelCmnAlarmConformance subtree.
+    -- ****************************************************************
+
+    -- ****************************************************************
+    -- The mitelConfGroups Application Common subtree.
+    -- ****************************************************************
+
+-- MITEL-CMNALM-MIB
+
+END 
+
+
+
+
+
+
+
+
+
+

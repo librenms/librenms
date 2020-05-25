@@ -1,0 +1,1385 @@
+-- File Name : PBI-4000P-5000P-MIB
+-- Date      : Thu Sep 21 14:34:51 CST 2006
+-- Author    : AdventNet Agent Toolkit Java Edition - MIB Editor 6
+
+
+
+PBI-4000P-5000P-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		TruthValue, DisplayString
+			FROM SNMPv2-TC
+		DisplayString
+			FROM RFC1213-MIB
+		basicInfo
+			FROM PBI-MGSYSTEM-MIB
+		mg
+			FROM PBI-MAIN-MIB
+		MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises
+			FROM SNMPv2-SMI;
+
+	p4000-p5000	MODULE-IDENTITY
+		LAST-UPDATED	"200609131023Z"
+		ORGANIZATION	"PBI"
+		CONTACT-INFO	"Tel:(010)82617178 
+									Fax:(010)82610263 
+									E-mail:mkt@pbi-china.com"
+		DESCRIPTION		" private infomation of 4000P&5000P "
+		REVISION			"200609131049Z"
+		DESCRIPTION		""
+		::=  {  basicInfo  104  }
+
+	inputStatus	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  1  }
+		
+	tunerType	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  2  }  
+		  
+	tuner-sInput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  3  }  
+		
+	tuner-cInput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  4  }
+
+	tuner-tInput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  5  }
+  
+  outputSel	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  6  }
+
+	asiOutput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  7  }
+		
+	sdiOutput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  8  }
+	
+	decoderOutput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  9  }
+		
+	ethernetOutput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  10  } 
+
+	ciOutput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  11  } 
+		     
+	outputStatus	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  12  } 
+		
+	ethernetInput	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  13  } 
+		
+	s2Input	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  14  }
+		
+	functionAdd	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  15  }
+		
+	filterSetup	OBJECT IDENTIFIER
+		::=  {  p4000-p5000  16  }
+		
+	multiplexSetup OBJECT IDENTIFIER
+		::=  {  p4000-p5000  17  }
+		
+	ds3Input OBJECT IDENTIFIER
+		::=  {  p4000-p5000  18  }
+		
+	cmOutput OBJECT IDENTIFIER
+		::=  {  p4000-p5000  20  }
+		
+	backupSetting OBJECT IDENTIFIER
+		::=  {  p4000-p5000  21  }
+		
+	ntpSetting OBJECT IDENTIFIER
+		::=  {  p4000-p5000  22  }
+		
+	gigabitIPInfo OBJECT IDENTIFIER
+		::=  {  p4000-p5000  23  }
+    
+  tunerStatusEntry OBJECT IDENTIFIER 
+    ::= { inputStatus 1 }
+    
+	asiStatusEntry OBJECT IDENTIFIER 
+	  ::= { inputStatus 2 }
+	  
+	ethernetInStatusEntry OBJECT IDENTIFIER 
+	  ::= { inputStatus 3 }
+
+  tunerLock	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"tuner Lock? yes: 1,no: 0 "
+		  ::=  {  tunerStatusEntry  1  }
+		
+  tunerPacketLen	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"packet length: 188 or 204 "
+		  ::=  {  tunerStatusEntry  2  }
+
+  tunerTotalBitrate	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"total bit Rate size: from 0 to 100Mbps"
+		  ::=  {  tunerStatusEntry  3  }
+
+  tunerValidBitrate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"valid Bit rate: from 0 to 100Mbps"
+		  ::=  {  tunerStatusEntry  4  }
+		  
+  tunerQuality	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"tuner quality signal monitoring"
+		  ::=  {  tunerStatusEntry  5  }
+		  
+	tunerStrength	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"tuner signal strength"
+		  ::=  {  tunerStatusEntry  6  }
+		  
+	tunerBER	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"tuner signal BER"
+		  ::=  {  tunerStatusEntry  7  }
+		  
+	tunerCN	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"tuner carrier noise"
+		  ::=  {  tunerStatusEntry  8  }
+		  
+	tunerEbNo	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"tuner Eb/No"
+		  ::=  {  tunerStatusEntry  9  }
+		
+	asiLock	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"ASI Lock? yes: 1,no: 0 "
+		  ::=  {  asiStatusEntry  1  }	
+		
+  asiPacketLen	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"packet length: 188 or 204 "
+		  ::=  {  asiStatusEntry  2  }
+
+  asiTotalBitrate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"total bit Rate size: from 0 to 100Mbps"
+		  ::=  {  asiStatusEntry  3  }
+
+  asiValidBitrate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"valid Bit rate: from 0 to 100Mbps"
+		  ::=  {  asiStatusEntry  4  }
+		  
+	asiIndex	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"specify which ASI input"
+		  ::=  {  asiStatusEntry  5  }
+
+	ethernetInLock	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"DS3 Lock? yes: 1,no: 0 "
+		  ::=  {  ethernetInStatusEntry  1  }  
+		
+	ethernetInPacketLen	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"packet length: 188 or 204 "
+		  ::=  {  ethernetInStatusEntry  2  }
+
+  ethernetInTotalBitrate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"total bit Rate size: from 0 to 100Mbps"
+		  ::=  {  ethernetInStatusEntry  3  }
+		
+	linkStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"0:none, 1:10M, 2:100M"
+		  ::=  {  ethernetInStatusEntry  4  }
+		  
+	typeSel	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"tuner type"
+		  ::=  {  tunerType  1  }
+		  
+	channel	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"tuner channel"
+		  ::=  {  tunerType  2  }
+		  
+	lnbFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"LNB frequency"
+		  ::=  {  tuner-sInput  1  }
+		
+	satFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner frequency or centre_frequency for the transmission expressed in MHz, its value range: from 950MHz to 2150 MHz"
+		  ::=  {  tuner-sInput  2  }	
+
+	symbolRate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner symbol rate in symbols per second,its value range: from 0kb/s to 45000kb/s"
+		  ::=  {  tuner-sInput  3  }
+      
+  lnbVoltage	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner power, Option: 0v,13v,18v"
+		  ::=  {  tuner-sInput  4  }
+
+	lnb22KHz	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner 22 KHz, option: off or on"
+		  ::=  {  tuner-sInput  5  }
+		  
+	diseqc	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner diseqc, option: 0:DisEqc Offˇ˘1:PortAˇ˘2:PortBˇ˘3:PortCˇ˘4:PortD"
+		  ::=  {  tuner-sInput  6  }
+                 
+  constellation	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"LNB frequency"
+		  ::=  {  tuner-cInput  1  }
+		
+	cableFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Cable frequency, its value range: from 48000KHz to 862000KHz"
+		  ::=  {  tuner-cInput  2  }	
+
+	cableSymbolRate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"The symbol rate in symbols per second, its value range: from 2000kb/s to 7000kb/s"
+		  ::=  {  tuner-cInput  3  }
+  
+  terFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"terrestrial frequency: its value range: from 0kb/s to 1000000kb/s"
+		  ::=  {  tuner-tInput  1  }
+		  
+	bandWidth	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"terrestrial band width,option: 0-6MHz; 1-7MHz; 2-8MHz"
+		  ::=  {  tuner-tInput  2  }
+		  
+	output2sel	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"output 2 select"
+		  ::=  {  outputSel  1  } 
+		  
+	decoderOutChannel	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"specify decoder out channel"
+		  ::=  {  outputSel  2  }
+		  
+	ciOutChannel	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"specify ci out channel"
+		  ::=  {  outputSel  3  }
+		  
+	filterOutChannel	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"specify filter out channel"
+		  ::=  {  outputSel  4  }
+		  
+	muxOutChannel	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"specify mux out channel"
+		  ::=  {  outputSel  5  }
+          
+ 	asi1OutputEntry OBJECT IDENTIFIER 
+ 	  ::= { asiOutput 1 }
+
+	asi2OutputEntry OBJECT IDENTIFIER 
+	  ::= { asiOutput 2 }
+
+  sourceSel1	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"select source, qpsk:0, asi:1, ds3:2 "
+		  ::=  {  asi1OutputEntry  1  }
+
+	packageLength1	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"package lengh, 188 or 204"
+		  ::=  {  asi1OutputEntry  2  }
+		  
+	outBitRate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"out BitRate, range: from 0~150000Kbps"
+		  ::=  {  asi1OutputEntry  3  }
+		  
+	muxType	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"set Mux Type,option: 0:ASI TV,QPSK EMM CAT; 1:ASI TV,IP EMM; 2:ASI TV,IP EMM CAT; 3:QPSK TV,ASI EMM CAT; 4:QPSK TV,IP EMM CAT"
+		  ::=  {  asi1OutputEntry  4  }
+   
+  sourceSel2	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"select source, qpsk:0, asi:1, ds3:2 "
+		  ::=  {  asi2OutputEntry  1  }
+
+	packageLength2	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"package lengh, 188 or 204"
+		  ::=  {  asi2OutputEntry  2  }
+		  
+	audioDID	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"options: group 1, group 2, group 3, group 4"
+		  ::=  {  sdiOutput  1  }
+	
+	embAudios	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"options: none, one, two, one&two"
+		  ::=  {  sdiOutput  2  }	
+		    
+  programOutputEntry OBJECT IDENTIFIER 
+    ::= { decoderOutput 1 }
+
+  videoOutputEntry OBJECT IDENTIFIER 
+    ::= { decoderOutput 2 }
+  
+	audioOutputEntry OBJECT IDENTIFIER 
+	  ::= { decoderOutput 3 } 
+	  
+	bissEntry OBJECT IDENTIFIER 
+	  ::= { decoderOutput 4 }
+	  
+	decoderSelection OBJECT IDENTIFIER
+	  ::= { decoderOutput 5 }
+ 
+  inputChannel	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"options: qpsk, asi, ds3"
+		  ::=  {  programOutputEntry  1  }
+
+	programNumber	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"select a program to 4000P and decode it,"
+		  ::=  {  programOutputEntry  2  }	  
+                  
+  videoStandard OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status 4 modes :PAL/AUTO/SECAM/NTSC "
+		  ::= { videoOutputEntry 1 }    
+		    
+	screen OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status screen display: 4:3 Letterbox/4:3 Full/16:9 Full"
+		  ::= { videoOutputEntry 2 }
+
+	dvbSubtitleLang OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status DVB subtitle language 3 characters"
+		  ::= { videoOutputEntry 3 }
+
+	ebuSubtitleLang OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status EBU subtitle language 3 characters"
+		  ::= { videoOutputEntry 4 }
+
+	subtitlePriority OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status subtitle priority: EBU First/DVB first"
+		  ::= { videoOutputEntry 5 }
+		  
+	failMode OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Video Fail Mode,option:Black Screen=0,Still Picture=1,No Sync=2"
+		  ::= { videoOutputEntry 6 }
+		  
+	dvbSubtitleLangEnable OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status DVB subtitle language enable: 0-off, 1-on"
+		  ::= { videoOutputEntry 7 }
+		  
+	ebuSubtitleLangEnable OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status EBU subtitle language enable: 0-off, 1-on"
+		  ::= { videoOutputEntry 8 }
+		  
+	closeCaption OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"video close caption,option: 0-off, 1-on"
+		  ::= { videoOutputEntry 9 }
+		  
+	videoOutAlarmEn OBJECT-TYPE
+		SYNTAX			INTEGER {
+		  disable(0),
+		  enable(1)
+		}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Video Out Alarm On/Off Setting"
+		  ::= { videoOutputEntry 10 }
+		  
+	vbiMode OBJECT-TYPE
+		SYNTAX			INTEGER {
+		  disable(0),
+		  enable(1)
+		}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Video Output VBI Mode Setting"
+		  ::= { videoOutputEntry 11 }
+		  
+	cvbsPAL OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"video output CVBS PAL Setting, for example, PALBDGHI, PALN, PALN_C, SECAM "
+		  ::= { videoOutputEntry 12 }
+		  
+	cvbsNTSC OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"video output CVBS NTSC Setting, for example, NTSCM, NTSCM_J, NTSCM_443, PALM "
+		  ::= { videoOutputEntry 13 }
+		  
+	videoOutputStatus OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"show video output status "
+		  ::= { videoOutputEntry 14 }
+
+	audioLevel OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status audio level: from 0 to 99"
+		  ::= { audioOutputEntry 1 }
+
+	audioModulation OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status audio modulation: stereo/left/right/mono"
+		  ::= { audioOutputEntry 2 }
+
+  audioLang OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Decoder status audio language 3 characters"
+		  ::= { audioOutputEntry 3 }
+		  
+  audioOutAlarmEn OBJECT-TYPE
+		SYNTAX			INTEGER {
+		  disable(0),
+		  enable(1)
+		}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Audio Out Alarm On/Off Setting"
+		  ::= { audioOutputEntry 4 }
+		  
+	audioOutIndex OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"specify which audio output"
+		  ::= { audioOutputEntry 5 }
+		  
+	audioOutputStatus OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"show audio output status "
+		  ::= { audioOutputEntry 6 }
+  		  
+	bissMode OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"biss mode, 0:biss 1, 1:biss E"
+		  ::= { bissEntry 1 }
+		  
+	biss1Key OBJECT-TYPE
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 12 ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the key of biss 1"
+		  ::= { bissEntry 2 }
+		  
+	bissEKey OBJECT-TYPE
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 16 ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the key of biss E"
+		  ::= { bissEntry 3 }
+		  
+	bissEId OBJECT-TYPE
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 14 ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the id of biss E"
+		  ::= { bissEntry 4 }
+		  
+	bissSource OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the source of biss, it include ASI1ˇ˘Tunerˇ˘IP In(option)ˇ˘CIˇ˘ASI2ˇ˘Mux TS(option)"
+		  ::= { bissEntry 5 }
+		  
+	bissProgram OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the program number of descramble program according to biss,a program number occupy 2 bytes"
+		  ::= { bissEntry 6 }
+		  
+	decoderMode OBJECT-TYPE
+		SYNTAX			INTEGER {
+			manual(0),
+			auto(1)
+		}
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		" Decoder Mode Setting, it include manualˇ˘auto "
+		  ::= { decoderSelection 1 }
+		  
+	ipAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ethernet output ip address"
+		  ::=  {  ethernetOutput  1  }  
+		 
+	streamUDPPort	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ethernet output stream UDP port"
+		  ::=  {  ethernetOutput  2  }
+
+  multicastIPAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ethernet output multicast IP address"
+		  ::=  {  ethernetOutput  3  }
+ 
+  tsPacketPerUDP	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ethernet output TS packets per UDP"
+		  ::=  {  ethernetOutput  4  }
+
+  ttl	OBJECT-TYPE
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ethernet output ttl"
+		  ::=  {  ethernetOutput  5  }
+                  
+ 	sourceNetmask     OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"External board netmask"
+		  ::=  {  ethernetOutput  6  }
+
+  sourceGateway     OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"External board gateway"
+		  ::=  {  ethernetOutput  7  }
+
+  sourceMac     OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"External board mac"
+		  ::=  {  ethernetOutput  8  }
+
+  multiUDPPort     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Multicast port"
+		  ::=  {  ethernetOutput  9  }
+
+  protocol     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"0 udp; 1 trp;"
+		  ::=  {  ethernetOutput  10  }
+
+  typeService     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"5 type: 0 normal; 1 min delay; 2 max throughput; 3 max reliability; 4 min monetary cost"
+		  ::=  {  ethernetOutput  11  }
+
+  source     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"4 types: 0 asi; 1 tuner; 2 ds3; 3 CI"
+		  ::=  {  ethernetOutput  12  }
+		  
+	mode     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"mode:DVB, IPTV"
+		  ::=  {  ethernetOutput  13  }
+		  
+	maxChannel     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"when mode is IPTV, hardware sustain max channel"
+		  ::=  {  ethernetOutput  14  }
+	
+	curMaxChannel     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"when mode is IPTV, device can output channel number most currently"
+		  ::=  {  ethernetOutput  15  }
+	
+	channelInput     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"when mode is IPTV, input channel number currently"
+		  ::=  {  ethernetOutput  16  }
+		  
+	multicastValues     OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"when mode is IPTV, the value of multicast"
+		  ::=  {  ethernetOutput  17  }
+		  
+	gatewayMac     OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the gatewat mac address, example: 44:45:53:54:00:00"
+		  ::=  {  ethernetOutput  18  }
+		  
+	highTargetMac     OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"when mode is IPTV, it denote all multicast channel's target mac, only save high 32bit, one channel occupy 4 bytes"
+		  ::=  {  ethernetOutput  19  }
+		  
+	lowTargetMac     OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"when mode is IPTV, it denote all multicast channel's target mac, only save target mac's low 16bit, one channel occupy 4 bytes, latter 2 bytes is effective"
+		  ::=  {  ethernetOutput  20  }
+		  
+	targetMac4Dvb     OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"when mode is DVB, the target mac address, example: 44:45:53:54:00:00"
+		  ::=  {  ethernetOutput  21  }
+		  
+	switch4Dvb     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"switch control for IP Output of DVB mode"
+		  ::=  {  ethernetOutput  23  }
+		  
+	ciSource	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"CI output source"
+		  ::=  {  ciOutput  1  }
+
+  ciCount1	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"CI1 output program counts"
+		  ::=  {  ciOutput  2  }   
+		
+  ciProgramNumber1	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"CI1 output program numbers,it is a array"
+		  ::=  {  ciOutput  3  }     
+
+  ciCount2	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"CI2 output program counts"
+		  ::=  {  ciOutput  4  }   
+		
+  ciProgramNumber2	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"CI2 output program numbers,it is a array"
+		  ::=  {  ciOutput  5  }  
+		
+  ciLock	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"CI Lock? yes: 1,no: 0 "
+		  ::=  {  ciOutput  6  }  
+
+  ciMenuNode	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"which node in ci menu"
+		  ::=  {  ciOutput  7  }
+
+  ciMenuNodeInfo	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"the node values in ci menu"
+		  ::=  {  ciOutput  8  }	
+		  
+	ciSlot1Status	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the status of slot1,if slot1 has card,then return the name of card,else return string whose length is zero-length"
+		  ::=  {  ciOutput  9  }		
+		  
+	ciSlot2Status	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"the status of slot2,if slot2 has card,then return the name of card,else return string whose length is zero-length"
+		  ::=  {  ciOutput  10  }		
+		                    
+	asiOutputStatusEntry OBJECT IDENTIFIER 
+	  ::= { outputStatus 1 }
+	  
+	sdiOutputStatusEntry OBJECT IDENTIFIER 
+	  ::= { outputStatus 2 }
+	  
+	ds3OutputStatusEntry OBJECT IDENTIFIER 
+	  ::= { outputStatus 3 }
+	  
+	decoderOutputStatusEntry OBJECT IDENTIFIER 
+	  ::= { outputStatus 4 }
+	  	
+	ethernetOutputStatusEntry OBJECT IDENTIFIER 
+	  ::= { outputStatus 5 }
+	  
+	ciOutputStatusEntry OBJECT IDENTIFIER 
+	  ::= { outputStatus 6 }
+
+	asiStatus OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"ASI status"
+		  ::= { asiOutputStatusEntry 1 }
+
+	sdiStatus OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"SDI status"
+		  ::= { sdiOutputStatusEntry 1 }
+	       
+	ds3Status OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"DS3 status"
+		  ::= { ds3OutputStatusEntry 1 }
+
+	ethernetStatus OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Ethernet status"
+		  ::= { ethernetOutputStatusEntry 1 }
+
+	ciStatus OBJECT-TYPE
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"CI status"
+		  ::= { ciOutputStatusEntry 1 }
+		
+	streamIPAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ethernet input ip address"
+		  ::=  {  ethernetInput  1  }  
+		
+	streamNetmask     OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"External board Input netmask"
+		  ::=  {  ethernetInput  2  }
+		
+  streamGateway     OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"External board Input gateway"
+		  ::=  {  ethernetInput  3  }
+		
+  streamMacAddress    OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) )
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"External board Input mac"
+		  ::=  {  ethernetInput  4  }
+		
+	multicastIPAddress	OBJECT-TYPE
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"ethernet input multicast IP address"
+		  ::=  {  ethernetInput  5 }
+		
+	multicastUDPPort     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Multicast port:0~65535"
+		  ::=  {  ethernetInput  6  }
+		
+	protocol     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"0 udp; 1 trp;"
+		  ::=  {  ethernetInput  7  }
+		
+	outputSmoothing     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"0:Auto, 1:Fixed Rate, 2:Disable"
+	 	  ::=  {  ethernetInput  8  }
+	 	  
+	tsBitRate     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"input TS BitRate,from 0M~99M"
+	 	  ::=  {  ethernetInput  9  }
+		
+	lnbFrequency     OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"LNB frequency"
+		  ::=  {  s2Input  1  }
+
+	satFrequency	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner frequency or centre_frequency for the transmission expressed in MHz, its value range: from 950MHz to 2150 MHz"
+		  ::=  {  s2Input  2  }	
+
+	symbolRate	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner symbol rate in symbols per second,its value range: from 0kb/s to 45000kb/s"
+		  ::=  {  s2Input  3  }
+      
+  lnbVoltage	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner power, Option: 0v,13v,18v"
+		  ::=  {  s2Input  4  }
+
+	lnb22KHz	OBJECT-TYPE	
+		SYNTAX			INTEGER
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Tuner 22 KHz, option: off or on"
+		  ::=  {  s2Input  5  }
+		
+	demodulatorMode OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"DVB_S2 demodulator mode, option: DVB-Sˇ˘DVB-S2, parameter: 0,1"
+		  ::=  {  s2Input  6  }
+		
+	operationMode OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"RX operation mode, option: QPSK 1/2ˇ˘QPSK 2/3ˇ˘QPSK 3/4ˇ˘QPSK 3/5ˇ˘QPSK 4/5ˇ˘QPSK 5/6ˇ˘QPSK 8/9ˇ˘QPSK 9/10ˇ˘8PSK 2/3ˇ˘8PSK 3/4ˇ˘8PSK 3/5ˇ˘8PSK 5/6ˇ˘8PSK 8/9ˇ˘8PSK 9/10, parameter: 0ˇ˘1ˇ˘2ˇ˘3ˇ˘4ˇ˘5ˇ˘6ˇ˘7ˇ˘8ˇ˘9ˇ˘10ˇ˘11ˇ˘12ˇ˘13"
+		  ::=  {  s2Input  7  }
+		
+	pilot OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"pilot OPT, option: offˇ˘on, parameter: 0, 1"
+		  ::=  {  s2Input  8  }
+		
+	roll-OffFactor OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"Roll off OPT, option: 0.2ˇ˘0.25ˇ˘0.35, parameter: 0, 1, 2"
+		  ::=  {  s2Input  9  }
+		  
+	disEqc OBJECT-TYPE
+		SYNTAX			  INTEGER {
+			off(0),
+			portA(1),
+			portB(2),
+			portC(3),
+			portD(4)
+		}
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"tuner disEqc setting"
+		  ::=  {  s2Input  10  }
+		  
+	functionSelect OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"function select,option:0:null;1:filter;2:multiplexer"
+		  ::=  {  functionAdd  1  }
+		  
+	filterChannel OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"filter channel,option:0:ASI;1:Tuner;2:IP In;3:CI"
+		  ::=  {  filterSetup  1  }
+		  
+	filterSection OBJECT-TYPE
+		SYNTAX			  DisplayString
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set filter section to Agent,format:old program number,old program number...,every parameter size is 2Byte"
+		  ::=  {  filterSetup  2  }
+	
+	filterFunctionControl OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set filter function control,off:0;on:1"
+		  ::=  {  filterSetup  3  }
+		  
+	outBitRate OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set out bitRate, range: from 0~150000Kbps"
+		  ::=  {  filterSetup  4  }
+		  
+	programNumberContrast OBJECT-TYPE
+		SYNTAX			  DisplayString
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set program number contrast to Agent,format:channel,old program number,new program number,channel,old program number,new program number...,every parameter size is 2Byte"
+		  ::=  {  multiplexSetup  1  }
+		  
+	pidContrast OBJECT-TYPE
+		SYNTAX			  DisplayString
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set All PID contrast to Agent,format:channel,old PMT PID,new PMT PID,channel,old PCR PID,new PCR PID...,every parameter size is 2Byte"
+		  ::=  {  multiplexSetup  2  }
+		  
+	catSection OBJECT-TYPE
+		SYNTAX			  DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set new CAT section to Agent,The transport stream Relating to the CAT seciton, reference ISO/IEC 13818-1 "
+		  ::=  {  multiplexSetup  3  }
+		  
+	sdtSection OBJECT-TYPE
+		SYNTAX			  DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set new SDT section to Agent,The transport stream Relating to the SDT seciton, reference DVB 300-468 "
+		  ::=  {  multiplexSetup  4  }
+		  
+	pmtSection OBJECT-TYPE
+		SYNTAX			  DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set new PMT section to Agent,The transport stream Relating to the PMT seciton, reference ISO/IEC 13818-1 "
+		  ::=  {  multiplexSetup  5  }
+		  
+	nitActualSection OBJECT-TYPE
+		SYNTAX			  DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"Relating to the Actual section, its table ID is 0x40 in NIT,reference DVB 300-468"
+		  ::=  {  multiplexSetup  6  }
+		  
+	mxApply	OBJECT-TYPE	
+		SYNTAX			INTEGER 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"Send multiplexing command: send 1 to multiplexing"
+		::=  {  multiplexSetup  7  }
+		
+	mxFunctionControl	OBJECT-TYPE	
+		SYNTAX			INTEGER 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"set mux function control,off:0;on:1"
+		::=  {  multiplexSetup  8  }
+		
+	outBitRate	OBJECT-TYPE	
+		SYNTAX			INTEGER 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"set out bitRate,range:from 0~150000Kbps"
+		::=  {  multiplexSetup  9  }
+		
+	outTSID	OBJECT-TYPE	
+		SYNTAX			INTEGER 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION		"set out TS ID,range:from 0~65535"
+		::=  {  multiplexSetup  10  }
+		
+	ghostSection OBJECT-TYPE
+		SYNTAX			  DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set Ghost section to Agent,The transport stream Relating to the Ghost seciton, reference ISO/IEC 13818-1 "
+		  ::=  {  multiplexSetup  11  }
+		  
+	originalNetworkId OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set Original Network ID,range:from 0~65535 "
+		  ::=  {  multiplexSetup  12  }
+
+	muxOverFlowPercent OBJECT-TYPE
+		SYNTAX			   INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"mux overflow percent, range =(0-100). "
+		  ::=  {  multiplexSetup  13  }
+		  
+	ds3InputType OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"set DS3 Input Type, 0:Deinterleave; 1:Normal "
+		  ::=  {  ds3Input  1  }
+		  
+	qamOrder OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"QAM modulate mode,option:QPSKˇ˘16QAMˇ˘64QAM "
+		  ::=  {  cmOutput  1  }
+		  
+	bandWidths OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"band width,option:6Mˇ˘7Mˇ˘8M "
+		  ::=  {  cmOutput  2  }
+		  
+	fec OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"forward error correction,option: 1/2, 2/3, 3/4, 5/6, 7/8  "
+		  ::=  {  cmOutput  3  }
+		  
+	guardInterval OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"guard interval,option: 1/32,1/16,1/8,1/4 "
+		  ::=  {  cmOutput  4  }
+		  
+	modulation OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"carrier modulate,option: off,on "
+		  ::=  {  cmOutput  5  }
+		  
+	rfFrequency OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"RF Frequency,from 48MHz~865MHz "
+		  ::=  {  cmOutput  6  }
+		  
+	spec OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"spectrum inversion,option: normal,invert "
+		  ::=  {  cmOutput  7  }
+		  
+	attenuation OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"RF attenuation,from 0db~18db "
+		  ::=  {  cmOutput  8  }
+		  
+	source OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"the source of cm output, 0:ASI, 1:Tuner, 2:IP In, 3:CI, 4:Mux TS "
+		  ::=  {  cmOutput  9  }
+		  
+	cmOutStatus OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-only
+		STATUS			  current
+		DESCRIPTION		"the status of cm output, 0:normal, 1:overflow, 2:no sync "
+		  ::=  {  cmOutput  10  }
+		  
+	backupEnable OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-only
+		STATUS			  current
+		DESCRIPTION		"backup function switch "
+		  ::=  {  backupSetting  1  }
+		  
+	mainInputSource OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"specify main input source"
+		  ::=  {  backupSetting  2  }
+		  
+	backupInputSource OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"specify backup input source"
+		  ::=  {  backupSetting  3  }
+		  
+	tsIDPreference OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"specify the TS ID of IP Input "
+		  ::=  {  backupSetting  4  }
+		  
+	bitRate OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		"specify the bit rate's range of IP Input "
+		  ::=  {  backupSetting  5  }
+		  
+	enable OBJECT-TYPE
+		SYNTAX			  INTEGER {
+		 off(0),
+		 on(1)
+		}
+		MAX-ACCESS		read-only
+		STATUS			  current
+		DESCRIPTION		" NTP setting function switch "
+		  ::=  {  ntpSetting  1  }
+		  
+	serverIp OBJECT-TYPE
+		SYNTAX			  IpAddress
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		" specify the IP address of server "
+		  ::=  {  ntpSetting  2  }
+		  
+	intervalTime OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		" specify the interval for synchronization time with server "
+		  ::=  {  ntpSetting  3  }
+		  
+	timeZone OBJECT-TYPE
+		SYNTAX			  INTEGER
+		MAX-ACCESS		read-write
+		STATUS			  current
+		DESCRIPTION		" specify the time zone for synchronization time with server "
+		  ::=  {  ntpSetting  4  }
+		  
+	localSetting OBJECT-TYPE
+		SYNTAX					DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS			read-write
+		STATUS					current
+		DESCRIPTION			" local gigabit IP board setting "
+			::=  { gigabitIPInfo 1	}
+			
+	tsToIPSetting OBJECT-TYPE
+		SYNTAX					DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS			read-write
+		STATUS					current
+		DESCRIPTION			" TS To IP parameter setting "
+			::=  { gigabitIPInfo 2	}
+			
+	ipToTSSetting OBJECT-TYPE
+		SYNTAX					DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS			read-write
+		STATUS					current
+		DESCRIPTION			" IP To TS parameter setting "
+			::=  { gigabitIPInfo 3	}
+			
+	settingCommand OBJECT-TYPE
+		SYNTAX					INTEGER
+		MAX-ACCESS			write-only
+		STATUS					current
+		DESCRIPTION			" the command for gigabit IP board setting, 0x1111 "
+			::=  { gigabitIPInfo 4	}
+			
+	localStatus OBJECT-TYPE
+		SYNTAX					DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS			read-only
+		STATUS					current
+		DESCRIPTION			" the status for local gigabit IP board "
+			::=  { gigabitIPInfo 5	}
+			
+	tsToIPStatus OBJECT-TYPE
+		SYNTAX					DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS			read-only
+		STATUS					current
+		DESCRIPTION			" the status for TS To IP "
+			::=  { gigabitIPInfo 6	}
+			
+	ipToTSStatus OBJECT-TYPE
+		SYNTAX					DisplayString  ( SIZE ( 0 .. 1024  ) )
+		MAX-ACCESS			read-only
+		STATUS					current
+		DESCRIPTION			" the status for IP To TS "
+			::=  { gigabitIPInfo 7	}
+
+		
+END

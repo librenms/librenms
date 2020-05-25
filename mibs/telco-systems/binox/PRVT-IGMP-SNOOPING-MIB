@@ -1,0 +1,1179 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-IGMP-SNOOPING-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-IGMP-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    switch
+        FROM PRVT-SWITCH-MIB
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC;
+
+prvtIgmpSnoopingMIB MODULE-IDENTITY
+    LAST-UPDATED "201002030000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "Prvt IGMP Snooping MIB"
+    REVISION    "201002030000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 135 }
+
+
+prvtIgmpSnoopMIBObjects OBJECT IDENTIFIER
+    ::= { prvtIgmpSnoopingMIB 1 }
+
+prvtIgmpSnoopObjects OBJECT IDENTIFIER
+    ::= { prvtIgmpSnoopMIBObjects 1 }
+
+prvtIgmpSnoopCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing configuration required for each VLAN"
+    ::= { prvtIgmpSnoopObjects 1 }
+
+prvtIgmpSnoopCfgEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The configuration related to a specific VLAN."
+    INDEX       { prvtIgmpSnoopCfgSvcType, prvtIgmpSnoopCfgSvcId }
+    ::= { prvtIgmpSnoopCfgTable 1 }
+
+PrvtIgmpSnoopCfgEntry ::= SEQUENCE {
+    prvtIgmpSnoopCfgSvcType             INTEGER,
+    prvtIgmpSnoopCfgSvcId               Unsigned32,
+    prvtIgmpSnoopCfgRowStatus           RowStatus,
+    prvtIgmpSnoopCfgEnable              TruthValue,
+    prvtIgmpSnoopCfgRouterAlertCheck    TruthValue,
+    prvtIgmpSnoopCfgIpTosCheck          TruthValue,
+    prvtIgmpSnoopCfgFloodOnFlush        TruthValue,
+    prvtIgmpSnoopCfgTmrRobustness       Unsigned32,
+    prvtIgmpSnoopCfgTmrQIntvl           Unsigned32,
+    prvtIgmpSnoopCfgTmrQRespIntvl       Unsigned32,
+    prvtIgmpSnoopCfgTmrLastMbrQIntvl    Unsigned32,
+    prvtIgmpSnoopCfgMode                INTEGER,
+    prvtIgmpSnoopCfgSourceAddr          IpAddress
+}
+
+prvtIgmpSnoopCfgSvcType OBJECT-TYPE
+    SYNTAX      INTEGER { vlan(1), vpls(2), dot1q(3), tls(4) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Service Type"
+    ::= { prvtIgmpSnoopCfgEntry 1 }
+
+prvtIgmpSnoopCfgSvcId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..4294967294)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Service ID."
+    ::= { prvtIgmpSnoopCfgEntry 2 }
+
+prvtIgmpSnoopCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for this VLAN."
+    ::= { prvtIgmpSnoopCfgEntry 3 }
+
+prvtIgmpSnoopCfgEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable IGMP snooping."
+    ::= { prvtIgmpSnoopCfgEntry 4 }
+
+prvtIgmpSnoopCfgRouterAlertCheck OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable checking of the router
+         alert flags and drop the packet if it is not set."
+    ::= { prvtIgmpSnoopCfgEntry 5 }
+
+prvtIgmpSnoopCfgIpTosCheck OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Check IP tos and drop the packet if it is not set"
+    ::= { prvtIgmpSnoopCfgEntry 6 }
+
+prvtIgmpSnoopCfgFloodOnFlush OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable flooding of unknown
+         multicast traffic when a VFDB flush event occurs."
+    ::= { prvtIgmpSnoopCfgEntry 7 }
+
+prvtIgmpSnoopCfgTmrRobustness OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The robustness value to use for this VLAN."
+    ::= { prvtIgmpSnoopCfgEntry 8 }
+
+prvtIgmpSnoopCfgTmrQIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1024)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The query interval to use for this VLAN ."
+    ::= { prvtIgmpSnoopCfgEntry 9 }
+
+prvtIgmpSnoopCfgTmrQRespIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1024)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The query response interval to use for this VLAN."
+    ::= { prvtIgmpSnoopCfgEntry 10 }
+
+prvtIgmpSnoopCfgTmrLastMbrQIntvl OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1024)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The last member query interval to use for this VLAN."
+    ::= { prvtIgmpSnoopCfgEntry 11 }
+
+prvtIgmpSnoopCfgMode OBJECT-TYPE
+    SYNTAX      INTEGER { transparent(0), report-suppression(1), 
+                    proxy(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Configure IGMP Snooping v3 operational mode"
+    ::= { prvtIgmpSnoopCfgEntry 12 }
+
+prvtIgmpSnoopCfgSourceAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specify source IP address for Queries and Reports"
+    ::= { prvtIgmpSnoopCfgEntry 13 }
+
+prvtIgmpSnoopCfgIfTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopCfgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing configuration required for each interface."
+    ::= { prvtIgmpSnoopObjects 2 }
+
+prvtIgmpSnoopCfgIfEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopCfgIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The configuration related to a specific interface."
+    INDEX       { prvtIgmpSnoopCfgSvcType, prvtIgmpSnoopCfgSvcId, 
+                  prvtIgmpSnoopCfgIfType, prvtIgmpSnoopCfgIfName }
+    ::= { prvtIgmpSnoopCfgIfTable 1 }
+
+PrvtIgmpSnoopCfgIfEntry ::= SEQUENCE {
+    prvtIgmpSnoopCfgIfType              INTEGER,
+    prvtIgmpSnoopCfgIfName              OCTET STRING,
+    prvtIgmpSnoopCfgIfRowStatus         RowStatus,
+    prvtIgmpSnoopCfgIfMaxGroups         Unsigned32,
+    prvtIgmpSnoopCfgIfMRouter           TruthValue,
+    prvtIgmpSnoopCfgIfMRouterBlock      TruthValue,
+    prvtIgmpSnoopCfgIfExplctTracking    TruthValue,
+    prvtIgmpSnoopCfgIfFastLeave         TruthValue,
+    prvtIgmpSnoopCfgIfReportBlock       TruthValue,
+    prvtIgmpSnoopCfgIfForceFwd          TruthValue,
+    prvtIgmpSnoopCfgIfMrtAllowRprts     TruthValue,
+    prvtIgmpSnoopCfgIfQuerier           TruthValue
+}
+
+prvtIgmpSnoopCfgIfType OBJECT-TYPE
+    SYNTAX      INTEGER { port(1), sap(2), spoke-sdp(3), mesh-sdp(4) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface type."
+    ::= { prvtIgmpSnoopCfgIfEntry 1 }
+
+prvtIgmpSnoopCfgIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface name."
+    ::= { prvtIgmpSnoopCfgIfEntry 2 }
+
+prvtIgmpSnoopCfgIfRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for this interface."
+    ::= { prvtIgmpSnoopCfgIfEntry 3 }
+
+prvtIgmpSnoopCfgIfMaxGroups OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..1024)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The maximum number of groups permitted on this interface."
+    ::= { prvtIgmpSnoopCfgIfEntry 4 }
+
+prvtIgmpSnoopCfgIfMRouter OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to configure this interface as a multicast router
+         port (i.e. a port connected to a multicast router)."
+    ::= { prvtIgmpSnoopCfgIfEntry 5 }
+
+prvtIgmpSnoopCfgIfMRouterBlock OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to prevent this interface from becoming a multicast router port."
+    ::= { prvtIgmpSnoopCfgIfEntry 6 }
+
+prvtIgmpSnoopCfgIfExplctTracking OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable explicit tracking of the membership
+         of all multicast hosts."
+    ::= { prvtIgmpSnoopCfgIfEntry 7 }
+
+prvtIgmpSnoopCfgIfFastLeave OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable fast-leave mode on this interface."
+    ::= { prvtIgmpSnoopCfgIfEntry 8 }
+
+prvtIgmpSnoopCfgIfReportBlock OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Deny entry of IGMP reports to local IGMP database (disable IGMP)"
+    ::= { prvtIgmpSnoopCfgIfEntry 9 }
+
+prvtIgmpSnoopCfgIfForceFwd OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Forward IGMP control packets between Mesh SDPs/Secured SAPs"
+    ::= { prvtIgmpSnoopCfgIfEntry 10 }
+
+prvtIgmpSnoopCfgIfMrtAllowRprts OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Allow processing of Reports on MRouter port"
+    ::= { prvtIgmpSnoopCfgIfEntry 11 }
+
+prvtIgmpSnoopCfgIfQuerier OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Send IGMPv2 General Query when interface becomes up."
+    ::= { prvtIgmpSnoopCfgIfEntry 12 }
+
+prvtIgmpSnoopDbGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopDbGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing multicast groups."
+    ::= { prvtIgmpSnoopObjects 3 }
+
+prvtIgmpSnoopDbGrpEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopDbGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific multicast group."
+    INDEX       { prvtIgmpSnoopDbGrpStatsVlanId, prvtIgmpSnoopCfgIfName, 
+                  prvtIgmpSnoopDbGrpIpAddr }
+    ::= { prvtIgmpSnoopDbGrpTable 1 }
+
+PrvtIgmpSnoopDbGrpEntry ::= SEQUENCE {
+    prvtIgmpSnoopDbGrpIpAddr        IpAddress,
+    prvtIgmpSnoopDbGrpBitFlags      Unsigned32,
+    prvtIgmpSnoopDbGrpFilterMode    INTEGER,
+    prvtIgmpSnoopDbGrpExpireTime    Unsigned32
+}
+
+prvtIgmpSnoopDbGrpIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The IP address of the multicast group."
+    ::= { prvtIgmpSnoopDbGrpEntry 1 }
+
+prvtIgmpSnoopDbGrpBitFlags OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The bit flags of this multicast group.."
+    ::= { prvtIgmpSnoopDbGrpEntry 2 }
+
+prvtIgmpSnoopDbGrpFilterMode OBJECT-TYPE
+    SYNTAX      INTEGER { include(1), exclude(2), toInclude(3), 
+                    toExclude(4), allow(5), block(6) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The IGMPv3 filter mode of this multicast group."
+    ::= { prvtIgmpSnoopDbGrpEntry 3 }
+
+prvtIgmpSnoopDbGrpExpireTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The expiry time for this multicast group."
+    ::= { prvtIgmpSnoopDbGrpEntry 4 }
+
+prvtIgmpSnoopDbGrpHostTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopDbGrpHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the hosts belonging to multicast groups."
+    ::= { prvtIgmpSnoopObjects 4 }
+
+prvtIgmpSnoopDbGrpHostEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopDbGrpHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific host."
+    INDEX       { prvtIgmpSnoopDbGrpStatsVlanId, prvtIgmpSnoopCfgIfName, 
+                  prvtIgmpSnoopDbGrpIpAddr, 
+                  prvtIgmpSnoopDbGrpHostSourceIp }
+    ::= { prvtIgmpSnoopDbGrpHostTable 1 }
+
+PrvtIgmpSnoopDbGrpHostEntry ::= SEQUENCE {
+    prvtIgmpSnoopDbGrpHostSourceIp      IpAddress,
+    prvtIgmpSnoopDbGrpHostExpireTime    Unsigned32
+}
+
+prvtIgmpSnoopDbGrpHostSourceIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The source IP address of the host to which this row applies."
+    ::= { prvtIgmpSnoopDbGrpHostEntry 1 }
+
+prvtIgmpSnoopDbGrpHostExpireTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The expiry time for this host."
+    ::= { prvtIgmpSnoopDbGrpHostEntry 2 }
+
+prvtIgmpSnoopDbGrpSrcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopDbGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the sources of multicast groups."
+    ::= { prvtIgmpSnoopObjects 5 }
+
+prvtIgmpSnoopDbGrpSrcEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopDbGrpSrcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific source."
+    INDEX       { prvtIgmpSnoopDbGrpStatsVlanId, prvtIgmpSnoopCfgIfName, 
+                  prvtIgmpSnoopDbGrpIpAddr, prvtIgmpSnoopDbGrpSrcIpAddr }
+    ::= { prvtIgmpSnoopDbGrpSrcTable 1 }
+
+PrvtIgmpSnoopDbGrpSrcEntry ::= SEQUENCE {
+    prvtIgmpSnoopDbGrpSrcIpAddr     IpAddress,
+    prvtIgmpSnoopDbGrpSrcExpTime    Unsigned32
+}
+
+prvtIgmpSnoopDbGrpSrcIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The IP address of the multicast source to which this row applies."
+    ::= { prvtIgmpSnoopDbGrpSrcEntry 1 }
+
+prvtIgmpSnoopDbGrpSrcExpTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The expiry time for this multicast source."
+    ::= { prvtIgmpSnoopDbGrpSrcEntry 2 }
+
+prvtIgmpSnoopDbGrpSrcHostTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopDbGrpSrcHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the hosts listening to each multicast source."
+    ::= { prvtIgmpSnoopObjects 6 }
+
+prvtIgmpSnoopDbGrpSrcHostEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopDbGrpSrcHostEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific host."
+    INDEX       { prvtIgmpSnoopDbGrpStatsVlanId, prvtIgmpSnoopCfgIfName, 
+                  prvtIgmpSnoopDbGrpIpAddr, prvtIgmpSnoopDbGrpSrcIpAddr, 
+                  prvtIgmpSnoopDbGrpSrcHostIp }
+    ::= { prvtIgmpSnoopDbGrpSrcHostTable 1 }
+
+PrvtIgmpSnoopDbGrpSrcHostEntry ::= SEQUENCE {
+    prvtIgmpSnoopDbGrpSrcHostIp         IpAddress,
+    prvtIgmpSnoopDbGrpSrcHostExpTime    Unsigned32
+}
+
+prvtIgmpSnoopDbGrpSrcHostIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The IP of the host to which this row applies."
+    ::= { prvtIgmpSnoopDbGrpSrcHostEntry 1 }
+
+prvtIgmpSnoopDbGrpSrcHostExpTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The expiry time for this host."
+    ::= { prvtIgmpSnoopDbGrpSrcHostEntry 2 }
+
+prvtIgmpSnoopDbMrtrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopDbMrtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing information about multicast routers."
+    ::= { prvtIgmpSnoopObjects 7 }
+
+prvtIgmpSnoopDbMrtrEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopDbMrtrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific multicast router."
+    INDEX       { prvtIgmpSnoopDbGrpStatsVlanId, prvtIgmpSnoopCfgIfName, 
+                  prvtIgmpSnoopDbMrtrSrcIp }
+    ::= { prvtIgmpSnoopDbMrtrTable 1 }
+
+PrvtIgmpSnoopDbMrtrEntry ::= SEQUENCE {
+    prvtIgmpSnoopDbMrtrSrcIp    IpAddress,
+    prvtIgmpSnoopDbMrtrFlags    Unsigned32,
+    prvtIgmpSnoopDbMrtrExpTime  Unsigned32
+}
+
+prvtIgmpSnoopDbMrtrSrcIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The source IP address of the multicast router."
+    ::= { prvtIgmpSnoopDbMrtrEntry 1 }
+
+prvtIgmpSnoopDbMrtrFlags OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Bit flags pertaining to this multicst router."
+    ::= { prvtIgmpSnoopDbMrtrEntry 2 }
+
+prvtIgmpSnoopDbMrtrExpTime OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The expiry time for this multicast router."
+    ::= { prvtIgmpSnoopDbMrtrEntry 3 }
+
+prvtIgmpSnoopDbGrpStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopDbGrpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing discarded packets for each VLAN"
+    ::= { prvtIgmpSnoopObjects 8 }
+
+prvtIgmpSnoopDbGrpStatsEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopDbGrpStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Something something"
+    INDEX       { prvtIgmpSnoopDbGrpStatsVlanId }
+    ::= { prvtIgmpSnoopDbGrpStatsTable 1 }
+
+PrvtIgmpSnoopDbGrpStatsEntry ::= SEQUENCE {
+    prvtIgmpSnoopDbGrpStatsVlanId       Integer32,
+    prvtIgmpSnoopDbGrpStatsDscPkt       Unsigned32,
+    prvtIgmpSnoopDbGrpStatsDscPktTtl    Unsigned32,
+    prvtIgmpSnoopDbGrpStatsDscPktChk    Unsigned32,
+    prvtIgmpSnoopDbGrpStatsDscPktRA     Unsigned32
+}
+
+prvtIgmpSnoopDbGrpStatsVlanId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Vlan ID."
+    ::= { prvtIgmpSnoopDbGrpStatsEntry 1 }
+
+prvtIgmpSnoopDbGrpStatsDscPkt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of Discarded packets."
+    ::= { prvtIgmpSnoopDbGrpStatsEntry 2 }
+
+prvtIgmpSnoopDbGrpStatsDscPktTtl OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of Discarded TTL packets."
+    ::= { prvtIgmpSnoopDbGrpStatsEntry 3 }
+
+prvtIgmpSnoopDbGrpStatsDscPktChk OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of Discarded Checksum packets."
+    ::= { prvtIgmpSnoopDbGrpStatsEntry 4 }
+
+prvtIgmpSnoopDbGrpStatsDscPktRA OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of Discarded Router Alert packets."
+    ::= { prvtIgmpSnoopDbGrpStatsEntry 5 }
+
+prvtIgmpSnoopDbIfStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopDbIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing statistics for each interface."
+    ::= { prvtIgmpSnoopObjects 9 }
+
+prvtIgmpSnoopDbIfStatsEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopDbIfStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific interface."
+    INDEX       { prvtIgmpSnoopDbGrpStatsVlanId, 
+                  prvtIgmpSnoopDbIfStatsIfName }
+    ::= { prvtIgmpSnoopDbIfStatsTable 1 }
+
+PrvtIgmpSnoopDbIfStatsEntry ::= SEQUENCE {
+    prvtIgmpSnoopDbIfStatsIfName        OCTET STRING,
+    prvtIgmpSnoopDbIfStatsV2Reports     Unsigned32,
+    prvtIgmpSnoopDbIfStatsV2Leaves      Unsigned32,
+    prvtIgmpSnoopDbIfStatsV3Reports     Unsigned32,
+    prvtIgmpSnoopDbIfStatsGenQueries    Unsigned32,
+    prvtIgmpSnoopDbIfStatsGrpQueries    Unsigned32,
+    prvtIgmpSnoopDbIfStatsSrcQueries    Unsigned32
+}
+
+prvtIgmpSnoopDbIfStatsIfName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Interface name."
+    ::= { prvtIgmpSnoopDbIfStatsEntry 1 }
+
+prvtIgmpSnoopDbIfStatsV2Reports OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IGMP Snooping V2 reports."
+    ::= { prvtIgmpSnoopDbIfStatsEntry 2 }
+
+prvtIgmpSnoopDbIfStatsV2Leaves OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IGMP Snooping V2 leaves."
+    ::= { prvtIgmpSnoopDbIfStatsEntry 3 }
+
+prvtIgmpSnoopDbIfStatsV3Reports OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IGMP Snooping V3 reports."
+    ::= { prvtIgmpSnoopDbIfStatsEntry 4 }
+
+prvtIgmpSnoopDbIfStatsGenQueries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IGMP Snooping general queries."
+    ::= { prvtIgmpSnoopDbIfStatsEntry 5 }
+
+prvtIgmpSnoopDbIfStatsGrpQueries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IGMP Snooping group-specific queries."
+    ::= { prvtIgmpSnoopDbIfStatsEntry 6 }
+
+prvtIgmpSnoopDbIfStatsSrcQueries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of IGMP Snooping group-and-source-specific queries."
+    ::= { prvtIgmpSnoopDbIfStatsEntry 7 }
+
+prvtIgmpSnoopMemoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopMemoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing information about IGMP Snooping memory pools."
+    ::= { prvtIgmpSnoopObjects 10 }
+
+prvtIgmpSnoopMemoryEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopMemoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Information about a specific memory pool."
+    INDEX       { prvtIgmpSnoopMemoryPoolId }
+    ::= { prvtIgmpSnoopMemoryTable 1 }
+
+PrvtIgmpSnoopMemoryEntry ::= SEQUENCE {
+    prvtIgmpSnoopMemoryPoolId           Unsigned32,
+    prvtIgmpSnoopMemoryPoolName         OCTET STRING,
+    prvtIgmpSnoopMemoryTaken            Unsigned32,
+    prvtIgmpSnoopMemoryFree             Unsigned32,
+    prvtIgmpSnoopMemoryToAllocate       Unsigned32,
+    prvtIgmpSnoopMemoryInitCount        Unsigned32,
+    prvtIgmpSnoopMemorySize             Unsigned32,
+    prvtIgmpSnoopMemoryAllAllocated     Unsigned32
+}
+
+prvtIgmpSnoopMemoryPoolId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a memory pool item."
+    ::= { prvtIgmpSnoopMemoryEntry 1 }
+
+prvtIgmpSnoopMemoryPoolName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory pool name."
+    ::= { prvtIgmpSnoopMemoryEntry 2 }
+
+prvtIgmpSnoopMemoryTaken OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Taken memory."
+    ::= { prvtIgmpSnoopMemoryEntry 3 }
+
+prvtIgmpSnoopMemoryFree OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Free memory."
+    ::= { prvtIgmpSnoopMemoryEntry 4 }
+
+prvtIgmpSnoopMemoryToAllocate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory to allocate."
+    ::= { prvtIgmpSnoopMemoryEntry 5 }
+
+prvtIgmpSnoopMemoryInitCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Initialization count."
+    ::= { prvtIgmpSnoopMemoryEntry 6 }
+
+prvtIgmpSnoopMemorySize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Memory size."
+    ::= { prvtIgmpSnoopMemoryEntry 7 }
+
+prvtIgmpSnoopMemoryAllAllocated OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "All allocated memory."
+    ::= { prvtIgmpSnoopMemoryEntry 8 }
+
+prvtIgmpSnoopApplStatsObjects OBJECT IDENTIFIER
+    ::= { prvtIgmpSnoopObjects 11 }
+
+prvtIgmpSnoopCapturedPckts OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of captured packets."
+    ::= { prvtIgmpSnoopApplStatsObjects 1 }
+
+prvtIgmpSnoopCapturedReports OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of captured reports."
+    ::= { prvtIgmpSnoopApplStatsObjects 2 }
+
+prvtIgmpSnoopUniqueSources OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of unique sources."
+    ::= { prvtIgmpSnoopApplStatsObjects 3 }
+
+prvtIgmpSnoopUniqueGroupRecords OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of unique group records."
+    ::= { prvtIgmpSnoopApplStatsObjects 4 }
+
+prvtIgmpSnoopDuplicateSources OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of duplicate sources."
+    ::= { prvtIgmpSnoopApplStatsObjects 5 }
+
+prvtIgmpSnoopDuplicateGrpRecs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of duplicate group records."
+    ::= { prvtIgmpSnoopApplStatsObjects 6 }
+
+prvtIgmpSnoopUniqueMacs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of unique MACs."
+    ::= { prvtIgmpSnoopApplStatsObjects 7 }
+
+prvtIgmpSnoopDuplicateMacs OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of duplicate MACs."
+    ::= { prvtIgmpSnoopApplStatsObjects 8 }
+
+prvtIgmpSnoopUniqueHsis OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of unique HSIs."
+    ::= { prvtIgmpSnoopApplStatsObjects 9 }
+
+prvtIgmpSnoopDuplicateHsis OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The number of duplicate HSIs."
+    ::= { prvtIgmpSnoopApplStatsObjects 10 }
+
+prvtIgmpSnoopMvrObjects OBJECT IDENTIFIER
+    ::= { prvtIgmpSnoopMIBObjects 3 }
+
+prvtIgmpSnoopMvrShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to shutdown the multicast VLAN registration."
+    ::= { prvtIgmpSnoopMvrObjects 1 }
+
+prvtIgmpSnoopMvrMode OBJECT-TYPE
+    SYNTAX      INTEGER { static(1), dynamic(2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The Multicast VLAN registration mode."
+    ::= { prvtIgmpSnoopMvrObjects 2 }
+
+prvtIgmpSnoopMvrVlan OBJECT-TYPE
+    SYNTAX      Integer32 (1..4092)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The MVR VLAN."
+    ::= { prvtIgmpSnoopMvrObjects 3 }
+
+prvtIgmpSnoopMvrSrcIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The MVR IP address."
+    ::= { prvtIgmpSnoopMvrObjects 4 }
+
+prvtIgmpSnoopMvrGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopMvrGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the MVR static multicast groups."
+    ::= { prvtIgmpSnoopMvrObjects 10 }
+
+prvtIgmpSnoopMvrGrpEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopMvrGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The configuration related to a MVR multicast group."
+    INDEX       { prvtIgmpSnoopMvrGrpName }
+    ::= { prvtIgmpSnoopMvrGrpTable 1 }
+
+PrvtIgmpSnoopMvrGrpEntry ::= SEQUENCE {
+    prvtIgmpSnoopMvrGrpName         OCTET STRING,
+    prvtIgmpSnoopMvrGrpRowStatus    RowStatus
+}
+
+prvtIgmpSnoopMvrGrpName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(1..16))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A string uniquely identifying a MVR multicast group.
+         Acceptable characters are a-z, A-Z, 0-9, '\', ']', '^', '_'."
+    ::= { prvtIgmpSnoopMvrGrpEntry 1 }
+
+prvtIgmpSnoopMvrGrpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for this group."
+    ::= { prvtIgmpSnoopMvrGrpEntry 2 }
+
+prvtIgmpSnoopMvrGrpAsmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopMvrGrpAsmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the MVR all-sources multicast groups."
+    ::= { prvtIgmpSnoopMvrObjects 11 }
+
+prvtIgmpSnoopMvrGrpAsmEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopMvrGrpAsmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The configuration related to a specific group."
+    INDEX       { prvtIgmpSnoopMvrGrpName, prvtIgmpSnoopMvrGrpAsmIndex }
+    ::= { prvtIgmpSnoopMvrGrpAsmTable 1 }
+
+PrvtIgmpSnoopMvrGrpAsmEntry ::= SEQUENCE {
+    prvtIgmpSnoopMvrGrpAsmIndex         Unsigned32,
+    prvtIgmpSnoopMvrGrpAsmRowStatus     RowStatus,
+    prvtIgmpSnoopMvrGrpAsmAddr          IpAddress,
+    prvtIgmpSnoopMvrGrpAsmCount         Unsigned32
+}
+
+prvtIgmpSnoopMvrGrpAsmIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1024)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies an all-source multicast group."
+    ::= { prvtIgmpSnoopMvrGrpAsmEntry 1 }
+
+prvtIgmpSnoopMvrGrpAsmRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for this group."
+    ::= { prvtIgmpSnoopMvrGrpAsmEntry 2 }
+
+prvtIgmpSnoopMvrGrpAsmAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "In combination with prvtIgmpSnoopMvrGrpAsmCount, defines a
+         range of IP addresses belonging to the multicast group."
+    ::= { prvtIgmpSnoopMvrGrpAsmEntry 3 }
+
+prvtIgmpSnoopMvrGrpAsmCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..256)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "In combination with prvtIgmpSnoopMvrGrpAsmAddr, defines a
+         range of IP addresses belonging to the multicast group."
+    ::= { prvtIgmpSnoopMvrGrpAsmEntry 4 }
+
+prvtIgmpSnoopMvrGrpSsmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopMvrGrpSsmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containg the MVR source-specific multicast groups."
+    ::= { prvtIgmpSnoopMvrObjects 12 }
+
+prvtIgmpSnoopMvrGrpSsmEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopMvrGrpSsmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The configuration related to a specific group."
+    INDEX       { prvtIgmpSnoopMvrGrpName, prvtIgmpSnoopMvrGrpSsmIndex }
+    ::= { prvtIgmpSnoopMvrGrpSsmTable 1 }
+
+PrvtIgmpSnoopMvrGrpSsmEntry ::= SEQUENCE {
+    prvtIgmpSnoopMvrGrpSsmIndex         Unsigned32,
+    prvtIgmpSnoopMvrGrpSsmRowStatus     RowStatus,
+    prvtIgmpSnoopMvrGrpSsmAddr          IpAddress,
+    prvtIgmpSnoopMvrGrpSsmSrcList       OCTET STRING,
+    prvtIgmpSnoopMvrGrpSsmMode          INTEGER
+}
+
+prvtIgmpSnoopMvrGrpSsmIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..1024)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Uniquely identifies a source-specific multicast group."
+    ::= { prvtIgmpSnoopMvrGrpSsmEntry 1 }
+
+prvtIgmpSnoopMvrGrpSsmRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for this group."
+    ::= { prvtIgmpSnoopMvrGrpSsmEntry 2 }
+
+prvtIgmpSnoopMvrGrpSsmAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The multicast IP address of this group."
+    ::= { prvtIgmpSnoopMvrGrpSsmEntry 3 }
+
+prvtIgmpSnoopMvrGrpSsmSrcList OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A list of the source IP addresses belonging to this group.
+         Entries in the list are expressed in ASCII dot-decimal notation (a.c.b.d)
+         separated from other entries by a space."
+    ::= { prvtIgmpSnoopMvrGrpSsmEntry 4 }
+
+prvtIgmpSnoopMvrGrpSsmMode OBJECT-TYPE
+    SYNTAX      INTEGER { include(1), exclude(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The mode for this multicast group."
+    ::= { prvtIgmpSnoopMvrGrpSsmEntry 5 }
+
+prvtIgmpSnoopMvrPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopMvrPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing MVR port-specific configuration."
+    ::= { prvtIgmpSnoopMvrObjects 13 }
+
+prvtIgmpSnoopMvrPortEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopMvrPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The configuration related to a specific MVR port."
+    INDEX       { prvtIgmpSnoopCfgIfName }
+    ::= { prvtIgmpSnoopMvrPortTable 1 }
+
+PrvtIgmpSnoopMvrPortEntry ::= SEQUENCE {
+    prvtIgmpSnoopMvrPortRowStatus   RowStatus,
+    prvtIgmpSnoopMvrPortType        INTEGER,
+    prvtIgmpSnoopMvrPortExpTrack    TruthValue,
+    prvtIgmpSnoopMvrPortFastLeave   TruthValue
+}
+
+prvtIgmpSnoopMvrPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for this MVR port."
+    ::= { prvtIgmpSnoopMvrPortEntry 1 }
+
+prvtIgmpSnoopMvrPortType OBJECT-TYPE
+    SYNTAX      INTEGER { source(1), receiver(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The type of port."
+    ::= { prvtIgmpSnoopMvrPortEntry 2 }
+
+prvtIgmpSnoopMvrPortExpTrack OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable explicit tracking of the memberhip
+         of all multicast hosts."
+    ::= { prvtIgmpSnoopMvrPortEntry 3 }
+
+prvtIgmpSnoopMvrPortFastLeave OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'true' to enable fast-leave mode."
+    ::= { prvtIgmpSnoopMvrPortEntry 4 }
+
+prvtIgmpSnoopMvrPortMcGrpTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtIgmpSnoopMvrPortMcGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table containing the multicast groups that are to be forwarded to a port."
+    ::= { prvtIgmpSnoopMvrObjects 14 }
+
+prvtIgmpSnoopMvrPortMcGrpEntry OBJECT-TYPE
+    SYNTAX      PrvtIgmpSnoopMvrPortMcGrpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A row belonging to prvtIgmpSnoopMvrPortMcGrpTable."
+    INDEX       { prvtIgmpSnoopCfgIfName, prvtIgmpSnoopMvrGrpName }
+    ::= { prvtIgmpSnoopMvrPortMcGrpTable 1 }
+
+PrvtIgmpSnoopMvrPortMcGrpEntry ::= SEQUENCE {
+    prvtIgmpSnoopMvrPortMcGrpRStatus    RowStatus
+}
+
+prvtIgmpSnoopMvrPortMcGrpRStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus entry for this multicast group."
+    ::= { prvtIgmpSnoopMvrPortMcGrpEntry 1 }
+
+END -- end of module PRVT-IGMP-SNOOPING-MIB.

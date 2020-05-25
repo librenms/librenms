@@ -1,0 +1,331 @@
+ARRIS-D5-LICENSE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    arrisD5UEQam
+        FROM ARRIS-MIB
+    Counter32,
+    Gauge32,
+    Unsigned32,
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+	RowStatus
+        FROM SNMPv2-TC;
+    
+d5LicenseMib MODULE-IDENTITY
+    LAST-UPDATED "200905140800Z"
+    ORGANIZATION
+        "Arris International"
+    CONTACT-INFO
+        "Network Management
+         Postal: Arris International.
+         4300 Cork Airport Business Park
+         Cork Airport, Kinsale Road
+         Cork, Ireland.
+         Tel: +353 21 7305 800
+         Fax: +353 21 4321 972"
+    DESCRIPTION
+        "This MIB contains objects to configure and monitor licensing
+        of features on the ARRIS D5 UEQ."
+    REVISION "200905140800Z"
+    DESCRIPTION
+        "D5 UEQ LICENSE MIB"
+    ::= {arrisD5UEQam 22}
+
+D5LicenseType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Type definition for license types."
+    SYNTAX INTEGER {
+        qamQuadToHex(1),
+        qamHexToOctal(2),
+        qamQuadToOctal(3)
+    }
+
+D5EncryptionKeyType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Type definition for license encryption keys."
+    SYNTAX OCTET STRING (SIZE(0..150))
+
+D5EncryptedType ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "Type definition for encrypted license information."
+    SYNTAX OCTET STRING (SIZE(0..128))
+
+d5LicenseConfigurationGroup OBJECT-GROUP
+    OBJECTS {
+        d5LicenseTrapDelay,
+        d5LicenseTrapResendRate,
+        d5LicenseTimeToLive,
+        d5LicenseRemotePublicKey,
+        d5LicenseLocalPublicKey
+    }
+    STATUS current
+    DESCRIPTION
+        "A collection of objects providing configuration of D5
+        license management."
+    ::= { d5LicenseMib 1 }
+
+d5LicenseTrapDelay OBJECT-TYPE
+    SYNTAX       D5EncryptedType
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The delay before the generation of an SNMP TRAP requesting
+        additional licenses after the current allocation has been
+        exhausted. No TRAP will be generated if the resend rate is
+        zero."
+    ::= { d5LicenseConfigurationGroup 1 }
+
+d5LicenseTrapResendRate OBJECT-TYPE
+    SYNTAX       D5EncryptedType
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The rate at which TRAPs are resent, specified as the period
+        between TRAPs. A value of zero will suppress the generation of
+        any TRAPs."
+    ::= { d5LicenseConfigurationGroup 2 }
+
+d5LicenseTimeToLive OBJECT-TYPE
+    SYNTAX       D5EncryptedType
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The TTL or grace period to use for temporary licenses."
+    ::= { d5LicenseConfigurationGroup 3 }
+
+d5LicenseRemotePublicKey OBJECT-TYPE
+    SYNTAX D5EncryptionKeyType
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "The public key used to encrypt license information requested from the D5 UEQ."
+    ::= { d5LicenseConfigurationGroup 4 }
+
+d5LicenseLocalPublicKey OBJECT-TYPE
+    SYNTAX D5EncryptionKeyType
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The public key used to encrypt license allocations sent to the D5 UEQ."
+    ::= { d5LicenseConfigurationGroup 5 }
+
+-----------------------------------------------------------------------
+-- License allocation table
+-----------------------------------------------------------------------
+d5LicenseAllocationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5LicenseAllocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists license allocations on the D5 UEQ."
+    ::= { d5LicenseMib 2 }
+
+d5LicenseAllocationEntry OBJECT-TYPE
+    SYNTAX D5LicenseAllocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the D5 license allocation table."
+    INDEX {d5LicenseAllocationType}
+    ::= { d5LicenseAllocationTable 1 }
+
+D5LicenseAllocationEntry ::= SEQUENCE {
+    d5LicenseAllocationType           D5LicenseType,
+    d5LicensesAllocated               D5EncryptedType,
+    d5LicensesInUse                   Unsigned32,
+    d5LicMgrId                        OCTET STRING
+}
+
+d5LicenseAllocationType OBJECT-TYPE
+    SYNTAX D5LicenseType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type of license allocated."
+    ::= { d5LicenseAllocationEntry 1 }
+
+d5LicensesAllocated OBJECT-TYPE
+    SYNTAX D5EncryptedType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The total number of licenses in this allocation."
+    ::= { d5LicenseAllocationEntry 2 }
+
+d5LicensesInUse OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of licenses in this allocation that is currently in
+        use. A higher number in use than allocated indicates the presence
+        of temporary licenses. The number of temporary licenses can be
+        determined by subtracting d5LicensesAllocated from d5LicensesInUse."
+    ::= { d5LicenseAllocationEntry 3 }
+
+d5LicMgrId OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Identifier of the license manager making this allocation."
+    ::= { d5LicenseAllocationEntry 4 }
+
+-----------------------------------------------------------------------
+-- License in-use table
+-----------------------------------------------------------------------
+d5LicenseInUseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5LicenseInUseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists licenses in use D5 UEQ."
+    ::= { d5LicenseMib 3 }
+
+d5LicenseInUseEntry OBJECT-TYPE
+    SYNTAX D5LicenseInUseEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the D5 license in-use table."
+    INDEX {d5LicenseInUseType, d5LicenseIndex}
+    ::= { d5LicenseInUseTable 1 }
+
+D5LicenseInUseEntry ::= SEQUENCE {
+    d5LicenseInUseType                D5LicenseType,
+    d5LicenseIndex                    Unsigned32,
+	d5LicenseRowStatus                RowStatus,
+    d5LicenseInUseMgrId               OCTET STRING
+}
+
+d5LicenseInUseType OBJECT-TYPE
+    SYNTAX D5LicenseType
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Type of license in use."
+    ::= { d5LicenseInUseEntry 1 }
+
+d5LicenseIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1 .. 4294967295)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "A feature specific unique identifier for this license."
+    ::= { d5LicenseInUseEntry 2 }
+
+d5LicenseRowStatus OBJECT-TYPE
+	SYNTAX	RowStatus
+	MAX-ACCESS	read-write
+	STATUS	current
+	DESCRIPTION
+		"The RowStatus for controlling entries in this table."
+	::= { d5LicenseInUseEntry 3 }
+
+d5LicenseInUseMgrId OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Identifier of the license manager using this license."
+    ::= { d5LicenseInUseEntry 4 }
+
+-----------------------------------------------------------------------
+-- License manager allocation table
+-----------------------------------------------------------------------
+d5LicMgrAllocationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF D5LicMgrAllocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table lists license allocations from specific license managers
+         on the D5 UEQ."
+    ::= { d5LicenseMib 4 }
+
+d5LicMgrAllocationEntry OBJECT-TYPE
+    SYNTAX D5LicMgrAllocationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry for the D5 license manager allocation table."
+    INDEX {d5LicMgrIndex}
+    ::= { d5LicMgrAllocationTable 1 }
+
+D5LicMgrAllocationEntry ::= SEQUENCE {
+    d5LicMgrIndex                    OCTET STRING,
+    d5LicMgrQuadToHexAllocated       Unsigned32,
+    d5LicMgrHexToOctalAllocated      Unsigned32,
+    d5LicMgrQuadToOctalAllocated     Unsigned32
+}
+
+d5LicMgrIndex OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Identifier of the license manager that made this allocation."
+    ::= { d5LicMgrAllocationEntry 1 }
+
+d5LicMgrQuadToHexAllocated OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of quad to hex licenses allocated by this license manager."
+    ::= { d5LicMgrAllocationEntry 2 }
+
+d5LicMgrHexToOctalAllocated OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of hex to octal licenses allocated by this license manager."
+    ::= { d5LicMgrAllocationEntry 3 }
+
+d5LicMgrQuadToOctalAllocated OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of quad to octal licenses allocated by this license manager."
+    ::= { d5LicMgrAllocationEntry 4 }
+
+-----------------------------------------------------------------------
+-- License request TRAPs
+-----------------------------------------------------------------------
+d5LicenseTraps OBJECT IDENTIFIER ::= { d5LicenseMib 5 }
+
+d5LMNoKeyAvailable NOTIFICATION-TYPE
+    OBJECTS {
+        d5LicenseAllocationType,
+        d5LicensesAllocated,
+        d5LicensesInUse
+    }
+    STATUS current
+    DESCRIPTION 
+        "This TRAP is sent by the D5 UEQ if it receives a request 
+        for a licensed feature, but the free pool of available
+        permanent licenses is exhausted. It is resent at the
+        configured d5LicenseTrapResendRate."
+     ::= { d5LicenseTraps 1 }
+
+d5LMServicePeriodExpire NOTIFICATION-TYPE
+    OBJECTS {
+        d5LicenseAllocationType,
+        d5LicensesAllocated,
+        d5LicensesInUse,
+        d5LicenseIndex
+    }
+    STATUS current
+    DESCRIPTION 
+        "This TRAP is sent by the D5 UEQ when the grace period for a
+        Temporary license expires and a feature is revoked."
+     ::= { d5LicenseTraps 2 }
+
+END

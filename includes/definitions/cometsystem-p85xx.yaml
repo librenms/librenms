@@ -1,6 +1,0 @@
-os: cometsystem-p85xx
-text: 'Comet System P85xx'
-type: environment
-icon: comet
-over:
-    - { graph: device_temperature, text: temperature }

@@ -1,0 +1,266 @@
+--**************************************************************************
+--                                                                          
+--    Copyright 2011 Cisco Systems, Inc.                                   
+--    All Rights Reserved                                                   
+--    No portions of this material may be reproduced in any
+--    form without the written permission of:                                                
+--             Cisco Systems Inc.                                           
+--             170 West Tasman Dr.                                    
+--             San Jose, CA 95134                                    
+--             USA                                                             
+--**************************************************************************
+
+SA-CM-MTA-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        MODULE-IDENTITY, 
+        OBJECT-TYPE,
+        enterprises, 
+        Integer32
+                FROM SNMPv2-SMI
+        SnmpAdminString 
+                FROM SNMP-FRAMEWORK-MIB
+        TruthValue
+                FROM SNMPv2-TC ;
+                
+sa           OBJECT IDENTIFIER ::= { enterprises 1429 }
+saVoip       OBJECT IDENTIFIER ::= { sa 78 }
+
+saCmMta MODULE-IDENTITY
+        LAST-UPDATED    "201612230000Z"
+        ORGANIZATION    "Cisco Systems, Inc."
+        CONTACT-INFO    "http://support.cisco.com"
+        DESCRIPTION
+            "Controls the behavior of the Cable Modem
+             functional block in Embedded MTA devices.  
+             This MIB is active only at the Cable Modem IP address"
+
+        -- History
+        REVISION "201612230000Z"
+        DESCRIPTION 
+            "Initial release of reduced-set module for releases based on BFC 5.7.x."
+
+        ::= { saVoip 1 }
+
+saCmMtaDevice OBJECT-TYPE
+    SYNTAX INTEGER {
+          disable(0),
+          enable(1)
+	}
+    MAX-ACCESS 	  read-only
+    STATUS        current
+    DESCRIPTION	
+        "Control embedded MTA. 
+         If disable(0), MTA will not send out DHCP DISCOVER message.
+         If DHCP option 122.1 is missing, MTA is disabled and MIB is set to disable(0).
+         Note:  Equivalent of VSIF 54.
+         Note:  This object can be set via the CM configuration file ONLY."
+    ::= { saCmMta 1 }
+
+saCmMtaIpFilters OBJECT-TYPE
+    SYNTAX INTEGER {
+          perSpec(0),
+          openMta(1)
+        }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "DOCSIS config file filters (from RFC2669) are normally applied to the MTA and all 
+         CPE interfaces per the eDOCSIS spec. This MIB controls if the filters are applied
+         to the MTA.
+         0: Follow e-docsis spec - apply filters to MTA, Ethernet and USB ports (default)
+         1: Do not apply any filters to the MTA - apply filters only to Ethernet and USB ports  
+            Filters do NOT block traffic to/from the MTA.
+         Note: Equivalent of VSIF 77"
+    DEFVAL    { 0 }
+    ::= { saCmMta 3 }
+
+saCmMtaSidCount OBJECT-TYPE
+    SYNTAX INTEGER (4|16)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Number of SIDs the MTA supports."
+    ::= { saCmMta 5 }
+
+saCmMtaProvisioningMode OBJECT-TYPE
+    SYNTAX INTEGER {
+          packetCable(0),
+          oneConfigFile(1),
+          twoConfigFilesDHCP(2),
+          twoConfigFilesSNMP(3),
+          twoConfigFilesDHCPmacAddress(4),
+          twoConfigFilesMacAddressOnly(5),
+          webPage(6)
+          }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object must only be set via the CM configuration
+         file during the provisioning process.
+         After CM is operational, this object can not be set
+         via SNMP.
+         MTA provisioning modes:
+         0: MTA follows the PacketCable provisioning specifications
+            and supports BASIC, HYBRID and SECURE flows.
+         1: MTA will provision using only the CM config file. VoIP
+            parameters MUST be included in the CM config file as
+            VSIFs. This option will become obsolete.
+         2: MTA will learn the MTA config file name and location
+            from the MTA DHCP OFFER.
+            If the filename or location is missing, MTA will switch
+            to mode 3.
+         3: MTA will learn the MTA config file name and location via
+            SNMP.  The MTA will send an SNMP inform to the
+            provisioning server specified in DHCP option 122.3 or
+            177.3, depending on saCmMtaDhcpPktcOption (note: MTA
+            will not provision if saCmMtaDhcpPktcOption = requireNone(1)
+            and no option 122.3 or 177.3 is specified).
+         4: MTA will learn the MTA config file name and location and
+            the MTA host name from the MTA DHCP OFFER/ACK.
+            If the filename is missing in the DHCP OFFER/ACK, the MTA
+            will request a config file name based on the MTA mac
+            address (example: 000f21c4e145.bin).
+            If the MTA host name is missing in the DHCP OFFER/ACK the
+            MTA will use a host name of MAC_ADDR (example: 000f21c4e145).
+         5: MTA will request a config file name based on the MTA mac
+            address (example: 000f21c4e145.bin).  
+            MTA will learn the MTA config file location via DHCP.  
+            MTA will use a host name of MAC_ADDR (example: 000f21c4e145).  
+            MTA will NOT use the file name and host name in the
+            DHCP ACK even if the parameters are present.
+         6: Web page provisioning. Parameters from a web page will be used
+            rather than from config file. All the web page parameters are
+            stored in non-vol. Base provisioning method is 2 above.
+         For modes other than 0, MTA DHCP options 122, 177 are not required.
+         Note:  This object can be set via the CM configuration file ONLY."
+    DEFVAL    { 0 }
+    ::= { saCmMta 7 }
+
+saCmMtaDhcpPktcOption OBJECT-TYPE
+    SYNTAX INTEGER {
+          require122(0),
+          requireNone(1),
+          require177(2)
+          }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object must only be set via the CM configuration file during the provisioning process.
+         After CM is operational, this object can not be set via SNMP.
+         0: CM and MTA will accept only PacketCable option 122. If option 122 is not included
+            in CM DHCP OFFER, MTA will not start.
+         1: CM and MTA will accept 122 or 177 or none. If DHCP OFFER contains 122 or 177, MTA
+            will process it.
+         2: CM and MTA will accept only PacketCable option 177. If option 177 is not included
+            in CM DHCP OFFER, MTA will not start.
+         This MIB is saved into modem's non-vol memory and the new value is active after
+         the modem registers and reboots again (DHCP comes before config file parsing).
+         Note:  Equivalent of VSIF 64
+         Note:  This object can be set via the CM configuration file ONLY."
+    DEFVAL    { 0 }
+    ::= { saCmMta 8 }
+
+saCmMtaRequireTod OBJECT-TYPE
+    SYNTAX INTEGER {
+          false(0),
+          true(1)
+         }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+              "This object controls if the EMTA will continue the provisioning
+               process if a response from a Time of Day server is not available
+               at provisioning step CM-8. If set to true(1) the EMTA will require
+               a ToD response. If set to false(0) the EMTA will request ToD but
+               will not require the TOD server response.
+               Note: For PacketCable secure provisioning, if this object is
+               set to false(0), and ToD is not available, MTA will probably
+               be unable to verify that certificates are valid and will not provision.
+               Note: this object can be set in the CM config file only."
+    DEFVAL    { 1 }
+    ::= { saCmMta 10 }
+
+saCmMtaDecryptMtaConfigFile OBJECT-TYPE 
+    SYNTAX INTEGER { 
+        disable(1), 
+        RSA-CM-cert(2) 
+        } 
+    MAX-ACCESS read-only 
+    STATUS current 
+    DESCRIPTION 
+        "To be written." 
+    DEFVAL { 1 } 
+    ::= { saCmMta 13 } 
+
+saCmMtaSwUpgradeControlTimer OBJECT-TYPE
+        SYNTAX INTEGER (0..7200)
+        UNITS         "seconds"
+        MAX-ACCESS       read-write
+        STATUS    current
+        DESCRIPTION       
+            "This object is used to control the conditions for rebooting
+             the modem following a software download:
+             0: Docsis Default: Always download software and reboot
+                immediately after software download,
+             1: Do not download software if any phone endpoint is off hook
+                and return 13 to docsDevSwAdminStatus when set to
+                upgradgeFromMgt(1),
+             other: Download software immediately but delay the reboot
+                    until all lines have been on-hook for the specified
+                    time in seconds.
+             Note: docsDevSwOperStatus shows inProgess(1) even if the
+                   download itself has finished and MTA is waiting for user
+                   to hang up."
+        DEFVAL { 0 }
+        ::= { saCmMta 14 }   
+
+saCmMtaDhcpOptionSixty OBJECT-TYPE
+    SYNTAX SnmpAdminString
+    MAX-ACCESS read-only
+    STATUS current 
+    DESCRIPTION 
+        "Defines the string value for SIP EMTA DHCP DISCOVER option 60 text. 
+         This mib is only writeable in the the CM config file. Default option
+         60 value is pktc1.0" 
+    DEFVAL { "pktc1.0" }
+    ::= { saCmMta 20 }
+
+saCmMtaProvSnmpSetCommunityString OBJECT-TYPE 
+    SYNTAX SnmpAdminString
+    MAX-ACCESS    read-only 
+    STATUS        current 
+    DESCRIPTION 
+        "The value set in this object becomes the SNMPv2c community string that will be accepted
+         in the SNMPSET sent from the provisioning server during MTA registration.
+         Provisioning methods affected include: 
+         - Pktc HYBRID.1 (MTA-19 only)
+         - Pktc HYBRID.2 (MTA-19 only)
+        Note: Pktc SECURE mode is NOT affected.
+        Note: This setting only affects provisioning-related SNMPSET, not SNMPSET sent by
+              the prov server to the MTA after it has completed registration.
+        Note: This object can be set via the CM configuration file ONLY."
+    DEFVAL  { "public" } 
+    ::= { saCmMta 26 }
+
+
+-- ===========
+-- TELNET TREE
+
+saCmMtaCliAccess OBJECT IDENTIFIER ::= { saCmMta 1001 }
+
+saCmMtaCliAccessPasswordType OBJECT-TYPE
+    SYNTAX INTEGER {
+        plain(0),
+        md5(1),
+        pod(2)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Password type"
+    DEFVAL { 0 }
+    ::= { saCmMtaCliAccess 5 }
+
+-- END OF TELNET TREE  
+
+END

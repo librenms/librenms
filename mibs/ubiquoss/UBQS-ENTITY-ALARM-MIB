@@ -1,0 +1,303 @@
+-- *****************************************************************
+-- UBQS-ENTITY-ALARM-MIB  : Ubiquoss Environment Monitor MIB file
+--
+-- June 2013, Doyle Son
+--
+-- Copyright (c) 2013 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-ENTITY-ALARM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TimeStamp,
+    TruthValue
+        FROM SNMPv2-TC
+    ubiMgmtv2
+        FROM UBQS-SMI;
+  
+  
+ubiEntityAlarmMIB MODULE-IDENTITY
+    LAST-UPDATED    "201306170000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-ENTITY-ALARM-MIB is used to monitor
+        and configure status of alarms for Environment Monitor."
+    ::= { ubiMgmtv2 28 }
+
+
+-- ***********************************************************   
+-- TEXTUAL-CONVENTION
+-- Define the composed syntax 
+-- ***********************************************************
+
+AlarmSeverity ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Alarm states for severity.  Valid values are :
+
+        	critical(1)        severity in critical
+
+        	major(2)           severity in major
+
+        	minor(3)           severity in minor
+		"
+    SYNTAX          INTEGER  {
+                        critical(1),
+                        major(2),
+                        minor(3)
+     }      
+   
+-- ***********************************************************
+-- ubiEntityAlarmMIB
+-- *********************************************************** 
+
+ubiEntityAlarmMIBNotificationPrefix		OBJECT IDENTIFIER		::= { ubiEntityAlarmMIB 0 }
+ubiEntityAlarmMIBObjects  				OBJECT IDENTIFIER		::= { ubiEntityAlarmMIB 1 }
+ubiEntityAlarmMIBConformance  			OBJECT IDENTIFIER	 	::= { ubiEntityAlarmMIB 2 }
+
+ubiEntityAlarmMIBNotifications			OBJECT IDENTIFIER	 	::= { ubiEntityAlarmMIBNotificationPrefix 0 }
+
+ubiEntityAlarmNotificationEnables  		OBJECT IDENTIFIER		::= { ubiEntityAlarmMIBObjects 2 }
+
+
+
+-- ***********************************************************
+-- ubiEntityAlarmMIBNotifications
+-- ***********************************************************  
+	ubiAlarmAsserted NOTIFICATION-TYPE
+    	OBJECTS         {
+    					ubiAlarmContactIndex,
+    					ubiAlarmContactDescr,    
+    					ubiAlarmContactSeverity,
+    				  	ubiAlarmContactLastAlarmStamp	  	 
+    					}
+    	STATUS          current
+    	DESCRIPTION
+        	"The agent generates this trap
+        	 when a physical entity asserts an alarm."
+   		::= { ubiEntityAlarmMIBNotifications 1 }
+
+	ubiAlarmCleared NOTIFICATION-TYPE
+    	OBJECTS         {
+    					ubiAlarmContactIndex,
+    					ubiAlarmContactDescr,    
+    					ubiAlarmContactSeverity,
+    				  	ubiAlarmContactLastAlarmStamp	  
+    				    }
+    	STATUS          current
+    	DESCRIPTION
+       		"The agent generates this trap
+       		 when a physical entity clears a previously asserted alarm."
+   		::= { ubiEntityAlarmMIBNotifications 2 }
+
+
+-- ***********************************************************
+-- ubiAlarmContactTable
+-- *********************************************************** 
+
+	ubiAlarmContactTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiAlarmContactEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains one row per specific alarm."
+    	::= { ubiEntityAlarmMIBObjects 1 }
+
+
+	ubiAlarmContactEntry OBJECT-TYPE
+    	SYNTAX          UbiAlarmContactEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Information about a specific alarm.
+        	 each index corresponds to each alarm contact
+        	 and index '0' means whole alarm contacts."
+    	INDEX           { ubiAlarmContactIndex } 
+    	::= { ubiAlarmContactTable 1 }
+
+	UbiAlarmContactEntry ::= SEQUENCE {                  
+		ubiAlarmContactIndex						Integer32,
+		ubiAlarmContactDescr						DisplayString,
+        ubiAlarmContactSeverity             		AlarmSeverity,
+        ubiAlarmContactTrigger   					INTEGER,
+        ubiAlarmContactLastAlarmStatus			  	INTEGER, 
+        ubiAlarmContactLastAlarmStamp     			DisplayString,
+       }
+ 
+   	ubiAlarmContactIndex OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"This object uniquely identifies an alarm description." 
+    	::= { ubiAlarmContactEntry 1 }
+ 
+  	ubiAlarmContactDescr OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"This object specifies a human-readable message
+        	 describing the specific alarm." 
+    	::= { ubiAlarmContactEntry 2 }
+
+	ubiAlarmContactSeverity OBJECT-TYPE
+    	SYNTAX          AlarmSeverity
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"This object specifies the severity
+        	 associated with the specific alarm.
+        	 Valid values are :
+
+        	 critical(1)        severity in critical
+
+        	 major(2)           severity in major
+
+        	 minor(3)           severity in minor" 
+    	::= { ubiAlarmContactEntry 3 }
+  
+	ubiAlarmContactTrigger OBJECT-TYPE
+    	SYNTAX          INTEGER    	   
+    	{   
+    			closed(1),
+				open(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+       		"This object specifies the trigger state
+       		 associated with the specific alarm." 
+    	::= { ubiAlarmContactEntry 4 }     
+    	
+ 	ubiAlarmContactLastAlarmStatus OBJECT-TYPE
+        SYNTAX          INTEGER    	   
+    	{   
+    			cleared(1),
+				asserted(2)
+    	}
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   
+        	"This object specifies the last alarm status
+        	 associated with the specific alarm."
+        ::= { ubiAlarmContactEntry 5 }
+ 
+  	ubiAlarmContactLastAlarmStamp OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"This object specifies the system clock
+        	 at the time the alarm was generated." 
+    	::= { ubiAlarmContactEntry 6 }
+
+
+-- ***********************************************************
+-- ubiEntityEnableFruControlNotification
+-- ***********************************************************      
+
+	ubiAlarmAssertedEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"This variable indicates whether the system
+        	produces the following notifications:
+        	ubiEntityFRUInserted, ubiEntityFRURemoved.
+
+        	A false value will prevent these notifications
+       	 from being generated."
+  	 	DEFVAL          { false } 
+    	::= { ubiEntityAlarmNotificationEnables 1 }         
+    	
+  	ubiAlarmClearedEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"This variable indicates whether the system
+        	produces the following notification:
+        	ubiEntSensorThreshold.
+
+        	A false value will prevent these notifications 
+        	from being generated."
+  	 	DEFVAL          { false } 
+    	::= { ubiEntityAlarmNotificationEnables 2 }
+
+-- ***********************************************************
+-- ubiEntityAlarmMIBConformance
+-- ***********************************************************  
+
+-- conformance information
+
+ubiEntityAlarmMIBCompliances  OBJECT IDENTIFIER		::= { ubiEntityAlarmMIBConformance 1 }
+ubiEntityAlarmMIBGroups  OBJECT IDENTIFIER			::= { ubiEntityAlarmMIBConformance 2 }
+
+
+--
+-- compliance statements
+--
+	ubiEntityAlarmMIBCompliances MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"An Entity-Alarm-MIB implementation can implement this group to
+        	provide Alarm properties."
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {
+    					ubiEntityAlarmMIBContactGroup,
+    					ubiEntityAlarmMIBNotificationGroup
+                        }
+
+    	GROUP           ubiEntityAlarmMIBContactGroup
+    	DESCRIPTION
+        	"The ubiEntityAlarmMIBContactGroup must be implemented for
+        	entity alarm"
+
+    	GROUP           ubiEntityAlarmMIBNotificationGroup
+    	DESCRIPTION
+        	"The ubiEntityMIBNotificationGroup must be
+        	implemented for entity alarms that have notification"
+    	::= { ubiEntityAlarmMIBCompliances 1 }
+
+-- units of conformance
+
+	ubiEntityAlarmMIBContactGroup OBJECT-GROUP
+    	OBJECTS         {
+                    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to get the
+        	operational state and redundancy state of the modules"
+    	::= { ubiEntityAlarmMIBGroups 1 }
+
+	ubiEntityAlarmMIBNotificationGroup OBJECT-GROUP
+    	OBJECTS         {
+                    	}
+        STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are 
+        	used to send a notification."
+    	::= { ubiEntityAlarmMIBGroups 2 }    
+
+END

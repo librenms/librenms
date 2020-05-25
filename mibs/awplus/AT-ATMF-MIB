@@ -1,0 +1,608 @@
+-- ============================================================================
+-- AT-ATMF-MIB, Allied Telesis enterprise MIB: ATMF module
+--
+-- Copyright (c) 2013-2014 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-ATMF-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32
+            FROM SNMPv2-SMI
+
+        DisplayString
+            FROM SNMPv2-TC
+
+        modules,
+        DisplayStringUnsized
+            FROM AT-SMI-MIB;
+
+    atmf MODULE-IDENTITY
+        LAST-UPDATED "201410071200Z"
+        ORGANIZATION "Allied Telesis, Inc"
+        CONTACT-INFO
+            "http://www.alliedtelesis.com"
+        DESCRIPTION
+            "This MIB file contains definitions of managed objects for the
+            ATMF module."
+
+        REVISION "201410071200Z"
+        DESCRIPTION
+            "This MIB file is enhanced to incorporate the new controller
+            module trap - atAtmfControllerAreaRemoteBackupStatusTrap."
+
+        REVISION "201407041200Z"
+        DESCRIPTION
+            "This MIB file is updated to incorporate the definitions of managed
+            objects for the ATMF controller module."
+
+        REVISION "201405071200Z"
+        DESCRIPTION
+            "Enhance the atAtmfRemoteBackupStatusTrap to include the
+            atAtmfTrapRemoteBackupServerId field."
+
+        REVISION "201307151200Z"
+        DESCRIPTION
+            "Add atAtmfTrapRemoteServersAvailable.
+             Add trap and trap variable definitions."
+
+        REVISION "201305271200Z"
+        DESCRIPTION
+            "Initial Revision"
+
+    ::= { modules 603 }
+
+-- The ATMF (Allied Telesis Management Framework) module.
+
+-------------------------------------------------------- --
+-- The ATMF Traps
+-------------------------------------------------------- --
+atAtmfTraps  OBJECT IDENTIFIER ::= { atmf 0 }
+atAtmfBackupStatusTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+        atAtmfTrapNodeName,
+        atAtmfTrapMasterNodeName,
+        atAtmfTrapBackupStatus
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an ATMF master attempts to perform a backup of a
+         nodes FLASH contents.  Nominally, it states that the backup of an individual
+         node or all nodes to a master node has <failed|passed>."
+    ::= { atAtmfTraps 1 }
+
+atAtmfNodeStatusChangeTrap NOTIFICATION-TYPE
+    OBJECTS 
+        {
+        atAtmfTrapNodeName,
+        atAtmfTrapNodeStatusChange,
+        atAtmfTrapNetworkName
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an ATMF node joins or leaves the ATMF network.
+         Nominally, it states that a node has <left|joined> an ATMF network."
+    ::= { atAtmfTraps 2 }
+
+atAtmfNodeRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS 
+        {
+        atAtmfTrapNodeName,
+        atAtmfTrapMasterNodeName,
+        atAtmfTrapNodeRecoveryStatus
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an attempt has been made to recover an ATMF
+         node. Nominally, it states that an attempt has been made to recover a
+         node from the specified master with the status of <passed|failed>."
+    ::= { atAtmfTraps 3 }
+
+atAtmfInterfaceStatusChangeTrap NOTIFICATION-TYPE
+    OBJECTS 
+        {
+        atAtmfTrapNodeName,
+        atAtmfTrapInterfaceName,
+        atAtmfTrapInterfaceStatusChange
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an ATMF interface status change has occurred.
+         Nominally, it states that an interface on a node has changed status to
+         <blocking|forwarding>."
+    ::= { atAtmfTraps 4 }
+
+
+atAtmfExternalMediaLowMemoryTrap NOTIFICATION-TYPE
+    OBJECTS 
+        {
+        atAtmfTrapMasterNodeName,
+        atAtmfTrapMediaType,
+        atAtmfTrapMediaTotal,
+        atAtmfTrapMediaFree
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the available external storage on the ATMF master
+         node falls below a nominated threshold.  Nominally, it states that the external
+         <usb|sd> storage on a master node has fallen below the designated threshold and
+         specifies the total available memory <xxx MB> and the total free memory <xxx MB>."
+    ::= { atAtmfTraps 5 }
+
+atAtmfRollingRebootCompleteTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+        atAtmfTrapNodeName,
+        atAtmfTrapRollingRebootStatus
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the ATMF rolling reboot process has finished
+         on a particular ATMF node.  Nominally, it states that the ATMF rolling reboot,
+         executed against the specified node, has returned a reboot status of
+         <failed|passed>."
+    ::= { atAtmfTraps 6 }
+
+atAtmfRollingRebootReleaseCompleteTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+        atAtmfTrapNodeName,
+        atAtmfTrapRollingRebootStatus,
+        atAtmfTrapRollingRebootReleaseName,
+        atAtmfTrapRollingRebootReleaseStatus
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when the ATMF rolling reboot process attempts to push a new
+         software release to a specified ATMF node.  Nominally, it states that the ATMF
+         rolling reboot release process, executed from the specified node has returned a
+         reboot status of <failed|passed>, the name of the attempted release file and
+         the release status of <failed|passed>."
+    ::= { atAtmfTraps 7 }
+
+atAtmfRemoteBackupStatusTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+        atAtmfTrapNodeName,
+        atAtmfTrapRemoteBackupServerId,
+        atAtmfTrapRemoteBackupServerName,
+        atAtmfTrapRemoteServerStatus,
+        atAtmfTrapRemoteServersAvailable
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an ATMF remote backup server availability state changes.
+         Nominally, it states whether a remote backup server is <unavailable|available> and
+         the number of remote backup servers available."
+    ::= { atAtmfTraps 8 }
+
+atAtmfControllerAreaStatusChangeTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+        atAtmfTrapNodeName,
+        atAtmfControllerAreaName,
+        atAtmfControllerAreaStatus
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an ATMF controller area reachability state changes.
+         Nominally, it states whether an ATMF controller area is <unreachable|reachable>."
+    ::= { atAtmfTraps 9 }
+
+atAtmfControllerAreaRemoteBackupStatusTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+          atAtmfTrapNodeName,
+          atAtmfControllerAreaName,
+          atAtmfTrapMasterNodeName,
+          atAtmfTrapBackupStatus
+        }
+    STATUS current
+    DESCRIPTION
+        "This trap is generated when an ATMF controller attempts to perform a backup of a
+        remote area local master's FLASH contents.  Nominally, it states that the backup
+        of an individual local master, all area local masters in a specified area or all
+        local area master's in all areas has <failed|passed>."
+    ::= { atAtmfTraps 10 }
+
+-- ---------------------------------------------------------- --
+-- The ATMF Trap Variables
+-- ---------------------------------------------------------- --
+atAtmfTrapVariable OBJECT IDENTIFIER ::= { atmf 1 }
+
+atAtmfTrapNodeName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF node name."
+    ::= { atAtmfTrapVariable 1 }
+
+atAtmfTrapMasterNodeName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF master node name."
+    ::= { atAtmfTrapVariable 2 }
+
+atAtmfTrapNetworkName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF network name."
+    ::= { atAtmfTrapVariable 3 }
+
+atAtmfTrapInterfaceName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF interface name."
+    ::= { atAtmfTrapVariable 4 }
+
+atAtmfTrapBackupStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        failed(1),
+        passed(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the last backup attempt on either a specified ATMF node or all
+         nodes in the ATMF network."
+    ::= { atAtmfTrapVariable 5 }
+
+atAtmfTrapNodeStatusChange OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        left(1),
+        joined(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An ATMF node has changed status in the ATMF network."
+    ::= { atAtmfTrapVariable 6 }
+
+atAtmfTrapInterfaceStatusChange OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        blocking(1),
+        forwarding(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "An ATMF interface has changed status."
+    ::= { atAtmfTrapVariable 7 } 
+
+atAtmfTrapNodeRecoveryStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        failed(1),
+        passed(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the last recovery attempt."
+    ::= { atAtmfTrapVariable 8 }
+
+atAtmfTrapMediaType OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..8))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The media type configured on the ATMF node - USB, SD or FS."
+    ::= { atAtmfTrapVariable 9 } 
+
+atAtmfTrapMediaTotal OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total memory available on the resident media, in MB."
+    ::= { atAtmfTrapVariable 10 }
+
+atAtmfTrapMediaFree OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The free memory available on the resident media, in MB. Each
+         node has a maximum flash of 64MB."
+    ::= { atAtmfTrapVariable 11 }
+
+atAtmfTrapRollingRebootStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        failed(1),
+        passed(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of the last rolling reboot for a node."
+    ::= { atAtmfTrapVariable 12 }
+
+atAtmfTrapRollingRebootReleaseName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..255))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the last rolling reboot release."
+    ::= { atAtmfTrapVariable 13 } 
+
+atAtmfTrapRollingRebootReleaseStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        failed(1),
+        passed(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The release update status of the last rolling reboot for a node."
+    ::= { atAtmfTrapVariable 14 }
+
+atAtmfTrapRemoteBackupServerId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF remote backup server id."
+    ::= { atAtmfTrapVariable 15 }
+
+atAtmfTrapRemoteBackupServerName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF remote backup server name."
+    ::= { atAtmfTrapVariable 16 }
+
+atAtmfTrapRemoteServerStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        unavailable(1),
+        available(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current availablility of the remote backup server for a specified ATMF master node."
+    ::= { atAtmfTrapVariable 17 }
+
+atAtmfTrapRemoteServersAvailable OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of currently available remote backup servers."
+    ::= { atAtmfTrapVariable 18 }
+
+-- ---------------------------------------------------------- --
+-- The ATMF Summary Information Table
+-- ---------------------------------------------------------- --
+atAtmfSummary OBJECT IDENTIFIER ::= { atmf 2 }
+
+atAtmfSummaryNodeName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name assigned to a particular node."
+    ::= { atAtmfSummary 1 }
+
+atAtmfSummaryStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        disabled(1),
+        enabled(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Node's ATMF status."
+    ::= { atAtmfSummary 2 }
+
+atAtmfSummaryRole OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        member(1),
+        master(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The role configured for this ATMF device, either Member or Master."
+    ::= { atAtmfSummary 3 }
+
+atAtmfSummaryNetworkName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..32))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF network that a particular node belongs to."
+    ::= { atAtmfSummary 4 }
+
+atAtmfSummaryParentName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The parent name of the node or 'none'."
+    ::= { atAtmfSummary 5 }
+
+atAtmfSummaryCoreDistance OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF core distance for this node."
+    ::= { atAtmfSummary 6 }
+
+atAtmfSummaryDomainId OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF domain Id for this node."
+    ::= { atAtmfSummary 7 }
+
+atAtmfSummaryRestrictedLogin OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        disabled(1),
+        enabled(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The login for this ATMF device is restricted to only those devices
+         that are designated ATMF Masters."
+    ::= { atAtmfSummary 8 }
+
+atAtmfSummaryNodes OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number ATMF nodes known to this device."
+    ::= { atAtmfSummary 9 }
+
+atAtmfSummaryAreaName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The ATMF default area configured for this ATMF device."
+    ::= { atAtmfSummary 10 }
+
+atAtmfSummaryControllerRole OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        non-controller(1),
+        controller(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The controller role configured for this ATMF device, either Non-controller or
+         Controller."
+    ::= { atAtmfSummary 11 }
+
+-- ---------------------------------------------------------- --
+-- The ATMF Node Information Table
+-- ---------------------------------------------------------- --
+atAtmfNodeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AtAtmfNodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ATMF Node Entry."
+    ::= { atmf 3 }
+
+atAtmfNodeEntry OBJECT-TYPE
+    SYNTAX AtAtmfNodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ATMF Node Entry."
+    INDEX   { atAtmfNodeName }
+    ::= { atAtmfNodeTable 1 }
+
+AtAtmfNodeEntry ::=
+    SEQUENCE
+        {
+        atAtmfNodeName
+            DisplayStringUnsized
+        }
+
+atAtmfNodeName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..64))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name assigned to a particular node."
+    ::= { atAtmfNodeEntry 1 }
+
+-- ---------------------------------------------------------- --
+-- The ATMF Controller Area Information Table
+-- ---------------------------------------------------------- --
+atAtmfControllerAreaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF AtAtmfControllerAreaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The configured areas available to the ATMF controller."
+    ::= { atmf 4 }
+
+atAtmfControllerAreaEntry OBJECT-TYPE
+    SYNTAX AtAtmfControllerAreaEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "ATMF controller entry."
+    INDEX   { atAtmfControllerAreaId }
+    ::= { atAtmfControllerAreaTable 1 }
+
+AtAtmfControllerAreaEntry ::=
+    SEQUENCE
+        {
+        atAtmfControllerAreaId Integer32,
+        atAtmfControllerAreaName DisplayStringUnsized,
+        atAtmfControllerAreaStatus INTEGER,
+        atAtmfControllerAreaMemberCount Integer32
+        }
+
+atAtmfControllerAreaId OBJECT-TYPE
+    SYNTAX Integer32 (1..126)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The area identifier assigned to a particular controller area."
+    ::= { atAtmfControllerAreaEntry 1 }
+
+atAtmfControllerAreaName OBJECT-TYPE
+    SYNTAX DisplayStringUnsized (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name assigned to a particular controller area."
+    ::= { atAtmfControllerAreaEntry 2 }
+
+atAtmfControllerAreaStatus OBJECT-TYPE
+    SYNTAX INTEGER
+        {
+        unreachable(1),
+        reachable(2)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The reachability status of a particular controller area."
+    ::= { atAtmfControllerAreaEntry 3 }
+
+atAtmfControllerAreaMemberCount OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of member nodes available in a particular controller area."
+    ::= { atAtmfControllerAreaEntry 4 }
+END
+
+--
+-- at-atmf.mib
+--
+

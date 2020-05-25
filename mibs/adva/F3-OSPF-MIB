@@ -1,0 +1,770 @@
+F3-OSPF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
+    Gauge32, Counter32
+             FROM SNMPv2-SMI
+    RowStatus, StorageType, TEXTUAL-CONVENTION, TruthValue
+             FROM SNMPv2-TC
+    fsp150cm
+             FROM ADVA-MIB
+    RouterID, AreaID, HelloRange, DesignatedRouterPriority,
+    OspfAuthenticationType, ospfNbrEntry
+             FROM OSPF-MIB
+    cmIpInterfaceEntry, ipManagementTunnelEntry
+             FROM CM-IP-MIB;
+
+f3OspfMIB MODULE-IDENTITY
+    LAST-UPDATED        "201410060000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Jakub Nadolski
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 421
+             E-mail: jnadolski@advaoptical.com
+             Postal: ul. Slaska 35
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the OSPF MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201410060000Z"
+    DESCRIPTION
+        "
+         Notes from release 201410060000Z,
+         (1) MIB version ready for release FSP150CC 6.6.CC."
+
+    ::= {fsp150cm 35}
+
+OspfMetricType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "The metric type can be specified to define
+          how the cost of redistributed routes are to be
+          calculated. A metric type of E1 means that 
+          the redistribution cost plus the cost to the ASBR is          
+          used for the route while a metric type of E2 means 
+          that only the redistributed cost is used."
+       SYNTAX       INTEGER {
+                       e1 (1),
+                       e2 (2)
+                    }
+
+OspfRedistributionType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "Enables redistribution of routes of a specific
+          protocol or kind into OSPF. The only supported
+          type is RIP."
+       SYNTAX       INTEGER {
+                       none (1),
+                       rip (2)
+                    }
+                    
+OspfState ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "Allows user configuration of the behavior associated 
+          with the OSPF interface. 
+            ENABLED - OSPF is enabled and the interface 
+            will send HELLOs and form adjacencies.
+            DISABLED - the interface is not advertised 
+            and does not participate in OSPF message exchanges.
+            PASSIVE - the interface will be advertised as a stub 
+            link but will not participate in OSPF message exchange."
+       SYNTAX       INTEGER {
+                       enabled (1),
+                       disabled (2),
+                       passive (3)
+                    }
+                    
+OspfAreaType ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "The OSPF area type."
+       SYNTAX       INTEGER {
+                       normal (1),
+                       stub (2)
+                    }
+
+
+OspfRole ::= TEXTUAL-CONVENTION
+       STATUS       current
+       DESCRIPTION
+          "The OSPF role of the neighbor router."
+       SYNTAX       INTEGER {
+                       bdr (1),
+                       dr (2),
+                       drother (3)   
+                    }
+              
+
+-- 
+-- OID definitions
+-- 
+
+f3OspfConfigObjects      OBJECT IDENTIFIER ::= {f3OspfMIB 1}
+f3OspfConformance        OBJECT IDENTIFIER ::= {f3OspfMIB 2}
+
+--
+--  OSPF Router
+--
+
+f3OspfRouterTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OspfRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to OSPF Router 
+             instance for configuration purposes."
+    ::= { f3OspfConfigObjects 1 }
+
+f3OspfRouterEntry OBJECT-TYPE
+    SYNTAX      F3OspfRouterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OspfRouterTable."
+    INDEX { f3OspfRouterIndex }
+    ::= { f3OspfRouterTable 1 }
+
+F3OspfRouterEntry ::= SEQUENCE {
+    f3OspfRouterIndex                       RouterID,
+    f3OspfRouterMetricType                  OspfMetricType,    
+    f3OspfRouterMetric                      Integer32,
+    f3OspfRouterRedistributionType          OspfRedistributionType,
+    f3OspfRouterNumAttachedAreas            Unsigned32,
+    f3OspfRouterAreaBdrRtrStatus            TruthValue,
+    f3OspfRouterStorageType                 StorageType,
+    f3OspfRouterRowStatus                   RowStatus
+}
+
+f3OspfRouterIndex OBJECT-TYPE
+    SYNTAX        RouterID
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+         "A 32-bit integer uniquely identifying the 
+         router in the Autonomous System.
+         By convention, to ensure uniqueness, this
+         should default to the value of one of the
+         router's IP interface addresses."
+    ::= { f3OspfRouterEntry 1 }
+
+f3OspfRouterMetricType OBJECT-TYPE
+    SYNTAX        OspfMetricType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The metric type can be specified to define how the cost of 
+         redistributed routes are to be calculated. This attribute must 
+         be set to zero if f3OspfRouterMetric has been specified."
+    ::= { f3OspfRouterEntry 2 }
+
+f3OspfRouterMetric OBJECT-TYPE
+    SYNTAX        Integer32 (0..16777214)
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The metric value to use as the default cost to be
+         associated with any redistributed routes. This attribute must be set
+         to zero if the f3OspfRouterMetricType has been specified"
+    ::= { f3OspfRouterEntry 3 }
+    
+f3OspfRouterRedistributionType OBJECT-TYPE
+    SYNTAX        OspfRedistributionType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The redistribution type is used to enable redistribution of routes of
+         a specified protocol."
+    ::= { f3OspfRouterEntry 4 }
+    
+f3OspfRouterNumAttachedAreas OBJECT-TYPE
+    SYNTAX        Unsigned32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+         "Number of attached areas for the OSPF Router."
+    ::= { f3OspfRouterEntry 5 }
+
+f3OspfRouterAreaBdrRtrStatus OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "A flag to note whether this router is an Area
+         Border Router."
+    ::= { f3OspfRouterEntry 6 }
+   
+f3OspfRouterStorageType OBJECT-TYPE
+    SYNTAX        StorageType
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The type of storage configured for this entry."
+    ::= { f3OspfRouterEntry 7 }
+    
+f3OspfRouterRowStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+         "The status of this row.  An entry MUST NOT exist in the 
+         active state unless all objects in the entry have an 
+         appropriate value, as described
+         in the description clause for each writable object.
+
+         The values of f3OspfRouterRowStatus supported are
+         createAndGo(4) and destroy(6).  All mandatory attributes
+         must be specified in a single SNMP SET request with
+         f3OspfRouterRowStatus value as createAndGo(4).
+         Upon successful row creation, this object has a
+         value of active(1).
+         
+         The f3OspfRouterRowStatus object may be modified if
+         the associated instance of this object is equal to active(1)."
+    ::= { f3OspfRouterEntry 8 }
+
+
+--
+--  OSPF Area Table
+--
+
+f3OspfAreaTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OspfAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to OSPF Area
+            configuration purposes."
+    ::= { f3OspfConfigObjects 2 }
+
+f3OspfAreaEntry OBJECT-TYPE
+    SYNTAX      F3OspfAreaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OspfAreaTable."
+    INDEX { f3OspfAreaId }
+    ::= { f3OspfAreaTable 1 }
+
+F3OspfAreaEntry ::= SEQUENCE {
+    f3OspfAreaId                                AreaID,
+    f3OspfAreaType                              OspfAreaType,
+    f3OspfAreaAuthType                          OspfAuthenticationType,
+    f3OspfAreaDefaultCost                       Unsigned32,
+    f3OspfAreaSpfRuns                           Counter32,
+    f3OspfAreaLsaCount                          Gauge32,
+    f3OspfAreaStorageType                       StorageType,
+    f3OspfAreaRowStatus                         RowStatus
+}
+
+f3OspfAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A 32-bit integer uniquely identifying an area.
+        Area ID 0.0.0.0 is used for the OSPF backbone."
+    ::= { f3OspfAreaEntry 1 }
+
+f3OspfAreaType OBJECT-TYPE
+    SYNTAX      OspfAreaType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of an area."
+    ::= { f3OspfAreaEntry 2 }
+
+f3OspfAreaAuthType OBJECT-TYPE
+    SYNTAX      OspfAuthenticationType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The authentication type specifies whether no authentication, simple 
+        authentication, or MD5 authentication is required for this area.  Keying
+        information must be configured on a per-interface basis.  This only 
+        applies to non-stubby areas."
+    ::= { f3OspfAreaEntry 3 }
+
+f3OspfAreaDefaultCost OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16777215)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The default cost for summary LSA's announced to stubby areas. This only
+        applies to stubby areas."
+    ::= { f3OspfAreaEntry 4 }
+    
+f3OspfAreaSpfRuns OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A count of the number of times the Shortest Path algorithm has been
+        run for this area."
+    ::= { f3OspfAreaEntry 5 }
+    
+f3OspfAreaLsaCount OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of link state advertisements
+        in this area's link state database, excluding
+        AS-external LSAs."
+    ::= { f3OspfAreaEntry 6 }
+
+f3OspfAreaStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The type of storage configured for this entry."
+    ::= { f3OspfAreaEntry 7 }
+    
+f3OspfAreaRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The status of this row.  An entry MUST NOT exist in the 
+        active state unless all objects in the entry have an 
+        appropriate value, as described
+        in the description clause for each writable object.
+
+        The values of f3OspfAreaRowStatus supported are
+        createAndGo(4) and destroy(6).  All mandatory attributes
+        must be specified in a single SNMP SET request with
+        f3OspfAreaRowStatus value as createAndGo(4).  
+        Upon successful row creation, this object has a
+        value of active(1).
+        
+        The f3OspfAreaRowStatus object may be modified if
+        the associated instance of this object is equal to active(1)."
+    ::= { f3OspfAreaEntry 8 }
+    
+
+--
+--  OSPF IP Interface Ext Table
+--
+
+f3OspfIpInterfaceExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OspfIpInterfaceExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to OSPF Interface
+            configuration purposes. This table extends cmIpInterfaceTable 
+            from CM-IP-MIB."
+    ::= { f3OspfConfigObjects 3 }
+
+f3OspfIpInterfaceExtEntry OBJECT-TYPE
+    SYNTAX      F3OspfIpInterfaceExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OspfIpInterfaceExtTable."
+    AUGMENTS { cmIpInterfaceEntry }
+    ::= { f3OspfIpInterfaceExtTable 1 }
+
+F3OspfIpInterfaceExtEntry ::= SEQUENCE {
+    f3OspfIpInterfaceExtStatus                     OspfState,
+    f3OspfIpInterfaceExtAreaId                     AreaID,
+    f3OspfIpInterfaceExtIfType                     INTEGER,
+    f3OspfIpInterfaceExtHelloInterval              HelloRange,
+    f3OspfIpInterfaceExtRtrDeadInterval            Integer32,
+    f3OspfIpInterfaceExtRetransInterval            Integer32,
+    f3OspfIpInterfaceExtRtrPriority                DesignatedRouterPriority,
+    f3OspfIpInterfaceExtCost                       Integer32,
+    f3OspfIpInterfaceExtAuthType                   OspfAuthenticationType,
+    f3OspfIpInterfaceExtAuthKey                    OCTET STRING
+}
+    
+f3OspfIpInterfaceExtStatus OBJECT-TYPE
+    SYNTAX      OspfState  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF admin status for the IP Interface."
+    DEFVAL { enabled }
+    ::= { f3OspfIpInterfaceExtEntry 1 }
+ 
+f3OspfIpInterfaceExtAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Area ID with which this IP Interface is associated."
+    DEFVAL { '00000000'H }
+    ::= { f3OspfIpInterfaceExtEntry 2 }
+   
+f3OspfIpInterfaceExtIfType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    broadcast (1),
+                    nbma (2),
+                    pointToPoint (3),
+                    pointToMultipoint (5)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF interface type for the IP Interface."
+    ::= { f3OspfIpInterfaceExtEntry 3 }
+
+f3OspfIpInterfaceExtHelloInterval OBJECT-TYPE
+    SYNTAX      HelloRange
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds between OSPF Hello packets for the IP Interface."
+    DEFVAL { 10 }
+    ::= { f3OspfIpInterfaceExtEntry 4 }
+    
+f3OspfIpInterfaceExtRtrDeadInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)  
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds that must pass from the last received Hello 
+        packet before a neighbor router is declared down."
+    DEFVAL { 40 }
+    ::= { f3OspfIpInterfaceExtEntry 5 }
+    
+f3OspfIpInterfaceExtRetransInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"    
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds for the Retransmit Timer Interval value for 
+        the IP Interface. The value is used when retransmitting Database 
+        Description and Link State Request packets."
+    DEFVAL { 5 }
+    ::= { f3OspfIpInterfaceExtEntry 6 }
+    
+f3OspfIpInterfaceExtRtrPriority OBJECT-TYPE
+    SYNTAX      DesignatedRouterPriority  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF router priority for the IP Interface.  The router with the
+        highest priority will be more eligible to become Designated Router.
+        Setting the value to 0 makes the router ineligible to become the 
+        Designated Router."
+    DEFVAL { 1 }        
+    ::= { f3OspfIpInterfaceExtEntry 7 }
+    
+f3OspfIpInterfaceExtCost OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The cost associated with the IP Interface for use in the Shortest
+        Path calculations."
+    ::= { f3OspfIpInterfaceExtEntry 8 }
+    
+f3OspfIpInterfaceExtAuthType OBJECT-TYPE
+    SYNTAX      OspfAuthenticationType  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF authentication type for the IP Interface.  This value 
+        supersedes the authentication type defined for the Area."
+    DEFVAL { none }
+    ::= { f3OspfIpInterfaceExtEntry 9 }
+    
+f3OspfIpInterfaceExtAuthKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF authentication key for the IP Interface.  
+        If the authentication type is Simple, the authentication key is 
+        limited to 8 characters.  If the authentication type is MD5, the
+        authentication key is up to 16 characters."
+    DEFVAL { '0000000000000000'H }
+    ::= { f3OspfIpInterfaceExtEntry 10 }
+
+
+--
+--  OSPF IP Management Tunnel Ext Table
+--
+
+f3OspfIpMgmtTunnelExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OspfIpMgmtTunnelExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to OSPF Interface
+            configuration purposes. This table extends ipManagementTunnelTable 
+            from CM-IP-MIB."
+    ::= { f3OspfConfigObjects 4 }
+
+f3OspfIpMgmtTunnelExtEntry OBJECT-TYPE
+    SYNTAX      F3OspfIpMgmtTunnelExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OspfIpMgmtTunnelExtTable."
+    AUGMENTS { ipManagementTunnelEntry }
+    ::= { f3OspfIpMgmtTunnelExtTable 1 }
+
+F3OspfIpMgmtTunnelExtEntry ::= SEQUENCE {
+    f3OspfIpMgmtTunnelExtStatus                     OspfState,
+    f3OspfIpMgmtTunnelExtAreaId                     AreaID,
+    f3OspfIpMgmtTunnelExtIfType                     INTEGER,
+    f3OspfIpMgmtTunnelExtHelloInterval              HelloRange,
+    f3OspfIpMgmtTunnelExtRtrDeadInterval            Integer32,
+    f3OspfIpMgmtTunnelExtRetransInterval            Integer32,
+    f3OspfIpMgmtTunnelExtRtrPriority                DesignatedRouterPriority,
+    f3OspfIpMgmtTunnelExtCost                       Integer32,
+    f3OspfIpMgmtTunnelExtAuthType                   OspfAuthenticationType,
+    f3OspfIpMgmtTunnelExtAuthKey                    OCTET STRING
+}
+    
+f3OspfIpMgmtTunnelExtStatus OBJECT-TYPE
+    SYNTAX      OspfState  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF admin status for the IP Management Tunnel."
+    DEFVAL { enabled }
+    ::= { f3OspfIpMgmtTunnelExtEntry 1 }
+ 
+f3OspfIpMgmtTunnelExtAreaId OBJECT-TYPE
+    SYNTAX      AreaID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Area ID with which this IP Management Tunnel is associated."
+    DEFVAL { '00000000'H }
+    ::= { f3OspfIpMgmtTunnelExtEntry 2 }
+   
+f3OspfIpMgmtTunnelExtIfType OBJECT-TYPE
+    SYNTAX       INTEGER {
+                    broadcast (1),
+                    nbma (2),
+                    pointToPoint (3),
+                    pointToMultipoint (5)
+                    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF interface type for the IP Management Tunnel."
+    ::= { f3OspfIpMgmtTunnelExtEntry 3 }
+
+f3OspfIpMgmtTunnelExtHelloInterval OBJECT-TYPE
+    SYNTAX      HelloRange
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds between OSPF Hello packets
+        for the IP Management Tunnel."
+    DEFVAL { 10 }
+    ::= { f3OspfIpMgmtTunnelExtEntry 4 }
+    
+f3OspfIpMgmtTunnelExtRtrDeadInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds that must pass from the last received Hello 
+        packet before a neighbor router is declared down."
+    DEFVAL { 40 }
+    ::= { f3OspfIpMgmtTunnelExtEntry 5 }
+    
+f3OspfIpMgmtTunnelExtRetransInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    UNITS       "seconds"    
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of seconds for the Retransmit Timer Interval value for 
+        the IP Interface. The value is used when retransmitting Database 
+        Description and Link State Request packets."
+    DEFVAL { 5 }
+    ::= { f3OspfIpMgmtTunnelExtEntry 6 }
+    
+f3OspfIpMgmtTunnelExtRtrPriority OBJECT-TYPE
+    SYNTAX      DesignatedRouterPriority  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF router priority for the IP Management Tunnel.
+        The router with the highest priority will be more eligible 
+        to become Designated Router. Setting the value to 0 makes 
+        the router ineligible to become the Designated Router."
+    DEFVAL { 1 }        
+    ::= { f3OspfIpMgmtTunnelExtEntry 7 }
+    
+f3OspfIpMgmtTunnelExtCost OBJECT-TYPE
+    SYNTAX      Integer32 (1..65535)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The cost associated with the IP Management Tunnel for use in the 
+        Shortest Path calculations."
+    ::= { f3OspfIpMgmtTunnelExtEntry 8 }
+    
+f3OspfIpMgmtTunnelExtAuthType OBJECT-TYPE
+    SYNTAX      OspfAuthenticationType  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The OSPF authentication type for the IP Management Tunnel.  This value 
+        supersedes the authentication type defined for the Area."
+    DEFVAL { none }
+    ::= { f3OspfIpMgmtTunnelExtEntry 9 }
+    
+f3OspfIpMgmtTunnelExtAuthKey OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The OSPF authentication key for the IP Management Tunnel.  
+        If the authentication type is Simple, the authentication key is 
+        limited to 8 characters.  If the authentication type is MD5, the
+        authentication key is up to 16 characters."
+    DEFVAL { '0000000000000000'H }
+    ::= { f3OspfIpMgmtTunnelExtEntry 10 }
+
+
+--
+--  OSPF Neighbor Ext Table
+--
+
+f3OspfNbrExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3OspfNbrExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends ospfNbrTable from OSPF-MIB."
+    ::= { f3OspfConfigObjects 5 }
+
+f3OspfNbrExtEntry OBJECT-TYPE
+    SYNTAX      F3OspfNbrExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3OspfNbrExtTable."
+    AUGMENTS { ospfNbrEntry }
+    ::= { f3OspfNbrExtTable 1 }
+
+F3OspfNbrExtEntry ::= SEQUENCE {
+    f3OspfNbrExtRole                     OspfRole
+}
+    
+f3OspfNbrExtRole OBJECT-TYPE
+    SYNTAX      OspfRole  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The OSPF role for this neighbor router."
+    ::= { f3OspfNbrExtEntry 1 }
+
+
+--
+-- Conformance
+--
+f3OspfCompliances OBJECT IDENTIFIER ::= {f3OspfConformance 1}
+f3OspfGroups    OBJECT IDENTIFIER ::= {f3OspfConformance 2}
+
+f3OspfCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-OSPF-MIB compilance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3OspfRouterGroup, f3OspfAreaGroup,
+              f3OspfIpInterfaceExtGroup, f3OspfIpMgmtTunnelExtGroup,
+              f3OspfNbrExtGroup
+        }
+    ::= { f3OspfCompliances 1 }
+
+f3OspfRouterGroup OBJECT-GROUP
+    OBJECTS {
+        f3OspfRouterMetricType,
+        f3OspfRouterMetric,
+        f3OspfRouterRedistributionType,
+        f3OspfRouterNumAttachedAreas,
+        f3OspfRouterAreaBdrRtrStatus,
+        f3OspfRouterStorageType,
+        f3OspfRouterRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the OSPF Router."
+    ::= { f3OspfGroups 1 }
+
+f3OspfAreaGroup OBJECT-GROUP
+    OBJECTS {
+        f3OspfAreaType,
+        f3OspfAreaAuthType,
+        f3OspfAreaDefaultCost,
+        f3OspfAreaSpfRuns,
+        f3OspfAreaLsaCount,
+        f3OspfAreaStorageType,
+        f3OspfAreaRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the OSPF Area."
+    ::= { f3OspfGroups 2 }
+
+f3OspfIpInterfaceExtGroup OBJECT-GROUP
+    OBJECTS {
+        f3OspfIpInterfaceExtStatus,
+        f3OspfIpInterfaceExtAreaId,
+        f3OspfIpInterfaceExtIfType,
+        f3OspfIpInterfaceExtHelloInterval,
+        f3OspfIpInterfaceExtRtrDeadInterval,
+        f3OspfIpInterfaceExtRetransInterval,
+        f3OspfIpInterfaceExtRtrPriority,
+        f3OspfIpInterfaceExtCost,
+        f3OspfIpInterfaceExtAuthType,
+        f3OspfIpInterfaceExtAuthKey
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage OSPF configuration
+              of IP Interface."
+    ::= { f3OspfGroups 3 }
+
+f3OspfIpMgmtTunnelExtGroup OBJECT-GROUP
+    OBJECTS {
+        f3OspfIpMgmtTunnelExtStatus,
+        f3OspfIpMgmtTunnelExtAreaId,
+        f3OspfIpMgmtTunnelExtIfType,
+        f3OspfIpMgmtTunnelExtHelloInterval,
+        f3OspfIpMgmtTunnelExtRtrDeadInterval,
+        f3OspfIpMgmtTunnelExtRetransInterval,
+        f3OspfIpMgmtTunnelExtRtrPriority,
+        f3OspfIpMgmtTunnelExtCost,
+        f3OspfIpMgmtTunnelExtAuthType,
+        f3OspfIpMgmtTunnelExtAuthKey
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage OSPF configuration
+              of IP Management Tunnel."
+    ::= { f3OspfGroups 4 }
+
+f3OspfNbrExtGroup OBJECT-GROUP
+    OBJECTS {
+        f3OspfNbrExtRole
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage OSPF configuration
+              of OSPF Neighbor."
+    ::= { f3OspfGroups 5 }
+
+END

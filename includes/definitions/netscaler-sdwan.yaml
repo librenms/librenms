@@ -1,0 +1,11 @@
+os: netscaler-sdwan
+text: 'NetScaler SD-WAN'
+type: appliance
+icon: citrix
+group: citrix
+over:
+    - { graph: device_uptime, text: 'Device Uptime' }
+    - { graph: device_ping_perf, text: 'Ping Response' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3845.31

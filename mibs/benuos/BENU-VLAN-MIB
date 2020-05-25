@@ -1,0 +1,466 @@
+BENU-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Integer32, Unsigned32, OBJECT-IDENTITY, Counter64, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+     DisplayString
+    FROM SNMPv2-TC
+    snmpTraps FROM SNMPv2-MIB
+    benuWAG FROM BENU-WAG-MIB;
+
+bVLANMIB MODULE-IDENTITY
+    LAST-UPDATED "201505070000Z"  -- May 7, 2015
+    ORGANIZATION "Benu Networks"
+    CONTACT-INFO "Benu Networks Inc,
+      300 Concord Road,
+      Billerca MA 01821
+      Email: support@benunets.com"
+    DESCRIPTION
+        "This MIB module defines VLAN statistics.
+        Copyright (C) 2014 by Benu Networks, Inc.
+        All rights reserved."
+
+    REVISION "201505070000Z" -- May 7, 2015
+    DESCRIPTION "Added bWagVlanTotalBytesRcvd and bWagVlanTotalBytesSent
+                 columns in bWagVlanStatsTable"
+
+    REVISION "201504140000Z" -- Apr 14, 2015
+    DESCRIPTION "Updated MIB file with change in bVlanCurrentNumber Syntax"
+
+    REVISION "201501060000Z" -- Jan 6, 2015
+    DESCRIPTION "VLAN object-types and notification-types separated."
+
+    REVISION "201411170000Z" -- Nov 17, 2014
+    DESCRIPTION "updated MIB file with change in bVLANNotifObjects"
+
+    REVISION "201408040000Z" -- Aug 4, 2014
+    DESCRIPTION "updated MIB file with correct revision and descriptions."
+
+    REVISION "201406240000Z" -- Jun 24, 2014
+    DESCRIPTION "Added VLAN information per port Table"
+
+    REVISION "201405310000Z" --  May 31, 2014
+    DESCRIPTION "This version introduces support for VLAN"
+
+    ::= { benuWAG 8 }
+
+-- declare top-level MIB objects for each component
+
+bVLANMIBObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "MIB objects for VLAN utilization statistics are defined in this branch."
+   ::= { bVLANMIB 1 }
+
+bVLANNotifObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "Notifications of VLAN utilization statistics are defined in this branch."
+   ::= { bVLANMIB 0 }
+
+bVLANNotifVariables  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "MIB objects for VLAN notifications are defined in this branch."
+   ::= { bVLANMIB 2}
+
+-- VLAN utilization Performance table per each interface
+
+bVlanTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of VLAN utilization performance metrics
+         of each interface."
+    ::= { bVLANMIBObjects 1 }
+
+bVlanEntry OBJECT-TYPE
+    SYNTAX     BVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry containing VLAN utilization performance metrics
+         for each interface."
+  INDEX {
+      bVlanPortIndex,
+      bVlanIndex
+   }
+    ::= { bVlanTable 1 }
+
+BVlanEntry ::= SEQUENCE {
+        bVlanPortIndex                                       Integer32,
+        bVlanIndex                                           Integer32,
+        bVlanName                                            DisplayString,
+        bVlanMTU                                             Unsigned32,
+        bVlanEncapName                                       DisplayString,
+        bVlanAdminStatus                                     INTEGER,
+        bVlanOperStatus                                      INTEGER
+}
+
+bVlanPortIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The index value that uniquely identifies the interface to which this
+        entry is applicable. The interface identified by a particular value of this
+        index is the same interface as identified by the same value of the
+        IF-MIB's ifIndex."
+   ::= { bVlanEntry 1 }
+
+bVlanIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "VLAN id configued on port."
+   ::= { bVlanEntry 2 }
+
+bVlanName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "VLAN name configured on port"
+   ::= { bVlanEntry 3 }
+
+bVlanMTU  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "VLAN MTU configured on port"
+   ::= { bVlanEntry 4 }
+
+bVlanEncapName  OBJECT-TYPE
+   SYNTAX      DisplayString
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "VLAN encapsulation name configured on port"
+   ::= { bVlanEntry 5 }
+
+bVlanAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                up(1),       -- ready to pass packets
+                down(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The desired state of the interface.  When a
+            managed system initializes, all interfaces start with
+            bVlanAdminStatus in the down(2) state.  As a result of either
+            explicit management action or per configuration information
+            retained by the managed system, bVlanAdminStatus is then
+            changed to up(1) state (or remains
+            in the down(2) state)."
+    ::= { bVlanEntry 6 }
+
+
+bVlanOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                up(1),        -- ready to pass packets
+                down(2),
+                testing(3),   -- in some test mode
+                unknown(4),   -- status can not be determined
+                              -- for some reason.
+                dormant(5),
+                notPresent(6),    -- some component is missing
+                lowerLayerDown(7) -- down due to state of
+                                  -- lower-layer interface(s)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current operational state of the interface.  The
+            testing(3) state indicates that no operational packets can
+            be passed.  If bVlanAdminStatus is down(2) then bVlanOperStatus
+            should be down(2).  If bVlanAdminStatus is changed to up(1)
+            then bVlanOperStatus should change to up(1) if the interface is
+            ready to transmit and receive network traffic; it should
+            change to dormant(5) if the interface is waiting for
+            external actions (such as a serial line waiting for an
+            incoming connection); it should remain in the down(2) state
+            if and only if there is a fault that prevents it from going
+            to the up(1) state; it should remain in the notPresent(6)
+            state if the interface has missing (typically, hardware)
+            components."
+    ::= { bVlanEntry 7 }
+
+-- VLAN utilization Performance table per each interface
+
+bWagVlanTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BWagVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of VLAN utilization performance metrics
+         of each interface."
+    ::= { bVLANMIBObjects 2 }
+
+bWagVlanEntry OBJECT-TYPE
+    SYNTAX     BWagVlanEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A logical row in bWagVlanTable"
+  INDEX {
+      bWagVlanPortIndex,
+      bWagVlanIndex
+   }
+    ::= { bWagVlanTable 1 }
+
+BWagVlanEntry ::= SEQUENCE {
+        bWagVlanPortIndex                          Integer32,
+        bWagVlanIndex                              Integer32,
+        bWagVlanSubscriberCount                    Unsigned32
+}
+
+bWagVlanPortIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The index value that uniquely identifies the interface to which this
+       entry is applicable. The interface identified by a particular value of this
+       index is the same interface as identified by the same value of the IF-MIB's
+       ifIndex."
+   ::= { bWagVlanEntry 1 }
+
+bWagVlanIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "VLAN id of the port."
+   ::= { bWagVlanEntry 2 }
+
+bWagVlanSubscriberCount    OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Number of subscribers currently using this VLAN tunnel."
+   ::= { bWagVlanEntry 3 }
+
+
+-- VLAN utilization WAG stats table per each interface
+
+bWagVlanStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BWagVlanStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of VLAN utilization performance metrics
+         of each interface."
+    ::= { bVLANMIBObjects 3 }
+
+bWagVlanStatsEntry OBJECT-TYPE
+    SYNTAX     BWagVlanStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry containing VLAN utilization performance metrics
+         for each interface."
+  INDEX {
+      bWagVlanStatsPortIndex,
+      bWagVlanStatsIndex
+   }
+    ::= { bWagVlanStatsTable 1 }
+
+BWagVlanStatsEntry ::= SEQUENCE {
+        bWagVlanStatsPortIndex                        Integer32,
+        bWagVlanStatsIndex                            Integer32,
+        bWagVlanTotalPktsRcvd                         Counter64,
+        bWagVlanTotalPktsSent                         Counter64,
+        bWagVlanTotalBytesRcvd                        Counter64,
+        bWagVlanTotalBytesSent                        Counter64
+}
+
+bWagVlanStatsPortIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The index value that uniquely identifies the interface to which this
+       entry is applicable. The interface identified by a particular value of this
+       index is the same interface as identified by the same value of the IF-MIB's
+       ifIndex."
+   ::= { bWagVlanStatsEntry 1 }
+
+bWagVlanStatsIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "VLAN id of the port."
+   ::= { bWagVlanStatsEntry 2 }
+
+bWagVlanTotalPktsRcvd    OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number of packets received from this port."
+   ::= { bWagVlanStatsEntry 3 }
+
+bWagVlanTotalPktsSent    OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number of packets sent from this port."
+   ::= { bWagVlanStatsEntry 4 }
+
+bWagVlanTotalBytesRcvd    OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number of bytes received from this port."
+   ::= { bWagVlanStatsEntry 5 }
+
+bWagVlanTotalBytesSent    OBJECT-TYPE
+   SYNTAX      Counter64
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Total number of bytes sent from this port."
+   ::= { bWagVlanStatsEntry 6 }
+
+-- VLAN information per port Table
+
+bVlanPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF BVlanPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table of VLAN information per port."
+    ::= { bVLANMIBObjects 4 }
+
+bVlanPortEntry OBJECT-TYPE
+    SYNTAX     BVlanPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry containing VLAN information per port"
+  INDEX {
+      bVlanPerPortIndex
+   }
+    ::= { bVlanPortTable 1 }
+
+BVlanPortEntry ::= SEQUENCE {
+        bVlanPerPortIndex                                    Integer32,
+        bVlanTotal                                           Unsigned32,
+        bVlanActive                                          Unsigned32
+}
+
+bVlanPerPortIndex  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+       "The index value that uniquely identifies the interface to which this
+       entry is applicable. The interface identified by a particular value of this
+       index is the same interface as identified by the same value of the IF-MIB's
+       ifIndex."
+   ::= { bVlanPortEntry 1 }
+
+bVlanTotal OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "The total number of VLAN's created per port"
+   ::= { bVlanPortEntry 2 }
+
+bVlanActive OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+       "Number of VLANs created and active on this port."
+   ::= { bVlanPortEntry 3 }
+
+
+-- Scalars
+
+bVlanCurrentNumber OBJECT-TYPE
+   SYNTAX     Integer32 (0..4094)
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+           "Total number of VLAN's created and active at present"
+   ::= { bVLANMIBObjects 5 }
+
+bVlanAssocSub   OBJECT-TYPE
+   SYNTAX     Integer32 
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+           "Total number of VLAN's with associated subscribers"
+   ::= { bVLANMIBObjects 6 }
+
+
+-- definition of VLAN-related traps.
+
+bVlanPortId OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "The index value that uniquely identifies the interface to which this
+        entry is applicable. The interface identified by a particular value of this
+        index is the same interface as identified by the same value of the IF-MIB's
+        ifIndex."
+   ::= { bVLANNotifVariables 1 }
+
+bVlanId OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  accessible-for-notify
+   STATUS      current
+   DESCRIPTION
+       "VLAN id configured on port."
+   ::= { bVLANNotifVariables 2 }
+
+bVlanEncapEnable   NOTIFICATION-TYPE
+   OBJECTS { bVlanPortId }
+   STATUS  current
+   DESCRIPTION
+           "A bVlanEncapEnable trap signifies that the SNMP entity, acting in
+            an agent role, has detected that encapsulation 802.1q is enabled 
+            on the port"
+   ::= {  bVLANNotifObjects 1 }
+
+bVlanEncapDisable   NOTIFICATION-TYPE
+   OBJECTS { bVlanPortId }
+   STATUS  current
+   DESCRIPTION
+           "A bVlanEncapEnable trap signifies that the SNMP entity, acting in
+            an agent role, has detected that encapsulation 802.1q is disabled 
+            on the port"
+   ::= {  bVLANNotifObjects 2 }
+
+
+bVlanCreate   NOTIFICATION-TYPE
+   OBJECTS { bVlanPortId, bVlanId }
+   STATUS  current
+   DESCRIPTION
+           "A bVlanCreate trap signifies that the SNMP entity, acting in
+            an agent role, has detected that VLAN is created with 
+            bVlanIndex"
+   ::= {  bVLANNotifObjects 3 }
+
+bVlanDelete   NOTIFICATION-TYPE
+   OBJECTS { bVlanPortId, bVlanId }
+   STATUS  current
+   DESCRIPTION
+           "A bVlanDelete trap signifies that the SNMP entity, acting in
+            an agent role, has detected that VLAN is deleted with 
+            bVlanIndex"
+   ::= {  bVLANNotifObjects 4 }
+
+END

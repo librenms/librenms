@@ -1,0 +1,126 @@
+--
+-- Copyright (c) 2010-2016. Aerohive Networks, Inc
+-- All rights reserved.
+
+AH-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Imports
+--
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE
+		FROM SNMPv2-SMI
+		
+	DisplayString
+	    FROM SNMPv2-TC
+	
+	ahProduct
+		FROM AH-SMI-MIB;
+
+--
+-- Module Identity
+--    
+		
+ahSystem MODULE-IDENTITY
+         LAST-UPDATED  "201608310000Z"  --  Aug 31, 2016
+         ORGANIZATION  "Aerohive Networks, Inc"
+         CONTACT-INFO  "info@aerohive.com
+                        1011 McCarthy Boulevard
+                        Milpitas, CA 95035"
+         DESCRIPTION   "This module contains the MIB definition of 
+			aerohive system related information."
+	 
+	 ::=  {  ahProduct 2  }
+
+--
+-- Aerohive Extension to ahSystem
+-- 	
+
+ahSystemName	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive platform system name"
+	::=  {  ahSystem  1  }
+
+ahSystemDescription	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive platform system description"
+	::=  {  ahSystem  2  }
+	
+ahCpuUtilization   	OBJECT-TYPE
+	SYNTAX      INTEGER (0..100)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive platform cpu utilization"
+	::=  {  ahSystem  3  }		
+	
+ahMemUtilization	OBJECT-TYPE
+	SYNTAX      INTEGER (0..100)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive platform memory utilization"
+	::=  {  ahSystem  4  }	
+	
+ahSystemSerial	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive platform system serial-number"
+	::=  {  ahSystem  5  }
+	
+ahDeviceMode	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive device mode type"
+	::=  {  ahSystem  6  }		
+
+ahUpTime   	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive platform up time"
+	::=  {  ahSystem  7  }	
+
+ahHwVersion	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive platform hardware version"
+	::=  {  ahSystem  8  }		
+
+ahClientCount	OBJECT-TYPE
+	SYNTAX      INTEGER (0..10000)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "the counter of devices connected to aerohive products"
+	::=  {  ahSystem  9  }
+
+ahEnvirmentTemp	OBJECT-TYPE
+	SYNTAX      INTEGER (0..100)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive envirment temp-ditection"
+	::=  {  ahSystem  10  }		
+
+ahEnvirmentFan	OBJECT-TYPE
+	SYNTAX      INTEGER (0..10000)
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive envirment fan speed,  unit as RPM"
+	::=  {  ahSystem  11  }
+	
+ahFirmwareVersion	OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION "aerohive platform fireware version"
+	::=  {  ahSystem  12  }		
+	
+	
+END
+

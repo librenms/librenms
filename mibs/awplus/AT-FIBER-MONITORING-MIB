@@ -1,0 +1,327 @@
+--   ============================================================================
+-- AT-FIBER-MONITORING-MIB, Allied Telesis enterprise MIB:
+-- Fiber Monitoring MIB objects.
+--
+-- Copyright (c) 2015 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-FIBER-MONITORING-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SYSINFO-MIB
+            Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+            DisplayString
+                FROM SNMPv2-TC;
+
+        atFiberMon MODULE-IDENTITY 
+            LAST-UPDATED "201509080000Z"
+            ORGANIZATION
+                "Allied Telesis, Inc"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "This MIB contains managed objects definition and notification
+                definitions for AT Fiber Monitoring feature."
+            REVISION "201509080000Z"
+            DESCRIPTION
+                "Initial revision"
+            ::= { sysinfo 27 }
+
+--
+-- Textual conventions
+--
+
+
+--
+-- Node definitions
+--
+-- ---------------------------------------------------------- --
+-- Fiber Monitoring Notifications
+-- ---------------------------------------------------------- --
+        atFiberMonNotifications OBJECT IDENTIFIER::= { atFiberMon 0 }
+
+        atFiberMonAlarmSetNotify NOTIFICATION-TYPE
+            OBJECTS { atFiberMonIfindex, atFiberMonChannel, atFiberMonIfname, atFiberMonReading,
+                      atFiberMonThreshold }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the monitored received optical power of an SFP
+                goes outside its alarm threshold."
+            ::= { atFiberMonNotifications 1 }
+
+        atFiberMonAlarmClearedNotify NOTIFICATION-TYPE
+            OBJECTS { atFiberMonIfindex, atFiberMonChannel, atFiberMonIfname, atFiberMonReading,
+                      atFiberMonThreshold }
+            STATUS current
+            DESCRIPTION
+                "A notification generated when the monitored received optical power of an SFP
+                returns to an acceptable value.  This can occur because the power has returned
+                to its previous level or the comparison baseline has adjusted to the new level."
+            ::= { atFiberMonNotifications 2 }
+
+-- ---------------------------------------------------------- --
+-- Notification variables
+-- ---------------------------------------------------------- --
+        atFiberMonTrapVariable OBJECT IDENTIFIER::= { atFiberMon 1 }
+
+        atFiberMonReading OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The current received optical power reading for the port specified
+                in the trap (x0.0001mW)"
+            ::= { atFiberMonTrapVariable 1 }
+
+-- ---------------------------------------------------------- --
+-- Fiber monitoring configuration objects
+-- ---------------------------------------------------------- --
+        atFiberMonConfigTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtFiberMonConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "It contains the objects used to configure the operation of fiber monitoring."
+            ::= { atFiberMon 2 }
+
+        atFiberMonConfigEntry OBJECT-TYPE
+            SYNTAX AtFiberMonConfigEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry for the table. It contains the configurables of fiber monitering for an interface."
+            INDEX { atFiberMonIfname }
+            ::= { atFiberMonConfigTable 1 }
+
+
+        AtFiberMonConfigEntry ::=
+            SEQUENCE {
+                atFiberMonIfname
+                    OCTET STRING,
+                atFiberMonEnable
+                    INTEGER,
+                atFiberMonInterval
+                    Integer32,
+                atFiberMonSensitivity
+                    OCTET STRING,
+                atFiberMonBaseline
+                    OCTET STRING,
+                atFiberMonAlarmAction
+                    INTEGER
+             }
+
+        atFiberMonIfname OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..16))
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The name of the interface where the pluggable is in."
+            ::= { atFiberMonConfigEntry 1 }
+
+        atFiberMonEnable OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                enabled(1),
+                disabled(2)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Enable or disable fiber monitoring."
+            ::= { atFiberMonConfigEntry 2 }
+
+        atFiberMonInterval OBJECT-TYPE
+            SYNTAX Integer32 (2..60)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Fiber monitoring polling interval in seconds."
+            ::= { atFiberMonConfigEntry 3 }
+
+        atFiberMonSensitivity OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The sensitivity for fiber monitoring.
+
+                Acceptable mode strings and value ranges are as below:
+
+                low                      - 2dB
+                medium                   - 1dB
+                high                     - 0.5dB
+                highest                  - 0.0025mW
+                fixed <25 - 65535>       - units of 0.0001mW
+                relative <0.00 - 10.00>  - units of dB
+
+                For example, if you want to set the sensitivity to medium level, then you enter word
+
+                medium
+
+                Or if you want to set it to a fixed value, then you enter string
+
+                fixed 1000
+
+                Or if you want to set to a relative value, then you enter string
+
+                relative 1.20
+                "
+            ::= { atFiberMonConfigEntry 4 }
+
+        atFiberMonBaseline OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The baseline value for firber mornitoring.
+
+                Acceptable mode string and value ranges are as below:
+
+                average <12-150> - number of readings used to calculate moving average.
+                fixed <1-65535>  - fixed baseline value in units of 0.0001mW.
+
+                For example, if you want to use a moving average of 12 readings as the baseline,
+                you enter
+
+                average 12
+
+                Or if you want to use a fixed value, though it is not recommended, you enter
+
+                fixed 500
+                "
+            ::= { atFiberMonConfigEntry 5 }
+
+        atFiberMonAlarmAction OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                logOnly(1),
+                sendTrap(2),
+                shutdown(3),
+                sendtrapAndShutdown(4)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "Actions to take when an alarm occurs.
+                Acceptable values are:
+                1. Log a message only.
+                2. Send snmp trap and log.
+                3. Shut down the interface and log.
+                4. Send trap, shutdown and log.
+                "
+            ::= { atFiberMonConfigEntry 6 }
+
+-- ---------------------------------------------------------- --
+-- Fiber monitoring state objects
+-- ---------------------------------------------------------- --
+        atFiberMonStateTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF AtFiberMonStateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table contains the information of fiber monitoring state for SFPs."
+            ::= { atFiberMon 3 }
+
+        atFiberMonStateEntry OBJECT-TYPE
+            SYNTAX AtFiberMonStateEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Entry for fiber monitoring state table. It contains state values for a fiber channel."
+            INDEX { atFiberMonIfindex, atFiberMonChannel }
+            ::= { atFiberMonStateTable 1 }
+
+        AtFiberMonStateEntry ::=
+            SEQUENCE {
+                atFiberMonIfindex
+                    Integer32,
+                atFiberMonChannel
+                    INTEGER,
+                atFiberMonlIfDescription
+                    DisplayString,
+                atFiberMonActualBaseline
+                    Integer32,
+                atFiberMonThreshold
+                    Integer32,
+                atFiberMonReadingHistory
+                    DisplayString,
+                atFiberMonMinReading
+                    Integer32,
+                atFiberMonMaxReading
+                    Integer32
+             }
+
+        atFiberMonIfindex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The index of the interface where the pluggable is in."
+            ::= { atFiberMonStateEntry 1 }
+
+        atFiberMonChannel OBJECT-TYPE
+            SYNTAX INTEGER (1..16)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The channel number of the pluggable."
+            ::= { atFiberMonStateEntry 2 }
+
+        atFiberMonlIfDescription OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Interface description. Normally it would be the name of the interface."
+            ::= { atFiberMonStateEntry 3 }
+
+        atFiberMonActualBaseline OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The calculated baseline value for the link, in units of 0.0001mW."
+            ::= { atFiberMonStateEntry 4 }
+
+        atFiberMonThreshold OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Threshold value for alarm to occur, in units of 0.0001mW."
+            ::= { atFiberMonStateEntry 5 }
+
+        atFiberMonReadingHistory OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The reading history. It is a string containing last 12 readings."
+            ::= { atFiberMonStateEntry 6 }
+
+        atFiberMonMinReading OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The minimum reading of rx power, in units of 0.0001mW."
+            ::= { atFiberMonStateEntry 7 }
+
+        atFiberMonMaxReading OBJECT-TYPE
+            SYNTAX Integer32 (0..65535)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The maximum reading of rx power, in units of 0.0001mW."
+            ::= { atFiberMonStateEntry 8 }
+
+
+    END
+
+--
+-- at-fiber-monitoring.mib
+--

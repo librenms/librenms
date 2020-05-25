@@ -1,0 +1,1087 @@
+-- *********************************************************************
+-- DLINKSW-NETWORK-ACCESS-MIB: Network Access Authentication
+-- configuration and information MIB
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+-- *******************************************************************
+
+DLINKSW-NETWORK-ACCESS-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32,
+        Integer32
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP
+            FROM SNMPv2-CONF
+        MacAddress,
+        TEXTUAL-CONVENTION,
+        TruthValue,
+        RowStatus,
+        DisplayString
+            FROM SNMPv2-TC
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        InetAddress,
+        InetAddressType
+            FROM INET-ADDRESS-MIB
+        ifIndex
+            FROM IF-MIB
+        VlanIdOrNone
+            FROM Q-BRIDGE-MIB
+        Dlink2kVlanList
+            FROM DLINKSW-TC-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwNetworkAccessAuthMIB MODULE-IDENTITY
+        LAST-UPDATED    "201307180000Z"
+        ORGANIZATION    "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+             Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for Network Access Authentication
+            in the system.
+
+            Network Access Authentication provides generic configurations
+            for authentication methods in the system and manages the
+            failover sequence of these methods in a flexible manner."
+        REVISION        "201307180000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'Network Access
+            Authentication.' functionality.
+            "
+        ::= { dlinkIndustrialCommon 151 }
+
+
+-- Textual Conventions
+
+    DlinkAuthMethod ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "The authentication methods and protocols supported in
+            Network Access Authentication.
+
+            other   : other methods no defined here. 'other' is a read-only
+                      value and cannot be used in set operation.
+
+            dot1x   : 802.1X Protocol.
+
+            macAuth : MAC-based Access Control.
+
+            webAuth : Web-based Access Control.
+
+            jwac    : Japanese Web Authentication.
+            "
+        SYNTAX          INTEGER  {
+            other(1),
+            dot1x(2),
+            macAuth(3),
+            webAuth(4),
+            jwac(5)
+        }
+
+    DlinkAuthMethodList ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "The authentication methods being used by
+            Network Access Authentication.
+            This object is a bit map, with each bit representing
+            a different authentication type as identified below.
+            A 1-bit indicates the authentication method is used.
+            A 0-bit indicates the authentication method is not used.
+
+            dot1x   : 802.1X Protocol.
+
+            macAuth : MAC-based Access Control.
+
+            webAuth : Web-based Access Control.
+
+            jwac    : Japanese Web Authentication.
+            "
+        SYNTAX           BITS {
+            dot1x(0),
+            macAuth(1),
+            webAuth(2),
+            jwac(3)
+        }
+
+    DlinkAuthHostMode ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "The authentication mode of a controlled port.
+
+            multiHost : If a port is operated in multi-host mode, once
+                  a host is authenticated, all remaining hosts are
+                  also authenticated in a single domain.
+
+            multiAuth : If a port is operated in multi-auth mode, each host
+                  is authenticated separately in a single domain."
+        SYNTAX          INTEGER  {
+            multiHost(1),
+            multiAuth(2)
+        }
+
+    DlinkCompAuthMode ::= TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION
+            "The compound authentication mode of a controlled port.
+
+            any     : The host needs pass one of the authentication methods
+                      (802.1X, MAC-based Access Control, WAC and JWAC).
+
+            macJwac : MAC-based Access Control will be verified first. If
+                      a client passed MAC authentication, JWAC will be verified.
+                      The host needs pass both authentication methods.
+
+            macWac : MAC-based Access Control will be verified first. If
+                      a client passed MAC authentication, WAC will be verified.
+                      The host needs pass both authentication methods. "
+        SYNTAX          INTEGER  {
+            any(1),
+            macJwac(2),
+            macWac(3)
+        }
+
+-- -----------------------------------------------------------------------------
+    dNetAccessAuthMIBNotifications  OBJECT IDENTIFIER    ::= { dlinkSwNetworkAccessAuthMIB 0 }
+    dNetAccessAuthMIBObjects        OBJECT IDENTIFIER    ::= { dlinkSwNetworkAccessAuthMIB 1 }
+    dNetAccessAuthMIBConformance    OBJECT IDENTIFIER    ::= { dlinkSwNetworkAccessAuthMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dNetAuthSystem         OBJECT IDENTIFIER     ::= { dNetAccessAuthMIBObjects 1 }
+    dNetAuthAuthenticator  OBJECT IDENTIFIER     ::= { dNetAccessAuthMIBObjects 2 }
+    dNetAuthSession        OBJECT IDENTIFIER     ::= { dNetAccessAuthMIBObjects 3 }
+    dNetAuthUser           OBJECT IDENTIFIER     ::= { dNetAccessAuthMIBObjects 4 }
+
+-- -----------------------------------------------------------------------------
+    dnaMacMoveMode OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            deny(1),
+            permit(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object controls whether to allow authenticated hosts to do
+            roaming across different switch ports.
+
+            deny : When a host is authenticated on one port,
+                   that address is not allowed to move on another
+                   authenticated manager-enabled port of the device.
+
+            permit: Authenticated hosts are allowed to move from one
+                   port to another on the same device. When a host moves to
+                   a new port, the authenticated session on the original
+                   port is deleted, and the host is re-authenticated on the
+                   new port."
+       ::= { dNetAuthSystem 1 }
+
+    dnaAuthorizationEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the state of acceptance of the authorized
+            configuration.
+            When authorization is enabled for authentication, the authorized
+            attributes (for example VLAN, 802.1p default priority, bandwidth,
+            and ACL) will be accepted."
+        ::= { dNetAuthSystem 2 }
+
+    dnaMacFormatCase OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            uppercase(1),
+            lowercase(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the format of the authentication MAC address.
+            uppercase: Using uppercase format, the formatted is: AA-BB-CC-DD-EE-FF.
+            lowercase: Using lowercase format, the formatted is: aa-bb-cc-dd-ee-ff."
+        DEFVAL { uppercase }
+        ::= { dNetAuthSystem 3 }
+
+    dnaMacFormatDelimiter OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            none(1),
+            hyphen(2),
+            colon(3),
+            dot(4)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the delimiter format of authentication MAC address.
+            none: Not using any delimiter, the format is: AABBCCDDEEFF
+            hyphen: Using '-' as delimiter, the format is: AA-BB-CC-DD-EE-FF
+            colon: Using ':' as delimiter, the format is: AA:BB:CC:DD:EE:FF
+            dot: Using '.' as delimiter, the format is: AA.BB.CC.DD.EE.FF"
+        DEFVAL { none }
+        ::= { dNetAuthSystem 4 }
+
+    dnaMacFormatDelimiterNumber OBJECT-TYPE
+        SYNTAX          Integer32 ( 1 | 2 | 5 )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the delimiter number of authentication MAC address.
+            1: single delimiter, the format is: AABBCC.DDEEFF
+            2: double delimiter, the format is: AABB.CCDD.EEFF
+            5: multiple delimiter, the format is: AA.BB.CC.DD.EE.FF
+            Note: while dnaMacFormatDelimiter is none(1), the delimiter number
+            will not take effect."
+        ::= { dNetAuthSystem 5 }
+
+-- -----------------------------------------------------------------------------
+    dnaMaxAuthedUserLimit OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the maximum authenticated users of the system."
+       ::= { dNetAuthAuthenticator 1 }
+
+    dnaPortConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DnaPortConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table is a list of configurations for ports. An entry will
+            exist for every interface which supports Network Access
+            Authentication feature."
+        ::= { dNetAuthAuthenticator 2 }
+
+    dnaPortConfigEntry OBJECT-TYPE
+        SYNTAX          DnaPortConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains port-specific configuration for Network Access
+            Authentication."
+        INDEX           { ifIndex }
+        ::= { dnaPortConfigTable 1 }
+
+    DnaPortConfigEntry ::= SEQUENCE {
+        dnaPortMaxAuthedUserLimit  Unsigned32,
+        dnaPortAuthHostMode        DlinkAuthHostMode,
+        dnaPortAuthVlansFirst2K    Dlink2kVlanList,
+        dnaPortAuthVlansSecond2K   Dlink2kVlanList,
+        dnaPortReauthEnabled       TruthValue,
+        dnaPortReauthInterval      Unsigned32,
+        dnaPortRestartInterval     Unsigned32,
+        dnaPortInactivityTimeout   Integer32,
+        dnaPortGuestVlanid         VlanIdOrNone
+    }
+
+    dnaPortMaxAuthedUserLimit OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the maximum authenticated users of this port."
+        ::= { dnaPortConfigEntry 1 }
+
+    dnaPortAuthHostMode OBJECT-TYPE
+        SYNTAX          DlinkAuthHostMode
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the authentication host mode of the entry."
+        ::= { dnaPortConfigEntry 2 }
+
+    dnaPortAuthVlansFirst2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "This object specifies the authentication VLAN(s)
+            in a string of octets containing one bit per VLAN for VLANs 1 to
+            2048.
+            If the bit is set to '1', then the VLAN needs authentication."
+    ::= { dnaPortConfigEntry 3 }
+
+    dnaPortAuthVlansSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the authentication VLAN(s)
+            in a string of octets containing one bit per VLAN for VLANs 2049
+            to 4094.
+            If the bit is set to '1', then the VLAN needs authentication."
+        ::= { dnaPortConfigEntry 4 }
+
+    dnaPortReauthEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the periodic re-authentication is
+            enabled."
+        ::= { dnaPortConfigEntry 5 }
+
+    dnaPortReauthInterval OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Specifies the re-authentication interval, after which the port
+            will be re-authenticated if value of the corresponding instance
+            of dnaPortReauthEnabled is 'true'.
+
+            A value of zero indicates that the re-authentication interval
+            is based on AAA server when this port is authenticated.
+            Besides, the action (re-authenticate or initialize) to take after
+            expiration of the timer is also based on server.
+            "
+            ::= { dnaPortConfigEntry 6 }
+
+    dnaPortRestartInterval OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..65535)
+        UNITS           "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Specifies the interval after which a further authentication
+            attempt should be made to this port if it is not authorized."
+        ::= { dnaPortConfigEntry 7 }
+
+    dnaPortInactivityTimeout OBJECT-TYPE
+        SYNTAX          Integer32 (-1 | 0 | 1..65535)
+        UNITS           "seconds"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Specifies the period of time that a client associating with
+            this port is allowed to be inactive before being terminated.
+
+            A value of zero indicates that inactivity timeout is disabled on
+            this port.
+
+            A value of -1 indicates that inactivity timeout is based on
+            AAA server when this port is authenticated."
+        ::= { dnaPortConfigEntry 8 }
+
+    dnaPortGuestVlanid  OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Specifies the VLAN ID of guest VLAN on the interface.
+            The guest VLAN allows the user access within the
+            guest VLAN before it is authenticated.
+
+            A value of zero for this object indicates guest
+            VLAN is not configured for the interface."
+        ::= { dnaPortConfigEntry 9 }
+
+-- -----------------------------------------------------------------------------
+    dnaPortMethodTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DnaPortMethodEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains a list of authentication methods information on
+            ports.  An entry will exist for every port which supports Network
+            Access Authentication feature."
+        ::= { dNetAuthAuthenticator 3 }
+
+    dnaPortMethodEntry OBJECT-TYPE
+        SYNTAX          DnaPortMethodEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains configuration and information of
+            authentication methods for a particular port."
+        INDEX           { ifIndex }
+        ::= { dnaPortMethodTable 1 }
+
+    DnaPortMethodEntry ::= SEQUENCE {
+        dnaPortMethodAvailable      DlinkAuthMethodList,
+        dnaPortMethodCompAuthMode   DlinkCompAuthMode
+    }
+
+    dnaPortMethodAvailable OBJECT-TYPE
+        SYNTAX          DlinkAuthMethodList
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the currently effective authentication methods
+            on the port.
+
+            e.g: The dnaPortMethodCompAuthMode of the interface is set to any(1),
+            but only dot1x is running on this interface, macAuth, webAuth
+            and jwac are disabled, only the bit of dot1x is '1'."
+        ::= { dnaPortMethodEntry 1 }
+
+    dnaPortMethodCompAuthMode OBJECT-TYPE
+        SYNTAX          DlinkCompAuthMode
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the compound authentication mode on the port."
+        ::= { dnaPortMethodEntry 2 }
+
+-- -----------------------------------------------------------------------------
+    dnaSessionTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DnaSessionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains a list of authentication sessions.
+
+            An entry is created when an authentication session has been
+            successfully created within Network Access Authentication.
+
+            An entry is deleted when an authentication session has been
+            removed."
+        ::= { dNetAuthSession 1 }
+
+    dnaSessionEntry OBJECT-TYPE
+        SYNTAX          DnaSessionEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains management information for a particular
+            authentication session."
+        INDEX           {
+            ifIndex,
+            dnaSessionId
+        }
+    ::= { dnaSessionTable 1 }
+
+    DnaSessionEntry ::= SEQUENCE {
+        dnaSessionId                        Unsigned32,
+        dnaSessionClientMacAddress          MacAddress,
+        dnaSessionClientAddrType            InetAddressType,
+        dnaSessionClientAddress             InetAddress,
+        dnaSessionStatus                    INTEGER,
+        dnaSessionAuthUserName              SnmpAdminString,
+        dnaSessionAuthorizedBy              DlinkAuthMethod,
+        dnaSessionAuthVlan                  VlanIdOrNone,
+        dnaSessionAccountingID              SnmpAdminString,
+        dnaSessionAssignVid                 VlanIdOrNone,
+        dnaSessionAssignPriority            Integer32,
+        dnaSessionAssignIngressBandwidth    Integer32,
+        dnaSessionAssignEgressBandwidth     Integer32,
+        dnaSessionTimeout                   Unsigned32,
+        dnaSessionTimeLeft                  Unsigned32,
+        dnaSessionInactivityTimeout         Unsigned32,
+        dnaSessionInactivityTimeLeft        Unsigned32,
+        dnaSessionTerminateSession          INTEGER
+    }
+
+    dnaSessionId OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 0 .. 0xffffffff)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates a unique identifier of the
+            authentication session."
+        ::= { dnaSessionEntry 1 }
+
+    dnaSessionClientMacAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the device associates with
+            the authentication session."
+        ::= { dnaSessionEntry 2 }
+
+    dnaSessionClientAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the type of Internet address of the client
+            associates with the authentication session.
+            This object is meaningful only when the corresponding dnaSessionAuthorizedBy
+            is webAuth or jwac."
+        ::= { dnaSessionEntry 3 }
+
+    dnaSessionClientAddress OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Internet address of the client associates
+            with the authentication session.
+            This object is meaningful only when the corresponding dnaSessionAuthorizedBy
+            is webAuth or jwac."
+        ::= { dnaSessionEntry 4 }
+
+    dnaSessionStatus OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            idle(1),
+            authenticating(2),
+            noMethod(3),
+            authenticationSuccess(4),
+            authenticationFailed(5)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the current status of the authentication session.
+
+            idle        : the session has been initialized and no
+                          method has run yet.
+
+            authenticating     : an authentication method is running for
+                          this session.
+
+            noMethod    : no authentication method has provided a
+                          result for this session.
+
+            authenticationSuccess: an authentication method has resulted
+                          in authentication success for this session.
+
+            authenticationFailed: an authentication method has resulted
+                    in authentication failed for this session."
+            ::= { dnaSessionEntry 5 }
+
+    dnaSessionAuthUserName OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the user name of the authentication session.
+            This object is meaningless when the corresponding dnaSessionAuthorizedBy
+            is macAuth and a zero length string will be returned."
+        ::= { dnaSessionEntry 6 }
+
+    dnaSessionAuthorizedBy OBJECT-TYPE
+        SYNTAX          DlinkAuthMethod
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the method which authorizes the 
+            authentication session."
+        ::= { dnaSessionEntry 7 }
+
+    dnaSessionAuthVlan OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the authorized VLAN applied to the authentication
+           session. Value zero indicates that no authorized VLAN has been
+           applied, or it is not applicable."
+        ::= { dnaSessionEntry 8 }
+
+    dnaSessionAccountingID OBJECT-TYPE
+        SYNTAX          SnmpAdminString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the accounting session ID
+            that using to accounting after authenticated."
+        ::= { dnaSessionEntry 9 }
+
+    dnaSessionAssignVid OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the effectively assigned VLAN ID
+            that are authorized after host pass authenticated.
+
+            A value of zero indicates that no valid VLAN ID is authorized."
+        ::= { dnaSessionEntry 10 }
+
+    dnaSessionAssignPriority OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the effectively assigned priority
+            that is authorized after host pass authenticated.
+
+            A value of -1 indicates that no valid priority is authorized."
+        ::= { dnaSessionEntry 11 }
+
+    dnaSessionAssignIngressBandwidth OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the effectively assigned ingress bandwidth
+            that is authorized after host pass authenticated.
+
+            A value of -1 indicates that no valid ingress is authorized."
+        ::= { dnaSessionEntry 12 }
+
+    dnaSessionAssignEgressBandwidth OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the effectively assigned egress bandwidth
+            that is authorized after host pass authenticated.
+
+            A value of -1 indicates that no valid egress is authorized."
+        ::= { dnaSessionEntry 13 }
+
+    dnaSessionTimeout OBJECT-TYPE
+       SYNTAX          Unsigned32
+       UNITS           "seconds"
+       MAX-ACCESS      read-only
+       STATUS          current
+       DESCRIPTION
+            "Indicates the session timeout used by Network Access
+            Authentication for the authentication session."
+       ::= { dnaSessionEntry 14 }
+
+    dnaSessionTimeLeft OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the leftover time of the authentication session."
+        ::= { dnaSessionEntry 15 }
+
+    dnaSessionInactivityTimeout OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the inactivity timeout used by Network Access
+            Authentication for the authentication session."
+        ::= { dnaSessionEntry 16 }
+
+    dnaSessionInactivityTimeLeft OBJECT-TYPE
+        SYNTAX          Unsigned32
+        UNITS           "seconds"
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the leftover time of the inactivity timer of
+            the authentication session."
+        ::= { dnaSessionEntry 17 }
+
+    dnaSessionTerminateSession OBJECT-TYPE
+        SYNTAX          INTEGER {
+            terminate(1),
+            noOp(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object terminates the authentication session, when set
+            to 'terminate'.
+            Setting this object to 'false' has no effect.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dnaSessionEntry 99 }
+
+-- -----------------------------------------------------------------------------
+    dnaSessionMethodInfoTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DnaSessionMethodInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains a list of authenticating state information of
+            methods for every authentication session.
+
+            An entry exists for every authentication method that can
+            initiate the authentication session within Network Access
+            Authentication."
+        ::= { dNetAuthSession 2 }
+
+    dnaSessionMethodInfoEntry OBJECT-TYPE
+        SYNTAX          DnaSessionMethodInfoEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains information for a particular effective
+            authentication method which is associated with a session on an
+            interface."
+        INDEX           {
+            ifIndex,
+            dnaSessionId,
+            dnaSessionMethod
+        }
+        ::= { dnaSessionMethodInfoTable 1 }
+
+    DnaSessionMethodInfoEntry ::= SEQUENCE {
+        dnaSessionMethod            DlinkAuthMethod,
+        dnaSessionMethodState       INTEGER
+    }
+
+    dnaSessionMethod OBJECT-TYPE
+        SYNTAX          DlinkAuthMethod
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the authentication method of the entry."
+        ::= { dnaSessionMethodInfoEntry 1 }
+
+    dnaSessionMethodState OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            notInitiated(1),
+            inProgress(2),
+            authcSuccess(3),
+            authcFailed(4)
+        }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "Indicates the state of this authentication method.
+
+        notInitiated : The method hasn't initiated the authentication process
+                       yet.
+        inProgress   : The authentication method is in progress.
+
+        authcSuccess: The session has been authenticated by the method.
+
+        authcFailed : The session has failed to be authenticated by the method.
+        "
+    ::= { dnaSessionMethodInfoEntry 2 }
+
+-- -----------------------------------------------------------------------------
+    dnaSessionTerminateIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DnaSessionTerminateIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "The table is used to terminate authentication sessions by interface."
+        ::= { dNetAuthSession 3 }
+
+    dnaSessionTerminateIfEntry OBJECT-TYPE
+        SYNTAX          DnaSessionTerminateIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is used to terminate authentication sessions by specifying
+            authentication methods per Network Access Authentication managed
+            port."
+        INDEX    { ifIndex }
+        ::= { dnaSessionTerminateIfTable 1 }
+
+    DnaSessionTerminateIfEntry ::= SEQUENCE {
+        dnaSessionTerminateIfMethodList   DlinkAuthMethodList
+    }
+
+    dnaSessionTerminateIfMethodList OBJECT-TYPE
+        SYNTAX          DlinkAuthMethodList
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to terminate authentication sessions by methods on
+            an interface by setting the corresponding bit to '1'.
+
+            This object always returns '00'H when read."
+        ::= { dnaSessionTerminateIfEntry 1 }
+
+-- -----------------------------------------------------------------------------
+    dnaSessionTerminateMethod OBJECT-TYPE
+        SYNTAX          DlinkAuthMethod
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to terminate the authentication sessions by
+            setting this object to valid value.
+            Setting this object to 'other' has no effect.
+            When read, the value 'other' is returned."
+        ::= { dNetAuthSession 4 }
+
+    dnaSessionTerminateAll OBJECT-TYPE
+        SYNTAX          INTEGER {
+            terminateAll(1),
+            noOp(2)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to terminate all authentication sessions by
+            setting this object to 'terminateAll'.
+            Setting this object to 'noOp' has no effect.
+            When read, the value 'noOp' is returned."
+        ::= { dNetAuthSession 5 }
+
+-- -----------------------------------------------------------------------------
+    dnaUserTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DnaUserEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table contains a list of users in the local database for
+            authentication."
+        ::= { dNetAuthUser 1 }
+
+    dnaUserEntry OBJECT-TYPE
+        SYNTAX           DnaUserEntry
+        MAX-ACCESS       not-accessible
+        STATUS           current
+        DESCRIPTION
+            "An entry consists of information for an account."
+        INDEX { dnaUserName }
+        ::= { dnaUserTable 1 }
+
+    DnaUserEntry ::=    SEQUENCE {
+        dnaUserName             DisplayString,
+        dnaUserPassword         DisplayString,
+        dnaUserTargetVlanid     VlanIdOrNone,
+        dnaUserRowStatus        RowStatus
+    }
+
+    dnaUserName OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the username for this user account."
+        ::= { dnaUserEntry 1 }
+
+    dnaUserPassword OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "This object indicates the password in clear text form for this user
+           account.
+           When read, a zero length string will be returned for security reasons.
+           "
+        ::= { dnaUserEntry 2 }
+
+    dnaUserTargetVlanid OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN ID to be assigned for this user
+            account."
+        ::= { dnaUserEntry 3 }
+
+    dnaUserRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "This object manages this user account."
+        ::= { dnaUserEntry 99 }
+
+
+-- Conformanceance
+
+    dnaMIBCompliances  OBJECT IDENTIFIER  ::= { dNetAccessAuthMIBConformance 1 }
+
+    dnaMIBGroups  OBJECT IDENTIFIER       ::= { dNetAccessAuthMIBConformance 2 }
+
+
+    dnaCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for entities which implement
+            DLINKSW-NETWORK-ACCESS-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS {
+            dnaAuthPortConfigGroup,
+            dnaPortMethodGroup,
+            dnaSessionGroup,
+            dnaSessionMethodInfoGroup
+        }
+
+        GROUP           dnaMacMoveConfigGroup
+        DESCRIPTION
+            "This group is mandatory in devices which provide MAC move
+            configuration for Network Access Authentication."
+
+        GROUP           dnaAuthzConfigGroup
+        DESCRIPTION
+            "This group is mandatory in devices which provide authorization
+            configuration for Network Access Authentication."
+
+        GROUP           dnaMacFormatGroup
+        DESCRIPTION
+            "This group is mandatory in devices which provide MAC format
+            configuration for Network Access Authentication."
+
+        GROUP           dnaGuestVlanGroup
+        DESCRIPTION
+            "This group is mandatory in devices which provide guest VLAN
+            configuration for Network Access Authentication."
+
+        GROUP          dnaAuthenticationVlanGroup
+        DESCRIPTION
+            "This group is mandatory only for the platform which supports
+            the feature of per VLAN authentication."
+
+        GROUP           dnaMaxAuthedUserLimitGroup
+        DESCRIPTION
+            "This group is mandatory in devices which provide maximum
+            authenticated user for Network Access Authentication."
+
+        GROUP          dnaAccountUserGroup
+        DESCRIPTION
+            "This group is mandatory in devices which provide the feature
+            to terminate authentication session for Network Access
+            Authentication."
+
+        GROUP          dnaSessionTerminateGroup
+        DESCRIPTION
+            "This group is mandatory in devices which provide terminate
+            authentication session for Network Access Authentication."
+       
+    ::= { dnaMIBCompliances 1 }
+
+-- Units of Conformanceance
+
+    dnaAuthPortConfigGroup OBJECT-GROUP
+        OBJECTS         {
+            dnaPortAuthHostMode,
+            dnaPortReauthEnabled,
+            dnaPortReauthInterval,
+            dnaPortRestartInterval,
+            dnaPortInactivityTimeout
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects that provides port-specific configuration of
+            Network Access Authentication."
+        ::= { dnaMIBGroups 1 }
+
+    dnaPortMethodGroup OBJECT-GROUP
+        OBJECTS         {
+            dnaPortMethodAvailable,
+            dnaPortMethodCompAuthMode
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects provides authentication methods configuration
+            for Network Access Authentication."
+        ::= { dnaMIBGroups 2 }
+
+    dnaSessionGroup OBJECT-GROUP
+        OBJECTS         {
+            dnaSessionClientMacAddress,
+            dnaSessionClientAddrType,
+            dnaSessionClientAddress,
+            dnaSessionStatus,
+            dnaSessionAuthUserName,
+            dnaSessionAuthorizedBy,
+            dnaSessionAuthVlan,
+            dnaSessionAccountingID,
+            dnaSessionAssignVid,
+            dnaSessionAssignPriority,
+            dnaSessionAssignIngressBandwidth,
+            dnaSessionAssignEgressBandwidth,
+            dnaSessionTimeout,
+            dnaSessionTimeLeft,
+            dnaSessionInactivityTimeout,
+            dnaSessionInactivityTimeLeft
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects that provides authentication session
+            management information for Network Access Authentication."
+        ::= { dnaMIBGroups 3 }
+
+    dnaSessionMethodInfoGroup OBJECT-GROUP
+        OBJECTS         { dnaSessionMethodState }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects that provides authentication session state
+            information per authentication methods."
+        ::= { dnaMIBGroups 4 }
+
+    dnaMacMoveConfigGroup OBJECT-GROUP
+        OBJECTS         { dnaMacMoveMode }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing MAC move configuration
+            for Network Access Authentication on the device."
+        ::= { dnaMIBGroups 5 }
+
+    dnaAuthzConfigGroup OBJECT-GROUP
+        OBJECTS         { dnaAuthorizationEnabled  }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects provides authorization configuration
+            for Network Access Authentication on the device."
+        ::= { dnaMIBGroups 6 }
+
+    dnaMacFormatGroup OBJECT-GROUP
+        OBJECTS         {
+            dnaMacFormatCase,
+            dnaMacFormatDelimiter,
+            dnaMacFormatDelimiterNumber
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects provides MAC format configuration
+            for Network Access Authentication on the device."
+        ::= { dnaMIBGroups 7 }
+
+    dnaMaxAuthedUserLimitGroup OBJECT-GROUP
+        OBJECTS         {
+            dnaMaxAuthedUserLimit,
+            dnaPortMaxAuthedUserLimit
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects provides configuration of upper limits
+            for authenticated user."
+        ::= { dnaMIBGroups 8 }
+
+    dnaGuestVlanGroup OBJECT-GROUP
+        OBJECTS         {
+            dnaPortGuestVlanid
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing guest VLAN configuration
+            for Network Access Authentication on the device."
+        ::= { dnaMIBGroups 9 }
+
+    dnaAuthenticationVlanGroup OBJECT-GROUP
+        OBJECTS         {
+            dnaPortAuthVlansFirst2K,
+            dnaPortAuthVlansSecond2K
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects provides for the platform which supports
+            the feature of per VLAN authentication."
+        ::= { dnaMIBGroups 10 }
+
+    dnaSessionTerminateGroup OBJECT-GROUP
+        OBJECTS         {
+             dnaSessionTerminateSession,
+             dnaSessionTerminateIfMethodList,
+             dnaSessionTerminateMethod,
+             dnaSessionTerminateAll
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing terminate authentication session
+            information for Network Access Authentication on the device."
+        ::= { dnaMIBGroups 11 }
+
+    dnaAccountUserGroup OBJECT-GROUP
+        OBJECTS         {
+            dnaUserPassword,
+            dnaUserTargetVlanid,
+            dnaUserRowStatus
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects providing local account
+            information for Network Access Authentication on the device."
+        ::= { dnaMIBGroups 12 }
+
+END

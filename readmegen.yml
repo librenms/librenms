@@ -26,3 +26,5 @@ message_groups:
     - refactor
   Security:
     - security
+  API:
+    - api

@@ -1,0 +1,357 @@
+PEGASUS-LEAN-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+  MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+    FROM SNMPv2-SMI
+  DisplayString
+    FROM SNMPv2-TC
+  pegasusMibModule
+    FROM PEGASUS-MIB;
+
+pegasusLeanTrapModule MODULE-IDENTITY
+  LAST-UPDATED "200502020000Z"  -- 2 Feb, 2005
+  ORGANIZATION "Schmid Telecom, Zurich"
+  CONTACT-INFO
+    "Schmid Telecom AG
+     Binzstrasse 35, CH-8048 Zurich
+     Switzerland
+
+     Email: xdslsupport@schmid-telecom.ch"
+  DESCRIPTION
+    "Pegasus is an SDSL system manufactured by Schmid Telecom Zurich.
+    The information base is defined in PEGASUS-MIB. This MIB singles out
+    the definitions of notification types from that MIB. This allows us to
+    keep the base MIB clearer, and also to have alternative sets of
+    notifications as separate MIBs.
+    The notification types defined in this module are centered around the
+    idea of having a minimal set of notification types, and add the information
+    to the varbindings list of the notification. Here are some examples. The
+    first two were caused by interrupting the DSL line of an running Iad (DSL
+    link and card both unlocked). The third and fourth are generated when the
+    DSL line is restored.
+
+     sysUpTime.0             0:0:42:36.21
+     snmpTrapOID.0           pegasusAlarm
+     sender                  dslInterfaceAvailabilityStatus.5.1.ltu
+     senderObjectName        LineCard:DSLInterfaceId=LTU,DSLLinkId=0,slotId=5
+     senderDescription       dslInterface 5.1.ltu
+     probableCause           dslLoswFailure
+     probableCauseText       DSL_LOSW_FAILURE
+     perceivedSeverity       minor
+     perceivedSeverityText   MINOR
+
+     sysUpTime.0             0:0:42:36.22
+     snmpTrapOID.0           pegasusAlarm
+     sender                  dslLinkActiveLoop.5.1
+     senderObjectName        LineCard:DSLLinkId=0,slotId=5
+     senderDescription       dslLink 5.1
+     probableCause           dslUserService
+     probableCauseText       DSL_USER_SERVICE
+     perceivedSeverity       minor
+     perceivedSeverityText   MINOR
+
+     sysUpTime.0             0:0:42:56.21
+     snmpTrapOID.0           pegasusAlarm
+     sender                  dslInterfaceAvailabilityStatus.5.1.ltu
+     senderObjectName        LineCard:DSLInterfaceId=LTU,DSLLinkId=0,slotId=5
+     senderDescription       dslInterface 5.1.ltu
+     probableCause           dslLoswFailure
+     probableCauseText       DSL_LOSW_FAILURE
+     perceivedSeverity       cleared
+     perceivedSeverityText   CLEARED
+
+     sysUpTime.0             0:0:42:59.21
+     snmpTrapOID.0           pegasusAlarm
+     sender                  dslLinkActiveLoop.5.1
+     senderObjectName        LineCard:DSLLinkId=0,slotId=5
+     senderDescription       dslLink 5.1
+     probableCause           dslUserService
+     probableCauseText       DSL_USER_SERVICE
+     perceivedSeverity       cleared
+     perceivedSeverityText   CLEARED
+
+    Note
+
+    - If the Dsl link (or the DSL card) is locked, the traps would have been
+      suppressed.
+    - Two traps are for the DSL interface, with probableCause dslLoswFailure,
+      indicating a condition of loss of synchronization word. The first has
+      perceivedSeverity minor, the second cleared, to show that the condition
+      has ceased and synchronization regained.
+    - Likewise, for the DSL link, a pair of probableCause dslUserService is
+      sent, with severity minor and then again cleared.
+    - The 'affected managed object' is identified by the JMX object name in
+      senderObjectName, and also be the variable name (OID) in sender. The
+      choice of the variable is arbitrary, usually it is the variable with the
+      lowest OID value (the first variable) of tha 'affected managed object'.
+    - The JMX senderObjectName contains a domain (LineCard in our examples), and
+      a list of attributes, e.g. link, interface and slot numbers. The numbers
+      usually start at zero, while the SNMP index values start at one, as is
+      usual with SNMP. To get the SNMP index value, add one to the JMX value."
+
+  REVISION "200502020000Z"  -- 2 Feb, 2005
+  DESCRIPTION
+    "Added new probableCause values."
+  REVISION "200412170000Z"  -- 17 Dec, 2004
+  DESCRIPTION
+    "Updated probableCause values."
+  REVISION "200403180000Z"  -- 15 Mar, 2004
+  DESCRIPTION
+    "Updated probableCause. Added some new values and modified existing 
+     values."
+  REVISION "200401150000Z"  -- 15 Jan, 2004
+  DESCRIPTION
+    "Updated probableCause. New value writeError(77)."
+  REVISION "200311110000Z"  -- 11 Nov, 2003
+  DESCRIPTION
+    "Updated probableCause. New last value is m16ProgramTransfer(76)."
+  REVISION "200303210000Z"  -- 21 Mar, 2003
+  DESCRIPTION
+    "Appended five new literals into enumeration ProbableCause:
+    - unsupported2ndV5Card(47),
+    - currentLimit(48),
+    - watsonDTRFailed(49),
+    - softwareMismatch(50),
+    - hardwareProblem(51)"
+  REVISION "200209190000Z"  -- 19 Sep, 2002
+  DESCRIPTION
+    "Inserted four new literals into enumeration ProbableCause:
+    - iadDCContinuity(34),
+    - v5InterfaceIDFailure(44),
+    - v5InterfaceProvisMismatch(45),
+    - v5LinkIdFailure(46)
+    Warning: dslConfig and all other old literals defined after it have
+    changed their ordinal values!"
+  REVISION "200204250000Z"  -- 25 Apr, 2002
+  DESCRIPTION
+    "Added senderDescription. Renamed 'alarm' to 'pegasusAlarm', to help with
+    name conflicts. Made corresponding changes to trap examples above."
+  REVISION "200204020000Z"  -- 2 Apr, 2002
+  DESCRIPTION
+    "Added missing import of DisplayString."
+  REVISION "200203140000Z"  -- 14 Mar, 2002
+  DESCRIPTION
+    "Added some trap example dumps and explanation to the module description."
+  REVISION "200202180000Z"  -- 18 Feb, 2002
+  DESCRIPTION
+    "The two trap types were collapsed into one. The former changedAlarm is now
+    represented by an 'alarm' with exactly the same parameters. The former
+    newAlarm was used when the perceivedSeverity changed from CLEARED (i.e.
+    alarm not present) to other than cleared. This is now also reported through
+    the single trap type 'alarm'.
+    The senderText variable was removed. Each of sender and senderObjectName
+    alone exactly identifies the object affected, and senderText was redundant."
+  REVISION "200202140000Z"  -- 14 Feb, 2002
+  DESCRIPTION
+    "Initial revision."
+  ::= { pegasusMibModule 5 }
+
+leanTrapObjects   OBJECT IDENTIFIER ::= { pegasusLeanTrapModule 1 }
+leanNotifications OBJECT IDENTIFIER ::= { pegasusLeanTrapModule 2 }
+leanTraps         OBJECT IDENTIFIER ::= { leanNotifications 0 }
+
+
+sender        OBJECT-TYPE
+  SYNTAX      OBJECT IDENTIFIER
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+         "The 'sender' of the trap is the SNMP object which caused the event
+         or experienced the condition reported by this trap.
+         Typically, the object identifier is the first accessible column of
+         the table entry representing the sender, in the SNMP table representing
+         objects of the senders type."
+  ::= { leanTrapObjects 1 }
+
+senderObjectName  OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+         "The canonical form of the JMX object name for the object which sent
+         the trap. This is a compact and unique representation readable both to
+         man and machine. "
+  ::= { leanTrapObjects 2 }
+
+senderDescription  OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION   
+         "A description of the sender (affected managed object). The description
+         is human readable, unique, and easy to parse. It consists of a single
+	 word describing the kind of sender, optionally followed by a space and
+	 a complete SNMP index value for the MIB table related to the sender.
+	 The space is omitted if there is no index (pegasusSystem only). The
+	 index value is expressed as a sequence of numbers separated by dots.
+	 The last number may actually be a string (only with dslInterface, 'ltu'
+	 or 'ntu'). The table below contains schematic representations for all
+	 types of objects, with ranges for the index values, and examples.
+	 In the table, s is a slot number, l a link or trunk number, i an
+	 interface number, n a user port number (on the Iad) or a logical comm
+	 channel number.
+
+         dataPort s.l         s=1,0<l<6                dataPort 1.3
+	 dslInterface s.l.t   4<s<13,0<l<9,t=ntu|ltu   dslInterface 5.1.ltu
+	 dslLink s.l          4<s<13,0<l<9             dslLink 5.1
+         dataCard s           s=1                      dataCard 1
+	 dslCard s            4<s<13                   dslCard 12
+	 iad s.l              4<s<13,0<l<9             iad 5.1
+	 v5Card s             s=3                      v5Card 3
+	 pegasusSystem                                 pegasusSystem
+	 v5Interface s.i      s=3,0<i                  v5Interface 3.1
+	 v5IsdnPort s.l.n     4<s<13,0<l<9,0<n<5       v5IsdnPort 5.1.1
+	 v5Lcc s.i.n          s=3,0<i,0<n              v5Lcc 3.1.3
+	 v5Link s.l           s=3,0<l<9                v5Link 3.1"
+  ::= { leanTrapObjects 3 }
+         
+probableCause OBJECT-TYPE
+  SYNTAX      INTEGER {
+                disconnectionError(1),
+                communicationError(2),
+                outOfMemory(3),
+                cfgUploadProblem(4),
+                cfgDownloadProblem(5),
+                statusSyncProblem(6),
+                operStateDisabled(7),
+                activeMaintenanceLoop(8),
+                deviceFailure(9),
+                lossOfSignal(10),
+                lossOfFrameAlignement(11),
+                alarmIndicationSignal(12),
+                bitErrorRateToHigh(13),
+                lossOfExternalClock(14),
+                remoteAlarmIndication(15),
+                deviceInactive(16),
+                wrongProgram(17),
+                inTest(18),
+                failed(19),
+                powerOff(20),
+                offLine(21),
+                offDuty(22),
+                dependency(23),
+                degraded(24),
+                notInstalled(25),
+                logFull(26),
+                blocked(27),
+                l1Activation(28),
+                hasLosAtTrefPoint(29),
+                hasL1ActivationFault(30),
+                hasLosAtDigSection(31),
+                iadPowerLoss(32),
+                iadLifeline(33),
+                iadDCContinuity(34),
+                dslConfig(35),
+                dslUserService(36),
+                dslLoopAtt(37),
+                dslLoswFailure(38),
+                dataswitchPsu1Fail(39),
+                dataswitchPsu2Fail(40),
+                dataswitchFanFail(41),
+                dataswitchUrgentExt(42),
+                dataswitchNonurgentExt(43),
+                v5InterfaceIDFailure(44),
+                v5InterfaceProvisMismatch(45),
+                v5LinkIdFailure(46),
+                unsupported2ndV5Card(47),
+                currentLimit(48),
+                watsonDTRFailed(49),
+                softwareMismatch(50),
+                hardwareProblem(51),
+                ethernetIfLinkIntegrityFailed(52),
+                ethernetIfFifoError(53),
+                unknownProbableCause(54),
+                lossOfFrame(55),
+                traceIdMissmatch(56),
+                lossOfMultiframe(57),
+                multiplexSectionRemoteDefectIndication(58),
+                multiplexSectionAlarmIndicationSignal(59),
+                regeneratorSectionTraceIdMismatch(60),
+                outOfLock(61),
+                lossOfPointer(62),
+                remoteDefectIndication(63),
+                payloadLabelMismatch(64),
+                unequipped(65),
+                initFailed(66),
+                watsonRegW2-AlarmA(67),
+                watsonRegW2-AlarmB(68),
+                watsonRegR-LoswFailure(69),
+                watsonRegC-LoswFailure(70),
+                watsonRegR-BerToHigh(71),
+                watsonRegC-BerToHigh(72),
+                watsonTrapPortBindFailed(73),
+                watsonHPOVConnectFailed(74),
+                dslCurrentLimit(75),
+                m16ProgramTransfer(76),
+                writeError(77),
+                maintenance(78),
+                remoteFailureIndication(79),
+                lcasCrcError(80),        
+                nonLcasSequenceError(81),
+                rxLowOrderGroupIdMismatch(82),
+                rxHighOrderGroupIdMismatch(83),
+                rxLowOrderDifferentialDelay(84),
+                rxHighOrderDifferentialDelay(85),
+                rxLowOrderDifferentialDelayAllVT(86),
+                rxHighOrderDifferentialDelayAllVT(87),
+                txFifoOverflow(88),
+                rxFifoOverflow(89),
+                emailServiceAlarm(90),
+                licenseMissing(91),
+                licenseInvalid(92),
+                licenseWrongHostId(93),
+                licenseMaxNetworkNodesExceeded(94),
+                alarmFilteringParseError(95),
+                iadNoCOS(96)
+              }
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+         ""
+  ::= { leanTrapObjects 4 }
+
+probableCauseText OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+         ""
+  ::= { leanTrapObjects 5 }
+
+perceivedSeverity OBJECT-TYPE
+  SYNTAX      INTEGER {
+                critical(1),
+                major(2),
+                minor(3),
+                warning(4),
+                cleared(5),
+                indeterminate(6)
+              }
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+         ""
+  ::= { leanTrapObjects 6 }
+
+perceivedSeverityText OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  accessible-for-notify
+  STATUS      current
+  DESCRIPTION
+         ""
+  ::= { leanTrapObjects 7 }
+
+
+pegasusAlarm NOTIFICATION-TYPE
+  OBJECTS  { sender, senderObjectName, senderDescription,
+             probableCause, probableCauseText,
+             perceivedSeverity, perceivedSeverityText
+           }
+  STATUS   current
+  DESCRIPTION
+         "The perceivedSeverity changed since the last notification with
+         this probableCause for this sender. If the perceivedSeverity is
+         CLEARED, the alarm condition is no longer present."
+  ::= { leanTraps 1 }
+
+END

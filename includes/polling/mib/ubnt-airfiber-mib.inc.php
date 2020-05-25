@@ -59,6 +59,7 @@ $mib_oids = array(
         'Radio 1 Temp',
         'GAUGE',
     ),
+    // above here is duplicated in wireless
     'txOctetsOK'              => array(
         '1',
         'txOctetsOK',
@@ -208,5 +209,3 @@ $mib_graphs = array(
 unset($graph, $oids, $oid);
 
 poll_mib_def($device, 'UBNT-AirFIBER-MIB:UBNT', 'ubiquiti', $mib_oids, $mib_graphs, $graphs);
-
-// EOF

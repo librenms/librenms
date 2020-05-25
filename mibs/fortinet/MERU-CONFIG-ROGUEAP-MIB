@@ -1,0 +1,465 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-ROGUEAP-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlOnOffSwitch,
+    MwlBlock,
+    MwlArrayDataTypeAction,
+    MwlSpectrumBandsBits,
+    MwlApType
+        FROM MERU-TC;
+
+  mwConfigRogueAp  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         Rogue AP Configuration infrastructure"
+    ::= { mwConfiguration 7 } 
+  
+    mwRogueapVars                            OBJECT IDENTIFIER ::= { mwConfigRogueAp 1 }
+    
+  
+  mwRogueapVarsDetection  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Detection"
+    ::= { mwRogueapVars    1 }
+
+  mwRogueapVarsBlock  OBJECT-TYPE
+    SYNTAX MwlBlock
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Mitigation"
+    ::= { mwRogueapVars    2 }
+
+  mwRogueapVarsAging  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue AP Aging (seconds)"
+    ::= { mwRogueapVars    3 }
+
+  mwRogueapVarsMitigateAps  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of Mitigating APs"
+    ::= { mwRogueapVars    4 }
+
+  mwRogueapVarsScanningTime  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Scanning time in ms"
+    ::= { mwRogueapVars    5 }
+
+  mwRogueapVarsOperationalTime  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operational time in ms"
+    ::= { mwRogueapVars    6 }
+
+  mwRogueapVarsMitigationFrames  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Max mitigation frames sent per channel"
+    ::= { mwRogueapVars    7 }
+
+  mwRogueapVarsScanChannelMask  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Scanning Channels"
+    ::= { mwRogueapVars    8 }
+
+  mwRogueapVarsMinRSSI  OBJECT-TYPE
+    SYNTAX Integer32(-100..0)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes RSSI Threshold for Mitigation"
+    ::= { mwRogueapVars    9 }
+
+  mwRogueapVarsSpectrumBands  OBJECT-TYPE
+    SYNTAX MwlSpectrumBandsBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Spectrum Bands"
+    ::= { mwRogueapVars   10 }
+
+  mwRogueapAclTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwRogueapAclEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Allowed APs "
+    ::= { mwConfigRogueAp 2 }
+
+  mwRogueapAclEntry  OBJECT-TYPE
+    SYNTAX MwRogueapAclEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Allowed APs "
+    INDEX {  mwRogueapAclTableIndex  }
+    ::= { mwRogueapAclTable 1 }
+
+  MwRogueapAclEntry  ::=  SEQUENCE { 
+       mwRogueapAclTableIndex                                      Integer32, 
+       mwRogueapAclBssId                                           MacAddress,
+       mwRogueapAclRowStatus                                       RowStatus 
+  }
+   
+   
+  mwRogueapAclTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwRogueapAclEntry 1 }
+
+  mwRogueapAclBssId  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSSID"
+    ::= { mwRogueapAclEntry    2 }
+
+  mwRogueapAclRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwRogueapAclEntry 3 }
+
+  mwRogueapBlockTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwRogueapBlockEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Blocked APs "
+    ::= { mwConfigRogueAp 3 }
+
+  mwRogueapBlockEntry  OBJECT-TYPE
+    SYNTAX MwRogueapBlockEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Blocked APs "
+    INDEX {  mwRogueapBlockTableIndex  }
+    ::= { mwRogueapBlockTable 1 }
+
+  MwRogueapBlockEntry  ::=  SEQUENCE { 
+       mwRogueapBlockTableIndex                                    Integer32, 
+       mwRogueapBlockBssId                                         MacAddress,
+       mwRogueapBlockCreationDate                                  DateAndTime,
+       mwRogueapBlockLastReported                                  DateAndTime,
+       mwRogueapBlockRowStatus                                     RowStatus 
+  }
+   
+   
+  mwRogueapBlockTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwRogueapBlockEntry 1 }
+
+  mwRogueapBlockBssId  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSSID"
+    ::= { mwRogueapBlockEntry    2 }
+
+  mwRogueapBlockCreationDate  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Creation Time"
+    ::= { mwRogueapBlockEntry    3 }
+
+  mwRogueapBlockLastReported  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Last Reported Time"
+    ::= { mwRogueapBlockEntry    4 }
+
+  mwRogueapBlockRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwRogueapBlockEntry 5 }
+
+  mwRogueApListTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwRogueApListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue AP Table "
+    ::= { mwConfigRogueAp 4 }
+
+  mwRogueApListEntry  OBJECT-TYPE
+    SYNTAX MwRogueApListEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue AP Table "
+    INDEX {  mwRogueApListTableIndex  }
+    ::= { mwRogueApListTable 1 }
+
+  MwRogueApListEntry  ::=  SEQUENCE { 
+       mwRogueApListTableIndex                                     Integer32, 
+       mwRogueApListMac                                            MacAddress,
+       mwRogueApListEssid                                          DisplayString,
+       mwRogueApListBssid                                          MacAddress,
+       mwRogueApListChannel                                        Unsigned32,
+       mwRogueApListMeruAp1Id                                      Integer32,
+       mwRogueApListMeruAp2Id                                      Integer32,
+       mwRogueApListMeruAp3Id                                      Integer32,
+       mwRogueApListDeviceType                                     MwlApType,
+       mwRogueApListMeruAp1Rssi                                    Integer32,
+       mwRogueApListMeruAp2Rssi                                    Integer32,
+       mwRogueApListMeruAp3Rssi                                    Integer32,
+       mwRogueApListNonReportedAudits                              Unsigned32,
+       mwRogueApListMeruAp1LastActivity                            TimeTicks,
+       mwRogueApListMeruAp2LastActivity                            TimeTicks,
+       mwRogueApListMeruAp3LastActivity                            TimeTicks 
+  }
+   
+   
+  mwRogueApListTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwRogueApListEntry 1 }
+
+  mwRogueApListMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue AP MAC"
+    ::= { mwRogueApListEntry    2 }
+
+  mwRogueApListEssid  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes SSID"
+    ::= { mwRogueApListEntry    3 }
+
+  mwRogueApListBssid  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSSID"
+    ::= { mwRogueApListEntry    4 }
+
+  mwRogueApListChannel  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel"
+    ::= { mwRogueApListEntry    5 }
+
+  mwRogueApListMeruAp1Id  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP 1 ID"
+    ::= { mwRogueApListEntry    6 }
+
+  mwRogueApListMeruAp2Id  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP 2 ID"
+    ::= { mwRogueApListEntry    7 }
+
+  mwRogueApListMeruAp3Id  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP 3 ID"
+    ::= { mwRogueApListEntry    8 }
+
+  mwRogueApListDeviceType  OBJECT-TYPE
+    SYNTAX MwlApType
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Type"
+    ::= { mwRogueApListEntry    9 }
+
+  mwRogueApListMeruAp1Rssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP1 RSSI"
+    ::= { mwRogueApListEntry   11 }
+
+  mwRogueApListMeruAp2Rssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP2 RSSI"
+    ::= { mwRogueApListEntry   12 }
+
+  mwRogueApListMeruAp3Rssi  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP3 RSSI"
+    ::= { mwRogueApListEntry   13 }
+
+  mwRogueApListNonReportedAudits  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of audits this AP was not reported"
+    ::= { mwRogueApListEntry   14 }
+
+  mwRogueApListMeruAp1LastActivity  OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP1 Last Activity"
+    ::= { mwRogueApListEntry   15 }
+
+  mwRogueApListMeruAp2LastActivity  OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP2 Last Activity"
+    ::= { mwRogueApListEntry   16 }
+
+  mwRogueApListMeruAp3LastActivity  OBJECT-TYPE
+    SYNTAX TimeTicks
+    MAX-ACCESS  read-only 
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP3 Last Activity"
+    ::= { mwRogueApListEntry   17 }
+
+  mwRogueDetectionApTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwRogueDetectionApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue Device Detecting APs "
+    ::= { mwConfigRogueAp 5 }
+
+  mwRogueDetectionApEntry  OBJECT-TYPE
+    SYNTAX MwRogueDetectionApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Rogue Device Detecting APs "
+    INDEX {  mwRogueDetectionApTableIndex  }
+    ::= { mwRogueDetectionApTable 1 }
+
+  MwRogueDetectionApEntry  ::=  SEQUENCE { 
+       mwRogueDetectionApTableIndex                                Integer32, 
+       mwRogueDetectionApNmsApNodeId                               Integer32,
+       mwRogueDetectionApRowStatus                                 RowStatus 
+  }
+   
+   
+  mwRogueDetectionApTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwRogueDetectionApEntry 1 }
+
+  mwRogueDetectionApNmsApNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwRogueDetectionApEntry    2 }
+
+  mwRogueDetectionApRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwRogueDetectionApEntry 3 }
+
+  
+END
+   

@@ -1,0 +1,3230 @@
+--  *****************************************************************
+--  DLINKSW-ACL-MIB.mib : ACL MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-ACL-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32,
+        IpAddress,
+        Counter64
+            FROM SNMPv2-SMI
+        MacAddress,
+        DisplayString,
+        TruthValue,
+        RowStatus,
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+	    OBJECT-GROUP
+		    FROM SNMPv2-CONF
+        InterfaceIndex,     
+        InterfaceIndexOrZero
+            FROM IF-MIB  
+        VlanId,VlanIdOrNone
+            FROM Q-BRIDGE-MIB                                                
+        InetAddressIPv6,
+        InetAddressPrefixLength
+            FROM INET-ADDRESS-MIB        
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwAclMIB MODULE-IDENTITY
+        LAST-UPDATED "201511260000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+             Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "    
+        DESCRIPTION
+                "The Structure of Access Control List Information for the
+                 proprietary enterprise."
+ 
+        REVISION "201511260000Z"
+        DESCRIPTION
+            "Add DEFVAL for nodes dAclIpAccessRuleSrcPort,dAclIpAccessRuleQosPrecedence etc.
+            And correct description of node dAclReSeqIncrement."
+    
+        REVISION "201507100000Z"
+        DESCRIPTION
+            "Add nodes to support vlan range, traffic class, l4 port mask operator, and mask for some nodes."
+
+        REVISION "201401210000Z"
+        DESCRIPTION
+            "Obsolete nodes dAclMacAccessRuleLlcDSAP, dAclMacAccessRuleLlcSSAP and dAclMacAccessRuleLlcCntl."
+        
+        REVISION "201311130000Z"
+        DESCRIPTION
+            "Add 'deny-cpu'option for DlinkAclRuleType."
+                 
+        REVISION "201308200000Z"
+        DESCRIPTION
+            "Add nodes for counter function, access list remark, access list id, and some rule items."
+            
+        REVISION "201302080000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'ACL' functionality."         
+        ::= { dlinkIndustrialCommon 28}
+
+    DlinkAclRuleType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION
+             "The action type when the packets match the access profile.
+
+             permit(1)- Specifies that packets that match the access rule are
+                        permitted to be forwarded by the switch.
+             deny(2)  - Specifies that packets that match the access rule
+                        are not permitted to be forwarded by the switch and will be filtered.
+             deny-cpu(3)- Specifies that packet that match the access rule are prevented to be 
+             			copied to CPU and redirected to CPU. And the hardware forwarding behavior
+             			should not be affected. 
+            "
+        SYNTAX         INTEGER {
+            permit(1),
+            deny(2),
+            deny-cpu(3)         
+        }
+
+    DlinkAclPortOperatorType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION
+            " The type of UDP/TCP port operator indicates how a packet's
+             TCP/UDP source or destination port number is compared.
+            none(1) - No comparison.
+            eq (2)- equal
+            gt (3)- greater than.
+            lt (4)- less than.
+            neq(5)- not equal                            
+            range(6)- compares the port value between two numbers. 
+            mask(7)- check the bit corresponding to bit value 1, ignore the bit corresponding to bit value 0.                 
+            "
+        SYNTAX         INTEGER {
+            none(1),
+            eq(2),
+            gt(3),
+            lt(4),
+            neq(5),
+            range(6),
+            mask(7)       
+        }
+
+    TcpFlag ::= TEXTUAL-CONVENTION
+    	STATUS current
+    	DESCRIPTION
+        	"The TCP flag fields. Each bit defined as follow:
+        		urgent(0) - urgent.
+        		acknowledge(1) - acknowledge.
+        		push(2) - push,
+        		reset(3) - reset.
+        		synchronize(4) - synchronize.
+			finish (5) - finish.	
+        "
+    SYNTAX 			BITS {
+    			urgent(0),
+        		acknowledge(1),
+        		push(2),
+        		reset(3),
+        		synchronize(4),
+              finish (5)
+      }
+                
+-- -----------------------------------------------------------------------------                                      
+    dAclMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwAclMIB 0 }
+    dAclMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwAclMIB 1 }
+    dAclMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwAclMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dAclGeneral          OBJECT IDENTIFIER ::= { dAclMIBObjects 1 }
+    
+    dAclReSeqTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclReSeqEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of information about how re-sequencing
+            the rules in access lists.             
+            "                        
+        ::= { dAclGeneral 1 }
+                          
+    dAclReSeqEntry OBJECT-TYPE
+        SYNTAX          DAclReSeqEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry appears in this table for controlling the re-sequence of
+            an access-list."
+        INDEX  { dAclReSeqAccessListName }
+        ::= { dAclReSeqTable 1 }
+
+    DAclReSeqEntry ::= SEQUENCE {
+        dAclReSeqAccessListName             DisplayString,
+        dAclReSeqStartingNumber             Integer32,
+        dAclReSeqIncrement                  Integer32
+    }
+    dAclReSeqAccessListName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the name of an access list."
+        ::= { dAclReSeqEntry 1 }
+
+    dAclReSeqStartingNumber OBJECT-TYPE
+        SYNTAX          Integer32 ( 1..65535 )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicates the initial value of sequence number of the corresponding
+            access list."
+        DEFVAL { 10 } 
+        ::= { dAclReSeqEntry 2 }
+
+    dAclReSeqIncrement OBJECT-TYPE
+        SYNTAX          Integer32 ( 1..32 )
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number that the sequence numbers step.
+            If the increment value is 5 and the beginning sequence number is 20,
+            the subsequent sequence numbers are 25, 30, 35, 40, and so on."
+        DEFVAL { 10 } 
+        ::= { dAclReSeqEntry 3 }
+        
+-- -----------------------------------------------------------------------------
+    dAclMac              OBJECT IDENTIFIER ::= { dAclMIBObjects 2 }
+    dAclMacAccessListNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in the MAC access list
+             table."
+        ::= { dAclMac 1 }
+
+    dAclMacAccessListTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclMacAccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains information about MAC access list."
+        ::= { dAclMac 2 }
+
+    dAclMacAccessListEntry OBJECT-TYPE
+        SYNTAX          DAclMacAccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defined in dAclMacAccessListTable. An entry is 
+            created/removed when an MAC access list is created/deleted."
+        INDEX { dAclMacAccessListName }
+        ::= { dAclMacAccessListTable 1 }
+
+    DAclMacAccessListEntry ::= SEQUENCE {
+        dAclMacAccessListName           DisplayString,
+        dAclMacAccessListRowStatus      RowStatus,
+        dAclMacAccessListId				Integer32,
+        dAclMacAccessListCounterEnabled		TruthValue,
+        dAclMacAccessListClearStatAction  INTEGER,
+        dAclMacAccessListRemark		DisplayString   
+    }
+
+    dAclMacAccessListName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the MAC access list."
+        ::= { dAclMacAccessListEntry 1 }
+
+    dAclMacAccessListRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object allows the dynamic creation and deletion of a MAC
+            access list."
+        ::= { dAclMacAccessListEntry 2 }
+ 
+    dAclMacAccessListId OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The number of the MAC access list.
+            If user specify value zero(0) for this node, agent will assign a number 
+            	for it. After the table created, this node should not be changed."         
+        ::= { dAclMacAccessListEntry 3 }
+     
+     dAclMacAccessListCounterEnabled	OBJECT-TYPE
+        SYNTAX  			TruthValue
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+             "This object indicates the counter state of the access list is 
+             enabled('true') or disabled('false'). And the counter state just 
+             for the all interface that applied the access list in 
+             dAclMacAccessGroupTable.             
+             "
+        ::= { dAclMacAccessListEntry 4 }
+            
+     dAclMacAccessListClearStatAction  	OBJECT-TYPE
+        SYNTAX  			INTEGER{
+			                clear(1),
+			                noOp(2)
+            }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object is used to clear statistics of the access list when set
+            to 'clear'. No action is taken if this object is set to 'noOp'.
+            The 'clear' action just for the all interface that applied the access 
+            list in dAclMacAccessGroupTable.
+            When read, the value 'noOp' is returned."
+        ::= { dAclMacAccessListEntry 5 }    
+          
+     dAclMacAccessListRemark OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS       read-create
+        STATUS          current
+        DESCRIPTION
+            "The description of the MAC access list."
+        ::= { dAclMacAccessListEntry 6 }   
+            
+-- -----------------------------------------------------------------------------    
+    dAclMacAccessRuleTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclMacAccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of rules for the MAC access list."
+        ::= { dAclMac 3 }
+
+    dAclMacAccessRuleEntry OBJECT-TYPE
+        SYNTAX          DAclMacAccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined dAclMacAccessRuleTable. 
+            The first instance identifier index value identifies the 
+            dAclMacAccessListEntry that a MAC access rule (dAclMacAccessRuleEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dAclMacAccessListEntry is deleted."
+        INDEX { 
+            dAclMacAccessListName, 
+            dAclMacAccessRuleSn 
+        }
+        ::= { dAclMacAccessRuleTable 1 }
+
+    DAclMacAccessRuleEntry ::= SEQUENCE {
+        dAclMacAccessRuleSn                 Integer32,
+        dAclMacAccessRuleRowStatus          RowStatus,
+        dAclMacAccessRuleAction             DlinkAclRuleType,
+        dAclMacAccessRuleSrcMacAddr         MacAddress,
+        dAclMacAccessRuleSrcMacWildcard     MacAddress,
+        dAclMacAccessRuleDstMacAddr         MacAddress,
+        dAclMacAccessRuleDstMacWildcard     MacAddress,
+        dAclMacAccessRulePacketType         INTEGER,
+        dAclMacAccessRuleEthernetType       Integer32,
+        dAclMacAccessRuleLlcDSAP            Integer32,
+        dAclMacAccessRuleLlcSSAP            Integer32,
+        dAclMacAccessRuleLlcCntl            Integer32,
+        dAclMacAccessRuleDot1p              Integer32, 
+        dAclMacAccessRuleInnerDot1p         Integer32,
+        dAclMacAccessRuleVlanID             VlanIdOrNone,   
+        dAclMacAccessRuleInnerVlanID        VlanIdOrNone,
+        dAclMacAccessRuleTimeName           DisplayString,    
+        dAclMacAccessRuleEthernetTypeMask   OCTET STRING, 
+        dAclMacAccessRuleDot1pMask          OCTET STRING, 
+        dAclMacAccessRuleInnerDot1pMask     OCTET STRING,
+        dAclMacAccessRuleVlanIDMask         OCTET STRING,   
+        dAclMacAccessRuleInnerVlanIDMask    OCTET STRING, 
+        dAclMacAccessRuleVlanRangeMin       VlanIdOrNone,
+        dAclMacAccessRuleVlanRangeMax       VlanIdOrNone
+        }
+
+    dAclMacAccessRuleSn  OBJECT-TYPE
+        SYNTAX          Integer32 (0..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Specifies the sequence number of this rule. 
+            The lower the number is, the higher the priority of the rule.
+            The special value of 0 means the sequence number will be automatically 
+            determined by the agent."
+        ::= { dAclMacAccessRuleEntry 1 }
+
+    dAclMacAccessRuleRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dAclMacAccessRuleEntry 2 }
+
+    dAclMacAccessRuleAction OBJECT-TYPE
+        SYNTAX          DlinkAclRuleType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the result of the packet examination is to
+             permit or deny or prevent to CPU.           
+            "
+        ::= { dAclMacAccessRuleEntry 3 }
+
+    dAclMacAccessRuleSrcMacAddr OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies a source MAC address."
+        ::= { dAclMacAccessRuleEntry 4 }
+
+    dAclMacAccessRuleSrcMacWildcard OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is a wildcard bitmap to specify a group of source
+            MAC addresses. The bit value 1 indicates the corresponding bit will
+            be ignored. The bit value 0 indicates the corresponding bit will be
+            checked. In other words, when the value of all 'ff'Hs indicates any
+            source MAC address is specified. When the value of all '00'Hs indicates
+            host source MAC address is specified."
+        ::= { dAclMacAccessRuleEntry 5 }
+
+    dAclMacAccessRuleDstMacAddr  OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies a destination MAC address."
+        ::= { dAclMacAccessRuleEntry 6 }
+
+    dAclMacAccessRuleDstMacWildcard  OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is a wildcard bitmap to specify a group of destination
+            MAC addresses. The bit value 1 indicates the corresponding bit will
+            be ignored. The bit value 0 indicates the corresponding bit will be
+            checked. In other words, when the value of all 'ff'Hs indicates any
+            destination MAC address is specified. When the value of all '00'Hs 
+            indicates host destination MAC address is specified."
+        ::= { dAclMacAccessRuleEntry 7 }
+
+    dAclMacAccessRulePacketType  OBJECT-TYPE
+        SYNTAX          INTEGER { 
+            none(1), 
+            ethernet(2), 
+            llc(3) 
+        }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the Ethernet frame type. The value of none (1) means the 
+            frame type is not specified."
+        DEFVAL { none }    
+        ::= { dAclMacAccessRuleEntry 8 }
+
+    dAclMacAccessRuleEthernetType  OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the Ethernet type for an Ethernet II or SNAP packet.
+             The special value of -1 means the Ethernet type value is not specified.             
+             It is only meaningful when the dAclMacAccessRulePacketType is
+              'ethernet'."
+        DEFVAL { -1 }
+        ::= { dAclMacAccessRuleEntry 9}
+
+    dAclMacAccessRuleLlcDSAP  OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..255)
+        MAX-ACCESS  read-create
+        STATUS      obsolete
+        DESCRIPTION
+            "Specifies the DSAP value for the LLC packet. If the value is -1, it
+            means the DSAP number is not specified.
+            It is only meaningful when the dAclMacAccessRulePacketType is 'llc'."
+        DEFVAL { -1 }
+        ::= { dAclMacAccessRuleEntry 10 }
+       
+    dAclMacAccessRuleLlcSSAP  OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..255)
+        MAX-ACCESS  read-create
+        STATUS      obsolete
+        DESCRIPTION
+            "Specifies the SSAP value for the LLC packet. If the value is -1, it
+            means the SSAP number is not specified.
+            It is only meaningful when the dAclMacAccessRulePacketType is 'llc'."
+        DEFVAL { -1 }    
+        ::= { dAclMacAccessRuleEntry 11 }
+
+    dAclMacAccessRuleLlcCntl  OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..255)
+        MAX-ACCESS  read-create
+        STATUS      obsolete
+        DESCRIPTION
+            "Specifies the control field for the LLC packet. If the value is -1, it
+            means the SSAP number is not specified.
+            It is only meaningful when the dAclMacAccessRulePacketType is 'llc'."
+        DEFVAL { -1 }
+        ::= { dAclMacAccessRuleEntry 12 }
+
+    dAclMacAccessRuleDot1p  OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the priority value. The value of -1 means the priority
+             is not specified."
+        DEFVAL { -1 }
+        ::= { dAclMacAccessRuleEntry 13 }
+
+     dAclMacAccessRuleInnerDot1p  OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..7)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the inner priority value. The value of -1 means the 
+            inner priority is not specified."
+        DEFVAL { -1 }
+        ::= { dAclMacAccessRuleEntry 14 }
+        
+    dAclMacAccessRuleVlanID  OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the VLAN ID.                                
+             A value of zero indicates the VLAN ID is not specified.
+             This node and dAclMacAccessRuleVlanRangeMin/dAclMacAccessRuleVlanRangeMax 
+             cannot be specified at same time in a row."
+        DEFVAL { 0 }
+        ::= { dAclMacAccessRuleEntry 15 }
+
+    dAclMacAccessRuleInnerVlanID  OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the inner VLAN ID. A value of zero indicates 
+            the inner VLAN ID is not specified."
+        DEFVAL { 0 }
+        ::= { dAclMacAccessRuleEntry 16 }
+        
+    dAclMacAccessRuleTimeName  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the name of time-period profile associated with
+            the access-list delineating its activation period.
+            The value 'NULL' means that this rule is not bound with any Time
+            mechanism." 
+        ::= { dAclMacAccessRuleEntry 17 }  
+        
+     dAclMacAccessRuleEthernetTypeMask  OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(2))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the mask for ethernet type defined by dAclMacAccessRuleEthernetType.
+             Valid values are from 0x0000 to 0xFFFF.
+             Default value is 0xFFFF.
+             This node is valid only for the dAclMacAccessRuleEthernetType specified."
+         ::= { dAclMacAccessRuleEntry 18}
+  
+     dAclMacAccessRuleDot1pMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the mask for priority defined by dAclMacAccessRuleDot1p.
+             Valid values are from 0x00 to 0x07.
+             Default value is 0x07.
+             This node is valid only for the dAclMacAccessRuleDot1p specified."
+         ::= { dAclMacAccessRuleEntry 19 }
+
+     dAclMacAccessRuleInnerDot1pMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the mask for inner priority defined by dAclMacAccessRuleInnerDot1p.
+             Valid values are from 0x00 to 0x07.
+             Default value is 0x07.
+             This node is valid only for the dAclMacAccessRuleInnerDot1p specified."
+        ::= { dAclMacAccessRuleEntry 20 }
+        
+     dAclMacAccessRuleVlanIDMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for VLAN ID defined by dAclMacAccessRuleVlanID.
+             Valid values are from 0x0000 to 0x0FFF.
+             This node and dAclMacAccessRuleVlanRangeMin/dAclMacAccessRuleVlanRangeMax 
+             cannot be specified at same time in a row.
+             Default value is 0x0FFF.
+             This node is valid only for the dAclMacAccessRuleVlanID specified."
+        ::= { dAclMacAccessRuleEntry 21 }
+
+     dAclMacAccessRuleInnerVlanIDMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION  
+            "Specifies the mask for inner VLAN ID defined by dAclMacAccessRuleInnerVlanID.
+             Valid values are from 0x0000 to 0x0FFF.
+             Default value is 0x0FFF.
+             This node is valid only for the dAclMacAccessRuleInnerVlanID specified."
+        ::= { dAclMacAccessRuleEntry 22 }       
+    
+     dAclMacAccessRuleVlanRangeMin  OBJECT-TYPE
+        SYNTAX       VlanIdOrNone
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the minimum outer VLAN ID of a VLAN range. A value of zero
+             indicates the VLAN range is not specified.    
+             This node and dAclMacAccessRuleVlanID/dAclMacAccessRuleVlanIDMask cannot
+             be specified at same time in a row.
+             This node is valid only for the dAclMacAccessRuleVlanRangeMax specified." 
+        DEFVAL { 0 }
+        ::= { dAclMacAccessRuleEntry 23 }
+  
+    dAclMacAccessRuleVlanRangeMax  OBJECT-TYPE
+        SYNTAX       VlanIdOrNone
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the maximum outer VLAN ID of a VLAN range. A value of zero
+             indicates the VLAN range is not specified.    
+             This node and dAclMacAccessRuleVlanID/dAclMacAccessRuleVlanIDMask cannot
+             be specified at same time in a row.
+             This node is valid only for the dAclMacAccessRuleVlanRangeMin specified."  
+        DEFVAL { 0 }
+        ::= { dAclMacAccessRuleEntry 24 } 
+
+-- -----------------------------------------------------------------------------
+    dAclMacAccessGroupTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclMacAccessGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table represents a list of MAC access group configuration."
+        ::= { dAclMac 4 }
+
+    dAclMacAccessGroupEntry OBJECT-TYPE
+        SYNTAX          DAclMacAccessGroupEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "An entry in dAclMacAccessGroupTable contains interface specific 
+            MAC access list association."
+        INDEX { dAclMacAccessGroupIfIndex, dAclMacAccessGroupApplyDirection }
+        ::= { dAclMacAccessGroupTable 1 }
+
+    DAclMacAccessGroupEntry ::= SEQUENCE {
+        dAclMacAccessGroupIfIndex    InterfaceIndex,
+        dAclMacAccessGroupApplyDirection 	INTEGER,
+        dAclMacAccessGroupRowStatus  RowStatus,
+        dAclMacAccessGroupAclName  DisplayString,
+        dAclMacAccessGroupAclId		Integer32
+    }
+
+    dAclMacAccessGroupIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the ifIndex of the interface.
+            Only physical port is valid interface."
+        ::= { dAclMacAccessGroupEntry 1 }
+
+    dAclMacAccessGroupApplyDirection OBJECT-TYPE
+        SYNTAX          INTEGER{ 
+            inbound(1),
+            outbound(2)         
+       	}
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           	"Indicates whether this access list is to be attached to ingress
+           	or egress direction." 
+        ::= { dAclMacAccessGroupEntry 2 }
+        
+    dAclMacAccessGroupRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."
+        ::= { dAclMacAccessGroupEntry 3 }
+
+    dAclMacAccessGroupAclName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The name of the MAC access list to be applied.
+            "             
+        ::= { dAclMacAccessGroupEntry 4 }
+        
+    dAclMacAccessGroupAclId OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The ID of the MAC access list to be applied.
+           	User maybe specify access list ID(by this object) or name (by 
+           	dAclMacAccessGroupAclName) to be applied. If both access list 
+           	ID and name are specified, the access list name specified by 
+           	dAclMacAccessGroupAclName will be take.
+            "             
+        ::= { dAclMacAccessGroupEntry 5 }
+-- -----------------------------------------------------------------------------
+    dAclIp               OBJECT IDENTIFIER ::= { dAclMIBObjects 3 }
+    dAclIpAccessListNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in the IP access list 
+            table."
+        ::= { dAclIp 1 }
+
+    dAclIpAccessListTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclIpAccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains IP access list configuration."
+        ::= { dAclIp 2 }
+
+    dAclIpAccessListEntry OBJECT-TYPE
+        SYNTAX          DAclIpAccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry defined in dAclIpAccessListTable. An entry is 
+            created/removed when an IP access list is created/deleted."
+        INDEX { dAclIpAccessListName }
+        ::= { dAclIpAccessListTable 1 }
+
+    DAclIpAccessListEntry ::= SEQUENCE {
+        dAclIpAccessListName        DisplayString,
+        dAclIpAccessListRowStatus   RowStatus,
+        dAclIpAccessExtended        TruthValue,
+        dAclIpAccessListId			Integer32,
+        dAclIpAccessListCounterEnabled	TruthValue,
+        dAclIpAccessListClearStatAction 	INTEGER,
+        dAclIpAccessListRemark		DisplayString        			
+    }
+
+    dAclIpAccessListName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the IP access list."
+        ::= { dAclIpAccessListEntry 1 }
+
+    dAclIpAccessListRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object allows the dynamic creation and
+             deletion of an IP access list."
+        ::= { dAclIpAccessListEntry 2 }
+
+    dAclIpAccessExtended OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP access list is extended ('true') or 
+            standard ('false').
+            A standard ip access list means only IP address related i.e. 
+            source or destination IP address is specified for the filter. 
+            For an extended IP access list, more fields can be chosen for the
+            filter."         
+        ::= { dAclIpAccessListEntry 3 }
+        
+    dAclIpAccessListId OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The number of the IP access list.
+            If user specify value zero(0) for this node, agent will assign a number 
+            	for it. After the table created, this node should not be changed."         
+        ::= { dAclIpAccessListEntry 4 }
+     
+     dAclIpAccessListCounterEnabled	OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+             "This object indicates the counter state of the access list is
+              enabled('true') or disabled('false'). And the counter just for 
+              the all interface that applied the access list in 
+              dAclIpAccessGroupTable."
+        ::= { dAclIpAccessListEntry 5 }
+        
+      dAclIpAccessListClearStatAction  	OBJECT-TYPE
+        SYNTAX  			INTEGER{
+			                clear(1),
+			                noOp(2)
+            }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object is used to clear statistics of the access list when set
+            to 'clear'. No action is taken if this object is set to 'noOp'.
+            The 'clear' action just for the all interface that applied the access
+            list in dAclIpAccessGroupTable.
+            When read, the value 'noOp' is returned."
+        ::= { dAclIpAccessListEntry 6 }    
+                    
+     dAclIpAccessListRemark OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS       read-create
+        STATUS          current
+        DESCRIPTION
+            "The description of the IP access list."
+        ::= { dAclIpAccessListEntry 7 }   
+        
+-- -----------------------------------------------------------------------------    
+    dAclIpAccessRuleTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclIpAccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "The table contains a list of IP access rules for IP access lists."
+        ::= { dAclIp 3}
+
+    dAclIpAccessRuleEntry OBJECT-TYPE
+        SYNTAX          DAclIpAccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined dAclIpAccessRuleTable. 
+            The first instance identifier index value identifies the 
+            dAclIpAccessListEntry that an IP access rule (dAclIpAccessRuleEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dAclIpAccessRuleEntry is deleted."           
+        INDEX { 
+            dAclIpAccessListName, 
+            dAclIpAccessRuleSn 
+        }
+        ::= { dAclIpAccessRuleTable 1 }
+
+    DAclIpAccessRuleEntry ::= SEQUENCE {
+        dAclIpAccessRuleSn         Integer32,
+        dAclIpAccessRuleRowStatus        RowStatus,
+        dAclIpAccessRuleAction           DlinkAclRuleType,
+        dAclIpAccessRuleProtocol         INTEGER,
+        dAclIpAccessRuleUserDefProtocol  Integer32,
+        dAclIpAccessRuleSrcAddr          IpAddress,
+        dAclIpAccessRuleSrcWildcard      IpAddress,                
+        dAclIpAccessRuleDstAddr          IpAddress,
+        dAclIpAccessRuleDstWildcard      IpAddress,        
+        dAclIpAccessRuleSrcOperator      DlinkAclPortOperatorType,
+        dAclIpAccessRuleSrcPort          Integer32,
+        dAclIpAccessRuleSrcPortRange     Integer32,
+        dAclIpAccessRuleDstOperator      DlinkAclPortOperatorType,
+        dAclIpAccessRuleDstPort          Integer32,
+        dAclIpAccessRuleDstPortRange     Integer32,         
+        dAclIpAccessRuleQosPrecedence    Integer32,
+        dAclIpAccessRuleQosTos           Integer32, 
+        dAclIpAccessRuleQosDscp          Integer32,            
+        dAclIpAccessRuleIcmpType         Integer32,
+        dAclIpAccessRuleIcmpCode         Integer32,        
+        dAclIpAccessRuleTimeName         DisplayString,
+        dAclIpAccRuleTcpFlag			 TcpFlag,
+        dAclIpAccRuleFragments		     TruthValue,
+        dAclIpAccRuleUserDefProtocolMask  OCTET STRING,
+        dAclIpAccRuleSrcPortMask          OCTET STRING,
+        dAclIpAccRuleDstPortMask          OCTET STRING,
+        dAclIpAccRuleQosPrecedenceMask    OCTET STRING,
+        dAclIpAccRuleQosTosMask           OCTET STRING,
+        dAclIpAccRuleQosDscpMask          OCTET STRING        
+    }
+
+    dAclIpAccessRuleSn OBJECT-TYPE
+        SYNTAX          Integer32 (0..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "Specifies the sequence number of this rule. 
+            The lower the number is, the higher the priority of the rule.
+            The special value of 0 means the sequence number will be automatically 
+            determined by the agent."
+        ::= { dAclIpAccessRuleEntry 1 }
+
+    dAclIpAccessRuleRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dAclIpAccessRuleEntry 2 }
+
+    dAclIpAccessRuleAction OBJECT-TYPE
+        SYNTAX          DlinkAclRuleType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the result of the packet examination is to
+            permit or deny or prevent to CPU."
+        ::= { dAclIpAccessRuleEntry 3 }
+
+    dAclIpAccessRuleProtocol OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            none(0),
+            userDefine(1),
+            tcp(2),
+            udp(3),                             
+            icmp(4),
+            gre(5),
+            esp(6),
+            eigrp(7),
+            igmp(8),
+            ospf(9),
+            pim(10),
+            vrrp(11),
+            ipinip(12),
+            pcp(13)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the IP protocol."
+        ::= { dAclIpAccessRuleEntry 4 }
+
+    dAclIpAccessRuleUserDefProtocol OBJECT-TYPE
+        SYNTAX          Integer32 (-1 | 0..255)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the user defined protocol ID when the dAclIpAccessRuleProtocol
+             is 'userDefine (1)'. The value of -1 means the user defined protocol ID
+             is not specified."
+        DEFVAL { -1 }                     
+        ::= { dAclIpAccessRuleEntry 5 }
+
+    dAclIpAccessRuleSrcAddr OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "Specifies a source IP address."
+        ::= { dAclIpAccessRuleEntry 6 }
+
+    dAclIpAccessRuleSrcWildcard OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION           
+            "This object is a wildcard bitmap to specify a group of source IP
+            addresses. The bit value 1 indicates the corresponding bit will
+            be ignored. The bit value 0 indicates the corresponding bit will be
+            checked. In other words, when the value of all 'ff'Hs indicates any
+            IP source address is specified. When the value of all '00'Hs indicates
+            host IP source address is specified."
+        ::= { dAclIpAccessRuleEntry 7 }      
+        
+     dAclIpAccessRuleDstAddr OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "Specifies a destination IP address."
+        ::= { dAclIpAccessRuleEntry 8 }
+
+    dAclIpAccessRuleDstWildcard OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "This object is a wildcard bitmap to specify a group of destination IP
+            addresses. The bit value 1 indicates the corresponding bit will
+            be ignored. The bit value 0 indicates the corresponding bit will be
+            checked. In other words, when the value of all 'ff'Hs indicates any
+            IP destination address is specified. When the value of all '00'Hs indicates
+            host IP destination address is specified."
+        ::= { dAclIpAccessRuleEntry 9 }    
+   
+    dAclIpAccessRuleSrcOperator OBJECT-TYPE
+        SYNTAX          DlinkAclPortOperatorType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates how a packet's source TCP/UDP port number is
+            compared.
+            When the value of this object is eq(2),gt(3),lt(4) or neq(5) uses
+            the dAclIpAccessRuleSrcPort as an operand which is the only one needed. 
+           
+            When the value of this object is range(6) needs 2 operands. One is 
+            dAclIpAccessRuleSrcPort, which is the starting port number of the 
+            range, and the other operand is dAclIpAccessRuleSrcPortRange, 
+            which is the ending port number of the range.
+                  
+            When the value of this object is mask(7) needs 2 operands. One is 
+            dAclIpAccessRuleSrcPort, the other operand is dAclIpAccRuleSrcPortMask. 
+            
+            This object is used for TCP/UDP protocol only, hence when the object
+            'dAclIpAccessRuleProtocol' is set to other than TCP/UDP, the object has
+            to be 'none(1)'."
+        ::= { dAclIpAccessRuleEntry 10 }
+              
+    dAclIpAccessRuleSrcPort OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the source port number of TCP/UDP protocol.
+            If the value is -1, it means the value is not specified.
+            If the dAclIpAccessRuleSrcOperator object in the same row is
+            range(6), this object will be the starting port number of the port
+            range.
+            This object only can be configured dAclIpAccessRuleSrcOperator in
+            the same row is not 'none(1)'."      
+        DEFVAL { -1 }
+        ::= { dAclIpAccessRuleEntry 11 }
+
+    dAclIpAccessRuleSrcPortRange OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The source port number of the TCP/UDP protocol. If the
+            dAclIpAccessRuleSrcOperator object in the same row is range(6), this
+            object will be the ending port number of the port range.
+           The value of -1 means the ending port number is not specified."       
+        DEFVAL { -1 } 
+        ::= { dAclIpAccessRuleEntry 12 }
+             
+    dAclIpAccessRuleDstOperator OBJECT-TYPE
+        SYNTAX          DlinkAclPortOperatorType
+        MAX-ACCESS  read-create
+        STATUS      current                           
+        DESCRIPTION
+            "This object indicates how a packet's TCP/UDP destination port number is
+            compared.
+            When the value of this object is eq(2),gt(3),lt(4) or neq(5) uses
+            the dAclIpAccessRuleSrcPort as an operand which is the only one needed. 
+           
+            When the value of this object is range(6) needs 2 operands. One is 
+            dAclIpAccessRuleSrcPort, which is the starting port number of the 
+            range, and the other operand is dAclIpAccessRuleDstPortRange, 
+            which is the ending port number of the range.
+                  
+            When the value of this object is mask(7) needs 2 operands. One is 
+            dAclIpAccessRuleDstPort, the other operand is dAclIpAccRuleDstPortMask. 
+            
+            This object is used for TCP/UDP protocol only, hence when the object
+            'dAclIpAccessRuleProtocol' is set to other than TCP/UDP, the object has
+            to be 'none(1)'."
+        ::= { dAclIpAccessRuleEntry 13 }
+     
+     dAclIpAccessRuleDstPort OBJECT-TYPE
+        SYNTAX      Integer32 (-1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the destination port number of TCP/UDP protocol.
+            If the value is -1, it means the value is not specified.
+            If the dAclIpAccessRuleDstOperator object in the same row is
+            range(6), this object will be the starting port number of the port
+            range.
+            This object only can be configured dAclIpAccessRuleDstOperator in
+            the same row is not 'none(1)'."         
+        DEFVAL { -1 }
+        ::= { dAclIpAccessRuleEntry 14 }
+         
+    dAclIpAccessRuleDstPortRange OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The destination port number of the TCP/UDP protocol. If the
+            dAclIpAccessRuleDstOperator object in the same row is range(6), this
+            object will be the ending port number of the port range.
+            The value of -1 means the ending port number is not specified."        
+        DEFVAL { -1 }
+        ::= { dAclIpAccessRuleEntry 15 }
+               
+    dAclIpAccessRuleQosPrecedence  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..7)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the value of precedence.
+             The value of -1 means the value is not specified or not applicable.     
+             dAclIpAccessRuleQosPrecedence and  dAclIpAccessRuleQosDscp cannot
+             be specified at same time in a row."
+        DEFVAL { -1 }
+        ::= { dAclIpAccessRuleEntry 16 }
+  
+    dAclIpAccessRuleQosTos  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..15)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the value of type of service.
+             The value of -1 means the value is not specified or not applicable.                          
+             dAclIpAccessRuleQosTos and  dAclIpAccessRuleQosDscp cannot
+             be specified at same time in a row."
+        DEFVAL { -1 }
+        ::= { dAclIpAccessRuleEntry 17 } 
+    
+     dAclIpAccessRuleQosDscp  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..63)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the value of DSCP code.
+             The value of -1 means the value is not specified or not applicable. 
+             Neither dAclIpAccessRuleQosPrecedence nor dAclIpAccessRuleQosTos 
+             cannot be specified with dAclIpAccessRuleQosDscp at same time
+             in a row.
+            "
+        DEFVAL { -1 }
+        ::= { dAclIpAccessRuleEntry 18 } 
+        
+     dAclIpAccessRuleIcmpType OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the type of ICMP protocol.
+            If the value is -1, it means the value is not specified.
+            This object is used for ICMP protocol only, hence when the object
+            'dAclIpAccessRuleProtocol' is set to other than ICMP, the object has
+            to be -1."
+        DEFVAL { -1 }    
+        ::= { dAclIpAccessRuleEntry 19 }
+    
+    dAclIpAccessRuleIcmpCode OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the code of ICMP protocol.
+            If the value is -1, it means the value is not specified.
+            This object is used for ICMP protocol only, hence when the object
+            'dAclIpAccessRuleProtocol' is set to other than ICMP, the object has
+            to be -1."
+        DEFVAL { -1 }    
+        ::= { dAclIpAccessRuleEntry 20 }
+            
+    dAclIpAccessRuleTimeName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the name of time-period profile associated with the 
+            access-list delineating its activation period.
+            The value 'NULL' means that this rule is not bound with any Time
+            mechanism."
+        ::= { dAclIpAccessRuleEntry 21 }
+
+	dAclIpAccRuleTcpFlag  OBJECT-TYPE
+        SYNTAX       TcpFlag
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the TCP flag fields. 
+            This node is available only for TCP protocol. 
+            The default value for this node is empty set, which means no TCP flag 
+            values are set.  					
+            "
+        ::= { dAclIpAccessRuleEntry 22 } 
+        
+    dAclIpAccRuleFragments  OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object indicates the Packet fragment filtering status 
+            is  enabled('true') or disabled('false').
+            "
+        ::= { dAclIpAccessRuleEntry 23 } 
+    
+      dAclIpAccRuleUserDefProtocolMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for protocol ID defined by dAclIpAccessRuleUserDefProtocol. 
+             Valid values are from 0x00 to 0xFF.
+             Default value is 0xFF.
+             This node is valid only for the dAclIpAccessRuleUserDefProtocol specified."                    
+        ::= { dAclIpAccessRuleEntry 24 }
+     
+     dAclIpAccRuleSrcPortMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for L4 source port defined by dAclIpAccessRuleSrcPort. 
+             Valid values are from 0x0 to 0xFFFF.
+             Default value is 0xFFFF.
+             This object only can be configured dAclIpAccessRuleSrcOperator in the 
+             same row is 'mask(7)'.              
+             This node is valid only for the dAclIpAccessRuleSrcPort specified." 
+        ::= { dAclIpAccessRuleEntry 25 } 
+     
+     dAclIpAccRuleDstPortMask OBJECT-TYPE                       
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for L4 destination port defined by dAclIpAccessRuleDstPort. 
+             Valid values are from 0x0 to 0xFFFF.
+             Default value is 0xFFFF.
+             This object only can be configured dAclIpAccessRuleDstOperator in the 
+             same row is 'mask(7)'.
+             This node is valid only for the dAclIpAccessRuleDstPort specified." 
+        ::= { dAclIpAccessRuleEntry 26 } 
+       
+    dAclIpAccRuleQosPrecedenceMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for ip precedence defined by dAclIpAccessRuleQosPrecedence.
+             Valid values are from 0x0 to 0x7.
+             Default value is 0x7.
+             This node is valid only for the dAclIpAccessRuleQosPrecedence specified." 
+        ::= { dAclIpAccessRuleEntry 27 }
+  
+     dAclIpAccRuleQosTosMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for type of service defined by dAclIpAccessRuleQosTos.
+             Valid values are from 0x0 to 0xF.
+             Default value is 0xF.
+             This node is valid only for the dAclIpAccessRuleQosTos specified." 
+        ::= { dAclIpAccessRuleEntry 28 } 
+    
+     dAclIpAccRuleQosDscpMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for DSCP code defined by dAclIpAccessRuleQosDscp.
+             Valid values are from 0x0 to 0x3F.
+             Default value is 0x3F.
+             This node is valid only for the dAclIpAccessRuleQosDscp specified." 
+        ::= { dAclIpAccessRuleEntry 29 }
+                
+-- -----------------------------------------------------------------------------  
+    dAclIpAccessGroupTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclIpAccessGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table represents a list of IP access group configuration."
+        ::= { dAclIp 4 }
+
+    dAclIpAccessGroupEntry OBJECT-TYPE
+        SYNTAX          DAclIpAccessGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry in dAclIpAccessGroupTable contains interface specific 
+            IP access list association."
+        INDEX { dAclIpAccessGroupIfIndex,dAclIpAccessGroupApplyDirection}
+        ::= { dAclIpAccessGroupTable 1 }
+
+    DAclIpAccessGroupEntry ::= SEQUENCE {
+        dAclIpAccessGroupIfIndex     InterfaceIndex,
+        dAclIpAccessGroupApplyDirection INTEGER,
+        dAclIpAccessGroupStatus      RowStatus,
+        dAclIpAccessGroupAclName   DisplayString,
+        dAclIpAccessGroupAclId 		Integer32
+        }
+
+    dAclIpAccessGroupIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the ifIndex of the interface.
+            Only physical port is valid interface."
+        ::= { dAclIpAccessGroupEntry 1 }
+
+    dAclIpAccessGroupApplyDirection OBJECT-TYPE
+        SYNTAX      INTEGER{ 
+            				inbound(1),
+            				outbound(2)         
+       					 }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+           	"Indicates whether this access list is to be attached to ingress or egress direction." 
+        ::= { dAclIpAccessGroupEntry 2 }
+    dAclIpAccessGroupStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dAclIpAccessGroupEntry 3 }
+
+    dAclIpAccessGroupAclName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The name of the IP access list to be applied."
+        ::= { dAclIpAccessGroupEntry 4 }
+
+ 	dAclIpAccessGroupAclId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The ID of the IP access list to be applied. 
+           	User maybe specify access list ID(by this object) or name (by 
+           	dAclIpAccessGroupAclName) to be applied. If both access list 
+           	ID and name are specified, the access list name specified by 
+           	dAclIpAccessGroupAclName will be take.
+			"
+        ::= { dAclIpAccessGroupEntry 5 }
+-- -----------------------------------------------------------------------------
+    dAclIPv6               OBJECT IDENTIFIER ::= { dAclMIBObjects 4 }
+    dAclIPv6AccessListNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in the IPv6 access list
+            table."
+        ::= { dAclIPv6 1 }
+
+    dAclIPv6AccessListTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclIPv6AccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains IPv6 access list configuration."
+        ::= { dAclIPv6 2 }
+
+    dAclIPv6AccessListEntry OBJECT-TYPE
+        SYNTAX          DAclIPv6AccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry defined in dAclIPv6AccessListTable. An entry is 
+            created/removed when an IPv6 access list is created/deleted."
+        INDEX { dAclIPv6AccessListName }
+        ::= { dAclIPv6AccessListTable 1 }
+
+    DAclIPv6AccessListEntry ::= SEQUENCE {
+        dAclIPv6AccessListName          DisplayString,
+        dAclIPv6AccessListRowStatus     RowStatus,
+        dAclIPv6AccessExtended          TruthValue,
+        dAclIPv6AccessListId		Integer32,
+        dAclIPv6AccessListCounterEnabled		TruthValue,
+        dAclIPv6AccessListClearStatAction 	INTEGER,
+        dAclIPv6AccessListRemark        DisplayString
+    }
+
+    dAclIPv6AccessListName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the IPv6 access list."
+        ::= { dAclIPv6AccessListEntry 1 }
+
+    dAclIPv6AccessListRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object allows the dynamic creation and
+             deletion of an IPv6 access list."
+        ::= { dAclIPv6AccessListEntry 2 }
+
+    dAclIPv6AccessExtended OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv6 access list is extended ('true') or 
+            standard ('false').
+            A standard ip access list means only IPv6 address related i.e. 
+            source or destination IPv6 address is specified for the filter. 
+            For an extended IPv6 access list, more fields can be chosen for the
+            filter."         
+        ::= { dAclIPv6AccessListEntry 3 }
+     	    
+    dAclIPv6AccessListId OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The number of the IPv6 access list."         
+        ::= { dAclIPv6AccessListEntry 4 }
+     
+    dAclIPv6AccessListCounterEnabled OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+             "This object indicates the counter state of the access list is
+              enabled('true') or disabled('false'). And the counter just for 
+              the all interface that applied the access list in 
+              dAclIPv6AccessGroupTable."
+        ::= { dAclIPv6AccessListEntry 5 }
+
+     dAclIPv6AccessListClearStatAction  	OBJECT-TYPE
+        SYNTAX  			INTEGER{
+			                clear(1),
+			                noOp(2)
+            }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object is used to clear statistics of the access list when set
+            to 'clear'. No action is taken if this object is set to 'noOp'.
+            The 'clear' action just for the all interface that applied the access 
+            list in dAclIPv6AccessGroupTable.
+            When read, the value 'noOp' is returned."
+        ::= { dAclIPv6AccessListEntry 6 }    
+                   
+    dAclIPv6AccessListRemark OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS       read-create
+        STATUS          current
+        DESCRIPTION
+            "The description of the IPv6 access list."
+        ::= { dAclIPv6AccessListEntry 7 }   
+              
+-- -----------------------------------------------------------------------------       
+    dAclIPv6AccessRuleTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclIPv6AccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "The table contains a list of IPv6 access rules for IPv6 access lists."
+        ::= { dAclIPv6 3}
+
+    dAclIPv6AccessRuleEntry OBJECT-TYPE
+        SYNTAX          DAclIPv6AccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined dAclIPv6AccessRuleTable. 
+            The first instance identifier index value identifies the 
+            dAclIPv6AccessListEntry that an IPv6 access rule (dAclIPv6AccessRuleEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dAclIPv6AccessRuleEntry is deleted."           
+        INDEX { 
+            dAclIPv6AccessListName, 
+            dAclIPv6AccessRuleSn 
+        }
+        ::= { dAclIPv6AccessRuleTable 1 }
+
+    DAclIPv6AccessRuleEntry ::= SEQUENCE {
+        dAclIPv6AccessRuleSn         Integer32,
+        dAclIPv6AccessRuleRowStatus        RowStatus,
+        dAclIPv6AccessRuleAction           DlinkAclRuleType,
+        dAclIPv6AccessRuleProtocol         INTEGER,
+        dAclIPv6AccessRuleUserDefProtocol  Integer32,
+        dAclIPv6AccessRuleSrcAddr          InetAddressIPv6,
+        dAclIPv6AccessRuleSrcPrefixLen     InetAddressPrefixLength,         
+        dAclIPv6AccessRuleDstAddr          InetAddressIPv6,
+        dAclIPv6AccessRuleDstPrefixLen     InetAddressPrefixLength,
+        dAclIPv6AccessRuleDstOperator      DlinkAclPortOperatorType,
+        dAclIPv6AccessRuleSrcOperator      DlinkAclPortOperatorType,
+        dAclIPv6AccessRuleSrcPort          Integer32,
+        dAclIPv6AccessRuleSrcPortRange     Integer32,       
+        dAclIPv6AccessRuleDstPort          Integer32,
+        dAclIPv6AccessRuleDstPortRange     Integer32,
+        dAclIPv6AccessRuleDscp             Integer32,                
+        dAclIPv6AccessRuleIcmpType         Integer32,
+        dAclIPv6AccessRuleIcmpCode         Integer32,
+        dAclIPv6AccessRuleTimeName         DisplayString,
+        dAclIPv6AccRuleTcpFlag			   TcpFlag, 
+        dAclIPv6AccRuleFragments		   TruthValue,
+        dAclIPv6AccRuleFlowLabel		   Integer32,        
+        dAclIPv6AccRuleTrafficClass 	   Integer32,  	
+        dAclIPv6AccRuleUserDefProtocolMask OCTET STRING,
+        dAclIPv6AccRuleSrcPortMask         OCTET STRING, 
+        dAclIPv6AccRuleDstPortMask         OCTET STRING,
+        dAclIPv6AccRuleDscpMask            OCTET STRING,
+        dAclIPv6AccRuleFlowLabelMask	   OCTET STRING,		 
+        dAclIPv6AccRuleTrafficClassMask	   OCTET STRING      	
+    }
+
+    dAclIPv6AccessRuleSn OBJECT-TYPE
+        SYNTAX          Integer32 (0..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Specifies the sequence number of this rule. 
+            The lower the number is, the higher the priority of the rule.
+            The special value of 0 means the sequence number will be automatically
+            determined by the agent."
+        ::= { dAclIPv6AccessRuleEntry 1 }
+
+    dAclIPv6AccessRuleRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dAclIPv6AccessRuleEntry 2 }
+
+    dAclIPv6AccessRuleAction OBJECT-TYPE
+        SYNTAX          DlinkAclRuleType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the result of the packet examination is to
+            permit or deny or prevent to CPU."            
+        ::= { dAclIPv6AccessRuleEntry 3 }
+
+    dAclIPv6AccessRuleProtocol OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            none(0),
+            userDefine(1),  
+            tcp(2),
+            udp(3),                              
+            icmp(4),
+            esp(5),
+            pcp(6),
+            sctp(7)                              
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the IP protocol."
+        ::= { dAclIPv6AccessRuleEntry 4 }
+
+    dAclIPv6AccessRuleUserDefProtocol OBJECT-TYPE
+        SYNTAX          Integer32 (-1 | 0..255)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the user defined protocol ID when the 
+            dAclIPv6AccessRuleProtocol is 'userDefine (1)'. 
+            The value of -1 means the user defined protocol ID is not
+            specified."
+        DEFVAL { -1 }                     
+        ::= { dAclIPv6AccessRuleEntry 5 }
+
+    dAclIPv6AccessRuleSrcAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies a source IPv6 address."
+        ::= { dAclIPv6AccessRuleEntry 6 }
+
+    dAclIPv6AccessRuleSrcPrefixLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION           
+            "Specifies the length in bits of source IPv6 address will be
+            matched. In other words, the value of 0 indicates any source
+            IPv6 address is specified. When the value of 128 indicates
+            host IPv6 source address is specified."
+        ::= { dAclIPv6AccessRuleEntry 7 }
+           
+    dAclIPv6AccessRuleDstAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies a destination IPv6 address."
+        ::= { dAclIPv6AccessRuleEntry 8 }
+
+    dAclIPv6AccessRuleDstPrefixLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "Specifies the length in bits of destination IPv6 address will be
+            matched. In other words, the value of 0 indicates any destination
+            IPv6 address is specified. When the value of 128 indicates
+            host IPv6 destination address is specified."
+        ::= { dAclIPv6AccessRuleEntry 9 }
+
+     dAclIPv6AccessRuleSrcOperator OBJECT-TYPE
+        SYNTAX          DlinkAclPortOperatorType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates how a packet's TCP/UDP source port number is
+            compared.
+            When the value of this object is eq(2),gt(3),lt(4) or neq(5) uses
+            the dAclIPv6AccessRuleSrcPort as an operand which is the only one needed. 
+           
+            When the value of this object is range(6) needs 2 operands. One is 
+            dAclIPv6AccessRuleSrcPort, which is the starting port number of the 
+            range, and the other operand is dAclIPv6AccessRuleSrcPortRange, 
+            which is the ending port number of the range.
+           
+            When the value of this object is mask(7) needs 2 operands. One is 
+            dAclIPv6AccessRuleSrcPort, the other operand is dAclIPv6AccessRuleSrcPortMask.  
+                   
+            This object is used for TCP/UDP protocol only, hence when the object
+            'dAclIPv6AccessRuleProtocol' is set to other than TCP/UDP, the object has
+            to be 'none(1)'."
+        ::= { dAclIPv6AccessRuleEntry 10 }
+              
+    dAclIPv6AccessRuleSrcPort OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the source port number of TCP/UDP protocol.
+            If the value is -1, it means the value is not specified.
+            If the dAclIPv6AccessRuleSrcOperator object in the same row is
+            range(6), this object will be the starting port number of the port
+            range.
+            This object only can be configured dAclIPv6AccessRuleSrcOperator in
+            the same row is not 'none(1)'."
+        DEFVAL { -1 }
+        ::= { dAclIPv6AccessRuleEntry 11 }
+
+    dAclIPv6AccessRuleSrcPortRange OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The source port number of the TCP/UDP protocol. If the
+            dAclIPv6AccessRuleSrcOperator object in the same row is range(6), this
+            object will be the ending port number of the port range.
+           The value of -1 means the ending port number is not specified."        
+        DEFVAL { -1 }
+        ::= { dAclIPv6AccessRuleEntry 12 }
+                    
+    dAclIPv6AccessRuleDstOperator OBJECT-TYPE
+        SYNTAX          DlinkAclPortOperatorType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates how a packet's TCP/UDP destination port number is
+            compared.
+            When the value of this object is eq(2),gt(3),lt(4) or neq(5) uses
+            the dAclIPv6AccessRuleDstPort as an operand which is the only one needed. 
+           
+            When the value of this object is range(6) needs 2 operands. One is 
+            dAclIPv6AccessRuleDstPort, which is the starting port number of the 
+            range, and the other operand is dAclIPv6AccessRuleDstPortRange, 
+            which is the ending port number of the range.
+            
+            When the value of this object is mask(7) needs 2 operands. One is 
+            dAclIPv6AccessRuleDstPort, the other operand is dAclIPv6AccessRuleDstPortMask.         
+            
+            This object is used for TCP/UDP protocol only, hence when the object
+            'dAclIPv6AccessRuleProtocol' is set to other than TCP/UDP, the object has
+            to be 'none(1)'."
+        ::= { dAclIPv6AccessRuleEntry 13 }
+     
+     dAclIPv6AccessRuleDstPort OBJECT-TYPE
+        SYNTAX      Integer32 (-1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the destination port number of TCP/UDP protocol.
+            If the value is -1, it means the value is not specified.
+            If the dAclIPv6AccessRuleDstOperator object in the same row is
+            range(6), this object will be the starting port number of the port
+            range.
+            This object only can be configured dAclIPv6AccessRuleDstOperator in
+            the same row is not 'none(1)'."
+        DEFVAL { -1 }
+        ::= { dAclIPv6AccessRuleEntry 14 }
+         
+    dAclIPv6AccessRuleDstPortRange OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The destination port number of the TCP/UDP protocol. If the
+            dAclIPv6AccessRuleDstOperator object in the same row is range(6), this
+            object will be the ending port number of the port range.
+            The value of -1 means the ending port number is not specified."        
+        ::= { dAclIPv6AccessRuleEntry 15 }
+           
+    dAclIPv6AccessRuleDscp OBJECT-TYPE        
+        SYNTAX       Integer32 (-1 | 0 .. 63)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the matching DSCP code value in IPv6 header.
+            The value of -1 means the DSCP value is not specified." 
+        DEFVAL { -1 }
+        ::= { dAclIPv6AccessRuleEntry 16 }
+    
+     dAclIPv6AccessRuleIcmpType OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the type of ICMP protocol.
+            The value of -1 means the ICMP type is not specified.
+            This object is used for ICMP protocol only, hence when the object
+            'dAclIPv6AccessRuleProtocol' is set to other than ICMP, the object has
+            to be -1."
+        DEFVAL { -1 }    
+        ::= { dAclIPv6AccessRuleEntry 17 }
+    
+    dAclIPv6AccessRuleIcmpCode OBJECT-TYPE
+        SYNTAX      Integer32 (-1 | 0..255)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the code of ICMP protocol.
+            If the value is -1, it means the value is not specified.
+            This object is used for ICMP protocol only, hence when the object
+            'dAclIPv6AccessRuleProtocol' is set to other than ICMP, the object has
+            to be -1."
+        DEFVAL { -1 }    
+        ::= { dAclIPv6AccessRuleEntry 18 }
+            
+    dAclIPv6AccessRuleTimeName  OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the name of time-period profile associated with the 
+            access-list delineating its activation period.
+            The value 'NULL' means that this rule is not bound with any Time
+            mechanism."
+        ::= { dAclIPv6AccessRuleEntry 19 }
+        
+	dAclIPv6AccRuleTcpFlag  OBJECT-TYPE
+        SYNTAX        TcpFlag
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the TCP flag fields. And this node is available only for TCP protocol. 
+            	The default value for this node is empty set, which means no TCP flag values are set.  					
+             	"
+        ::= { dAclIPv6AccessRuleEntry 20 } 
+        
+    dAclIPv6AccRuleFragments  OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object indicates the Packet fragment filtering status 
+            is  enabled('true') or disabled('false')."
+        ::= { dAclIPv6AccessRuleEntry 21 } 
+      
+    dAclIPv6AccRuleFlowLabel  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..1048575)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object indicates the Flow label value.
+            The value of -1 means the flow-label value is not specified.
+		"
+        DEFVAL { -1 }
+        ::= { dAclIPv6AccessRuleEntry 22 }  
+     
+     dAclIPv6AccRuleTrafficClass OBJECT-TYPE        
+        SYNTAX       Integer32 (-1 | 0 .. 255)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the matching traffic class value in IPv6 header.
+            The value of -1 means the traffic class value is not specified.
+            This node and dAclIPv6AccessRuleDscp cannot be specified at same time in a row.
+            " 
+        DEFVAL { -1 }
+        ::= { dAclIPv6AccessRuleEntry 23 }
+
+     dAclIPv6AccRuleUserDefProtocolMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for protocol ID defined by dAclIPv6AccessRuleUserDefProtocol. 
+             Valid values are from 0x00 to 0xFF.
+             Default value is 0xFF.
+             This node is valid only for the dAclIPv6AccessRuleUserDefProtocol specified."                     
+        ::= { dAclIPv6AccessRuleEntry 24 }
+     
+     dAclIPv6AccRuleSrcPortMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for L4 source port defined by dAclIPv6AccessRuleSrcPort. 
+             Valid values are from 0x0 to 0xFFFF.
+             Default value is 0xFFFF.
+             This object only can be configured dAclIPv6AccessRuleSrcOperator in the 
+             same row is 'mask(7)'.              
+             This node is valid only for the dAclIPv6AccessRuleSrcPort specified." 
+        ::= { dAclIPv6AccessRuleEntry 25 } 
+     
+     dAclIPv6AccRuleDstPortMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for L4 destination port defined by dAclIPv6AccessRuleDstPort. 
+             Valid values are from 0x0 to 0xFFFF.
+             Default value is 0xFFFF.
+             This object only can be configured dAclIPv6AccessRuleDstOperator in the 
+             same row is 'mask(7)'.
+             This node is valid only for the dAclIPv6AccessRuleDstPort specified."  
+        ::= { dAclIPv6AccessRuleEntry 26 } 
+     
+     dAclIPv6AccRuleDscpMask OBJECT-TYPE        
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for DSCP code defined by dAclIPv6AccessRuleDscp.
+             Valid values are from 0x0 to 0x3F.
+             Default value is 0x3F.
+             This node is valid only for the dAclIPv6AccessRuleDscp specified." 
+        ::= { dAclIPv6AccessRuleEntry 27 }
+        
+     dAclIPv6AccRuleFlowLabelMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(3))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for Flow label value defined by dAclIPv6AccRuleFlowLabel.
+             Valid values are from 0x0 to 0xFFFFF.
+             Default value is 0xFFFFF.
+             This node is valid only for the dAclIPv6AccRuleFlowLabel specified." 
+       ::= { dAclIPv6AccessRuleEntry 28 }  
+         
+     dAclIPv6AccRuleTrafficClassMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for traffic class defined by dAclIPv6AccRuleTrafficClass.
+             Valid values are from 0x0 to 0xFF.
+             Default value is 0xFF.
+             This node is valid only for the dAclIPv6AccRuleTrafficClass specified." 
+        ::= { dAclIPv6AccessRuleEntry 29 } 
+ 
+ -- -----------------------------------------------------------------------------  
+    dAclIPv6AccessGroupTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclIPv6AccessGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table represents a list of IPv6 access group configuration."
+        ::= { dAclIPv6 4 }
+
+    dAclIPv6AccessGroupEntry OBJECT-TYPE
+        SYNTAX          DAclIPv6AccessGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry in dAclIPv6AccessGroupTable contains interface specific 
+            IPv6 access list association."
+        INDEX { dAclIPv6AccessGroupIfIndex, dAclIpv6AccessGroupApplyDirection }
+        ::= { dAclIPv6AccessGroupTable 1 }
+
+    DAclIPv6AccessGroupEntry ::= SEQUENCE {
+        dAclIPv6AccessGroupIfIndex     InterfaceIndex,
+        dAclIpv6AccessGroupApplyDirection	INTEGER,
+        dAclIPv6AccessGroupStatus      RowStatus,
+        dAclIPv6AccessGroupAclName   DisplayString,
+        dAclIPv6AccessGroupAclId		Integer32
+        }
+
+    dAclIPv6AccessGroupIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the ifIndex of the interface.
+            Only physical port is valid interface."
+        ::= { dAclIPv6AccessGroupEntry 1 }
+            
+    dAclIpv6AccessGroupApplyDirection OBJECT-TYPE
+        SYNTAX      INTEGER{ 
+            				inbound(1),
+            				outbound(2)         
+       					 }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+           	"Indicates whether this ACL access list is to be attached to ingress or egress direction." 
+        ::= { dAclIPv6AccessGroupEntry 2 }
+    dAclIPv6AccessGroupStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dAclIPv6AccessGroupEntry 3 }
+
+     dAclIPv6AccessGroupAclName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The name of the IPv6 access list to be applied."
+        ::= { dAclIPv6AccessGroupEntry 4 }
+
+ 	dAclIPv6AccessGroupAclId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The ID of the IPv6 access list to be applied. 
+           	User maybe specify access list ID(by this object) or name (by 
+           	dAclIPv6AccessGroupAclName) to be applied. If both access list 
+           	ID and name are specified, the access list name specified by 
+           	dAclIPv6AccessGroupAclName will be take.
+			"
+        ::= { dAclIPv6AccessGroupEntry 5 }
+-- -----------------------------------------------------------------------------
+    dAclExpert              OBJECT IDENTIFIER ::= { dAclMIBObjects 5 }
+    dAclExpertAccessListNumber  OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "Indicates the number of entries present in the extended expert 
+            access list table."
+        ::= { dAclExpert 1 }
+
+    dAclExpertAccessListTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclExpertAccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table contains information about extended expert access list."
+        ::= { dAclExpert 2 }
+
+    dAclExpertAccessListEntry OBJECT-TYPE
+        SYNTAX          DAclExpertAccessListEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defined in dAclExpertAccessListTable. An entry is 
+            created/removed when an extended expert access list is 
+            created/deleted."
+        INDEX { dAclExpertAccessListName }
+        ::= { dAclExpertAccessListTable 1 }
+
+    DAclExpertAccessListEntry ::= SEQUENCE {
+        dAclExpertAccessListName           DisplayString,
+        dAclExpertAccessListRowStatus      RowStatus,
+        dAclExpertAccessListId		   Integer32,
+        dAclExpertAccessListCounterEnabled		TruthValue,
+        dAclExpertAccessListClearStatAction 	INTEGER,
+        dAclExpertAccessListRemark      DisplayString	
+    }
+
+    dAclExpertAccessListName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of the extended expert access list."
+        ::= { dAclExpertAccessListEntry 1 }
+
+    dAclExpertAccessListRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object allows the dynamic creation and
+             deletion of an extended expert access list."
+        ::= { dAclExpertAccessListEntry 2 }
+	
+    dAclExpertAccessListId OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The number of the extended expert access list."         
+        ::= { dAclExpertAccessListEntry 3 }
+     	    
+    dAclExpertAccessListCounterEnabled		OBJECT-TYPE
+        SYNTAX 				TruthValue
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+             "This object indicates the counter state of the access list is
+              enabled('true') or disabled('false'). And the counter just for 
+              the all interface that applied the access list in
+              dAclExpertAccessGroupTable."
+        ::= { dAclExpertAccessListEntry 4 }
+ 
+      dAclExpertAccessListClearStatAction  	OBJECT-TYPE
+        SYNTAX  			INTEGER{
+			                clear(1),
+			                noOp(2)
+            }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object is used to clear statistics of the access list when set
+            to 'clear'. No action is taken if this object is set to 'noOp'.
+            The 'clear' action just for the all interface that applied the access 
+            list in dAclExpertAccessGroupTable.
+            When read, the value 'noOp' is returned."
+        ::= { dAclExpertAccessListEntry 5 }    
+                  
+    dAclExpertAccessListRemark OBJECT-TYPE
+        SYNTAX          		DisplayString (SIZE (0..255))
+        MAX-ACCESS       read-create
+        STATUS          current
+        DESCRIPTION
+            "The description of the Expert access list."
+        ::= { dAclExpertAccessListEntry 6 }   
+                
+-- -----------------------------------------------------------------------------          
+    dAclExpertAccessRuleTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclExpertAccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table consists of a list of rules for the extended expert access list."
+        ::= { dAclExpert 3 }
+
+    dAclExpertAccessRuleEntry OBJECT-TYPE
+        SYNTAX          DAclExpertAccessRuleEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined ddAclExpertAccessRuleTable. 
+            The first instance identifier index value identifies the 
+            dAclExpertAccessListEntry that a extended expert access rule
+            (dAclExpertAccessRuleEntry) belongs to. 
+            An entry is removed from this table when its 
+            corresponding dAclExpertAccessListEntry is deleted."
+        INDEX { 
+            dAclExpertAccessListName, 
+            dAclExpertAccRuleSn 
+        }
+        ::= { dAclExpertAccessRuleTable 1 }
+
+    DAclExpertAccessRuleEntry ::= SEQUENCE {
+        dAclExpertAccRuleSn           Integer32,
+        dAclExpertAccRuleRowStatus          RowStatus,
+        dAclExpertAccRuleAction             DlinkAclRuleType,
+        dAclExpertAccRuleProtocol           INTEGER,
+        dAclExpertAccRuleUserDefProtocol    Integer32,
+        dAclExpertAccRuleSrcIpAddr          IpAddress,
+        dAclExpertAccRuleSrcIpWildcard      IpAddress,
+        dAclExpertAccRuleSrcMacAddr         MacAddress,
+        dAclExpertAccRuleSrcMacWildcard     MacAddress,
+        dAclExpertAccRuleSrcOperator        DlinkAclPortOperatorType,
+        dAclExpertAccRuleSrcPort            Integer32,
+        dAclExpertAccRuleSrcPortRange       Integer32,           
+        dAclExpertAccRuleDstIpAddr          IpAddress,
+        dAclExpertAccRuleDstIpWildcard      IpAddress,
+        dAclExpertAccRuleDstMacAddr         MacAddress,
+        dAclExpertAccRuleDstMacWildcard     MacAddress,
+        dAclExpertAccRuleDstOperator        DlinkAclPortOperatorType,
+        dAclExpertAccRuleDstPort            Integer32,
+        dAclExpertAccRuleDstPortRange       Integer32,        
+        dAclExpertAccRuleVlanID             VlanIdOrNone,   
+        dAclExpertAccRuleInnerVlanID        VlanIdOrNone,       
+        dAclExpertAccRuleQosPrecedence      Integer32,
+        dAclExpertAccRuleQosTos             Integer32,
+        dAclExpertAccRuleQosDscp            Integer32,
+        dAclExpertAccRuleIcmpType           Integer32,
+        dAclExpertAccRuleIcmpCode           Integer32,              
+        dAclExpertAccRuleTimeName          DisplayString,
+        dAclExpertAccRuleTcpFlag			TcpFlag,
+        dAclExpertAccRuleFragments			TruthValue,
+        dAclExpertAccRuleOuterCos			Integer32,
+        dAclExpertAccRuleInnerCos			Integer32,
+        dAclExpertAccRuleUserDefProtocolMask    OCTET STRING,
+        dAclExpertAccRuleSrcPortMask            OCTET STRING, 
+        dAclExpertAccRuleDstPortMask          	OCTET STRING,
+        dAclExpertAccRuleVlanIDMask             OCTET STRING,   
+        dAclExpertAccRuleInnerVlanIDMask        OCTET STRING,       
+        dAclExpertAccRuleQosPrecedenceMask      OCTET STRING,
+        dAclExpertAccRuleQosTosMask             OCTET STRING,
+        dAclExpertAccRuleQosDscpMask            OCTET STRING, 
+        dAclExpertAccRuleOuterCosMask		OCTET STRING,
+        dAclExpertAccRuleInnerCosMask		OCTET STRING,
+        dAclExpertAccRuleVlanRangeMin           VlanIdOrNone, 
+        dAclExpertAccRuleVlanRangeMax           VlanIdOrNone
+    }
+                    
+    dAclExpertAccRuleSn  OBJECT-TYPE
+        SYNTAX          Integer32 (0..65535)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "Specifies the sequence number of this rule. 
+            The lower the number is, the higher the priority of the rule.
+            The special value of 0 means the sequence number will be automatically 
+            determined by the agent."
+        ::= { dAclExpertAccessRuleEntry 1 }
+
+    dAclExpertAccRuleRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dAclExpertAccessRuleEntry 2 }
+
+    dAclExpertAccRuleAction OBJECT-TYPE
+        SYNTAX          DlinkAclRuleType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the result of the packet examination is to
+            permit or deny or prevent to CPU."            
+        ::= { dAclExpertAccessRuleEntry 3 }
+
+    dAclExpertAccRuleProtocol OBJECT-TYPE
+        SYNTAX      INTEGER { 
+            none(0),
+            userDefine(1),
+            tcp(2),
+            udp(3),                             
+            icmp(4),
+            gre(5),
+            esp(6),
+            eigrp(7),
+            igmp(8),
+            ospf(9),
+            pim(10),
+            vrrp(11),
+            ipinip(12),
+            pcp(13)       
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the IP protocol."
+        ::= { dAclExpertAccessRuleEntry 4 }
+
+    dAclExpertAccRuleUserDefProtocol OBJECT-TYPE
+        SYNTAX          Integer32 (-1 | 0..255)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the user defined protocol ID when the 
+            dAclExpertAccRuleProtocol is 'userDefine (1)'. 
+            The value of -1 means the user defined protocol ID is not
+            specified."
+        DEFVAL { -1 }                     
+        ::= { dAclExpertAccessRuleEntry 5 }
+
+    dAclExpertAccRuleSrcIpAddr OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies a source IP address."
+        ::= { dAclExpertAccessRuleEntry 6 }
+
+    dAclExpertAccRuleSrcIpWildcard OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION           
+            "This object is a wildcard bitmap to specify a group of source IP
+            addresses. The bit value 1 indicates the corresponding bit will
+            be ignored. The bit value 0 indicates the corresponding bit will be
+            checked. In other words, when the value of all 'ff'Hs indicates any
+            IP source address is specified. When the value of all '00'Hs indicates
+            host IP source address is specified."
+        ::= { dAclExpertAccessRuleEntry 7 }
+    
+    dAclExpertAccRuleSrcMacAddr OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies a source MAC address."
+        ::= { dAclExpertAccessRuleEntry 8 }
+
+    dAclExpertAccRuleSrcMacWildcard OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is a wildcard bitmap to specify a group of source
+            MAC addresses. The bit value 1 indicates the corresponding bit will
+            be ignored. The bit value 0 indicates the corresponding bit will be
+            checked. In other words, when the value of all 'ff'Hs indicates any
+            source MAC address is specified. When the value of all '00'Hs indicates
+            host source MAC address is specified."
+        ::= { dAclExpertAccessRuleEntry 9 }
+        
+    dAclExpertAccRuleSrcOperator OBJECT-TYPE
+        SYNTAX          DlinkAclPortOperatorType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates how a packet's source TCP/UDP port number is
+            compared.
+            When the value of this object is eq(2),gt(3),lt(4) or neq(5) uses
+            the dAclExpertAccsRuleSrcPort as an operand which is the only one needed. 
+           
+            When the value of this object is range(6) needs 2 operands. One is 
+            dAclExpertAccsRuleSrcPort, which is the starting port number of the 
+            range, and the other operand is dAclExpertAccsRuleSrcPortRange, 
+            which is the ending port number of the range.  
+            
+            When the value of this object is mask(7) needs 2 operands. One is 
+            dAclExpertAccsRuleSrcPort, the other operand is dAclExpertAccsRuleSrcPortMask.  
+                  
+            This object is used for TCP/UDP protocol only, hence when the object
+            'dAclExpertAccRuleProtocol' is set to other than TCP/UDP, the object has
+            to be 'none(1)'."
+        ::= { dAclExpertAccessRuleEntry 10 }
+              
+    dAclExpertAccRuleSrcPort OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the source port number of TCP/UDP protocol.
+            If the value is -1, it means the value is not specified.
+            If the dAclExpertAccsRuleSrcOperator object in the same row is
+            range(6), this object will be the starting port number of the port
+            range.
+            This object only can be configured dAclExpertAccsRuleSrcOperator in
+            the same row is not 'none(1)'."
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 11 }
+
+    dAclExpertAccRuleSrcPortRange OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The source port number of the TCP/UDP protocol. If the
+            dAclExpertAccsRuleSrcOperator object in the same row is range(6), this
+            object will be the ending port number of the port range.
+           The value of -1 means the ending port number is not specified."        
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 12 }
+        
+     dAclExpertAccRuleDstIpAddr OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "Specifies a destination IP address."
+        ::= { dAclExpertAccessRuleEntry 13 }
+
+    dAclExpertAccRuleDstIpWildcard OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "This object is a wildcard bitmap to specify a group of destination IP
+            addresses. The bit value 1 indicates the corresponding bit will
+            be ignored. The bit value 0 indicates the corresponding bit will be
+            checked. In other words, when the value of all 'ff'Hs indicates any
+            IP destination address is specified. When the value of all '00'Hs indicates
+            host IP destination address is specified."
+        ::= { dAclExpertAccessRuleEntry 14 }    
+    
+    dAclExpertAccRuleDstMacAddr  OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies a destination MAC address."
+        ::= { dAclExpertAccessRuleEntry 15 }
+
+    dAclExpertAccRuleDstMacWildcard  OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is a wildcard bitmap to specify a group of destination
+            MAC addresses. The bit value 1 indicates the corresponding bit will
+            be ignored. The bit value 0 indicates the corresponding bit will be
+            checked. In other words, when the value of all 'ff'Hs indicates any
+            destination MAC address is specified. When the value of all '00'Hs 
+            indicates host destination MAC address is specified."
+        ::= { dAclExpertAccessRuleEntry 16 }
+            
+    dAclExpertAccRuleDstOperator OBJECT-TYPE
+        SYNTAX          DlinkAclPortOperatorType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates how a packet's TCP/UDP destination port number is
+            compared.
+            When the value of this object is eq(2),gt(3),lt(4) or neq(5) uses
+            the dAclExpertAccsRuleDstPort as an operand which is the only one needed. 
+           
+            When the value of this object is range(6) needs 2 operands. One is 
+            dAclExpertAccsRuleDstPort, which is the starting port number of the 
+            range, and the other operand is dAclExpertAccsRuleDstPortRange, 
+            which is the ending port number of the range. 
+             
+            When the value of this object is mask(7) needs 2 operands. One is 
+            dAclExpertAccsRuleDstPort, the other operand is dAclExpertAccsRuleDstPortMask.  
+                  
+            This object is used for TCP/UDP protocol only, hence when the object
+            'dAclExpertAccRuleProtocol' is set to other than TCP/UDP, the object has
+            to be 'none(1)'."
+        ::= { dAclExpertAccessRuleEntry 17 }
+     
+     dAclExpertAccRuleDstPort OBJECT-TYPE
+        SYNTAX      Integer32 (-1..65535)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the destination port number of TCP/UDP protocol.
+            If the value is -1, it means the value is not specified.
+            If the dAclExpertAccsRuleDstOperator object in the same row is
+            range(6), this object will be the starting port number of the port
+            range.
+            This object only can be configured dAclExpertAccsRuleDstOperator in
+            the same row is not 'none(1)'."
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 18 }
+         
+    dAclExpertAccRuleDstPortRange OBJECT-TYPE
+        SYNTAX          Integer32 (-1..65535)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION            
+            "The destination port number of the TCP/UDP protocol. If the
+            dAclExpertAccsRuleDstOperator object in the same row is range(6), this
+            object will be the ending port number of the port range.
+            The value of -1 means the ending port number is not specified."        
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 19 }
+        
+    dAclExpertAccRuleVlanID  OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the VLAN ID. 
+            A value of zero indicates the VLAN ID is not specified."
+        DEFVAL { 0 }
+        ::= { dAclExpertAccessRuleEntry 20 }
+
+    dAclExpertAccRuleInnerVlanID  OBJECT-TYPE
+        SYNTAX          VlanIdOrNone
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the inner VLAN ID. A value of zero indicates 
+            the inner VLAN ID is not specified."
+        DEFVAL { 0 }
+        ::= { dAclExpertAccessRuleEntry 21 }
+                      
+    dAclExpertAccRuleQosPrecedence  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..7)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the value of precedence.
+             The value of -1 means the value is not specified or not applicable.                          
+             dAclExpertAccRuleQosPrecedence and dAclExpertAccRuleQosDscp cannot
+             be specified at same time in a row."
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 22 }
+  
+    dAclExpertAccRuleQosTos  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..15)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the value of type of service.
+             The value of -1 means the value is not specified or not applicable.                          
+             dAclExpertAccRuleQosTos and dAclExpertAccRuleQosDscp cannot
+             be specified at same time in a row."
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 23 } 
+    
+     dAclExpertAccRuleQosDscp  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..63)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the value of DSCP code.
+             The value of -1 means the value is not specified or not applicable.                          
+             Neither dAclExpertAccRuleQosPrecedence nor dAclExpertAccRuleQosTos
+             can be specified with dAclExpertAccRuleQosDscp at same time in a 
+             row."
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 24 } 
+     
+     dAclExpertAccRuleIcmpType OBJECT-TYPE
+        SYNTAX          Integer32 (-1 | 0..255)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the type of ICMP protocol.
+            If the value is -1, it means the value is not specified.
+            This object is used for ICMP protocol only, hence when the object
+            'dAclExpertAccRuleProtocol' is set to other than ICMP, the object has
+            to be -1."
+        DEFVAL { -1 }    
+        ::= { dAclExpertAccessRuleEntry 25 }
+    
+    dAclExpertAccRuleIcmpCode OBJECT-TYPE
+        SYNTAX          Integer32 (-1 | 0..255)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the code of ICMP protocol.
+            If the value is -1, it means the value is not specified.
+            This object is used for ICMP protocol only, hence when the object
+            'dAclExpertAccRuleProtocol' is set to other than ICMP, the object has
+            to be -1."
+        DEFVAL { -1 }    
+        ::= { dAclExpertAccessRuleEntry 26 }
+    
+    dAclExpertAccRuleTimeName  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the name of time-period profile associated with the 
+            access-list delineating its activation period. 
+            The value 'NULL' means that this rule is not bound with any Time
+            mechanism." 
+        ::= { dAclExpertAccessRuleEntry 27 }
+        
+    dAclExpertAccRuleTcpFlag  OBJECT-TYPE
+         SYNTAX       TcpFlag
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the TCP flag fields. 
+            This node is available only for TCP protocol. 
+            The default value for this node is empty set, which means no TCP flag
+            values are set.  					
+            "
+        ::= { dAclExpertAccessRuleEntry 28 } 
+        
+    dAclExpertAccRuleFragments  OBJECT-TYPE
+        SYNTAX       TruthValue
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "This object indicates the Packet fragment filtering status 
+            is  enabled('true') or disabled('false')."
+        ::= { dAclExpertAccessRuleEntry 29 } 
+        
+    dAclExpertAccRuleOuterCos  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..7)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the value of inner priority.
+             The value of -1 means the value is not specified or not applicable.                          
+         	"
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 30 }
+                
+    dAclExpertAccRuleInnerCos  OBJECT-TYPE
+        SYNTAX       Integer32 (-1 | 0..7)
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the value of inner priority, the node is availabe just for the 
+            node dAclExpertAccRuleOuterCos be specified.
+             The value of -1 means the value is not specified or not applicable.        
+         	"
+        DEFVAL { -1 }
+        ::= { dAclExpertAccessRuleEntry 31 } 
+
+     dAclExpertAccRuleUserDefProtocolMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for protocol ID defined by dAclExpertAccRuleUserDefProtocol. 
+             Valid values are from 0x00 to 0xFF.
+             Default value is 0xFF.
+             This node is valid only for the dAclExpertAccRuleUserDefProtocol specified."                    
+        ::= { dAclExpertAccessRuleEntry 32 }
+     
+     dAclExpertAccRuleSrcPortMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for L4 source port defined by dAclExpertAccRuleSrcPort. 
+             Valid values are from 0x0 to 0xFFFF.
+             Default value is 0xFFFF.
+             This object only can be configured dAclExpertAccRuleSrcOperator in the 
+             same row is 'mask(7)'.              
+             "
+        ::= { dAclExpertAccessRuleEntry 33 } 
+     
+     dAclExpertAccRuleDstPortMask OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for L4 destination port defined by dAclExpertAccRuleDstPort. 
+             Valid values are from 0x0 to 0xFFFF.
+             Default value is 0xFFFF.
+             This object only can be configured dAclExpertAccRuleDstOperator in the 
+             same row is 'mask(7)'." 
+        ::= { dAclExpertAccessRuleEntry 34 } 
+        
+     dAclExpertAccRuleVlanIDMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the mask for VLAN ID defined by dAclExpertAccRuleVlanID.
+             Valid values are from 0x0000 to 0x0FFF.
+             This node and dAclExpertAccRuleVlanRangeMin/dAclExpertAccRuleVlanRangeMax 
+             cannot be specified at same time in a row.
+             Default value is 0x0FFF.
+             This node is valid only for the dAclExpertAccRuleVlanID specified." 
+        ::= { dAclExpertAccessRuleEntry 35 }
+
+     dAclExpertAccRuleInnerVlanIDMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(2))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION  
+            "Specifies the mask for inner VLAN ID defined by dAclExpertAccRuleInnerVlanID.
+             Valid values are from 0x0000 to 0x0FFF.
+             Default value is 0x0FFF.
+             This node is valid only for the dAclExpertAccRuleInnerVlanID specified." 
+        ::= { dAclExpertAccessRuleEntry 36 }  
+        
+    dAclExpertAccRuleQosPrecedenceMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for ip precedence defined by dAclExpertAccRuleQosPrecedence.
+             Valid values are from 0x0 to 0x7.
+             Default value is 0x7.
+             This node is valid only for the dAclExpertAccRuleQosPrecedence specified." 
+        ::= { dAclExpertAccessRuleEntry 37 }
+  
+     dAclExpertAccRuleQosTosMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for type of service defined by dAclExpertAccRuleQosTos.
+             Valid values are from 0x0 to 0xF.
+             Default value is 0xF.
+             This node is valid only for the dAclExpertAccRuleQosTos specified." 
+        ::= { dAclExpertAccessRuleEntry 38 } 
+    
+     dAclExpertAccRuleQosDscpMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for DSCP code defined by dAclExpertAccRuleQosDscp.
+             Valid values are from 0x0 to 0x3F.
+             Default value is 0x3F.
+             This node is valid only for the dAclExpertAccRuleQosDscp specified." 
+        ::= { dAclExpertAccessRuleEntry 39 } 
+               
+     dAclExpertAccRuleOuterCosMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Specifies the mask for priority defined by dAclExpertAccRuleOuterCos.
+             Valid values are from 0x00 to 0x07.
+             Default value is 0x07.
+             This node is valid only for the dAclExpertAccRuleOuterCos specified." 
+         ::= { dAclExpertAccessRuleEntry 40 }
+                      
+     dAclExpertAccRuleInnerCosMask  OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(1))
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the mask for inner priority defined by dAclExpertAccRuleInnerCos.
+             Valid values are from 0x00 to 0x07.
+             Default value is 0x07.
+             This node is valid only for the dAclExpertAccRuleInnerCos specified." 
+        ::= { dAclExpertAccessRuleEntry 41 }  
+   
+      dAclExpertAccRuleVlanRangeMin  OBJECT-TYPE
+        SYNTAX       VlanIdOrNone
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the minimum outer VLAN ID of a VLAN range. A value of zero
+             indicates the VLAN range is not specified.    
+             This node and dAclMacAccessRuleVlanID/dAclMacAccessRuleVlanIDMask cannot
+             be specified at same time in a row.
+             This node is valid only for the dAclExpertAccRuleVlanRangeMax specified."
+        DEFVAL { 0 }
+        ::= { dAclExpertAccessRuleEntry 42 }
+  
+    dAclExpertAccRuleVlanRangeMax  OBJECT-TYPE
+        SYNTAX       VlanIdOrNone
+        MAX-ACCESS   read-create
+        STATUS       current
+        DESCRIPTION
+            "Specifies the maximum outer VLAN ID of a VLAN range. A value of zero
+             indicates the VLAN range is not specified.    
+             This node and dAclMacAccessRuleVlanID/dAclMacAccessRuleVlanIDMask cannot
+             be specified at same time in a row.
+             This node is valid only for the dAclExpertAccRuleVlanRangeMin specified."
+        DEFVAL { 0 }
+        ::= { dAclExpertAccessRuleEntry 43 } 
+     
+-- -----------------------------------------------------------------------------   
+    dAclExpertAccessGroupTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclExpertAccessGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table represents a list of extended expert access group 
+            configuration."
+        ::= { dAclExpert 4 }
+
+    dAclExpertAccessGroupEntry OBJECT-TYPE
+        SYNTAX          DAclExpertAccessGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry in dAclExpertAccessGroupTable contains interface specific 
+           extended expert access list association."
+        INDEX { dAclExpertAccessGroupIfIndex , dAclExpertAccessGroupApplyDirection }
+        ::= { dAclExpertAccessGroupTable 1 }
+
+    DAclExpertAccessGroupEntry ::= SEQUENCE {
+        dAclExpertAccessGroupIfIndex    InterfaceIndex,
+        dAclExpertAccessGroupApplyDirection INTEGER,
+        dAclExpertAccessGroupRowStatus  RowStatus,
+        dAclExpertAccessGroupAclName  DisplayString,
+        dAclExpertAccessGroupAclId 		Integer32
+    }
+
+    dAclExpertAccessGroupIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the ifIndex of the interface.
+            Only physical port is valid interface."
+        ::= { dAclExpertAccessGroupEntry 1 }
+
+    dAclExpertAccessGroupApplyDirection OBJECT-TYPE
+        SYNTAX      INTEGER{ 
+            				inbound(1),
+            				outbound(2)         
+       					 }
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+           	"Indicates whether this ACL access list is to be attached to ingress or egress direction." 
+	   ::= { dAclExpertAccessGroupEntry 2 }
+    dAclExpertAccessGroupRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."
+        ::= { dAclExpertAccessGroupEntry 3 }
+
+    dAclExpertAccessGroupAclName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The name of the Expert access list to be applied."             
+        ::= { dAclExpertAccessGroupEntry 4 }
+   
+    	dAclExpertAccessGroupAclId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The ID of the Expert access list to be applied. 
+           	User maybe specify access list ID(by this object) or name (by 
+           	dAclExpertAccessGroupAclName) to be applied. If both access list 
+           	ID and name are specified, the access list name specified by 
+           	dAclExpertAccessGroupAclName will be take.
+           "
+        ::= { dAclExpertAccessGroupEntry 5 }
+-- -----------------------------------------------------------------------------
+    dAclVlan             OBJECT IDENTIFIER ::= { dAclMIBObjects 6 }
+   
+    dAclVlanSubMapTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclVlanSubMapEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "The table contains a list of sub-map configuration. The first
+            instance identifier index value (dAclVlanAccMapName) identifies the
+            entry(dAclVlanSubMapEntry) belongs to.            
+            A VLAN access map can contain multiple sub-maps, the packet that
+            matches a sub-map (that is packet permitted by the associated
+            access-list) will take the action specified for the same entry. 
+            No further check against the next sub-maps is done. 
+            If the packet does not match a sub-map, then the next sub-map will
+            be checked. The checking sequence is determined by the value of
+            dAclVlanAccSubMapSeq for a same VLAN acess map."
+        ::= { dAclVlan 1}
+
+    dAclVlanSubMapEntry OBJECT-TYPE
+        SYNTAX          DAclVlanSubMapEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined dAclVlanSubMapTable. 
+            "           
+        INDEX { 
+            dAclVlanAccMapName, 
+            dAclVlanAccSubMapSeq 
+        }
+        ::= { dAclVlanSubMapTable 1 }
+
+    DAclVlanSubMapEntry ::= SEQUENCE {
+        dAclVlanAccMapName                  DisplayString,
+        dAclVlanAccSubMapSeq                Integer32,
+        dAclVlanAccSubMapRowStatus	        RowStatus,
+        dAclVlanAccSubMapMatchAclName       DisplayString,
+        dAclVlanAccessSubMapAction          INTEGER,     
+        dAclVlanAccSubMapRedirectIfIndex    InterfaceIndexOrZero,
+        dAclVlanAccSubMapMatchAclId       Integer32
+    }
+      
+     dAclVlanAccMapName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object is used to specify the name of an VLAN
+            acess map."
+        ::= { dAclVlanSubMapEntry 1 }  
+     
+     dAclVlanAccSubMapSeq OBJECT-TYPE
+        SYNTAX          Integer32 ( 0 | 1..65535 )
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the sequence number of a VLAN access rule. 
+             The value range is 1 to 65535.             
+             The value of 0 indicates the number is not specified and
+             sequence number will be automatically assigned.
+             "
+        ::= { dAclVlanSubMapEntry 2 }
+    
+    dAclVlanAccSubMapRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status variable, used according to installation
+            and removal conventions for conceptual rows."
+        ::= { dAclVlanSubMapEntry 3 }
+
+    dAclVlanAccSubMapMatchAclName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of MAC/IP/IPv6 ACL 
+            which will be associated."
+        ::= { dAclVlanSubMapEntry 4 }
+        
+     dAclVlanAccessSubMapAction OBJECT-TYPE
+         SYNTAX      INTEGER { 
+            none(1),
+            forward(2),
+            drop(3),
+            redirect(4)
+        }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the action when the packet that matches
+            a sub-map (that is packet permitted by the associated access-list). "
+        ::= { dAclVlanSubMapEntry 5 }
+     
+     dAclVlanAccSubMapRedirectIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndexOrZero
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates ifIndex of the interface the packet will be 
+            redirected.
+            When the dAclVlanAccessAction in the same row 
+            is set to other than 'redirect', the object has to be zero, 
+            which indicates the redirected interface is not specified or not
+            applicable."           
+        ::= { dAclVlanSubMapEntry 6 }
+
+    dAclVlanAccSubMapMatchAclId OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ID of MAC/IP/IPv6 ACL access list
+            which will be associated. 
+            User may specify access list ID(by this object) or name (by
+            dAclVlanAccSubMapMatchAclName) to be applied. If both access list 
+            ID and name are specified, the access list name specified by 
+            dAclVlanAccSubMapMatchAclName will be take.
+            "
+        ::= { dAclVlanSubMapEntry 7 }
+-- -----------------------------------------------------------------------------           
+    dAclVlanFilterTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclVlanFilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The table represents a list of VLAN access map configuration."
+        ::= { dAclVlan 2 }
+
+    dAclVlanFilterEntry OBJECT-TYPE
+        SYNTAX          DAclVlanFilterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "An entry in dAclVlanFilterTable contains vlan-specific 
+            VLAN access map association."
+        INDEX { dAclVlanFilterVlanId }
+        ::= { dAclVlanFilterTable 1 }
+
+    DAclVlanFilterEntry ::= SEQUENCE {
+        dAclVlanFilterVlanId            VlanId,
+        dAclVlanFilterRowStatus         RowStatus,
+        dAclVlanFilterVlanAccMapName    DisplayString
+       
+    }
+
+    dAclVlanFilterVlanId OBJECT-TYPE
+        SYNTAX      VlanId
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the VLAN ID of the entry. "
+        ::= { dAclVlanFilterEntry 1 }
+
+    dAclVlanFilterRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dAclVlanFilterEntry 2 }
+
+    dAclVlanFilterVlanAccMapName OBJECT-TYPE
+        SYNTAX      DisplayString (SIZE (1..32))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The name of the access list to be applied for the VLAN.
+             NULL value indicates the access list is not specified."
+        ::= { dAclVlanFilterEntry 3 }
+        
+-- -----------------------------------------------------------------------------
+    dAclVlanAccessMapTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclVlanAccessMapEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION            
+            "The table contains a list of VLAN access map configuration. "
+        ::= { dAclVlan 3}
+
+    dAclVlanAccessMapEntry OBJECT-TYPE
+        SYNTAX          DAclVlanAccessMapEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined dAclVlanAccessMapTable. 
+            "           
+        INDEX { 
+            dAclVlanAccMapName             
+        }
+        ::= { dAclVlanAccessMapTable 1 }
+
+    DAclVlanAccessMapEntry ::= SEQUENCE {
+        dAclVlanAccessMapCounterEnabled       TruthValue,
+        dAclVlanAccessMapClearStatAction 		INTEGER
+    }
+    
+    dAclVlanAccessMapCounterEnabled OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "This object indicates the counter state of the VLAN access map 
+             is enabled('true') or disabled('false').
+             The counter state setting just for the all VLAN interface that applied
+             the access map in dAclVlanFilterTable."
+        ::= { dAclVlanAccessMapEntry 1 }
+ 
+    dAclVlanAccessMapClearStatAction  	OBJECT-TYPE
+        SYNTAX  			INTEGER{
+			                clear(1),
+			                noOp(2)
+            }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object is used to clear statistics of the VLAN access map 
+            when set to 'clear'. No action is taken if this object is set to 'noOp'.
+             The 'clear' action just for the all entry that applied the VLAN 
+             access map in dAclVlanFilterTable.
+            When read, the value 'noOp' is returned."
+        ::= { dAclVlanAccessMapEntry 2 }    
+        
+-- -----------------------------------------------------------------------------
+    dAclCounter             OBJECT IDENTIFIER ::= { dAclMIBObjects 7 }
+    
+    dAclAccessGroupCounterTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclAccessGroupCounterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION    
+       	   "This table maintains counter information associated with 
+       	   a specific access list rule in the access rule table. 
+       	   Please refer to the dAclMacAccessRuleTable, dAclIpAccessRuleTable,
+       	   dAclIPv6AccessRuleTable and dAclExpertAccessRuleTable for 
+       	   detailed ACL rule information.
+       	   "
+        ::= { dAclCounter 1}
+
+    dAclAccessGroupCounterEntry OBJECT-TYPE
+        SYNTAX          DAclAccessGroupCounterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined dAclAccessGroupCounterTable.
+            "           
+        INDEX { 
+            dAclAccessGroupCounterAccListId, 
+            dAclAccessGroupCounterAccRuleSn 
+        }
+        ::= { dAclAccessGroupCounterTable 1 }
+
+    DAclAccessGroupCounterEntry ::= SEQUENCE {
+        dAclAccessGroupCounterAccListId      Integer32,
+        dAclAccessGroupCounterAccRuleSn      Integer32,
+        dAclAccessGroupCounterIngressStat  Counter64,
+        dAclAccessGroupCounterEgressStat  Counter64
+    }
+
+     dAclAccessGroupCounterAccListId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The ID of an access list which access group counter enabled.
+            the access list was defined by the tables:
+            dAclMacAccessListTable, dAclIpAccessListTable,
+            dAclIPv6AccessListTable, dAclExpertAccessListTable."
+        ::= { dAclAccessGroupCounterEntry 1 }
+
+     dAclAccessGroupCounterAccRuleSn OBJECT-TYPE
+        SYNTAX      Integer32(1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Specifies the sequence number of this rule entry as related to the
+             dAclAccessGroupCounterAccListId."
+        ::= { dAclAccessGroupCounterEntry 2 }
+        
+     dAclAccessGroupCounterIngressStat OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the total number of matched packets for the access rule
+            applied on inbound of all interface in dAclMacAccessGroupTable,
+            dAclIpAccessGroupTable, dAclIPv6AccessGroupTable, or 
+            dAclExpertAccessGroupTable.
+            "
+        ::= { dAclAccessGroupCounterEntry 3 }
+        
+     dAclAccessGroupCounterEgressStat OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the total number of matched packets for the access rule
+            applied on outbound of all interface in dAclMacAccessGroupTable,
+            dAclIpAccessGroupTable, dAclIPv6AccessGroupTable, or 
+            dAclExpertAccessGroupTable.
+            "
+        ::= { dAclAccessGroupCounterEntry 4 }
+        
+-- -----------------------------------------------------------------------------
+    dAclVlanFilterCounterTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DAclVlanFilterCounterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+       	   "This table maintains counter information associated with
+       	   a specific access sub map in the dAclVlanSubMapTable.        	
+       	   "
+        ::= { dAclCounter 2}
+
+    dAclVlanFilterCounterEntry OBJECT-TYPE
+        SYNTAX          DAclVlanFilterCounterEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry is defined dAclVlanFilterCounterTable.
+            "
+        INDEX {
+            dAclVlanFilterCounterAccMapName,
+            dAclVlanFilterCounterSubMapSeq
+        }
+        ::= { dAclVlanFilterCounterTable 1 }
+
+    DAclVlanFilterCounterEntry ::= SEQUENCE {
+        dAclVlanFilterCounterAccMapName    DisplayString,
+        dAclVlanFilterCounterSubMapSeq     Integer32,
+        dAclVlanFilterCounterStatistics  Counter64
+        }
+
+    dAclVlanFilterCounterAccMapName OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE (1..32))
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "The name of a VLAN access map which counter enabled. the VLAN
+            access map was defined by the dAclVlanSubMapTable.
+            "
+        ::= { dAclVlanFilterCounterEntry 1 }
+
+    dAclVlanFilterCounterSubMapSeq OBJECT-TYPE
+        SYNTAX      Integer32(1..65535)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Indicates the sequence number of a VLAN access sub map. the vlan
+            sub map sequence number was defined by the dAclVlanSubMapTable."
+        ::= { dAclVlanFilterCounterEntry 2 }
+        
+    dAclVlanFilterCounterStatistics OBJECT-TYPE
+        SYNTAX  Counter64
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the total number of matched packets for the
+            sub map that applied on all VLAN interface in dAclVlanFilterTable."
+        ::= { dAclVlanFilterCounterEntry 3 }
+
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	dAclCompliances OBJECT IDENTIFIER ::= { dAclMIBConformance 1 }
+		
+	dAclCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-ACL-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dAclGenGroup,
+		    dAclMacGroup,
+		    dAclIpGroup
+		}
+		
+		GROUP       dAclIPv6Group 
+           DESCRIPTION 
+              "This group is required only if the IPv6 access list feature
+              is implemented by the agent."
+		
+		GROUP       dAclExpertGroup 
+           DESCRIPTION 
+              "This group is required only if the extended expert access list
+              feature is implemented by the agent."
+				
+		GROUP       dAclVlanFilterGroup 
+           DESCRIPTION 
+              "This group is required only if vlan filter feature is implemented
+              by the agent."
+		::= { dAclCompliances 1 }
+		
+	dAclGroups OBJECT IDENTIFIER ::= { dAclMIBConformance 2 }
+	
+	dAclGenGroup OBJECT-GROUP
+		OBJECTS { 
+			dAclReSeqStartingNumber, dAclReSeqIncrement 
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing general access list configuration."
+		::= { dAclGroups 1 }
+	
+	dAclMacGroup OBJECT-GROUP
+		OBJECTS { 
+		    dAclMacAccessListNumber, dAclMacAccessListRowStatus, 
+		    dAclMacAccessListId, dAclMacAccessListCounterEnabled,
+		    dAclMacAccessListClearStatAction,dAclMacAccessListRemark,
+		    dAclMacAccessRuleRowStatus, dAclMacAccessRuleAction, 
+		    dAclMacAccessRuleSrcMacAddr, dAclMacAccessRuleSrcMacWildcard, 
+		    dAclMacAccessRuleDstMacAddr, dAclMacAccessRuleDstMacWildcard, 
+		    dAclMacAccessRulePacketType, dAclMacAccessRuleEthernetType, 
+		    dAclMacAccessRuleLlcDSAP, dAclMacAccessRuleLlcSSAP, 
+		    dAclMacAccessRuleLlcCntl, 
+		    dAclMacAccessRuleDot1p, dAclMacAccessRuleInnerDot1p, 
+		    dAclMacAccessRuleVlanID, dAclMacAccessRuleInnerVlanID, 
+		    dAclMacAccessRuleTimeName, 
+		    dAclMacAccessGroupRowStatus, 
+		    dAclMacAccessGroupAclName,dAclMacAccessGroupAclId 			
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing MAC access list configuration."
+		::= { dAclGroups 2 }
+					
+	dAclIpGroup OBJECT-GROUP
+		OBJECTS { 
+		    dAclIpAccessListNumber, dAclIpAccessListRowStatus, 
+		    dAclIpAccessExtended, dAclIpAccessListId,
+		    dAclIpAccessListCounterEnabled, dAclIpAccessListClearStatAction,
+		    dAclIpAccessListRemark, 
+		    dAclIpAccessRuleRowStatus, dAclIpAccessRuleAction, 
+		    dAclIpAccessRuleProtocol, dAclIpAccessRuleUserDefProtocol, 
+		    dAclIpAccessRuleSrcAddr, dAclIpAccessRuleSrcWildcard, 		    
+			dAclIpAccessRuleDstAddr, dAclIpAccessRuleDstWildcard, 
+			dAclIpAccessRuleSrcOperator, dAclIpAccessRuleSrcPort, 
+			dAclIpAccessRuleSrcPortRange, 
+			dAclIpAccessRuleDstOperator, dAclIpAccessRuleDstPort,
+			dAclIpAccessRuleDstPortRange, 
+			dAclIpAccessRuleQosPrecedence, dAclIpAccessRuleQosTos, 
+			dAclIpAccessRuleQosDscp,
+			dAclIpAccessRuleIcmpType, dAclIpAccessRuleIcmpCode, 
+			dAclIpAccessRuleTimeName, dAclIpAccRuleTcpFlag,
+			dAclIpAccRuleFragments,
+			dAclIpAccessGroupStatus, 
+			dAclIpAccessGroupAclName, dAclIpAccessGroupAclId
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing IP access list configuration."
+		::= { dAclGroups 3 }
+		
+	dAclIPv6Group OBJECT-GROUP
+		OBJECTS { 		    
+		    dAclIPv6AccessListNumber, dAclIPv6AccessListRowStatus, 
+		    dAclIPv6AccessExtended, dAclIPv6AccessListId,
+		    dAclIPv6AccessListCounterEnabled,
+		    dAclIPv6AccessListClearStatAction,
+		    dAclIPv6AccessListRemark,        
+		    dAclIPv6AccessRuleRowStatus, dAclIPv6AccessRuleAction, 
+			dAclIPv6AccessRuleProtocol, dAclIPv6AccessRuleUserDefProtocol, 
+			dAclIPv6AccessRuleSrcAddr, dAclIPv6AccessRuleSrcPrefixLen, 			
+			dAclIPv6AccessRuleDstAddr, dAclIPv6AccessRuleDstPrefixLen, 
+			dAclIPv6AccessRuleSrcOperator, dAclIPv6AccessRuleSrcPort, 
+			dAclIPv6AccessRuleSrcPortRange, 
+			dAclIPv6AccessRuleDstOperator, dAclIPv6AccessRuleDstPort, 
+			dAclIPv6AccessRuleDstPortRange, 
+			dAclIPv6AccessRuleDscp, 
+			dAclIPv6AccessRuleIcmpType, dAclIPv6AccessRuleIcmpCode, 
+			dAclIPv6AccessRuleTimeName, 
+			dAclIPv6AccessGroupStatus, 
+			dAclIPv6AccessGroupAclName,dAclIPv6AccessGroupAclId,
+			dAclIPv6AccRuleTcpFlag, 
+        		dAclIPv6AccRuleFragments,
+        		dAclIPv6AccRuleFlowLabel
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing IPv6 access list configuration."
+		::= { dAclGroups 4 }    
+	
+	dAclExpertGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dAclExpertAccessListNumber, dAclExpertAccessListRowStatus, 
+		    dAclExpertAccessListId, dAclExpertAccessListCounterEnabled,
+		    dAclExpertAccessListClearStatAction, dAclExpertAccessListRemark,       
+		    dAclExpertAccRuleRowStatus, dAclExpertAccRuleAction,  
+		    dAclExpertAccRuleProtocol, dAclExpertAccRuleUserDefProtocol, 
+		    dAclExpertAccRuleSrcIpAddr, dAclExpertAccRuleSrcIpWildcard, 
+		    dAclExpertAccRuleSrcMacAddr, dAclExpertAccRuleSrcMacWildcard, 
+		    dAclExpertAccRuleSrcOperator, dAclExpertAccRuleSrcPort, 
+		    dAclExpertAccRuleSrcPortRange, 
+		    dAclExpertAccRuleDstIpAddr, dAclExpertAccRuleDstIpWildcard, 
+		    dAclExpertAccRuleDstMacAddr, dAclExpertAccRuleDstMacWildcard, 
+		    dAclExpertAccRuleDstOperator, dAclExpertAccRuleDstPort, 
+		    dAclExpertAccRuleDstPortRange, 
+		    dAclExpertAccRuleVlanID, dAclExpertAccRuleInnerVlanID, 
+		    dAclExpertAccRuleQosPrecedence, dAclExpertAccRuleQosTos, 
+		    dAclExpertAccRuleQosDscp,
+			dAclExpertAccRuleIcmpType, dAclExpertAccRuleIcmpCode, 
+			dAclExpertAccRuleTimeName, 
+			dAclExpertAccessGroupRowStatus, 
+			dAclExpertAccessGroupAclName,dAclExpertAccessGroupAclId,
+			dAclExpertAccRuleTcpFlag,
+        		dAclExpertAccRuleFragments,
+        		dAclExpertAccRuleOuterCos,
+        		dAclExpertAccRuleInnerCos
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing extended expert access list configuration."
+		::= { dAclGroups 5 } 
+
+    dAclVlanFilterGroup OBJECT-GROUP
+		OBJECTS { 		    		   
+		   dAclVlanAccSubMapRowStatus, dAclVlanAccSubMapMatchAclName, 
+		   dAclVlanAccessSubMapAction, dAclVlanAccSubMapRedirectIfIndex, 
+		   dAclVlanFilterRowStatus, dAclVlanFilterVlanAccMapName,
+		   dAclVlanAccSubMapMatchAclId, dAclVlanAccessMapCounterEnabled,
+		   dAclVlanAccessMapClearStatAction 		   
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing VLAN access map configuration."			
+		::= { dAclGroups 6 }		
+		
+	dAclCounterGroup OBJECT-GROUP
+		OBJECTS { 		    		   
+		   dAclAccessGroupCounterIngressStat,
+		   dAclAccessGroupCounterEgressStat,
+		   dAclVlanFilterCounterStatistics 	
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing ACL counter information."			
+		::= { dAclGroups 7 }		
+END
+
+

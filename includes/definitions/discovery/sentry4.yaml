@@ -1,0 +1,491 @@
+mib: Sentry4-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - st4InputCordName
+                    - st4LineLabel
+                    - st4PhaseLabel
+                    - st4OcpLabel
+                    - st4BranchLabel
+        current:
+            data:
+                -
+                    oid: st4LineCurrent
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.4.3.1.3.{{ $index }}'
+                    index: 'st4LineCurrent.{{ $index }}'
+                    descr: Line, {{ $st4LineLabel }}, Current
+                    divisor: 100
+                -
+                    oid: st4PhaseCurrent
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.6.{{ $index }}'
+                    index: 'st4PhaseCurrent.{{ $index }}'
+                    descr: Phase, {{ $st4PhaseLabel }}, Current
+                    divisor: 100
+        frequency:
+            data:
+                -
+                    oid: st4InputCordFrequency
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.11.{{ $index }}'
+                    index: 'st4InputCord.{{ $index }}'
+                    descr: Line, {{ $st4InputCordName }}, Frequency
+                    divisor: 10
+        power:
+            data:
+                -
+                    oid: st4InputCordActivePower
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.3.{{ $index }}'
+                    index: 'st4InputCord.{{ $index }}'
+                    descr: Cord, {{ $st4InputCordName }}, Active Power
+                    divisor: 0
+                -
+                    oid: st4PhaseActivePower
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.8.{{ $index }}'
+                    index: 'st4PhaseActivePower.{{ $index }}'
+                    descr: Phase, {{ $st4PhaseLabel }}, Active Power
+                    divisor: 0
+        voltage:
+            data:
+                -
+                    oid: st4PhaseVoltage
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.3.{{ $index }}'
+                    index: 'st4PhaseVoltage.{{ $index }}'
+                    descr: Phase, {{ $st4PhaseLabel }}, Voltage
+                    divisor: 10
+        state:
+            data:
+                -
+                    oid: st4UnitStatus
+                    value: st4UnitStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.2.3.1.1.{{ $index }}'
+                    descr: Unit Status
+                    index: 'st4UnitStatus.{{ $index }}'
+                    state_name: st4UnitStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4InputCordState
+                    value: st4InputCordState
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.1.{{ $index }}'
+                    descr: Input Cord State
+                    index: 'st4InputCordState.{{ $index }}'
+                    state_name: st4InputCordState
+                    states:
+                        - { descr: unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: on, graph: 0, value: 1, generic: 0 }
+                        - { descr: off, graph: 0, value: 2, generic: 3 }
+                -
+                    oid: st4InputCordStatus
+                    value: st4InputCordStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.2.{{ $index }}'
+                    descr: Input Cord Status
+                    index: 'st4InputCordStatus.{{ $index }}'
+                    state_name: st4InputCordStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4InputCordActivePowerStatus
+                    value: st4InputCordActivePowerStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.4.{{ $index }}'
+                    descr: Input Cord Active Power Status
+                    index: 'st4InputCordActivePowerStatus.{{ $index }}'
+                    state_name: st4InputCordActivePowerStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4InputCordApparentPowerStatus
+                    value: st4InputCordApparentPowerStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.6.{{ $index }}'
+                    descr: Input Cord Apparent Power Status
+                    index: 'st4InputCordApparentPowerStatus.{{ $index }}'
+                    state_name: st4InputCordApparentPowerStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4InputCordPowerFactorStatus
+                    value: st4InputCordPowerFactorStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.9.{{ $index }}'
+                    descr: Input Cord Power Factor Status
+                    index: 'st4InputCordPowerFactorStatus.{{ $index }}'
+                    state_name: st4InputCordPowerFactorStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4InputCordOutOfBalanceStatus
+                    value: st4InputCordOutOfBalanceStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.3.3.1.13.{{ $index }}'
+                    descr: Input Out Of Balance Status
+                    index: 'st4InputCordOutOfBalanceStatus.{{ $index }}'
+                    state_name: st4InputCordOutOfBalanceStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4LineState
+                    value: st4LineState
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.4.3.1.1.{{ $index }}'
+                    descr: Line {{ $st4LineLabel }} State
+                    index: 'st4LineState.{{ $index }}'
+                    state_name: st4LineState
+                    states:
+                        - { descr: unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: on, graph: 0, value: 1, generic: 0 }
+                        - { descr: off, graph: 0, value: 2, generic: 3 }
+                -
+                    oid: st4LineStatus
+                    value: st4LineStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.4.3.1.2.{{ $index }}'
+                    descr: Line {{ $st4LineLabel }} Status
+                    index: 'st4LineStatus.{{ $index }}'
+                    state_name: st4LineStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4PhaseState
+                    value: st4PhaseState
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.1.{{ $index }}'
+                    descr: Phase {{ $st4PhaseLabel }} State
+                    index: 'st4PhaseState.{{ $index }}'
+                    state_name: st4PhaseState
+                    states:
+                        - { descr: unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: on, graph: 0, value: 1, generic: 0 }
+                        - { descr: off, graph: 0, value: 2, generic: 3 }
+                -
+                    oid: st4PhaseStatus
+                    value: st4PhaseStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.2.{{ $index }}'
+                    descr: Phase {{ $st4PhaseLabel }} Status
+                    index: 'st4PhaseStatus.{{ $index }}'
+                    state_name: st4PhaseStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4PhaseVoltageStatus
+                    value: st4PhaseVoltageStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.4.{{ $index }}'
+                    descr: Phase {{ $st4PhaseLabel }} Voltage Status
+                    index: 'st4PhaseVoltageStatus.{{ $index }}'
+                    state_name: st4PhaseVoltageStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4PhasePowerFactorStatus
+                    value: st4PhasePowerFactorStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.5.3.1.11.{{ $index }}'
+                    descr: Phase {{ $st4PhaseLabel }} Power Factor Status
+                    index: 'st4PhasePowerFactorStatus.{{ $index }}'
+                    state_name: st4PhasePowerFactorStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4OcpStatus
+                    value: st4OcpStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.6.3.1.1.{{ $index }}'
+                    descr: Over-current Protector {{ $st4OcpLabel }} Status
+                    index: 'st4OcpStatus.{{ $index }}'
+                    state_name: st4OcpStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4BranchState
+                    value: st4BranchState
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.7.3.1.1.{{ $index }}'
+                    descr: Branch {{ $st4OcpLabel }} State
+                    index: 'st4BranchState.{{ $index }}'
+                    state_name: st4BranchState
+                    states:
+                        - { descr: unknown, graph: 0, value: 0, generic: 3 }
+                        - { descr: on, graph: 0, value: 1, generic: 0 }
+                        - { descr: off, graph: 0, value: 2, generic: 3 }
+                -
+                    oid: st4BranchStatus
+                    value: st4BranchStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.7.3.1.2.{{ $index }}'
+                    descr: Branch {{ $st4OcpLabel }} Status
+                    index: 'st4BranchStatus.{{ $index }}'
+                    state_name: st4BranchStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }
+                -
+                    oid: st4BranchCurrentStatus
+                    value: st4BranchCurrentStatus
+                    num_oid: '.1.3.6.1.4.1.1718.4.1.7.3.1.4.{{ $index }}'
+                    descr: Branch Current {{ $st4OcpLabel }} Status
+                    index: 'st4BranchCurrentStatus.{{ $index }}'
+                    state_name: st4BranchCurrentStatus
+                    states:
+                        - { descr: normal, graph: 1, value: 0, generic: 0 }
+                        - { descr: disabled, graph: 1, value: 1, generic: 3 }
+                        - { descr: purged, graph: 1, value: 2, generic: 2 }
+                        - { descr: reading, graph: 1, value: 5, generic: 2 }
+                        - { descr: settle, graph: 1, value: 6, generic: 1 }
+                        - { descr: notFound, graph: 1, value: 7, generic: 3 }
+                        - { descr: lost, graph: 1, value: 8, generic: 1 }
+                        - { descr: readError, graph: 1, value: 9, generic: 1 }
+                        - { descr: noComm, graph: 1, value: 10, generic: 1 }
+                        - { descr: pwrError, graph: 1, value: 11, generic: 2 }
+                        - { descr: breakerTripped, graph: 1, value: 12, generic: 2 }
+                        - { descr: fuseBlown, graph: 1, value: 13, generic: 2 }
+                        - { descr: lowAlarm, graph: 1, value: 14, generic: 2 }
+                        - { descr: lowWarning, graph: 1, value: 15, generic: 1 }
+                        - { descr: highWarning, graph: 1, value: 16, generic: 1 }
+                        - { descr: highAlarm, graph: 1, value: 17, generic: 2 }
+                        - { descr: alarm, graph: 1, value: 18, generic: 2 }
+                        - { descr: underLimit, graph: 1, value: 19, generic: 1 }
+                        - { descr: overLimit, graph: 1, value: 20, generic: 1 }
+                        - { descr: nvmFail, graph: 1, value: 21, generic: 2 }
+                        - { descr: profileError, graph: 1, value: 22, generic: 2 }
+                        - { descr: conflict, graph: 1, value: 23, generic: 2 }

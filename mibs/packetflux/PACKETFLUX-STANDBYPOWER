@@ -1,0 +1,642 @@
+PACKETFLUX-STANDBYPOWER DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY, Integer32, OBJECT-TYPE,
+    Gauge32, TimeTicks
+        FROM SNMPv2-SMI
+    packetfluxMgmt
+        FROM PACKETFLUX-SMI
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TruthValue
+        FROM SNMPv2-TC;
+
+    standbypower MODULE-IDENTITY
+        LAST-UPDATED        "201306041649Z"
+        ORGANIZATION        "PacketFlux Technologies"
+        CONTACT-INFO        "custsvc@packetflux.com                        
+                            http://www.packetflux.com"
+        DESCRIPTION         "MIB for the PacketFlux Standby Power Controller"
+
+        REVISION            "201306041649Z"
+        DESCRIPTION         "initial version of this module"
+        ::= { packetfluxMgmt 2 }
+
+
+    powercontrollerstate OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                onprimarypower( 1 ),
+                                startingstandby( 2 ),
+                                transferringtostandby( 3 ),
+                                onstandbypower( 4 ),
+                                transferringtoprimary( 5 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The status of the standby power controller."
+        ::= { standbypower 1 }
+
+    transferswitchstate OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                primary( 1 ),
+                                transfertostandby1( 2 ),
+                                transfertostandby2( 3 ),
+                                transfertostandby3( 4 ),
+                                standby( 5 ),
+                                transfertoprimary1( 6 ),
+                                transfertoprimary2( 7 ),
+                                transfertoprimary3( 8 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The current state in the transfer sequence."
+        ::= { standbypower 2 }
+
+    standbypowerstate OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                stopped( 1 ),
+                                prepare1( 2 ),
+                                prepare2( 3 ),
+                                prepare3( 4 ),
+                                startup1( 5 ),
+                                startup2( 6 ),
+                                startup3( 7 ),
+                                checkrun( 8 ),
+                                reprepare1( 9 ),
+                                reprepare2( 10 ),
+                                reprepare3( 11 ),
+                                warmup1( 12 ),
+                                warmup2( 13 ),
+                                warmup3( 14 ),
+                                verifyrun( 15 ),
+                                running( 16 ),
+                                cooldown1( 17 ),
+                                cooldown2( 18 ),
+                                cooldown3( 19 ),
+                                shutdown1( 20 ),
+                                shutdown2( 21 ),
+                                shutdown3( 22 ),
+                                verifystopped( 23 ),
+                                postshutdown1( 24 ),
+                                postshutdown2( 25 ),
+                                postshutdown3( 26 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The current state in the standby power sequence."
+        ::= { standbypower 3 }
+
+    ac1voltage OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The voltage of the AC input AC1 in 1/10ths of
+                            a volt."
+        ::= { standbypower 4 }
+
+    ac1frequency OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The frequency of the AC input AC1 in 1/100ths
+                            of a Hertz."
+        ::= { standbypower 5 }
+
+    ac2voltage OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The voltage of the AC input AC2 in 1/10ths of
+                            a volt."
+        ::= { standbypower 6 }
+
+    ac2frequency OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The frequency of the AC input AC2 in 1/100ths
+                            of a Hertz."
+        ::= { standbypower 7 }
+
+    mtr1voltage OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The voltage of the DC input Mtr1 in 1/10ths of
+                            a volt."
+        ::= { standbypower 8 }
+
+    mtr2voltage OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The voltage of the DC input Mtr2 in 1/10ths of
+                            a volt."
+        ::= { standbypower 9 }
+
+    pwr1voltage OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The voltage of the DC input Pwr3 in 1/10ths of
+                            a volt."
+        ::= { standbypower 10 }
+
+    pwr2voltage OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The voltage of the DC input Pwr2 in 1/10ths of
+                            a volt."
+        ::= { standbypower 11 }
+
+    shuntvoltage OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The voltage of the DC input Shunt in 1/10ths of
+                            a millivolt. Can be negative."
+        ::= { standbypower 12 }
+
+    temperature OBJECT-TYPE
+        SYNTAX              Gauge32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The temperature of the onboard temperature sensor
+                            in 1/10ths of a degree centigrade."
+        ::= { standbypower 13 }
+
+    recentunsuccessfulstarts OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The number of times the standby power source was
+                            not successfully started. This counter resets
+                            upon a successful start. It can also be reset
+                            via the web interface or by writing 0 to this
+                            object."
+        ::= { standbypower 14 }
+
+    totalunsuccessfulstarts OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The number of times the standby power source was
+                            not successfully started. This counter DOES NOT
+                            reset upon a successful start. It can be reset
+                            via the web interface or by writing 0 to this
+                            object."
+        ::= { standbypower 15 }
+
+    recentstalls OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The number of times the standby power source has
+                            stalled. This counter resets upon a clean shutdown.
+                            It can also be reset via the web interface or
+                            by writing 0 to this object."
+        ::= { standbypower 16 }
+
+    totalstalls OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The number of times the standby power source has
+                            stalled. This counter DOES NOT reset upon a clean
+                            shutdown. It can be reset via the web interface
+                            or by writing 0 to this object."
+        ::= { standbypower 17 }
+
+    numberofstarts OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The number of times the secondary power source
+                            has started. This counter increments when the
+                            standby sequence reaches the running state. This
+                            counter can be reset via the web interface or
+                            by writing 0 to this object."
+        ::= { standbypower 18 }
+
+    numberoftransfers OBJECT-TYPE
+        SYNTAX              Integer32
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The number of times the power has transfered from
+                            primary to standby, or back. A complete transfer
+                            cycle from primary to standby and back to primary
+                            will increment this counter twice. This counter
+                            can be reset via the web interface or by writing
+                            0 to this object."
+        ::= { standbypower 19 }
+
+    currenttimeonprimary OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time the transfer switch has been
+                            in the primary state (position) since the most
+                            recent transfer to that state. This timer resets
+                            to zero when the transfer switch leaves the primary
+                            state (position). This timer can be reset via
+                            the web interface or by writing 0 to this object."
+        ::= { standbypower 20 }
+
+    totaltimeonprimary OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time the transfer switch has been
+                            in the primary state (position) since power on
+                            or the last reset of this counter. This timer
+                            does not automatically reset. This timer can
+                            be reset via the web interface or by writing
+                            0 to this object."
+        ::= { standbypower 21 }
+
+    currenttimeonstandby OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time the transfer switch has been
+                            in the standby state (position) since the most
+                            recent transfer to that state. This timer resets
+                            to zero when the transfer switch leaves the primary
+                            state (position). This timer can be reset via
+                            the web interface or by writing 0 to this object."
+        ::= { standbypower 22 }
+
+    totaltimeonstandby OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time the transfer switch has been
+                            in the standby state (position) since power on
+                            or the last reset of this counter. This timer
+                            does not automatically reset. This timer can
+                            be reset via the web interface or by writing
+                            0 to this object."
+        ::= { standbypower 23 }
+
+    currentstandbyruntime OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time the standby power source has
+                            been running during it's current run. This timer
+                            resets to zero when the standby power source
+                            shuts down. This timer can be reset via the web
+                            interface or by writing 0 to this object."
+        ::= { standbypower 24 }
+
+    totalstandbyruntime OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time the standby power source has
+                            been running since power on or the last reset
+                            of this counter. This timer does not automatically
+                            reset. This timer can be reset via the web interface
+                            or by writing 0 to this object."
+        ::= { standbypower 25 }
+
+    laststandbyrun OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time since the standby power source
+                            ran last. This timer resets upon start of the
+                            standby power source and starts timing upon shutdown
+                            of the standby power source. This timer can be
+                            reset via the web interface or by writing 0 to
+                            this object."
+        ::= { standbypower 26 }
+
+    laststandbygracefulstop OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time since standby power source
+                            was gracefully shutdown. This timer resets and
+                            starts timing upon graceful shutdown of the standby
+                            power source. This timer can be reset via the
+                            web interface or by writing 0 to this object."
+        ::= { standbypower 27 }
+
+    laststandbyunsuccessfulstart OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time since the last failed start
+                            of the standby power source . This timer resets
+                            and starts timing upon a unsuccessful start of
+                            the power source. This timer can be reset via
+                            the web interface or by writing 0 to this object."
+        ::= { standbypower 28 }
+
+    laststandbyfailure OBJECT-TYPE
+        SYNTAX              TimeTicks
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "The amount of time since the stall or failure
+                            while running of the standby power source . This
+                            timer resets and starts timing upon a stall/failure
+                            of the power source. This timer can be reset
+                            via the web interface or by writing 0 to this
+                            object."
+        ::= { standbypower 29 }
+
+    switch1closed OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Switch 1 input is closed (shorted/on).
+                            False(2) if it is open."
+        ::= { standbypower 30 }
+
+    switch2closed OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Switch 2 input is closed (shorted/on).
+                            False(2) if it is open."
+        ::= { standbypower 31 }
+
+    switch3closed OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Switch 3 input is closed (shorted/on).
+                            False(2) if it is open."
+        ::= { standbypower 32 }
+
+    switch4closed OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Switch 4 input is closed (shorted/on).
+                            False(2) if it is open."
+        ::= { standbypower 33 }
+
+    switch5closed OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Switch 5 input is closed (shorted/on).
+                            False(2) if it is open."
+        ::= { standbypower 34 }
+
+    enabled OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the enable input is closed (shorted/on).
+                            False(2) if it is open."
+        ::= { standbypower 35 }
+
+    relay1on OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Relay 1 ouput is on (C and NO connected).
+                            False(2) if it is off (C and NC connected)."
+        ::= { standbypower 36 }
+
+    relay2on OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Relay 2 ouput is on (C and NO connected).
+                            False(2) if it is off (C and NC connected)."
+        ::= { standbypower 37 }
+
+    relay3on OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Relay 3 ouput is on (C and NO connected).
+                            False(2) if it is off (C and NC connected)."
+        ::= { standbypower 38 }
+
+    relay4on OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Relay 4 ouput is on (C and NO connected).
+                            False(2) if it is off (C and NC connected)."
+        ::= { standbypower 39 }
+
+    relay5on OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Relay 5 output is on (C and NO
+                            connected). False(2) if it is off (C and NC connected)."
+        ::= { standbypower 40 }
+
+    relay6on OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Relay 6 output is on (C and NO
+                            connected). False(2) if it is off (C and NC connected)."
+        ::= { standbypower 41 }
+
+    relay7on OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the Relay 7 output is on (C and NO
+                            connected). False(2) if it is off (C and NC connected)."
+        ::= { standbypower 42 }
+
+    ruleswitchstandby OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the switch to standby rule is true.
+                            False(2) if it is not."
+        ::= { standbypower 43 }
+
+    rulereturnprimary OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the return to primary rule is true.
+                            False(2) if it is not."
+        ::= { standbypower 44 }
+
+    rulestandbygood OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the standby power good rule is true.
+                            False(2) if it is not."
+        ::= { standbypower 45 }
+
+    rulestopstandby OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the stop standby and consider it failed
+                            rule is true. False(2) if it is not."
+        ::= { standbypower 46 }
+
+    ruleexercisestandby OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "True(1) if the exercise standby without transfer
+                            rule is true. False(2) if it is not."
+        ::= { standbypower 47 }
+
+    webcontrol1 OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "True(1) if the webcontrol 1 virtual toggle switch
+                            is in the on position. False(2) if it is not.
+                            This value can be written to affect the position
+                            of the toggle switch."
+        ::= { standbypower 48 }
+
+    webcontrol2 OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "True(1) if the webcontrol 2 virtual toggle switch
+                            is in the on position. False(2) if it is not.
+                            This value can be written to affect the position
+                            of the toggle switch."
+        ::= { standbypower 49 }
+
+    webcontrol3 OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "True(1) if the webcontrol 3 virtual toggle switch
+                            is in the on position. False(2) if it is not.
+                            This value can be written to affect the position
+                            of the toggle switch."
+        ::= { standbypower 50 }
+
+    webcontrol4 OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "True(1) if the webcontrol 4 virtual toggle switch
+                            is in the on position. False(2) if it is not.
+                            This value can be written to affect the position
+                            of the toggle switch."
+        ::= { standbypower 51 }
+
+    webcontrol5 OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "True(1) if the webcontrol 5 virtual toggle switch
+                            is in the on position. False(2) if it is not.
+                            This value can be written to affect the position
+                            of the toggle switch."
+        ::= { standbypower 52 }
+
+    webcontrol6 OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "True(1) if the webcontrol 6 virtual toggle switch
+                            is in the on position. False(2) if it is not.
+                            This value can be written to affect the position
+                            of the toggle switch."
+        ::= { standbypower 53 }
+
+    webcontrol7 OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "True(1) if the webcontrol 7 virtual toggle switch
+                            is in the on position. False(2) if it is not.
+                            This value can be written to affect the position
+                            of the toggle switch."
+        ::= { standbypower 54 }
+
+    webcontrol8 OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "True(1) if the webcontrol 8 virtual toggle switch
+                            is in the on position. False(2) if it is not.
+                            This value can be written to affect the position
+                            of the toggle switch."
+        ::= { standbypower 55 }
+
+    standbypowerConformance OBJECT IDENTIFIER ::= { standbypower 256 }
+
+    standbypowerGroups OBJECT IDENTIFIER ::= { standbypowerConformance 1 }
+
+    packetfluxStandbypowerAllObjects OBJECT-GROUP
+        OBJECTS {           
+                        powercontrollerstate,
+                        transferswitchstate,
+                        standbypowerstate,
+                        ac1voltage,
+                        ac1frequency,
+                        ac2voltage,
+                        ac2frequency,
+                        mtr1voltage,
+                        mtr2voltage,
+                        pwr1voltage,
+                        pwr2voltage,
+                        shuntvoltage,
+                        temperature,
+                        recentunsuccessfulstarts,
+                        totalunsuccessfulstarts,
+                        recentstalls,
+                        totalstalls,
+                        numberofstarts,
+                        numberoftransfers,
+                        currenttimeonprimary,
+                        totaltimeonprimary,
+                        currenttimeonstandby,
+                        totaltimeonstandby,
+                        currentstandbyruntime,
+                        totalstandbyruntime,
+                        laststandbyrun,
+                        laststandbygracefulstop,
+                        laststandbyunsuccessfulstart,
+                        laststandbyfailure,
+                        switch1closed,
+                        switch2closed,
+                        switch3closed,
+                        switch4closed,
+                        switch5closed,
+                        enabled,
+                        relay1on,
+                        relay2on,
+                        relay3on,
+                        relay4on,
+                        relay5on,
+                        relay6on,
+                        relay7on,
+                        ruleswitchstandby,
+                        rulereturnprimary,
+                        rulestandbygood,
+                        rulestopstandby,
+                        ruleexercisestandby,
+                        webcontrol1,
+                        webcontrol2,
+                        webcontrol3,
+                        webcontrol4,
+                        webcontrol5,
+                        webcontrol6,
+                        webcontrol7,
+                        webcontrol8
+                }
+        STATUS              current
+        DESCRIPTION         "This automatically created object group contains
+                            all those objects that do not belong to any other
+                            OBJECT-GROUP"
+        ::= { standbypowerGroups 1 }
+
+
+END

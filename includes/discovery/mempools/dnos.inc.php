@@ -1,23 +1,39 @@
 <?php
+/**
+ * dnos.inc.php
+ *
+ * LibreNMS memory discovery module for Dell-Networking
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2019 Spencer Butler
+ * @author     Spencer Butler <github@crooked.app>
+ */
 
-// Code borrowed and modified from 'powerconnect-cpu.inc.php' 
+$mem_data = snmpwalk_cache_oid($device, 'dellNetCpuUtilTable', [], 'DELL-NETWORKING-CHASSIS-MIB', 'dell', '-OUseQ');
+$mem_data = snmpwalk_cache_oid($device, 'DellNetProcessorEntry', $mem_data, 'DELL-NETWORKING-CHASSIS-MIB', 'dell', '-OUseQ');
 
-if ($device['os'] == 'dnos') {
-    echo 'DNOS-MEMORY-POOL:  ';
-
-    $get_series = explode('.', snmp_get($device, 'mib-2.1.2.0', '-Onvsbq', 'F10-PRODUCTS-MIB', 'dnos'), 2); // Get series From MIB
-    $series = $get_series[0];
-    if ($series == 'f10SSeriesProducts') {
-        $total = snmp_get($device, 'chSysProcessorMemSize.1', '-OvQU', 'F10-S-SERIES-CHASSIS-MIB');
-        $used = $mempool['total'] * (snmp_get($device, 'F10-S-SERIES-CHASSIS-MIB::chStackUnitMemUsageUtil.1', '-OvQU')/ 100);
-        $free = ($mempool['total'] - $mempool['used']);
-        if (is_numeric($total) && is_numeric($used)) {
-            discover_mempool($valid_mempool, $device, 0, 'dnos-mem', 'Memory Utilization', '1', null, null);
-        }
-    } else {
-        $free = snmp_get($device, '.1.3.6.1.4.1.674.10895.5000.2.6132.1.1.1.1.4.1.0', '-OvQ');
-        if (is_numeric($free)) {
-            discover_mempool($valid_mempool, $device, 0, 'dnos-mem', 'Memory Utilization', '1', null, null);
+if (is_array($mem_data)) {
+    foreach ($mem_data as $index => $data) {
+        $size = $data['dellNetProcessorMemSize'];
+        if (preg_match('/stack/', $index) && isset($size)) {
+            $type = 'dell-net';
+            $descr = 'Memory Usage';
+            discover_mempool($valid_mempool, $device, $index, $type, $descr, null, null, null);
         }
     }
 }
+unset($mem_data);

@@ -1,0 +1,102 @@
+-- **************************************************************************
+-- HILLSTONE-POWER-MIB
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V6   
+-- Description:	 Hillstone Networks POWER MIB Object Identifier Assignments
+-- **************************************************************************
+--
+
+HILLSTONE-POWER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstonePower
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212	
+        RowStatus		
+		FROM SNMPv2-TC;
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstonePowerObjects OBJECT IDENTIFIER ::= { hillstonePower 1 }
+
+hillstonePowerNumber OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+	"The number of powers."
+    ::= { hillstonePowerObjects 1 } 
+
+hillstonePowerTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF HillstonePowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+	    "This table contains all the POWER data."
+::= { hillstonePowerObjects 2 }
+
+HillstonePowerEntry OBJECT-TYPE
+	SYNTAX HillstonePowerEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Define the parameters of POWER."
+INDEX { hillstonePowerIndex }
+::= { hillstonePowerTable 1 }
+	
+HillstonePowerEntry ::=
+SEQUENCE { 
+	hillstonePowerIndex
+		INTEGER,
+	hillstonePowerDescr
+		DisplayString,
+	hillstonePowerState
+		INTEGER
+	}
+
+hillstonePowerIndex OBJECT-TYPE
+	SYNTAX INTEGER 
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The power index ."
+::= { HillstonePowerEntry 1 }
+
+hillstonePowerDescr OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The power description ."
+::= { HillstonePowerEntry 2 }
+
+hillstonePowerState OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+		fine(0),
+		absent(1),
+		warning(2),
+		fail(3),
+		fail-or-nopower(4),
+		unsupport(5)
+	}
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	    "The power state ."
+::= { HillstonePowerEntry 3 }
+
+
+END

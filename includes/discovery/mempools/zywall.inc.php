@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS
  *
@@ -17,5 +16,10 @@ if ($device['os'] == 'zywall') {
     $usage = snmp_get($device, '.1.3.6.1.4.1.890.1.6.22.1.2.0', '-Ovq');
     if (is_numeric($usage)) {
         discover_mempool($valid_mempool, $device, '0', 'zywall', 'Memory', '1', null, null);
+    }
+    
+    $flash = snmp_get($device, '.1.3.6.1.4.1.890.1.15.3.2.6.0', '-Ovq');
+    if (is_numeric($flash)) {
+        discover_mempool($valid_mempool, $device, '1', 'zywall', 'Flash', '1', null, null);
     }
 }

@@ -1,0 +1,1929 @@
+-- This file was included in WWP MIB release 04-16-00-0047
+ --
+ -- CIENA-CES-DHCPV6-CLIENT-MIB.my
+ --
+
+ CIENA-CES-DHCPV6-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+   Integer32, Counter32, Gauge32,  OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
+        FROM SNMPv2-SMI
+   DisplayString, RowStatus
+        FROM SNMPv2-TC
+   InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+   CienaGlobalState, CienaStatsClear
+        FROM CIENA-TC
+   cienaCesConfig, cienaCesNotifications
+        FROM CIENA-SMI;
+
+
+ cienaCesDhcpv6ClientMIB MODULE-IDENTITY
+        LAST-UPDATED "201606210000Z"
+        ORGANIZATION "Ciena, Inc"
+        CONTACT-INFO
+            "   Mib Meister
+                115 North Sullivan Road
+                Spokane Valley, WA 99037
+                USA
+                Phone:  +1 509 242 9000
+                Email:  support@ciena.com"
+        DESCRIPTION
+                "The MIB module to manage DHCPv6 client on Ciena CES products."
+
+        REVISION "201606210000Z"
+        DESCRIPTION
+                "LDRA - updated cienaCesDhcpv6LdraMplsVcName to 
+                allow the VC name length up to 31 characters."
+        
+        REVISION "201601190000Z"
+        DESCRIPTION
+                "LDRA - updated Dhcpv6LdraVsName and Dhcpv6LdraMplsName 
+                to allow the VS name length up to 31 characters."
+
+        REVISION "201511020000Z"
+        DESCRIPTION
+                "LDRA - added missing DHCP Relay global statistic."
+
+        REVISION "201508060000Z"
+        DESCRIPTION
+                "LDRA - added support for Q-in-Q VS and MPLS VS relay agents."
+
+        REVISION "201310170000Z"
+        DESCRIPTION
+                "LDRA - added new global statistics, ability to clear global stats."
+
+        REVISION "201309240000Z"
+        DESCRIPTION
+                "Added length checks for LDRA IntId, rid values. EnterpriseID can be unsigned 32"
+
+        REVISION "201307190000Z"
+        DESCRIPTION
+                "Added support for Lightweight DHCPv6 Relay Agent (LDRA). The
+                functionality is similar to that for the L2 relay agent."
+
+        REVISION "201302111900Z"
+        DESCRIPTION
+                "The ReconfigureState was included by mistake.  It should not
+                be visible to the SNMP user until the feature is completed."
+
+        REVISION "201302110000Z"
+        DESCRIPTION
+                "The OptionCodeIndex incorrectly began at 0.
+                It was changed to begin at 1."
+
+        REVISION "201302080000Z"
+        DESCRIPTION
+                "The notification cienaCesDhcpv6ClientOptionDisabledNotification,
+                neither implemented nor released, was removed."
+
+        REVISION "201211150000Z"
+        DESCRIPTION
+            "Initial creation."
+
+        ::= { cienaCesConfig 30 }
+
+ --
+ --
+ -- Node definitions
+ --
+
+ cienaCesDhcpv6ClientMIBObjects OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIB 1 }
+
+ cienaCesDhcpv6Client     OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBObjects 1 }
+
+ cienaCesDhcpv6RelayAgent OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBObjects 2 }
+
+ cienaCesDhcpv6RelayAgentGlobalAttrs OBJECT IDENTIFIER ::= { cienaCesDhcpv6RelayAgent 1 }
+
+ -- Notifications
+
+ cienaCesDhcpv6ClientMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 30}
+ cienaCesDhcpv6ClientMIBNotifications       OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBNotificationPrefix 0 }
+
+ -- Conformance information
+
+ cienaCesDhcpv6ClientMIBConformance OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIB 2 }
+ cienaCesDhcpv6ClientMIBCompliances OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBConformance 1 }
+ cienaCesDhcpv6ClientMIBGroups      OBJECT IDENTIFIER ::= { cienaCesDhcpv6ClientMIBConformance 2 }
+
+ -- The DHCPv6 client table - global settings
+
+ cienaCesDhcpv6AdminState     OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+        "This object indicates if the DHCPv6 client is administratively enabled."
+     ::= { cienaCesDhcpv6Client 1 }
+
+ cienaCesDhcpv6IfName  OBJECT-TYPE
+     SYNTAX         DisplayString(SIZE (0..32))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+        "The interface associated with the DHCPV6 client."
+     ::= { cienaCesDhcpv6Client 2 }
+
+ cienaCesDhcpv6RapidCommitState         OBJECT-TYPE
+     SYNTAX                             CienaGlobalState
+     MAX-ACCESS                         read-only
+     STATUS                             current
+     DESCRIPTION
+        "This object indicates if rapid commit option is enabled on the DHCPv6 client."
+     ::= { cienaCesDhcpv6Client 3 }
+
+-- cienaCesDhcpv6ReconfigureState       OBJECT-TYPE
+--     SYNTAX                           CienaGlobalState
+--     MAX-ACCESS                       read-only
+--     STATUS                           current
+--     DESCRIPTION
+--      "This object indicates if reconfigure option is enabled on the DHCPv6 client."
+--     ::= { cienaCesDhcpv6Client 4 }
+
+ cienaCesDhcpv6PrefLifetimeReq  OBJECT-TYPE
+     SYNTAX         Integer32(0..2147483647)
+     UNITS          "seconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+        "The requested preferred lifetime for the IPv6 address expressed in seconds."
+     DEFVAL         { 0 }
+     ::= { cienaCesDhcpv6Client 5 }
+
+ cienaCesDhcpv6ValidLifetimeReq  OBJECT-TYPE
+     SYNTAX         Integer32(0..2147483647)
+     UNITS          "seconds"
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+        "The requested valid lifetime for the IPv6 address expressed in seconds."
+     DEFVAL         { 0 }
+     ::= { cienaCesDhcpv6Client 6 }
+
+
+ --
+ -- DHCPOption List
+ --
+ -- the Multi DHCP client Table
+
+ cienaCesDhcpv6ClientOptionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CienaCesDhcpv6ClientOptionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "List of options supported by the DHCPv6 client."
+    ::= { cienaCesDhcpv6Client 7 }
+
+ cienaCesDhcpv6ClientOptionEntry OBJECT-TYPE
+    SYNTAX      CienaCesDhcpv6ClientOptionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing list of options supported by DHCPv6 client."
+    INDEX   { cienaCesDhcpv6OptionCodeIndex }
+    ::= { cienaCesDhcpv6ClientOptionTable 1 }
+
+ CienaCesDhcpv6ClientOptionEntry ::=
+    SEQUENCE {
+        cienaCesDhcpv6OptionCodeIndex                   Integer32,
+        cienaCesDhcpv6OptionDesc                        DisplayString,
+        cienaCesDhcpv6OptionCode                        Integer32,
+        cienaCesDhcpv6OptionState                       CienaGlobalState
+    }
+
+ cienaCesDhcpv6OptionCodeIndex OBJECT-TYPE
+     SYNTAX                     Integer32 (1..65535)
+     MAX-ACCESS                 not-accessible
+     STATUS                     current
+     DESCRIPTION
+             "Specifies the index used for this entry."
+        ::= { cienaCesDhcpv6ClientOptionEntry 1 }
+
+ cienaCesDhcpv6OptionDesc OBJECT-TYPE
+     SYNTAX                     DisplayString
+     MAX-ACCESS                 read-only
+     STATUS                     current
+     DESCRIPTION
+             "Specifies the description for the given DHCPv6 option code."
+        ::= { cienaCesDhcpv6ClientOptionEntry 2 }
+
+ cienaCesDhcpv6OptionCode OBJECT-TYPE
+     SYNTAX                     Integer32 (0..2147483647)
+     MAX-ACCESS                 read-only
+     STATUS                     current
+     DESCRIPTION
+             "Specifies the option code specified by RFC specification."
+        ::= { cienaCesDhcpv6ClientOptionEntry 3 }
+
+ cienaCesDhcpv6OptionState      OBJECT-TYPE
+     SYNTAX                     CienaGlobalState
+     MAX-ACCESS                 read-only
+     STATUS                     current
+     DESCRIPTION
+             "Specifies if the given option is enabled/disabled."
+        ::= { cienaCesDhcpv6ClientOptionEntry 4 }
+
+ --
+ -- Per Session Status
+ --
+ -- DHCPv6 client Session Table
+
+cienaCesDhcpv6ClientSessTable   OBJECT-TYPE
+        SYNTAX                  SEQUENCE OF CienaCesDhcpv6ClientSessEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION      "List of active DHCPv6 client sessions."
+        ::= { cienaCesDhcpv6Client 8 }
+
+cienaCesDhcpv6ClientSessEntry   OBJECT-TYPE
+        SYNTAX                  CienaCesDhcpv6ClientSessEntry
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION      "An entry in the cienaCesDhcpv6ClientSessTable."
+        INDEX                      { cienaCesDhcpv6ClientSessMgmtIntfIndex }
+        ::= { cienaCesDhcpv6ClientSessTable 1 }
+
+CienaCesDhcpv6ClientSessEntry ::= SEQUENCE {
+   cienaCesDhcpv6ClientSessMgmtIntfIndex        Integer32,
+   cienaCesDhcpv6ClientSessState                INTEGER,
+   cienaCesDhcpv6ClientSessAutoConfigState      INTEGER,
+   cienaCesDhcpv6ClientSessUpTime               Integer32,
+   cienaCesDhcpv6ClientSessPrefLifetime         Integer32,
+   cienaCesDhcpv6ClientSessValidLifetime        Integer32,
+   cienaCesDhcpv6ClientSessLeaseExpire          Integer32,
+   cienaCesDhcpv6ClientSessClientId             DisplayString,
+   cienaCesDhcpv6ClientSessServerIpAddrType     InetAddressType,
+   cienaCesDhcpv6ClientSessServerIpAddr         InetAddress,
+   cienaCesDhcpv6ClientSessServerId             DisplayString,
+   cienaCesDhcpv6ClientSessT1Time               Integer32,
+   cienaCesDhcpv6ClientSessT2Time               Integer32
+}
+
+cienaCesDhcpv6ClientSessMgmtIntfIndex           OBJECT-TYPE
+        SYNTAX                  Integer32 (1..65535)
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION             "The mgmt interface index."
+        ::= { cienaCesDhcpv6ClientSessEntry 1 }
+
+cienaCesDhcpv6ClientSessState           OBJECT-TYPE
+        SYNTAX      INTEGER
+                {
+                        disabled(1),
+                        init(2),
+                        bound(3),
+                        renewing(4),
+                        rebinding(5),
+                        solicit(6),
+                        request(7),
+                        reconfigure(8),
+                        unknown(99)
+                }
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The DHCPv6 client state of this session."
+        ::= { cienaCesDhcpv6ClientSessEntry 2 }
+
+cienaCesDhcpv6ClientSessAutoConfigState         OBJECT-TYPE
+        SYNTAX      INTEGER
+                {
+                        none(1),
+                        stateless(2),
+                        stateful(3),
+                        unknown(99)
+                }
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The DHCPv6 autoconfiguration state of this session
+                          set by the router advertisement."
+        ::= { cienaCesDhcpv6ClientSessEntry 3 }
+
+cienaCesDhcpv6ClientSessUpTime          OBJECT-TYPE
+        SYNTAX                  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "The total length of time that this session has had active
+                 lease(s)."
+        ::= { cienaCesDhcpv6ClientSessEntry 4 }
+
+cienaCesDhcpv6ClientSessPrefLifetime    OBJECT-TYPE
+        SYNTAX                  Integer32
+        UNITS                   "seconds"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The preferred lifetime in seconds of the current lease."
+        ::= { cienaCesDhcpv6ClientSessEntry 5 }
+
+cienaCesDhcpv6ClientSessValidLifetime   OBJECT-TYPE
+        SYNTAX                  Integer32
+        UNITS                   "seconds"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The valid lifetime in seconds of the current lease."
+        ::= { cienaCesDhcpv6ClientSessEntry 6 }
+
+cienaCesDhcpv6ClientSessLeaseExpire     OBJECT-TYPE
+        SYNTAX                  Integer32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The remaining seconds until the current lease expires."
+        ::= { cienaCesDhcpv6ClientSessEntry 7 }
+
+cienaCesDhcpv6ClientSessClientId                OBJECT-TYPE
+        SYNTAX                  DisplayString
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The full 'client ID' value associated with this lease."
+        ::= { cienaCesDhcpv6ClientSessEntry 8 }
+
+cienaCesDhcpv6ClientSessServerIpAddrType        OBJECT-TYPE
+        SYNTAX                  InetAddressType
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "The IP address type (IPv6) of the server from which this lease was obtained."
+        ::= { cienaCesDhcpv6ClientSessEntry 9 }
+
+cienaCesDhcpv6ClientSessServerIpAddr    OBJECT-TYPE
+        SYNTAX                  InetAddress
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "The IP address of the server from which this lease was obtained."
+        ::= { cienaCesDhcpv6ClientSessEntry 10 }
+
+cienaCesDhcpv6ClientSessServerId                OBJECT-TYPE
+        SYNTAX                  DisplayString
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The full 'server ID' value associated with this lease."
+        ::= { cienaCesDhcpv6ClientSessEntry 11 }
+
+cienaCesDhcpv6ClientSessT1Time  OBJECT-TYPE
+        SYNTAX                  Integer32
+        UNITS                   "seconds"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "The  lease renewal (T1) time in seconds."
+        ::= { cienaCesDhcpv6ClientSessEntry 12 }
+
+cienaCesDhcpv6ClientSessT2Time  OBJECT-TYPE
+        SYNTAX                  Integer32
+        UNITS                   "seconds"
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION             "The  lease rebind (T2) time in seconds."
+        ::= { cienaCesDhcpv6ClientSessEntry 13 }
+
+ --
+ -- DHCPv6 Client Session Statistics
+ --
+ --
+
+cienaCesDhcpv6ClientSessStatsTable OBJECT-TYPE
+     SYNTAX  SEQUENCE OF CienaCesDhcpv6ClientSessStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the statistics for DHCPv6 per
+            interface"
+     ::= { cienaCesDhcpv6Client 9 }
+
+cienaCesDhcpv6ClientSessStatsEntry OBJECT-TYPE
+     SYNTAX      CienaCesDhcpv6ClientSessStatsEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesDhcpv6ClientSessStatsTable."
+     INDEX {cienaCesDhcpv6ClientSessStatsMgmtIntfIndex}
+     ::= { cienaCesDhcpv6ClientSessStatsTable 1 }
+
+CienaCesDhcpv6ClientSessStatsEntry ::=  SEQUENCE {
+        cienaCesDhcpv6ClientSessStatsMgmtIntfIndex      Integer32,
+        cienaCesDhcpv6ClientSessStatsClear              CienaStatsClear,
+        cienaCesDhcpv6ClientSessStatsPktsRx             Gauge32,
+        cienaCesDhcpv6ClientSessStatsReply              Gauge32,
+        cienaCesDhcpv6ClientSessStatsAdvert             Gauge32,
+        cienaCesDhcpv6ClientSessStatsRecfg              Gauge32,
+        cienaCesDhcpv6ClientSessStatsInvalid            Gauge32,
+        cienaCesDhcpv6ClientSessStatsPktsTx             Gauge32,
+        cienaCesDhcpv6ClientSessStatsSolicit            Gauge32,
+        cienaCesDhcpv6ClientSessStatsRequest            Gauge32,
+        cienaCesDhcpv6ClientSessStatsConfirm            Gauge32,
+        cienaCesDhcpv6ClientSessStatsRenew              Gauge32,
+        cienaCesDhcpv6ClientSessStatsRebind             Gauge32,
+        cienaCesDhcpv6ClientSessStatsInfoReq            Gauge32,
+        cienaCesDhcpv6ClientSessStatsRelease            Gauge32,
+        cienaCesDhcpv6ClientSessStatsDecline            Gauge32,
+        cienaCesDhcpv6ClientSessStatsTxFail             Gauge32
+        }
+
+cienaCesDhcpv6ClientSessStatsMgmtIntfIndex              OBJECT-TYPE
+        SYNTAX                  Integer32 (1..65535)
+        MAX-ACCESS              not-accessible
+        STATUS                  current
+        DESCRIPTION             "The mgmt interface index."
+        ::= { cienaCesDhcpv6ClientSessStatsEntry 1 }
+
+cienaCesDhcpv6ClientSessStatsClear      OBJECT-TYPE
+        SYNTAX                          CienaStatsClear
+        MAX-ACCESS                      read-write
+        STATUS                          current
+        DESCRIPTION
+            "This object clears the DHCPv6 session statistics."
+        DEFVAL { 0 }
+        ::= { cienaCesDhcpv6ClientSessStatsEntry 2}
+
+cienaCesDhcpv6ClientSessStatsPktsRx     OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 packets received by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 3 }
+
+cienaCesDhcpv6ClientSessStatsReply      OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 reply messages received by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 4 }
+
+cienaCesDhcpv6ClientSessStatsAdvert     OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 advertise messages received by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 5 }
+
+cienaCesDhcpv6ClientSessStatsRecfg      OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 reconfigure messages received by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 6 }
+
+cienaCesDhcpv6ClientSessStatsInvalid    OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 invalid messages received by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 7 }
+
+cienaCesDhcpv6ClientSessStatsPktsTx     OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 8 }
+
+cienaCesDhcpv6ClientSessStatsSolicit    OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 solicit messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 9 }
+
+cienaCesDhcpv6ClientSessStatsRequest    OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 request messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 10 }
+
+cienaCesDhcpv6ClientSessStatsConfirm    OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 confirm messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 11 }
+
+cienaCesDhcpv6ClientSessStatsRenew      OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 renew messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 12 }
+
+cienaCesDhcpv6ClientSessStatsRebind     OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 rebind messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 13 }
+
+cienaCesDhcpv6ClientSessStatsInfoReq    OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 information request messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 14 }
+
+cienaCesDhcpv6ClientSessStatsRelease    OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 release messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 15 }
+
+cienaCesDhcpv6ClientSessStatsDecline    OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 decline messages sent by the client."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 16 }
+
+cienaCesDhcpv6ClientSessStatsTxFail     OBJECT-TYPE
+        SYNTAX                  Gauge32
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION      "The number of DHCPv6 messages the client was unable to send."
+          ::= { cienaCesDhcpv6ClientSessStatsEntry 17 }
+
+
+ --
+ -- DHCPv6 Relay Agent Functionality
+ -- LDRA is LightWeight DHCPv6 Relay Agent
+ --
+
+--- Global Lightweight DHCPv6 Relay Agent (LDRA) fields
+
+ cienaCesDhcpv6LdraState OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Specifies the global state of the Lightweight DHCPv6 Relay Agent."
+ ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 1 }
+
+ cienaCesDhcpv6LdraInterfaceId OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        slotAndPort(1),
+                        slotAndPortAndVlan(2),
+                        intidString(3)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Specifies the type of data to use in the InterfaceID option of LDRA messages."
+    ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 2 }
+
+ cienaCesDhcpv6LdraRemoteId OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        macAddress(1),
+                        hostName(2),
+                        ridString(3)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "Specifies the type of data to use in the RemoteID option of LDRA messages."
+    ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 3 }
+
+ cienaCesDhcpv6LdraRemoteIdOption OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        on(1),
+                        off(2)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "If on, the RemoteID option will be added to client messages being relayed by LDRA."
+    ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 4 }
+
+ cienaCesDhcpv6LdraRemoteIdEnterpriseNo OBJECT-TYPE
+     SYNTAX         Unsigned32 (1..4294967295)
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "If the RemoteID option is on, this value will be used as the Enterprise Number in the
+             RemoteID option field. Uses Broadband Forum value 3561 as default"
+    ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 5 }
+
+ cienaCesDhcpv6LdraForward   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets forwarded rather than relayed.
+             These are valid DHCPv6 frames that don't have a defined relay."
+     ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 6 }
+
+ cienaCesDhcpv6LdraRelayed   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets processed by
+             the LDRA and not dropped."
+     ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 7 }
+
+ cienaCesDhcpv6LdraDropped   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets processed by the LDRA and dropped.
+             Inspect the detailed statistics on each relay for more details related to dropped packets."
+     ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 8 }
+
+ cienaCesDhcpv6LdraGlobalStatsClear OBJECT-TYPE
+     SYNTAX       CienaStatsClear
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "This object when set to 'clear(1)', clears the global DHCPv6 LDRA stats."
+     DEFVAL { 0 }
+ ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 9 }
+
+ cienaCesDhcpv6LdraNotForRelay  OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets passed to the relay,
+             but were determined to not belong to the relay. The packets are dropped."
+     ::= { cienaCesDhcpv6RelayAgentGlobalAttrs 10 }
+
+
+
+ --
+ -- Table to control DHCPv6 LDRA functionality on each L2 VLAN
+ --
+ cienaCesDhcpv6LdraStateTable OBJECT-TYPE
+     SYNTAX             SEQUENCE OF CienaCesDhcpV6LdraStateEntry
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+             "Table allows changing configuration of DHCPv6 LDRA functionality
+             for each cienaCesDhcpv6LdraVlan."
+     ::= { cienaCesDhcpv6RelayAgent 2 }
+
+ cienaCesDhcpv6LdraStateEntry OBJECT-TYPE
+     SYNTAX             CienaCesDhcpV6LdraStateEntry
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+             "Entry in the table to configure DHCPv6 LDRA functionality."
+     INDEX { cienaCesDhcpv6LdraVlan }
+     ::= { cienaCesDhcpv6LdraStateTable 1 }
+
+ CienaCesDhcpV6LdraStateEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraVlan         Integer32,
+     cienaCesDhcpv6LdraAdminState   CienaGlobalState,
+     cienaCesDhcpv6LdraOperState    CienaGlobalState,
+     cienaCesDhcpv6LdraRowStatus    RowStatus
+  }
+
+ cienaCesDhcpv6LdraVlan   OBJECT-TYPE
+     SYNTAX         Integer32 (1..24576)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the VLAN on which DHCPv6 LDRA is configured."
+     ::= { cienaCesDhcpv6LdraStateEntry 1 }
+
+ cienaCesDhcpv6LdraAdminState   OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object allows the user to disable or enable DHCPv6 LDRA functionality on
+             the given VLAN specified by cienaCesDhcpv6LdraVlan."
+     ::= { cienaCesDhcpv6LdraStateEntry 2 }
+
+ cienaCesDhcpv6LdraOperState   OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object shows the operational status of the DHCPv6 LDRA on given VLAN."
+     ::= { cienaCesDhcpv6LdraStateEntry 3 }
+
+ cienaCesDhcpv6LdraRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Set this object to 'Destroy' to terminate DHCPv6 LDRA Relaying
+              on the VLAN specified by cienaCesDhcpv6LdraVlan.
+
+              Set this object to 'CreateAndGo' to enable DHCPv6 LDRA Relaying
+              on the VLAN specified by cienaCesDhcpv6LdraVlan."
+     ::= { cienaCesDhcpv6LdraStateEntry 4 }
+
+
+ --
+ -- DHCPv6 LDRA Port Trust Table
+ --
+ cienaCesDhcpv6LdraTrustTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraTrustEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "This table is used to specify the slot / ports and VLANs
+              that the DHCPv6 LDRA can trust.
+              
+              This table has been deprecated in favor of the
+              cienaCesDhcpv6LdraExtTrustTable which adds a column for port
+              status."
+     ::= { cienaCesDhcpv6RelayAgent 3 }
+
+ cienaCesDhcpv6LdraTrustEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraTrustEntry
+     MAX-ACCESS   not-accessible
+     STATUS       deprecated
+     DESCRIPTION
+             "Each entry in this table is used to specify the slot / port and VLAN to be trusted."
+     INDEX { cienaCesDhcpv6LdraVlan, cienaCesDhcpv6LdraPort }
+     ::= { cienaCesDhcpv6LdraTrustTable 1 }
+
+ CienaCesDhcpV6LdraTrustEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraPort         Integer32,
+     cienaCesDhcpv6LdraTrustMode    INTEGER
+  }
+
+ cienaCesDhcpv6LdraPort   OBJECT-TYPE
+     SYNTAX         Integer32 (1..65535)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This object is used as an index in the table and is used to specify the port."
+     ::= { cienaCesDhcpv6LdraTrustEntry 1 }
+
+ cienaCesDhcpv6LdraTrustMode   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        client(1),
+                        clientTrust(2),
+                        serverTrust(3),
+                        dualRoleTrust(4),
+                        unTrust(5)
+                    }
+     MAX-ACCESS     read-create
+     STATUS         deprecated
+     DESCRIPTION
+             "This object is used to set the port as client trusted, server
+             trusted or not trusted.
+
+             Note that the client(1) mode is deprecated. That value will
+             never be returned. Setting that value will set the mode to
+             clientTrust(2) instead."
+     ::= { cienaCesDhcpv6LdraTrustEntry 2 }
+
+ --
+ -- DHCPv6 LDRA VLAN Statistics
+ --
+ cienaCesDhcpv6LdraStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table to display L2 statistics for each cienaCesDhcpv6LdraVlan."
+     ::= { cienaCesDhcpv6RelayAgent 4 }
+
+ cienaCesDhcpv6LdraStatsEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Entry in the table to display LDRA stats."
+     INDEX { cienaCesDhcpv6LdraVlan }
+     ::= { cienaCesDhcpv6LdraStatsTable 1 }
+
+ CienaCesDhcpV6LdraStatsEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraPktsForRelay                        Counter32,
+     cienaCesDhcpv6LdraRelayedClient                       Counter32,
+     cienaCesDhcpv6LdraRelayedServer                       Counter32,
+     cienaCesDhcpv6LdraUntrustedClientPortPktsRx           Counter32,
+     cienaCesDhcpv6LdraUntrustedServerPortPktsRx           Counter32,
+     cienaCesDhcpv6LdraFailedValidationPktDrop             Counter32,
+     cienaCesDhcpv6LdraInvalidConfigPktDrop                Counter32,
+     cienaCesDhcpv6LdraExceededHopCountPktDrop             Counter32,
+     cienaCesDhcpv6LdraExceedMTUPktDrop                    Counter32,
+     cienaCesDhcpv6LdraNoTrustedServerPktDrop              Counter32,
+     cienaCesDhcpv6LdraNoTrustedClientPktDrop              Counter32,
+     cienaCesDhcpv6LdraIPv6FragBadExtHdrPktDrop            Counter32,
+     cienaCesDhcpv6LdraGeneralErrors                       Counter32,
+     cienaCesDhcpv6LdraStatsClear                          CienaStatsClear
+  }
+
+ cienaCesDhcpv6LdraPktsForRelay   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of packets sent to this relay process."
+     ::= { cienaCesDhcpv6LdraStatsEntry 1 }
+
+ cienaCesDhcpv6LdraRelayedClient   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of client sourced DHCPv6 packets relayed."
+     ::= { cienaCesDhcpv6LdraStatsEntry 2 }
+
+ cienaCesDhcpv6LdraRelayedServer   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of server sourced DHCPv6 packets relayed."
+     ::= { cienaCesDhcpv6LdraStatsEntry 3 }
+
+ cienaCesDhcpv6LdraUntrustedClientPortPktsRx OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of client DHCPv6 packets dropped because they were
+             received on untrusted client ports."
+ ::= { cienaCesDhcpv6LdraStatsEntry 4 }
+
+ cienaCesDhcpv6LdraUntrustedServerPortPktsRx OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of server DHCPv6 packets dropped because they were
+             received on untrusted server ports."
+ ::= { cienaCesDhcpv6LdraStatsEntry 5 }
+
+ cienaCesDhcpv6LdraFailedValidationPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to failed validation."
+ ::= { cienaCesDhcpv6LdraStatsEntry 6 }
+
+ cienaCesDhcpv6LdraInvalidConfigPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due
+             to LDRA configuration issues."
+ ::= { cienaCesDhcpv6LdraStatsEntry 7 }
+
+ cienaCesDhcpv6LdraExceededHopCountPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to hop count
+             in the packet exceeding hop count the limit."
+ ::= { cienaCesDhcpv6LdraStatsEntry 8 }
+
+ cienaCesDhcpv6LdraExceedMTUPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped because the new
+             relay frame size would exceed the MTU."
+ ::= { cienaCesDhcpv6LdraStatsEntry 9 }
+
+ cienaCesDhcpv6LdraNoTrustedServerPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped because there are no server trusted ports configured."
+ ::= { cienaCesDhcpv6LdraStatsEntry 10 }
+
+ cienaCesDhcpv6LdraNoTrustedClientPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped because there are no client trusted ports configured."
+ ::= { cienaCesDhcpv6LdraStatsEntry 11 }
+
+ cienaCesDhcpv6LdraIPv6FragBadExtHdrPktDrop OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to IPv6 packet
+             extension headers that could not be processed."
+ ::= { cienaCesDhcpv6LdraStatsEntry 12 }
+
+ cienaCesDhcpv6LdraGeneralErrors OBJECT-TYPE
+     SYNTAX     Counter32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to unclassified errors."
+ ::= { cienaCesDhcpv6LdraStatsEntry 13 }
+
+ cienaCesDhcpv6LdraStatsClear OBJECT-TYPE
+     SYNTAX       CienaStatsClear
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "This object when set to 'true', clears DHCPv6 LDRA stats for given VLAN."
+     DEFVAL { 0 }
+ ::= { cienaCesDhcpv6LdraStatsEntry 14 }
+
+ --
+ -- DHCPv6 LDRA Interface ID String Table
+ --
+ cienaCesDhcpv6LdraIntidStringTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraIntidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify CID strings for slot / ports
+             and VLANs that the DHCP relay agent can specify in Option 82 CID
+             information."
+     ::= { cienaCesDhcpv6RelayAgent 5 }
+
+ cienaCesDhcpv6LdraIntidStringEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraIntidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify an interface id string for slot / port and VLAN combinations."
+     INDEX { cienaCesDhcpv6LdraVlan, cienaCesDhcpv6LdraIntidStringPort }
+     ::= { cienaCesDhcpv6LdraIntidStringTable 1 }
+
+ CienaCesDhcpV6LdraIntidStringEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraIntidStringPort          Integer32,
+     cienaCesDhcpv6LdraIntidString              DisplayString,
+     cienaCesDhcpv6LdraIntidStringRowStatus     RowStatus
+  }
+
+ cienaCesDhcpv6LdraIntidStringPort   OBJECT-TYPE
+     SYNTAX         Integer32 (1..65535)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This object is used as an index in the table and is used to specify the port."
+     ::= { cienaCesDhcpv6LdraIntidStringEntry 1 }
+
+ cienaCesDhcpv6LdraIntidString   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..64))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object is used to get and set the IntID string for the port."
+     ::= { cienaCesDhcpv6LdraIntidStringEntry 2 }
+
+ cienaCesDhcpv6LdraIntidStringRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the conceptual rows in this table.
+             To create a row in this table set this object to 'createAndGo'.
+             To delete a row in this table set this object to 'destroy'."
+     ::= { cienaCesDhcpv6LdraIntidStringEntry 3 }
+
+ --
+ -- DHCPv6 LDRA RID String Table
+ --
+ cienaCesDhcpv6LdraRidStringTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraRidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify RID strings for slot / ports
+             and VLANs that the DHCP relay agent can specify in Option 82 RID
+             information."
+     ::= { cienaCesDhcpv6RelayAgent 6 }
+
+ cienaCesDhcpv6LdraRidStringEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraRidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify an RID string for
+             slot / port and VLAN combinations."
+     INDEX { cienaCesDhcpv6LdraVlan, cienaCesDhcpv6LdraRidStringPort }
+     ::= { cienaCesDhcpv6LdraRidStringTable 1 }
+
+ CienaCesDhcpV6LdraRidStringEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraRidStringPort            Integer32,
+     cienaCesDhcpv6LdraRidString                DisplayString,
+     cienaCesDhcpv6LdraRidStringRowStatus       RowStatus
+ }
+
+ cienaCesDhcpv6LdraRidStringPort   OBJECT-TYPE
+     SYNTAX         Integer32 (1..65535)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This MIB object is used as an index in the table and is used to specify the port."
+     ::= { cienaCesDhcpv6LdraRidStringEntry 1 }
+
+ cienaCesDhcpv6LdraRidString   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..64))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This MIB object is used to get and set the RID string for the port."
+     ::= { cienaCesDhcpv6LdraRidStringEntry 2 }
+
+ cienaCesDhcpv6LdraRidStringRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+              conceptual rows in this table.
+
+              To create a row in this table set this object
+              to 'createAndGo'.
+
+              To delete a row in this table set this object
+              to 'destroy'."
+     ::= { cienaCesDhcpv6LdraRidStringEntry 3 }
+
+ --
+ -- DHCPv6 LDRA Extended Port Trust Table
+ --
+ cienaCesDhcpv6LdraExtTrustTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraExtTrustEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify the ports and VLANs that the
+             DHCPv6 LDRA can trust. This table is the same as
+             cienaCesDhcpv6LdraTrustTable with the addition of a column for
+             the port status."
+     ::= { cienaCesDhcpv6RelayAgent 7 }
+
+ cienaCesDhcpv6LdraExtTrustEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraExtTrustEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify the port and VLAN to
+             be trusted."
+     INDEX { cienaCesDhcpv6LdraVlan, cienaCesDhcpv6LdraPort }
+     ::= { cienaCesDhcpv6LdraExtTrustTable 1 }
+
+ CienaCesDhcpV6LdraExtTrustEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraExtPortState INTEGER,
+     cienaCesDhcpv6LdraExtTrustMode INTEGER
+  }
+
+ cienaCesDhcpv6LdraExtPortState   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        active(1),
+                        inactive(2)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object reports whether the specified port is active or
+              inactive."
+     ::= { cienaCesDhcpv6LdraExtTrustEntry 1 }
+
+ cienaCesDhcpv6LdraExtTrustMode   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        client(1),
+                        clientTrust(2),
+                        serverTrust(3),
+                        dualRoleTrust(4),
+                        unTrust(5)
+                    }
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object is used to set the port as client trusted, server
+             trusted or not trusted.
+
+             Note that the client(1) mode is deprecated. That value will
+             never be returned. Setting that value will set the mode to
+             clientTrust(2) instead."
+     ::= { cienaCesDhcpv6LdraExtTrustEntry 2 }
+
+ --
+ -- Table to control DHCPv6 LDRA functionality on each L2 VS
+ --
+ cienaCesDhcpv6LdraVsStateTable OBJECT-TYPE
+     SYNTAX             SEQUENCE OF CienaCesDhcpV6LdraVsStateEntry
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+             "Table allows changing configuration of DHCPv6 LDRA functionality
+             for each VS."
+     ::= { cienaCesDhcpv6RelayAgent 8 }
+
+ cienaCesDhcpv6LdraVsStateEntry OBJECT-TYPE
+     SYNTAX             CienaCesDhcpV6LdraVsStateEntry
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+             "Entry in the table to configure DHCPv6 LDRA functionality."
+     INDEX { cienaCesDhcpv6LdraVsVlan }
+     ::= { cienaCesDhcpv6LdraVsStateTable 1 }
+
+ CienaCesDhcpV6LdraVsStateEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraVsVlan         Integer32,
+     cienaCesDhcpv6LdraVsName         DisplayString,
+     cienaCesDhcpv6LdraVsAdminState   CienaGlobalState,
+     cienaCesDhcpv6LdraVsOperState    CienaGlobalState,
+     cienaCesDhcpv6LdraVsRowStatus    RowStatus
+  }
+
+ cienaCesDhcpv6LdraVsVlan   OBJECT-TYPE
+     SYNTAX         Integer32 (1..24576)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the VS VLAN on which the DHCPv6 LDRA is configured."
+     ::= { cienaCesDhcpv6LdraVsStateEntry 1 }
+
+ cienaCesDhcpv6LdraVsName   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..31))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object shows the name of the VS VLAN on which the DHCPv6 LDRA is configured."
+     ::= { cienaCesDhcpv6LdraVsStateEntry 2 }
+
+ cienaCesDhcpv6LdraVsAdminState   OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object allows the user to disable or enable DHCPv6 LDRA functionality on
+             the given VS VLAN specified by cienaCesDhcpv6LdraVsVlan."
+     ::= { cienaCesDhcpv6LdraVsStateEntry 3 }
+
+ cienaCesDhcpv6LdraVsOperState   OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object shows the operational status of the DHCPv6 LDRA on
+             the given VS VLAN."
+     ::= { cienaCesDhcpv6LdraVsStateEntry 4 }
+
+ cienaCesDhcpv6LdraVsRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Set this object to 'Destroy' to terminate DHCPv6 LDRA Relaying
+              on the VS VLAN specified by cienaCesDhcpv6LdraVsVlan.
+
+              Set this object to 'CreateAndGo' to enable DHCPv6 LDRA Relaying
+              on the VS VLAN specified by cienaCesDhcpv6LdraVsVlan."
+     ::= { cienaCesDhcpv6LdraVsStateEntry 5 }
+
+ --
+ -- DHCPv6 LDRA VS Trust Table
+ --
+ cienaCesDhcpv6LdraVsTrustTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraVsTrustEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify the VLANs, ports and sub-VLANs
+             that the DHCPv6 LDRA can trust."
+     ::= { cienaCesDhcpv6RelayAgent 9 }
+
+ cienaCesDhcpv6LdraVsTrustEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraVsTrustEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify the VLAN, port and
+             sub-VLAN to be trusted."
+     INDEX { cienaCesDhcpv6LdraVsVlan, cienaCesDhcpv6LdraVsPort, cienaCesDhcpv6LdraVsSubVlan }
+     ::= { cienaCesDhcpv6LdraVsTrustTable 1 }
+
+ CienaCesDhcpV6LdraVsTrustEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraVsPort         Integer32,
+     cienaCesDhcpv6LdraVsSubVlan      Integer32,
+     cienaCesDhcpv6LdraVsPortState    INTEGER,
+     cienaCesDhcpv6LdraVsTrustMode    INTEGER
+  }
+
+ cienaCesDhcpv6LdraVsPort   OBJECT-TYPE
+     SYNTAX         Integer32 (1..65535)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This object is used as an index in the table and is used to specify the VS port."
+     ::= { cienaCesDhcpv6LdraVsTrustEntry 1 }
+
+ cienaCesDhcpv6LdraVsSubVlan   OBJECT-TYPE
+     SYNTAX         Integer32 (0..24576)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the sub-VLAN on which the DHCPv6 LDRA
+              is configured. Note that the special value 0 means that no
+              sub-VLAN is associated with this particular trust entry."
+     ::= { cienaCesDhcpv6LdraVsTrustEntry 2 }
+
+ cienaCesDhcpv6LdraVsPortState   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        active(1),
+                        inactive(2)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object reports whether the specified port and sub-VLAN is
+             active or inactive."
+     ::= { cienaCesDhcpv6LdraVsTrustEntry 3 }
+
+ cienaCesDhcpv6LdraVsTrustMode   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        client(1),
+                        clientTrust(2),
+                        serverTrust(3),
+                        dualRoleTrust(4),
+                        unTrust(5)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object is used to set the port and sub-VLAN as client
+             trusted, server trusted or not trusted.
+
+             Note that the client(1) mode is deprecated. That value will
+             never be returned. Setting that value will set the mode to
+             clientTrust(2) instead."
+     ::= { cienaCesDhcpv6LdraVsTrustEntry 4 }
+
+ --
+ -- DHCPv6 LDRA VS Statistics
+ --
+ cienaCesDhcpv6LdraVsStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraVsStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table to display VS statistics for each VS LDRA."
+     ::= { cienaCesDhcpv6RelayAgent 10 }
+
+ cienaCesDhcpv6LdraVsStatsEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraVsStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Entry in the table to display VS LDRA statistics."
+     INDEX { cienaCesDhcpv6LdraVsVlan }
+     ::= { cienaCesDhcpv6LdraVsStatsTable 1 }
+
+ CienaCesDhcpV6LdraVsStatsEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraVsPktsForRelay                        Counter32,
+     cienaCesDhcpv6LdraVsRelayedClient                       Counter32,
+     cienaCesDhcpv6LdraVsRelayedServer                       Counter32,
+     cienaCesDhcpv6LdraVsUntrustedClientPortPktsRx           Counter32,
+     cienaCesDhcpv6LdraVsUntrustedServerPortPktsRx           Counter32,
+     cienaCesDhcpv6LdraVsFailedValidationPktDrop             Counter32,
+     cienaCesDhcpv6LdraVsInvalidConfigPktDrop                Counter32,
+     cienaCesDhcpv6LdraVsExceededHopCountPktDrop             Counter32,
+     cienaCesDhcpv6LdraVsExceedMTUPktDrop                    Counter32,
+     cienaCesDhcpv6LdraVsNoTrustedServerPktDrop              Counter32,
+     cienaCesDhcpv6LdraVsNoTrustedClientPktDrop              Counter32,
+     cienaCesDhcpv6LdraVsIPv6FragBadExtHdrPktDrop            Counter32,
+     cienaCesDhcpv6LdraVsGeneralErrors                       Counter32,
+     cienaCesDhcpv6LdraVsStatsClear                          CienaStatsClear
+  }
+
+ cienaCesDhcpv6LdraVsPktsForRelay   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of packets sent to this relay process."
+     ::= { cienaCesDhcpv6LdraVsStatsEntry 1 }
+
+ cienaCesDhcpv6LdraVsRelayedClient   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of client sourced DHCPv6 packets relayed."
+     ::= { cienaCesDhcpv6LdraVsStatsEntry 2 }
+
+ cienaCesDhcpv6LdraVsRelayedServer   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of server sourced DHCPv6 packets relayed."
+     ::= { cienaCesDhcpv6LdraVsStatsEntry 3 }
+
+ cienaCesDhcpv6LdraVsUntrustedClientPortPktsRx OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of client DHCPv6 packets dropped because they were
+             received on untrusted client ports."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 4 }
+
+ cienaCesDhcpv6LdraVsUntrustedServerPortPktsRx OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of server DHCPv6 packets dropped because they were
+             received on untrusted server ports."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 5 }
+
+ cienaCesDhcpv6LdraVsFailedValidationPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to failed validation."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 6 }
+
+ cienaCesDhcpv6LdraVsInvalidConfigPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due
+             to LDRA configuration issues."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 7 }
+
+ cienaCesDhcpv6LdraVsExceededHopCountPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to hop count
+             in the packet exceeding hop count the limit."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 8 }
+
+ cienaCesDhcpv6LdraVsExceedMTUPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped because the new
+             relay frame size would exceed the MTU."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 9 }
+
+ cienaCesDhcpv6LdraVsNoTrustedServerPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped
+             because there are no server trusted ports configured."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 10 }
+
+ cienaCesDhcpv6LdraVsNoTrustedClientPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped
+             because there are no client trusted ports configured."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 11 }
+
+ cienaCesDhcpv6LdraVsIPv6FragBadExtHdrPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to IPv6 packet
+             extension headers that could not be processed."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 12 }
+
+ cienaCesDhcpv6LdraVsGeneralErrors OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object reports the number of DHCPv6 packets dropped due to unclassified errors."
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 13 }
+
+ cienaCesDhcpv6LdraVsStatsClear OBJECT-TYPE
+     SYNTAX         CienaStatsClear
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object when set to 'true', clears DHCPv6 LDRA stats for given VLAN."
+     DEFVAL { none }
+ ::= { cienaCesDhcpv6LdraVsStatsEntry 14 }
+
+ --
+ -- DHCPv6 LDRA VS Interface ID String Table
+ --
+ cienaCesDhcpv6LdraVsIntidStringTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraVsIntidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify CID strings for VS ports and VLANs
+             that the LDRA can specify in Option 82 CID information."
+     ::= { cienaCesDhcpv6RelayAgent 11 }
+
+ cienaCesDhcpv6LdraVsIntidStringEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraVsIntidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify an interface ID
+             string for VS port and VLAN combinations."
+     INDEX { cienaCesDhcpv6LdraVlan, cienaCesDhcpv6LdraVsPort }
+     ::= { cienaCesDhcpv6LdraVsIntidStringTable 1 }
+
+ CienaCesDhcpV6LdraVsIntidStringEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraVsIntidString              DisplayString,
+     cienaCesDhcpv6LdraVsIntidStringRowStatus     RowStatus
+  }
+
+ cienaCesDhcpv6LdraVsIntidString   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..64))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object is used to get and set the IntID string for the port."
+     ::= { cienaCesDhcpv6LdraVsIntidStringEntry 1 }
+
+ cienaCesDhcpv6LdraVsIntidStringRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the conceptual rows in this table.
+             To create a row in this table set this object to 'createAndGo'.
+             To delete a row in this table set this object to 'destroy'."
+     ::= { cienaCesDhcpv6LdraVsIntidStringEntry 2 }
+
+ --
+ -- DHCPv6 LDRA VS RID String Table
+ --
+ cienaCesDhcpv6LdraVsRidStringTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraVsRidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify RID strings for VS ports and VLANs
+              that the DHCPv6 LDRA can specify in Option 82 RID information."
+     ::= { cienaCesDhcpv6RelayAgent 12 }
+
+ cienaCesDhcpv6LdraVsRidStringEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraVsRidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify an RID string for
+             VS port and VLAN combinations."
+     INDEX { cienaCesDhcpv6LdraVlan, cienaCesDhcpv6LdraVsPort }
+     ::= { cienaCesDhcpv6LdraVsRidStringTable 1 }
+
+ CienaCesDhcpV6LdraVsRidStringEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraVsRidString                DisplayString,
+     cienaCesDhcpv6LdraVsRidStringRowStatus       RowStatus
+ }
+
+ cienaCesDhcpv6LdraVsRidString   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..64))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This MIB object is used to get and set the RID string for the port."
+     ::= { cienaCesDhcpv6LdraVsRidStringEntry 1 }
+
+ cienaCesDhcpv6LdraVsRidStringRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+              conceptual rows in this table.
+
+              To create a row in this table set this object
+              to 'createAndGo'.
+
+              To delete a row in this table set this object
+              to 'destroy'."
+     ::= { cienaCesDhcpv6LdraVsRidStringEntry 2 }
+
+ --
+ -- Table to control DHCPv6 LDRA functionality on MPLS
+ --
+ cienaCesDhcpv6LdraMplsStateTable OBJECT-TYPE
+     SYNTAX             SEQUENCE OF CienaCesDhcpV6LdraMplsStateEntry
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+             "Table allows changing configuration of DHCPv6 LDRA functionality
+             for each MPLS VS."
+     ::= { cienaCesDhcpv6RelayAgent 13 }
+
+ cienaCesDhcpv6LdraMplsStateEntry OBJECT-TYPE
+     SYNTAX             CienaCesDhcpV6LdraMplsStateEntry
+     MAX-ACCESS         not-accessible
+     STATUS             current
+     DESCRIPTION
+             "Entry in the table to configure DHCPv6 LDRA functionality."
+     INDEX { cienaCesDhcpv6LdraMplsId }
+     ::= { cienaCesDhcpv6LdraMplsStateTable 1 }
+
+ CienaCesDhcpV6LdraMplsStateEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraMplsId           Unsigned32,
+     cienaCesDhcpv6LdraMplsName         DisplayString,
+     cienaCesDhcpv6LdraMplsAdminState   CienaGlobalState,
+     cienaCesDhcpv6LdraMplsOperState    CienaGlobalState,
+     cienaCesDhcpv6LdraMplsRowStatus    RowStatus
+  }
+
+ cienaCesDhcpv6LdraMplsId   OBJECT-TYPE
+     SYNTAX         Unsigned32 (1..1677215)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the MPLS VS on which DHCPv6 LDRA is configured."
+     ::= { cienaCesDhcpv6LdraMplsStateEntry 1 }
+
+ cienaCesDhcpv6LdraMplsName   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..31))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object shows the name of the MPLS VS on which DHCPv6 LDRA
+             is configured."
+     ::= { cienaCesDhcpv6LdraMplsStateEntry 2 }
+
+ cienaCesDhcpv6LdraMplsAdminState   OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object allows the user to disable or enable DHCPv6 LDRA
+             functionality on the given MPLS VS specified by
+             cienaCesDhcpv6LdraMplsId."
+     ::= { cienaCesDhcpv6LdraMplsStateEntry 3 }
+
+ cienaCesDhcpv6LdraMplsOperState   OBJECT-TYPE
+     SYNTAX         CienaGlobalState
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object shows the operational status of the DHCPv6 LDRA on the given MPLS VS."
+     ::= { cienaCesDhcpv6LdraMplsStateEntry 4 }
+
+ cienaCesDhcpv6LdraMplsRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Set this object to 'Destroy' to terminate DHCPv6 LDRA Relaying
+              on the MPLS VS specified by cienaCesDhcpv6LdraMplsId.
+
+              Set this object to 'CreateAndGo' to enable DHCPv6 LDRA Relaying
+              on the MPLS VS specified by cienaCesDhcpv6LdraMplsId."
+     ::= { cienaCesDhcpv6LdraMplsStateEntry 5 }
+
+ --
+ -- DHCPv6 LDRA MPLS Trust Table
+ --
+ cienaCesDhcpv6LdraMplsTrustTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraMplsTrustEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify the MPLS VSs and interfaces that
+             the DHCPv6 LDRA can trust."
+     ::= { cienaCesDhcpv6RelayAgent 14 }
+
+ cienaCesDhcpv6LdraMplsTrustEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraMplsTrustEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify the MPLS VS and
+             interface to be trusted."
+     INDEX { cienaCesDhcpv6LdraMplsId, cienaCesDhcpv6LdraMplsInterface }
+     ::= { cienaCesDhcpv6LdraMplsTrustTable 1 }
+
+ CienaCesDhcpV6LdraMplsTrustEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraMplsInterface        Unsigned32,
+     cienaCesDhcpv6LdraMplsVcName           DisplayString,
+     cienaCesDhcpv6LdraMplsInterfaceState   INTEGER,
+     cienaCesDhcpv6LdraMplsTrustMode        INTEGER
+  }
+
+ cienaCesDhcpv6LdraMplsInterface   OBJECT-TYPE
+     SYNTAX         Unsigned32 (1..4294967295)
+     MAX-ACCESS     not-accessible
+     STATUS         current
+     DESCRIPTION
+             "This object is used as an index in the table and is used to
+             specify the MPLS interface."
+     ::= { cienaCesDhcpv6LdraMplsTrustEntry 1 }
+
+ cienaCesDhcpv6LdraMplsVcName   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..31))
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object shows the name of the MPLS VC."
+     ::= { cienaCesDhcpv6LdraMplsTrustEntry 2 }
+
+ cienaCesDhcpv6LdraMplsInterfaceState   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        active(1),
+                        inactive(2)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object reports whether the specified interface is active or
+             inactive."
+     ::= { cienaCesDhcpv6LdraMplsTrustEntry 3 }
+
+ cienaCesDhcpv6LdraMplsTrustMode   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        client(1),
+                        clientTrust(2),
+                        serverTrust(3),
+                        dualRoleTrust(4),
+                        unTrust(5)
+                    }
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object is used to set the interface as client trusted,
+             server trusted or not trusted.
+
+             Note that the client(1) mode is deprecated. That value will
+             never be returned. Setting that value will set the mode to
+             clientTrust(2) instead."
+     ::= { cienaCesDhcpv6LdraMplsTrustEntry 4 }
+
+ --
+ -- DHCPv6 LDRA MPLS Statistics
+ --
+ cienaCesDhcpv6LdraMplsStatsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraMplsStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table to display MPLS statistics for each MPLS LDRA."
+     ::= { cienaCesDhcpv6RelayAgent 15 }
+
+ cienaCesDhcpv6LdraMplsStatsEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraMplsStatsEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Entry in the table to display MPLS LDRA statistics."
+     INDEX { cienaCesDhcpv6LdraMplsId }
+     ::= { cienaCesDhcpv6LdraMplsStatsTable 1 }
+
+ CienaCesDhcpV6LdraMplsStatsEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraMplsPktsForRelay                        Counter32,
+     cienaCesDhcpv6LdraMplsRelayedClient                       Counter32,
+     cienaCesDhcpv6LdraMplsRelayedServer                       Counter32,
+     cienaCesDhcpv6LdraMplsUntrustedClientInterfacePktsRx      Counter32,
+     cienaCesDhcpv6LdraMplsUntrustedServerInterfacePktsRx      Counter32,
+     cienaCesDhcpv6LdraMplsFailedValidationPktDrop             Counter32,
+     cienaCesDhcpv6LdraMplsInvalidConfigPktDrop                Counter32,
+     cienaCesDhcpv6LdraMplsExceededHopCountPktDrop             Counter32,
+     cienaCesDhcpv6LdraMplsExceedMTUPktDrop                    Counter32,
+     cienaCesDhcpv6LdraMplsNoTrustedServerPktDrop              Counter32,
+     cienaCesDhcpv6LdraMplsNoTrustedClientPktDrop              Counter32,
+     cienaCesDhcpv6LdraMplsIPv6FragBadExtHdrPktDrop            Counter32,
+     cienaCesDhcpv6LdraMplsGeneralErrors                       Counter32,
+     cienaCesDhcpv6LdraMplsStatsClear                          CienaStatsClear
+  }
+
+ cienaCesDhcpv6LdraMplsPktsForRelay   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of packets sent to this relay process."
+     ::= { cienaCesDhcpv6LdraMplsStatsEntry 1 }
+
+ cienaCesDhcpv6LdraMplsRelayedClient   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of client sourced DHCPv6 packets relayed."
+     ::= { cienaCesDhcpv6LdraMplsStatsEntry 2 }
+
+ cienaCesDhcpv6LdraMplsRelayedServer   OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of server sourced DHCPv6 packets relayed."
+     ::= { cienaCesDhcpv6LdraMplsStatsEntry 3 }
+
+ cienaCesDhcpv6LdraMplsUntrustedClientInterfacePktsRx OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of client DHCPv6 packets
+             dropped because they were received on untrusted client
+             interfaces."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 4 }
+
+ cienaCesDhcpv6LdraMplsUntrustedServerInterfacePktsRx OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of server DHCPv6 packets
+             dropped because they were received on untrusted server
+             interfaces."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 5 }
+
+ cienaCesDhcpv6LdraMplsFailedValidationPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to failed validation."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 6 }
+
+ cienaCesDhcpv6LdraMplsInvalidConfigPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due
+             to LDRA configuration issues."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 7 }
+
+ cienaCesDhcpv6LdraMplsExceededHopCountPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to hop count
+             in the packet exceeding hop count the limit."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 8 }
+
+ cienaCesDhcpv6LdraMplsExceedMTUPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped because the new
+             relay frame size would exceed the MTU."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 9 }
+
+ cienaCesDhcpv6LdraMplsNoTrustedServerPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped
+             because there are no server trusted interfaces configured."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 10 }
+
+ cienaCesDhcpv6LdraMplsNoTrustedClientPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped
+             because there are no client trusted interfaces configured."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 11 }
+
+ cienaCesDhcpv6LdraMplsIPv6FragBadExtHdrPktDrop OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to IPv6 packet
+             extension headers that could not be processed."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 12 }
+
+ cienaCesDhcpv6LdraMplsGeneralErrors OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the number of DHCPv6 packets dropped due to unclassified errors."
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 13 }
+
+ cienaCesDhcpv6LdraMplsStatsClear OBJECT-TYPE
+     SYNTAX         CienaStatsClear
+     MAX-ACCESS     read-write
+     STATUS         current
+     DESCRIPTION
+             "This object when set to 'true', clears DHCPv6 LDRA stats for given VLAN."
+     DEFVAL { none }
+ ::= { cienaCesDhcpv6LdraMplsStatsEntry 14 }
+
+ --
+ -- DHCPv6 LDRA MPLS Interface ID String Table
+ --
+ cienaCesDhcpv6LdraMplsIntidStringTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraMplsIntidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify interface ID strings for MPLS VSs
+             and interfaces that the DHCPv6 LDRA can specify in Option 82 CID
+             information."
+     ::= { cienaCesDhcpv6RelayAgent 16 }
+
+ cienaCesDhcpv6LdraMplsIntidStringEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraMplsIntidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify an interface ID
+             string for MPLS VS and interface combinations."
+     INDEX { cienaCesDhcpv6LdraMplsId, cienaCesDhcpv6LdraMplsInterface }
+     ::= { cienaCesDhcpv6LdraMplsIntidStringTable 1 }
+
+ CienaCesDhcpV6LdraMplsIntidStringEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraMplsIntidString              DisplayString,
+     cienaCesDhcpv6LdraMplsIntidStringRowStatus     RowStatus
+  }
+
+ cienaCesDhcpv6LdraMplsIntidString   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..64))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This object is used to get and set the IntID string for the
+             interface."
+     ::= { cienaCesDhcpv6LdraMplsIntidStringEntry 1 }
+
+ cienaCesDhcpv6LdraMplsIntidStringRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the conceptual rows in this table.
+             To create a row in this table set this object to 'createAndGo'.
+             To delete a row in this table set this object to 'destroy'."
+     ::= { cienaCesDhcpv6LdraMplsIntidStringEntry 2 }
+
+ --
+ -- DHCPv6 LDRA MPLS RID String Table
+ --
+ cienaCesDhcpv6LdraMplsRidStringTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesDhcpV6LdraMplsRidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "This table is used to specify RID strings for MPLS VSs and
+             interfaces that the DHCPv6 LDRA can specify in Option 82 RID
+             information."
+     ::= { cienaCesDhcpv6RelayAgent 17 }
+
+ cienaCesDhcpv6LdraMplsRidStringEntry OBJECT-TYPE
+     SYNTAX       CienaCesDhcpV6LdraMplsRidStringEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Each entry in this table is used to specify an RID string for
+             MPLS VS and interface combinations."
+     INDEX { cienaCesDhcpv6LdraMplsId, cienaCesDhcpv6LdraMplsInterface }
+     ::= { cienaCesDhcpv6LdraMplsRidStringTable 1 }
+
+ CienaCesDhcpV6LdraMplsRidStringEntry ::= SEQUENCE {
+     cienaCesDhcpv6LdraMplsRidString                DisplayString,
+     cienaCesDhcpv6LdraMplsRidStringRowStatus       RowStatus
+ }
+
+ cienaCesDhcpv6LdraMplsRidString   OBJECT-TYPE
+     SYNTAX         DisplayString (SIZE (1..64))
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "This MIB object is used to get and set the RID string for the
+             interface."
+     ::= { cienaCesDhcpv6LdraMplsRidStringEntry 1 }
+
+ cienaCesDhcpv6LdraMplsRidStringRowStatus   OBJECT-TYPE
+     SYNTAX         RowStatus
+     MAX-ACCESS     read-create
+     STATUS         current
+     DESCRIPTION
+             "Used to manage the creation and deletion of the
+              conceptual rows in this table.
+
+              To create a row in this table set this object
+              to 'createAndGo'.
+
+              To delete a row in this table set this object
+              to 'destroy'."
+     ::= { cienaCesDhcpv6LdraMplsRidStringEntry 2 }
+
+ --
+ -- Notifications
+ --
+
+ -- There are currently no DHCPv6 notifications.
+
+ END
+
+ --
+ -- CIENA-CES-DHCPV6-CLIENT-MIB.my
+ --

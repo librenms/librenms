@@ -1,0 +1,97 @@
+-- IRMS-MIB { iso org(3) dod(6) internet(1) private(4)
+-- enterprises(1) riello(5491) }
+
+SENSORTRAP-MIB DEFINITIONS ::= BEGIN
+
+-- Title: SENSOR TRAP MIB
+-- Version: 1.0 by Michele Marcon
+-- Date: 02.11.2009
+
+IMPORTS
+     enterprises
+         FROM RFC1155-SMI
+     OBJECT-TYPE
+         FROM RFC-1212
+     TRAP-TYPE
+         FROM RFC-1215;
+
+
+rielloMIB OBJECT IDENTIFIER ::= { enterprises 5491 }
+
+sensorgroup              OBJECT IDENTIFIER ::= { rielloMIB 9 }
+                                    
+sensor                  OBJECT IDENTIFIER ::= { sensorgroup 1 }
+
+sensorId OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+            "The number of the sensor."
+    ::= { sensor 1 }
+
+sensorTrapGroup OBJECT IDENTIFIER ::= { sensor 2 }
+
+
+sensorAlarmTMax TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent each minute when temperature reaches maximum level"     
+       ::= 1
+
+sensorAlarmTMaxRemoved TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent when temperature returns to standard level"     
+       ::= 2
+
+sensorAlarmTMin TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent each minute when temperature reaches minimum level"     
+       ::= 3
+
+sensorAlarmTMinRemoved TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent when temperature returns to standard level"     
+       ::= 4
+
+sensorIOAlarm TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent each minute when input contact is in alarm"     
+       ::= 5
+
+sensorIOAlarmRemoved TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent when input contact is normal"     
+       ::= 6
+
+sensorHumidityAlarm TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent each minute when humidity reaches maximum level"     
+       ::= 7
+
+sensorHumidityAlarmRemoved TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent when humidity returns to normal level"     
+       ::= 8
+
+sensorHumidityLowAlarm TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent each minute when humidity reaches minimum level"     
+       ::= 9
+
+sensorHumidityLowAlarmRemoved TRAP-TYPE
+       ENTERPRISE  sensorTrapGroup 
+       VARIABLES { sensorId }
+       DESCRIPTION "This trap is sent when humidity returns to normal level"     
+       ::= 10
+
+END
+

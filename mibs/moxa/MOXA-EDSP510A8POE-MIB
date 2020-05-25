@@ -1,0 +1,4880 @@
+
+-- *****************************************************************
+-- Moxa EtherDevice Switch EDSP510A_8POE MIB
+--
+-- Copyright (c) 2011 by Moxa Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+MOXA-EDSP510A8POE-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        enterprises, MODULE-IDENTITY, NOTIFICATION-TYPE, IpAddress, OBJECT-TYPE
+        	FROM SNMPv2-SMI
+        DateAndTime, TEXTUAL-CONVENTION, MacAddress, DisplayString  
+        	FROM SNMPv2-TC;
+
+    moxa 		OBJECT IDENTIFIER ::= { enterprises 8691 }	-- 1.3.6.1.4.1.8691    
+    industrialEthernet	OBJECT IDENTIFIER ::= { moxa 7 }		-- 1.3.6.1.4.1.8691.7
+               
+    edsp510a8poe   MODULE-IDENTITY                 
+	    LAST-UPDATED "201701160000Z"
+	    ORGANIZATION "Moxa Inc."
+	    CONTACT-INFO
+	            "Postal: Moxa Inc.
+	             Fl.4, No.135,Lane 235,Pao-Chiao Rd.
+	             Shing Tien City,Taipei,Taiwan,R.O.C
+	          
+	             Tel: +866-2-89191230 "
+	             
+	    DESCRIPTION
+	            "The MIB module for Moxa EDSP510A-8PoE series specific information."   
+
+    REVISION    "201701160000Z"
+        DESCRIPTION
+            "Remove objects:
+                igmpSnoopingMulticastGroupTable,
+                igmpSnoopingMulticastGroupEntry,
+                igmpSnoopingIpGroup,
+                igmpSnoopingMacGroup,
+                igmpSnoopingJoinedPorts,
+                enhancedMode
+             Fix TYPO"
+
+	REVISION    "201506300000Z"
+    	DESCRIPTION
+            "Support v3.5 firmware,
+             Added new objects: 
+            	multicastFastForwarding,
+            	 
+             Modified objects:
+             	n/a"     	    
+
+    	REVISION    "201301080000Z"
+    	DESCRIPTION
+            "Support TurboPack2 v3.3 firmware,
+             Added new objects: 
+            	timeProtocolOption,    	            	                    	 
+            	loopProtection,
+            	calibratePeriod,
+            	monitorSFPTable,
+            	eventlog,
+            	 
+             Modified objects:
+             	Vlan,
+             	enableModbusTCP,
+            	enableWarmStart,
+            	mibNotificationsPrefix,
+            	dhcpRelayAgentSetting"
+
+    	REVISION    "201212190000Z"
+    	DESCRIPTION
+            "Support TurboPack2 v3.1 firmware,
+             Added new objects: 
+            	spanningTreePortEdge,            	            	
+            	enableEtherNetIP,
+            	enableModbus,
+            	enableNTPServer,
+            	userLoginSetting,
+            	cpuLoading5s,
+            	cpuLoading30s,
+            	cpuLoading300s,
+            	totalMemory,
+            	freeMemory,
+            	usedMemory,
+            	memoryUsage,            	
+            	 
+             Modified objects:
+             	Vlan,
+             	commRedundancy,
+             	rateLimiting,
+             	ieee1588Setting"
+             
+	    ::= { industrialEthernet 86 }    -- 1.3.6.1.4.1.8691.7.86
+    
+-- -------------------------------------------------------------
+-- groups in the MOXA-EDSP510 MIB
+-- -------------------------------------------------------------
+	mibNotificationsPrefix OBJECT IDENTIFIER
+    ::= { edsp510a8poe 0 }
+
+swMgmt		OBJECT IDENTIFIER ::= { edsp510a8poe 1 }			-- 1.3.6.1.4.1.8691.7.86.1    
+swTraps		OBJECT IDENTIFIER ::= { edsp510a8poe 2 }			-- 1.3.6.1.4.1.8691.7.86.2    
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+
+PortList ::= TEXTUAL-CONVENTION
+	STATUS			current
+	DESCRIPTION		
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying ports 1 through
+        8, the second octet specifying ports 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered port, and the least significant bit
+        represents the highest numbered port.  Thus, each port
+        of the bridge is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that port is included in the set of ports; the port
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+	
+-- -------------------------------------------------------------
+-- swMgmt group
+-- -------------------------------------------------------------
+
+    numberOfPorts OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total Ports."
+        ::= { swMgmt 1 }
+    
+    switchModel OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The switch model."
+        ::= { swMgmt 2 }
+    
+    firmwareVersion OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The firmware version."
+        ::= { swMgmt 4 }
+    
+    enableWebConfig OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), httpOrHttps(1), httpsOnly(2) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the Web. configuration function."
+        ::= { swMgmt 5 }
+    
+    consoleLoginMode OBJECT-TYPE
+        SYNTAX INTEGER  { menu(0), cli(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This option can change console login mode."
+        ::= { swMgmt 51 }    
+    
+    enableTelnetConsole OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable telnet console."
+        ::= { swMgmt 6 }
+    
+    lineSwapRecovery OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable line-swap-fast-recovery function."
+        ::= { swMgmt 7 }
+    
+    webTimeout OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Web Timeout"
+        ::= { swMgmt 43 }
+        
+     ageTime OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Web Timeout"
+        ::= { swMgmt 44 }       
+-- -------------------------------------------------------------
+-- network settings
+-- -------------------------------------------------------------
+    
+    networkSetting OBJECT IDENTIFIER ::= { swMgmt 8 }
+    
+    switchIpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The IP Address of this switch."
+        ::= { networkSetting 1 }
+    
+    switchIpMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The netmask of this switch."
+        ::= { networkSetting 2 }
+    
+    defaultGateway OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The default gateway of this switch."
+        ::= { networkSetting 3 }
+    
+    enableAutoIpConfig OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enableDHCP(1),enableBOOTP(2)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the automatic IP address configuration function."
+        ::= { networkSetting 4 }
+    
+    dnsServer1IpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The first DNS server's IP address"
+        ::= { networkSetting 5 }
+        
+    snmpTrapCommunity OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The SNMP trap community name"
+        ::= { networkSetting 6 }
+    
+    trapServerAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The IP address/Domain name of SNMP trap server"
+        ::= { networkSetting 7 }
+        
+    dnsServer2IpAddr OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The second DNS server's IP address"
+        ::= { networkSetting 8 }
+
+    snmpReadCommunity OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The SNMP read community name"
+        ::= { networkSetting 9 }
+
+    snmpTrap2Community OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The Second SNMP trap community name"
+        ::= { networkSetting 11 }
+    
+    trap2ServerAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The IP address/Domain name of Second SNMP trap server"
+        ::= { networkSetting 12 }
+        
+    snmpInformEnable OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the snmpInform function."
+        ::= { networkSetting 13 }
+    
+    snmpInformRetries OBJECT-TYPE
+        SYNTAX INTEGER (1..99)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The snmp inform retry times of SNMP trap server"            
+        ::= { networkSetting 14 }
+    
+    snmpInformTimeout OBJECT-TYPE
+        SYNTAX INTEGER (1..300)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The snmp inform interval of SNMP trap server"   
+        ::= { networkSetting 15 }            
+                
+     dhcpRetryPeriods  OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The DHCP retry periods."   
+        ::= { networkSetting 16 }                
+     
+     dhcpRetryTimes  OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The dhcp retry times."   
+        ::= { networkSetting 17 }                   
+                
+-- -------------------------------------------------------------
+-- port settings
+-- -------------------------------------------------------------
+
+    portSetting OBJECT IDENTIFIER ::= { swMgmt 9 }
+    
+    portTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The port table."
+        ::= { portSetting 1 }
+    
+    portEntry OBJECT-TYPE
+        SYNTAX PortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The port entry."
+        INDEX { portIndex }
+        ::= { portTable 1 }
+        
+    PortEntry ::=
+        SEQUENCE {
+            portIndex
+                INTEGER,
+            portDesc
+            	DisplayString,
+            portEnable
+                INTEGER,
+            portSpeed
+                INTEGER,
+            portMDI
+                INTEGER,
+            portFDXFlowCtrl
+                INTEGER,
+            portName
+                DisplayString
+        }
+    
+    portIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The port index."
+        ::= { portEntry 1 }
+        
+    portDesc OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The port description"
+        ::= { portEntry 2 } 
+
+    portEnable OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the port."
+        ::= { portEntry 3 }
+    
+    portSpeed OBJECT-TYPE
+        SYNTAX INTEGER {
+	        auto(0),
+	        speed100M-Full(1),
+	        speed100M-Half(2),
+	        speed10M-Full(3),
+	        speed10M-Half(4),  
+	        speed1000M-Full(5) 
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port speed and duplex."
+        ::= { portEntry 4 }
+    
+    portMDI OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        	na(0),
+            auto(1),
+            mdi(2),
+            mdiX(3)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The port MDI/MDIX."
+        ::= { portEntry 5 }     
+        
+    portFDXFlowCtrl OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The port FDX Flow Control"
+        ::= { portEntry 6 } 
+        
+    portName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The port Name"
+        ::= { portEntry 7 } 
+        
+-- -------------------------------------------------------------
+-- monitor
+-- -------------------------------------------------------------
+
+    monitor OBJECT IDENTIFIER ::= { swMgmt 10 }
+    
+    power1InputStatus OBJECT-TYPE
+        SYNTAX INTEGER { not-present(0), present(1) }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The status of the first power input."
+        ::= { monitor 1 }
+    
+    power2InputStatus OBJECT-TYPE
+        SYNTAX INTEGER { not-present(0), present(1) }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The status of the second power input."
+        ::= { monitor 2 }
+
+    monitorPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MonitorPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The  port table of monitor function."
+        ::= { monitor 3 }
+    
+    monitorPortEntry OBJECT-TYPE
+        SYNTAX MonitorPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The port table entry of monitor function."
+        INDEX { portIndex }        
+        ::= { monitorPortTable 1 }
+        
+    MonitorPortEntry ::=
+        SEQUENCE {
+            monitorLinkStatus
+                INTEGER,
+            monitorSpeed
+                INTEGER,
+            monitorAutoMDI
+                INTEGER,
+            monitorTraffic
+                INTEGER,
+            monitorFDXFlowCtrl
+                INTEGER,
+            monitorTxTraffic
+                INTEGER,
+            monitorRxTraffic
+                INTEGER
+        }
+        
+    monitorLinkStatus OBJECT-TYPE
+        SYNTAX INTEGER { disable(-1), off(0), on(1) }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The port link status."
+        ::= { monitorPortEntry 2}
+    
+    monitorSpeed OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+			speed1000M-Full(5),
+            speed1000M-Half(4),
+            speed100M-Full(3),
+            speed100M-Half(2),
+            speed10M-Full(1),
+            speed10M-Half(0),
+            na(-1)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The port speed and duplex status."
+        ::= { monitorPortEntry 3 }
+    
+    monitorAutoMDI OBJECT-TYPE
+        SYNTAX INTEGER
+            {            
+            mdiX(1),
+            mdi(0),
+            na(-1)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The port MDI/MDIX status."
+        ::= { monitorPortEntry 4 }
+    
+    monitorTraffic OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The traffic loading percentage of port."
+        ::= { monitorPortEntry 5 }
+        
+    monitorFDXFlowCtrl OBJECT-TYPE
+        SYNTAX INTEGER { off(0),on(1)}
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The Full-Duplex flow control status"
+        ::= { monitorPortEntry 6 }
+                
+		monitorTxTraffic OBJECT-TYPE
+		    SYNTAX INTEGER
+		    MAX-ACCESS read-only                
+		    STATUS current
+		    DESCRIPTION
+		        "The TX  traffic loading percentage of port."
+		    ::= { monitorPortEntry 7 }
+		
+		monitorRxTraffic OBJECT-TYPE
+		    SYNTAX INTEGER
+		    MAX-ACCESS read-only                
+		    STATUS current
+		    DESCRIPTION
+		        "The RTX  traffic loading percentage of port."
+		    ::= { monitorPortEntry 8 }
+		                
+    monitorDiTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MonitorDiEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The DI table of monitor function."
+        ::= { monitor 4 }
+    
+    monitorDiEntry OBJECT-TYPE
+        SYNTAX MonitorDiEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The DI table entry of monitor function."
+        INDEX { diIndex }
+        ::= { monitorDiTable 1 }
+        
+    MonitorDiEntry ::=
+        SEQUENCE {
+            diIndex
+                INTEGER,
+            diInputStatus
+                INTEGER
+        }
+    
+    diIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..2)
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The DI index of monitor function"
+        ::= { monitorDiEntry 1 }        
+    
+    diInputStatus OBJECT-TYPE
+        SYNTAX INTEGER { off(0), on(1) }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The DI input status."
+        ::= { monitorDiEntry 2 }
+        
+        
+-- -------------------------------------------------------------
+-- Monitor SFP Informations
+-- Add by Steven SC Yen 2013-01-17
+-- -------------------------------------------------------------                                
+                                      
+    monitorSFPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF MonitorSFPEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The SFP table of monitor function."
+        ::= { monitor 7 }
+    
+    monitorSFPEntry OBJECT-TYPE
+        SYNTAX MonitorSFPEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The SFP table entry of monitor function."
+        INDEX { portIndex }
+        ::= { monitorSFPTable 1 }
+                                      
+                                      
+    MonitorSFPEntry ::=
+        SEQUENCE {
+            sfpPort
+                DisplayString,
+            sfpModelName
+                DisplayString,
+            sfpTemperature
+            	DisplayString,
+            sfpVoltage
+            	DisplayString,
+            sfpTxPower
+            	DisplayString,
+            sfpRXPower
+            	DisplayString			
+        }
+                                      
+    sfpPort OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The SPF index of monitor function"
+        ::= { monitorSFPEntry 1 }                                        
+        
+    sfpModelName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The SPF ModelName of monitor function"
+        ::= { monitorSFPEntry 2 } 
+        
+    sfpTemperature OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The SPF Temperature of monitor function"
+        ::= { monitorSFPEntry 3 } 
+        
+    sfpVoltage OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The SPF Voltage of monitor function"
+        ::= { monitorSFPEntry 4 }            
+        
+    sfpTxPower OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The SPF TX power of monitor function"
+        ::= { monitorSFPEntry 5 }  
+        
+    sfpRXPower OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The SPF RX power of monitor function"
+        ::= { monitorSFPEntry 6 }          
+        
+-- -------------------------------------------------------------
+-- email warning
+-- -------------------------------------------------------------
+        
+    emailWarning OBJECT IDENTIFIER ::= { swMgmt 11 }     
+    emailService OBJECT IDENTIFIER ::= { emailWarning 1 }
+        
+    emailWarningMailServer OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The email server's Ip Address/Domain name of email warning function."
+        ::= { emailService 1 }
+        
+    emailWarningSMTPPort OBJECT-TYPE    
+        SYNTAX INTEGER (1..65536)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The email server's SMTP port of email warning function."
+        ::= { emailService 6 }     
+        
+            
+    emailWarningFirstEmailAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The first email address of email warning function."
+        ::= { emailService 2 }
+        
+    emailWarningSecondEmailAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The second email address of email warning function."
+        ::= { emailService 3 }
+        
+    emailWarningThirdEmailAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The third email address of email warning function."
+        ::= { emailService 4 }
+        
+    emailWarningFourthEmailAddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The fourth email address of email warning function."
+        ::= { emailService 5 }
+        
+    emailWarningEventType OBJECT IDENTIFIER ::= { emailWarning 2 }
+        
+    emailWarningEventServerColdStart OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch cold start event of email warning function."
+        ::= { emailWarningEventType 1 }
+        
+    emailWarningEventServerWarmStart OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The switch warm start event of email warning function."
+        ::= { emailWarningEventType 2 }
+        
+    emailWarningEventConfigChange OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The configuration changed event of email warning function."
+        ::= { emailWarningEventType 3 }
+        
+    emailWarningEventPowerOn2Off OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The power on event of email warning function."
+        ::= { emailWarningEventType 4 }
+        
+    emailWarningEventPowerOff2On OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The power off event of email warning function."
+        ::= { emailWarningEventType 5 }
+        
+    emailWarningEventAuthFail OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The authentication fail event of email warning function."
+        ::= { emailWarningEventType 6 }
+        
+    emailWarningEventTopologyChanged OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The communication redundancy topology changed event of email warning function."
+        ::= { emailWarningEventType 7 }     
+    
+    emailWarningEventPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EmailWarningEventPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The port table of the email warning event."
+        ::= { emailWarning 3 }
+    
+    emailWarningEventPortEntry OBJECT-TYPE
+        SYNTAX EmailWarningEventPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The port table entry of the email warning event."
+        INDEX { portIndex }        
+        ::= { emailWarningEventPortTable 1 }
+        
+    EmailWarningEventPortEntry ::=
+        SEQUENCE {
+            emailWarningEventPortLinkOn
+                INTEGER,
+            emailWarningEventPortLinkOff
+                INTEGER,
+            emailWarningEventPortTrafficOverload
+                INTEGER,
+            emailWarningEventPortRxTrafficThreshold
+                INTEGER,
+            emailWarningEventPortTrafficDuration
+                INTEGER             
+        }
+        
+    emailWarningEventPortLinkOn OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port link on event of email warning function."
+        ::= { emailWarningEventPortEntry 2 }
+        
+    emailWarningEventPortLinkOff OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port link off event of email warning function."
+        ::= { emailWarningEventPortEntry 3 }
+        
+    emailWarningEventPortTrafficOverload OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The port's traffic overloading event of email warning function."
+        ::= { emailWarningEventPortEntry 4 }
+        
+    emailWarningEventPortRxTrafficThreshold OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The port's traffic threshold of the overloading event."
+        ::= { emailWarningEventPortEntry 5 }   
+        
+    emailWarningEventPortTrafficDuration OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The port's traffic duration of the overloading event."
+        ::= { emailWarningEventPortEntry 6 }        
+    
+    emailWarningEventDiTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EmailWarningEventDiEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The DI table of the email warning event."
+        ::= { emailWarning 4 }
+    
+    emailWarningEventDiEntry OBJECT-TYPE
+        SYNTAX EmailWarningEventDiEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The DI table entry of the email warning event."
+        INDEX { diIndex }
+        ::= { emailWarningEventDiTable 1 }
+        
+    EmailWarningEventDiEntry ::=
+        SEQUENCE {
+            emailWarningEventDiInputOn2Off
+                INTEGER,
+            emailWarningEventDiInputOff2On
+                INTEGER
+        }
+
+    emailWarningEventDiInputOn2Off OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The DI input off event of email warning function ."
+        ::= { emailWarningEventDiEntry 1 }
+        
+    emailWarningEventDiInputOff2On OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The DI input on event of email warning function."
+        ::= { emailWarningEventDiEntry 2 }  
+        
+-- -------------------------------------------------------------
+-- set device ip
+-- -------------------------------------------------------------
+
+    setDeviceIp OBJECT IDENTIFIER ::= { swMgmt 12 }
+        
+    setDevIpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SetDevIpEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The set device IP table."
+        ::= { setDeviceIp 1 }
+    
+    setDevIpEntry OBJECT-TYPE
+        SYNTAX SetDevIpEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The set device IP table entry."
+        INDEX { setDevIpIndex }
+        ::= { setDevIpTable 1 }
+        
+    SetDevIpEntry ::=
+        SEQUENCE {
+            setDevIpIndex
+                INTEGER,
+            setDevIpCurrentIpofDevice
+                DisplayString,
+            setDevIpPresentBy
+                INTEGER,
+            setDevIpDedicatedIp
+                IpAddress
+        }
+    setDevIpIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The set device IP index."
+        ::= { setDevIpEntry 1 }
+    
+    setDevIpCurrentIpofDevice OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The current IP address of connected to this port."
+        ::= { setDevIpEntry 2 }
+    
+    setDevIpPresentBy OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            no(0),
+            dhcpClient(1),
+            rarp(2),
+            bootp(4)
+            }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The protocol used that assigning IP to the device."
+        ::= { setDevIpEntry 3 }
+    
+    setDevIpDedicatedIp OBJECT-TYPE
+        SYNTAX IpAddress 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The IP address when assign to the device connected to this port."
+        ::= { setDevIpEntry 4 } 
+        
+-- -------------------------------------------------------------
+-- port mirror
+-- -------------------------------------------------------------
+
+    mirroring OBJECT IDENTIFIER ::= { swMgmt 13 }
+        
+    targetPort OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The mirrored port of mirroring function."
+        ::= { mirroring 1 }
+    
+    mirroringPort OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The mirroring port of mirroring function."
+        ::= { mirroring 2 }
+    
+    monitorDirection OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            inputDataStream(0),
+            outputDataStream(1),
+            biDirectional(2)
+            }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The traffic direction of mirroring function."
+        ::= { mirroring 3 }     
+    
+-- -------------------------------------------------------------
+-- port trunking
+-- -------------------------------------------------------------
+    
+    portTrunking OBJECT IDENTIFIER ::= { swMgmt 14 }
+    
+    -- trunk setting table
+    
+    trunkSettingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TrunkSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Port Trunking Setting Table."
+        ::= { portTrunking 1 }
+
+    trunkSettingEntry OBJECT-TYPE
+        SYNTAX TrunkSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Port Trunking Setting Entry."
+        INDEX { trunkSettingIndex }
+        ::= { trunkSettingTable 1 }
+        
+    TrunkSettingEntry ::=
+        SEQUENCE {     
+            trunkSettingIndex
+                INTEGER,
+            trunkType
+            	INTEGER,
+            trunkMemberPorts
+            	PortList
+            }     
+    
+    trunkSettingIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Trunking Group Index."
+        ::= { trunkSettingEntry 1 }
+
+    trunkType OBJECT-TYPE
+        SYNTAX INTEGER {
+        	static(1),
+        	lacp(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Trunking Group Type."
+        ::= { trunkSettingEntry 2 }
+
+    trunkMemberPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Trunking Group Member Ports."
+        ::= { trunkSettingEntry 3 }
+
+	-- trunk table
+	
+    trunkTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TrunkEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Port Trunking Table."
+        ::= { portTrunking 2 }
+
+    trunkEntry OBJECT-TYPE
+        SYNTAX TrunkEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Port Trunking Entry."
+        INDEX { trunkIndex, trunkPort }
+        ::= { trunkTable 1 }
+        
+    TrunkEntry ::=
+        SEQUENCE {     
+            trunkIndex
+                INTEGER,
+            trunkPort
+            	INTEGER,
+            trunkStatus
+            	INTEGER
+            }     
+    
+    trunkIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Trunking Group Index."
+        ::= { trunkEntry 1 }
+
+    trunkPort OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Trunking Group Member Port."
+        ::= { trunkEntry 2 }
+
+    trunkStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+        	success(1),
+        	fail(2),
+        	standby(3)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Trunking Port Status."
+        ::= { trunkEntry 3 }
+
+-- -------------------------------------------------------------
+-- communication redundancy
+-- -------------------------------------------------------------
+        
+    commRedundancy OBJECT IDENTIFIER ::= { swMgmt 16 }        
+    
+    protocolOfRedundancySetup OBJECT-TYPE
+        SYNTAX INTEGER  { spanningTree(1), turboRing(2), turboRingV2(3), turboChain(4), mstp(5)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This set the redundancy protocol of this switch. "
+        ::= { commRedundancy 1 }
+    
+    turboRing OBJECT IDENTIFIER ::= { commRedundancy 2}
+    
+    turboRingMaster OBJECT-TYPE
+        SYNTAX INTEGER  { no(0), yes(1) }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "Is this a Master or Slave."
+        ::= { turboRing 1 }
+        
+    turboRingMasterSetup OBJECT-TYPE
+        SYNTAX INTEGER  { no(0), yes(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set this to be Master."
+        ::= { turboRing 2 }
+                
+    turboRingPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TurboRingPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Turbo Ring Port Table."
+        ::= { turboRing 3 }
+    
+    turboRingPortEntry OBJECT-TYPE
+        SYNTAX TurboRingPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Turbo Ring Port Entry."
+        INDEX { turboRingPortIndex  }
+        ::= { turboRingPortTable 1 }
+        
+    TurboRingPortEntry ::=
+        SEQUENCE {
+            turboRingPortIndex
+                INTEGER,
+            turboRingPortStatus
+                INTEGER,  
+            turboRingPortDesignatedBridge
+                OCTET STRING,
+            turboRingPortDesignatedPort
+                INTEGER
+        }
+    turboRingPortIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "Turbo Ring Port Index."
+        ::= { turboRingPortEntry 1 }
+    
+    turboRingPortStatus OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            portDisabled(0),     
+            notTurboRingPort(1),
+            linkDown(2),
+            blocked(3),
+            learning(4),
+            forwarding(5)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Turbo Ring Port Status."
+        ::= { turboRingPortEntry 2 } 
+        
+     turboRingPortDesignatedBridge OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The MAC address of the bridge which this
+              port considers to be the Designated Bridge for
+              this port's segment."
+        ::= { turboRingPortEntry 3 }
+
+    turboRingPortDesignatedPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+              "The Port Number of the port on the Designated
+               Bridge for this port's segment."  
+     ::= { turboRingPortEntry 4 }
+        
+    turboRingDesignatedMaster OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The MAC address of the bridge which is the Master of the TURBO RING."
+        ::= { turboRing 6 } 
+        
+    turboRingRdntPort1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The port number of 1st Redundant Port on the TURBO RING."
+        ::= { turboRing 7 } 
+        
+    turboRingRdntPort2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The port number of 2nd Redundant Port on the TURBO RING."
+        ::= { turboRing 8 } 
+        
+    turboRingEnableCoupling OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the ring coupling function."
+        ::= { turboRing 9 }     
+        
+    turboRingCouplingPort OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The coupling port of ring coupling function."
+        ::= { turboRing 10 }
+    
+    turboRingCouplingPortStatus OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            portDisabled(0),      
+            notCouplingPort(1),
+            linkDown(2),
+            blocked(3),
+            forwarding(5)
+            }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The coupling port status of ring coupling function."
+        ::= { turboRing 11 }        
+        
+    turboRingControlPort OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The control port of ring coupling function."
+        ::= { turboRing 12 }
+
+    turboRingControlPortStatus OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            portDisabled(0),      
+            notControlPort(1),
+            linkDown(2),
+            blocked(3),
+            forwarding(5),
+            inactive(6),
+            active(7)
+            }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The control port status of ring coupling function."
+        ::= { turboRing 13 }        
+        
+    turboRingBrokenStatus OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            na(0),
+            normal(1),
+            broken(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Turbo Ring broken display."
+        ::= { turboRing 14 }           
+        
+    spanningTree OBJECT IDENTIFIER ::= { commRedundancy 3 }
+        
+    spanningTreeRoot OBJECT-TYPE
+        SYNTAX INTEGER  { no(0), yes(1) }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The root of spanning tree."
+        ::= { spanningTree 1 }
+    
+    spanningTreeBridgePriority OBJECT-TYPE
+        SYNTAX INTEGER {priority0(0), priority4096(4096), priority8192(8192), priority12288(12288),
+                        priority16384(16384), priority20480(20480), priority24576(24576),
+                        priority28672(28672), priority32768(32768), priority36864(36864),
+                        priority40960(40960), priority45056(45056), priority49152(49152),
+                        priority53248(53248), priority57344(57344), priority61440(61440)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The bridge priority of spanning tree protocol."
+        ::= { spanningTree 2 }
+    
+    spanningTreeHelloTime OBJECT-TYPE
+        SYNTAX INTEGER  
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The hello time of spanning tree protocol."
+        ::= { spanningTree 3 }
+    
+    spanningTreeMaxAge OBJECT-TYPE
+        SYNTAX INTEGER  
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The max. age of spanning tree protocol."
+        ::= { spanningTree 4 }
+    
+    spanningTreeForwardingDelay OBJECT-TYPE
+        SYNTAX INTEGER  
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Tje forwarding delay of spanning tree protocol."
+        ::= { spanningTree 5 }
+    
+    spanningTreeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SpanningTreeEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The spanning tree table."
+        ::= { spanningTree 6 }
+    
+    spanningTreeEntry OBJECT-TYPE
+        SYNTAX SpanningTreeEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The spanning tree port entry."
+        INDEX { spanningTreeIndex }
+        ::= { spanningTreeTable 1 }
+        
+    SpanningTreeEntry ::=
+        SEQUENCE {
+            spanningTreeIndex
+                INTEGER,
+            enableSpanningTree
+                INTEGER,
+            spanningTreePortPriority
+                INTEGER,
+            spanningTreePortCost
+                INTEGER,
+            spanningTreePortStatus
+                INTEGER,
+            spanningTreePortEdge
+                INTEGER
+        }
+    spanningTreeIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The index of spanning tree table."
+        ::= { spanningTreeEntry 1 }
+    enableSpanningTree OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable of spanning tree protocol for this port."
+        ::= { spanningTreeEntry 2 }
+    
+    spanningTreePortPriority OBJECT-TYPE
+
+        SYNTAX INTEGER {priority0(0), priority16(16), priority32(32), priority48(48),
+                        priority64(64), priority80(80), priority96(96), priority112(112),
+                        priority128(128), priority144(144), priority160(160), priority176(176),
+                        priority192(192), priority208(208), priority224(224), priority240(240)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The port priority of spanning tree protocol."
+        ::= { spanningTreeEntry 3 }
+    
+    spanningTreePortCost OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The port cost of spanning tree protocol."
+        ::= { spanningTreeEntry 4 }
+    
+    spanningTreePortStatus OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            portDisabled(0),
+            notSpanningTreePort(1),
+            linkDown(2),
+            blocked(3),
+            learning(4),
+            forwarding(5)
+            }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The port status of spanning tree protocol."
+        ::= { spanningTreeEntry 5 }     
+        
+   spanningTreePortEdge OBJECT-TYPE
+        SYNTAX INTEGER { auto(0), forceEdge(1), false(2) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This configures the Edge Port property for this port."
+        ::= { spanningTreeEntry 6 }
+		
+   activeProtocolOfRedundancy OBJECT-TYPE
+        SYNTAX INTEGER  { none(0), spanningTree(1), turboRing(2), turboRingV2(3), turboChain(4), mstp(5)}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+        "This shows the active redundancy protocol of this switch now. The none(0) status will 
+         be showed if only if the switch's redundancy protocol is set to spanning tree and none of
+         ports enable spanning tree."
+        ::= { commRedundancy 4 }
+        
+   turboRingV2 OBJECT IDENTIFIER ::= { commRedundancy 5}                                    
+     
+   turboRingV2Ring1 OBJECT IDENTIFIER ::= { turboRingV2 1 }    
+     
+   ringIndexRing1 OBJECT-TYPE
+        SYNTAX INTEGER (1..2)
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The turboRingV2 Ring Index."
+        ::= { turboRingV2Ring1 1 }
+                  
+    ringEnableRing1 OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write                
+        STATUS current
+        DESCRIPTION
+            "The turboRingV2 Ring1 enable config."
+        ::= { turboRingV2Ring1 2 }
+        
+    masterSetupRing1 OBJECT-TYPE
+        SYNTAX INTEGER  { no(0), yes(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Is this a Master or Slave."
+        ::= { turboRingV2Ring1 3 }
+        
+    masterStatusRing1 OBJECT-TYPE
+        SYNTAX INTEGER  { no(0), yes(1) }
+        MAX-ACCESS read-only                 
+        STATUS current
+        DESCRIPTION
+            "Set this to be Master."
+        ::= { turboRingV2Ring1 4 }    
+        
+    designatedMasterRing1 OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The MAC address of the bridge which is the Master of the turboRingV2."
+        ::= { turboRingV2Ring1 5 } 
+        
+    rdnt1stPortRing1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The port number of 1st Redundant Port on the turboRingV2."
+        ::= { turboRingV2Ring1 6 } 
+        
+    rdnt1stPortStatusRing1 OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            disabled(0),
+            notRedundant(1),
+            linkdown(2),      
+            blocking(3),
+            learning(4),
+            forwarding(5)  
+            }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The status of 1st Redundant Port on the turboRingV2."
+        ::= { turboRingV2Ring1 7 }         
+        
+    rdnt2ndPortRing1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The port number of 2nd Redundant Port on the turboRingV2."
+        ::= { turboRingV2Ring1 8 }            
+        
+         
+      rdnt2ndPortStatusRing1 OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            disabled(0),
+            notRedundant(1),
+            linkdown(2),      
+            blocking(3),
+            learning(4),
+            forwarding(5) 
+            }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The status of 2nd Redundant Port on the turboRingV2."
+        ::= { turboRingV2Ring1 9 }
+       
+    brokenStatusRing1 OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            na(0),
+            normal(1),
+            broken(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "turboRingV2 broken display."
+        ::= { turboRingV2Ring1 10 }                
+    
+    turboRingV2Ring2 OBJECT IDENTIFIER ::= { turboRingV2 2 }    
+ 
+    ringIndexRing2 OBJECT-TYPE
+        SYNTAX INTEGER (1..2)
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The turboRingV2 Ring Index."
+        ::= { turboRingV2Ring2 1 }
+                  
+    ringEnableRing2 OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write                
+        STATUS current
+        DESCRIPTION
+            "The turboRingV2 Ring2 enable config."
+        ::= { turboRingV2Ring2 2 }
+        
+    masterSetupRing2 OBJECT-TYPE
+        SYNTAX INTEGER  { no(0), yes(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Is this a Master or Slave."
+        ::= { turboRingV2Ring2 3 }
+        
+    masterStatusRing2 OBJECT-TYPE
+        SYNTAX INTEGER  { no(0), yes(1) }
+        MAX-ACCESS read-only                 
+        STATUS current
+        DESCRIPTION
+            "Set this to be Master."
+        ::= { turboRingV2Ring2 4 }    
+        
+    designatedMasterRing2 OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The MAC address of the bridge which is the Master of the turboRingV2."
+        ::= { turboRingV2Ring2 5 } 
+        
+    rdnt1stPortRing2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The port number of 1st Redundant Port on the turboRingV2."
+        ::= { turboRingV2Ring2 6 } 
+        
+    rdnt1stPortStatusRing2 OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            disabled(0),
+            notRedundant(1),
+            linkdown(2),      
+            blocking(3),
+            learning(4),
+            forwarding(5) 
+            }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The status of 1st Redundant Port on the turboRingV2."
+        ::= { turboRingV2Ring2 7 }         
+        
+    rdnt2ndPortRing2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The port number of 2nd Redundant Port on the turboRingV2."
+        ::= { turboRingV2Ring2 8 }            
+        
+        
+      rdnt2ndPortStatusRing2 OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            disabled(0),
+            notRedundant(1),
+            linkdown(2),      
+            blocking(3),
+            learning(4),
+            forwarding(5) 
+            }
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The status of 2nd Redundant Port on the turboRingV2."
+        ::= { turboRingV2Ring2 9 }
+                 
+    brokenStatusRing2 OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            na(0),
+            normal(1),
+            broken(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "turboRingV2 broken display."
+        ::= { turboRingV2Ring2 10 }                           
+                      
+    turboRingV2Coupling OBJECT IDENTIFIER ::= { turboRingV2 3 }        
+    
+    couplingEnable OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting the ring coupling enable."
+        ::= { turboRingV2Coupling 1 }     
+        
+    couplingMode OBJECT-TYPE
+        SYNTAX INTEGER  { dualHoming(1), couplingBackup(2), couplingPrimary(3) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting the ring coupling mode."
+        ::= { turboRingV2Coupling 2 }     
+        
+    coupling1stPort OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "If in 'DUAL HOMING' mode, port name is 'Primary port'; if in 'COUPLING' mode, port name is 'Coupling port'"
+        ::= { turboRingV2Coupling 3 }
+    
+    coupling1stPortStatus OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            disabled(0),
+            notRedundant(1),
+            linkdown(2),      
+            blocking(3),
+            learning(4),
+            forwarding(5) 
+            }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The 1st coupling port status of coupling function."
+        ::= { turboRingV2Coupling 4 }        
+        
+    coupling2ndPort OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "If in 'DUAL HOMING' mode, port name is 'Backup port'; if in 'COUPLING' mode, port name is no used."
+        ::= { turboRingV2Coupling 5 }
+
+    coupling2ndPortStatus OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            disabled(0),
+            notRedundant(1),
+            linkdown(2),      
+            blocking(3),
+            learning(4),
+            forwarding(5) 
+            }
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The 2nd coupling port status of coupling function."
+        ::= { turboRingV2Coupling 6 }     
+        
+        
+ turboChain OBJECT IDENTIFIER ::= { commRedundancy 6}
+ 
+    turboChainRole OBJECT-TYPE
+        SYNTAX  INTEGER
+            {
+            head(1),     
+            member(2),
+            tail(3)
+            }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The Role of TURBO CHAIN."
+        ::= { turboChain 1 } 
+           
+    turboChainPort1 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The port number of 1st Redundant Port on the TURBO CHAIN.
+             If switch role is Turbo Chain Head, this is Head port,
+             If Switch role is  Turbo Chain Tail, this is Tail port."  
+        ::= { turboChain 2 } 
+    
+    turboChainPort2 OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+             "The port number of 2nd Redundant Port on the TURBO CHAIN.
+             It is the member port of TurboChain"
+        ::= { turboChain 3 } 
+
+    turboChainPort1Status OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            notTurboChainPort(0),     
+            linkDown(1),
+            blocking(2),
+            blocked(3),
+            forwarding(4),
+            na(5)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Turbo Chain Port Status."
+        ::= { turboChain 4 } 
+        
+     turboChainPort2Status OBJECT-TYPE
+        SYNTAX INTEGER 
+            {
+            notTurboChainPort(0),     
+            linkDown(1),
+            blocking(2),
+            blocked(3),
+            forwarding(4),
+            na(5)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Turbo Chain Port Status."
+        ::= { turboChain 5 } 
+        
+     turboChainPort1PartnerBridge OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The MAC address of the next bridge "
+        ::= { turboChain 6 }
+        
+     turboChainPort2PartnerBridge OBJECT-TYPE
+        SYNTAX  MacAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+             "The MAC address of the neighbor Turbo Chain switch"
+        ::= { turboChain 7 }
+     
+-- -------------------------------------------------------------
+-- relay warning
+-- -------------------------------------------------------------
+
+    relayWarning OBJECT IDENTIFIER ::= { swMgmt 17 }   
+    
+    relayWarningTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF RelayWarningEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The relay warning table."
+        ::= { relayWarning 11 }
+    
+    relayWarningEntry OBJECT-TYPE
+        SYNTAX RelayWarningEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Relay Warning Entry."
+        INDEX { relayAlarmIndex }
+        ::= { relayWarningTable 1 }
+        
+    RelayWarningEntry ::=
+        SEQUENCE {
+            relayAlarmIndex
+                INTEGER,   
+            relayWarningRelayContact
+                INTEGER,            
+            overrideRelayWarningSetting
+                INTEGER,
+            relayWarningPower1Off
+                INTEGER,   
+            relayWarningPower1OffStatus
+                INTEGER,
+            relayWarningPower2Off
+                INTEGER,
+            relayWarningPower2OffStatus
+                INTEGER,
+            relayWarningTurboRingBreak
+            	INTEGER,      
+            relayWarningTurboRingBreakStatus
+            	INTEGER                	             
+        }
+        
+    relayAlarmIndex OBJECT-TYPE
+        SYNTAX INTEGER  
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Relay alarm index."
+        ::= { relayWarningEntry 1 }
+        
+    relayWarningRelayContact OBJECT-TYPE
+        SYNTAX INTEGER  {closed(0) ,opened(1)}
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The first Relay contact status."
+        ::= { relayWarningEntry 2 }
+
+    
+    overrideRelayWarningSetting OBJECT-TYPE
+        SYNTAX INTEGER { no(0), yes(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Override the relay warning setting."
+        ::= { relayWarningEntry 3 }
+        
+    relayWarningPower1Off OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The relay contact will be opened while the first power input off."
+        ::= { relayWarningEntry 4 }    
+        
+    relayWarningPower1OffStatus OBJECT-TYPE
+        SYNTAX INTEGER  { not-triggered(0), triggered(1) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The relay contact is opened as the first power input off.."
+        ::= { relayWarningEntry 5 }    
+        
+    relayWarningPower2Off OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The relay contact will be opened while the second power input off."
+        ::= { relayWarningEntry 6 }
+        
+    relayWarningPower2OffStatus OBJECT-TYPE
+        SYNTAX INTEGER  { not-triggered(0), triggered(1) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The relay contact is opened as the second power input off."
+        ::= { relayWarningEntry 7 }
+
+     relayWarningTurboRingBreak OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The relay contact will be opened while turbo ring break."
+        ::= { relayWarningEntry 8 }       
+         
+    relayWarningTurboRingBreakStatus OBJECT-TYPE
+             SYNTAX INTEGER  { not-triggered(0), triggered(1) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The relay contact is opened while turbo ring is broken."
+        ::= { relayWarningEntry 9 }                
+        
+    portRelayWarningTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortRelayWarningEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The relay warning port table."
+        ::= { relayWarning 12 }
+    
+    portRelayWarningEntry OBJECT-TYPE
+        SYNTAX PortRelayWarningEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Port Relay Warning Entry."
+        INDEX { portIndex,relayAlarmIndex }
+        ::= { portRelayWarningTable 1 }
+        
+    PortRelayWarningEntry ::=
+        SEQUENCE {
+            relayWarningLinkChanged
+                INTEGER,            
+            relayWarningLinkChangedStatus
+                INTEGER,
+            relayWarningTrafficOverload
+                INTEGER,   
+            relayWarningTrafficOverloadStatus
+                INTEGER,
+            relayWarningRxTrafficThreshold
+                INTEGER,
+            relayWarningTrafficDuration
+                INTEGER             
+        }
+    
+    relayWarningLinkChanged OBJECT-TYPE
+        SYNTAX INTEGER  { ignore(0), on2off(1), off2on(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The relay contact will be opened while this port's link status is changed."
+        ::= { portRelayWarningEntry 1 }
+                                                  
+    relayWarningLinkChangedStatus OBJECT-TYPE
+        SYNTAX INTEGER  { not-triggered(0), triggered(1) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The relay contact is opened as this port's link status is changed."
+        ::= { portRelayWarningEntry 2 }
+                                                  
+    relayWarningTrafficOverload OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The relay contact will be opened while this port's traffic is overload."
+        ::= { portRelayWarningEntry 3 }  
+        
+    relayWarningTrafficOverloadStatus OBJECT-TYPE
+        SYNTAX INTEGER  { not-triggered(0), triggered(1) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The relay contact is opened as this port's traffic is overload."
+        ::= { portRelayWarningEntry 4 }
+        
+    relayWarningRxTrafficThreshold OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The threshold of the port traffic will be over loading."
+        ::= { portRelayWarningEntry 5 }         
+        
+    relayWarningTrafficDuration OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The duration of the port traffic will be over loading."
+        ::= { portRelayWarningEntry 6 }     
+        
+    diRelayWarningTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DiRelayWarningEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The relay warning DI table."
+        ::= { relayWarning 13 }
+    
+    diRelayWarningEntry OBJECT-TYPE
+        SYNTAX DiRelayWarningEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "DI Relay Warning Entry."
+        INDEX { diIndex,relayAlarmIndex }
+        ::= { diRelayWarningTable 1 }
+        
+    DiRelayWarningEntry ::=
+        SEQUENCE {
+            relayWarningDiInputChanged
+                INTEGER,            
+            relayWarningDiInputChangedStatus
+                INTEGER
+        }           
+        
+    relayWarningDiInputChanged OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), off(1), on(2) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The relay contact will be opened while the DI input changed."
+        ::= { diRelayWarningEntry 1 }       
+        
+    relayWarningDiInputChangedStatus OBJECT-TYPE
+        SYNTAX INTEGER  { not-triggered(0), triggered(1) }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The relay contact is opened as the first DI input changed.."
+        ::= { diRelayWarningEntry 2 } 
+         
+-- -------------------------------------------------------------
+-- traffic prioritization
+-- -------------------------------------------------------------
+        
+    trafficPrioritization OBJECT IDENTIFIER ::= { swMgmt 18 }
+    
+   qosClassification OBJECT IDENTIFIER ::= { trafficPrioritization 1 }
+    queuingMechanism OBJECT-TYPE
+        SYNTAX INTEGER {schedweightfair(0),schedstrict(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The queuing mechanism."
+        ::= { qosClassification 1 }  
+        
+    qosPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF QosPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The QoS port table."
+        ::= { qosClassification 2 }
+    
+    qosPortEntry OBJECT-TYPE
+        SYNTAX QosPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The QoS Port Entry."
+        INDEX { portIndex }
+        ::= { qosPortTable 1 }
+        
+    QosPortEntry ::=
+        SEQUENCE {
+            inspectTos
+                INTEGER,            
+            inspectCos
+                INTEGER,
+            portPriority
+                INTEGER
+            } 
+    
+    inspectTos OBJECT-TYPE
+        SYNTAX INTEGER {no (0),yes(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the inspection of TOS field."
+        ::= { qosPortEntry 1 }  
+        
+    inspectCos OBJECT-TYPE
+        SYNTAX INTEGER {no (0),yes(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the inspection of CoS field."
+        ::= { qosPortEntry 2 }  
+        
+    portPriority OBJECT-TYPE
+       SYNTAX INTEGER {priority0(0), priority1(1), priority2(2), priority3(3),
+        				priority4(4), priority5(5), priority6(6), priority7(7)
+       	}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The default priority of the port."
+        ::= { qosPortEntry 3 }   
+        
+    cosMapping OBJECT IDENTIFIER ::= { trafficPrioritization 2 }
+    cosMappingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CosMappingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The COS mapping table."
+        ::= { cosMapping 1 }
+    
+    cosMappingEntry OBJECT-TYPE
+        SYNTAX CosMappingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The COS mapping Entry."
+        INDEX { cosTag}
+        ::= { cosMappingTable 1 }
+        
+    CosMappingEntry ::=
+        SEQUENCE {
+            cosTag
+                INTEGER,            
+            cosMappedPriority
+                INTEGER
+            } 
+    
+    cosTag OBJECT-TYPE
+        SYNTAX INTEGER (0..7) 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The cos tag of TOS field."
+        ::= { cosMappingEntry 1 }  
+        
+    cosMappedPriority OBJECT-TYPE
+        SYNTAX INTEGER {low(0),normal(1),medium(2),high(3)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The frame's priority corresponding to it's COS tag value."
+        ::= { cosMappingEntry 2 }  
+    
+    tosMapping OBJECT IDENTIFIER ::= { trafficPrioritization 3 }    
+    tosMappingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TosMappingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The TOS mapping table."
+        ::= { tosMapping 1 }
+    
+    tosMappingEntry OBJECT-TYPE
+        SYNTAX TosMappingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "TOS mapping Entry."
+        INDEX { tosClass }
+        ::= { tosMappingTable 1 }
+        
+    TosMappingEntry ::=
+        SEQUENCE {
+            tosClass
+                INTEGER,            
+            tosMappedPriority
+                INTEGER
+            } 
+    
+    tosClass OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The TOS class of TOS field."
+        ::= { tosMappingEntry 1 }  
+        
+    tosMappedPriority OBJECT-TYPE
+        SYNTAX INTEGER {low(0),normal(1),medium(2),high(3)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The frame's priority corresponding to it's TOS class value."
+        ::= { tosMappingEntry 2 }  
+    
+-- -------------------------------------------------------------
+-- vlan
+-- -------------------------------------------------------------        
+    
+    vlan OBJECT IDENTIFIER ::= { swMgmt 19 }
+    vlanPortSettingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VlanPortSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The vlan setting table of ports."
+        ::= { vlan 1 }
+    
+    vlanPortSettingEntry OBJECT-TYPE
+        SYNTAX VlanPortSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Port Setting Entry of VLAN."
+        INDEX { portIndex }
+        ::= { vlanPortSettingTable 1 }
+        
+    VlanPortSettingEntry ::=
+        SEQUENCE {
+            portVlanType
+                INTEGER,           
+            portDefaultVid
+                INTEGER,
+            portFixedVid
+                DisplayString,
+            portFixedVidUntag
+                DisplayString,         
+            portForbiddenVid
+                DisplayString
+            } 
+    
+    portVlanType OBJECT-TYPE
+        SYNTAX INTEGER {access(0),trunk(1),hybrid(2)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The vlan type of port."
+        ::= { vlanPortSettingEntry 1 }  
+        
+    portDefaultVid OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The PVID of port."
+        ::= { vlanPortSettingEntry 2 }  
+        
+    portFixedVid OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The fixed vids of (trunk) port."
+        ::= { vlanPortSettingEntry 3 }  
+        
+    portForbiddenVid OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The forbidden vids of (trunk)port."
+        ::= { vlanPortSettingEntry 4 }      
+        
+    portFixedVidUntag OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The fixed untag vids of (trunk) port."
+        ::= { vlanPortSettingEntry 5 }   
+        
+    vlanTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF VlanEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The VLAN table."
+        ::= { vlan 2 }
+    
+    vlanEntry OBJECT-TYPE
+        SYNTAX VlanEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "VLAN Entry."
+        INDEX { vlanId }
+        ::= { vlanTable 1 }
+        
+    VlanEntry ::=
+        SEQUENCE {
+            vlanId
+                INTEGER,           
+            joinedAccessPorts
+                PortList,
+            joinedTrunkPorts
+                PortList,
+	    joinedHybridPorts
+                PortList
+            } 
+    
+    vlanId OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The VLAN id."
+        ::= { vlanEntry 1 }  
+
+    joinedAccessPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The access ports that joined this VID."
+        ::= { vlanEntry 2 }  
+        
+    joinedTrunkPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The trunk ports that joined this VID."
+        ::= { vlanEntry 3 }     
+        
+    joinedHybridPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The hybrid ports that joined this VID."
+        ::= { vlanEntry 4 }     
+        
+    managementVlanId OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The management VLAN id."
+        ::= { vlan 3 }    
+               
+    vlanType OBJECT-TYPE
+        SYNTAX INTEGER {tagBased(0),portBased(1)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "VLAN Type."
+        ::= { vlan 4 }     
+                
+    portbaseVlanSettingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortbaseVlanSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Port base Vlan Setting Table."
+        ::= { vlan 5 }
+
+    portbaseVlanSettingEntry OBJECT-TYPE
+        SYNTAX PortbaseVlanSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Port base Vlan  Setting Entry."
+        INDEX { portbaseVlanSettingIndex }
+        ::= { portbaseVlanSettingTable 1 }
+        
+    PortbaseVlanSettingEntry ::=
+        SEQUENCE {     
+            portbaseVlanSettingIndex
+                INTEGER,
+            portbaseVlanMemberPorts
+            	 PortList
+            }     
+    
+    portbaseVlanSettingIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "port base Vlan Group Index."
+        ::= { portbaseVlanSettingEntry 1 }
+
+    portbaseVlanMemberPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "port base Vlan  Group Member Ports."
+        ::= { portbaseVlanSettingEntry 2 }
+
+    enableGvrp OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable GVRP."
+        ::= { vlan 6 }  
+
+-- -------------------------------------------------------------
+-- multicast filtering
+-- -------------------------------------------------------------        
+
+    multicastFiltering OBJECT IDENTIFIER ::= { swMgmt 20 }
+    igmpSnooping OBJECT IDENTIFIER ::= { multicastFiltering 1 }
+    
+    querierQueryInterval OBJECT-TYPE
+        SYNTAX INTEGER (20..600)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This query interval of the querier function for this VLAN."
+        ::= { igmpSnooping 1 }      
+    
+    igmpSnoopingSettingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IgmpSnoopingSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The IGMP snooping setting table."
+        ::= { igmpSnooping 2 }
+    
+    igmpSnoopingSettingEntry OBJECT-TYPE
+        SYNTAX IgmpSnoopingSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The IGMP snooping setting Entry."
+        INDEX { vlanId }
+        ::= { igmpSnoopingSettingTable 1 }
+        
+    IgmpSnoopingSettingEntry ::=
+        SEQUENCE {
+            enableIgmpSnooping
+                INTEGER,           
+            enableQuerier
+                INTEGER,
+            fixedMulticastQuerierPorts
+                PortList,
+            learnedMulticastQuerierPorts
+                PortList
+            } 
+    
+    enableIgmpSnooping OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the IGMP snooping function in this VLAN."
+        ::= { igmpSnoopingSettingEntry 1 }  
+        
+    enableQuerier OBJECT-TYPE 
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the querier function for this VLAN."
+        ::= { igmpSnoopingSettingEntry 2 }  
+    
+    fixedMulticastQuerierPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The ports that multicast-Querier exist."
+        ::= { igmpSnoopingSettingEntry 3 }  
+        
+    learnedMulticastQuerierPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ports that multicast-Querier exist."
+        ::= { igmpSnoopingSettingEntry 4 }      
+
+    enableGlobalIgmpSnooping OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the IGMP snooping function ."
+        ::= { igmpSnooping 4 }  
+
+    multicastFastForwarding OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This Enable Multicast Fast Forwarding Mode function ."
+        ::= { igmpSnooping 7 }
+        
+    staticMulticast OBJECT IDENTIFIER ::= { multicastFiltering 2 }
+    staticMulticastTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF StaticMulticastEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The static multicast table."
+        ::= { staticMulticast 1 }
+    
+    staticMulticastEntry OBJECT-TYPE
+        SYNTAX StaticMulticastEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Static multicast Entry."
+        INDEX { staticMulticastAddress }
+        ::= { staticMulticastTable 1 }
+        
+    StaticMulticastEntry ::=
+        SEQUENCE {
+            staticMulticastAddress
+                MacAddress,                
+            staticMulticastPorts 
+                PortList,
+            staticMulticastStatus
+                INTEGER
+            } 
+    
+    staticMulticastAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "The static multicast address."
+        ::= { staticMulticastEntry 1 }  
+        
+    staticMulticastPorts OBJECT-TYPE
+        SYNTAX	PortList
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "The port map of the static multicast address."
+        ::= { staticMulticastEntry 2 }      
+    
+    staticMulticastStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            active(1),
+            createAndGo(4),
+            createAndWait(5),
+            destroy(6)
+        }
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "The status is active to indicate normal.
+            Use createAndGo to create new on multiple SET.
+            Use createAndWait to create new on one SET all then active.
+            Use destroy to delete this row."
+        ::= { staticMulticastEntry 3 }
+
+	--
+    -- GMRP
+    --
+    
+    gmrp OBJECT IDENTIFIER ::= { multicastFiltering 3 }
+    
+    -- gmrp setting table    
+    
+    gmrpSettingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GmrpSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The GMRP setting table."
+        ::= { gmrp 1 }
+    
+    gmrpSettingEntry OBJECT-TYPE
+        SYNTAX GmrpSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The GMRP Setting Entry."
+        INDEX { portIndex }
+        ::= { gmrpSettingTable 1 }
+        
+    GmrpSettingEntry ::=
+        SEQUENCE {   
+            enableGMRP
+                INTEGER
+        } 
+    
+    enableGMRP OBJECT-TYPE
+        SYNTAX INTEGER {
+        	disable(0),
+        	enable(1)
+        }
+        MAX-ACCESS read-write              
+        STATUS current
+        DESCRIPTION
+            "Enable/Disable GMRP."
+        ::= { gmrpSettingEntry 1 }       
+    
+    -- gmrp status
+    
+    gmrpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF GmrpEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The GMRP status table."
+        ::= { gmrp 2 }
+    
+    gmrpEntry OBJECT-TYPE
+        SYNTAX GmrpEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The GMRP Status Entry."
+        INDEX { gmrpMulticastGroup }
+        ::= { gmrpTable 1 }
+        
+    GmrpEntry ::=
+        SEQUENCE {
+            gmrpMulticastGroup
+                MacAddress,           
+            gmrpFixedPorts
+                PortList,
+            gmrpLearnedPorts
+                PortList
+            } 
+    
+    gmrpMulticastGroup OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only              
+        STATUS current
+        DESCRIPTION
+            "GMRP multicast group."
+        ::= { gmrpEntry 1 }  
+        
+    gmrpFixedPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only              
+        STATUS current
+        DESCRIPTION
+            "The ports that joined GMRP multicast group manually."
+        ::= { gmrpEntry 2 }      
+   
+    gmrpLearnedPorts OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The ports that joined GMRP multicast group by GMRP learning."
+        ::= { gmrpEntry 3 }      
+
+   
+-- -------------------------------------------------------------
+-- rate limiting
+-- -------------------------------------------------------------        
+
+    rateLimiting OBJECT IDENTIFIER ::= { swMgmt 21 }
+    
+     rateLimitingMode OBJECT-TYPE
+        SYNTAX INTEGER {normal(0),portDisable(1)}
+        MAX-ACCESS read-write                
+        STATUS current
+        DESCRIPTION
+            "The rate limiting mode."
+        ::= { rateLimiting 4 }
+    
+-- normalMode --  
+
+-- ingress --
+    normalModeRateLimitingIngressTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF NormalModeRateLimitingIngressEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The rate limiting table."
+        ::= { rateLimiting 1 }
+    
+    normalModeRateLimitingIngressEntry OBJECT-TYPE
+        SYNTAX NormalModeRateLimitingIngressEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Rate limiting Entry."
+        INDEX { portIndex }
+        ::= { normalModeRateLimitingIngressTable 1 }
+    
+    NormalModeRateLimitingIngressEntry ::=
+        SEQUENCE {
+            limitMode
+                INTEGER,            
+            lowPriLimitRate
+                INTEGER,
+            normalPriLimitRate
+                INTEGER,            
+            mediumPriLimitRate
+                INTEGER,
+            highPriLimitRate
+                INTEGER,
+            egressLimit
+                INTEGER                
+            } 
+    
+    limitMode OBJECT-TYPE
+        SYNTAX INTEGER {all(0),bmucast(1),bmcast(2),bcast(3)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The limit mode."
+        ::= { normalModeRateLimitingIngressEntry 1 }  
+        
+    lowPriLimitRate OBJECT-TYPE
+        SYNTAX INTEGER {notlimit(0),limit128k(1),limit256k(2),limit512k(3),
+                        limit1M(4),limit2M(5),limit4M(6),limit8M(7)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The limiting rate of low priority queue."
+        ::= { normalModeRateLimitingIngressEntry 2 }  
+
+    normalPriLimitRate OBJECT-TYPE
+        SYNTAX INTEGER {notlimit(0),limit128k(1),limit256k(2),limit512k(3),
+                        limit1M(4),limit2M(5),limit4M(6),limit8M(7),
+                        limit16M(8)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The limiting rate of normal priority queue.
+            The values being equal to or double value of lowPriLimitRate are valid for set."
+        ::= { normalModeRateLimitingIngressEntry 3 }  
+
+    mediumPriLimitRate OBJECT-TYPE
+        SYNTAX INTEGER {notlimit(0),limit128k(1),limit256k(2),limit512k(3),
+                        limit1M(4),limit2M(5),limit4M(6),limit8M(7),
+                        limit16M(8),limit32M(9)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The limiting rate of medium priority queue.
+            The values being equal to or double value of normalPriLimitRate are valid for set."
+        ::= { normalModeRateLimitingIngressEntry 4 }  
+
+    highPriLimitRate OBJECT-TYPE
+        SYNTAX INTEGER {notlimit(0),limit128k(1),limit256k(2),limit512k(3),
+                        limit1M(4),limit2M(5),limit4M(6),limit8M(7),
+                        limit16M(8),limit32M(9),limit64M(10)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The limiting rate of high priority queue.
+            The values being equal to or double value of mediumPriLimitRate are valid for set."
+        ::= { normalModeRateLimitingIngressEntry 5 }  
+        
+        
+    egressLimit OBJECT-TYPE
+        SYNTAX INTEGER {notlimited(0), percentage03(1), percentage05(2), percentage10(3),
+        	            percentage15(4), percentage25(5), percentage35(6), percentage50(7), 
+        	            percentage65(8), percentage85(9)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The ingress limit mode."
+        ::= { normalModeRateLimitingIngressEntry 6 }     
+        
+--  portDisableMode --       
+    
+    portDisableMode OBJECT IDENTIFIER ::= { rateLimiting 3 }
+    
+    portDisableModePeriod OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Check time. "
+        ::= {portDisableMode 1 }
+    
+    portDisableModeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortDisableModeEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The rate limiting table."
+        ::= { portDisableMode 2 }
+    
+    portDisableModeEntry OBJECT-TYPE
+        SYNTAX PortDisableModeEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Rate limiting Entry."
+        INDEX { portIndex }
+        ::= { portDisableModeTable 1 }
+    
+    PortDisableModeEntry ::=
+        SEQUENCE {
+            ingressLimit
+                INTEGER                        
+            } 
+              
+    ingressLimit OBJECT-TYPE
+        SYNTAX INTEGER {notlimited(0), rateMega1Fps4464(1), rateMega2Fps7441(2), rateMega3Fps14881(3),
+        	            rateMega4Fps22322(4), rateMega5Fps37203(5), rateMega6Fps52084(6), rateMega7Fps74405(7), rateGiga1Fps44640(8), rateGiga2Fps74410(9), rateGiga3Fps148810(10),
+        	            rateGiga4Fps223220(11), rateGiga5Fps372030(12), rateGiga6Fps520840(13), rateGiga7Fps744050(14) 
+        	            }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The ingress limit mode."
+        ::= { portDisableModeEntry 1 }    
+ 
+
+
+        
+            
+        
+-- -------------------------------------------------------------
+-- security
+-- -------------------------------------------------------------        
+     
+    security OBJECT IDENTIFIER ::= { swMgmt 22 }
+-- -------------------------------------------------------------
+-- user login authentication
+-- -------------------------------------------------------------            
+    userLoginSetting OBJECT IDENTIFIER ::= { security 1 }
+
+    userLoginServer OBJECT-TYPE
+    SYNTAX INTEGER {
+        tacacs(1),
+        radius(2)
+    }
+    MAX-ACCESS read-write               
+    STATUS current
+    DESCRIPTION
+        "Set user login server option."
+    ::= { userLoginSetting 1 }
+
+    tacacsServerSetting OBJECT IDENTIFIER ::= { userLoginSetting 2 }
+    tacacsLoginAuthServer OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Tacacs+ Server IP Address/Domain name."
+        ::= { tacacsServerSetting 1 }
+
+    tacacsLoginAuthPort OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Tacacs+ Port."
+        ::= {tacacsServerSetting 2 }
+
+    tacacsLoginAuthSharedKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Tacacs+ Shared Key."
+        ::= { tacacsServerSetting 3 }
+
+   tacacsLoginAuthAuthType OBJECT-TYPE
+         SYNTAX INTEGER {
+            ascii(0),
+            pap(1),
+            chap(2),
+            mschap(4)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Tacacs+ Shared Key."
+        ::= { tacacsServerSetting 4 }        
+   tacacsLoginAuthTimeout OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Tacacs+ Shared Key."
+        ::= { tacacsServerSetting 5 }           
+
+    radiusServerSetting OBJECT IDENTIFIER ::= { userLoginSetting 3 }
+    radiusLoginAuthServer OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Server IP Address/Domain name."
+        ::= { radiusServerSetting 1 }
+
+    radiusLoginAuthPort OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Port."
+        ::= { radiusServerSetting 2 }
+
+    radiusLoginAuthSharedKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Shared Key."
+        ::= { radiusServerSetting 3 }
+
+    radiusLoginAuthAuthType OBJECT-TYPE
+         SYNTAX INTEGER {
+            eap-md5(0)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Shared Key."
+        ::= { radiusServerSetting 4 }        
+    radiusLoginAuthTimeout OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Shared Key."
+        ::= { radiusServerSetting 5 }  
+        
+-- -------------------------------------------------------------
+-- port access control
+-- -------------------------------------------------------------        
+
+    portAccessControl OBJECT IDENTIFIER ::= { security 2 }
+    
+    --
+    -- static port lock 
+    --
+    
+    staticPortLock OBJECT IDENTIFIER ::= { portAccessControl 1 }
+    
+    staticPortLockAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "The static port lock address."
+        ::= { staticPortLock 1 }  
+        
+    staticPortLockPort OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "The port of the static port lock address."
+        ::= { staticPortLock 2 }  
+
+    staticPortLockStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            active(1),
+            createAndGo(4)
+        }
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The status is active to indicate normal.
+            Use createAndGo to create new on multiple SET."
+        ::= { staticPortLock 3 }
+    
+    --
+    -- IEEE 802.1X
+    --
+    
+    dot1x OBJECT IDENTIFIER ::= { portAccessControl 2 }
+    
+    -- ieee 802.1x global settings    
+    
+    dataBaseOption OBJECT-TYPE
+        SYNTAX INTEGER {
+            local(1),
+            radius(2),
+            radiuslocal(3)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set IEEE 802.1X database option."
+        ::= { dot1x 1 }
+        
+    dot1xReauthEnable OBJECT-TYPE
+        SYNTAX INTEGER {
+        	disable(0),
+        	enable(1)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Enable/Disable IEEE 802.1X Re-authentication."
+        ::= { dot1x 5 }
+
+    dot1xReauthPeriod OBJECT-TYPE
+        SYNTAX INTEGER (60..3600)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set IEEE 802.1X Re-authentication Period."
+        ::= { dot1x 6 }
+    
+    -- ieee 802.1X port setting table
+    
+    dot1xSettingTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot1xSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "IEEE 802.1X Port Setting Table."
+        ::= { dot1x 7 }
+    
+    dot1xSettingEntry OBJECT-TYPE
+        SYNTAX Dot1xSettingEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "IEEE 802.1X Port Setting Entry."
+        INDEX { portIndex }
+        ::= { dot1xSettingTable 1 }
+        
+    Dot1xSettingEntry ::=
+        SEQUENCE {     
+            enableDot1X
+                INTEGER
+            }     
+    
+    enableDot1X OBJECT-TYPE
+        SYNTAX INTEGER {
+        	disable(0),
+        	enable(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable/Disable IEEE 802.1X."
+        ::= { dot1xSettingEntry 1 }
+
+    -- ieee 802.1X re-authentication table
+    
+    dot1xReauthTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Dot1xReauthEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "IEEE 802.1X Re-authentication Table."
+        ::= { dot1x 8 }
+    
+    dot1xReauthEntry OBJECT-TYPE
+        SYNTAX Dot1xReauthEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "IEEE 802.1X Re-authentication Entry."
+        INDEX { dot1xReauthPortIndex }
+        ::= { dot1xReauthTable 1 }
+        
+    Dot1xReauthEntry ::=
+        SEQUENCE { 
+        	dot1xReauthPortIndex
+        		INTEGER, 
+            dot1xReauth
+                INTEGER
+            }     
+    
+    dot1xReauthPortIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "IEEE 802.1X Enabled Port Index."
+        ::= { dot1xReauthEntry 1 }
+
+    dot1xReauth OBJECT-TYPE
+        SYNTAX INTEGER {
+        	no(0),
+        	yes(1)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Reauth IEEE 802.1X."
+        ::= { dot1xReauthEntry 2 }
+
+		-- ieee 802.1x dot1x Radius Server settings    
+        
+    dot1xRadius OBJECT IDENTIFIER ::= { dot1x 9 }
+    dot1xSameAsAuthServer OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+            notSame(0),
+            same(1)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Server IP Address/Domain name."
+        ::= { dot1xRadius 1 }    
+    dot1x1stRadiusServer OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Server IP Address/Domain name."
+        ::= { dot1xRadius 2 }
+
+    dot1x1stRadiusPort OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Port."
+        ::= { dot1xRadius 3 }
+
+    dot1x1stRadiusSharedKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Shared Key."
+        ::= { dot1xRadius 4 }        
+    dot1x2ndRadiusServer OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Server IP Address/Domain name."
+        ::= { dot1xRadius 5 }
+
+    dot1x2ndRadiusPort OBJECT-TYPE
+        SYNTAX INTEGER (1..65535)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Port."
+        ::= { dot1xRadius 6 }
+
+    dot1x2ndRadiusSharedKey OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Set Radius Shared Key."
+        ::= { dot1xRadius 7 }                
+        
+    --
+    -- port access control table
+    --
+    
+    portAccessControlTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PortAccessControlEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The Port Access Control table."
+        ::= { portAccessControl 3 }
+    
+    portAccessControlEntry OBJECT-TYPE
+        SYNTAX PortAccessControlEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The Port Access Control table entry."
+        INDEX { portAccessControlAddress }
+        ::= { portAccessControlTable 1 }
+        
+    PortAccessControlEntry ::=
+        SEQUENCE {
+            portAccessControlAddress
+                MacAddress,     
+            portAccessControlPortNo
+            	INTEGER,
+            portAccessControlAccessStatus
+                INTEGER,      
+            portAccessControlStatus
+                INTEGER
+            } 
+    
+    portAccessControlAddress OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The MAC address which is static locked or IEEE 802.1X authorized."
+        ::= { portAccessControlEntry 1 }  
+
+    portAccessControlPortNo OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The port number that the Port Access Control address resides."
+        ::= { portAccessControlEntry 2 }  
+
+    portAccessControlAccessStatus OBJECT-TYPE
+        SYNTAX INTEGER {  
+        	staticLock(1), 	
+        	authorized(2),
+        	unAuthorized(3),
+        	authorizing(4)
+        } 
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The access status of the Port Access Control address."
+        ::= { portAccessControlEntry 3 }  
+
+    portAccessControlStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            active(1),
+            createAndGo(4),
+            createAndWait(5),
+            destroy(6)
+        }
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "The status is active to indicate normal.
+            Use createAndGo to create new on multiple SET.
+            Use createAndWait to create new on one SET all then active.
+            Use destroy to delete this row."
+        ::= { portAccessControlEntry 4 }
+        
+-- -------------------------------------------------------------
+-- accessible ip
+-- -------------------------------------------------------------        
+
+    accessibleIP OBJECT IDENTIFIER ::= { swMgmt 30 }
+    
+    enableAccessibleIP OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Enable the accessible IP address list."
+        ::= { accessibleIP 1 }
+        
+    accessibleIpTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AccessibleIpEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "accessibleIP."
+        ::= { accessibleIP 2 }
+    
+    accessibleIpEntry OBJECT-TYPE
+        SYNTAX AccessibleIpEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Accessible IP address entry."
+        INDEX { accessibleIpAddress }
+        ::= { accessibleIpTable 1 }
+        
+    AccessibleIpEntry ::=
+        SEQUENCE {
+            accessibleIpAddress
+                IpAddress,
+            accessibleIpNetMask
+                IpAddress,
+            accessibleIpStatus
+                INTEGER
+        }
+    
+    accessibleIpAddress OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "Accessible IP address"
+        ::= { accessibleIpEntry 1 } 
+    
+    accessibleIpNetMask OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "Accessible IP netmask."
+        ::= { accessibleIpEntry 2 }     
+
+    accessibleIpStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            active(1),
+            createAndGo(4),
+            createAndWait(5),
+            destroy(6)
+        }
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            "The status is active to indicate normal.
+            Use createAndGo to create new on multiple SET.
+            Use createAndWait to create new on one SET all then active.
+            Use destroy to delete this row."
+        ::= { accessibleIpEntry 3 }     
+
+-- -------------------------------------------------------------
+-- system file update
+-- -------------------------------------------------------------        
+
+    sysFileUpdate OBJECT IDENTIFIER ::= { swMgmt 31 }
+    tftpServer OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The TFTP Server name(IP Address)"
+        ::= { sysFileUpdate 1 }
+        
+    firmwarePathName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The path name of firmware file in the TFTP Server"
+        ::= { sysFileUpdate 2 }
+        
+    logPathName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The path name of log file in the TFTP Server"
+        ::= { sysFileUpdate 3 }
+        
+    confPathName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The path name of configuration file in the TFTP Server"
+        ::= { sysFileUpdate 4 }
+
+    tftpUpdate OBJECT-TYPE
+        SYNTAX INTEGER {
+            importFirmware(1),
+            importConfig(2),
+            exportConfig(3),
+            exportLog(4)
+        }
+        MAX-ACCESS read-create              
+        STATUS current
+        DESCRIPTION
+            ""
+        ::= { sysFileUpdate 5 }       
+        
+        
+    
+
+-- -------------------------------------------------------------
+-- time setting
+-- -------------------------------------------------------------        
+        
+    timeSetting OBJECT IDENTIFIER ::= { swMgmt 32 }
+    
+        sysDateTime OBJECT-TYPE
+        SYNTAX DateAndTime
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The date time of system"
+        ::= { timeSetting 1 }
+    
+    calibratePeriod OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The period (seconds) that calibrate with time server"
+        ::= { timeSetting 2 }
+        
+    timeServer1 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The first time server"
+        ::= { timeSetting 3 }
+    
+    timeServer2 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The second time server"
+        ::= { timeSetting 4 }
+        
+    daylightSaving OBJECT IDENTIFIER ::= { timeSetting 5 }
+     
+    startMonth OBJECT-TYPE
+        SYNTAX INTEGER  { na(0), jan(1), feb(2), mar(3), apr(4), may(5), jun(6), jul(7), aug(8), sep(9), oct(10), nov(11), dec(12)  }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting Start Month of Daylight Saving time"
+        ::= { daylightSaving 1 }
+    
+    startWeek OBJECT-TYPE
+        SYNTAX INTEGER  { na(0), week1(1), week2(2), week3(3), week4(4), weeklast(6) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting Start Week of Daylight Saving time"
+        ::= { daylightSaving 2 }
+        
+    startDay OBJECT-TYPE
+        SYNTAX INTEGER  { na(0), sun(1), mon(2), tue(3), wed(4), thu(5), fri(6), sat(7)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting Start Day of Daylight Saving time"
+        ::= { daylightSaving 3 }
+       
+    startHour OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting Start Hour of Daylight Saving time"
+        ::= { daylightSaving 4 }
+        
+    endMonth OBJECT-TYPE
+        SYNTAX INTEGER  { na(0), jan(1), feb(2), mar(3), apr(4), may(5), jun(6), jul(7), aug(8), sep(9), oct(10), nov(11), dec(12)  }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting End Month of Daylight Saving time"
+        ::= { daylightSaving 5 }
+    
+    endWeek OBJECT-TYPE
+        SYNTAX INTEGER  { na(0), week1(1), week2(2), week3(3), week4(4), weeklast(6) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting End Week of Daylight Saving time"
+        ::= { daylightSaving 6 }
+        
+    endDay OBJECT-TYPE
+        SYNTAX INTEGER  { na(0), sun(1), mon(2), tue(3), wed(4), thu(5), fri(6), sat(7)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting End Day of Daylight Saving time"
+        ::= { daylightSaving 7 }
+       
+    endHour OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting End Hour of Daylight Saving time"
+        ::= { daylightSaving 8 }
+    
+    offsetHours OBJECT-TYPE
+        SYNTAX INTEGER  
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Setting Offset Hours of Daylight Saving time"
+        ::= { daylightSaving 9 }
+
+    enableNTPServer OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable NTP Server."
+        ::= { timeSetting 6 }    
+
+	timeProtocolOption OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), sntp(1), ntp(2) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Time Protocol."
+        ::= { timeSetting 7 }    	
+
+-- -------------------------------------------------------------
+-- TurboRing Dip Switch setting
+-- -------------------------------------------------------------        
+    
+    dipSwitchSetting OBJECT IDENTIFIER ::= { swMgmt 34 }
+    
+    dipSwitchEnableTurboRing OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Enable TurboRing Dip Switch functions"
+        ::= { dipSwitchSetting 1 }
+        
+    dipSwitchTurboRingPole OBJECT-TYPE
+        SYNTAX INTEGER  { off(0), on(1) }
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The TurboRing Pole status of Dip switch."
+        ::= { dipSwitchSetting 2 }
+    
+    dipSwitchRingCouplingPole OBJECT-TYPE
+        SYNTAX INTEGER  { off(0), on(1) }
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The Ring Coupling Pole status of Dip switch."
+        ::= { dipSwitchSetting 3 }
+
+    dipSwitchRingMasterPole OBJECT-TYPE
+        SYNTAX INTEGER  { off(0), on(1) }
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The Ring Master Pole status of Dip switch."
+        ::= { dipSwitchSetting 4 }
+        
+-- -------------------------------------------------------------
+-- Auto-Backup Media setting
+-- -------------------------------------------------------------        
+    
+    backupMediaSetting OBJECT IDENTIFIER ::= { swMgmt 35 }
+    
+    backupMediaAutoLoad OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Enable Abc-01 backupMedia configuration PowerOn Auto Load functions"
+        ::= { backupMediaSetting 1 }        
+        
+-- -------------------------------------------------------------
+-- Warm Start setting
+-- -------------------------------------------------------------            
+    
+    enableWarmStart OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            no(0),
+            yes(1)
+            }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Enable to restart MOXA ethernet switch."
+        ::= { swMgmt 36 }           
+
+-- -------------------------------------------------------------
+-- Syslog setting
+-- -------------------------------------------------------------         
+    
+    syslogSetting OBJECT IDENTIFIER ::= { swMgmt 37 }
+    
+    syslogServer1 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The syslog server 1"
+        ::= { syslogSetting 1 }
+    
+    syslogServer1port OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The syslog server 1 port"
+        ::= { syslogSetting 2 }
+        
+    syslogServer2 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The syslog server 2"
+        ::= { syslogSetting 3 }
+    
+    syslogServer2port OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The syslog server 2 port"
+        ::= { syslogSetting 4 }
+        
+    syslogServer3 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The syslog server 3"
+        ::= { syslogSetting 5 }
+    
+    syslogServer3port OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The syslog server 3 port"
+        ::= { syslogSetting 6 }   
+        
+
+-- -------------------------------------------------------------
+-- DHCP Relay Agent group
+-- -------------------------------------------------------------
+    dhcpRelayAgentSetting OBJECT IDENTIFIER ::= { swMgmt 39 }
+    
+    dhcpServer1 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The dhcp Relay Agent Server 1."
+        ::= { dhcpRelayAgentSetting 1 }
+
+    dhcpServer2 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The dhcp Relay Agent Server 2."
+        ::= { dhcpRelayAgentSetting 2 }
+
+    dhcpServer3 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The dhcp Relay Agent Server 3."
+        ::= { dhcpRelayAgentSetting 3 }
+
+    dhcpServer4 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The dhcp Relay Agent Server 4."
+        ::= { dhcpRelayAgentSetting 4 }        
+
+		option82Setting OBJECT IDENTIFIER ::= { dhcpRelayAgentSetting 5 }
+
+    enableOption82 OBJECT-TYPE
+        SYNTAX INTEGER  { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Enable DHCP Option 82"
+        ::= { option82Setting 1 }
+        
+    option82Type OBJECT-TYPE
+        SYNTAX INTEGER  { ip(0), mac(1), client-id(2), other(3) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "Option 82 Type selector "
+        ::= { option82Setting 2 }
+
+    option82Value OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Option 82 Type Value"
+        ::= { option82Setting 3 }        
+
+    option82ValueDisplay OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "Option 82 Type Value Display"
+        ::= { option82Setting 4 }        
+
+    dhcpFunctionTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF DhcpFunctionEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "DHCP Function Table."
+        ::= { dhcpRelayAgentSetting 6 }
+
+    dhcpFunctionEntry OBJECT-TYPE
+        SYNTAX DhcpFunctionEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "DHCP Function Table Entry."
+        INDEX { dhcpPortIndex }
+        ::= { dhcpFunctionTable 1 }
+        
+    DhcpFunctionEntry ::=
+        SEQUENCE {
+        		dhcpPortIndex
+        			INTEGER,
+            circuitID
+            	DisplayString,
+            option82Enable
+              INTEGER
+            }
+
+    dhcpPortIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The DHCP Port Index."
+        ::= { dhcpFunctionEntry 1 } 
+        
+    circuitID OBJECT-TYPE
+        SYNTAX DisplayString 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The Circuit ID."
+        ::= { dhcpFunctionEntry 2 } 
+
+    option82Enable OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable option 82 of the port."
+        ::= { dhcpFunctionEntry 3 }
+
+
+-- -------------------------------------------------------------
+-- Power over Ethernet(POE) Function
+-- -------------------------------------------------------------
+    poeSetting OBJECT IDENTIFIER ::= { swMgmt 40 }
+
+    
+   poePortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PoePortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Poe Port Function Table."
+        ::= { poeSetting 3 }
+
+    poePortEntry OBJECT-TYPE
+        SYNTAX PoePortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "Poe Port Function Table Entry."
+        INDEX { poePortIndex }
+        ::= { poePortTable 1 }
+        
+    PoePortEntry ::=
+        SEQUENCE {
+        	poePortIndex
+        		INTEGER,
+            poePortEnable
+            	INTEGER,
+            poePowerOutputMode
+  	          	INTEGER,
+    	    powerLimit
+            	INTEGER,
+   	        pdfailure
+            	INTEGER,
+  	    	pdipaddr
+				DisplayString,
+			pdPollingInterval
+            	INTEGER,
+			poeporttimetabling
+            	INTEGER
+          }
+
+    poePortIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "PoE port index."
+        ::= { poePortEntry 1 } 
+        
+    poePortEnable OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "PoE port Enable."
+        ::= { poePortEntry 2 } 
+
+    poePowerOutputMode OBJECT-TYPE
+        SYNTAX INTEGER { auto(0), highPower(1), force(2) } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "PoE port Power Output Mode."
+        ::= { poePortEntry 3 }
+     
+    powerLimit OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "PoE Port Power Budget"
+        ::= { poePortEntry 4 }
+    pdfailure OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "PD check Enable per port."
+        ::= { poePortEntry 5 }
+
+    pdipaddr OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "PD ip address."
+        ::= { poePortEntry 6 } 
+	pdPollingInterval OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "PD check interval"
+        ::= { poePortEntry 7 }
+	poeporttimetabling OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "PoE port timetabling"
+        ::= { poePortEntry 8 }
+
+	-- PoE Timetabling Table
+	
+    poeTimeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PoeTimeEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "PoE Time Table."
+        ::= { poeSetting 5 }
+
+    poeTimeEntry OBJECT-TYPE
+        SYNTAX PoeTimeEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "PoE Time Table Entry."
+        INDEX { poeTPortIndex, poeWeekDay }
+        ::= { poeTimeTable 1 }
+        
+    PoeTimeEntry ::=
+        SEQUENCE {
+			poeTPortIndex
+				INTEGER,     
+            poeWeekDay
+            	INTEGER,
+           poeDayEnable
+            	INTEGER,
+           poeDayStart
+            	INTEGER, 
+           poeDayStop
+            	INTEGER 
+            }     
+    
+    poeTPortIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "port Index for time table."
+        ::= { poeTimeEntry 1 }
+
+    poeWeekDay OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "day index for a week."
+        ::= { poeTimeEntry 2 }
+
+    poeDayEnable OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) } 
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Enable or not for one day."
+        ::= { poeTimeEntry 3 }
+
+   poeDayStart OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "PoE Port Start Time"
+        ::= { poeTimeEntry 4 }
+
+   poeDayStop OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "PoE Port Stop Time"
+        ::= { poeTimeEntry 5 }
+
+	-- PoE Status Table
+	
+    poeStatusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PoeStatusEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "PoE Status Table."
+        ::= { poeSetting 6 }
+
+    poeStatusEntry OBJECT-TYPE
+        SYNTAX PoeStatusEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "PoE Status Table Entry."
+        INDEX { poePortIndex}
+        ::= { poeStatusTable 1 }
+        
+    PoeStatusEntry ::=
+        SEQUENCE {     
+         poePortStatus
+            	INTEGER,
+         poePortConsumption
+            	INTEGER, 
+         poePortVoltage
+            	INTEGER, 
+         poePortCurrent
+            	INTEGER 
+            }     
+    
+    poePortStatus OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) } 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "PoE port Status."
+        ::= { poeStatusEntry 1 }
+
+   poePortConsumption OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "PoE port Consumption"
+        ::= { poeStatusEntry  2}
+
+   poePortVoltage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "PoE port Voltage"
+        ::= { poeStatusEntry 3 }
+   poePortCurrent OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "PoE port Current"
+        ::= { poeStatusEntry 4 }
+
+
+
+
+	
+-- -------------------------------------------------------------
+-- PTP Setting
+-- -------------------------------------------------------------
+    
+    ieee1588Setting OBJECT IDENTIFIER ::= { swMgmt 41 }  
+    
+    ptpv1Setting OBJECT IDENTIFIER ::= { ieee1588Setting 1 }
+       
+    enablePtpv1 OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the PTP function."
+        ::= { ptpv1Setting 1 }  
+    
+    clockModev1 OBJECT-TYPE
+        SYNTAX INTEGER {
+        	v1BC(0),
+        	v2E2E2stepTC(1),
+        	v2E2E1stepTC(2),
+        	v2P2PTC(3),
+        	v2E2EBC(4),
+        	v2P2PBC(5)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the clock mode of the PTP clock."
+        ::= { ptpv1Setting 2 }  
+
+    syncIntervalv1 OBJECT-TYPE
+        SYNTAX INTEGER {
+        	oneSec(0),
+        	twoSec(1),
+        	fourSec(2),
+        	eightSec(3),
+        	sixteenSec(4)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the logSyncInterval of the PTP clock."
+        ::= { ptpv1Setting 3 }   
+
+    subDomainNamev1 OBJECT-TYPE
+        SYNTAX INTEGER {dflt(0),alt1(1),alt2(2),alt3(3)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The subdomain name of the PTP clock."
+        ::= { ptpv1Setting 4 }                   
+
+    preferMasterv1 OBJECT-TYPE
+        SYNTAX INTEGER {false(0),true(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the PTP prefer master function."
+        ::= { ptpv1Setting 5 }  
+          
+    ptpv2Setting OBJECT IDENTIFIER ::= { ieee1588Setting 2 }
+       
+    enablePtp OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the PTP function."
+        ::= { ptpv2Setting 1 }  
+    
+    clockMode OBJECT-TYPE
+        SYNTAX INTEGER {
+        	v1BC(0),
+        	v2E2E2stepTC(1),
+        	v2E2E1stepTC(2),
+        	v2P2PTC(3),
+        	v2E2EBC(4),
+        	v2P2PBC(5)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the clock mode of the PTP clock."
+        ::= { ptpv2Setting 2 }  
+
+    transport OBJECT-TYPE
+        SYNTAX INTEGER {ieee802dot3(0),ipv4(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the transport mode of the PTP clock."
+        ::= { ptpv2Setting 3 }  
+                        
+    syncInterval OBJECT-TYPE
+        SYNTAX INTEGER {
+        	t128msec(-3),
+        	t256msec(-2),
+        	t512msec(-1),
+        	t1sec(0),
+        	t2sec(1)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the logSyncInterval of the PTP clock."
+        ::= { ptpv2Setting 4 }   
+
+    logMinDelayReqInterval OBJECT-TYPE
+        SYNTAX INTEGER {t1sec(0),t2sec(1),t4sec(2),t8sec(3),t16sec(4),t32sec(5)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the logMinDelayReqInterval of the PTP clock."
+        ::= { ptpv2Setting 5 }   
+ 
+    logMinPdelayReqInterval OBJECT-TYPE
+        SYNTAX INTEGER {
+        	t512msec(-1),
+        	t1sec(0),
+        	t2sec(1),
+        	t4sec(2),
+        	t8sec(3),
+        	t16sec(4),
+        	t32sec(5)
+        }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the logMinPdelayReqInterval of the PTP clock."
+        ::= { ptpv2Setting 6 }   
+
+    logAnnounceInterval OBJECT-TYPE
+        SYNTAX INTEGER {t1sec(0),t2sec(1),t4sec(2),t8sec(3),t16sec(4)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the logAnnounceInterval of the PTP clock."
+        ::= { ptpv2Setting 7 }   
+
+    announceReceiptTimeout OBJECT-TYPE
+        SYNTAX INTEGER (2..10)
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the announceReceiptTimeout of the PTP clock."
+        ::= { ptpv2Setting 8 }   
+
+    priority1 OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the priority1 of the PTP clock."
+        ::= { ptpv2Setting 9 }   
+ 
+    priority2 OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the priority2 of the PTP clock."
+        ::= { ptpv2Setting 10 }   
+ 
+    clockClass OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the clockClass of the PTP clock."
+        ::= { ptpv2Setting 11 }   
+                                                   
+    domainNumber OBJECT-TYPE
+        SYNTAX INTEGER {dflt(0),alt1(1),alt2(2),alt3(3)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "The domain number of the PTP clock."
+        ::= { ptpv2Setting 12 }                   
+
+    localUtcOffset OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the UTC offset of the local PTP clock."
+        ::= { ptpv2Setting 13 }   
+
+    localUtcOffsetValid OBJECT-TYPE
+        SYNTAX INTEGER {false(0),true(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the UTC offset valid of the local PTP clock."
+        ::= { ptpv2Setting 14 }   
+ 
+    localLeap59 OBJECT-TYPE
+        SYNTAX INTEGER {false(0),true(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the leap59 of the local PTP clock."
+        ::= { ptpv2Setting 15 }   
+
+    localLeap61 OBJECT-TYPE
+        SYNTAX INTEGER {false(0),true(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the leap61 of the local PTP clock."
+        ::= { ptpv2Setting 16 }   
+
+    localPtpTimescale OBJECT-TYPE
+        SYNTAX INTEGER {arb(0),ptp(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the timescale of the local PTP clock."
+        ::= { ptpv2Setting 17 }   
+
+    localArbTime OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "the ARB time of the local PTP clock."
+        ::= { ptpv2Setting 18 }   
+                                                                                                        
+    ptpv1Status OBJECT IDENTIFIER ::= { ieee1588Setting 3 }
+       
+    offsetToMasterv1 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The offset to master for nsec."
+        ::= { ptpv1Status 1 }
+    
+    meanPathDelayv1 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The mean path delay of the PTP clock."
+        ::= { ptpv1Status 2 }
+                
+    grandMasterUuidv1 OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only          
+        STATUS current
+        DESCRIPTION
+            "The grand master UUID address of the PTP clock."
+        ::= { ptpv1Status 3 }  
+    
+    parentUuidv1 OBJECT-TYPE
+        SYNTAX MacAddress
+        MAX-ACCESS read-only          
+        STATUS current
+        DESCRIPTION
+            "The parent master UUID address of the PTP clock."
+        ::= { ptpv1Status 4 }  
+        
+    clockStratumv1 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only             
+        STATUS current
+        DESCRIPTION
+            "The clock stratum of the PTP clock."
+        ::= { ptpv1Status 5 }  
+        
+    clockIdentifierv1 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The clock identifier of the PTP clock."
+        ::= { ptpv1Status 6 }                            
+
+    ptpv2Status OBJECT IDENTIFIER ::= { ieee1588Setting 4 }
+
+    offsetToMaster OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The offset to master for nsec."
+        ::= { ptpv2Status 1 }
+    
+    meanPathDelay OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The mean path delay of the PTP clock."
+        ::= { ptpv2Status 2 }
+         
+    parentIdentity OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The parent identity of the PTP clock."
+        ::= { ptpv2Status 3 }                            
+
+    grandmasterIdentity OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The grandmaster identity of the PTP clock."
+        ::= { ptpv2Status 4 }                            
+
+    grandmasterClockClass OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The grandmaster clockClass of the PTP clock."
+        ::= { ptpv2Status 5 }
+
+    grandmasterClockAccuracy OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The grandmaster clockAccuracy of the PTP clock."
+        ::= { ptpv2Status 6 }
+
+    grandmasterPriority1 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The grandmaster priority1 of the PTP clock."
+        ::= { ptpv2Status 7 }
+
+    grandmasterPriority2 OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The grandmaster priority2 of the PTP clock."
+        ::= { ptpv2Status 8 }
+
+    stepsRemoved OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The steps removed of the PTP clock."
+        ::= { ptpv2Status 9 }
+
+    currentUtcOffset OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The current utc offset of the PTP clock."
+        ::= { ptpv2Status 10 }
+
+    currentUtcOffsetValid OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The current utc offset valid flag of the PTP clock."
+        ::= { ptpv2Status 11 }
+ 
+    leap59 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The leap59 of the PTP clock."
+        ::= { ptpv2Status 12 }
+
+    leap61 OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The leap61 of the PTP clock."
+        ::= { ptpv2Status 13 }
+
+    ptpTimescale OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The ptp timescale of the PTP clock."
+        ::= { ptpv2Status 14 }
+
+    timesource OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only               
+        STATUS current
+        DESCRIPTION
+            "The timesource of the PTP clock."
+        ::= { ptpv2Status 15 }
+                                                                                                                                                                                                                            
+    ptpPortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF PtpPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The ptp port table."
+        ::= { ieee1588Setting 5 }
+    
+    ptpPortEntry OBJECT-TYPE
+        SYNTAX PtpPortEntry
+        MAX-ACCESS not-accessible               
+        STATUS current
+        DESCRIPTION
+            "The ptp port entry."
+        INDEX { ptpPortIndex }
+        ::= { ptpPortTable 1 }
+        
+    PtpPortEntry ::=
+        SEQUENCE {
+            ptpPortIndex
+                INTEGER,        
+            ptpPortEnable
+                INTEGER,
+            ptpPortStatus
+                INTEGER
+        }
+    
+    ptpPortIndex OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-only                
+        STATUS current
+        DESCRIPTION
+            "The ptp port index."
+        ::= { ptpPortEntry 1 }          
+
+    ptpPortEnable OBJECT-TYPE
+        SYNTAX INTEGER { disable(0), enable(1) }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the ptp port."
+        ::= { ptpPortEntry 2 }
+    
+    ptpPortStatus OBJECT-TYPE
+    	SYNTAX INTEGER { 
+    		ptpInitializing(0), 
+    		ptpFaulty(1), 
+    		ptpDisabled(2), 
+    		ptpListening(3), 
+    		ptpPreMaster(4), 
+    		ptpMaster(5), 
+    		ptpPassive(6), 
+    		ptpUncalibrated(7), 
+    		ptpSlave(8) 
+    	} 
+        MAX-ACCESS read-only              
+        STATUS current
+        DESCRIPTION
+            "This port status of the PTP clock."
+        ::= { ptpPortEntry 3 }
+                      
+          
+-- -------------------------------------------------------------
+-- swTraps group
+-- -------------------------------------------------------------
+
+    varconfigChangeTrap OBJECT-TYPE
+		SYNTAX	INTEGER {
+			none(1),			-- no config change happened
+			configChanged(2)	-- config changed
+		}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The configuration has been changed."
+		::= { swTraps 1 }
+              
+    configChangeTrap NOTIFICATION-TYPE
+    OBJECTS         { varconfigChangeTrap }
+    STATUS          current	
+	DESCRIPTION
+			"The configuration has been changed."
+	::= { mibNotificationsPrefix 1 }
+              
+    varpower1Trap OBJECT-TYPE
+		SYNTAX	INTEGER {
+			none(1),			-- no power on/off
+			on2off(2),			-- power on to power off
+			off2on(3)			-- power off to power on
+		}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The power on/off changed."
+		::= { swTraps 2 }
+			
+    power1Trap NOTIFICATION-TYPE
+    OBJECTS         { varpower1Trap }
+    STATUS          current		
+	DESCRIPTION
+			"The power on/off changed."
+	::= { mibNotificationsPrefix 2 }
+              			
+    varpower2Trap OBJECT-TYPE
+		SYNTAX	INTEGER {
+			none(1),			-- no power on/off
+			on2off(2),			-- power on to power off
+			off2on(3)			-- power off to power on
+		}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The power on/off changed."
+		::= { swTraps 3 }
+			
+    power2Trap NOTIFICATION-TYPE
+    OBJECTS         { varpower2Trap }
+    STATUS          current			
+	DESCRIPTION
+			"The power on/off changed."
+	::= { mibNotificationsPrefix 3 }
+
+    vartrafficOverloadTrap OBJECT-TYPE
+		SYNTAX	INTEGER
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The ethernet port's traffic loading exceeds the pre-defined value."
+		::= { swTraps 4 }
+		
+    trafficOverloadTrap NOTIFICATION-TYPE
+    OBJECTS         { vartrafficOverloadTrap }
+    STATUS          current		
+	DESCRIPTION
+			"The ethernet port's traffic loading exceeds the pre-defined value."
+	::= { mibNotificationsPrefix 4 }
+
+    varredundancyTopologyChangedTrap OBJECT-TYPE
+		SYNTAX	INTEGER {
+			none(1),			-- no topology change
+			topologyChanged(2),	-- topology changed
+			topologyChangedTurboChainHead(3),	-- topology change turboChain head
+			topologyChangedTurboChainTail(4)	-- topology change turboChain tail
+		}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The redundancy topology has been changed."
+		::= { swTraps 5 }
+       
+    redundancyTopologyChangedTrap NOTIFICATION-TYPE
+    OBJECTS         { varredundancyTopologyChangedTrap }
+    STATUS          current				
+	DESCRIPTION
+			"The redundancy topology has been changed."
+	::= { mibNotificationsPrefix 5 }
+
+    varturboRingCouplingPortChangedTrap OBJECT-TYPE
+		SYNTAX	INTEGER {
+			none(1),				-- no topology change
+			couplingPortChanged(2)	-- coupling port changed
+		}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The coupling path of Turbo Ring has been changed."
+		::= { swTraps 6 }
+                
+    turboRingCouplingPortChangedTrap NOTIFICATION-TYPE
+    OBJECTS         { varturboRingCouplingPortChangedTrap }
+    STATUS          current		
+	DESCRIPTION
+			"The coupling path of Turbo Ring has been changed."
+	::= { mibNotificationsPrefix 6 }
+
+    varturboRingMasterChangedTrap OBJECT-TYPE
+		SYNTAX	INTEGER {
+			none(1),				-- no topology change
+			ringMasterChanged(2)	-- ring master changed
+		}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The master of Turbo Ring has been changed."
+		::= { swTraps 7 }   
+
+ turboRingMasterChangedTrap NOTIFICATION-TYPE
+    OBJECTS         { varturboRingMasterChangedTrap }
+    STATUS          current		
+		DESCRIPTION
+			"The master of Turbo Ring has been changed."
+	::= { mibNotificationsPrefix 7 }	
+					
+					
+		varPoEWarningTrap OBJECT-TYPE
+		SYNTAX	INTEGER {
+			pdOverCurrent(1),		-- PoE port over-current/short-circuit
+			pdCheckFail(2),			-- PD Failure Check (no response)
+			pdPowerOn(3),			-- PoE port power on
+			pdPowerOff(4),			-- PoE port power off
+			exceedSystemThreshold(5),-- Exceed PoE system threshold
+			pseFetBad(6),			-- PoE port External FET has failed
+			pseOverTemperature(7),	-- PSE chip is over temperature
+			pseVeeUvlo(8)			-- PSE chip VEE under voltage lockout			
+		}
+		MAX-ACCESS	read-only
+		STATUS	current
+		DESCRIPTION
+			"The POE warning message."
+		::= { swTraps 16 }			
+-- -------------------------------------------------------------
+-- Diagnosis:  LLDP Setting
+-- -------------------------------------------------------------
+    
+     diagnosis OBJECT IDENTIFIER ::= { swMgmt 42 }
+     lldpSetting OBJECT IDENTIFIER ::= { diagnosis 1 }
+    
+       
+    enableLLDP OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the LLDP function."
+        ::= { lldpSetting 1 }  	
+    
+        
+ 		lldpMSGInterval OBJECT-TYPE
+        SYNTAX INTEGER 
+        MAX-ACCESS read-write                
+        STATUS current
+        DESCRIPTION
+            "The LLDP message transmit interval."
+        ::= { lldpSetting 2 }              	
+		
+-- -------------------------------------------------------------
+-- Industrial Protocol
+-- -------------------------------------------------------------
+    
+     industrialProtocol OBJECT IDENTIFIER ::= { swMgmt 47 }
+     eipSetting OBJECT IDENTIFIER ::= { industrialProtocol 1 }
+     modbusTCPSetting OBJECT IDENTIFIER ::= { industrialProtocol 2 }
+    
+       
+    enableEtherNetIP OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the EtherNet/IP function."
+        ::= { eipSetting 1 }  	
+    
+        
+    enableModbusTCP OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write                
+        STATUS current
+        DESCRIPTION
+            "This enable the Modbus TCP function."
+        ::= { modbusTCPSetting 1 }     
+        
+        
+-- -------------------------------------------------------------
+-- GARP
+-- -------------------------------------------------------------
+    
+    garpSetting OBJECT IDENTIFIER ::= { swMgmt 45 }
+     
+       
+     leaveAllTime OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Leaveall Time (ms)."
+        ::= { garpSetting 3 }  	    
+        
+    leaveTime OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Leave Time (ms)."
+        ::= { garpSetting 2 }  	
+        
+    joinTime OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Join Time (ms)."
+        ::= { garpSetting 1 }  	    
+		
+-- -------------------------------------------------------------
+-- Factory Default setting
+-- -------------------------------------------------------------            
+    
+    enableFactoryDefault OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            activate(1)
+            }
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "Reset all EtherDevice switch settings to factory default values"
+        ::= { swMgmt 48 }                     	    
+		
+        
+-- -------------------------------------------------------------
+-- eventlog
+-- -------------------------------------------------------------
+    eventlog OBJECT IDENTIFIER ::= { swMgmt 46 }
+
+    eventlogTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF EventlogEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table of eventlog."
+        ::= { eventlog 1 }
+
+    eventlogEntry OBJECT-TYPE
+        SYNTAX EventlogEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The table entry of eventlog."
+        INDEX { eventlogIndex }
+        ::= { eventlogTable 1 }
+
+    EventlogEntry ::=
+        SEQUENCE {
+            eventlogIndex
+                INTEGER,
+            eventlogBootup
+                INTEGER,
+            eventlogDate
+                DisplayString,
+            eventlogTime
+                DisplayString,
+            eventlogUptime
+                DisplayString,
+            eventlogEvent
+                DisplayString
+        }
+
+    eventlogIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The index of eventlog entry."
+        ::= { eventlogEntry 1 }
+
+    eventlogBootup OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The reboot count of the system."
+        ::= { eventlogEntry 2 }
+
+    eventlogDate OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The date of the event occurred."
+        ::= { eventlogEntry 3 }
+
+    eventlogTime OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The time of the event occurred."
+        ::= { eventlogEntry 4 }
+
+    eventlogUptime OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The time of the event occurred after booting up."
+        ::= { eventlogEntry 5 }
+
+    eventlogEvent OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The event which occurred in the system."
+        ::= { eventlogEntry 6 }
+
+    eventlogClear OBJECT-TYPE
+        SYNTAX INTEGER { noop(0), clear(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "To clear the eventlog, set value 1 to this field."
+        ::= { eventlog 2 }                          	    
+-- -------------------------------------------------------------
+-- CPU Loading and Free Memory info.
+-- -------------------------------------------------------------                    	    
+    cpuLoading5s OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "CPU Loading for the past 5 seconds in %."
+        ::= { swMgmt 53 }  
+        
+     cpuLoading30s OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "CPU Loading for the past 30 seconds in %."
+        ::= { swMgmt 54 }    
+        
+      cpuLoading300s OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "CPU Loading for the past 5 minutes in %."
+        ::= { swMgmt 55 }    
+
+       totalMemory OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total size of System RAM."
+        ::= { swMgmt 56 } 
+        
+        freeMemory OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total size of free dynamic memory"
+        ::= { swMgmt 57 }     		
+        
+     usedMemory OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Total size of used dynamic memory"
+        ::= { swMgmt 58 }  
+        
+     memoryUsage OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The usage of memory size in %."
+        ::= { swMgmt 59 } 		
+
+-- -------------------------------------------------------------
+-- Loop Protection info.
+-- -------------------------------------------------------------   
+     loopProtection OBJECT-TYPE
+        SYNTAX INTEGER {disable(0),enable(1)}
+        MAX-ACCESS read-write               
+        STATUS current
+        DESCRIPTION
+            "This enable the Loop Protection function."
+        ::= { swMgmt 61 } 
+
+END
+    
+ 

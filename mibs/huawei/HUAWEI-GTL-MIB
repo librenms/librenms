@@ -1,0 +1,531 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI GTL MIB
+-- Reference:
+-- Version: V2.15
+-- History:
+-- <author>,  <date>,  <contents>
+-- WangHaiwei   2007-1-16
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types are imported
+-- 
+-- ==================================================================
+
+    HUAWEI-GTL-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB   
+            DisplayString 
+                FROM SNMPv2-TC
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI;
+
+        hwGtl MODULE-IDENTITY 
+            LAST-UPDATED "201708171643Z"        -- AUG 17, 2017 at 16:43 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "            
+            DESCRIPTION 
+                "The private mib file includes the general extent 
+                information of the device.hwDatacomm(25).htGtl(142)"
+
+            REVISION     "201708171643Z"                                                                                    
+            DESCRIPTION  "V2.15, Modify description of hwGtlChassisID "  
+								
+            REVISION     "201708141700Z"                                                                                    
+            DESCRIPTION  "V2.14, Modify INDEX of hwGtlItemEntry, Delete hwGtlItemIndex, Add hwGtlItemState, hwGtlItemExpireDay "  
+
+            REVISION     "201607271037Z"                                                                                    
+            DESCRIPTION  "V2.13, Modify description of hwGtlFunctionInactive, hwGtlFunctionInactiveCleared, hwGtlResourceLack, hwGtlResourceLackCleared "  
+
+            REVISION     "201606282020Z"                                                                                    
+            DESCRIPTION  "V2.12, Add hwGtlAbnormal, hwGtlAbnormalCleared, hwGtlAbnormalReason "     				
+				
+            REVISION     "201605191118Z"                                                                                    
+            DESCRIPTION  "V2.11, Add hwGtlFunctionInactive, hwGtlFunctionInactiveCleared, hwGtlResourceLack, hwGtlResourceLackCleared "     				
+				
+            REVISION     "201512311501Z"                                                                                    
+            DESCRIPTION  "V2.10, Add hwGtlInitial, hwGtlInitialCleared, hwGtlBoardID  "     
+               
+            REVISION     "201508101714Z"                                                                                    
+            DESCRIPTION  "V2.09, Add hwGtlItemInactive, hwGtlItemInactiveCleared  "     
+ 
+            REVISION     "201507201148Z"                                                                                    
+            DESCRIPTION  "V2.08, Add hwGtlEsnMismatchCleared" 
+                
+            REVISION     "201507141538Z"                                                                                    
+            DESCRIPTION  "V2.07, Add hwGtlEsnMismatch" 
+
+            REVISION     "201506041538Z"                                                                                    
+            DESCRIPTION  "V2.06, Add hwGtlResourceOverload, hwGtlResourceOverloadCleared" 
+
+            REVISION     "201412041538Z"                                                                                    
+            DESCRIPTION  "V2.05, Add the hwGtlTrialFeatureNearDeadline, hwGtlTrialFeatureNearDeadlineCleared" 
+
+            REVISION     "201403051428Z"                                                                                    
+            DESCRIPTION  "V2.04, Add the hwGtlTrialFeatureEnable,hwGtlTrialFeatureDisable" 
+
+            REVISION     "201308191042Z"                                                                                    
+            DESCRIPTION  "V2.03, Add the hwGtlEmergencyStart,hwGtlEmergencyStop" 
+            
+            REVISION     "201308061134Z"                                                                                    
+            DESCRIPTION  "V2.02, Add the hwGtlLicenseNotCommeral" 
+            
+            REVISION     "201307171614Z"                                                                                    
+            DESCRIPTION  "V2.01, Add the hwGtlResourceUsedUpCleared  " 
+
+            ::= { hwDatacomm 142 }
+   
+--
+-- Node definitions
+--
+    
+-- ==================================================================
+-- 
+-- ======================= definition begin =========================
+-- 
+-- ==================================================================  
+        hwGtlMibObjects OBJECT IDENTIFIER ::= { hwGtl 1 }
+
+        hwGtlDefaultValueReason OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object specifies the reason why the system uses the default value."
+            ::= { hwGtlMibObjects 1 }
+        
+        hwGtlResourceItem OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object specifies the resource item which is nearly exhausted."
+            ::= { hwGtlMibObjects 2 }
+
+        hwGtlFeatureName OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (1..31))
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The object specifies the feature name which is near deadline."
+            ::= { hwGtlMibObjects 3 }
+
+        hwGtlRemainTime OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "Remain time of the feature which is near deadline.The unit is day."
+            ::= { hwGtlMibObjects 4 }
+
+        hwGtlVerifyCode OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The verify code returned when verify license file failed."
+            ::= { hwGtlMibObjects 5 }
+
+        hwGtlActive OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (5..127))
+            MAX-ACCESS read-write
+            STATUS     current
+            DESCRIPTION
+                    "Active GTL license"
+            ::= { hwGtlMibObjects 6 }
+            
+        hwGtlShowActLCSName OBJECT-TYPE
+            SYNTAX     OCTET STRING (SIZE (5..127))
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                    "Show active GTL license file name"
+            ::= { hwGtlMibObjects 7 }    
+
+        hwGtlItemTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwGtlItemEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of item infomation in GTL license. Especially for show usage of reource item."
+            ::= { hwGtlMibObjects 8 }
+            
+        hwGtlItemEntry OBJECT-TYPE
+            SYNTAX HwGtlItemEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A GTL license item information entry. Each entry consists of information of a item."
+            INDEX { hwGtlItemName }
+            ::= { hwGtlItemTable 1 }
+            
+        HwGtlItemEntry ::=
+            SEQUENCE { 
+                hwGtlItemName
+                    DisplayString,
+                hwGtlItemControlValue
+                    Unsigned32,
+                hwGtlItemUsedValue
+                    Unsigned32,
+                hwGtlItemDescription
+                    DisplayString,
+                hwGtlItemState
+                    DisplayString,
+                hwGtlItemExpireDay
+                    DisplayString
+             }
+
+        hwGtlItemName OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "Item name."
+            ::= { hwGtlItemEntry 1 }  
+
+        hwGtlItemControlValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Control value of the item. Control value will always be non-zero."
+            ::= { hwGtlItemEntry 2 }
+
+        hwGtlItemUsedValue OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Used value of the item."
+            ::= { hwGtlItemEntry 3 }
+
+        hwGtlItemDescription OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "Description of the item."
+            ::= { hwGtlItemEntry 4 }  
+            
+        hwGtlItemState OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "Description of the item state."
+            ::= { hwGtlItemEntry 5 }  
+
+        hwGtlItemExpireDay OBJECT-TYPE
+            SYNTAX     DisplayString
+            MAX-ACCESS read-only
+            STATUS     current
+            DESCRIPTION
+                "Description of the item expire day."
+            ::= { hwGtlItemEntry 6 }  
+
+        hwGtlChassisID OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE (1..32))
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "Description of the alarm chassis whose license control items are inconsistent with those of the main chassis."
+        ::= { hwGtlMibObjects 9 }
+
+        hwGtlBoardID OBJECT-TYPE
+        SYNTAX     OCTET STRING (SIZE (1..32))
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "Show board description."
+        ::= { hwGtlMibObjects 10 }
+
+        hwGtlAbnormalReason OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            startLibrary(10),
+            requestRespond(11),
+            processMessage(12),
+            sendRequest(13),
+            processRequest(14),
+            licenseAbnormal(15)
+            }
+        MAX-ACCESS accessible-for-notify
+        STATUS     current
+        DESCRIPTION
+            "Show abnormal reason of license:
+            startLibrary(10): Failed to start the license library
+            requestRespond(11): The backup request was not responded
+            processMessage(12): Failed to process the backup message
+            sendRequest(13): Failed to send a backup request
+            processRequest(14): Failed to process the backup request
+            licenseAbnormal(15): The license may be abnormal
+            "
+        ::= { hwGtlMibObjects 11 }
+
+        hwGtlNotifications OBJECT IDENTIFIER ::= { hwGtl 2 }
+
+        hwGtlDefaultValue NOTIFICATION-TYPE
+            OBJECTS { hwGtlDefaultValueReason, hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents that the system will use default value if the license file fails to pass the verification."
+            ::= { hwGtlNotifications 1 }
+
+        hwGtlResourceUsedUp NOTIFICATION-TYPE
+            OBJECTS { hwGtlResourceItem }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the resource is nearly exhausted."
+            ::= { hwGtlNotifications 2 }
+
+        hwGtlNearDeadline NOTIFICATION-TYPE
+            OBJECTS { hwGtlFeatureName, hwGtlRemainTime, hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the feature is near deadline."
+            ::= { hwGtlNotifications 3 }
+
+        hwGtlLicenseVerifyFailed NOTIFICATION-TYPE
+            OBJECTS { hwGtlVerifyCode }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents license verification failed.
+                The reason why license verification failed can be:
+                1 represents that the ESN or version of the device and the license file mismatch.
+                2 represents that the license file has expired.
+                3 represents that the product type of the device and the license file mismatch.
+                4 represents that the license file is invalid."
+            ::= { hwGtlNotifications 4 }
+        
+        hwGtlExpired NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the license has expired."
+            ::= { hwGtlNotifications 5 }
+
+        hwGtlItemMismatch NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "License item mismatch with the main chassis."
+            ::= { hwGtlNotifications 6 }
+
+        hwGtlDefaultValueCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlDefaultValueReason, hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents that the system will use default value if the license file fails to pass the verification is cleared."
+            ::= { hwGtlNotifications 7 }
+
+        hwGtlNearDeadlineCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlFeatureName, hwGtlRemainTime, hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents the feature is near deadline is cleared."
+            ::= { hwGtlNotifications 8 }
+
+        hwGtlItemMismatchCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents the license item mismatch with the main chassis is cleared."
+            ::= { hwGtlNotifications 9 }
+
+        hwGtlResourceUsedUpCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlResourceItem }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents the resource is nearly exhausted is cleared."
+            ::= { hwGtlNotifications 10 }
+
+        hwGtlLicenseNotCommeral NOTIFICATION-TYPE        
+	    STATUS current
+	    DESCRIPTION 
+                "The notification represents the license is not commerial."
+	    ::= { hwGtlNotifications 11}
+	      
+        hwGtlEmergencyStart NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the license emergency is started."
+            ::= { hwGtlNotifications 12 }
+            
+        hwGtlEmergencyStop NOTIFICATION-TYPE
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the license mergency is stopped after 7 days."
+            ::= { hwGtlNotifications 13 } 
+
+        hwGtlTrialFeatureEnable NOTIFICATION-TYPE
+            OBJECTS { hwGtlFeatureName, hwGtlRemainTime}
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the trial feature is enable."
+            ::= { hwGtlNotifications 14 } 
+
+        hwGtlTrialFeatureDisable NOTIFICATION-TYPE
+            OBJECTS { hwGtlFeatureName}
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the trial feature is disable ."
+            ::= { hwGtlNotifications 15} 
+
+       hwGtlTrialFeatureNearDeadline NOTIFICATION-TYPE
+            OBJECTS { hwGtlFeatureName, hwGtlRemainTime, hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "The trial feature is about to expire."
+            ::= { hwGtlNotifications 16 }           
+
+       hwGtlTrialFeatureNearDeadlineCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlFeatureName, hwGtlRemainTime, hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicating that the trial feature is about to expire is cleared."
+            ::= { hwGtlNotifications 17 }  
+
+        hwGtlResourceOverload NOTIFICATION-TYPE
+            OBJECTS { hwGtlResourceItem }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the resource has been used up."
+            ::= { hwGtlNotifications 18 }
+
+       hwGtlResourceOverloadCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlResourceItem }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents the resource has been used up is cleared."
+            ::= { hwGtlNotifications 19 }
+            
+       hwGtlEsnMismatch NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents the mismatch between the device ESN and license file."
+            ::= { hwGtlNotifications 20 }
+
+       hwGtlEsnMismatchCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents the mismatch between the device ESN and license file is cleared."
+            ::= { hwGtlNotifications 21 }
+            
+        hwGtlItemInactive NOTIFICATION-TYPE
+            OBJECTS { hwGtlResourceItem }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents the item is inactive."
+            ::= { hwGtlNotifications 22 }
+            
+        hwGtlItemInactiveCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlResourceItem }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents the item is inactive is cleared."
+            ::= { hwGtlNotifications 23 }
+
+        hwGtlInitial NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID, hwGtlBoardID }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents current license had been initialized."
+            ::= { hwGtlNotifications 24 }
+            
+        hwGtlInitialCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID, hwGtlBoardID }
+            STATUS current
+            DESCRIPTION 
+                "The notification represents current license had been initialized is cleared."
+            ::= { hwGtlNotifications 25 }
+			
+			
+        hwGtlFunctionInactive NOTIFICATION-TYPE
+            OBJECTS { hwGtlItemName }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicates that the control item is not activated."
+            ::= { hwGtlNotifications 26 }
+            
+        hwGtlFunctionInactiveCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlItemName }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicating that the control item is not activated is cleared."
+            ::= { hwGtlNotifications 27 }
+
+        hwGtlResourceLack NOTIFICATION-TYPE
+            OBJECTS { hwGtlItemName, hwGtlItemControlValue, hwGtlItemUsedValue }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicates that the current resources are insufficient."
+            ::= { hwGtlNotifications 28 }
+            
+        hwGtlResourceLackCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlItemName, hwGtlItemControlValue, hwGtlItemUsedValue }
+            STATUS current
+            DESCRIPTION 
+                "The alarm indicating that the current resources are insufficient is cleared."
+            ::= { hwGtlNotifications 29 }			
+
+        hwGtlAbnormal NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID, hwGtlBoardID, hwGtlAbnormalReason }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents license function is abnormal."
+            ::= { hwGtlNotifications 30 }
+            
+        hwGtlAbnormalCleared NOTIFICATION-TYPE
+            OBJECTS { hwGtlChassisID, hwGtlBoardID, hwGtlAbnormalReason }
+            STATUS current
+            DESCRIPTION 
+                "Notification represents license function is abnormal is cleared."
+            ::= { hwGtlNotifications 31 }			
+            
+--    Conformance information            
+        hwGtlConformance OBJECT IDENTIFIER ::= { hwGtl 3 }
+
+        hwGtlCompliances OBJECT IDENTIFIER ::= { hwGtlConformance 1 }
+
+        hwGtlCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting 
+                the HUAWEI-GTL-MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwGtlObjectGroup, hwGtlNotificationGroup }
+            ::= { hwGtlCompliances 1 }
+
+        hwGtlGroups OBJECT IDENTIFIER ::= { hwGtlConformance 2 }
+
+        hwGtlObjectGroup OBJECT-GROUP
+            OBJECTS { hwGtlDefaultValueReason, hwGtlResourceItem, hwGtlFeatureName, hwGtlRemainTime, hwGtlVerifyCode, 
+                      hwGtlActive, hwGtlShowActLCSName, hwGtlItemName, hwGtlItemControlValue, hwGtlItemUsedValue, hwGtlItemDescription, hwGtlItemState, hwGtlItemExpireDay, hwGtlChassisID, hwGtlBoardID, hwGtlAbnormalReason }
+            STATUS current
+            DESCRIPTION 
+                "The GTL attribute group."
+            ::= { hwGtlGroups 1 }
+
+        hwGtlNotificationGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwGtlDefaultValue, hwGtlResourceUsedUp, hwGtlNearDeadline, hwGtlLicenseVerifyFailed, hwGtlExpired, hwGtlItemMismatch, hwGtlDefaultValueCleared, hwGtlNearDeadlineCleared, hwGtlItemMismatchCleared, hwGtlResourceUsedUpCleared, hwGtlLicenseNotCommeral, hwGtlEmergencyStart, hwGtlEmergencyStop, hwGtlTrialFeatureEnable, hwGtlTrialFeatureDisable, hwGtlTrialFeatureNearDeadline, hwGtlTrialFeatureNearDeadlineCleared, hwGtlResourceOverload, hwGtlResourceOverloadCleared, hwGtlEsnMismatch, hwGtlEsnMismatchCleared, hwGtlItemInactive, hwGtlItemInactiveCleared, hwGtlInitial, hwGtlInitialCleared, hwGtlFunctionInactive, hwGtlFunctionInactiveCleared, hwGtlResourceLack, hwGtlResourceLackCleared, hwGtlAbnormal, hwGtlAbnormalCleared }
+            STATUS current
+            DESCRIPTION 
+                "The notification group."
+            ::= { hwGtlGroups 2 }
+    
+    END

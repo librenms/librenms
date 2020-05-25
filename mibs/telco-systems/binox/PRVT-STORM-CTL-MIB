@@ -1,0 +1,168 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-STORM-CTL-MIB.mib
+-- ** Project: T-Metro Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2009, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+
+PRVT-STORM-CTL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex
+        FROM IF-MIB
+    switch
+        FROM PRVT-SWITCH-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+prvtStormCtlMIB MODULE-IDENTITY
+    LAST-UPDATED "201006210000Z"
+    ORGANIZATION 
+        "BATM Advanced Communication"
+    CONTACT-INFO 
+        "BATM/Telco Systems Support team
+         Email:
+         For North America: techsupport@telco.com
+         For North Europe: support@batm.de, info@batm.de
+         For the rest of the world: techsupport@telco.com"
+    DESCRIPTION 
+        "The MIB module for managing storm control."
+    REVISION    "201006210000Z"
+    DESCRIPTION 
+        "Initial version."
+    ::= { switch 171 }
+
+
+RateThresholdType ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d"
+    STATUS      current
+    DESCRIPTION 
+        "A rate threshold in packets per seconds."
+    SYNTAX      Unsigned32
+
+prvtStormCtlMIBObjects OBJECT IDENTIFIER
+    ::= { prvtStormCtlMIB 1 }
+
+prvtStrmCtlPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStrmCtlPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A list of interfaces that have storm control functionality configured."
+    ::= { prvtStormCtlMIBObjects 1 }
+
+prvtStrmCtlPortEntry OBJECT-TYPE
+    SYNTAX      PrvtStrmCtlPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtStrmCtlPortTable."
+    INDEX       { ifIndex }
+    ::= { prvtStrmCtlPortTable 1 }
+
+PrvtStrmCtlPortEntry ::= SEQUENCE {
+    prvtStrmCtlPortRowStatus    RowStatus,
+    prvtStrmCtlPortShutdown     TruthValue
+}
+
+prvtStrmCtlPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this port."
+    ::= { prvtStrmCtlPortEntry 1 }
+
+prvtStrmCtlPortShutdown OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Set to 'false' to enable storm control functionality on this port."
+    ::= { prvtStrmCtlPortEntry 3 }
+
+prvtStrmCtlPortTrafficTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF PrvtStrmCtlPortTrafficEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A table of traffic-type specific configuration for each interface.
+         Currently, only one traffic type is supported per interface."
+    ::= { prvtStormCtlMIBObjects 3 }
+
+prvtStrmCtlPortTrafficEntry OBJECT-TYPE
+    SYNTAX      PrvtStrmCtlPortTrafficEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "An entry in prvtStrmCtlPortTrafficTable."
+    INDEX       { ifIndex, prvtStrmCtlPortTrafficType }
+    ::= { prvtStrmCtlPortTrafficTable 1 }
+
+PrvtStrmCtlPortTrafficEntry ::= SEQUENCE {
+    prvtStrmCtlPortTrafficType          INTEGER,
+    prvtStrmCtlPortTrafficRowStatus     RowStatus,
+    prvtStrmCtlPortTrafficThreshold     RateThresholdType
+}
+
+prvtStrmCtlPortTrafficType OBJECT-TYPE
+    SYNTAX      INTEGER { all(0), unknown(1), multicast(2), broadcast(4) }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The type of traffic to which this row applies "
+    ::= { prvtStrmCtlPortTrafficEntry 1 }
+
+prvtStrmCtlPortTrafficRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The RowStatus for this traffic type."
+    ::= { prvtStrmCtlPortTrafficEntry 2 }
+
+prvtStrmCtlPortTrafficThreshold OBJECT-TYPE
+    SYNTAX      RateThresholdType
+    UNITS       "packets-per-second"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The threshold at which, when exceeded, traffic will undergo
+         storm control action for this port and traffic type."
+    ::= { prvtStrmCtlPortTrafficEntry 3 }
+
+END -- end of module PRVT-STORM-CTL-MIB.

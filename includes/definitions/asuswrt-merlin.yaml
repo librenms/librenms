@@ -1,0 +1,15 @@
+os: asuswrt-merlin
+text: 'AsusWRT Merlin'
+type: network
+icon: asuswrt-merlin
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+      snmpget:
+          oid: .1.3.6.1.4.1.2021.7890.1.101.1
+          op: starts
+          value: ASUSWRT-Merlin

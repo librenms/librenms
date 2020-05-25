@@ -1,9 +1,13 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 if ($device['os_group'] == 'cisco') {
 // FIXME - seems to be broken. IPs appear with leading zeroes.
     $ipsec_array = snmpwalk_cache_oid($device, 'cipSecTunnelEntry', array(), 'CISCO-IPSEC-FLOW-MONITOR-MIB');
-    $ike_array = snmpwalk_cache_oid($device, 'cikeTunnelEntry', array(), 'CISCO-IPSEC-FLOW-MONITOR-MIB');
+    if (!empty($ipsec_array)) {
+        $ike_array = snmpwalk_cache_oid($device, 'cikeTunnelEntry', array(), 'CISCO-IPSEC-FLOW-MONITOR-MIB');
+    }
 
     $tunnels_db = dbFetchRows('SELECT * FROM `ipsec_tunnels` WHERE `device_id` = ?', array($device['device_id']));
     foreach ($tunnels_db as $tunnel) {
@@ -64,13 +68,15 @@ if ($device['os_group'] == 'cisco') {
                 $db_update[$db_value] = $tunnel[$db_oid];
             }
 
-            $updated = dbUpdate(
-                $db_update,
-                'ipsec_tunnels',
-                '`tunnel_id` = ?',
-                array($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'])
-            );
-            $valid_tunnels[] = $tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'];
+            if (!empty($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'])) {
+                $updated = dbUpdate(
+                    $db_update,
+                    'ipsec_tunnels',
+                    '`tunnel_id` = ?',
+                    array($tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'])
+                );
+                $valid_tunnels[] = $tunnels[$tunnel['cikeTunRemoteValue']]['tunnel_id'];
+            }
         }
 
         if (is_numeric($tunnel['cipSecTunHcInOctets']) &&
@@ -87,10 +93,11 @@ if ($device['os_group'] == 'cisco') {
         }
 
         $rrd_name = array('ipsectunnel', $address);
-        $rrd_def = array();
+        $rrd_def = new RrdDefinition();
+        $rrd_def->disableNameChecking();
         foreach ($oids as $oid) {
-            $oid_ds = substr(str_replace('cipSec', '', $oid), 0, 19);
-            $rrd_def[] = "DS:$oid_ds:COUNTER:600:U:1000000000";
+            $oid_ds = str_replace('cipSec', '', $oid);
+            $rrd_def->addDataset($oid_ds, 'COUNTER', null, 1000000000);
         }
 
         $fields = array();
@@ -112,17 +119,21 @@ if ($device['os_group'] == 'cisco') {
         }
     }//end foreach
 
-    if (is_array($valid_tunnels)) {
+    if (!empty($valid_tunnels)) {
         d_echo($valid_tunnels);
-        if (empty($valid_tunnels)) {
-            $valid_tunnels = array(0);
-        }
         dbDelete(
             'ipsec_tunnels',
-            "`tunnel_id` NOT IN (" . implode(',', $valid_tunnels) . ") AND `device_id`=?",
-            array($device['device_id'])
+            "`tunnel_id` NOT IN " . dbGenPlaceholders(count($valid_tunnels)) . " AND `device_id`=?",
+            array_merge([$device['device_id']], $valid_tunnels)
         );
     }
 
     unset($rrd_name, $rrd_def, $fields, $oids, $data, $data, $oid, $tunnel);
 }
+
+unset(
+    $ipsec_array,
+    $ike_array,
+    $tunnels_db,
+    $valid_tunnels
+);

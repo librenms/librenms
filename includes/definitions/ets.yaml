@@ -1,0 +1,13 @@
+os: ets
+text: 'Gude Expert Transfer Switch'
+type: power
+icon: gude
+group: gude
+mib_dir:
+    - gude
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_state, text: States }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.28507

@@ -1,0 +1,301 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-UNIT-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             DisplayString, AutonomousType, RowStatus
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             unitTypeUnequipped
+        FROM SIAE-UNITYPE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+    unit MODULE-IDENTITY
+        LAST-UPDATED "201402030000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Unit inventory MIB. A unit is a replaceable HW card.
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of unitMibVersion
+            "
+        REVISION "201304160000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 6 }
+
+------------------------------------------------------------------------------
+--  object identifier inside the module
+------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------
+--  unit GROUP
+------------------------------------------------------------------------------
+--
+--  This group is used to manage the units (board and in general replaceable
+--  part) present in the equipment.
+--
+------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+
+-------  Begin of unitTable
+--
+    unitMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+        DEFVAL {1}
+    ::= {unit 1}
+
+    unitTable  OBJECT-TYPE
+        SYNTAX      SEQUENCE OF UnitRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with Unit records."
+    ::= {unit 2}
+
+    unitRecord  OBJECT-TYPE
+        SYNTAX      UnitRecord
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Unit record."
+        INDEX {unitId}
+    ::= {unitTable 1}
+
+    UnitRecord  ::=
+        SEQUENCE {
+            unitId                  Integer32,
+            unitExpectedType        AutonomousType,
+            unitActualType          AutonomousType,
+            unitLabel               DisplayString,
+            unitFailAlarm           AlarmStatus,
+            unitMissingAlarm        AlarmStatus,
+            unitNotRespondingAlarm  AlarmStatus,
+            unitHwMismatchAlarm     AlarmStatus,
+            unitSwMismatchAlarm     AlarmStatus,
+            unitHwEdition           DisplayString,
+            unitPartNumber          DisplayString,
+            unitParentPartNumber    DisplayString,
+            unitParentSerialNumber  DisplayString,
+            unitRowStatus           RowStatus
+       }
+
+    unitId  OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used as Index of the Unit Table."
+    ::= {unitRecord 1}
+
+    unitExpectedType  OBJECT-TYPE
+        SYNTAX      AutonomousType 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Defines the expected unit type."
+        DEFVAL { unitTypeUnequipped }
+    ::= {unitRecord 2}
+
+    unitActualType  OBJECT-TYPE
+        SYNTAX      AutonomousType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Defines the real unit type actually present in the equipment"
+        DEFVAL { unitTypeUnequipped }
+    ::= {unitRecord 3}
+
+    unitLabel  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..30))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to assign a name to the unit."
+    ::= {unitRecord 4}
+
+    unitFailAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unit Fail alarm status status with associated severity."
+        DEFVAL { activeReportableMajor }
+    ::= {unitRecord 5}
+
+    unitMissingAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unit Missing alarm status with associated severity."
+        DEFVAL { activeReportableMajor }
+    ::= {unitRecord 6}
+
+    unitNotRespondingAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unit Not Responding alarm status with associated severity."
+        DEFVAL { activeReportableMajor }
+    ::= {unitRecord 7}
+
+    unitHwMismatchAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unit type Mismatch alarm status with associated severity."
+        DEFVAL { activeReportableMajor }
+    ::= {unitRecord 8}
+
+    unitSwMismatchAlarm  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Unit with Sw Release Mismatch alarm status with associated severity."
+        DEFVAL { activeReportableMajor }
+    ::= {unitRecord 9}
+
+    unitHwEdition  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE (0..20))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASCII string used to identify Hw edition of the unit."
+    ::= {unitRecord 10}
+
+    unitPartNumber  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..30))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASCII string to identify the Part Number of the unit."
+    ::= {unitRecord 11}
+
+    unitParentPartNumber  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..30))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASCII string to identify the parent Part Number of the unit."
+    ::= {unitRecord 12}
+
+    unitParentSerialNumber  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..30))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "ASCII string to identify parent Serial Number of the unit."
+    ::= {unitRecord 13}
+
+    unitRowStatus   OBJECT-TYPE 
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Status of this row of unitTable.
+            "
+    ::= {unitRecord 14}
+
+--
+-------  End of unitTable
+
+--
+-------  The following objects define the profile of the unit alarms:
+--
+
+    -- OBJECT-IDENTIFIER {unit 3} is used in sm_unitype.mib
+
+    unitFailAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the unitFailAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {unit 4}
+
+    unitMissingAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the unitMissingAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {unit 5}
+
+    unitNotRespondingAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the unitNotRespondingAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {unit 6}
+
+    unitHwMismatchAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the unitHwMismatchAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {unit 7}
+
+    unitSwMismatchAlarmSeverityCode  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Defines the severity associated to the unitSwMismatchAlarm
+             and enables/disables the trap generation on status change event."
+        DEFVAL {majorTrapEnable}
+    ::= {unit 8}
+
+------ End group -------------------------------------------------------------
+
+END
+

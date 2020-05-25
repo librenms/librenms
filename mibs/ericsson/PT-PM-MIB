@@ -1,0 +1,170 @@
+PT-PM-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,Integer32, Counter64 FROM SNMPv2-SMI
+        MODULE-COMPLIANCE,
+        OBJECT-GROUP FROM SNMPv2-CONF
+        pt       FROM PT-MIB;
+
+    ptPM MODULE-IDENTITY
+        LAST-UPDATED "201808291230Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            " "
+
+        DESCRIPTION
+            "This is the MIB of PT PM specifics"
+
+        REVISION      "201808291230Z"
+        DESCRIPTION
+            "Support for PT PM OIDs"
+
+        REVISION      "201603091230Z"
+        DESCRIPTION
+            "Version 1.0:   Validated."
+
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "Version 0.1:   The initial version of this MIB module."
+
+      ::= { pt 5 }
+
+         ptPMConformance OBJECT IDENTIFIER ::= { ptPM 2 }
+
+
+---
+---The definition of ptPMTable
+---
+   ptPMTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF PtPMEntry
+    MAX-ACCESS  not-accessible
+    STATUS current
+    DESCRIPTION
+            "A table of ptPM Table entries."
+        ::= { ptPM 1 }
+
+   ptPMEntry OBJECT-TYPE
+        SYNTAX      PtPMEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "An entry of ptPM application."
+        INDEX   { queueIndex }
+        ::= { ptPMTable 1 }
+
+
+   PtPMEntry ::=
+        SEQUENCE {
+              queueIndex                      Integer32,
+              forwardingPacket                Counter64,
+              forwardingOctets                Counter64,
+              discardPackets                  Counter64,
+              discardOctets                   Counter64,
+              inputPackets                    Counter64,
+              inputOctets                     Counter64
+                            }
+
+   queueIndex OBJECT-TYPE
+        SYNTAX       Integer32 (1..2147483647)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                  "A unique index for the queue."
+
+        ::= { ptPMEntry 1 }
+
+   forwardingPacket OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of packets that have been sent from the queue."
+
+        ::= { ptPMEntry 2 }
+
+   forwardingOctets  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of octets that have been sent from the queue."
+
+        ::= { ptPMEntry 3 }
+
+   discardPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of packets that have been discarded by the queue management mechanism."
+
+        ::= { ptPMEntry 4 }
+
+   discardOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of octets that have been discarded by the queue management mechanism."
+
+        ::= { ptPMEntry 5 }
+
+   inputPackets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of packets that have reached the queue."
+
+        ::= { ptPMEntry 6 }
+
+    inputOctets OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                  "The number of octets that have reached the queue."
+
+        ::= { ptPMEntry 7 }
+
+--
+-- Conformance
+--
+
+    ptPMCompliances OBJECT IDENTIFIER ::= { ptPMConformance 1 }
+    ptPMGroups      OBJECT IDENTIFIER ::= { ptPMConformance 2 }
+
+    ptPMFullCompliance MODULE-COMPLIANCE
+        STATUS current
+        DESCRIPTION
+            "The compliance statement for SNMP entities which implement everything."
+        MODULE -- This Module
+        MANDATORY-GROUPS { ptPMCompleteGroup}
+        ::= { ptPMCompliances 1 }
+
+    ptPMCompleteGroup OBJECT-GROUP
+        OBJECTS
+        {
+            forwardingPacket,
+            forwardingOctets,
+            discardPackets,
+            discardOctets,
+            inputPackets,
+            inputOctets
+        }
+        STATUS current
+        DESCRIPTION
+            "A collection of all current objects in this MIB module."
+        ::= { ptPMGroups 1 }
+
+
+
+
+    -- ************
+    -- * PT       *
+    -- ************
+
+    -- Place holder for ETHERNET-PM-COUNTER-MIB
+
+END
+

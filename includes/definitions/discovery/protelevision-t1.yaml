@@ -1,0 +1,258 @@
+mib: PT3080-MIB
+modules:
+     sensors:
+         state:
+             data:
+                -
+                     oid: pt3080InputTSPrimaryStatus
+                     num_oid: '.1.3.6.1.4.1.18086.3080.3.36.{{ $index }}'
+                     descr: TS Primary Status
+                     group: Input
+                     state_name: pt3080InputTSPrimaryStatus
+                     states:
+                         - { descr: 'Available', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'Unavailable', graph: 1, value: 1, generic: 1 }
+                         - { descr: 'No sync', graph: 1, value: 2, generic: 2 }
+                -
+                     oid: pt3080InputTSSecondaryStatus
+                     num_oid: '.1.3.6.1.4.1.18086.3080.3.37.{{ $index }}'
+                     descr: TS Secondary Status
+                     group: Input
+                     state_name: pt3080InputTSSecondaryStatus
+                     states:
+                         - { descr: 'Available', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'Unavailable', graph: 1, value: 1, generic: 3 }
+                         - { descr: 'No sync', graph: 1, value: 2, generic: 2 }
+                -
+                     oid: pt3080InputTSHp
+                     num_oid: '.1.3.6.1.4.1.18086.3080.3.38.{{ $index }}'
+                     descr: Input source On Air
+                     group: Input
+                     state_name: pt3080InputTSHp
+                     states:
+                         - { descr: 'asi-in-1', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'asi-in-2', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'demodulator-1', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'demodulator-2', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'tsoip-rx1', graph: 1, value: 4, generic: 0 }
+                         - { descr: 'tsoip-rx2', graph: 1, value: 5, generic: 0 }
+                         - { descr: 'satRecv', graph: 1, value: 6, generic: 0 }
+                -
+                     oid: pt3080InputTSLp
+                     num_oid: '.1.3.6.1.4.1.18086.3080.3.39.{{ $index }}'
+                     descr: Input source Backup
+                     group: Input
+                     state_name: pt3080InputTSLp
+                     states:
+                         - { descr: 'asi-in-1', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'asi-in-2', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'demodulator-1', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'demodulator-2', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'tsoip-rx1', graph: 1, value: 4, generic: 0 }
+                         - { descr: 'tsoip-rx2', graph: 1, value: 5, generic: 0 }
+                         - { descr: 'satRecv', graph: 1, value: 6, generic: 0 }
+                -
+                     oid: pt3080SystemModulationStandard
+                     num_oid: '.1.3.6.1.4.1.18086.3080.1.32.{{ $index }}'
+                     descr: Modulation standard
+                     group: System
+                     state_name: pt3080SystemModulationStandard
+                     states:
+                         - { descr: 'dvbt', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'dvbt2', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'atsc', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'isdbt', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'iboc', graph: 1, value: 4, generic: 0 }
+                -
+                     oid: pt3080OutputSynchronized
+                     num_oid: '.1.3.6.1.4.1.18086.3080.4.6.{{ $index }}'
+                     descr: Output Synchronized Status
+                     group: Output
+                     state_name: pt3080OutputSynchronized
+                     states:
+                         - { descr: 'not-synchronized', graph: 1, value: 0, generic: 2 }
+                         - { descr: 'synchronized', graph: 1, value: 1, generic: 0 }
+                -
+                     oid: pt3080Gps1PPSStatus
+                     num_oid: '.1.3.6.1.4.1.18086.3080.7.1.{{ $index }}'
+                     descr: GPS Status
+                     group: GPS
+                     state_name: pt3080Gps1PPSStatus
+                     states:
+                         - { descr: 'locked', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'unlocked', graph: 1, value: 1, generic: 2 }
+                -
+                     oid: pt3080GpsBias
+                     num_oid: '.1.3.6.1.4.1.18086.3080.7.4.{{ $index }}'
+                     descr: GPS Bias
+                     group: GPS
+                     state_name: pt3080GpsBias
+                     states:
+                         - { descr: 'off', graph: 1, value: 0, generic: 3 }
+                         - { descr: 'on', graph: 1, value: 1, generic: 0 }
+                -
+                     oid: pt3080GpsbiasVoltage
+                     num_oid: '.1.3.6.1.4.1.18086.3080.7.15.{{ $index }}'
+                     descr: GPS Bias Voltage
+                     group: GPS
+                     state_name: pt3080GpsbiasVoltage
+                     states:
+                         - { descr: 'gpsant-5v', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'gpsant-33v', graph: 1, value: 1, generic: 0 }
+                -
+                     oid: pt3080GpsSatelliteSystemGPS
+                     num_oid: '.1.3.6.1.4.1.18086.3080.7.16.{{ $index }}'
+                     descr: GPS Satellites Timing
+                     group: GPS
+                     state_name: pt3080GpsSatelliteSystemGPS
+                     states:
+                         - { descr: 'disable', graph: 1, value: 0, generic: 3 }
+                         - { descr: 'enable', graph: 1, value: 1, generic: 0 }
+                -
+                     oid: pt3080GpsSatelliteSystemGLONASS
+                     num_oid: '.1.3.6.1.4.1.18086.3080.7.17.{{ $index }}'
+                     descr: GPS GLONASS Satellites Timing
+                     group: GPS
+                     state_name: pt3080GpsSatelliteSystemGLONASS
+                     states:
+                         - { descr: 'disable', graph: 1, value: 0, generic: 3 }
+                         - { descr: 'enable', graph: 1, value: 1, generic: 0 }
+                -
+                     oid: pt3080GpsSatelliteSystemGALILEO
+                     num_oid: '.1.3.6.1.4.1.18086.3080.7.18.{{ $index }}'
+                     descr: GPS GALILEO Satellites Timing
+                     group: GPS
+                     state_name: pt3080GpsSatelliteSystemGALILEO
+                     states:
+                         - { descr: 'disable', graph: 1, value: 0, generic: 3 }
+                         - { descr: 'enable', graph: 1, value: 1, generic: 0 }
+                -
+                     oid: pt3080GpsSatelliteSystemCOMPASS
+                     num_oid: '.1.3.6.1.4.1.18086.3080.7.19.{{ $index }}'
+                     descr: GPS COMPASS Satellites Timing
+                     group: GPS
+                     state_name: pt3080GpsSatelliteSystemCOMPASS
+                     states:
+                         - { descr: 'disable', graph: 1, value: 0, generic: 3 }
+                         - { descr: 'enable', graph: 1, value: 1, generic: 0 }
+                -
+                     oid: pt3080SystemDateTimeSyncActual
+                     num_oid: '.1.3.6.1.4.1.18086.3080.1.31.{{ $index }}'
+                     descr: Time Sync
+                     group: System
+                     state_name: pt3080SystemDateTimeSyncActual
+                     states:
+                         - { descr: 'manual', graph: 1, value: 0, generic: 1 }
+                         - { descr: 'auto', graph: 1, value: 1, generic: 1 }
+                         - { descr: 'gps', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'ntp', graph: 1, value: 3, generic: 1 }
+                -
+                     oid: pt3080ModeCodeRateHighPrio
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.4.{{ $index }}'
+                     descr: HP Code Rate
+                     group: Mode
+                     state_name: pt3080ModeCodeRateHighPrio
+                     states:
+                         - { descr: 'code-rate-1/2', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'code-rate-2/3', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'code-rate-3/4', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'code-rate-5/6', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'code-rate-7/8', graph: 1, value: 4, generic: 0 }
+                -
+                     oid: pt3080ModeCodeRateLowPrio
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.5.{{ $index }}'
+                     descr: LP Code Rate
+                     group: Mode
+                     state_name: pt3080ModeCodeRateLowPrio
+                     states:
+                         - { descr: 'code-rate-1/2', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'code-rate-2/3', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'code-rate-3/4', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'code-rate-5/6', graph: 1, value: 3, generic: 0 }
+                         - { descr: 'code-rate-7/8', graph: 1, value: 4, generic: 0 }
+                -
+                     oid: pt3080ModeConstellation
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.6.{{ $index }}'
+                     descr: OFDM Constellation Mode
+                     group: Mode
+                     state_name: pt3080ModeConstellation
+                     states:
+                         - { descr: 'qpsk', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'qam16', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'qam64', graph: 1, value: 2, generic: 0 }
+                -
+                     oid: pt3080OutputMode
+                     num_oid: '.1.3.6.1.4.1.18086.3080.4.1.{{ $index }}'
+                     descr: RF Output Mode
+                     group: Output
+                     state_name: pt3080OutputMode
+                     states:
+                         - { descr: 'normal', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'standby', graph: 1, value: 1, generic: 1 }
+                -
+                     oid: pt3080TSoIPRx1Status
+                     num_oid: '.1.3.6.1.4.1.18086.3080.10.17.{{ $index }}'
+                     descr: TSoIP 1 Receiver Status
+                     group: TSoIP
+                     state_name: pt3080TSoIPRx1Status
+                     states:
+                         - { descr: 'locked', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'unlocked', graph: 1, value: 1, generic: 2 }
+                         - { descr: 'disabled', graph: 1, value: 2, generic: 3 }
+                -
+                     oid: pt3080TSoIPRx2Status
+                     num_oid: '.1.3.6.1.4.1.18086.3080.10.47.{{ $index }}'
+                     descr: TSoIP 2 Receiver Status
+                     group: TSoIP
+                     state_name: pt3080TSoIPRx2Status
+                     states:
+                         - { descr: 'locked', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'unlocked', graph: 1, value: 1, generic: 2 }
+                         - { descr: 'disabled', graph: 1, value: 2, generic: 3 }
+                -
+                     oid: pt3080ModeGuardInterval
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.7.{{ $index }}'
+                     descr: OFDM Guard Interval
+                     group: Mode
+                     state_name: pt3080ModeGuardInterval
+                     states:
+                         - { descr: 'guard-1/32', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'guard-1/16', graph: 1, value: 1, generic: 0 }
+                         - { descr: 'guard-1/8', graph: 1, value: 2, generic: 0 }
+                         - { descr: 'guard-1/4', graph: 1, value: 3, generic: 0 }
+                -
+                     oid: pt3080Modeifft
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.3.{{ $index }}'
+                     descr: OFDM IFFT Mode
+                     group: Mode
+                     state_name: pt3080Modeifft
+                     states:
+                         - { descr: 'mode-2k', graph: 1, value: 0, generic: 0 }
+                         - { descr: 'mode-4k', graph: 1, value: 1, generic: 2 }
+                         - { descr: 'mode-8k', graph: 1, value: 2, generic: 0 }
+         dbm:
+             data:
+                -
+                     oid: pt3080OutputEffectiveLevel
+                     num_oid: '.1.3.6.1.4.1.18086.3080.4.17.{{ $index }}'
+                     index: 0
+                     descr: 'Effective RF Output Level'
+                     divisor: 100
+                -
+                     oid: pt3080OutputActualLevel
+                     num_oid: '.1.3.6.1.4.1.18086.3080.4.18.{{ $index }}'
+                     index: 1
+                     descr: 'Actual RF Output Level'
+                     divisor: 100
+                -
+                     oid: pt3080OutputRfDetectedActualLevel
+                     num_oid: '.1.3.6.1.4.1.18086.3080.4.19.{{ $index }}'
+                     index: 2
+                     descr: 'Detected RF Output Level'
+                     divisor: 100
+         delay:
+             data:
+                -
+                     oid: pt3080ModeNetworkDelayHP
+                     num_oid: '.1.3.6.1.4.1.18086.3080.2.20.{{ $index }}'
+                     descr: 'Network delay of HP TS'

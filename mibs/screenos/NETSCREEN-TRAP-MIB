@@ -1,0 +1,548 @@
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenTrap, netscreenTrapInfo
+        FROM NETSCREEN-SMI
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenTrapMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200503032022Z" -- March 03, 2005
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "Added trap types 15, it is still in use"
+    REVISION      "200803170000Z" -- Mar 17, 2008
+    DESCRIPTION
+        "Added 5 new trap types - 800-804. Removed 1000."
+    REVISION      "200510170000Z" -- Oct 17, 2005
+    DESCRIPTION
+        "Added 4 new trap types - ipv6 ip conflicts(101), dip util raise(102) and clear(103), 
+         ids-icmp-ping-id-zero(441)."
+    REVISION      "200503030000Z" -- March 03, 2005
+    DESCRIPTION
+        "Trap MIB"
+    REVISION      "200409100000Z" -- Sep 10, 2004
+    DESCRIPTION
+        "Removed nsTrapType 3, 15,18,19 and 1000"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200401230000Z" -- January 23, 2004
+    DESCRIPTION
+        "Add new traps (430~434)"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "Add global-report manager specific trap"
+    REVISION      "200008020000Z" -- August 02, 2000
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenTrapInfo 0 }
+
+netscreenTrapHw NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that some kind of hardware problem has
+         occured."
+    ::= { netscreenTrap 100 }
+
+netscreenTrapFw NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that some kind of firewall functions has
+         been triggered."
+    ::= { netscreenTrap 200 }
+
+netscreenTrapSw NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that some kind of software problem has
+         occured."
+    ::= { netscreenTrap 300 }
+
+netscreenTrapTrf NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that some kind of traffic conditions has
+         been triggered."
+    ::= { netscreenTrap 400 }
+
+netscreenTrapVpn NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that VPN tunnel status has occured."
+    ::= { netscreenTrap 500 }
+
+netscreenTrapNsrp NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that NSRP status has occured."
+    ::= { netscreenTrap 600 }
+
+netscreenTrapGPRO NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that some kind of Global PRO problems has
+         occurred."
+    ::= { netscreenTrap 700 }
+
+netscreenTrapDrp NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that Drp status has occured."
+    ::= { netscreenTrap 800 }
+
+netscreenTrapIFFailover NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that interface fail over status has
+         occured."
+    ::= { netscreenTrap 900 }
+
+netscreenTrapIDPAttack NOTIFICATION-TYPE
+    OBJECTS
+        { netscreenTrapType, netscreenTrapDesc }
+    STATUS        current
+    DESCRIPTION
+        "This trap indicates that IDP attack status has occured."
+    ::= { netscreenTrap 1000 }
+
+netscreenTrapType OBJECT-TYPE
+    SYNTAX        INTEGER {
+
+	-- Traffic per-second threshold
+	traffic-sec(1),
+	-- Traffic per-minute threshold
+	traffic-min(2),
+	-- Multiple user auth fail alarm type
+	multi-auth-fail(3),
+        -- Winnuke pak
+        winnuke(4),
+        -- Syn attack
+        syn-attack(5),
+        -- tear-drop attack
+        tear-drop(6),
+        -- Ping of Death attack
+        ping-death(7),
+        -- IP spoofing attack
+        ip-spoofing(8),
+        -- IP source routing attack
+        ip-src-route(9),
+        -- land attack
+        land(10),
+        -- ICMP flooding attack
+        icmp-flood(11),
+        -- UDP flooding attack
+        udp-flood(12),
+        -- Illegal server IP to connect to CMS port
+        illegal-cms-svr(13),
+        -- URL blocking server connection alarm
+        url-block-srv(14),
+        -- high availability
+        high-availability(15),
+        -- Port Scan attack
+        port-scan(16),
+        -- address sweep attack
+        addr-sweep(17),
+        -- deny by policy attack
+        deny-policy(18),
+        -- device is dead
+        device-dead(19)
+        -- memory low
+        low-memory(20),
+        -- DNS server unreachable
+        dns-srv-down(21),
+        -- Fan, Power Supply failure
+        generic-HW-fail(22),
+        -- Load balance server unreachable
+        lb-srv-down(23),
+        -- log buffer overflow
+        log-full(24),
+        -- X509 related
+        x509(25),
+        -- VPN and IKE related
+        vpn-ike(26),
+        -- admin realted
+        admin(27),
+        -- Illegal src ip to connect to sme port
+        sme(28),
+        -- DHCP related
+        dhcp(29),
+        -- CPU usage is high
+        cpu-usage-high(30),
+        -- Interface IP conflict
+        ip-conflict(31),
+        -- Microsoft IIS server vulnerability
+        attact-malicious-url(32),
+        -- session threshold is exceeded
+        session-threshold(33),
+        -- SSH related alarms
+        ssh-alarm(34),
+        -- Audit storage related alarms
+        audit-storage(35),
+        -- memory normal
+        memory-normal(36),
+        -- cpu usage normal
+        cpu-usage-normal(37)
+        -- driver's rx bd shortage
+        rxbd-low-alarm(39),
+        -- VPN tunnel from down to up
+        vpn-tunnel-up(40),
+        -- VPN tunnel from up to down
+        vpn-tunnel-down(41),
+        -- VPN replay detected
+        vpn-replay-attack(42),
+        -- VPN tunnel removed
+        vpn-l2tp-tunnel-remove(43),    
+        -- VPN tunnel removed and error detected 
+        vpn-l2tp-tunnel-remove-err(44), 
+        -- VPN call removed
+        vpn-l2tp-call-remove(45), 
+        -- VPN call removed and error detected
+        vpn-l2tp-call-remove-err(46),   
+        -- Number of IAS exceeds configured maximum
+   		vpn-ias-too-many(47),
+        -- Number of IAS crossed configured upper threshold
+		vpn-ias-over-threshold(48),	
+        -- Number of IAS crossed configured lower threshold
+		vpn-ias-under-threshold(49),	
+        -- IKE error occured for the IAS session
+		vpn-ias-ike-error(50),	
+        -- allocated session exceed threshold
+        allocated-session-threshold(51),
+        -- av-csp related alarm
+        av-csp-alarm(52),
+        -- av related alarm
+        av-alarm(53),
+        -- apppry related alarm
+        apppry-alarm(54),
+        -- NSRP rto self unit status change from up to down
+        nsrp-rto-up(60),
+        -- NSRP rto self unit status change from down to up
+        nsrp-rto-down(61),
+        -- NSRP track ip successed
+        nsrp-trackip-success(62),
+        -- NSRP track ip failed
+        nsrp-trackip-failed(63),
+        -- NSRP track ip fail over
+        nsrp-trackip-failover(64),
+        -- NSRP inconsistent configuration between master and backup
+        nsrp-inconsistent-configuration(65),
+        -- track ip status related alarm
+        trackip-status(66),
+        -- NSRP vsd group status change to elect
+        nsrp-vsd-init(70),
+        -- NSRP vsd group status change to master
+        nsrp-vsd-master(71),
+        -- NSRP vsd group status change to primary backup
+        nsrp-vsd-pbackup(72),
+        -- NSRP vsd group status change to backup
+        nsrp-vsd-backup(73),
+        -- NSRP vsd group status change to ineligible
+        nsrp-vsd-ineligible(74),
+        -- NSRP VSD group status change to inoperable
+        nsrp-vsd-inoperable(75),
+        -- NSRP VSD request heartbeat from 2nd HA path
+        nsrp-vsd-req-hearbeat-2nd(76),
+        -- NSRP VSD reply to 2nd path request
+        nsrp-vsd-reply-2nd(77),
+        -- NSRP duplicated RTO group found
+        nsrp-rto-duplicated(78),
+        -- NSRP duplicated VSD group master
+        ip-dup-master(79),
+        -- MEM cannot find usable memory for current pool
+        di-heap-create-fail(80),
+        -- MEM cannot find usable in any pool
+        mem-alloc-fail(81),
+        -- VRRP status related alarm
+        vrrp-status-alarm(82),
+        -- SCCP related alarm
+        sccp-alarm(83),
+        -- MGCP related alarm
+        mgcp-reinit(84),
+        -- MLFR related alarm
+        mlfr-alarm(85),
+        -- FR related alarm
+        fr-alarm(86),
+        -- CISCO HDLC related alarm
+        cisco-hdlc-alarm(87),
+        -- PPPOW related alarm
+        pppow-alarm(88),
+        -- H323 related alarm
+        h323-alarm(89),
+        -- ISDN related alarm
+        isdn-alarm(90),
+  		-- interface backup 
+		interface-backup(91), 
+  		-- Card function is abnormal 
+		wan-card-function(92), 
+  		-- A USB key is plug/unplug from USB port 
+		usb-device-operation(93), 
+  		-- interface failure 
+		interface-failure(94), 
+        -- No ppp IP pool configured 
+        ppp-no-ip-cfg(95),   
+        -- IP pool exhausted. No ip to assign
+        ppp-no-ip-in-pool(96), 
+        -- Any change to interface IP address can use the type 
+       	ip-addr-event(101),			
+        -- DIP utilization reaches raised threshold limit
+		dip-util-raise(102),		
+        -- DIP utilization reaches clear threshold limit
+		dip-util-clear(103),	
+        -- DOT1X related alarm
+        dot1x-alarm(105),
+        -- VPN IAS radius error
+        vpn-ias-radius-error(110),
+        -- VPN IKEID enum attack
+        vpn-ikeid-enum-attack(111),
+        -- VPN soft limit reached
+        vpn-softlimit-reached(112),
+        -- VPN IKE dos attack
+        vpn-ikedos-attack(113),
+        -- VPN acvpn profile error
+        vpn-acvpn-profile-error(114),
+	-- exceed maximum routing entry allowed for the system 
+	route-sys-entry-ex(200),
+	-- exceed maximum routing entry allowed for a vr
+	route-vr-entry-ex(201),
+	-- exceed the hello packet threshold per hello interval 
+	route-ospf-hello-flood(202),
+	-- exceed the lsa packet threshold per lsa threshold 
+	route-ospf-lsa-flood(203),
+	-- exceed the update4 packet threshold per update time in rip
+	route-rip-update-flood(204),
+	-- Errors in route module (exceed limit, malloc failure, add-perfix failure etc) 
+	route-alarm(205),
+	-- LSA/Hello packets flood in OSPF, route redistribution exceed limit, 
+	ospf-flood(206),
+	-- Update packet floods in RIP 
+	rip-flood(207),
+	-- Peer forms adjacency completely
+	bgp-established(208),
+	-- Peer's adjacency is torn down, goes to Idle state
+	bgp-backwardtransition(209),
+	-- change in virtual link's state (down, point-to-point etc)
+	ospf-virtifstatechange(210),
+	-- change in neighbor's state on regular interface (down, 2way, full etc)
+	ospf-nbrstatechange(211),
+	-- change in neighbor's state on virtual link (down, full etc)
+	ospf-virtnbrstatechange(212),
+	-- authentication mismatch/area mismatch etc on regular interface
+	ospf-ifconfigerror(213),
+	-- authentication mismatch/area mismatch etc on virtual link
+	ospf-virtifconfigerror(214),
+	-- Authentication eror on regular interface
+	ospf-ifauthfailure(215),
+	-- Authentication eror on virtual link
+	ospf-virtifauthfailure(216),
+	-- lsa received with invalid lsa-type on regular interface
+	ospf-ifrxbadpacket(217),
+	-- lsa received with invalid lsa-type on virtual link
+	ospf-virtifrxbadpacket(218),
+	-- retransmission to neighbor on regular interface
+	ospf-txretransmit(219),
+	-- retransmission to neighbor on virtual link
+	ospf-virtiftxretransmit(220),
+	-- new LSA generated by local router
+	ospf-originatelsa(221),
+	-- LSA aged out
+	ospf-maxagelsa(222),
+	-- when total LSAs in database exceed predefined limit
+	ospf-lsdboverflow(223),
+	-- when total LSAs in database approach predefined limit
+	ospf-lsdbapproachingoverflow(224),
+	-- change in regular interface state (up/down, dr/bdr etc)
+	ospf-ifstatechange(225),
+	-- BGP related alarm  
+	bgp-alarm(226),
+	-- packet floods in RIPng 
+	ripng-flood(227),
+	-- exceed the update4 packet threshold per update time in ripng
+	route-ripng-update-flood(228),
+	-- PBR related alarm  
+	pbr-alarm(229),
+	-- NHRP related alarm  
+	nhrp-alarm(230),
+	-- OSPFV3 related alarm  
+	ospfv3-alarm(231),
+        -- block java/active-x component
+        ids-component(400),
+        -- icmp flood attack
+        ids-icmp-flood(401),
+        -- udp flood attack
+        ids-udp-flood(402),
+        -- winnuke attack
+        ids-winnuke(403),
+        -- port scan attack
+        ids-port-scan(404),
+        -- address sweep attack
+        ids-addr-sweep(405),
+        -- tear drop attack
+        ids-tear-drop(406),
+        -- syn flood attack
+        ids-syn(407),
+        -- ip spoofing attack
+        ids-ip-spoofing(408),
+        -- ping of death attack
+        ids-ping-death(409),
+        -- filter ip packet with source route option
+        ids-ip-source-route(410),
+        -- land attack
+        ids-land(411),
+        -- screen syn fragment attack
+        syn-frag-attack(412),
+        -- screen tcp packet without flag attack
+        tcp-without-flag(413),
+        -- screen unknown ip packet
+        unknow-ip-packet(414),
+        -- screen bad ip option
+        bad-ip-option(415),
+        -- screen ip option record
+        ip-option-record(416),
+        -- screen ip option timestamp 
+        ip-option-timestamp(417),
+        -- screen ip option scht
+        ip-option-scht(418),
+        -- screen ip option lsr
+        ip-option-lsr(419),
+        -- screen ip option ssr
+        ip-option-ssr(420),
+        -- screen ip option stream
+        ip-option-stream(421),
+        -- screen icmp fragment packet
+        icmp-fragment(422),
+        -- screen too large icmp packet
+        too-large-icmp(423),
+        -- screen tcp flag syn-fin set
+        tcp-syn-fin(424),
+        -- screen tcp fin without ack
+        tcp-fin-no-ack(425),
+        -- screen mal url
+        tcp-mal-url(426),
+        -- screen sess mal num
+        tcp-sess-mal-num(427),
+        -- avoid replying to syns after excessive 3 way TCP handshakes from
+        -- same src ip but not proceeding with user auth. (not replying to
+        -- username/password)..
+        ids-tcp-syn-ack-ack(428),
+        -- ip fragment
+        ids-ip-block-frag(429),
+        -- Dst IP-based session limiting
+        dst-ip-session-limit(430),
+        -- HTTP component blocking for .zip files
+        ids-block-zip(431),
+        -- HTTP component blocking for Java applets
+        ids-block-jar(432),
+        -- HTTP component blocking for .exe files
+        ids-block-exe(433),
+        -- HTTP component blocking for ActiveX controls
+        ids-block-activex(434),
+        -- screenos tcp syn mac
+        tcp-syn-mac(435),
+        -- screenos nac attack
+        ids-nac-attack(436),
+        -- icmp ping id 0
+        ids-icmp-ping-id-zero(441),
+        -- tcp sweep
+        tcp-sweep(442),
+        -- udp sweep
+        udp-sweep(443),
+		-- AV Scan Manager Alarm, sofeware trap 
+		av-scan-mgr(554), 
+        -- starting value for multicast alarm
+        mcast-base(600),
+        -- mcore related alarm
+        mcore-alarm(601),
+        -- spim related alarm
+        spim-alarm(602),
+        -- starting value for Security Module alarm
+        sm-base(700),
+        -- Security Module down detected
+        sm-down(701),
+        -- Security Module packet droped detected
+        sm-packet-drop(702),
+        -- Security Module memory, CPU and session detected
+        sm-overload(703),
+        -- Security Module CPU unresponsive detected
+        sm-cpu-unresponsive(704),
+        -- Security Module Engine unresponisve
+        sm-cpu-unresponsive(705),
+        -- Secruity Module Policy Abnormal
+        sm-policy-abnormal(706),
+        -- switch alarm
+        switch(751),
+        -- sfp alarm
+        sfp(752), 
+        --Shared to fair transition forced
+        cpu-limit-s2f-forced(800),   
+        --Shared to fair transition auto
+        cpu-limit-s2f-auto(801),     
+        --Fair to shared transition forced
+        cpu-limit-f2s-forced(802),   
+        --Fair to shared transition because of timeout
+        cpu-limit-f2s-timeout(803),  
+        --Fair to shared transition auto 
+        cpu-limit-f2s-auto(804),      
+        --Flow potential violation
+        sec-potential-voilation(805),  
+        --Flow session cache alarm 
+        flow-sess-cache(806),      
+        --vsys session limit alarm 
+        vsys-session-limit(850)      
+    }
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "The integer value of the raised alarm type. Note that the type
+         should be interpreted within a specific trap"
+    ::= { netscreenTrapInfo 1 }
+
+netscreenTrapDesc OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..255))
+    MAX-ACCESS    accessible-for-notify
+    STATUS        current
+    DESCRIPTION
+        "The textual description of the alarm"
+    ::= { netscreenTrapInfo 3 }
+
+END
+
+

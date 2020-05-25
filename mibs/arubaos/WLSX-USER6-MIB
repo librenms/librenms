@@ -1,0 +1,867 @@
+--- ArubaOS 8.5.0.0_70258
+-- vim:set ts=4 sw=4:
+   WLSX-USER6-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION FROM SNMPv2-TC 
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Unsigned32,
+	   Counter32,
+	   IpAddress,
+	   NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       TDomain,
+       DisplayString,
+       PhysAddress,
+       TAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+	   MacAddress,
+	   TruthValue
+           FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+
+	   ArubaAuthenticationMethods,
+	   ArubaSubAuthenticationMethods,
+	   ArubaEncryptionType,
+	   ArubaPhyType,
+	   ArubaHTMode,
+	   ArubaUserForwardMode
+	   		FROM ARUBA-TC
+		wlsxEnterpriseMibModules
+			FROM ARUBA-MIB
+		wlsxSwitchMIB
+			FROM WLSX-SWITCH-MIB
+		wlanESSID
+			FROM WLSX-WLAN-MIB;
+
+   wlsxUser6MIB MODULE-IDENTITY 
+       LAST-UPDATED "1001261806Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB module defines MIB objects which provide
+            information about the IPv6 users in an Aruba controller."
+       REVISION        "1001261806Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { wlsxEnterpriseMibModules 14 }
+
+   wlsxUser6AllInfoGroup        OBJECT IDENTIFIER ::= { wlsxUser6MIB 1 }
+   wlsxUser6InfoGroup         	OBJECT IDENTIFIER ::= { wlsxSwitchMIB 4 }
+
+-- wlsxUser6AllInfoGroup contains information about the users in the controller.
+ 
+  wlsxTotalNumOfUsers6 OBJECT-TYPE
+         SYNTAX       Unsigned32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Total Number of the users.
+            "
+  ::= { wlsxUser6AllInfoGroup 1 }
+
+  wlsxUser6Table  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF WlsxUser6Entry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists all the users (both wired and wireless) currently
+			connected to the controller. Users are identified by their MAC 
+			address and IP address.
+		"
+	
+  ::= { wlsxUser6AllInfoGroup 2 } 
+
+     wlsxUser6Entry OBJECT-TYPE 
+	  SYNTAX       WlsxUser6Entry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "User Entry"
+	  INDEX { nUser6PhyAddress, nUser6IpAddress }
+      ::= { wlsxUser6Table 1 } 
+
+     WlsxUser6Entry ::=
+     SEQUENCE {
+		nUser6PhyAddress 				MacAddress,
+		nUser6IpAddress					DisplayString,
+	 	nUser6Name						DisplayString,
+	 	nUser6Role						DisplayString,
+	 	nUser6UpTime					TimeTicks,
+	 	nUser6AuthenticationMethod		ArubaAuthenticationMethods,
+	 	nUser6SubAuthenticationMethod	ArubaSubAuthenticationMethods,
+	 	nUser6AuthServerName			DisplayString,
+	 	nUser6ExtVPNAddress				IpAddress,
+	 	nUser6ApLocation				DisplayString,
+	 	nUser6ApBSSID					MacAddress,
+	 	nUser6IsOnHomeAgent				TruthValue,
+	 	nUser6HomeAgentIpAddress		IpAddress,
+	 	nUser6MobilityStatus			INTEGER,
+	 	nUser6HomeVlan					Integer32,
+	 	nUser6DefaultVlan				Integer32,
+	 	nUser6AssignedVlan				Integer32,
+	 	nUser6BWContractName			DisplayString,
+	 	nUser6BWContractUsage			INTEGER,
+	 	nUser6BWContractId				Integer32,
+	 	nUser6IsProxyArpEnabled			TruthValue,
+	 	nUser6CurrentVlan				Integer32,
+		nUser6IsWired                   TruthValue,
+		nUser6ConnectedSlot             Integer32,
+		nUser6ConnectedPort             Integer32,
+		nUser6PhyType   				ArubaPhyType,
+		nUser6MobilityDomainName        DisplayString,
+	 	nUser6UPBWContractName			DisplayString,
+	 	nUser6UPBWContractUsage			INTEGER,
+	 	nUser6UPBWContractId			Integer32,
+	 	nUser6DNBWContractName			DisplayString,
+	 	nUser6DNBWContractUsage			INTEGER,
+	 	nUser6DNBWContractId			Integer32,
+		nUser6HTMode   				    ArubaHTMode,
+		nUser6DeviceID				DisplayString,
+		nUser6DeviceType			DisplayString,
+		nUser6ConnectedModule			Integer32,
+		nUser6RxDataPkts64			Counter64,
+		nUser6TxDataPkts64			Counter64,
+		nUser6RxDataOctets64			Counter64,
+		nUser6TxDataOctets64			Counter64,
+		nUser6ForwardMode			ArubaUserForwardMode,
+		nUser6EncryptionMethod			ArubaEncryptionType,
+		nVIAUser6DeviceID 				MacAddress
+     }
+
+     nUser6PhyAddress OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+                MAC address of the station from which the user connected to
+                the controller.
+            "
+        ::= { wlsxUser6Entry 1 }
+
+     nUser6IpAddress OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..128))
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			IPv6 Address of the user.
+            "
+        ::= { wlsxUser6Entry 2 }
+
+     nUser6Name OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..128))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Name of the User.
+            "
+        ::= { wlsxUser6Entry 3 }
+
+     nUser6Role OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Role configured for this user.
+            "
+        ::= { wlsxUser6Entry 4 }
+		 
+     nUser6UpTime OBJECT-TYPE
+         SYNTAX       TimeTicks
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Time since the user connected to the controller.	
+            "
+        ::= { wlsxUser6Entry 5 }
+
+     nUser6AuthenticationMethod OBJECT-TYPE
+         SYNTAX       ArubaAuthenticationMethods
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Authentication mechanism used by the user to connect to the 
+			controller.
+            "
+        ::= { wlsxUser6Entry 6 }
+
+     nUser6SubAuthenticationMethod OBJECT-TYPE
+         SYNTAX       ArubaSubAuthenticationMethods
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Sub Authentication Method
+            "
+        ::= { wlsxUser6Entry 7 }
+
+     nUser6AuthServerName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the authentication server used to authenticate 
+			the user.
+            "
+        ::= { wlsxUser6Entry 8 }
+
+     nUser6ExtVPNAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			External VPN IP Address, if this is a VPN user or 0.0.0.0 if not.
+            "
+        ::= { wlsxUser6Entry 9 }
+
+     nUser6ApLocation OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Location of the access point to 
+			which the user is associated.
+            "
+        ::= { wlsxUser6Entry 10 }
+
+     nUser6ApBSSID OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			BSSID of the access point, which 
+			the user used to connect to the controller.
+            "
+        ::= { wlsxUser6Entry 11 }
+
+     nUser6IsOnHomeAgent OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Object will indicate if the controller is the home controller 
+			 for the user or not.
+            "
+        ::= { wlsxUser6Entry 12 }
+
+     nUser6HomeAgentIpAddress OBJECT-TYPE
+         SYNTAX       IpAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Home agent IP Address of the user. If this user is already on 
+			the home controller, then this IP is the controller IP else it 
+			is the home controller IP address.
+			
+            "
+        ::= { wlsxUser6Entry 13 }
+
+     nUser6MobilityStatus OBJECT-TYPE
+         SYNTAX       INTEGER {
+		 				visitor(1),
+						away(2),
+						associated(3),
+						wired(4),
+                        wireless(5)
+		 				}
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Mobility Status of the User.
+			
+            "
+        ::= { wlsxUser6Entry 14 }
+
+     nUser6HomeVlan OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Home VLAN of the User. If the user is on the home controller 
+			 then this VLAN will be same as userDefaultVlan.
+            "
+        ::= { wlsxUser6Entry 15 }
+
+     nUser6DefaultVlan OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Default VLAN of the User based on the AP configuration.
+            "
+        ::= { wlsxUser6Entry 16 }
+
+     nUser6AssignedVlan OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This Vlan will be different from the Default VLAN if the user has 
+			a derived VLAN Configuration.
+            "
+        ::= { wlsxUser6Entry 17 }
+
+     nUser6BWContractName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       deprecated
+         DESCRIPTION
+            "
+			Name of the Bandwidth Contract applied to this user.
+            "
+        ::= { wlsxUser6Entry 18 }
+
+     nUser6BWContractUsage OBJECT-TYPE
+         SYNTAX       INTEGER {
+							user(1),
+							shared(2)
+					  }
+         MAX-ACCESS   read-only
+         STATUS       deprecated
+         DESCRIPTION
+            "
+			Indicates how the Bandwidth Contract is used.
+            "
+        ::= { wlsxUser6Entry 19 }
+
+     nUser6BWContractId OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       deprecated
+         DESCRIPTION
+            "
+			Bandwidth Contract Id Assigned to the User
+            "
+        ::= { wlsxUser6Entry 20 }
+
+     nUser6IsProxyArpEnabled OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			This object will indicate if the controller is proxy ARPing for the
+			user.
+            "
+        ::= { wlsxUser6Entry 21 }
+
+     nUser6CurrentVlan OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The VLAN to which the user is currently bound.
+            "
+        ::= { wlsxUser6Entry 22 }
+
+     nUser6IsWired OBJECT-TYPE
+         SYNTAX       TruthValue
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates whether this is a wired or wireless user.
+            "
+        ::= { wlsxUser6Entry 23 }
+
+     nUser6ConnectedSlot OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The slot to which the user is connected, if wired.
+            "
+        ::= { wlsxUser6Entry 24 }
+
+     nUser6ConnectedPort OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The port to which the user is connected, if wired.
+            "
+        ::= { wlsxUser6Entry 25 }
+
+     nUser6PhyType OBJECT-TYPE
+         SYNTAX       ArubaPhyType
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The wireless PHY type to which the user is associated, or 'wired'.
+            "
+        ::= { wlsxUser6Entry 26 }
+
+     nUser6MobilityDomainName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The name of mobility domain mobile user belongs to.
+            "
+        ::= { wlsxUser6Entry 27 }
+
+     nUser6UPBWContractName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the Upstream Bandwidth Contract applied to this user.
+            "
+        ::= { wlsxUser6Entry 28 }
+
+     nUser6UPBWContractUsage OBJECT-TYPE
+         SYNTAX       INTEGER {
+							user(1),
+							shared(2)
+					  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates how the Upstream Bandwidth Contract is used.
+            "
+        ::= { wlsxUser6Entry 29 }
+
+     nUser6UPBWContractId OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Upstream Bandwidth Contract Id Assigned to the User
+            "
+        ::= { wlsxUser6Entry 30 }
+
+     nUser6DNBWContractName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the Downstream Bandwidth Contract applied to this user.
+            "
+        ::= { wlsxUser6Entry 31 }
+
+     nUser6DNBWContractUsage OBJECT-TYPE
+         SYNTAX       INTEGER {
+							user(1),
+							shared(2)
+					  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates how the Downstream Bandwidth Contract is used.
+            "
+        ::= { wlsxUser6Entry 32 }
+
+     nUser6DNBWContractId OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Downstream Bandwidth Contract Id Assigned to the User
+            "
+        ::= { wlsxUser6Entry 33 }
+
+     nUser6HTMode OBJECT-TYPE
+         SYNTAX       ArubaHTMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The HT mode of this user, if any.
+            "
+        ::= { wlsxUser6Entry 34 }
+
+     nUser6DeviceID OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..128))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Device ID
+            "
+        ::= { wlsxUser6Entry 35 }
+
+     nUser6DeviceType OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..31))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Device Type
+            "
+        ::= { wlsxUser6Entry 36 }
+
+     nUser6ConnectedModule OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            The module to which the user is connected, if wired.
+            "
+        ::= { wlsxUser6Entry 37 }
+
+     nUser6RxDataPkts64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object specifies number of packets received by this IP
+            for which this user is connected to the controller.
+            "
+         ::= { wlsxUser6Entry 38 }
+
+     nUser6TxDataPkts64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object specifies number of packets transmitted by this IP
+            for which this user is connected to the controller.
+            "
+         ::= { wlsxUser6Entry 39 }
+
+     nUser6RxDataOctets64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object specifies number of octets received by this IP
+            for which this user is connected to the controller.
+            "
+         ::= { wlsxUser6Entry 40 }
+
+     nUser6TxDataOctets64 OBJECT-TYPE
+         SYNTAX       Counter64
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+            This object specifies number of octets transmitted by this IP
+            for which this user is connected to the controller.
+            "
+        ::= { wlsxUser6Entry 41 }
+
+     nUser6ForwardMode OBJECT-TYPE
+         SYNTAX       ArubaUserForwardMode
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Forward mode.
+            "
+        ::= { wlsxUser6Entry 42 }
+
+     nUser6EncryptionMethod OBJECT-TYPE
+         SYNTAX       ArubaEncryptionType
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Encryption method.
+            "
+        ::= { wlsxUser6Entry 43 }
+
+     nVIAUser6DeviceID OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+                MAC address of the station from which the user connected to
+                the controller using VIA.
+            "
+        ::= { wlsxUser6Entry 44 }
+
+  wlsxUser6SessionTimeTable OBJECT-TYPE
+	  SYNTAX		SEQUENCE OF WlsxUser6SessionTimeEntry
+	  MAX-ACCESS	not-accessible
+	  STATUS		current
+	  DESCRIPTION
+	  "
+		This table lists the user session time counts on an ESSID.
+		ssid. The session times  are separated into predefined time length 
+		buckets, with sessions lasting longer than 240 minutes falling into 
+		the 240min bucket. 
+	  "
+  ::= { wlsxUser6AllInfoGroup 3 }
+
+    wlsxUser6SessionTimeEntry OBJECT-TYPE 
+	  SYNTAX       WlsxUser6SessionTimeEntry
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+        "
+		 User session time data, divided into buckets of different
+	     time length.         "
+			
+	  INDEX { wlanESSID, wlsxUser6SessionTimeLength}
+	  ::= { wlsxUser6SessionTimeTable 1 }
+ 
+	  WlsxUser6SessionTimeEntry ::=
+      SEQUENCE {
+		 wlsxUser6SessionTimeLength   Integer32,
+		 wlsxUser6SessionTimeCount	 Counter32
+	  }
+
+     wlsxUser6SessionTimeLength OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			 Pre-defined user session time length.
+            "
+        ::= { wlsxUser6SessionTimeEntry 1 }
+
+     wlsxUser6SessionTimeCount OBJECT-TYPE
+         SYNTAX       Counter32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Number of users that are connected to the essid whose sessions expired in this time interval.
+            "
+        ::= { wlsxUser6SessionTimeEntry 2 }
+
+   wlsxSwitchUser6Table  OBJECT-TYPE 
+	  SYNTAX       SEQUENCE OF MxSwitchUser6Entry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+	  	"
+			This Table lists all the users (both wired and wireless) currently
+			connected to the switch. Users are identified by their IP address.
+		"
+	
+      ::= { wlsxUser6InfoGroup 1 } 
+
+     wlsxSwitchUser6Entry OBJECT-TYPE 
+	  SYNTAX       MxSwitchUser6Entry 
+	  MAX-ACCESS   not-accessible		
+      STATUS       current 
+      DESCRIPTION 
+             "User Entry"
+	  INDEX { user6IpAddress}
+      ::= { wlsxSwitchUser6Table 1 } 
+
+     MxSwitchUser6Entry ::=
+     SEQUENCE {
+         user6IpAddress				DisplayString,
+         user6PhyAddress 			MacAddress,
+		 user6Name					DisplayString,
+		 user6Role					DisplayString,
+		 user6UpTime				TimeTicks,
+		 user6AuthenticationMethod	INTEGER,
+		 user6Location				DisplayString,
+		 user6ServerName			DisplayString,
+		 user6ConnectedVlan			Integer32,
+		 user6ConnectedSlot			Integer32,
+		 user6ConnectedPort			Integer32,
+		 user6BWContractName		DisplayString,
+		 user6BWContractUsage		INTEGER,
+		 user6ConnectedModule		Integer32
+
+     }
+
+     user6IpAddress OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            "
+			IPv6 Address from which the user connected to the switch.
+            "
+        ::= { wlsxSwitchUser6Entry 1 }
+
+     user6PhyAddress OBJECT-TYPE
+         SYNTAX       MacAddress
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Physical Address of the station from which the user connected to 
+			the switch.
+            "
+        ::= { wlsxSwitchUser6Entry 2 }
+
+     user6Name OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Name of the User.
+            "
+        ::= { wlsxSwitchUser6Entry 3 }
+
+     user6Role OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			The Role configured for this user.
+            "
+        ::= { wlsxSwitchUser6Entry 4 }
+
+		 
+     user6UpTime OBJECT-TYPE
+         SYNTAX       TimeTicks
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			 Time since the user is connected to the switch.	
+            "
+        ::= { wlsxSwitchUser6Entry 5 }
+
+     user6AuthenticationMethod OBJECT-TYPE
+         SYNTAX       INTEGER {
+						none(1),
+						other(2),
+						web(3),
+						dot1x(4),
+						vpn(5),
+						mac(6)
+						}
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Authentication mechanism used by the user to connect to the switch.
+            "
+        ::= { wlsxSwitchUser6Entry 6 }
+
+     user6Location OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Location of the access point (in Building.Floor.... format), which
+			the user used to connect to the switch.
+            "
+        ::= { wlsxSwitchUser6Entry 7 }
+
+     user6ServerName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the Back-end authentication server, used to authenticate
+			the user.
+            "
+        ::= { wlsxSwitchUser6Entry 8 }
+
+     user6ConnectedVlan OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Vlan on which the user is connected to the switch.
+            "
+        ::= { wlsxSwitchUser6Entry 9 }
+
+     user6ConnectedSlot OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Slot on switch, where the user connection terminates.
+            "
+        ::= { wlsxSwitchUser6Entry 10 }
+
+     user6ConnectedPort OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Port on switch, where the user connection terminates.
+            "
+        ::= { wlsxSwitchUser6Entry 11 }
+
+     user6BWContractName OBJECT-TYPE
+         SYNTAX       DisplayString(SIZE(0..32))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Name of the Bandwidth Contract applied to this user.
+            "
+        ::= { wlsxSwitchUser6Entry 12 }
+
+     user6BWContractUsage OBJECT-TYPE
+         SYNTAX       INTEGER {
+							user(1),
+							shared(2)
+					  }
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Indicates how the Bandwidth Contract is used.
+            "
+        ::= { wlsxSwitchUser6Entry 13 }
+
+     user6ConnectedModule OBJECT-TYPE
+         SYNTAX       Integer32
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Module on switch, where the user connection terminates.
+            "
+        ::= { wlsxSwitchUser6Entry 14 }
+
+
+END

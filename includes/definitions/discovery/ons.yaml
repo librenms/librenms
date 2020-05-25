@@ -1,0 +1,29 @@
+mib: CERENT-ENVMON-MIB:ENTITY-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - entPhysicalDescr
+        voltage:
+            data:
+                -
+                    oid: cerentEnvMonVoltageStatsTable
+                    num_oid: '.1.3.6.1.4.1.3607.2.80.10.1.30.{{ $index }}'
+                    value: cerentEnvMonVoltageStatsCurrentValue
+                    index: 'cerentEnvMonVoltageStats.{{ $index }}'
+                    descr: '{{ $entPhysicalDescr }} - {{ $cerentEnvMonVoltageStatsDescr }}'
+                    divisor: 1000
+                    warn_limit: cerentEnvMonVoltageStatsThresholdHigh
+                    high_limit: cerentEnvMonVoltageStatsThresholdVeryHigh
+                    low_warn_limit: cerentEnvMonVoltageStatsThresholdLow
+                    low_limit: cerentEnvMonVoltageStatsThresholdVeryLow
+        temperature:
+            data:
+                -
+                    oid: cerentEnvMonTemperatureStatsTable
+                    num_oid: '.1.3.6.1.4.1.3607.2.80.20.1.30.{{ $index }}'
+                    value: cerentEnvMonTemperatureStatsCurrentValue
+                    index: 'cerentEnvMonTemperatureStats.{{ $index }}'
+                    descr: '{{ $entPhysicalDescr }} - {{ $cerentEnvMonTemperatureStatsDescr }}'
+                    high_limit: cerentEnvMonTemperatureStatsThresholdHigh

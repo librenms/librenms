@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\RRD\RrdDefinition;
+
 // Gather our SLA's from the DB.
 $slas = dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 0', array($device['device_id']));
 
@@ -44,7 +46,7 @@ if (count($slas) > 0) {
 
         // The base RRD
         $rrd_name = array('sla', $sla_nr);
-        $rrd_def = 'DS:rtt:GAUGE:600:0:300000';
+        $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
         $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
         data_update($device, 'sla', $tags, $fields);
 
@@ -65,19 +67,18 @@ if (count($slas) > 0) {
                     'AvgDSJ' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.2.1.48'][$sla_nr],
                 );
                 $rrd_name = array('sla', $sla_nr, $rtt_type);
-                $rrd_def = array(
-                    'DS:PacketLossSD:GAUGE:600:0:U',
-                    'DS:PacketLossDS:GAUGE:600:0:U',
-                    'DS:PacketOutOfSequence:GAUGE:600:0:U',
-                    'DS:PacketMIA:GAUGE:600:0:U',
-                    'DS:PacketLateArrival:GAUGE:600:0:U',
-                    'DS:MOS:GAUGE:600:0:U',
-                    'DS:ICPIF:GAUGE:600:0:U',
-                    'DS:OWAvgSD:GAUGE:600:0:U',
-                    'DS:OWAvgDS:GAUGE:600:0:U',
-                    'DS:AvgSDJ:GAUGE:600:0:U',
-                    'DS:AvgDSJ:GAUGE:600:0:U',
-                );
+                $rrd_def = RrdDefinition::make()
+                    ->addDataset('PacketLossSD', 'GAUGE', 0)
+                    ->addDataset('PacketLossDS', 'GAUGE', 0)
+                    ->addDataset('PacketOutOfSequence', 'GAUGE', 0)
+                    ->addDataset('PacketMIA', 'GAUGE', 0)
+                    ->addDataset('PacketLateArrival', 'GAUGE', 0)
+                    ->addDataset('MOS', 'GAUGE', 0)
+                    ->addDataset('ICPIF', 'GAUGE', 0)
+                    ->addDataset('OWAvgSD', 'GAUGE', 0)
+                    ->addDataset('OWAvgDS', 'GAUGE', 0)
+                    ->addDataset('AvgSDJ', 'GAUGE', 0)
+                    ->addDataset('AvgDSJ', 'GAUGE', 0);
                 $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                 data_update($device, 'sla', $tags, $jitter);
                 $fields = array_merge($fields, $jitter);
@@ -96,18 +97,17 @@ if (count($slas) > 0) {
                     'JitterIAJIn' => $rttMonLatestOper['1.3.6.1.4.1.9.9.42.1.5.4.1.50'][$sla_nr],
                 );
                 $rrd_name = array('sla', $sla_nr, $rtt_type);
-                $rrd_def = array(
-                    'DS:PacketLoss:GAUGE:600:0:U',
-                    'DS:PacketOosSD:GAUGE:600:0:U',
-                    'DS:PacketOosDS:GAUGE:600:0:U',
-                    'DS:PacketLateArrival:GAUGE:600:0:U',
-                    'DS:JitterAvgSD:GAUGE:600:0:U',
-                    'DS:JitterAvgDS:GAUGE:600:0:U',
-                    'DS:LatencyOWAvgSD:GAUGE:600:0:U',
-                    'DS:LatencyOWAvgDS:GAUGE:600:0:U',
-                    'DS:JitterIAJOut:GAUGE:600:0:U',
-                    'DS:JitterIAJIn:GAUGE:600:0:U',
-                );
+                $rrd_def = RrdDefinition::make()
+                    ->addDataset('PacketLoss', 'GAUGE', 0)
+                    ->addDataset('PacketOosSD', 'GAUGE', 0)
+                    ->addDataset('PacketOosDS', 'GAUGE', 0)
+                    ->addDataset('PacketLateArrival', 'GAUGE', 0)
+                    ->addDataset('JitterAvgSD', 'GAUGE', 0)
+                    ->addDataset('JitterAvgDS', 'GAUGE', 0)
+                    ->addDataset('LatencyOWAvgSD', 'GAUGE', 0)
+                    ->addDataset('LatencyOWAvgDS', 'GAUGE', 0)
+                    ->addDataset('JitterIAJOut', 'GAUGE', 0)
+                    ->addDataset('JitterIAJIn', 'GAUGE', 0);
                 $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                 data_update($device, 'sla', $tags, $icmpjitter);
                 $fields = array_merge($fields, $icmpjitter);
@@ -123,3 +123,5 @@ if (count($slas) > 0) {
         }
     }
 }
+
+unset($slas);

@@ -1,0 +1,5143 @@
+-- **********************************************************
+-- Copyright 2016-2017 VMware, Inc.  All rights reserved.
+-- **********************************************************
+
+VMWARE-NSX-MANAGER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, DateAndTime
+        FROM SNMPv2-TC
+    UUID
+        FROM UUID-TC-MIB
+    vmwNsxManager
+       FROM VMWARE-ROOT-MIB;
+
+     vmwNsxManagerMIB MODULE-IDENTITY
+     LAST-UPDATED "201704270000Z"
+     ORGANIZATION "VMware, Inc"
+     CONTACT-INFO
+     "VMware, Inc
+     3401 Hillview Ave
+     Palo Alto, CA 94304
+     Tel: 1-877-486-9273 or 650-427-5000
+     Fax: 650-427-5001
+     Web: http://kb.vmware.com/kb/1013445
+     "
+    DESCRIPTION
+     "This MIB file contains the information that the receiving party needs
+     in order to interpret SNMP traps sent by NSX Manager.
+
+     VMware NSX for vSphere is a key product in the SDDC architecture. With
+     NSX, virtualization delivers for networking what it has already delivered
+     for compute and storage. In much the same way that server virtualization
+     programmatically creates, snapshots, deletes and restores software-based
+     virtual machines (VMs), NSX network virtualization programmatically
+     creates, snapshots, deletes, and restores software-based virtual
+     networks. The result is a completely transformative approach to
+     networking that not only enables data center managers to achieve orders
+     of magnitude better agility and economics, but also allows for a vastly
+     simplified operational model for the underlying physical network. With
+     the ability to be deployed on any IP network, including both existing
+     traditional networking models and next-generation fabric architectures
+     from any vendor, NSX is a completely non-disruptive solution. In fact,
+     with NSX, the physical network infrastructure you already have is all you
+     need to deploy a software-defined data center.
+
+     The NSX Manager provides the graphical user interface (GUI) and the REST
+     APIs for creating, configuring, and monitoring NSX components, such as
+     controllers, logical switches, and edge services gateways. The NSX
+     Manager provides an aggregated system view and is the centralized network
+     management component of NSX. NSX Manager is installed as a virtual
+     appliance on any ESX host in your vCenter environment.
+
+     Support requests can be filed with VMware using KB article:
+     http://kb.vmware.com/kb/2006985
+
+         To reach NSX Manager Service Composer UI, login to
+         vSphere UI(https://<vsphere-ip>)->Networking & Security->Service
+         Composer"
+
+    REVISION     "201704270000Z"
+    DESCRIPTION
+               "This is the 6.3.0 version of the NSX Manager MIB.
+                It describes all the notifications sent from the NSX Manager appliance.
+                Added new traps to indicate Application Rule Manager related events
+                See https://pubs.vmware.com/NSX-62/index.jsp?topic=%2Fcom.vmware.nsx.admin.doc%2FGUID-8BC71FF1-9A94-4CBD-BA95-551B0B2266FA.html"
+    REVISION     "201606020000Z"
+    DESCRIPTION
+     "Release 6.2.3 for VMware NSX Manager supporting only SNMPv2c trap PDUs.
+      It describes all the notifications sent from the NSX Manager appliance.
+      WARNING: This mib module will not be backward compatible with next version."
+
+   ::= { vmwNsxManager 1 }
+
+--
+-- Data type definitions
+--
+VmwNsxManagerTypeSeverity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Severity enumeration definition of NSX Manager events"
+    SYNTAX  INTEGER { informational(1), low(2), medium(3), major(4),
+    critical(5), high(6) }
+
+
+--
+-- Top-level MIB groups
+--
+
+-- Group 1: Generic data sent in All Alerts
+
+vmwNsxMAlertData OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+         "This members of this group are the OIDs for VarBinds
+     that contain data for ALL Alerts."
+        ::= { vmwNsxManagerMIB 1 }
+
+-- Group 2: Alerts sent as notifications
+
+vmwNsxMNotification OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+         "All notifications for NSX Manager use this oid prefix."
+        ::= { vmwNsxManagerMIB 2 }
+
+vmwNsxMEventCode OBJECT-TYPE
+   SYNTAX Integer32 (1..2147483647)
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The event code of the alert that was generated. To fetch a list of all the
+   events with their code, severity and description please invoke the
+   nsx-manager url https://<nsx-manager-host>/api/2.0/systemevent/eventcode .
+   The event code specifically identifies each individual event type. This
+   event code is uniquely assigned only once to a particular event type."
+   ::= { vmwNsxMAlertData 1 }
+
+vmwNsxMEventTimestamp OBJECT-TYPE
+   SYNTAX DateAndTime
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The timestamp when the event was raised in the NSX Manager."
+   ::= { vmwNsxMAlertData 2 }
+
+vmwNsxMEventMessage OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "This object provides a human readable description of the event or group
+   of events"
+   ::= { vmwNsxMAlertData 3 }
+
+vmwNsxMEventSeverity OBJECT-TYPE
+   SYNTAX VmwNsxManagerTypeSeverity
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The severity for the event that was generated. The severity is
+   pre-defined and can only be changed from the NSX Manager section
+   of vsphere web client if the administrator so wishes."
+   ::= { vmwNsxMAlertData 4 }
+
+vmwNsxMEventComponent OBJECT-TYPE
+   SYNTAX OCTET STRING
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The NSX manager component where this event was generated."
+   ::= { vmwNsxMAlertData 5 }
+
+vmwNsxMUuid OBJECT-TYPE
+   SYNTAX UUID
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The NSX manager UUID where this event was generated."
+   ::= { vmwNsxMAlertData 6 }
+
+vmwNsxMCount OBJECT-TYPE
+   SYNTAX Integer32 (1..2147483647)
+   MAX-ACCESS accessible-for-notify
+   STATUS   current
+   DESCRIPTION
+   "The count of the number of events for a particular group raised in the
+   last 5 minute interval."
+   ::= { vmwNsxMAlertData 7 }
+
+--
+-- Groups related traps
+--
+
+vmwNsxMBranch OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Branch segregated out for various groups and other future requirements."
+    ::= { vmwNsxMNotification 0 }
+
+vmwNsxMGroupsBranch OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Grouped Notifications will have this OID prefix."
+    ::= { vmwNsxMBranch 1 }
+
+vmwNsxMGroupsPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Prefix added to place zero in penultimate sub-identifier of group oids."
+    ::= { vmwNsxMGroupsBranch 0 }
+
+vmwNsxMConfigGroup NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventTimestamp,
+      vmwNsxMCount,
+      vmwNsxMEventMessage,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Configuration notifications that are grouped will have this OID prefix."
+   ::= { vmwNsxMGroupsPrefix 1 }
+
+--
+-- Snmp related traps
+--
+
+vmwNsxMSnmp OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Snmp related will have this OID prefix."
+    ::= { vmwNsxMNotification 1 }
+
+vmwNsxMSnmpPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Snmp module."
+    ::= { vmwNsxMSnmp 0 }
+
+vmwNsxMSnmpDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "This notification is sent when the sending out of Snmp traps is disabled.
+   This would most likely be the last Snmp trap the snmp manager receives.
+   You may some times not receive it in case of high volume of traps. In those
+   cases you can rely on the heartbeat traps not being sent out.
+   Action required: None. If the sending of Snmp traps is enabled a warmStart
+   trap is received.
+   Frequency of traps: Once, whenever the sending snmp traps is disabled."
+   ::= { vmwNsxMSnmpPrefix 1 }
+
+vmwNsxMSnmpManagerConfigUpdated NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "This notification is sent when the snmp manager configuration has been
+   updated. The event message will carry the semicolon separated new snmp
+   managers' details.
+   Action required: None
+   Frequency of traps: Once, whenever the Snmp manager configuration is updated."
+   ::= { vmwNsxMSnmpPrefix 2 }
+
+--
+-- Security related traps
+--
+
+vmwNsxMSecurity OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are security related will have this OID prefix."
+    ::= { vmwNsxMNotification 2 }
+
+vmwNsxMSecurityPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for security module."
+    ::= { vmwNsxMSecurity 0 }
+
+vmwNsxMIpAddedBlackList NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Whenever user authentication fails for number of times that
+   user is blacklisted and further login attempts are disabled for that user
+   from given IP address for some time.
+   Action required: None
+   Frequency of traps: Whenever user authentication fails consecutively within
+   some time."
+   ::= { vmwNsxMSecurityPrefix 1 }
+
+vmwNsxMIpRemovedBlackList NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "After user is blacklisted, after blacklist duration expires,
+   user is removed from blacklist.
+   Action required: None
+   Frequency of traps: Whenever blacklist duration expires for any user."
+   ::= { vmwNsxMSecurityPrefix 2 }
+
+vmwNsxMSsoConfigFailure NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Whenever configuration of lookup service / SSO fails due to
+   various reasons like invalid credentials, invalid configuration, time sync
+   problem etc.
+   Action required: Check the event message and reconfigure lookup service
+   with correct details.
+   Frequency of traps: Once per failed configuration of lookup service."
+   ::= { vmwNsxMSecurityPrefix 3 }
+
+vmwNsxMSsoUnconfigured NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Whenever user unconfigures lookup service.
+   Action required: None
+   Frequency of traps: Once per unconfiguration event of lookup service."
+   ::= { vmwNsxMSecurityPrefix 4 }
+
+vmwNsxMUserRoleAssigned NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "When role is assigned on NSX manager for vCenter user.
+   Action required: None
+   Frequency of traps: Once for each user who is assigned role."
+   ::= { vmwNsxMSecurityPrefix 5 }
+
+vmwNsxMUserRoleUnassigned NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "When role is unassigned on NSX manager for vCenter user.
+   Action: None
+   Frequency of traps: Once for each user where role is removed."
+   ::= { vmwNsxMSecurityPrefix 6 }
+
+vmwNsxMGroupRoleAssigned NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "When role is assigned on NSX manager for vCenter group.
+   Action required: None
+   Frequency of traps: Once for each group who is assigned role."
+   ::= { vmwNsxMSecurityPrefix 7 }
+
+vmwNsxMGroupRoleUnassigned NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "When role is unassigned on NSX manager for vCenter group.
+   Action required: None
+   Frequency of traps: Once for each group where role is removed."
+   ::= { vmwNsxMSecurityPrefix 8 }
+
+vmwNsxMVcLoginFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Whenever Connection with vCenter starts failing due to
+   invalid credentials.
+   Action required: Reconfigure NSX Manager vCenter configuration with
+   correct credentials."
+   ::= { vmwNsxMSecurityPrefix 9 }
+
+vmwNsxMVcDisconnected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Whenever there is disconnectivity for default VCenter
+   Connection maintained by NSX.
+   Action required: Administrator needs to check the connectivity with vCenter
+   for network problems or any other reasons."
+   ::= { vmwNsxMSecurityPrefix 10 }
+
+vmwNsxMLostVcConnectivity NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Whenever there is disconnectivity for default VCenter
+   Connection maintained by NSX.
+   Action required: Administrator needs to check the connectivity with
+   vCenter for network problems or any other reasons."
+   ::= { vmwNsxMSecurityPrefix 11 }
+
+vmwNsxMSsoDisconnected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Whenever there is disconnection with SSO lookup service.
+   Action required: Please check the configuration for possible disconnection
+   reasons like Invalid Credentials, Time sync issues, Network connectivity
+   problems etc. Navigate to Appliance management Web UI in browser
+   (https://<nsx-manager-host>/) traverse to Manage vCenter Registration tab
+   and verify the configuration for SSO Lookupservice.
+   Frequency of traps: Once per disconnect event, default frequency to check
+   SSO connection state is 1 hour."
+   ::= { vmwNsxMSecurityPrefix 12 }
+
+--
+-- Distributed Firewall related traps
+--
+
+vmwNsxMFirewall OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are firewall related will have this OID prefix."
+    ::= { vmwNsxMNotification 3 }
+
+vmwNsxMFirewallPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for firewall module."
+    ::= { vmwNsxMFirewall 0 }
+
+vmwNsxMFltrCnfgUpdateFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager failed to enforce DFW. VMs on this host may not be protected by the DFW.  Contextual data provided with this event may indicate the cause of this failure.
+This could happen if the VIB version mismatches on the NSX Manager and ESX host. This may happen during an upgrade. Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 1 }
+
+vmwNsxMFltrCnfgNotAppliedToVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager failed to enforce DFW configuration on a vnic. This particular VM may not be protected by the DFW. Contextual data provided with this event may indicate the cause of this failure.This could happen if the VIB version mismatches on the NSX Manager and ESX host. This may happen during an upgrade. Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 2 }
+
+vmwNsxMFltrCnfgAppliedToVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Successfully updated filter config.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 3 }
+
+vmwNsxMFltrCreatedForVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Filter created. DFW is enforced in the datapath for the
+   vnic.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 4 }
+
+vmwNsxMFltrDeletedForVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Filter deleted. DFW is removed from the vnic.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 5 }
+
+vmwNsxMFirewallConfigUpdateFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Firewall rule Configuration between the NSX Manager and the host is not in sync. Contextual data provided with this event may indicate the cause of this failure. Verify that the host in question was properly prepared by NSX Manager. Collect error logs (vsfwd.log) when the host received firewall config. Force sync firewall config using ForceSync API/UI. See kb.vmware.com/kb/2125437 .
+
+If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 6 }
+
+vmwNsxMFirewallRuleFailedVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to apply Distributed Firewall configuration.
+Contextual data provided with this event may indicate the cause of this failure.
+Collect error logs (vmkernel.log) when the firewall configuration was applied to the vnic. vsip kernel heaps may not have enough free memory. Check VSFWD logs . See kb.vmware.com/kb/2125437.
+
+If the issue persists, please collect the ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport.  See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 7 }
+
+vmwNsxMFirewallRuleAppliedVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Applied firewall config. Key value will have context info
+   like generation number and also other debugging info.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 8 }
+
+vmwNsxMCntnrCnfgUpdateFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed receive, parse or update the container configuration. Contextual data provided with this event may indicate the cause of this failure.
+Collect error logs (vmkernel.log) when firewall configuration was applied to the vnic. Verify that vsip kernel heaps have enough free memory. Check VSFWD logs. See kb.vmware.com/kb/2125437 .
+If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 9 }
+
+vmwNsxMFlowMissed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Flow missed.
+Contextual data provided with this event may indicate the cause of this failure.
+Collect error logs (vmkernel.log) when firewall configuration was applied to the vnic. Verify that vsip kernel heaps have enough free memory and vsfwd memory consumption is within resource limits. Check VSFWD logs. See kb.vmware.com/kb/2125437.
+If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 10 }
+
+vmwNsxMSpoofGuardCnfgUpdateFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to receive, parse or Update the spoofguard configuration.
+Contextual data provided with this event may indicate the cause of this failure.
+Verify that the host in question was properly prepared by NSX Manager.
+Collect error logs (vmkernel.log) when the spoofguard configuration was applied to the host. For Sync the firewall configuration . See kb.vmware.com/kb/2125437."
+   ::= { vmwNsxMFirewallPrefix 11 }
+
+vmwNsxMSpoofGuardFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to apply spoofguard to the vnic.
+Contextual data provided with this event may indicate the cause of this failure.
+Verify that vsip kernel heaps have enough free memory.
+Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 12 }
+
+vmwNsxMSpoofGuardApplied NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Enabled spoofguard for vnic.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 13 }
+
+vmwNsxMSpoofGuardDisableFail NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to disable spoofguard on the vnic.
+Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 14 }
+
+vmwNsxMSpoofGuardDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Disabled spoofguard for vnic.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 15 }
+
+vmwNsxMLegacyAppServiceDeletionFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when legacy application service VM
+   deletion failed."
+   ::= { vmwNsxMFirewallPrefix 16 }
+
+vmwNsxMFirewallCpuThresholdCrossed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd CPU usage threshold was exceeded.
+Reduce the amount of traffic of VMs on the host in question."
+   ::= { vmwNsxMFirewallPrefix 17 }
+
+vmwNsxMFirewallMemThresholdCrossed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd heap memory threshold exceeded for the specified heap.
+Reduce the number of  of VMs on the host in question, reduce the number of rules or containers in firewall config. Use appliedTo feature to limit the number of rules for the current cluster."
+   ::= { vmwNsxMFirewallPrefix 18 }
+
+vmwNsxMConnPerSecThrshldCrossed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd Connectons Per Second (CPS) threshold exceeded for the specified vnic.
+Reduce the amount of new connections of VMs on the host in question."
+   ::= { vmwNsxMFirewallPrefix 19 }
+
+vmwNsxMFirewallCnfgUpdateTimedOut NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager waits for 2 minutes after publishing the Firewall configuration to each host in the cluster. If a host takes more than 2 minutes to process the data, it times out.
+Please check the Host in question. See if VSFWD is functioning or not. Also use CLI commands to verify if the rule realization is working properly or not. See kb.vmware.com/kb/2125437.
+Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 20 }
+
+vmwNsxMSpoofGuardCnfgUpdateTmOut NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager waits for 2 minutes after publishing the Spoofguard configuration to each host in the cluster. If a host takes more than 2 minutes to process the data, it times out.
+Please check the Host in question. See if VSFWD is functioning or not. Also use CLI commands to verify if the rule realization is working properly or not. See kb.vmware.com/kb/2125437.
+Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 21 }
+
+vmwNsxMFirewallPublishFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Firewall Configuration Publishing has failed for a given cluster/host.
+Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 22 }
+
+vmwNsxMCntnrUpdatePublishFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Publishing of container (IP/MAC/vNIC) update pdate failed for a given host/cluster object.
+Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 23 }
+
+vmwNsxMSpoofGuardUpdatePublishFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The publishing of the spoofguard updates on this host has failed. Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 24 }
+
+vmwNsxMExcludeListPublishFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The publishing of the exclude list or updates to the exclude list on this host has failed. Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 25 }
+
+vmwNsxMFirewallCnfgUpdateOnDltCntnr NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Deletion of the object referenced in firewall rules.
+   Action required: Go to the NSX manager DFW UI. All the invalid reference
+   are marked invalid on the UI as well. Please remove the orphaned referenced
+   and update the firewall rules."
+   ::= { vmwNsxMFirewallPrefix 26 }
+
+vmwNsxMHostSyncFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Host-level force synchronization has failed. Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 27 }
+
+vmwNsxMHostSynced NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Force Sync operation for host succeeded.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 28 }
+
+vmwNsxMFirewallInstalled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The Distributed Firewall was successfully Installed on the host."
+   ::= { vmwNsxMFirewallPrefix 29 }
+
+vmwNsxMFirewallInstallFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The Distributed Firewall Installation has failed. Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 30 }
+
+vmwNsxMFirewallClusterInstalled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The Distributed Firewall has been installed at the request of a user."
+   ::= { vmwNsxMFirewallPrefix 31 }
+
+vmwNsxMFirewallClusterUninstalled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The Distributed Firewall has been uninstalled at the request of a user."
+   ::= { vmwNsxMFirewallPrefix 32 }
+
+vmwNsxMFirewallClusterDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The Distributed Firewall has been disabeld on the cluster at the request of a user."
+   ::= { vmwNsxMFirewallPrefix 33 }
+
+vmwNsxMFirewallForceSyncClusterFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Force Sync operation for the cluster has failed.
+Use CLI commands to look at the logs and verify if any error messages appeared during the operation. See kb.vmware.com/kb/2125437.
+Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+http://kb.vmware.com/kb/1010705"
+   ::= { vmwNsxMFirewallPrefix 34 }
+
+vmwNsxMFirewallForceSyncClusterSuccess NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Force Sync operation for cluster succeeded.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 35 }
+
+vmwNsxMFirewallVsfwdProcessStarted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "vsfwd process started on host.
+   Action required: None"
+   ::= { vmwNsxMFirewallPrefix 36 }
+
+vmwNsxMFirewallRulesetApplyAllFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failure to apply all the rule section configuration. Contextual data provided with this event may indicate the cause of this failure.
+   Collect error logs (vmkernel.log) when firewall configuration was applied to the vnic. Verify that vsip kernel heaps have enough free memory. Check VSFWD logs. See kb.vmware.com/kb/2125437 .
+   If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and http://kb.vmware.com/kb/653."
+   ::= { vmwNsxMFirewallPrefix 37 }
+
+vmwNsxMFirewallRulesetAppliedAll NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Successfully applied all rule section config.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 38 }
+
+vmwNsxMCntnrCnfgApplyFailedToVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failure to apply the container configuration. Contextual data provided with this event may indicate the cause of this failure.
+   Collect error logs (vmkernel.log) when firewall configuration was applied to the vnic. Verify that vsip kernel heaps have enough free memory. Check VSFWD logs. See kb.vmware.com/kb/2125437 .
+   If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and http://kb.vmware.com/kb/653."
+   ::= { vmwNsxMFirewallPrefix 39 }
+
+vmwNsxMCntnrCnfgApplyAllFailedToVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failure to apply all container configuration. Contextual data provided with this event may indicate the cause of this failure.
+   Collect error logs (vmkernel.log) when firewall configuration was applied to the vnic. Verify that vsip kernel heaps have enough free memory. Check VSFWD logs. See kb.vmware.com/kb/2125437 .
+   If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and http://kb.vmware.com/kb/653."
+   ::= { vmwNsxMFirewallPrefix 40 }
+
+vmwNsxMCntnrCnfgAppliedAllToVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Successfully applied all container config to all vnics.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 41 }
+
+vmwNsxMSpoofGuardApplyAllFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to apply all spoofguard to the vnics.
+   Contextual data provided with this event may indicate the cause of this failure.
+   Verify that vsip kernel heaps have enough free memory.
+   Please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and
+   http://kb.vmware.com/kb/653."
+   ::= { vmwNsxMFirewallPrefix 42 }
+
+vmwNsxMSpoofGuardAppliedAll NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Applied all spoofguard for vnics.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 43 }
+
+vmwNsxMFirewallTimeoutUpdateFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Firewall session timer timeout configuration parse/update failed. Timeout values are unchanged. Contextual data provided with this event may indicate the cause of this failure. Collect error logs (vsfwd.log) when the host received firewall config. Force sync firewall config using ForceSync API/UI. See kb.vmware.com/kb/2125437 .
+   If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and http://kb.vmware.com/kb/653."
+   ::= { vmwNsxMFirewallPrefix 44 }
+
+vmwNsxMFirewallTimeoutApplyFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Firewall session timer timeout configuration apply failed. Certain timeout values are unchanged. Contextual data provided with this event may indicate the cause of this failure. Collect error logs (vsfwd.log) when the host received firewall config. Force sync firewall config using ForceSync API/UI. See kb.vmware.com/kb/2125437 .
+   If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and http://kb.vmware.com/kb/653."
+   ::= { vmwNsxMFirewallPrefix 45 }
+
+vmwNsxMFirewallTimeoutApplied NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Applied session timeout values for a vnic.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 46 }
+
+vmwNsxMFirewallTimeoutApplyAllFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to apply all firewall session timer timeout configuration. Some timeout values are unchanged. Contextual data provided with this event may indicate the cause of this failure. Collect error logs (vsfwd.log) when the host received firewall config. Force sync firewall config using ForceSync API/UI. See kb.vmware.com/kb/2125437 .
+   If the issue persists, please collect ESX and NSX Manager tech support bundle and open a SR with Vmware techsupport. See http://kb.vmware.com/kb/2074678 and http://kb.vmware.com/kb/653."
+   ::= { vmwNsxMFirewallPrefix 47 }
+
+vmwNsxMFirewallTimeoutAppliedAll NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Applied session timeout values for all vnics.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 48 }
+
+vmwNsxMCntnrCnfgAppliedToVnic NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Successfully applied container config to all vnics.
+   Action required: None."
+   ::= { vmwNsxMFirewallPrefix 49 }
+
+--
+-- Edge related traps
+--
+
+vmwNsxMEdge OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are edge related will have this OID prefix."
+    ::= { vmwNsxMNotification 4 }
+
+vmwNsxMEdgePrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for edge module."
+    ::= { vmwNsxMEdge 0 }
+
+vmwNsxMEdgeNoVmServing NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "None of the Edge VMs found in serving state. There is a
+   possibility of network disruption.
+   Action required: System auto recovers from this state today. Event should
+   be followed by traps with event code 30202 or 30203"
+   ::= { vmwNsxMEdgePrefix 1 }
+
+vmwNsxMEdgeGatewayCreated NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+    }
+   STATUS current
+   DESCRIPTION
+   "Edge Gateway created.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 2 }
+
+vmwNsxMEdgeVmBadState NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Edge VM in bad state. Needs a force sync.
+   Action required: System auto triggres force sync but if problem is
+   sustained then manual force sync should be triggered. For ESG force
+   sync is disruptive and will reboot edge VMs."
+   ::= { vmwNsxMEdgePrefix 3 }
+
+vmwNsxMEdgeVmCommFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to communicate with the Edge VM.
+   Action required: Need investigation depending upon comunication channel.
+   Log needs to be checked for VIX error code for futher action."
+   ::= { vmwNsxMEdgePrefix 4 }
+
+vmwNsxMEdgeVmCnfgChanged NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Edge VM configuration is
+   changed.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 5 }
+
+vmwNsxMEdgeGatewayDeleted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge Gateway is deleted.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 6 }
+
+vmwNsxMEdgeGatewayReDeployed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge Gateway is redeployed.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 7 }
+
+vmwNsxMEdgeVmPowerOff NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Edge VM is powered off.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 8 }
+
+vmwNsxMEdgeApplianceSizeChanged NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge appliance size has
+   changed.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 9 }
+
+vmwNsxMEdgeUpgrade51x NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge Gateway is upgraded
+   to 5.1.x.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 10 }
+
+vmwNsxMEdgeLicenseChanged NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge licensing changed on
+   vCenter Server.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 11 }
+
+vmwNsxMEdgeApplianceMoved NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge appliance is moved in the vCenter
+   inventory."
+   ::= { vmwNsxMEdgePrefix 12 }
+
+vmwNsxMEdgeApplianceNotFound NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge appliance not found in
+   the vCenter inventory.
+   Action required: If VM is accidentally deleted, redeploy edge."
+   ::= { vmwNsxMEdgePrefix 13 }
+
+vmwNsxMEdgeVMHealthCheckMiss NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM is not responding to
+   health check.
+   Action required: Communicaiton issues between manager and edge. Log
+   analysis required to root cause issue."
+   ::= { vmwNsxMEdgePrefix 14 }
+
+vmwNsxMEdgeHealthCheckMiss NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when none of the Edge VMs are found
+   in serving state. There is a possibility of network disruption.
+   Action required: Commnunicaiton issues between manager and edge. Log
+   analysis required to root cause issue."
+   ::= { vmwNsxMEdgePrefix 15 }
+
+vmwNsxMEdgeCommAgentNotConnected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge Communication Agent is not
+   connected to vCenter Server.
+   Action required: Check VSM and VC connectivity. Try registering VSM to VC"
+   ::= { vmwNsxMEdgePrefix 16 }
+
+vmwNsxMApplianceWithDifferentId NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM is discovered with
+   a different vmId.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 17 }
+
+vmwNsxMFirewallRuleModified NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge firewall rule is modified.
+   Action required: Revisit firewall rule and perform required updates"
+   ::= { vmwNsxMEdgePrefix 18 }
+
+vmwNsxMEdgeAntiAffinityRuleViolated NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when powering on NSX Edge appliance
+   violates a virtual machine anti-affinity rule.
+   Action required: Anti affinity rules removed from cluster. Both HA VM may
+   run on same host. Go to VC and please revisit anti affinity rules
+   on Cluster"
+   ::= { vmwNsxMEdgePrefix 19}
+
+vmwNsxMEdgeHaEnabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Edge HighAvailability is
+   enabled.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 20 }
+
+vmwNsxMEdgeHaDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Edge HighAvailability
+   is disabled.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 21 }
+
+vmwNsxMEdgeGatewayRecovered NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Edge Gateway has recovered
+   and now responding to health check.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 22 }
+
+vmwNsxMEdgeVmRecovered NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Edge VM has recovered
+   and now responding to health check.
+   Actione required: None"
+   ::= { vmwNsxMEdgePrefix 23 }
+
+vmwNsxMEdgeGatewayUpgraded NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge Gateway is upgraded.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 24 }
+
+vmwNsxMEdgeVmHlthChkDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM health check is
+   disabled on consecutive critical vix errors. Please redeploy or force
+   sync vm to resume health check.
+   Action required: This points to environmental issues that lead to
+   repeated failure over vix. Log analysis needs to be done to identify
+   root cause. Post resoving issues force sync edge vm to resume health
+   check. Force sync and redeploy are disruptive operation."
+   ::= { vmwNsxMEdgePrefix 25 }
+
+vmwNsxMEdgePrePublishFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Pre Publish has failed on Edge
+   VM.
+   Action required: Firewall rules might be out of sync. System auto recovers
+   but if problem persists then trigger force sync."
+   ::= { vmwNsxMEdgePrefix 26 }
+
+vmwNsxMEdgeForcedSync NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM was force synced.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 27 }
+
+vmwNsxMEdgeVmBooted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM was booted.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 28 }
+
+vmwNsxMEdgeVmInBadState NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM is in Bad State. Needs
+   a force sync.
+   Action required: Force sync required."
+   ::= { vmwNsxMEdgePrefix 29 }
+
+vmwNsxMEdgeVmCpuUsageIncreased NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM CPU usage has
+   increased.
+   Action required: Spikes are normal but collect tech support logs for
+   further analysis if high CPU sustained for longer duration."
+   ::= { vmwNsxMEdgePrefix 30 }
+
+vmwNsxMEdgeVmMemUsageIncreased NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM Memory usage has
+   increased.
+   Action required: System recovers but collect tech support logs for further
+   analysis."
+   ::= { vmwNsxMEdgePrefix 31 }
+
+vmwNsxMEdgeVmProcessFailure NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM process monitor detects
+   a process failure.
+   Action required: System recovers but collect tech support logs for further
+   analysis."
+   ::= { vmwNsxMEdgePrefix 32 }
+
+vmwNsxMEdgeVmSysTimeBad NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM system time is bad.
+   Action required: System recovers. Check NTP setting on hosts."
+   ::= { vmwNsxMEdgePrefix 33 }
+
+vmwNsxMEdgeVmSysTimeSync NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM system time sync up happens.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 34 }
+
+vmwNsxMEdgeAesniCryptoEngineUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when AESNI crypto engine is up.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 35 }
+
+vmwNsxMEdgeAesniCryptoEngineDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when AESNI crypto engine is down.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 36 }
+
+vmwNsxMEdgeVmOom NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge VM is out of memory. The
+   Edge is rebooting in 3 seconds.
+   Action required: Collect tech support for further analysis."
+   ::= { vmwNsxMEdgePrefix 37 }
+
+vmwNsxMEdgeFileSysRo NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge file system is read only.
+   Action required: Check datastore issues, once resolved force sync is
+   required."
+   ::= { vmwNsxMEdgePrefix 38 }
+
+vmwNsxMEdgeHaCommDisconnected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge HighAvailability
+   communication channel is disconnected from peer node.
+   Action required: User will need to check network infrastructure
+   (virtual and physical) to look for any failures, specially on
+   the interfaces and the path configured for HA."
+   ::= { vmwNsxMEdgePrefix 39 }
+
+vmwNsxMEdgeHaSwitchOverSelf NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when High Availability is disabled for NSX Edge.
+   The primary NSX Edge VM has its state transitioned from ACTIVE to SELF.
+   High Availability (HA) ensures that NSX Edge services are always available,
+   by deploying an additional Edge VM for failover. The primary NSX Edge VM is
+   the ACTIVE node and the secondary VM is the STANDBY node. Whenever the
+   ACTIVE VM is unreachable on account of VM powered off or network
+   connectivity issues, the STANDBY VM takes over the ACTIVE vm's role.
+   In the event NSX Edge High Availability is disabled, the STANDBY VM is
+   deleted and the ACTIVE VM continues to function with its ACTIVE state
+   transitioned to SELF.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 40 }
+
+vmwNsxMEdgeHaSwitchOverActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when High Availability switch over has happened
+   for NSX Edge. The secondary NSX Edge VM has its state transitioned from
+   STANDBY to ACTIVE. High Availability (HA) ensures that NSX Edge services
+   are always available, by deploying an additional Edge VM for failover.
+   The primary NSX Edge VM is the ACTIVE node and the secondary VM is the
+   STANDBY node. Whenever the ACTIVE VM is unreachable on account of VM
+   powered off or network connectivity issues, the STANDBY VM takes over the
+   ACTIVE vm's role.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 41 }
+
+vmwNsxMEdgeHaSwitchOverStandby NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when High Availability switch over has happened
+   for NSX Edge. The primary NSX Edge VM has its state transitioned from
+   ACTIVE to STANDBY. High Availability (HA) ensures that NSX Edge services
+   are always available, by deploying an additional Edge VM for failover.
+   The primary NSX Edge VM is the ACTIVE node and the secondary VM is the
+   STANDBY node. Whenever the ACTIVE VM is unreachable on account of VM
+   powered off or network connectivity issues, the STANDBY VM takes over the
+   ACTIVE vm's role. When connectivity is re-established between the NSX Edge
+   VM's, one of the VM's state is transitioned from ACTIVE to STANDBY.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 42 }
+
+vmwNsxMEdgeMonitorProcessFailure NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Edge process monitor detected
+   a process failure.
+   Action required: Collect tech support logs for further analysis."
+   ::= { vmwNsxMEdgePrefix 43 }
+
+vmwNsxMLbVirtualServerPoolUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when LoadBalancer virtualServer/pool
+   is up.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 44 }
+
+vmwNsxMLbVirtualServerPoolDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when LoadBalancer virtualServer/pool
+   is down."
+   ::= { vmwNsxMEdgePrefix 45 }
+
+vmwNsxMLbVirtualServerPoolWrong NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when LoadBalancer virtualServer/pool state is
+   wrong."
+   ::= { vmwNsxMEdgePrefix 46 }
+
+vmwNsxMLbPoolWarning NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when LoadBalancer pool changed to a warning
+   state."
+   ::= { vmwNsxMEdgePrefix 47 }
+
+vmwNsxMIpsecChannelUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when IPsec Channel is up.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 48 }
+
+vmwNsxMIpsecChannelDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when IPsec Channel is down.
+   Action required: Collect tech support logs for further analysis."
+   ::= { vmwNsxMEdgePrefix 49 }
+
+vmwNsxMIpsecTunnelUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when IPsec Tunnel is up.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 50 }
+
+vmwNsxMIpsecTunnelDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when IPsec Tunnel is down.
+   Action required: Collect tech support logs for further analysis."
+   ::= { vmwNsxMEdgePrefix 51 }
+
+vmwNsxMIpsecChannelUnknown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when IPsec Channel status is
+   unknown.
+   Action required: Collect tech support logs for further analysis."
+   ::= { vmwNsxMEdgePrefix 52 }
+
+vmwNsxMIpsecTunnelUnknown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when IPsec Tunnel status is unknown.
+   Action required: Collect tech support logs for further analysis."
+   ::= { vmwNsxMEdgePrefix 53 }
+
+vmwNsxMGlobalLbMemberUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Global Loadbalancer member
+   status is up.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 54 }
+
+vmwNsxMGlobalLbMemberWarning NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Global Loadbalancer member
+   status is warning."
+   ::= { vmwNsxMEdgePrefix 55 }
+
+vmwNsxMGlobalLbMemberDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Global Loadbalancer member
+   status is down."
+   ::= { vmwNsxMEdgePrefix 56 }
+
+vmwNsxMGlobalLbMemberUnknown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Global Loadbalancer member
+   status is unknown."
+   ::= { vmwNsxMEdgePrefix 57 }
+
+vmwNsxMGlobalLbPeerUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Global Loadbalancer peer status
+   is up.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 58 }
+
+vmwNsxMGlobalLbPeerDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Global Loadbalancer peer status
+   is down."
+   ::= { vmwNsxMEdgePrefix 59 }
+
+vmwNsxMDhcpServiceDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when DHCP Relay Service is
+   disabled."
+   ::= { vmwNsxMEdgePrefix 60 }
+
+vmwNsxMEdgeResourceReservationFailure NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Insufficient CPU and/or Memory Resources available on Host or Resource
+   Pool, during resource reservation at the time of NSX Edge deployment.
+   Resources are explicitly reserved to ensure sufficient resources are
+   available for NSX Edge to service High Availability. User can view the
+   available resources vs reserved resources by navigating to the page
+   Home > Hosts and Clusters > [Cluster-name] > Monitor > Resource Reservation.
+   Action required: After checking available resources, re-specify the
+   resources as part of appliance configuration so that resource reservation
+   succeeds."
+   ::= { vmwNsxMEdgePrefix 61 }
+
+vmwNsxMEdgeSplitBrainDetected NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Split Brain detected for NSX Edge with HighAvailability.
+   NSX Edge VM's configured for High Availability are unable to
+   determine if the other VM is alive due to network failure. In
+   such scenario, both the VM's think the other is not alive and
+   take on the ACTIVE state. This may cause network disruption.
+   Action required: User will need to check network infrastructure
+   (virtual and physical) to look for any failures, specially on
+   the interfaces and the path configured for HA."
+   ::= { vmwNsxMEdgePrefix 62 }
+
+vmwNsxMEdgeSplitBrainRecovered NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Resolved Split Brain for NSX Edge with HighAvailability.
+   The network path used by the NSX Edge VM's High Availability has been
+   re-established. NSX Edge VM's are able to communicate with each other,
+   and one of the VM has taken the STANDBY role, resolving the ACTIVE-ACTIVE
+   split brain scenario.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 63 }
+
+vmwNsxMEdgeSplitBrainRecoveryAttempt NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Attempted Split Brain resolution for NSX Edge.
+   Split Brain recovery is being attempted on NSX Edge by NSX Manager.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 64 }
+
+vmwNsxMEdgeResourceReservationSuccess NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "User specified or system managed CPU and/or Memory Resource reservation for
+   Edge VM is successful on Cluster or Resource
+   Pool, during deployment/redeployment of NSX Edge or Edge VM appliance
+   configuration.
+   Resources are explicitly reserved to ensure sufficient resources are
+   available for NSX Edge to service High Availability. User can view the
+   available resources vs reserved resources by navigating to the page
+   Home > Hosts and Clusters > [Cluster-name] > Monitor > Resource Reservation.
+   Action required: None"
+   ::= { vmwNsxMEdgePrefix 65 }
+
+vmwNsxMEdgeSddcChannelUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "VMCI communication channel to vmcd is up on specified NSX Edge.
+   Action required: None
+   Frequency: Once when the VMCI communication channel come up.
+   URL: Nil"
+   ::= { vmwNsxMEdgePrefix 66 }
+
+vmwNsxMEdgeSddcChannelDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "VMCI communication channel to vmcd is down on specified NSX Edge.
+   Action required: Check status of vmcd daemon process.
+                    Go to the ESX host and check vmcd status /etc/init.d/vmcd status
+                    If not running, start vmcd /etc/init.d/vmcd start.
+   Frequency: Once when the VMCI communication channel goes down.
+   URL: Nil"
+   ::= { vmwNsxMEdgePrefix 67 }
+
+
+vmwNsxMEdgeHaInUseVnicChanged NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+
+   "A notification generated when internally allocated vnic
+   for HA internal communication is changed because vnic configurations
+   have changed.
+   Action required: None."
+   ::= { vmwNsxMEdgePrefix 85 }
+
+--
+-- Endpoint related traps
+--
+
+vmwNsxMEndpoint OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Endpoint related will have this OID prefix."
+    ::= { vmwNsxMNotification 5 }
+
+vmwNsxMEndpointPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Endpoint module."
+    ::= { vmwNsxMEndpoint 0 }
+
+vmwNsxMEndpointThinAgentEnabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Thin agent is enabled."
+   ::= { vmwNsxMEndpointPrefix 1 }
+
+vmwNsxMGuestIntrspctnEnabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Guest Introspection solution
+   is enabled."
+   ::= { vmwNsxMEndpointPrefix 2 }
+
+vmwNsxMGuestIntrspctnIncompatibleEsx NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Guest Introspection solution
+   was contacted by an incompatible version of the ESX module."
+   ::= { vmwNsxMEndpointPrefix 3 }
+
+vmwNsxMGuestIntrspctnEsxConnFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when connection between the ESX
+   module and the Guest Introspection solution failed."
+   ::= { vmwNsxMEndpointPrefix 4 }
+
+vmwNsxMGuestIntrspctnStatusRcvFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when failed to receive status
+   from Guest Introspection solution."
+   ::= { vmwNsxMEndpointPrefix 5 }
+
+vmwNsxMEsxModuleEnabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when ESX module is enabled."
+   ::= { vmwNsxMEndpointPrefix 6 }
+
+vmwNsxMEsxModuleUninstalled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when ESX module is uninstalled."
+   ::= { vmwNsxMEndpointPrefix 7 }
+
+vmwNsxMGuestIntrspctnHstMxMssngRep NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Guest Introspection host MUX
+   is missing report."
+   ::= { vmwNsxMEndpointPrefix 8 }
+
+vmwNsxMEndpointUndefined NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Endpoint is undefined."
+   ::= { vmwNsxMEndpointPrefix 9 }
+
+--
+-- Eam related traps
+--
+
+vmwNsxMEam OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Eam related will have this OID prefix."
+    ::= { vmwNsxMNotification 6 }
+
+vmwNsxMEamPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Eam module."
+    ::= { vmwNsxMEam 0 }
+
+vmwNsxMEamGenericAlarm NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "EAM reports problems to NSX during vib/service VM
+   install/upgrade as these traps.
+   Action required: Use resolve API to resolve the Alarm.
+   Frequency of traps: N times per cluster per user action, where N is number
+   of hosts in a cluster."
+   ::= { vmwNsxMEamPrefix 1 }
+
+--
+-- Fabric related traps
+--
+
+vmwNsxMFabric OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Fabric related will have this OID prefix."
+    ::= { vmwNsxMNotification 7 }
+
+vmwNsxMFabricPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Fabric module."
+    ::= { vmwNsxMFabric 0 }
+
+vmwNsxMFabricDplymntStatusChanged NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The status of a service on a cluster has changed. It can
+   change to RED(Failure), GREEN(Success), YELLOW(in-progress).
+   Action required: RED state would be accompanied with an
+   EAM Alarm/Event/Trap, that indicates root cause. Use resolver API to fix
+   it.
+   Frequency of traps: Once per state change. State could change 2-3 times
+   per user operation [Deploy/Undeploy/Update]"
+   ::= { vmwNsxMFabricPrefix 1 }
+
+vmwNsxMFabricDplymntUnitCreated NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager has created the required objects for deploying
+   a service on a cluster. This would be followed by deployment of the
+   service on all hosts in the cluster.
+   Action required: None
+   Frequency: Once per cluster"
+   ::= { vmwNsxMFabricPrefix 2 }
+
+vmwNsxMFabricDplymntUnitUpdated NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager has made changes in the objects required for
+   deploying a service on a cluster. This would be followed by updation of
+   the service on all hosts in the cluster.
+   Action required: None
+   Frequency of traps: Once per cluster per user operation [Update]"
+   ::= { vmwNsxMFabricPrefix 3 }
+
+vmwNsxMFabricDplymntUnitDestroyed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A service has been removed from all hosts in a cluster. NSX
+   Manager has deleted the objects for the service on the cluster.
+   Action required: None
+   Frequency of traps: Once per cluster"
+   ::= { vmwNsxMFabricPrefix 4 }
+
+vmwNsxMDataStoreNotCnfgrdOnHost NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Datastore could not be configured on host, probably its
+   not connected.
+   Action required: Ensure that datastore is connected to the host. Use
+   resolve API to resolve the Alarm. Service will be deployed.
+   Frequency of traps: Once per cluster per user operation [Deploy]."
+   ::= { vmwNsxMFabricPrefix 5 }
+
+vmwNsxMFabricDplymntInstallationFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Installation of service failed, please check if ovf/vib urls
+   are accessible, in correct format and all the properties in ovf environment
+   have been configured in service attributes. Please check logs for details.
+   Action required: Ensure that ovf/vib urls accessible from VC and are in
+   correct format. Use resolve API to resolve the Alarm. Service will
+   be deployed.
+   Frequency of traps: Once per cluster per user operation [Deploy]."
+   ::= { vmwNsxMFabricPrefix 6 }
+
+vmwNsxMFabricAgentCreated NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The service has been successfully installed on a host.
+   Action required: None
+   Frequency of traps: N times per cluster, where N is number of hosts in a
+   cluster."
+   ::= { vmwNsxMFabricPrefix 7 }
+
+vmwNsxMFabricAgentDestroyed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The service has been successfully removed from a host.
+   Action required: None
+   Frequency of traps: N times per cluster, where N is number of hosts in
+   a cluster."
+   ::= { vmwNsxMFabricPrefix 8 }
+
+vmwNsxMFabricSrvceNeedsRedplymnt NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service will need to be redeployed as the location of the
+   OVF / VIB bundles to be deployed has changed.
+   Action required: Use resolve API to resolve the Alarm. Service will be
+   redeployed.
+   Frequency of traps: N times per NSX Manager IP change, where N is number
+   of cluster and service combinations deployed."
+   ::= { vmwNsxMFabricPrefix 9 }
+
+vmwNsxMUpgradeOfDplymntFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Upgrade of deployment unit failed, please check if ovf/vib
+   urls are accessible, in correct format and all the properties in ovf
+   environment have been configured in service attributes. Please check
+   logs for details.
+   Action required: Ensure that ovf/vib urls accessible from VC and are in
+   correct format. Use resolve API to resolve the Alarm. Service will be
+   redeployed.
+   Frequency of traps: Once per cluster per user operation [Upgrade]"
+   ::= { vmwNsxMFabricPrefix 10 }
+
+vmwNsxMFabricDependenciesNotInstalled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The service being installed is dependent on another service
+   that has not yet been installed.
+   Action required: Deploy the required service on the cluster.
+   Frequency of traps: Once per cluster per user operation [Deploy]"
+   ::= { vmwNsxMFabricPrefix 11 }
+
+vmwNsxMFabricErrorNotifSecBfrUpgrade NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Error while notifying security solution before upgrade. The
+   solution may not be reachable/responding.
+   Action required: Ensure that solution urls are accessible from NSX. Use
+   resolve API to resolve the Alarm. Service will be redeployed.
+   Frequency of traps: Once per cluster per user operation [Upgrade]"
+   ::= { vmwNsxMFabricPrefix 12 }
+
+vmwNsxMFabricErrCallbackNtRcvdUpgrade NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Did not receive callback from security solution for upgrade
+   notification even after timeout.
+   Action required: Ensure that solution urls are accessible from NSX, and
+   NSX is reachable from the solution. Use resolve API to resolve the Alarm.
+   Service will be redeployed.
+   Frequency : Once per cluster per user operation [Upgrade]"
+   ::= { vmwNsxMFabricPrefix 13 }
+
+vmwNsxMFabricErrCallbackNtRcvdUninstall NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Uninstallation of service failed.
+   Action required: Ensure that solution urls are accessible from NSX, and
+   NSX is reachable from the solution. Use resolve API to resolve the Alarm.
+   Service will be removed.
+   Frequency of traps: Once per cluster per user operation [Uninstall]"
+   ::= { vmwNsxMFabricPrefix 14 }
+
+vmwNsxMFabricUninstallServiceFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Error while notifying security solution before uninstall.
+   Resolve to notify once again, or delete to uninstall without notification.
+   Action required: Ensure that solution urls are accessible from NSX, and
+   NSX is reachable from the solution. Use resolve API to resolve the Alarm.
+   Service will be removed.
+   Frequency of traps: Once per cluster per user operation [Uninstall]"
+   ::= { vmwNsxMFabricPrefix 15 }
+
+vmwNsxMFabricErrorNotifSecBfrUninstall NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Error while notifying security solution before uninstall.
+   Resolve to notify once again, or delete to uninstall without notification.
+   Action required: Ensure that solution urls are accessible from NSX, and
+   NSX is reachable from the solution. Use resolve API to resolve the Alarm.
+   Service will be removed.
+   Frequency of traps: Once per cluster per user operation [Uninstall]"
+   ::= { vmwNsxMFabricPrefix 16 }
+
+vmwNsxMFabricServerRebootUninstall NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Server rebooted while security solution notification for
+   uninstall was going on.
+   Action required: Ensure that solution urls are accessible from NSX.
+   Use resolve API to resolve the Alarm. Service will be uninstalled.
+   Frequency of traps: Once per cluster per user operation [Uninstall]"
+   ::= { vmwNsxMFabricPrefix 17 }
+
+vmwNsxMFabricServerRebootUpgrade NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Server rebooted while security solution notification for
+   upgrade was going on.
+   Action required: Ensure that solution urls are accessible from NSX.
+   Use resolve API to resolve the Alarm. Service will be redeployed.
+   Frequency of traps: Once per cluster per user operation [Upgrade]"
+   ::= { vmwNsxMFabricPrefix 18 }
+
+vmwNsxMFabricConnEamFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager relies on the ESX Agent Manager service in VC for
+   deploying/monitoring NSX vibs on ESX. The connection to this EAM service
+   has gone down. This could be due to EAM service or VC restart/stop or an
+   issue in the EAM service.
+   Action required: In the NSX UI, traverse to Manage, then NSX Management
+   Service. Verify that the status of VC connection on this page is Green.
+   Use the VC IP to verify that EAM is UP by visiting https://<vc ip>/eam/mob.
+   Frequency of traps: Once per switch from success to failed EAM connection"
+   ::= { vmwNsxMFabricPrefix 19 }
+
+vmwNsxMFabricConnEamRestored NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager relies on the EAM service in VC for
+   deploying/monitoring NSX vibs on ESX. The connection of NSX to this EAM
+   service was re-established successfully.
+   Action required: None
+   Frequency of traps: Once per switch from failed to success EAM connection"
+   ::= { vmwNsxMFabricPrefix 20 }
+
+vmwNsxMFabricPreUninstallCleanUpFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Pre Uninstall cleanup failed.
+   Action required: Use resolve API to resolve the Alarm. Service will be removed.
+   Frequency of traps: Once per cluster per user operation [Uninstall]"
+   ::= { vmwNsxMFabricPrefix 21 }
+
+vmwNsxMFabricBackingEamNotFound NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The backing EAM agency for this deployment could not be found.
+   It is possible that the VC services may still be initializing. Please try
+   to resolve the alarm to check existence of the agency. In case you have
+   deleted the agency manually, please delete the deployment entry from NSX.
+   Action required: Use resolve API to check existence of the agency, if
+   backing agency exists in EAM, else delete the deployment entry from NSX.
+   Frequency of traps: Once per cluster."
+   ::= { vmwNsxMFabricPrefix 22 }
+
+--
+-- DeploymentPlugin related traps
+--
+
+vmwNsxMDepPlugin OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are DeploymentPlugin related will have this OID
+    prefix."
+    ::= { vmwNsxMNotification 8 }
+
+vmwNsxMDepPluginPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for DeploymentPlugin module."
+    ::= { vmwNsxMDepPlugin 0 }
+
+vmwNsxMDepPluginIpPoolExhausted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "When deploying Guest Introspection or other VM based service
+   with static IP, NSX Manager needs to have a IP pool, for IP assignment to
+   the VM. This pool has been exhausted, and new service VMs cannot be
+   provisioned.
+   Action required: Traverse to the Networking & Security page on VMWare
+   vSphere Web Client, then go to Installation, followed by Service
+   Deployments. Note the IP pool name for the failed service. Now
+   traverse to NSX Managers, then go to Manage tab, followed by Grouping
+   Objects sub-tab. Click on IP Pools, and add more Ips to the static IP
+   pool. Use resolve API to resolve the Alarm. Service will be deployed.
+   Frequency of traps: N times per cluster, where N is number of hosts in
+   the cluster."
+   ::= { vmwNsxMDepPluginPrefix 1 }
+
+vmwNsxMDepPluginGenericAlarm NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Deployment plugin generic alarm.
+   Action required: Use resolve API to resolve the Alarm. Service will be
+   deployed.
+   Frequency of traps: N times per cluster, where N is number of hosts in
+   the cluster."
+   ::= { vmwNsxMDepPluginPrefix 2 }
+
+vmwNsxMDepPluginGenericException NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Deployment plugin generic exception alarm.
+   Action required: Use resolve API to resolve the Alarm. Service will be
+   deployed.
+   Frequency of traps: N times per cluster, where N is number of hosts in
+   the cluster."
+   ::= { vmwNsxMDepPluginPrefix 3 }
+
+vmwNsxMDepPluginVmReboot NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "VM needs to be rebooted for some changes to be
+   made/take effect.
+   Action required: Use resolve API to resolve the Alarm.
+   Frequency of traps: N times per cluster, where N is number of hosts in
+   the cluster."
+   ::= { vmwNsxMDepPluginPrefix 4 }
+
+--
+-- Messaging related traps
+--
+
+vmwNsxMMessaging OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Messaging related will have this OID prefix."
+    ::= { vmwNsxMNotification 9 }
+
+vmwNsxMMessagingPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Messaging module."
+    ::= { vmwNsxMMessaging 0 }
+
+vmwNsxMMessagingConfigFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when host messaging configuration
+   failed."
+   ::= { vmwNsxMMessagingPrefix 1 }
+
+vmwNsxMMessagingReconfigFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when host messaging connection
+   reconfiguration failed."
+   ::= { vmwNsxMMessagingPrefix 2 }
+
+vmwNsxMMessagingConfigFailedNotifSkip NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when host messaging configuration
+   failed and notifications were skipped."
+   ::= { vmwNsxMMessagingPrefix 3 }
+
+vmwNsxMMessagingInfraUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Manager runs a heartbeat with all hosts it manages. Missing
+   heartbeat responses from a host indicate a communication issue between
+   manager and the host. Such instances are indicated by event code 391002.
+   When the communication is restored after such an instance, it is indicated
+   by this event/trap.
+   Action required: Refer to KB article http://kb.vmware.com/kb/2133897
+   Frequency of traps: Will be seen within 3 minutes of communication being
+   restored between manager and a host.
+   URL: http://kb.vmware.com/kb/2133897"
+   ::= { vmwNsxMMessagingPrefix 4 }
+
+vmwNsxMMessagingInfraDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Manager runs a heartbeat with all hosts it manages. Missing
+   heartbeat responses from a host indicate a communication issue between
+   manager and the host. In the case of such a communication issue, this trap
+   will be sent.
+   Action required: Refer to KB article http://kb.vmware.com/kb/2133897
+   Frequency of traps: Will be seen within 6 minutes of a communication
+   failure between manager and a host.
+   URL: http://kb.vmware.com/kb/2133897"
+   ::= { vmwNsxMMessagingPrefix 5 }
+
+vmwNsxMMessagingDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A messaging client such as a Host, an Edge appliance or
+   a USVM appliance is expected to change its password within 2 hours of
+   being prepped or deployed. If the password isn't changed in this
+   duration, the messaging account for the client is disabled.
+   Action required: This event will indicate communication issue between
+   the manager and the client. Verify if the client is running.
+   If running, in case of a Host, re-sync messaging. In case of an Edge or
+   a USVM, redeploy.
+   Frequency of traps: Will be seen 2 hours after prep, host re-sync
+   or deployment of appliance.
+   URL: http://kb.vmware.com/kb/2133897"
+   ::= { vmwNsxMMessagingPrefix 6 }
+
+--
+-- ServiceComposer related traps
+--
+
+vmwNsxMServiceComposer OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are ServiceComposer related will have this OID prefix."
+    ::= { vmwNsxMNotification 10 }
+
+vmwNsxMServiceComposerPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for ServiceComposer module."
+    ::= { vmwNsxMServiceComposer 0 }
+
+vmwNsxMServiceComposerPolicyOutOfSync NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error while attempting to
+   enforce rules on this Policy.
+   Action required: Administrator needs to check the rules on the given Policy
+   for any errors, as reported in the message. After fixing the rules in the
+   Policy, user would need to resolve the alarm to bring this Policy back in
+   sync. Policy's alarm can either be resolved from NSX Manager Service Composer
+   UI or by using alarms API.
+   Frequency of traps: This trap is generated only once, if an error is
+   encountered while enforcing the Policy."
+   ::= { vmwNsxMServiceComposerPrefix 1 }
+
+vmwNsxMServiceComposerPolicyDeleted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A Policy got deleted as a result of the internal
+   SecurityGroup, over which the Policy was created, got deleted.
+   Frequency of traps: This event is generated once every time
+   any internal SecurityGroup, that is being consumed by a policy,
+   gets deleted."
+   ::= { vmwNsxMServiceComposerPrefix 2 }
+
+vmwNsxMServiceComposerFirewallPolicyOutOfSync NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error while attempting to
+   enforce Firewall rules on this Policy. Firewall related changes on this
+   Policy will not take effect, until this alarm is resolved.
+   Action required: Administrator needs to check the rules on the given Policy
+   for any errors, as reported in the message. After fixing the rules in the
+   Policy, user would need to resolve the alarm to bring this Policy back in
+   sync. Policy's alarm can either be resolved from NSX Manager Service Composer
+   UI or by using alarms API.
+   Frequency of traps: This trap is generated only once, if an error is
+   encountered while enforcing the Policy."
+   ::= { vmwNsxMServiceComposerPrefix 3 }
+
+vmwNsxMServiceComposerNetworkPolicyOutOfSync NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error while attempting to
+   enforce Network Introspection rules on this Policy. Network Introspection
+   related changes on this Policy will not take effect, until this alarm is
+   resolved.
+   Action required: Administrator needs to check the rules on the given Policy
+   for any errors, as reported in the message. After fixing the rules in the
+   Policy, user would need to resolve the alarm to bring this Policy back in
+   sync. Policy's alarm can either be resolved from NSX Manager Service Composer
+   UI or by using alarms API.
+   Frequency of traps: This trap is generated only once, if an error is
+   encountered while enforcing the Policy."
+   ::= { vmwNsxMServiceComposerPrefix 4 }
+
+vmwNsxMServiceComposerGuestPolicyOutOfSync NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error while attempting to
+   enforce Guest Introspection rules on this Policy. Guest Introspection
+   related changes on this Policy will not take effect, until this alarm
+   is resolved.
+   Action required: Administrator needs to check the rules on the given Policy
+   for any errors, as reported in the message. After fixing the rules in the
+   Policy, user would need to resolve the alarm to bring this Policy back in
+   sync. Policy's alarm can either be resolved from NSX Manager Service Composer
+   UI or by using alarms API.
+   Frequency of traps: This trap is generated only once, if an error is
+   encountered while enforcing the Policy."
+   ::= { vmwNsxMServiceComposerPrefix 5 }
+
+vmwNsxMServiceComposerOutOfSync NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error synchronizing Policies. Any changes on
+   Service Composer will not be pushed to Firewall/Network Introspection
+   Services, until this alarm is resolved.
+   Action required: Administrator needs to check Policies and/or Firewall
+   sections for any errors, as reported in the message. After fixing the errors,
+   user would need to resolve the alarm to bring Service Composer back in sync.
+   Alarm can either be resolved from NSX Manager Service Composer UI or by using
+   alarms API.
+   Frequency of traps: This trap is generated only once, whenever an error is
+   encountered."
+   ::= { vmwNsxMServiceComposerPrefix 6 }
+
+ vmwNsxMServiceComposerOutOfSyncRebootFailure NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error while synchronizing Policies on
+   reboot.
+   Action required: Administrator needs to check Policies and/or Firewall config
+   for any errors, as reported in the message. After fixing the errors, user
+   would need to resolve the alarm to bring Service Composer back in sync. Alarm
+   can either be resolved from NSX Manager Service Composer UI or by using
+   alarms API.
+   Frequency of traps: This trap is generated only once on NSX Manager reboot,
+   if an error is encountered."
+   ::= { vmwNsxMServiceComposerPrefix 7 }
+
+vmwNsxMServiceComposerOutOfSyncDraftRollback NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer went out of sync due to rollback of drafts from Firewall.
+   Any changes on Service Composer will not be pushed to Firewall/Network
+   Introspection Services, until this alarm is resolved.
+   Action required: Administrator needs to resolve the alarm to bring Service
+   Composer back in sync. Alarm can either be resolved from NSX Manager Service
+   Composer UI or by using alarms API.
+   Frequency of traps: This trap is generated only once, whenever Firewall
+   config is reverted to an older version of drafts."
+   ::= { vmwNsxMServiceComposerPrefix 8 }
+
+vmwNsxMServiceComposerOutOfSyncSectionDeletionFailure NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error while deleting the section
+   corresponding to the Policy. This generally happens if third party(NetX)
+   service's Manager is not reachable.
+   Action required: Administrator needs to check connectivity with third
+   party(NetX) service's Manager. Once the connectivity is restored, user would
+   need to resolve the alarm. Alarm can either be resolved from Service Composer
+   UI or by using alarms API.
+   Frequency of traps: This trap is generated only once if a failure is
+   encountered while deleting a Policy's section on Policy deletion."
+   ::= { vmwNsxMServiceComposerPrefix 9 }
+
+vmwNsxMServiceComposerOutOfSyncPrecedenceChangeFailure NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error reordering sections to reflect
+   Policy's precedence change. This generally happens if there are Alarms on any
+   other Policy.
+   Action required: Administrator needs to check Policies and/or Firewall
+   sections for any errors, as reported in the message. After fixing the errors,
+   user would need to resolve the alarm. Alarm can either be resolved from
+   NSX Manager Service Composer UI or by using alarms API.
+   Frequency of traps: This trap is generated only once if a failure is
+   encountered while reordering section to reflect precedence change."
+   ::= { vmwNsxMServiceComposerPrefix 10 }
+
+vmwNsxMServiceComposerOutOfSyncDraftSettingFailure NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Composer encountered an error while initializing auto save drafts
+   setting.
+   Action required: Administrator needs to check Policies and/or Firewall
+   sections for any errors, as reported in the message. After fixing the errors,
+   user would need to resolve the alarm. Alarm can either be resolved from
+   NSX Manager Service Composer UI or by using alarms API.
+   Frequency of traps: This trap is generated only once if a failure is
+   encountered while initializing auto save drafts setting."
+   ::= { vmwNsxMServiceComposerPrefix 11 }
+
+--
+-- SvmOperations related traps
+--
+
+vmwNsxMSvmOperations OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are SvmOperations related will have this OID prefix."
+    ::= { vmwNsxMNotification 11 }
+
+vmwNsxMSvmOperationsPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for SvmOperations module."
+    ::= { vmwNsxMSvmOperations 0 }
+
+vmwNsxMInconsistentSvmAlarm NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service VMs are deployed per ESX host, to provide functionality like
+   guest introspection and McAfee/Trend virus checking in VMs on the host.
+   An issue is detected with the state of the deployed Service VM. Follow
+   instructions in http://kb.vmware.com/kb/2125482 to analyze the logs
+   further. Warning: Resolving this alarm will delete the VM. After
+   deletion you will see a different alarm saying VM is deleted. If you
+   resolve same, it will reinstall the VM. If redeployment of the VM does
+   not fix the original issue, the original alarm will be added back
+   immediately.
+   Action required: Use resolve API to resolve the Alarm.
+   Frequency of traps: Once per host."
+   ::= { vmwNsxMSvmOperationsPrefix 1 }
+
+vmwNsxMSvmRestartAlarm NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service VMs are deployed per ESX host, to provide functionality like
+   guest introspection and McAfee/Trend virus checking in VMs on the host.
+   An issue is detected with the state of the deployed Service VM. Follow
+   instructions in http://kb.vmware.com/kb/2125482 to analyze the logs
+   further. Warning: Resolving this alarm will restart the VM. If the
+   root cause here is not solved, the same alarm will be added back
+   immediately.
+   Action required: Use resolve API to resolve the Alarm.
+   Frequency of traps: Once per host."
+   ::= { vmwNsxMSvmOperationsPrefix 2 }
+
+vmwNsxMSvmAgentUnavailable NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "An issue is detected while marking agent as available. Kindly
+   check the logs. Resolving this alarm will attempt to mark the agent as
+   available.
+   Action required: Use resolve API to resolve the Alarm.
+   Frequency of traps: Once per host."
+   ::= { vmwNsxMSvmOperationsPrefix 3 }
+
+--
+-- Translation related traps
+--
+
+vmwNsxMTranslation OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Translation related will have this OID prefix."
+    ::= { vmwNsxMNotification 12 }
+
+vmwNsxMTranslationPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Translation module."
+    ::= { vmwNsxMTranslation 0 }
+
+vmwNsxMVmAddedToSg NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A VM has got added to the SecurityGroup.
+   Frequency of traps: Once for every VM getting added to any SecurityGroup."
+   ::= { vmwNsxMTranslationPrefix 1 }
+
+vmwNsxMVmRemovedFromSg NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A VM has got removed from the SecurityGroup.
+   Frequency of traps: Once for every VM getting removed from any
+   SecurityGroup."
+   ::= { vmwNsxMTranslationPrefix 2 }
+
+--
+-- UniversalSync related traps
+--
+
+vmwNsxMUniversalSync OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are UniversalSync related will have this OID prefix."
+    ::= { vmwNsxMNotification 13 }
+
+vmwNsxMUniversalSyncPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for UniversalSync module."
+    ::= { vmwNsxMUniversalSync 0 }
+
+vmwNsxMFullUniversalSyncFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A failure is encountered when doing full sync of universal
+   objects on a secondary NSX manager. IP address of the secondary NSX
+   manager is present in event's message variable.
+   Action required: Kindly check NSX manager logs on the secondary NSX
+   manager on which the full sync has failed.
+   Frequency of traps: This trap is generated once per NSX manager on which
+   full sync failure is seen."
+   ::= { vmwNsxMUniversalSyncPrefix 1 }
+
+vmwNsxMSecondaryDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Secondary NSX manager is unreachable.
+   Action required: Kindly check if NSX manager is running and is reachable
+   from primary NSX manager. IP address of the secondary NSX
+   manager is present in event's message variable.
+   Frequency of traps: This trap is generated once per NSX manager for which
+   connection issue is seen."
+   ::= { vmwNsxMUniversalSyncPrefix 2 }
+
+vmwNsxMUniversalSyncFailedForEntity NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A failure is encountered when doing sync of universal object
+   on a secondary NSX manager. IP address of the secondary NSX
+   manager is present in event's message variable.
+   Action required: Kindly check NSX manager logs on the secondary NSX manager
+   on which the sync has failed.
+   Frequency of traps: This trap is generated once per universal object on
+   a NSX manager on which sync failure is seen."
+   ::= { vmwNsxMUniversalSyncPrefix 3 }
+
+--
+-- AsyncRest related traps
+--
+
+vmwNsxMAsyncRest OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are AsyncRest related will have this OID prefix."
+    ::= { vmwNsxMNotification 14 }
+
+vmwNsxMAsyncRestPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for AsyncRest module."
+    ::= { vmwNsxMAsyncRest 0 }
+
+vmwNsxMServerUp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Denotes that NSX manager server is up and in running state,
+   Informs clients of NSX Manager of the current state.
+   Action required: None
+   Frequency of traps: Once for every query"
+   ::= { vmwNsxMAsyncRestPrefix 1 }
+
+--
+-- ExtensionRegistration related traps
+--
+
+vmwNsxMExtensionRegistration OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are ExtensionRegistration related will have this
+    OID prefix."
+    ::= { vmwNsxMNotification 15 }
+
+vmwNsxMExtensionRegistrationPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for ExtensionRegistration module."
+    ::= { vmwNsxMExtensionRegistration 0 }
+
+vmwNsxMExtensionRegistered NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Registers NSX manager as a vCenter extenstion. This is
+   applicable when no other NSX Manager is registered with vCenter and the
+   current NSX manager is the one registering with vCenter.
+   Action required: None
+   Frequency of traps: Only once when the extension is registered for the
+   very first time."
+   ::= { vmwNsxMExtensionRegistrationPrefix 1 }
+
+vmwNsxMExtensionUpdated NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Updates the vCenter extension registration with the new NSX
+   Manager. This is applicable when there already exists another NSX manager
+   that is registered as a vCenter extension and the current one overwrites
+   it.
+   Action required: None
+   Frequency of traps: Every time a NSX Manager registers as a vCenter
+   extension when there already exists another NSX manager registered with
+   vCenter"
+   ::= { vmwNsxMExtensionRegistrationPrefix 2 }
+
+--
+-- Dlp related traps
+--
+
+vmwNsxMDlp OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Dlp related will have this OID prefix."
+    ::= { vmwNsxMNotification 16 }
+
+vmwNsxMDlpPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Dlp module."
+    ::= { vmwNsxMDlp 0 }
+
+vmwNsxMDataSecScanStarted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Data Security scan started
+   on VirtualMachine."
+   ::= { vmwNsxMDlpPrefix 1 }
+
+vmwNsxMDataSecScanEnded NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Data Security scan ended
+   on VirtualMachine."
+   ::= { vmwNsxMDlpPrefix 2 }
+
+--
+-- SamSystem related traps
+--
+
+vmwNsxMSamSystem OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are SamSystem related will have this OID prefix."
+    ::= { vmwNsxMNotification 17 }
+
+vmwNsxMSamSystemPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for SamSystem module."
+    ::= { vmwNsxMSamSystem 0 }
+
+vmwNsxMSamDataCollectionEnabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Activity Monitoring will start collecting data.
+   Action required: None
+   Frequency of traps: Event is triggered when SAM data collection state is
+   toggled."
+   ::= { vmwNsxMSamSystemPrefix 1 }
+
+vmwNsxMSamDataCollectionDisabled NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Activity Monitoring will stop collecting data.
+   Action required: SAM data collection can be enabled to start collectiing
+   data.
+   Frequency of traps: Event is triggered when SAM data collection state is
+   toggled"
+   ::= { vmwNsxMSamSystemPrefix 2 }
+
+vmwNsxMSamDataStoppedFlowing NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Activity Monitoring data stopped flowing from USVM
+   Action required: Check the following
+      - USVM log to see if heartbeats are recieved and sent
+      - is the USVM running
+      - is the Mux - USVM connection healthy
+      - is the USVM - RMQ connection healthy
+      - does the VM have endpoint driver installed
+   Frequency of traps: Event is triggered when NSX Manager does not receives
+   SAM data from USVM"
+   ::= { vmwNsxMSamSystemPrefix 3 }
+
+vmwNsxMSamDataResumedFlowing NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Service Activity Monitoring data resumes flowing from USVM
+   Action required: None
+   Frequency of traps: Event is triggered when SAM data is received from USVM."
+   ::= { vmwNsxMSamSystemPrefix 4 }
+
+--
+-- Usvm related traps
+--
+
+vmwNsxMUsvm OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Usvm related will have this OID prefix."
+    ::= { vmwNsxMNotification 18 }
+
+vmwNsxMUsvmPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+    vmware NSX manager specific trap OID's for Usvm module."
+    ::= { vmwNsxMUsvm 0 }
+
+vmwNsxMUsvmHeartbeatStopped NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "USVM stopped sending heartbeats to management plane.
+   Action required: Connection to NSX Manager was lost. Check why the
+   Manager didn't send a heartbeat.
+   Frequency of traps: Event is triggered when NSX Manager does not receives
+   heartbeats from USVM"
+   ::= { vmwNsxMUsvmPrefix 1 }
+
+vmwNsxMUsvmHeartbeatResumed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "USVM will start sending heartbeats to management plane.
+   Action required: None
+   Frequency of traps: Event is triggered when NSX Manager receives
+   heartbeats from USVM"
+   ::= { vmwNsxMUsvmPrefix 2 }
+
+vmwNsxMUsvmReceivedHello NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "USVM sent a HELLO message to Mux
+   Action: None
+   Frequency of traps: Event is triggered when Epsec Mux receives HELLO
+   message from USVM during initial connection establishement."
+   ::= { vmwNsxMUsvmPrefix 3 }
+
+--
+-- VsmCore related traps
+--
+
+vmwNsxMVsmCore OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are VsmCore related will have this OID prefix."
+    ::= { vmwNsxMNotification 19 }
+
+vmwNsxMVsmCorePrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for VsmCore module."
+    ::= { vmwNsxMVsmCore 0 }
+
+vmwNsxMUpgradeSuccess NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Manager upgraded
+   successfully."
+   ::= { vmwNsxMVsmCorePrefix 1 }
+
+vmwNsxMRestoreSuccess NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when NSX Manager restored
+   successfully."
+   ::= { vmwNsxMVsmCorePrefix 2 }
+
+vmwNsxMDuplicateIp NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The NSX Manager IP has been assigned to another machine
+   Action: None
+   Frequency: This is triggered whenever NSX Manager detects that its IP
+   address is being used by another machine in the same network"
+   ::= { vmwNsxMVsmCorePrefix 3 }
+
+vmwNsxMVirtualMachineMarkedAsSystemResource NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Virtual machine is marked as system resource
+   Action: None
+   Frequency: This is triggered whenever any virtual machine is marked as system
+   resource"
+   ::= { vmwNsxMVsmCorePrefix 4 }
+
+vmwNsxMScaleAboveSupportedLimits NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The scale value(s) of the mentioned parameter(s) has crossed the supported scale limits
+    Action: Reduce the scale of the parameter(s) mentioned
+    Frequency: This is triggered every hour if any new parameters cross the supported scale limits"
+   ::= { vmwNsxMVsmCorePrefix 5 }
+
+vmwNsxMScaleAboveThreshold NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The scale value(s) of the mentioned parameter(s) has crossed set threshold scale value
+    Action: Reduce the scale of the parameter(s) mentioned
+    Frequency: This is triggered every hour if any new parameters cross the set threshold value"
+   ::= { vmwNsxMVsmCorePrefix 6 }
+
+vmwNsxMScaleNormalized NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The scale value(s) of the mentioned parameter(s) is back to normal after being above the set threshold or the supported value
+    Action: No action required.
+    Frequency: This is triggered every hour if any new parameters return to normal after being above the set threshold or the supported value"
+   ::= { vmwNsxMVsmCorePrefix 7 }
+
+--
+-- Vxlan related traps
+--
+
+vmwNsxMVxlan OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Vxlan related will have this OID prefix."
+    ::= { vmwNsxMNotification 20 }
+
+vmwNsxMVxlanPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is actually the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Vxlan module."
+    ::= { vmwNsxMVxlan 0 }
+
+vmwNsxMVxlanLogicalSwitchImproperlyCnfg NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "This event is triggered if one or more distributed virtual
+   port groups backing a certain Logical Switch were modified and/or removed.
+   Or if migration of Control plane mode for a Logical Switch/Transport
+   Zone failed.
+   Action required: (1) If the event was triggered due to
+   deletion/modification of backing distributed virtual port groups, then the
+   error will be visible on Logical Switch UI page. Resolve from there will
+   try and create missing distributed virtual port groups for the Logical
+   Switch. (2) If event was triggered due to failure of Control plan mode
+   migration, redo the migration for that Logical Switch or Transport Zone.
+   Frequency of traps: Event is triggered due to user actions as explained
+   in description.
+   Affects: Logical Switch network traffic."
+   ::= { vmwNsxMVxlanPrefix 1 }
+
+vmwNsxMVxlanLogicalSwitchProperlyCnfg NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Logical Switch status has been marked good, most probably as
+   result of resolving any errors on it.
+   Action required: None
+   Frequency of traps: Event is triggered when user resolves the Logical
+   Switch error and as a result missing backing distributed virtual port
+   groups are recreated."
+   ::= { vmwNsxMVxlanPrefix 2 }
+
+vmwNsxMVxlanInitFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to configure vmknic as a VTEP, VXLAN traffic through
+   this interface will be dropped until this is resolved.
+   Action required: Check the host's vmkernel.log for more details.
+   Frequency of traps: Every time a VTEP vmknic tries to connect to it's
+   Distributed Virtual Port.
+   Affects: VXLAN traffic on the affected Host."
+   ::= { vmwNsxMVxlanPrefix 3 }
+
+vmwNsxMVxlanPortInitFailed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Failed to configure VXLAN on the Distributed Virtual Port,
+   the port will be disconnected.
+   Action required: Check the host's vmkernel.log for more details.
+   Frequency of traps: Every time a VXLAN vNic tries to connect to it's
+   Distributed Virtual Port on the host.
+   Affects: VXLAN traffic on the affected Host."
+   ::= { vmwNsxMVxlanPrefix 4 }
+
+vmwNsxMVxlanInstanceDoesNotExist NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "VXLAN configuration was received for a Distributed Virtual
+   Port, but the host has not yet enabled VXLAN on the vSphere Distributed
+   Switch. VXLAN ports on affected Host will fail to connect until resolved.
+   Action required: See KB 2107951 (https://kb.vmware.com/selfservice/microsites/search.do?cmd=displayKC&docType=kc&externalId=2107951&sliceId=1&docTypeID=DT_KB_1_1&dialogID=40732862&stateId=0%200%2040754197)
+   Frequency of traps: Every time any VXLAN related port (vNic or vmknic)
+   tries to connect to it's Distributed Virtual Port on the host.
+   Affects: VXLAN Traffic on that Host."
+   ::= { vmwNsxMVxlanPrefix 5 }
+
+vmwNsxMVxlanLogicalSwitchWrkngImproperly NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "VTEP interface was unable to join the specified multicast
+   address, the VTEP will be unable to receive some traffic from other hosts
+   until this is resolved. The host will periodically retry joining the group
+   until it is successful.
+   Action required: Check the host's vmkernel.log for more details.
+   Frequency of traps: NSX retries joining failed mcast groups every
+   5 seconds.
+   Affects: Logical Switch associated with problem VTEP interface won't work
+   properly."
+   ::= { vmwNsxMVxlanPrefix 6 }
+
+vmwNsxMVxlanTransportZoneIncorrectlyWrkng NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "The IP address of a VTEP vmknic has changed.
+   Action required: None.
+   Frequency of traps: Every time a VTEP IP changes"
+   ::= { vmwNsxMVxlanPrefix 7 }
+
+vmwNsxMVxlanTransportZoneNotUsed NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "VTEP vmknic does not have a valid IP address assigned, all
+   VXLAN traffic through this vmknic will be dropped.
+   Action required: Verify the IP configuration for the interface, and the
+   DHCP server if DHCP is used.
+   Frequency of traps: Once per VTEP loosing it's IP address."
+   ::= { vmwNsxMVxlanPrefix 8 }
+
+vmwNsxMVxlanOverlayClassMissingOnDvs NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX packages where not installed prior to DVS configuration
+   for VXLAN. All VXLAN ports will fail to connect until resolved.
+   Action required: See KB 2107951 https://kb.vmware.com/selfservice/microsites/search.do?cmd=displayKC&docType=kc&externalId=2107951&sliceId=1&docTypeID=DT_KB_1_1&dialogID=40732862&stateId=0%200%2040754197
+   Frequency of traps: Once per setting of the com.vmware.netoverlay.layer0=vxlan
+   opaque property or whenver the host is configured for vxlan or Host
+   reconnects to VCEnter and host has some problem.
+   Affects: VXLAN Traffic for that Host will be affected."
+   ::= { vmwNsxMVxlanPrefix 9 }
+
+vmwNsxMVxlanControllerRemoved NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when VXLAN Controller has been removed due to
+   the connection cant be built, please check controller IP configuration
+   and deploy again."
+   ::= { vmwNsxMVxlanPrefix 10 }
+
+vmwNsxMVxlanControllerConnProblem NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected the connection between two controller
+   nodes is broken.
+   Action required: It is a warning event, users need to check the controller
+   cluster for the further steps. Check following KB 2127655 https://kb.vmware.com/selfservice/microsites/search.do?cmd=displayKC&docType=kc&externalId=2127655&sliceId=1&docTypeID=DT_KB_1_1&dialogID=40732913&stateId=0%200%2040754965 to see if issue matches.
+   Frequency of traps: Whenever the controller reports the issue.
+   Affects: Networking might get affected."
+   ::= { vmwNsxMVxlanPrefix 11 }
+
+vmwNsxMVxlanControllerInactive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Host Certification information couldn't be sent to NSX
+   Controllers.
+   Action required: Ensure that NSX Controller cluster is in healthy state
+   before preparing a new Host. Invoke Controller Sync API to try and rectify
+   this error.
+   Frequency of traps: When a new host is prepared for NSX networking.
+   Affects: Newly prepared Host. Communication channel between Host and NSX
+   Controllers might have issues."
+   ::= { vmwNsxMVxlanPrefix 12 }
+
+vmwNsxMVxlanControllerActive NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "A notification generated when Controller cluster state is
+   now active. Controller Synchronization job is in progress.
+   Frequency of traps: Controller cluster becomes active again from a
+   previous inactive state.
+   Action required: User doesnt have to take any corrective action.
+   NSX will auto-sync the controllers."
+   ::= { vmwNsxMVxlanPrefix 13 }
+
+vmwNsxMVxlanVmknicMissingOrDeleted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "VXLAN vmknic is missing or deleted from host.
+   Action required: Issue can be resolved from Logical Network
+   Preparation - VXLAN Transport UI section. Clicking on resolve will try to
+   rectify the issue.
+   Frequency of traps: First time NSX Manager finds that VXLAN vmknic is
+   missing or deleted from Host.
+   Affects: VXLAN Traffic to/from the mentioned Host will be affected."
+   ::= { vmwNsxMVxlanPrefix 14 }
+
+vmwNsxMVxlanInfo NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager will raise this event when connection between
+   either of the following component is established/re-established
+   (i) connection between NSX Manager and Host Firewall agent.
+   (ii) connection between NSX Manager and Control Plane Agent.
+   (iii) connection between Control Plane Agent to Controllers.
+   Action required: None
+   Frequency of traps: NSX Manager will raise this event when connection
+   between either of the following component is established/re-established
+   (i) connection between NSX Manager and Host Firewall agent.
+   (ii) connection between NSX Manager and Control Plane Agent
+   (iii) connection between Control Plane Agent to Controllers."
+   ::= { vmwNsxMVxlanPrefix 15 }
+
+vmwNsxMVxlanVmknicPortGrpMissing NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected one vxlan vmknic is missing on VC.
+   Action required: Check the host, if that vmknic is deleted, click on the
+   resolve button on UI, or call the remediate API (POST /api/2.0/vdn/config/host/{hostId}/vxlan/vteps?action=remediate)
+   to recreate the vxlan vmknic.
+   Frequency of traps: First time when vxlan vmknic is detected missing
+   (manually deleted by user or inventory report the incorrect information)
+   Affects:  The VXLAN traffic on that host may be interrupted."
+   ::= { vmwNsxMVxlanPrefix 16 }
+
+vmwNsxMVxlanVmknicPortGrpAppears NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected one vxlan vmknic that was marked as
+   missing has now reappeared on VC.
+   Action required: None
+   Frequency of traps: When that missing vmknic re-appears again.
+   Affects: The VXLAN traffic on that host may be resumed."
+   ::= { vmwNsxMVxlanPrefix 17 }
+
+vmwNsxMVxlanConnDown NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "This event is triggered when either of the following
+   connections are detected down by NSX Manager:
+   (i) connection between NSX Manager and Host Firewall agent.
+   (ii) connection between NSX Manager and Control Plane Agent.
+   (iii) connection between Control Plane Agent to Controllers.
+   Action required:
+   (i) If NSX Manager to Host Firewall Agent connection is
+   down, check NSX Manager and Firewall Agent logs to get error details. You
+   can try Fabric Synchronize API to try and retificy this issue.
+   (ii) If NSX Manager to Control Plane Agent connection is down, please
+   check NSX Manager and Control Plane Agent logs to get the error detail,
+   check whether the Control Plane Agent process is down.
+   (iii) If Control Plane Agent to Controllers connection is down, please go
+   to UI Installation page to check the connection status for crossponding
+   Host.
+   Frequency of traps: When
+   (i) NSX Manager looses connection with Firewall agent on host or
+   (ii) NSX Manager losses connection with Control plane agent on host or
+   (iii) Control plane agent on Host looses connection with NSX Controllers.
+   Affects: VMs on that Host might get affected."
+   ::= { vmwNsxMVxlanPrefix 18 }
+
+vmwNsxMBackingPortgroupMissing NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected one backing portgroup of a logical
+   switch is missing on VCenter.
+   Action required: Click on the resolve button on UI or call the API
+   (POST https://<nsx-manager-host>/api/2.0/vdn/virtualwires/<virtualwireId>/backing?action=remediate)
+   to recreate that backing portgroup.
+   Frequency of traps: Whenever logical switch backing portgroup is missing
+   on VC.
+   Affects: VMs cannot be connected to this Logical Switch."
+   ::= { vmwNsxMVxlanPrefix 19 }
+
+vmwNsxMBackingPortgroupReappears NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected one backing portgroup of a logical
+   switch that was missing reappears on VC.
+   Action required: None
+   Frequency of traps: Whenever user triggered remediate API on Logical
+   Switch which has missing backing portgroup."
+   ::= { vmwNsxMVxlanPrefix 20 }
+
+vmwNsxMManagedObjectIdChanged NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected the Managed Objectid of one backing
+   portgroup of a logical switch changed.
+   Action required: None
+   Frequnecy of traps: This typically happens when user restores a backup
+   of Logical Switch backing portgroup."
+   ::= { vmwNsxMVxlanPrefix 21 }
+
+vmwNsxMHighLatencyOnDisk NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected some disk on a NSX Controller has high
+   latency.
+   Action required: Rectify the issue on specified device and controller.
+   Frequency of traps: First time NSX detected this issue as reported by
+   Controller. When this issue gets resolved another Informational event will
+   be raised by NSX Manager indicating the same.
+   Affects: NSX Controller."
+   ::= { vmwNsxMVxlanPrefix 22 }
+
+vmwNsxMHighLatencyOnDiskResolved NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected the disk high latency alert on a some
+   disk on a NSX Controller has been resolved.
+   Frequency of traps: First time NSX detected, previously raised disk
+   latency issue has been resolved."
+   ::= { vmwNsxMVxlanPrefix 23 }
+
+vmwNsxMControllerVmPoweredOff NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected a Controller Virtual Machine is powered
+   off from vCenter.
+   Action required: Click on the 'Resolve' button on Controller page on UI or
+   call the API (POST https://<nsx-manager-host>/api/2.0/vdn/controller/{controllerId}?action=remediate)
+   to power on the Controller Virtual Machine.
+   Frequency of traps: This event wil be raised when controller Virtual
+   Machine is powered off from vCenter.
+   Affects: Controller cluster status might go to disconnected if a controller
+   Virtual Machine is powered off. Any operation that requires an active
+   Controller Cluster may be affected."
+   ::= { vmwNsxMVxlanPrefix 24 }
+
+vmwNsxMControllerVmDeleted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected a Controller Virtual Machine is deleted
+   from vCenter.
+   Action required: Click on the Resolve button on Controller page on UI or
+   call the API (POST https://<nsx-manager-host>/api/2.0/vdn/controller/{controllerId}?action=remediate)
+   to clean up NSX manager's database state.
+   Frequency of traps: This event will be raised when Controller Virtual
+   Machine is deleted from vCenter.
+   Affects: Controller cluster status might go to disconnected if a controller
+   Virtual Machine is powered off. Any operation that requires an active
+   Controller Cluster may be affected."
+   ::= { vmwNsxMVxlanPrefix 25 }
+
+vmwNsxMVxlanConfigNotSet NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX manager detected the VXLAN configuration is not set on
+   the host (would-block issue). And this event indicates NSX Manager tried
+   to rectify this issue by resending the VXLAN configuration on Host.
+   Action required: See KB 2107951 https://kb.vmware.com/selfservice/microsites/search.do?cmd=displayKC&docType=kc&externalId=2107951&sliceId=1&docTypeID=DT_KB_1_1&dialogID=40732862&stateId=0%200%2040754197
+   for more information.
+   Frequency of traps: This event will generate when host preparation task is
+   triggered for a host and Host encounters would-block issue.
+   Affects: It is a notification, no specific guide for the next step."
+   ::= { vmwNsxMVxlanPrefix 26 }
+
+vmwNsxMVxlanPortgroupDeleted NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "NSX Manager will raise this event when a VXLAN portgroup is deleted from
+   a switch.
+   ACTION: User does not have to take any action. This is just a notification
+   for the user.
+   FREQUENCY: This event is generated a single time when the VXLAN portgroup
+   is deleted from the switch.
+   AFFECTS: The VXLAN traffic on the switch is interrupted."
+   ::= { vmwNsxMVxlanPrefix 27 }
+
+vmwNsxMVxlanVDSandPgMismatch NOTIFICATION-TYPE
+   OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "DESCRIPTION: NSX Manager will raise this event when the teaming policies of
+   a VDS and it's associated VXLAN portgroup are not the same.
+   ACTION: Set the VXLAN portgroup teaming policy back to the original value.
+   Below is the workaround to correctly update the teaming policy in a deployed
+   cluster: The supported method to correct teaming policy inconsistencies is
+   to create and prepare a new NSX cluster with the required teaming policy,
+   and to migrate ESXi hosts to that cluster. Changing the teaming policy in
+   the manager DB by some other means only applies to newly created virtual
+   wires after the DB change is made.
+   FREQUENCY: This event will generate whenever the VXLAN portgroup teaming
+   policy is changed to something different than the VDS teaming policy.
+   AFFECTS: The VXLAN traffic on the switch may be interrupted."
+   ::= { vmwNsxMVxlanPrefix 28 }
+
+
+--
+--  Domain Controller Event Log server related trap
+--
+vmwNsxMLogserver OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Domain Controller Event Log server related will have this OID prefix."
+    ::= { vmwNsxMNotification 21 }
+
+vmwNsxMLogserverPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is the prefix one uses when creating
+     vmware NSX manager specific trap OID's for VsmCore module."
+    ::= { vmwNsxMLogserver 0 }
+
+vmwNsxMLogserverEventGenStopped NOTIFICATION-TYPE
+    OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "DESCRIPTION: This event is triggered if the security log on domain controller event log server is full.
+    ACTION: See article regarding the issue : https://support.microsoft.com/en-us/kb/867860
+            Contact Domain Administrator to take one of the following actions:
+            (1). Inclease the size of security log.
+            (2). Clear the security log.
+            (3). Archive the security log.
+    FREQUENCY: Event is triggered due to event log size reaches its limit.
+    AFFECTS: Identity firewall stops functioning."
+   ::= { vmwNsxMLogserverPrefix 1 }
+
+--
+--  Application Rule Manager Event Log related trap
+--
+vmwNsxMApplicationRuleManager OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "Notifications that are Application Rule Manager related will have this OID prefix."
+    ::= { vmwNsxMNotification 22 }
+
+vmwNsxMApplicationRuleManagerPrefix OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+    "This group is the prefix one uses when creating
+     vmware NSX manager specific trap OID's for Application Rule Manager module."
+    ::= { vmwNsxMApplicationRuleManager 0 }
+
+vmwNsxMApplicationRuleManagerFlowAnalysisStart NOTIFICATION-TYPE
+    OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Started flow analysis on Application Rule Manager session.
+   Action required: None
+   Frequency of traps:This trap is sent once for each session on which analysis has started"
+   ::= { vmwNsxMApplicationRuleManagerPrefix 1 }
+
+vmwNsxMApplicationRuleManagerFlowAnalysisFailed NOTIFICATION-TYPE
+    OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Flow analysis failed on Application Rule Manager session.
+   Contextual data provided with this event may indicate the cause of this failure.
+   Action required: Start a new monitoring session for the applcation and try analyzing flows again.
+   On repeated failure, collect ESX & NSX Manager tech support bundle and open SR with Vmware tech support.
+   Frequency of traps:This trap is sent once for each session on which analysis has failed"
+   ::= { vmwNsxMApplicationRuleManagerPrefix 2 }
+
+vmwNsxMApplicationRuleManagerFlowAnalysisComplete NOTIFICATION-TYPE
+    OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid
+   }
+   STATUS current
+   DESCRIPTION
+   "Completed flow analysis on Application Rule Manager session.
+   Action required: None
+   Frequency of traps:This trap is sent once for each session on which analysis has completed"
+   ::= { vmwNsxMApplicationRuleManagerPrefix 3 }
+
+-- conformance information
+vmwNsxManagerMIBConformance OBJECT IDENTIFIER ::= { vmwNsxManagerMIB 99 }
+vmwNsxManagerMIBCompliances OBJECT IDENTIFIER ::=
+                                        { vmwNsxManagerMIBConformance 1 }
+vmwNsxManagerMIBGroups OBJECT IDENTIFIER ::= { vmwNsxManagerMIBConformance 2 }
+
+-- compliance statements
+vmwNsxManagerMIBBasicCompliance MODULE-COMPLIANCE
+    STATUS     deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB."
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                             vmwNsxManagerNotificationGroup1 }
+    ::= { vmwNsxManagerMIBCompliances 3 }
+
+vmwNsxManagerNotificationInfoGroup1 OBJECT-GROUP
+    OBJECTS {
+      vmwNsxMEventCode,
+      vmwNsxMEventTimestamp,
+      vmwNsxMEventMessage,
+      vmwNsxMEventSeverity,
+      vmwNsxMEventComponent,
+      vmwNsxMUuid,
+      vmwNsxMCount
+    }
+    STATUS current
+    DESCRIPTION
+    "These objects provide details in NSX Manager notifications."
+    ::= { vmwNsxManagerMIBGroups 2 }
+
+vmwNsxManagerNotificationGroup1 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMConfigGroup,
+       vmwNsxMIpAddedBlackList,
+       vmwNsxMIpRemovedBlackList,
+       vmwNsxMSsoConfigFailure,
+       vmwNsxMSsoUnconfigured,
+       vmwNsxMUserRoleAssigned,
+       vmwNsxMUserRoleUnassigned,
+       vmwNsxMGroupRoleAssigned,
+       vmwNsxMGroupRoleUnassigned,
+       vmwNsxMVcLoginFailed,
+       vmwNsxMVcDisconnected,
+       vmwNsxMLostVcConnectivity,
+       vmwNsxMFltrCnfgUpdateFailed,
+       vmwNsxMFltrCnfgNotAppliedToVnic,
+       vmwNsxMFltrCnfgAppliedToVnic,
+       vmwNsxMFltrCreatedForVnic,
+       vmwNsxMFltrDeletedForVnic,
+       vmwNsxMFirewallConfigUpdateFailed,
+       vmwNsxMFirewallRuleFailedVnic,
+       vmwNsxMFirewallRuleAppliedVnic,
+       vmwNsxMCntnrCnfgUpdateFailed,
+       vmwNsxMFlowMissed,
+       vmwNsxMSpoofGuardCnfgUpdateFailed,
+       vmwNsxMSpoofGuardFailed,
+       vmwNsxMSpoofGuardApplied,
+       vmwNsxMSpoofGuardDisableFail,
+       vmwNsxMSpoofGuardDisabled,
+       vmwNsxMLegacyAppServiceDeletionFailed,
+       vmwNsxMFirewallCpuThresholdCrossed,
+       vmwNsxMFirewallMemThresholdCrossed,
+       vmwNsxMConnPerSecThrshldCrossed,
+       vmwNsxMFirewallCnfgUpdateTimedOut,
+       vmwNsxMSpoofGuardCnfgUpdateTmOut,
+       vmwNsxMFirewallPublishFailed,
+       vmwNsxMCntnrUpdatePublishFailed,
+       vmwNsxMSpoofGuardUpdatePublishFailed,
+       vmwNsxMExcludeListPublishFailed,
+       vmwNsxMFirewallCnfgUpdateOnDltCntnr,
+       vmwNsxMHostSyncFailed,
+       vmwNsxMHostSynced,
+       vmwNsxMFirewallInstalled,
+       vmwNsxMFirewallClusterInstalled,
+       vmwNsxMFirewallClusterUninstalled,
+       vmwNsxMFirewallClusterDisabled,
+       vmwNsxMEdgeNoVmServing,
+       vmwNsxMEdgeGatewayCreated,
+       vmwNsxMEdgeVmBadState,
+       vmwNsxMEdgeVmCommFailed,
+       vmwNsxMEdgeVmCnfgChanged,
+       vmwNsxMEdgeGatewayDeleted,
+       vmwNsxMEdgeGatewayReDeployed,
+       vmwNsxMEdgeVmPowerOff,
+       vmwNsxMEdgeApplianceSizeChanged,
+       vmwNsxMEdgeUpgrade51x,
+       vmwNsxMEdgeLicenseChanged,
+       vmwNsxMEdgeApplianceMoved,
+       vmwNsxMEdgeApplianceNotFound,
+       vmwNsxMEdgeVMHealthCheckMiss,
+       vmwNsxMEdgeHealthCheckMiss,
+       vmwNsxMEdgeCommAgentNotConnected,
+       vmwNsxMApplianceWithDifferentId,
+       vmwNsxMFirewallRuleModified,
+       vmwNsxMEdgeAntiAffinityRuleViolated,
+       vmwNsxMEdgeHaEnabled,
+       vmwNsxMEdgeHaDisabled,
+       vmwNsxMEdgeHaInUseVnicChanged,
+       vmwNsxMEdgeGatewayRecovered,
+       vmwNsxMEdgeVmRecovered,
+       vmwNsxMEdgeGatewayUpgraded,
+       vmwNsxMEdgeVmHlthChkDisabled,
+       vmwNsxMEdgePrePublishFailed,
+       vmwNsxMEdgeForcedSync,
+       vmwNsxMEdgeVmBooted,
+       vmwNsxMEdgeVmInBadState,
+       vmwNsxMEdgeVmCpuUsageIncreased,
+       vmwNsxMEdgeVmMemUsageIncreased,
+       vmwNsxMEdgeVmProcessFailure,
+       vmwNsxMEdgeVmSysTimeBad,
+       vmwNsxMEdgeVmSysTimeSync,
+       vmwNsxMEdgeAesniCryptoEngineUp,
+       vmwNsxMEdgeAesniCryptoEngineDown,
+       vmwNsxMEdgeVmOom,
+       vmwNsxMEdgeFileSysRo,
+       vmwNsxMEdgeHaCommDisconnected,
+       vmwNsxMEdgeHaSwitchOverSelf,
+       vmwNsxMEdgeHaSwitchOverActive,
+       vmwNsxMEdgeHaSwitchOverStandby,
+       vmwNsxMEdgeMonitorProcessFailure,
+       vmwNsxMLbVirtualServerPoolUp,
+       vmwNsxMLbVirtualServerPoolDown,
+       vmwNsxMLbVirtualServerPoolWrong,
+       vmwNsxMLbPoolWarning,
+       vmwNsxMIpsecChannelUp,
+       vmwNsxMIpsecChannelDown,
+       vmwNsxMIpsecTunnelUp,
+       vmwNsxMIpsecTunnelDown,
+       vmwNsxMIpsecChannelUnknown,
+       vmwNsxMIpsecTunnelUnknown,
+       vmwNsxMGlobalLbMemberUp,
+       vmwNsxMGlobalLbMemberWarning,
+       vmwNsxMGlobalLbMemberDown,
+       vmwNsxMGlobalLbMemberUnknown,
+       vmwNsxMGlobalLbPeerUp,
+       vmwNsxMGlobalLbPeerDown,
+       vmwNsxMDhcpServiceDisabled,
+       vmwNsxMEndpointThinAgentEnabled,
+       vmwNsxMGuestIntrspctnEnabled,
+       vmwNsxMGuestIntrspctnIncompatibleEsx,
+       vmwNsxMGuestIntrspctnEsxConnFailed,
+       vmwNsxMGuestIntrspctnStatusRcvFailed,
+       vmwNsxMEsxModuleEnabled,
+       vmwNsxMEsxModuleUninstalled,
+       vmwNsxMGuestIntrspctnHstMxMssngRep,
+       vmwNsxMEndpointUndefined,
+       vmwNsxMEamGenericAlarm,
+       vmwNsxMFabricDplymntStatusChanged,
+       vmwNsxMFabricDplymntUnitCreated,
+       vmwNsxMFabricDplymntUnitUpdated,
+       vmwNsxMFabricDplymntUnitDestroyed,
+       vmwNsxMDataStoreNotCnfgrdOnHost,
+       vmwNsxMFabricDplymntInstallationFailed,
+       vmwNsxMFabricAgentCreated,
+       vmwNsxMFabricAgentDestroyed,
+       vmwNsxMFabricSrvceNeedsRedplymnt,
+       vmwNsxMUpgradeOfDplymntFailed,
+       vmwNsxMFabricDependenciesNotInstalled,
+       vmwNsxMFabricErrorNotifSecBfrUpgrade,
+       vmwNsxMFabricErrCallbackNtRcvdUpgrade,
+       vmwNsxMFabricErrCallbackNtRcvdUninstall,
+       vmwNsxMFabricUninstallServiceFailed,
+       vmwNsxMFabricErrorNotifSecBfrUninstall,
+       vmwNsxMFabricServerRebootUninstall,
+       vmwNsxMFabricServerRebootUpgrade,
+       vmwNsxMFabricConnEamFailed,
+       vmwNsxMFabricConnEamRestored,
+       vmwNsxMFabricPreUninstallCleanUpFailed,
+       vmwNsxMFabricBackingEamNotFound,
+       vmwNsxMDepPluginIpPoolExhausted,
+       vmwNsxMDepPluginGenericAlarm,
+       vmwNsxMDepPluginGenericException,
+       vmwNsxMDepPluginVmReboot,
+       vmwNsxMMessagingConfigFailed,
+       vmwNsxMMessagingReconfigFailed,
+       vmwNsxMMessagingConfigFailedNotifSkip,
+       vmwNsxMMessagingInfraUp,
+       vmwNsxMMessagingInfraDown,
+       vmwNsxMMessagingDisabled,
+       vmwNsxMServiceComposerPolicyOutOfSync,
+       vmwNsxMServiceComposerPolicyDeleted,
+       vmwNsxMInconsistentSvmAlarm,
+       vmwNsxMSvmRestartAlarm,
+       vmwNsxMSvmAgentUnavailable,
+       vmwNsxMVmAddedToSg,
+       vmwNsxMVmRemovedFromSg,
+       vmwNsxMFullUniversalSyncFailed,
+       vmwNsxMSecondaryDown,
+       vmwNsxMUniversalSyncFailedForEntity,
+       vmwNsxMServerUp,
+       vmwNsxMExtensionRegistered,
+       vmwNsxMExtensionUpdated,
+       vmwNsxMDataSecScanStarted,
+       vmwNsxMDataSecScanEnded,
+       vmwNsxMSamDataCollectionEnabled,
+       vmwNsxMSamDataCollectionDisabled,
+       vmwNsxMSamDataStoppedFlowing,
+       vmwNsxMSamDataResumedFlowing,
+       vmwNsxMUsvmHeartbeatStopped,
+       vmwNsxMUsvmHeartbeatResumed,
+       vmwNsxMUsvmReceivedHello,
+       vmwNsxMUpgradeSuccess,
+       vmwNsxMRestoreSuccess,
+       vmwNsxMVxlanLogicalSwitchImproperlyCnfg,
+       vmwNsxMVxlanLogicalSwitchProperlyCnfg,
+       vmwNsxMVxlanInitFailed,
+       vmwNsxMVxlanPortInitFailed,
+       vmwNsxMVxlanInstanceDoesNotExist,
+       vmwNsxMVxlanLogicalSwitchWrkngImproperly,
+       vmwNsxMVxlanTransportZoneIncorrectlyWrkng,
+       vmwNsxMVxlanTransportZoneNotUsed,
+       vmwNsxMVxlanOverlayClassMissingOnDvs,
+       vmwNsxMVxlanControllerRemoved,
+       vmwNsxMVxlanControllerConnProblem,
+       vmwNsxMVxlanControllerInactive,
+       vmwNsxMVxlanControllerActive,
+       vmwNsxMVxlanVmknicMissingOrDeleted,
+       vmwNsxMVxlanInfo,
+       vmwNsxMVxlanVmknicPortGrpMissing,
+       vmwNsxMVxlanVmknicPortGrpAppears,
+       vmwNsxMVxlanConnDown,
+       vmwNsxMSamDataCollectionDisabled,
+       vmwNsxMSamDataStoppedFlowing,
+       vmwNsxMSamDataResumedFlowing,
+       vmwNsxMVxlanOverlayClassMissingOnDvs,
+       vmwNsxMVxlanControllerRemoved,
+       vmwNsxMVxlanControllerConnProblem,
+       vmwNsxMVxlanControllerInactive,
+       vmwNsxMSsoDisconnected,
+       vmwNsxMFirewallInstallFailed,
+       vmwNsxMFirewallForceSyncClusterFailed,
+       vmwNsxMFirewallForceSyncClusterSuccess,
+       vmwNsxMFirewallVsfwdProcessStarted,
+       vmwNsxMEdgeResourceReservationFailure,
+       vmwNsxMEdgeSplitBrainDetected,
+       vmwNsxMEdgeSplitBrainRecovered,
+       vmwNsxMEdgeSplitBrainRecoveryAttempt,
+       vmwNsxMServiceComposerFirewallPolicyOutOfSync,
+       vmwNsxMServiceComposerNetworkPolicyOutOfSync,
+       vmwNsxMServiceComposerGuestPolicyOutOfSync,
+       vmwNsxMServiceComposerOutOfSync,
+       vmwNsxMServiceComposerOutOfSyncRebootFailure,
+       vmwNsxMServiceComposerOutOfSyncDraftRollback,
+       vmwNsxMServiceComposerOutOfSyncSectionDeletionFailure,
+       vmwNsxMServiceComposerOutOfSyncPrecedenceChangeFailure,
+       vmwNsxMServiceComposerOutOfSyncDraftSettingFailure,
+       vmwNsxMBackingPortgroupMissing,
+       vmwNsxMBackingPortgroupReappears,
+       vmwNsxMManagedObjectIdChanged,
+       vmwNsxMHighLatencyOnDisk,
+       vmwNsxMHighLatencyOnDiskResolved,
+       vmwNsxMControllerVmPoweredOff,
+       vmwNsxMControllerVmDeleted,
+       vmwNsxMVxlanConfigNotSet,
+       vmwNsxMSnmpDisabled,
+       vmwNsxMSnmpManagerConfigUpdated,
+       vmwNsxMDuplicateIp
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 3 }
+
+
+vmwNsxManagerMIB630Compliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        VMWARE-NSX-MANAGER-MIB, see VMWARE-NSX-MANAGER-AGENTCAP-MIB"
+    MODULE -- this module
+    MANDATORY-GROUPS { vmwNsxManagerNotificationInfoGroup1,
+                       vmwNsxManagerNotificationGroup1,
+                       vmwNsxManagerNotificationGroup2 }
+    ::= { vmwNsxManagerMIBCompliances 4 }
+
+vmwNsxManagerNotificationGroup2 NOTIFICATION-GROUP
+       NOTIFICATIONS {
+       vmwNsxMFirewallRulesetApplyAllFailed,
+       vmwNsxMFirewallRulesetAppliedAll,
+       vmwNsxMCntnrCnfgApplyFailedToVnic,
+       vmwNsxMCntnrCnfgApplyAllFailedToVnic,
+       vmwNsxMCntnrCnfgAppliedAllToVnic,
+       vmwNsxMSpoofGuardApplyAllFailed,
+       vmwNsxMSpoofGuardAppliedAll,
+       vmwNsxMFirewallTimeoutUpdateFailed,
+       vmwNsxMFirewallTimeoutApplyFailed,
+       vmwNsxMFirewallTimeoutApplied,
+       vmwNsxMFirewallTimeoutApplyAllFailed,
+       vmwNsxMFirewallTimeoutAppliedAll,
+       vmwNsxMCntnrCnfgAppliedToVnic,
+       vmwNsxMLogserverEventGenStopped,
+       vmwNsxMApplicationRuleManagerFlowAnalysisStart,
+       vmwNsxMApplicationRuleManagerFlowAnalysisFailed,
+       vmwNsxMApplicationRuleManagerFlowAnalysisComplete,
+       vmwNsxMEdgeResourceReservationSuccess,
+       vmwNsxMVirtualMachineMarkedAsSystemResource,
+       vmwNsxMEdgeSddcChannelUp,
+       vmwNsxMEdgeSddcChannelDown,
+       vmwNsxMScaleAboveSupportedLimits,
+       vmwNsxMScaleAboveThreshold,
+       vmwNsxMScaleNormalized,
+       vmwNsxMVxlanPortgroupDeleted,
+       vmwNsxMVxlanVDSandPgMismatch
+       }
+       STATUS current
+       DESCRIPTION
+           "Group of objects describing notifications (traps, informs)."
+       ::= { vmwNsxManagerMIBGroups 4 }
+
+END

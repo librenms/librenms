@@ -1,0 +1,157 @@
+-- ============================================================================
+-- AT-ETH.MIB, Allied Telesis enterprise MIB: FILE module
+--
+-- Extracted from ATROUTER.MIB of pre 2.9.1 release
+--
+-- June 2006, Stan Xiang
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-FILE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE
+    	FROM SNMPv2-SMI
+
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+
+	ifIndex
+		FROM IF-MIB
+
+	modules,
+	DisplayStringUnsized
+		FROM AT-SMI-MIB
+;
+                                 
+file MODULE-IDENTITY
+	    LAST-UPDATED "200606281222Z"
+    	ORGANIZATION "Allied Telesis, Inc"
+		CONTACT-INFO
+		    "http://www.alliedtelesis.com"
+		DESCRIPTION
+		    "This MIB file contains definitions of managed objects for the
+	    	FILE module. "
+
+	    REVISION "200606281222Z"
+		DESCRIPTION
+			"Initial Revision"
+
+::= { modules 56 }
+
+-- The file group. This group contains information pertinent to the file system in the
+-- router.
+
+-- The file table
+
+fileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF FileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of all the files in the router's non-volatile storage."
+    ::= { file 1 }
+
+fileEntry OBJECT-TYPE
+    SYNTAX      FileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry in the list of files containing information about a
+            single file in the router."
+    INDEX   { fileIndex }
+    ::= { fileTable 1 }
+
+FileEntry ::=
+    SEQUENCE {
+        fileIndex
+            INTEGER,
+        fileName
+            DisplayString,
+        fileDevice
+            INTEGER,
+        fileCreationTime
+            DisplayString,
+        fileStatus
+            INTEGER,
+        fileSize
+            INTEGER
+    }
+
+fileIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique file index. File indices are recalculated every time
+            the router reboots to reflect the current files on the router.
+            As files are added, new indices are allocated to the new
+            files."
+    ::= { fileEntry 1 }
+
+fileName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The name of the file, in the form <name.typ>. The name is up
+            to eight characters long, the type is up to three characters
+            long."
+    ::= { fileEntry 2 }
+
+fileDevice OBJECT-TYPE
+    SYNTAX      INTEGER {
+                flash(1),
+                nvs(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The device on which the file resides."
+    ::= { fileEntry 3 }
+
+fileCreationTime OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The creation date and time for the file, in the format
+            <dd-mmm-yy, hh:mm:ss>."
+    ::= { fileEntry 4 }
+
+fileStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                ok(1),      -- file exists and is OK
+                deleting(2) -- delete the file when this value written
+            }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The status of the file. When read, this object will always
+            return a value of ok(1), since the object will not exist if the
+            value is deleting(2). Write the value deleting(2) to this
+            object to delete the file."
+    ::= { fileEntry 5 }
+
+fileSize OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The size, in bytes, of the file."
+    ::= { fileEntry 6 }
+
+fileNumbers OBJECT-TYPE
+    SYNTAX      INTEGER  
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The total number of files in FLASH and NVS."
+   ::= { file 2 }
+END

@@ -1,0 +1,93 @@
+mib: PBI-4000P-5000P-MIB
+modules:
+     sensors:
+         dbm:
+             data:
+                -
+                     oid: tunerBER
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.7.{{ $index }}'
+                     descr: 'BER'
+                     index: 'tunerBER.{{ $index }}'
+                -
+                     oid: tunerCN
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.8.{{ $index }}'
+                     descr: 'C/N'
+                     index: 'tunerCN.{{ $index }}'
+                     divisor: 10
+                -
+                     oid: tunerEbNo
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.9.{{ $index }}'
+                     descr: 'Eb/N0'
+                     index: 'tunerEbNo.{{ $index }}'
+                     divisor: 10
+         signal:
+             data:
+                -
+                     oid: tunerStrength
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.6.{{ $index }}'
+                     descr: 'Signal Strength'
+                     index: 'tunerStrength.{{ $index }}'
+                     divisor: -10
+         state:
+             data:
+                -
+                     oid: tunerLock
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.1.1.{{ $index }}'
+                     descr: Tuner Lock
+                     state_name: tunerLock
+                     states:
+                         - { descr: No, graph: 1, value: 0, generic: 3 }
+                         - { descr: Yes, graph: 1, value: 1, generic: 0 }
+                -
+                     oid: lnbVoltage
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.3.4.{{ $index }}'
+                     descr: LNB Voltage
+                     state_name: lnbVoltage
+                     states:
+                         - { descr: Off, graph: 1, value: 0, generic: 3 }
+                         - { descr: 13V, graph: 1, value: 1, generic: 0 }
+                         - { descr: 18V, graph: 1, value: 2, generic: 0 }
+                -
+                     oid: lnb22KHz
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.3.5.{{ $index }}'
+                     descr: LNB 22KHz
+                     state_name: lnb22KHz
+                     states:
+                         - { descr: Off, graph: 1, value: 0, generic: 3 }
+                         - { descr: On, graph: 1, value: 1, generic: 0 }
+                -
+                     oid: diseqc
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.3.6.{{ $index }}'
+                     descr: DiSEqC
+                     state_name: diseq
+                     states:
+                         - { descr: Off, graph: 1, value: 0, generic: 3 }
+                         - { descr: PortA, graph: 1, value: 1, generic: 0 }
+                         - { descr: PortB, graph: 1, value: 2, generic: 0 }
+                         - { descr: PortC, graph: 1, value: 3, generic: 0 }
+                         - { descr: PortD, graph: 1, value: 4, generic: 0 }
+                -
+                     oid: linkStatus
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.1.3.4.{{ $index }}'
+                     descr: Eth Link Status
+                     state_name: linkStatus
+                     states:
+                         - { descr: Off, graph: 1, value: 0, generic: 3 }
+                         - { descr: 10 MB, graph: 1, value: 1, generic: 2 }
+                         - { descr: 100 MB, graph: 1, value: 2, generic: 0 }
+                -
+                     oid: ciSource
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.11.1.{{ $index }}'
+                     descr: CI Source
+                     state_name: ciSource
+                     states:
+                         - { descr: ASI, graph: 1, value: 0, generic: 0 }
+                         - { descr: Tuner, graph: 1, value: 1, generic: 0 }  
+                -
+                     oid: ciLock
+                     num_oid: '.1.3.6.1.4.1.1070.3.1.1.104.11.6.{{ $index }}'
+                     descr: CI Lock
+                     state_name: ciLock
+                     states:
+                         - { descr: No, graph: 1, value: 0, generic: 3 }
+                         - { descr: Yes, graph: 1, value: 1, generic: 0 }

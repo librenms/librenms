@@ -1,0 +1,269 @@
+-- **********************************************************
+-- Copyright 2007-2011 VMware, Inc.  All rights reserved. 
+-- **********************************************************
+
+VMWARE-RESOURCES-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Gauge32, Integer32
+    FROM SNMPv2-SMI
+        DisplayString
+    FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+    FROM SNMPv2-CONF
+        VmwSubsystemStatus
+    FROM VMWARE-TC-MIB
+        vmwResources
+    FROM VMWARE-ROOT-MIB;
+
+    vmwResourcesMIB MODULE-IDENTITY
+    LAST-UPDATED "200810150000Z"
+    ORGANIZATION "VMware, Inc"
+    CONTACT-INFO
+    "VMware, Inc
+    3401 Hillview Ave
+    Palo Alto, CA 94304
+    Tel: 1-877-486-9273 or 650-427-5000
+    Fax: 650-427-5001
+    Web: http://communities.vmware.com/community/developer/forums/managementapi
+    "
+DESCRIPTION
+     "This MIB module provides instrumentation of ESX Hypervisor resources such 
+      as cpu, memory, and disk."
+
+REVISION      "200810150000Z"
+DESCRIPTION
+     "All per-VM managed objects were moved to new managed objects in VMWARE-VMINFO MIB.
+      See VMWARE-OBSOLETE-RESOURCE-MIB for oid assignments in prior version of this mib module.
+      Add to comments the Managed Object Browser (MOB) URLs which provide 
+      data this MIB module exposes."
+
+REVISION      "200712270000Z"
+DESCRIPTION
+    "This is the first revision in SMIv2 format. Prior version was published as SMIv1."
+::= { vmwResources 10 }
+
+vmwCPU OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Information about physical CPU(s)"
+::= { vmwResources 1 }
+
+vmwNumCPUs OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of physical CPUs on the system."
+    ::= { vmwCPU 1 }
+
+-- Memory subtree 
+
+vmwMemory OBJECT IDENTIFIER ::= { vmwResources 2 }
+
+vmwMemSize OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Amount of physical memory present on machine as provided by Hypervisor.
+         It is computed from the sum of vmwMemCOS plus unreserved property as
+         reported VIM subsystem. Unreserved is computed from hypervisor's total
+         number of memory pages.
+
+         VIM Parent Container: https://esx.example.com/mob/?moid=memorySystem
+         VIM property: unreserved
+         MOB: https://esx.example.com/mob/?moid=memoryManagerSystem&doPath=consoleReservationInfo
+
+         For reference here two other related VIM properties:
+         VIM property: memorySize
+         MOB: https://esx.example.com/mob/?moid=ha%2dhost&doPath=summary%2ehardware
+         
+         VIM property: totalMemory
+         MOB: https://esx.example.com/mob/?moid=ha%2dcompute%2dres&doPath=summary
+         "
+    ::= { vmwMemory 1 }
+
+vmwMemCOS OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This managed object reports memory allocated for COS, theConsole OS
+         (aka Service Console) which is a memory region carved out of physical
+         memory to boot a RedHat Linux distribution/provides device management
+         interface.
+
+         Note that in the VMware ESXi product there is no COS so this will report 0.
+         
+         This managed object reports the amount of physical memory allocated to the COS.
+         VIM Parent Container: https://esx.example.com/mob/?moid=memorySystem
+         VIM property: serviceConsoleReserved
+         MOB: https://esx.example.com/mob/?moid=memoryManagerSystem&doPath=consoleReservationInfo
+        "
+    ::= { vmwMemory 2 }
+
+vmwMemAvail OBJECT-TYPE
+    SYNTAX      Gauge32
+    UNITS       "kilobytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Amount of memory available to run Virutal Machines and to allocate for
+         hypervisor needs. It is computed by subtracting vmwMemCOS from
+         vmwMemSize. The result is the amount of memory available to VMs and to
+         the hypervisor.
+
+         To get a more accurate view of memory available to VMs the following property
+         represents the amount of resources available for the root resource pool for running 
+         virtual machines.
+
+         VIM property: effectiveMemory
+         MOB: https://esx.example.com/mob/?moid=ha%2dcompute%2dres&doPath=summary
+        "
+    ::= { vmwMemory 3 }
+
+
+-- Storage subtree
+
+vmwStorage OBJECT IDENTIFIER ::= { vmwResources 5 }
+vmwHostBusAdapterNumber OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of entries in vmwHostBusAdapterTable."
+    ::= { vmwStorage 1 }
+
+vmwHostBusAdapterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VmwHostBusAdapterEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      current
+    DESCRIPTION
+        "Inventory of Host Bus Adatpers found in this system. 
+         CLI: esxcfg-scsidevs -a
+         VIM Parent Container: https://esx.example.com/mob/?moid=storageSystem
+         VIM property: hostBusAdapter
+         MOB: https://esx.example.com/mob/?moid=storageSystem&doPath=storageDeviceInfo"
+    ::= { vmwStorage 2 }
+
+vmwHostBusAdapterEntry OBJECT-TYPE
+    SYNTAX      VmwHostBusAdapterEntry
+    MAX-ACCESS  not-accessible  
+    STATUS      current
+    DESCRIPTION
+        "Details for this adapter."
+    INDEX       { vmwHostBusAdapterIndex }
+    ::= { vmwHostBusAdapterTable 1 }
+
+VmwHostBusAdapterEntry ::= SEQUENCE
+{
+vmwHostBusAdapterIndex   Integer32,
+vmwHbaDeviceName         DisplayString,
+vmwHbaBusNumber          Integer32,
+vmwHbaStatus             VmwSubsystemStatus,
+vmwHbaModelName          DisplayString,
+vmwHbaDriverName         DisplayString,
+vmwHbaPci                DisplayString
+}
+
+vmwHostBusAdapterIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..1023)
+    MAX-ACCESS  not-accessible  
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to this adapter."
+    ::= { vmwHostBusAdapterEntry 1 }
+
+vmwHbaDeviceName OBJECT-TYPE
+    SYNTAX      DisplayString   
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system device name for this host bus adapter."
+    ::= { vmwHostBusAdapterEntry 2 }
+
+vmwHbaBusNumber   OBJECT-TYPE
+    SYNTAX      Integer32 (-1|0..1023)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The host bus number. For unsuported HBA's reports -1."
+    ::= { vmwHostBusAdapterEntry 3 }
+
+vmwHbaStatus    OBJECT-TYPE
+    SYNTAX      VmwSubsystemStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational status of the adapter."
+    ::= { vmwHostBusAdapterEntry 4 }
+
+vmwHbaModelName  OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The model name of the host bus adapter."
+    ::= { vmwHostBusAdapterEntry 5 }
+
+vmwHbaDriverName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the driver."
+    ::= { vmwHostBusAdapterEntry 6 }
+
+vmwHbaPci OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Peripheral Connect Interface (PCI) ID of the device."
+    ::= { vmwHostBusAdapterEntry 7 }
+
+-- Net subtree
+-- See IF-MIB for details of network interfaces
+
+
+-- conformance information
+vmwResourceMIBConformance
+OBJECT IDENTIFIER ::= { vmwResourcesMIB 2 }
+vmwResourceMIBCompliances
+OBJECT IDENTIFIER ::= { vmwResourceMIBConformance 1 }
+vmwResMIBGroups  OBJECT IDENTIFIER ::= { vmwResourceMIBConformance 2 }
+
+-- compliance statements
+vmwResourceMIBCompliance MODULE-COMPLIANCE
+STATUS  current
+DESCRIPTION
+    "The compliance statement for entities which implement the 
+    VMWARE-RESOURCE-MIB."
+MODULE  -- this module
+MANDATORY-GROUPS { vmwResourceGroup }
+::= { vmwResourceMIBCompliances 2 }
+
+vmwResourceGroup OBJECT-GROUP
+    OBJECTS { 
+    vmwNumCPUs,
+    vmwMemSize,
+    vmwMemCOS,
+    vmwMemAvail,
+    vmwHostBusAdapterNumber,
+    vmwHbaDeviceName,
+    vmwHbaBusNumber,
+    vmwHbaStatus,
+    vmwHbaModelName,
+    vmwHbaDriverName,
+    vmwHbaPci
+    }
+    STATUS  current
+    DESCRIPTION
+        "These objects provide resource details."
+    ::= { vmwResMIBGroups 1 }
+
+
+END

@@ -1,0 +1,350 @@
+NETGEAR-NSF-MIB DEFINITIONS ::= BEGIN
+
+-- Copyright Netgear Inc (2009-2009) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter32, Gauge32,
+        Unsigned32, TimeTicks, NOTIFICATION-TYPE  FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, DisplayString, TruthValue,
+        RowStatus                                 FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+                                                  FROM SNMPv2-CONF
+        lb6m                                  FROM QUANTA-LB6M-REF-MIB
+        agentInventoryUnitEntry, agentInventoryUnitNumber
+                                                  FROM NETGEAR-INVENTORY-MIB;
+
+    fastPathNsf MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+            "This MIB defines the objects used for FastPath to 
+            configure and report information and status of NSF features."
+        
+        -- Revision history.	  
+        REVISION
+            "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+            "Postal address updated."
+        REVISION
+            "200904230000Z" -- 23 Apr 2009 12:00:00 GMT
+        DESCRIPTION
+            "Initial version."
+ 
+        ::= { lb6m 46 }
+
+
+    --**************************************************************************************
+    -- agentNsfUnitTable
+    --
+    --**************************************************************************************
+
+    agentNsfUnitTable OBJECT-TYPE
+        SYNTAX         SEQUENCE OF AgentNsfUnitEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "A table of Per-Unit configuration objects for NSF."
+        ::= { fastPathNsf 1 }
+
+    agentNsfUnitEntry OBJECT-TYPE
+        SYNTAX         AgentNsfUnitEntry
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "Each Instance corresponds with a different unit managed by this agent."
+        AUGMENTS      { agentInventoryUnitEntry }
+        ::= { agentNsfUnitTable 1 }
+         
+    AgentNsfUnitEntry ::=
+        SEQUENCE {
+         agentNsfUnitSupport
+                 TruthValue
+         }
+
+    agentNsfUnitSupport OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates if the unit supports the NSF feature."
+        ::= { agentNsfUnitEntry 1 }
+
+
+    --**************************************************************************************
+    -- agentNsfConfigGroup
+    --
+    --**************************************************************************************
+
+    agentNsfGroup                  OBJECT IDENTIFIER ::= { fastPathNsf 2 }
+
+
+    agentNsfOperStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates whether NSF is enabled on the unit/chassis."
+        ::= { agentNsfGroup 2 }
+
+    agentNsfLastStartupReason OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     unknown(1),
+                     power-on(2),
+                     warm-admin-move(3),
+                     cold-admin-move(4),
+                     warm-auto-restart(5),
+                     cold-auto-restart(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The type of activation that caused the software to start the last time. 
+
+            unknown:             The switch rebooted for an unknown reason.
+            power-on:            The switch rebooted. This could have been caused by a power 
+                                 cycle or an administrative 'Reload' command. 
+            warm-admin-move:     The administrator issued a command for the stand-by manager to 
+                                 take over.
+            cold-admin-move:     The administrator issued a command for the stand-by manager to 
+                                 take over, but the system was not ready for a warm-failover.
+            warm-auto-restart:   The primary management card restarted due to a failure, and the 
+                                 system executed a nonstop forwarding failover. 
+            cold-auto-restart:   The system switched from the active manager to the backup manager 
+                                 and was unable to maintain user data traffic. This is usually 
+                                 caused by multiple failures occurring close together"
+
+        ::= { agentNsfGroup 3 }
+
+    agentNsfTimeSinceLastRestart OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Time since the current management card became the active management card."
+
+        ::= { agentNsfGroup 4 }
+
+    agentNsfRestartInProgress OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Whether a restart is in progress. A restart is not considered complete until all 
+            hardware tables have been fully reconciled."
+        ::= { agentNsfGroup 5 }
+
+    agentNsfWarmRestartReady OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Whether the initial full checkpoint has finished."
+        ::= { agentNsfGroup 6 }
+
+    agentNsfBackupConfigurationAge OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Age of the configuration on the backup unit. The time since the running configuration 
+            was last copied to the backup unit."
+
+        ::= { agentNsfGroup 7 }
+
+    agentNsfInitiateFailover OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Triggers an administrative failover to the backup unit."
+        ::= { agentNsfGroup 8 }
+
+
+    --**************************************************************************************
+    -- agentCheckpointStatsGroup
+    --
+    --**************************************************************************************
+    agentCheckpointStatsGroup         OBJECT IDENTIFIER ::= { fastPathNsf 3 }
+
+    agentCheckpointClearStatistics OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "When set to enable(1), resets checkpoint statistics."
+        ::= { agentCheckpointStatsGroup 1 }
+
+    agentCheckpointMessages OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Total number of checkpoint messages sent."
+        ::= { agentCheckpointStatsGroup 2 }
+
+    agentCheckpointBytes OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Size in bytes of the total ammount of checkpoint messages sent."
+        ::= { agentCheckpointStatsGroup 3 }
+
+    agentCheckpointTimeSinceCountersCleared OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates how long since the Checkpoint counters have been cleared."
+        ::= { agentCheckpointStatsGroup 4 }
+
+    agentCheckpointMessageRateInterval OBJECT-TYPE
+        SYNTAX      Unsigned32
+        UNITS       "seconds"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Indicates the duration in seconds of the message rate interval."
+        ::= { agentCheckpointStatsGroup 5 }
+
+    agentCheckpointMessageRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of checkpoint messages received in the last interval defined by 
+             agentCheckpointMessageRateInterval."
+        ::= { agentCheckpointStatsGroup 6 }
+
+    agentCheckpointHighestMessageRate OBJECT-TYPE
+        SYNTAX      Gauge32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Highest number of checkpoint messages received in an interval defined by 
+             agentCheckpointMessageRateInterval."
+        ::= { agentCheckpointStatsGroup 7 }
+
+    --**************************************************************************************
+    -- agentNsfOspfGroup
+    --
+    --**************************************************************************************
+    agentNsfOspfGroup         OBJECT IDENTIFIER ::= { fastPathNsf 4 }
+
+    agentNsfOspfSupportMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     none(1),
+                     planned(2),
+                     always(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            ""
+        ::= { agentNsfOspfGroup 1 }
+
+    agentNsfOspfRestartInterval OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            ""
+        ::= { agentNsfOspfGroup 2 }
+
+    agentNsfOspfRestartStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     unknown(1),
+                     not-restarting(2),
+                     planned-restart(3),
+                     unplanned-restart(4)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            ""
+        ::= { agentNsfOspfGroup 3 }
+
+    agentNsfOspfRestartAge OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            ""
+        ::= { agentNsfOspfGroup 4 }
+
+    agentNsfOspfRestartExitReason OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     none(1),
+                     in-progress(2),
+                     completed(3),
+                     timed-out(4),
+                     topology-change(5),
+                     manual-clear(6)
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            ""
+        ::= { agentNsfOspfGroup 5 }
+
+    agentNsfOspfHelperSupportMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     none(1),
+                     planned(2),
+                     always(3)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            ""
+        ::= { agentNsfOspfGroup 6 }
+
+    agentNsfOspfHelperStrictLSAChecking OBJECT-TYPE
+        SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            ""
+        ::= { agentNsfOspfGroup 7 }
+
+    --**************************************************************************************
+    -- agentNsfTraps
+    --
+    --**************************************************************************************
+
+    agentNsfTraps                           OBJECT IDENTIFIER ::= { fastPathNsf 0 }
+
+    agentNsfChassisRestartComplete NOTIFICATION-TYPE
+        OBJECTS {
+                 agentInventoryUnitNumber,
+                 agentNsfLastStartupReason
+                }
+        STATUS  current
+        DESCRIPTION
+            "Sent when the chassis finishes restarting after a failover."
+         ::= { agentNsfTraps 2}
+
+END

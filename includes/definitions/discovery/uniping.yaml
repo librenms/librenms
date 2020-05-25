@@ -1,0 +1,108 @@
+mib: DKSF-70-6-X-X-1
+modules:
+    sensors:
+        humidity:
+            data:
+                -
+                    oid: npRelHumTable
+                    value: npRelHumValue
+                    num_oid: '.1.3.6.1.4.1.25728.8400.1.1.2.{{ $index }}'
+                    low_limit: npRelHumSafeRangeLow
+                    high_limit: npRelHumSafeRangeHigh
+                    skip_values: 0
+                    descr: 'Relative Humidity {{ $index }}'
+        state:
+            data:
+                -
+                    oid: npSmokeTable
+                    value: npSmokeStatus
+                    num_oid: '.1.3.6.1.4.1.25728.8200.1.1.2.{{ $index }}'
+                    descr: 'Smoke {{ $index }}'
+                    skip_values: 5
+                    index: 'npSmokeStatus.{{ $index }}'
+                    state_name: npSmokeStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 0, generic: 0 }
+                        - { descr: alarm, graph: 0, value: 1, generic: 2 }
+                        - { descr: off, graph: 0, value: 4, generic: 1 }
+                        - { descr: failed, graph: 0, value: 5, generic: 2 }
+                -
+                    oid: npCurLoopTable
+                    value: npCurLoopStatus
+                    num_oid: '.1.3.6.1.4.1.25728.8300.1.1.2.{{ $index }}'
+                    descr: 'Loop {{ $index }}'
+                    index: 'npCurLoopStatus.{{ $index }}'
+                    state_name: npCurLoopStatus
+                    states:
+                        - { descr: ok, graph: 0, value: 0, generic: 0 }
+                        - { descr: alert, graph: 0, value: 1, generic: 2 }
+                        - { descr: cut, graph: 0, value: 2, generic: 2 }
+                        - { descr: short, graph: 0, value: 3, generic: 1 }
+                        - { descr: notPowered, graph: 0, value: 4, generic: 3 }
+                -
+                    oid: npRelayTable
+                    value: npRelayState
+                    num_oid: '.1.3.6.1.4.1.25728.5500.5.1.15.{{ $index }}'
+                    descr: 'Relay {{ $index }}'
+                    index: 'npRelayState.{{ $index }}'
+                    state_name: npRelayState
+                    states:
+                        - { descr: off, graph: 0, value: 0, generic: 2 }
+                        - { descr: on, graph: 0, value: 1, generic: 0 }
+                -
+                    oid: npThermoTable
+                    value: npThermoStatus
+                    num_oid: '.1.3.6.1.4.1.25728.8800.1.1.3.{{ $index }}'
+                    descr: 'Thermo {{ $index }}'
+                    skip_values: 0
+                    index: 'npThermoStatus.{{ $index }}'
+                    state_name: npThermoStatus
+                    states:
+                        - { descr: failed, graph: 0, value: 0, generic: 2 }
+                        - { descr: low, graph: 0, value: 1, generic: 1 }
+                        - { descr: norm, graph: 0, value: 2, generic: 0 }
+                        - { descr: high, graph: 0, value: 3, generic: 2 }
+                -
+                    oid: npRelHumTable
+                    value: npRelHumStatus
+                    num_oid: '.1.3.6.1.4.1.25728.8400.1.1.3.{{ $index }}'
+                    descr: 'Relative Humidity {{ $index }}'
+                    skip_values: 0
+                    index: 'npRelHumStatus.{{ $index }}'
+                    state_name: npRelHumStatus
+                    states:
+                        - { descr: sensorFailed, graph: 0, value: 0, generic: 2 }
+                        - { descr: belowSafeRange, graph: 0, value: 1, generic: 1 }
+                        - { descr: inSafeRange, graph: 0, value: 2, generic: 0 }
+                        - { descr: aboveSafeRange, graph: 0, value: 3, generic: 2 }
+                -
+                    oid: npRelHumTable
+                    value: npRelHumTempStatus
+                    num_oid: '.1.3.6.1.4.1.25728.8400.1.1.5.{{ $index }}'
+                    descr: 'Humidity Temp {{ $index }}'
+                    skip_values: 0
+                    index: 'npRelHumTempStatus.{{ $index }}'
+                    state_name: npRelHumTempStatus
+                    states:
+                        - { descr: sensorFailed, graph: 0, value: 0, generic: 2 }
+                        - { descr: belowSafeRange, graph: 0, value: 1, generic: 1 }
+                        - { descr: inSafeRange, graph: 0, value: 2, generic: 0 }
+                        - { descr: aboveSafeRange, graph: 0, value: 3, generic: 2 }
+        temperature:
+            data:
+                -
+                    oid: npThermoTable
+                    value: npThermoValue
+                    num_oid: '.1.3.6.1.4.1.25728.8800.1.1.2.{{ $index }}'
+                    low_limit: npThermoLow
+                    high_limit: npThermoHigh
+                    skip_values: 0
+                    descr: 'Thermo {{ $index }}'
+                -
+                    oid: npRelHumTable
+                    value: npRelHumTempValue
+                    num_oid: '.1.3.6.1.4.1.25728.8400.1.1.4.{{ $index }}'
+                    low_limit: npRelHumTempSafeRangeLow
+                    high_limit: npRelHumTempSafeRangeHigh
+                    skip_values: 0
+                    descr: 'Humidity Temp {{ $index }}'

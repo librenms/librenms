@@ -1,160 +1,117 @@
 <?php
-
-// MYSQL Check - FIXME
-// 1 UNKNOWN
-
-/*
- * LibreNMS Network Management and Monitoring System
- * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
+/**
+ * update.php
+ *
+ * Database update script
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
- * See COPYING for more details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * Copyright (C) 2006-2012, Observium Developers - http://www.observium.org
+ *
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2017-2018 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (!isset($debug)  && php_sapi_name() == 'cli') {
+use LibreNMS\Config;
+use LibreNMS\Exceptions\LockException;
+use LibreNMS\Util\FileLock;
+use LibreNMS\Util\MemcacheLock;
+
+if (!isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
-    $init_modules = array();
+    $init_modules = [];
     require realpath(__DIR__ . '/../..') . '/includes/init.php';
-
-    $options = getopt('d');
-    if (isset($options['d'])) {
-        $debug = true;
-    } else {
-        $debug = false;
-    }
 }
 
-$insert = 0;
+$return = 0;
 
-if ($db_rev = @dbFetchCell('SELECT version FROM `dbSchema` ORDER BY version DESC LIMIT 1')) {
-} else {
-    $db_rev = 0;
-    $insert = 1;
-}
-
-// For transition from old system
-if ($old_rev = @dbFetchCell('SELECT revision FROM `dbSchema`')) {
-    echo "-- Transitioning from old revision-based schema to database version system\n";
-    $db_rev = 6;
-
-    if ($old_rev <= 1000) {
-        $db_rev = 1;
-    }
-
-    if ($old_rev <= 1435) {
-        $db_rev = 2;
-    }
-
-    if ($old_rev <= 2245) {
-        $db_rev = 3;
-    }
-
-    if ($old_rev <= 2804) {
-        $db_rev = 4;
-    }
-
-    if ($old_rev <= 2827) {
-        $db_rev = 5;
-    }
-
-    $insert = 1;
-}//end if
-
-$updating = 0;
-
-$include_dir_regexp = '/\.sql$/';
-
-if ($handle = opendir($config['install_dir'].'/sql-schema')) {
-    while (false !== ($file = readdir($handle))) {
-        if (filetype($config['install_dir'].'/sql-schema/'.$file) == 'file' && preg_match($include_dir_regexp, $file)) {
-            $filelist[] = $file;
+try {
+    if (isset($skip_schema_lock) && !$skip_schema_lock) {
+        if (Config::get('distributed_poller')) {
+            $schemaLock = MemcacheLock::lock('schema', 30, 86000);
+        } else {
+            $schemaLock = FileLock::lock('schema', 30);
         }
     }
 
-    closedir($handle);
-}
+    $db_rev = get_db_schema();
 
-asort($filelist);
-$tmp = explode('.', max($filelist), 2);
-if ($tmp[0] <= $db_rev) {
-    if ($debug) {
-        echo "DB Schema already up to date.\n";
-    }
-    return;
-}
+    $migrate_opts = ['--force' => true, '--ansi' => true];
 
-$limit = 150; //magic marker far enough in the future
-foreach ($filelist as $file) {
-    list($filename,$extension) = explode('.', $file, 2);
-    if ($filename > $db_rev) {
-        if (isset($_SESSION['stage'])) {
-            $limit++;
-            if (time()-$_SESSION['last'] > 45) {
-                $_SESSION['offset'] = $limit;
-                $GLOBALS['refresh'] = '<b>Updating, please wait..</b><sub>'.date('r').'</sub><script>window.location.href = "install.php?offset='.$limit.'";</script>';
-                return;
-            }
-        }
+    if ($db_rev === 0) {
+        $migrate_opts['--seed'] = true;
+        $return = Artisan::call('migrate', $migrate_opts);
+        echo Artisan::output();
+    } elseif ($db_rev < 1000) {
+        // legacy update
+        d_echo("DB Schema update started....\n");
 
-        if (!$updating) {
-            echo "-- Updating database schema\n";
-        }
+        // Set Database Character set and Collation
+        dbQuery('ALTER DATABASE CHARACTER SET utf8 COLLATE utf8_unicode_ci;');
 
-        echo sprintf('%03d', $db_rev).' -> '.sprintf('%03d', $filename).' ...';
+        echo "-- Updating database schema\n";
+        foreach (get_schema_list() as $file_rev => $file) {
+            if ($file_rev > $db_rev) {
+                printf('%03d -> %03d ...', $db_rev, $file_rev);
 
-        $err = 0;
+                $err = 0;
+                if (($data = file_get_contents($file)) !== false) {
+                    foreach (explode("\n", $data) as $line) {
+                        if (trim($line)) {
+                            d_echo("$line \n");
 
-        if ($fd = @fopen($config['install_dir'].'/sql-schema/'.$file, 'r')) {
-            $data = fread($fd, 4096);
-            while (!feof($fd)) {
-                $data .= fread($fd, 4096);
-            }
-
-            foreach (explode("\n", $data) as $line) {
-                if (trim($line)) {
-                    d_echo("$line \n");
-
-                    if ($line[0] != '#') {
-                        $update = mysqli_query($database_link, $line);
-                        if (!$update) {
-                            $err++;
-                            if ($debug) {
-                                echo mysqli_error($database_link)."\n";
+                            if ($line[0] != '#') {
+                                if (!dbQuery($line)) {
+                                    $return = 2;
+                                    $err++;
+                                }
                             }
                         }
                     }
+
+                    echo " done ($err errors).\n";
+                } else {
+                    echo " Could not open file! $file\n";
+                    $return = 1;
+                }//end if
+
+                if ($db_rev == 0) {
+                    dbInsert(['version' => $file_rev], 'dbSchema');
+                } else {
+                    dbUpdate(['version' => $file_rev], 'dbSchema');
                 }
-            }
+                $db_rev = $file_rev;
+            }//end if
+        }//end foreach
 
-            if ($db_rev < 5) {
-                echo " done.\n";
-            } else {
-                echo " done ($err errors).\n";
-            }
-        } else {
-            echo " Could not open file!\n";
-        }//end if
-
-        $updating++;
-        $db_rev = $filename;
-        if ($insert) {
-            dbInsert(array('version' => $db_rev), 'dbSchema');
-            if ($db_rev >= 6) {
-                $insert = 0;
-            }
-        } else {
-            dbUpdate(array('version' => $db_rev), 'dbSchema');
-        }
-    }//end if
-}//end foreach
-
-if ($updating) {
-    echo "-- Done\n";
-    if (isset($_SESSION['stage'])) {
-        $_SESSION['build-ok'] = true;
+        echo "-- Done\n";
+        // end legacy update
+        $db_rev = get_db_schema();
     }
+
+    if ($db_rev == 1000) {
+        Artisan::call('db:seed', ['--force' => true, '--ansi' => true, '--class' => DefaultWidgetSeeder::class]);
+        $return = Artisan::call('migrate', $migrate_opts);
+        echo Artisan::output();
+    }
+
+    if (isset($schemaLock)) {
+        $schemaLock->release();
+    }
+} catch (LockException $e) {
+    echo $e->getMessage() . PHP_EOL;
+    $return = 1;
 }

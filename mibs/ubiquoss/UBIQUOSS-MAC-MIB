@@ -1,0 +1,551 @@
+-- *****************************************************************
+-- UBIQUOSS-MAC-MIB.mib:  
+-- Ubiquoss Enterprise Mac of Management Information
+--
+-- July 2006, Jisoo Kim
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+--
+
+UBIQUOSS-MAC-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		
+		DisplayString 
+		FROM RFC1213-MIB
+		
+		PhysAddress, RowStatus, MacAddress, TimeTicks
+	    FROM SNMPv2-TC
+	    
+	    ubiSysIndex
+	    	FROM UBIQUOSS-SYSINFO-MIB
+		ubiPortIndex
+		FROM UBIQUOSS-INTERFACE-MIB		
+	    			
+		ubiMgmt
+		FROM UBQS-SMI;     
+
+ubiMacMIB  MODULE-IDENTITY
+	LAST-UPDATED "0607130000Z"
+    ORGANIZATION "Ubiquoss Corp."
+    CONTACT-INFO
+        "Chair    :  jisoo Kim
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      jisoo@ubiquoss.com
+         Phone:      +82-2-2190-3100
+
+         Co-editor:  Paul 
+                     Ubiquoss Corp.
+         Postal:     24F Milennium B/D,
+		 	         467-12, Dogok-Dong,
+					 GangNam-Gu, Seoul 135-270
+					 Korea
+         EMail:      paul@ubiquoss.com
+         Phone:      +82-2-2190-3100"
+    DESCRIPTION
+        "This MIB module defines mac information" 
+   	::= { ubiMgmt  201 }
+   				
+	ubiMacMIBObjects	OBJECT IDENTIFIER ::= { ubiMacMIB  1 }      
+    
+-- ***********************************************************
+-- sysMac
+-- ***********************************************************
+	ubiSysMacTable OBJECT-TYPE
+             SYNTAX     SEQUENCE OF UbiSysMacEntry
+             MAX-ACCESS not-accessible
+             STATUS     current
+             DESCRIPTION
+                 "system mac "
+             ::=  { ubiMacMIBObjects  1  }
+
+	ubiSysMacEntry OBJECT-TYPE
+           SYNTAX     UbiSysMacEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                    "system mac"
+           INDEX   { ubiSysIndex }
+           ::= { ubiSysMacTable 1 }
+
+    UbiSysMacEntry ::= SEQUENCE
+    {
+		ubiSysMacMaxCnt				INTEGER,
+		ubiSysMacCurrentCnt			INTEGER,
+		ubiSysMacRisingThreshold	INTEGER,
+		ubiSysMacFallingThreshold	INTEGER,
+		ubiSysMacAgingTime			TimeTicks
+	}			
+	
+    ubiSysMacMaxCnt OBJECT-TYPE
+          SYNTAX     INTEGER
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               " system max mac count "
+          ::= { ubiSysMacEntry 1 }
+          
+    ubiSysMacCurrentCnt OBJECT-TYPE
+          SYNTAX     INTEGER
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               "system current mac count"
+          ::= { ubiSysMacEntry 2 }
+     
+     ubiSysMacRisingThreshold OBJECT-TYPE
+          SYNTAX     INTEGER
+          MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+               " system mac rising threshold "
+          ::= { ubiSysMacEntry 3 }
+     
+     ubiSysMacFallingThreshold OBJECT-TYPE
+          SYNTAX     INTEGER
+          MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+               " system mac falling threshold "
+          ::= { ubiSysMacEntry 4 }
+
+    ubiSysMacAgingTime OBJECT-TYPE
+          SYNTAX     TimeTicks
+          MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+               " current port mac aging time"
+          ::= { ubiSysMacEntry 5 }
+          
+-- ***********************************************************
+-- ubiPortMacLimitable
+-- ***********************************************************
+
+	ubiPortMacLimitTable OBJECT-TYPE
+             SYNTAX     SEQUENCE OF UbiPortMacLimitEntry
+             MAX-ACCESS not-accessible
+             STATUS     current
+             DESCRIPTION
+                 "port mac limit "
+             ::=  { ubiMacMIBObjects  2  }
+
+	ubiPortMacLimitEntry OBJECT-TYPE
+           SYNTAX     UbiPortMacLimitEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                    "port mac limit"
+           INDEX   { ubiSysIndex, ubiPortIndex }
+           ::= { ubiPortMacLimitTable 1 }
+
+    UbiPortMacLimitEntry ::= SEQUENCE
+    {
+		ubiPortMacMaxCnt		INTEGER,
+		ubiPortMacLimitCnt		INTEGER,
+		ubiPortMacCurrentCnt    INTEGER,
+		ubiPortMacAgingTime		TimeTicks
+    }
+    ubiPortMacMaxCnt OBJECT-TYPE
+          SYNTAX     INTEGER
+		  MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+                   "port mac max count "
+          ::= { ubiPortMacLimitEntry 1 }    
+    
+    ubiPortMacLimitCnt OBJECT-TYPE
+          SYNTAX     INTEGER
+		  MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+                   "port mac limit count "
+          ::= { ubiPortMacLimitEntry 2 }
+          
+    ubiPortMacCurrentCnt OBJECT-TYPE
+          SYNTAX     INTEGER
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               " current port mac count "
+          ::= { ubiPortMacLimitEntry 3 }  
+                                	 	                 	
+    ubiPortMacAgingTime OBJECT-TYPE
+          SYNTAX     TimeTicks
+          MAX-ACCESS read-write
+          STATUS     current
+          DESCRIPTION
+               " current port mac aging time"
+          ::= { ubiPortMacLimitEntry 4 }
+
+                         	 	                 	
+-- ***********************************************************
+-- ubiPortMacAddrTable
+-- ***********************************************************
+
+	ubiPortMacAddrTable OBJECT-TYPE
+             SYNTAX     SEQUENCE OF UbiPortMacAddrEntry
+             MAX-ACCESS not-accessible
+             STATUS     current
+             DESCRIPTION
+                 "MAC Address Infomation "
+             ::=  { ubiMacMIBObjects  3  }
+
+	ubiPortMacAddrEntry OBJECT-TYPE
+           SYNTAX     UbiPortMacAddrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                    "MAC Address Infomation Entry "
+           INDEX   { ubiSysIndex, ubiPortIndex, ubiPortMacAddrSequence }
+           ::= { ubiPortMacAddrTable 1 }
+
+    UbiPortMacAddrEntry ::= SEQUENCE
+    {
+		ubiPortMacAddrSequence		Integer32,
+		ubiPortMacAddress          PhysAddress
+    }
+    ubiPortMacAddrSequence OBJECT-TYPE
+          SYNTAX     Integer32
+		  MAX-ACCESS  not-accessible
+          STATUS     current
+          DESCRIPTION
+                   "A unique value for each MAC Address "
+          ::= { ubiPortMacAddrEntry 1 }    
+
+    ubiPortMacAddress OBJECT-TYPE
+          SYNTAX     PhysAddress
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               " current MAC Address "
+          ::= { ubiPortMacAddrEntry 2 }   
+                                                                               
+          
+-- ***********************************************************
+-- ubiPortRecentMacAddrTable
+-- ***********************************************************
+
+	ubiPortRecentMacAddrTable OBJECT-TYPE
+             SYNTAX     SEQUENCE OF UbiPortRecentMacAddrEntry
+             MAX-ACCESS not-accessible
+             STATUS     current
+             DESCRIPTION
+                 "Recent MAC Address Infomation "
+             ::=  { ubiMacMIBObjects  4  }
+
+	ubiPortRecentMacAddrEntry OBJECT-TYPE
+           SYNTAX     UbiPortRecentMacAddrEntry
+           MAX-ACCESS not-accessible
+           STATUS     current
+           DESCRIPTION
+                    "Recent MAC Address Infomation Entry "
+           INDEX   { ubiSysIndex, ubiPortIndex, ubiPortRecentMacAddrSequence }
+           ::= { ubiPortRecentMacAddrTable 1 }
+
+    UbiPortRecentMacAddrEntry ::= SEQUENCE
+    {
+		ubiPortRecentMacAddrSequence		Integer32,
+		ubiPortRecentMacAddress          PhysAddress
+    }
+    ubiPortRecentMacAddrSequence OBJECT-TYPE
+          SYNTAX     Integer32
+		  MAX-ACCESS  not-accessible
+          STATUS     current
+          DESCRIPTION
+                   "A unique value for each recent MAC Address "
+          ::= { ubiPortRecentMacAddrEntry 1 }    
+
+    ubiPortRecentMacAddress OBJECT-TYPE
+          SYNTAX     PhysAddress
+          MAX-ACCESS read-only
+          STATUS     current
+          DESCRIPTION
+               " recent MAC Address "
+          ::= { ubiPortRecentMacAddrEntry 2 }          
+          
+ -- ***********************************************************
+-- ubiBasefdbTable
+-- *********************************************************** 
+
+		ubiBaseFdbTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF UbiBaseFdbEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiMacMIBObjects 5 }
+		
+		ubiBaseFdbEntry OBJECT-TYPE
+			SYNTAX UbiBaseFdbEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"ubiPortIndex -> common index(port)"
+			INDEX { ubiSysIndex, ubiBaseFdbVlanId, ubiPortIndex , ubiBaseFdbMacAddress }
+			::= { ubiBaseFdbTable 1 }
+		
+		UbiBaseFdbEntry ::=
+			SEQUENCE { 
+				ubiBaseFdbVlanId
+					INTEGER,         
+				ubiBaseFdbMacAddress
+					MacAddress,
+				ubiBaseFdbStaticStatus
+					INTEGER,  
+				ubiBaseFdbSrcTrafficClass
+					INTEGER,
+				ubiBaseFdbDstTrafficClass 
+					INTEGER,
+				ubiBaseFdbSrcCommand
+					INTEGER,
+				ubiBaseFdbDstCommand
+					INTEGER,
+				ubiBaseFdbTrafficType
+					INTEGER,
+				ubiBaseFdbGateway
+					INTEGER,
+				ubiBaseFdbRowStatus
+					RowStatus
+			 }
+
+		ubiBaseFdbVlanId OBJECT-TYPE
+			SYNTAX INTEGER (1..4094)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 1 }    
+	
+		ubiBaseFdbMacAddress OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 2 }
+		
+		 ubiBaseFdbStaticStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				static(1),
+				dynamic(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 3 }          
+						
+		ubiBaseFdbSrcTrafficClass OBJECT-TYPE
+			SYNTAX INTEGER (0..7)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 4 }
+
+ 		ubiBaseFdbDstTrafficClass OBJECT-TYPE
+			SYNTAX INTEGER (0..7)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 5 }    
+			
+ 		ubiBaseFdbSrcCommand OBJECT-TYPE
+			SYNTAX INTEGER      
+			{
+				forward(1),
+				drop(2),
+				trap(3),  
+				control(4)      
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 6 }
+
+
+ 		ubiBaseFdbDstCommand OBJECT-TYPE
+			SYNTAX INTEGER      
+			{
+				forward(1),
+				drop(2),
+				trap(3),  
+				control(4)      
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 7 }    
+			
+ 		ubiBaseFdbTrafficType OBJECT-TYPE
+			SYNTAX INTEGER      
+			{
+				unicast(1),
+				multicast(2)     
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 8 }
+
+
+ 		ubiBaseFdbGateway OBJECT-TYPE
+			SYNTAX INTEGER      
+			{
+				Notgateway(1),
+				gateway(2)     
+			}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 9 }
+
+		ubiBaseFdbRowStatus OBJECT-TYPE
+			SYNTAX RowStatus
+			MAX-ACCESS read-create
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubiBaseFdbEntry 10 }
+
+
+-- ***********************************************************
+-- 
+-- ***********************************************************
+
+-- the following two OBJECT IDENTIFIERS are used to define SNMPv2 Notifications
+-- that are backward compatible with SNMPv1 Traps.
+ubiMacMIBNotificationPrefix OBJECT IDENTIFIER ::= { ubiMacMIB 2 }
+ubiMacMIBNotifications OBJECT IDENTIFIER ::= { ubiMacMIBNotificationPrefix 0 }
+
+ubiSysMacThresholdAlarmNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiMacThresholdAlarmNotification is sent 
+                if port is function fail"
+        ::= { ubiMacMIBNotifications 1 }
+
+ubiSysMacRisingThresholdNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiSysMacRisingThresholdNotification is sent 
+                if system mac count reach rising threshold"
+        ::= { ubiMacMIBNotifications 2 }
+        
+ubiSysMacFallingThresholdNotification NOTIFICATION-TYPE
+        OBJECTS {
+        		ubiAlarmIndex,
+				ubiAlarmId,
+				ubiAlarmType,
+				ubiAlarmSeverity,
+				ubiAlarmPhysicalLoc,
+				ubiAlarmLogicalLoc,
+				ubiAlarmCurStatus,
+				ubiAlarmAuxinfo,
+				ubiAlarmDateTime,
+				ubiAlarmStatus
+        		}
+        STATUS  current
+        DESCRIPTION
+                "A ubiSysMacFallingThresholdNotification is sent 
+                if system mac count reach rising threshold"
+        ::= { ubiMacMIBNotifications 3 }
+                                         
+-- conformance information
+
+ubiMacMIBConformance OBJECT IDENTIFIER ::= { ubiMacMIB 3 }
+ubiMacMIBCompliances OBJECT IDENTIFIER ::= { ubiMacMIBConformance 1 }
+ubiMacMIBGroups      OBJECT IDENTIFIER ::= { ubiMacMIBConformance 2 }
+
+
+-- compliance statements
+ubiMacMIBCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+                "The compliance statement for entities which implement
+                the ubiquoss mac MIB."
+        MODULE  -- this module
+                MANDATORY-GROUPS { ubiMacMIBGroup,
+                				   ubiMacMIBNotifGroup	
+                                  }
+
+        GROUP   ubiMacMIBGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need information for mac."
+        
+        GROUP   ubiMacMIBNotifGroup
+        DESCRIPTION
+                "This group is applicable for implementations which
+                 need notification for mac."
+                         
+        ::= { ubiMacMIBCompliances 1 }
+
+-- ports of conformance
+ubiMacMIBGroup OBJECT-GROUP
+        OBJECTS {
+			ubiSysMacMaxCnt,
+			ubiSysMacCurrentCnt,
+			ubiSysMacRisingThreshold,
+			ubiSysMacFallingThreshold,
+			
+			ubiPortMacCurrentCnt,
+			
+			ubiPortMacAddress,
+			
+			ubiPortRecentMacAddress				     
+        }
+        STATUS  current
+        DESCRIPTION
+                "ubiquoss mac."
+        ::= { ubiMacMIBGroups 1 }
+        
+ubiMacMIBNotifGroup NOTIFICATION-GROUP
+        NOTIFICATIONS {
+        		ubiSysMacThresholdAlarmNotification,
+				ubiSysMacRisingThresholdNotification,
+				ubiSysMacFallingThresholdNotification
+        }
+        STATUS   current
+        DESCRIPTION
+                 "A collection of notifications providing the 
+                 notification for mac."
+        ::= { ubiMacMIBGroups 2 }
+
+END

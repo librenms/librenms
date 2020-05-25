@@ -1,0 +1,14 @@
+os: powerlogic
+text: 'Schneider PowerLogic'
+icon: schneider
+type: power
+over:
+    - { graph: sensor_voltage, text: Voltage }
+    - { graph: sensor_current, text: Current }
+    - { graph: sensor_power, text: Power }
+    - { graph: sensor_frequency, text: Frequency }
+mib_dir:
+    - schneider
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3833.1.7.255.15

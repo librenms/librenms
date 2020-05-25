@@ -1,0 +1,401 @@
+OGTRAP-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		OBJECT-TYPE
+			FROM RFC-1212
+		TRAP-TYPE
+			FROM RFC-1215
+		enterprises FROM 
+			RFC1155-SMI;
+
+	opengear OBJECT IDENTIFIER            ::= { enterprises 25049 }
+	
+	ogLegacyMgmt OBJECT IDENTIFIER        ::= { opengear 2 }
+
+	ogConnectMib OBJECT IDENTIFIER        ::= { ogLegacyMgmt 10 }
+	ogSignalMib OBJECT IDENTIFIER         ::= { ogLegacyMgmt 11 }
+	ogPatternMib OBJECT IDENTIFIER        ::= { ogLegacyMgmt 12 }
+	ogSensorMib OBJECT IDENTIFIER         ::= { ogLegacyMgmt 13 }
+	ogHostMib OBJECT IDENTIFIER           ::= { ogLegacyMgmt 14 }
+	ogFailoverMib OBJECT IDENTIFIER       ::= { ogLegacyMgmt 15 }
+	ogNetUpsMib OBJECT IDENTIFIER         ::= { ogLegacyMgmt 16 }
+	ogDataMib OBJECT IDENTIFIER      ::= { ogLegacyMgmt 17 }
+
+	-- Serial port connection traps.
+	ogConnectMibObjects OBJECT IDENTIFIER ::= { ogConnectMib 10 }
+	ogconnEvent OBJECT IDENTIFIER         ::= { ogConnectMibObjects 1 }
+	ogconnEventTable OBJECT IDENTIFIER    ::= { ogconnEvent 1 }
+	ogconnEventEntry OBJECT IDENTIFIER    ::= { ogconnEventTable 1 }
+
+	ogconnEventUsername OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		        "The user pertaining to the connection event"
+		::= { ogconnEventEntry 10 }
+
+	ogconnEventType OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		        "The type of connection event"
+		::= { ogconnEventEntry 11 }
+
+	ogconnEventPortNumber OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Serial port number on which this connection applies"
+		::= { ogconnEventEntry 12 }
+
+	ogconnEventPortLabel OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The label for the serial port where the connection
+			occurred."
+		::= { ogconnEventEntry 13 }
+
+	ogconnEventOccurred TRAP-TYPE
+		ENTERPRISE  opengear
+		VARIABLES { 
+			ogconnEventUsername,
+			ogconnEventType, 
+			ogconnEventPortNumber,
+			ogconnEventPortLabel 
+		}
+		DESCRIPTION
+			"The alert sent when a user connection event occurs."
+		::= 1001
+
+	-- Serial port signal trap
+	ogSignalMibObjects OBJECT IDENTIFIER  ::= { ogSignalMib 10 }
+	ogsgnlEvent OBJECT IDENTIFIER         ::= { ogSignalMibObjects 1 }
+	ogsgnlEventTable OBJECT IDENTIFIER    ::= { ogsgnlEvent 1 }
+	ogsgnlEventEntry OBJECT IDENTIFIER    ::= { ogsgnlEventTable 1 }
+
+	ogsgnlEventType OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+	        	"The particular signal which changed"
+		::= { ogsgnlEventEntry 10 }
+
+	ogsgnlEventState OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		        "The current signal state"
+		::= { ogsgnlEventEntry 11 }
+
+	ogsgnlEventPortNumber OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Serial port number on which this signal applies"
+		::= { ogsgnlEventEntry 12 }
+
+	ogsgnlEventPortLabel OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The label for the serial port where the signal applies."
+		::= { ogsgnlEventEntry 13 }
+
+	ogsgnlEventOccurred TRAP-TYPE
+		ENTERPRISE  opengear
+		VARIABLES { 
+			ogsgnlEventType,
+			ogsgnlEventState,
+			ogsgnlEventPortNumber,
+			ogsgnlEventPortLabel }
+		DESCRIPTION
+			"The alert sent when a signal change occurs"
+		::= 1002
+
+	-- Serial console pattern traps
+	ogPatternMibObjects OBJECT IDENTIFIER ::= { ogPatternMib 10 }
+	ogpatnEvent OBJECT IDENTIFIER         ::= { ogPatternMibObjects 1 }
+	ogpatnEventTable OBJECT IDENTIFIER    ::= { ogpatnEvent 1 }
+	ogpatnEventEntry OBJECT IDENTIFIER    ::= { ogpatnEventTable 1 }
+
+	ogpatnEventDescription OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		        "A description of the matches purpose"
+		::= { ogpatnEventEntry 10 }
+
+	ogpatnEventText OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The full text which matched the pattern"
+		::= { ogpatnEventEntry 11 }
+
+	ogpatnEventPortNumber OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Serial port number on which the pattern matched"
+		::= { ogpatnEventEntry 12 }
+
+	ogpatnEventPortLabel OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The label for the serial port where pattern match
+			occurred"
+		::= { ogpatnEventEntry 13 }
+
+	ogpatnEventOccurred TRAP-TYPE
+		ENTERPRISE  opengear
+		VARIABLES {
+			ogpatnEventDescription,
+			ogpatnEventText,
+			ogpatnEventPortNumber,
+			ogpatnEventPortLabel }
+		DESCRIPTION
+			"The alert sent when a pre-defined pattern was
+			matched text in a consoles serial character stream"
+		::= 1003
+
+	-- Sensor traps
+	ogSensorMibObjects OBJECT IDENTIFIER  ::= { ogSensorMib 10 }
+	ogsensStatus OBJECT IDENTIFIER         ::= { ogSensorMibObjects 1 }
+	ogsensStatusTable OBJECT IDENTIFIER    ::= { ogsensStatus 1 }
+	ogsensStatusEntry OBJECT IDENTIFIER    ::= { ogsensStatusTable 1 }
+
+	ogsensStatusName OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+ 	        	"The name of the device pertaining to the status event"
+		::= { ogsensStatusEntry 10 }
+ 
+	ogsensStatusDevType OBJECT-TYPE
+ 		SYNTAX OCTET STRING
+ 		ACCESS read-only
+ 		STATUS mandatory
+ 		DESCRIPTION
+ 	        	"The type of device pertaining to the status event"
+		::= { ogsensStatusEntry 11 } 
+	
+	ogsensStatusType OBJECT-TYPE
+ 		SYNTAX OCTET STRING
+ 		ACCESS read-only
+ 		STATUS mandatory
+ 		DESCRIPTION
+ 	        	"The type of sensor pertaining to the status event"
+		::= { ogsensStatusEntry 12 }
+ 
+	ogsensStatusValue OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The value of the sensor pertaining to the status event"
+		::= { ogsensStatusEntry 13 }
+
+	ogsensStatusOccurred TRAP-TYPE
+		ENTERPRISE  opengear
+		VARIABLES { 
+			ogsensStatusName, 
+			ogsensStatusDevType, 
+			ogsensStatusType, 
+			ogsensStatusValue }
+		DESCRIPTION
+			"The trap sent when a sensor event occurs"
+		::= 1004
+
+	-- Host traps
+	ogHostMibObjects OBJECT IDENTIFIER  ::= { ogHostMib 10 }
+	oghostEvent OBJECT IDENTIFIER       ::= { ogHostMibObjects 1 }
+	oghostEventTable OBJECT IDENTIFIER  ::= { oghostEvent 1 }
+	oghostEventEntry OBJECT IDENTIFIER  ::= { oghostEventTable 1 }
+
+	oghostEventUsername OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		        "The user pertaining to the connection event"
+		::= { oghostEventEntry 10 }
+
+	oghostEventType OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		        "The type of connection event"
+		::= { oghostEventEntry 11 }
+
+	oghostEventAddress OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The address of the host to which this connection applies."
+		::= { oghostEventEntry 12 }
+
+	oghostEventDescription OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The description of the host to which this connection applies."
+		::= { oghostEventEntry 13 }
+
+	oghostEventProtocol OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The internet protocl to which this connection applies."
+		::= { oghostEventEntry 14 }
+
+	oghostEventPort OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The applicable port number of the host."
+		::= { oghostEventEntry 15 }
+
+	oghostEventOccurred TRAP-TYPE
+		ENTERPRISE  opengear
+		VARIABLES {
+			oghostEventUsername,
+			oghostEventType,
+			oghostEventAddress,
+			oghostEventDescription,
+			oghostEventProtocol,
+			oghostEventPort }
+		DESCRIPTION
+			"The alert sent when a user connection event occurs"
+		::= 2001
+
+	-- Failover traps
+	ogFailoverMibObjects OBJECT IDENTIFIER  ::= { ogFailoverMib 10 }
+	ogfovrEvent OBJECT IDENTIFIER           ::= { ogFailoverMibObjects 1 }
+	ogfovrEventTable OBJECT IDENTIFIER      ::= { ogfovrEvent 1 }
+	ogfovrEventEntry OBJECT IDENTIFIER      ::= { ogfovrEventTable 1 }
+
+	ogfovrEventPrimary OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+	        	"The name of the network interface which failed"
+		::= { ogfovrEventEntry 10 }
+
+	ogfovrEventSecondary OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+	        	"The name of the network interface which was connected
+			instead"
+		::= { ogfovrEventEntry 11 }
+
+	ogfovrEventOccurred TRAP-TYPE
+		ENTERPRISE  opengear
+		VARIABLES { ogfovrEventPrimary, ogfovrEventSecondary }
+		DESCRIPTION
+			"The alert sent when a network failover event occurs"
+		::= 2002
+
+	-- Ups trap
+	ogNetUpsMibObjects OBJECT IDENTIFIER  ::= { ogNetUpsMib 10 }
+	ognupsEvent OBJECT IDENTIFIER         ::= { ogNetUpsMibObjects 1 }
+	ognupsEventTable OBJECT IDENTIFIER    ::= { ognupsEvent 1 }
+	ognupsEventEntry OBJECT IDENTIFIER    ::= { ognupsEventTable 1 }
+
+	ognupsEventName OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		        "The name of the UPS pertaining to the status event"
+		::= { ognupsEventEntry 10 }
+
+	ognupsEventType OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+	        	"The type of status event"
+		::= { ognupsEventEntry 11 }
+
+	ognupsEventOccurred TRAP-TYPE
+		ENTERPRISE opengear
+		VARIABLES { 
+			ognupsEventName, 
+			ognupsEventType }
+		DESCRIPTION
+			"The alert sent when a UPS status event occurs"
+		::= 2003
+
+	-- Data Usage trap
+	ogDataMibObjects OBJECT IDENTIFIER  ::= { ogDataMib 10 }
+	ogdataEvent OBJECT IDENTIFIER         ::= { ogDataMibObjects 1 }
+	ogdataEventTable OBJECT IDENTIFIER    ::= { ogdataEvent 1 }
+	ogdataEventEntry OBJECT IDENTIFIER    ::= { ogdataEventTable 1 }
+
+	ogdataEventBytes OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+	        	"The amount of bytes which triggers this usage alert"
+		::= { ogdataEventEntry 10 }
+
+	ogdataEventSeconds OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		        "The time in seconds over which bytes are measured"
+		::= { ogdataEventEntry 11 }
+
+	ogdataEventDevice OBJECT-TYPE
+		SYNTAX OCTET STRING
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"The ID for the interface thos pertains to"
+		::= { ogdataEventEntry 12 }
+
+	ogdataEventState OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Whether data usage alert is on (1) or off (0)"
+		::= { ogdataEventEntry 13 }
+
+	ogdataEventOccurred TRAP-TYPE
+		ENTERPRISE  opengear
+		VARIABLES { 
+			ogdataEventBytes,
+			ogdataEventSeconds,
+			ogdataEventDevice,
+			ogdataEventState }
+		DESCRIPTION
+			"The trap sent when a data usage alert occurs"
+		::= 2004
+
+END

@@ -1,0 +1,240 @@
+-- *****************************************************************
+-- CISCO-VOA-MIB.my
+--
+-- May 2002, Sonal Maheshwari, Mickey Spiegel
+--
+-- Copyright (c) 2002 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-VOA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, 
+    Integer32                           FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,             
+    TimeStamp                           FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP                        FROM SNMPv2-CONF
+    ifIndex                             FROM IF-MIB
+    OpticalIfDirection                  FROM CISCO-OPTICAL-MONITOR-MIB
+    ciscoMgmt                           FROM CISCO-SMI
+;
+
+ciscoVoaMIB MODULE-IDENTITY
+    LAST-UPDATED   "200205070000Z"
+    ORGANIZATION   "Cisco Systems, Inc."
+    CONTACT-INFO   "Cisco Systems
+                    Customer Service
+
+                    Postal: 170 W Tasman Drive
+                    San Jose, CA 95134
+
+                    Tel: +1 800 553-NETS
+
+                    E-mail: cs-dwdm@cisco.com"
+    DESCRIPTION
+        "This MIB module defines objects to configure and manage the
+        Variable Optical Attenuator (VOA) modules.
+
+        VOA modules are typically used to attenuate channels added
+        by a network element, in order to equalize the input power of
+        each wavelength before the multiplexed signal consisting of
+        all wavelengths is sent through an EDFA.  There may be
+        a separate VOA per channel, one VOA per band of wavelengths,
+        or one VOA for the pass through wavelengths.
+
+        VOA modules are also often used before terminating optical
+        wavelengths at optical receivers, in order to avoid receiver
+        saturation.
+
+        The VOAs may be present on various modules within the network
+        element, for example, on an Optical Add/Drop Multiplexer
+        (OADM) module, on the same module as an optical transceiver,
+        or on a separate module of its own.
+        "
+        REVISION   "200205070000Z"
+        DESCRIPTION
+            "The initial revision of this MIB."
+    ::= { ciscoMgmt 262 }
+
+
+-- Textual Conventions
+
+OpticalPowerInDbm ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "An integer value that gives the optical power level in 1/10ths
+        of dBm.
+        Example: The value -300 represents a power level of -30.0 dBm.
+
+        The distinguished value of '-1000' indicates that the object
+        has not yet been initialized.
+        "
+    SYNTAX    Integer32 ( -400..250 | -1000 )
+
+
+OpticalAttenInDb ::= TEXTUAL-CONVENTION
+    STATUS    current
+    DESCRIPTION
+        "An integer value that gives the attenuation level in
+        1/10ths of dB. 
+        Example: The value 80 represents an attenuation
+        level of 8.0 dB.
+        "
+    SYNTAX    Integer32 (0..400)
+
+
+-- MIB Object Definitions
+
+cVoaMIBObjects    OBJECT IDENTIFIER ::= { ciscoVoaMIB 1 }
+
+-- groups in this MIB module
+
+cVoaBaseGroup           OBJECT IDENTIFIER ::= { cVoaMIBObjects 1 }
+
+-- VOA basic objects
+
+cVoaTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF CVoaEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table provides objects to configure and control the 
+        attenuation on VOAs."
+    ::={ cVoaBaseGroup 1 }
+
+cVoaEntry OBJECT-TYPE
+    SYNTAX        CVoaEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the cVoaTable provides objects to configure and
+        control the attenuation level of a VOA at an interface, for
+        a given direction."
+    INDEX    { ifIndex, cVoaDirection } 
+    ::={ cVoaTable 1 }
+
+CVoaEntry ::= SEQUENCE {
+    cVoaDirection                 OpticalIfDirection,
+    cVoaAttenuationControlMode    INTEGER,
+    cVoaAttenuation               OpticalAttenInDb,
+    cVoaAttenuationLastChange     TimeStamp,
+    cVoaDesiredPower              OpticalPowerInDbm
+}
+
+cVoaDirection OBJECT-TYPE
+    SYNTAX        OpticalIfDirection 
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This is the second index into the cVoaTable and indicates
+        the direction for which the attenuation level at this
+        interface is being controlled, in this entry."
+    ::={ cVoaEntry 1 }
+
+cVoaAttenuationControlMode OBJECT-TYPE
+    SYNTAX        INTEGER {
+                      manual(1),
+                      automatic(2)
+                  }
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to set the mode of controlling the
+        attenuation level of a VOA at an interface.
+
+        When the mode is set to 'manual', the attenuation level is
+        configured manually, by setting the desired attenuation
+        level in the cVoaAttenuation object. The cVoaDesiredPower
+        object does not apply in this case.
+
+        When the mode is set to 'automatic', the attenuation level
+        is continuously adjusted to maintain a desired power level,
+        after attenuation. The desired optical power level after
+        attenuation is configured using the cVoaDesiredPower object.
+        The cVoaAttenuation object cannot be configured in this case,
+        but it indicates the attenuation level derived from the
+        desired power level.
+
+        The automatic mode of controlling attenuation should not be
+        used when the monitored power level includes multiple
+        wavelengths, since the power level monitor cannot distinguish
+        between a decrease in power across all wavelengths, versus a
+        loss of power of some but not all wavelengths. If some but not
+        all wavelengths go down, this would cause the attenuation level
+        to be automatically decreased, leading to an increase in the
+        power level of the remaining wavelengths."
+    ::={ cVoaEntry 2 }
+
+cVoaAttenuation OBJECT-TYPE
+    SYNTAX        OpticalAttenInDb
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object indicates the attenuation level applied at the
+        interface.
+
+        When the cVoaAttenuationControlMode object is set to 'manual', 
+        the attenuation level may be specified by setting this object."
+    ::={ cVoaEntry 3 }
+
+cVoaAttenuationLastChange OBJECT-TYPE
+    SYNTAX        TimeStamp
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This object indicates the value of sysUpTime at the last
+        time the attenuation level was adjusted at this interface,
+        in the given direction."
+    ::={ cVoaEntry 4 }
+
+cVoaDesiredPower OBJECT-TYPE
+    SYNTAX        OpticalPowerInDbm
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object indicates the desired optical power level,
+        after attenuation, at the interface. 
+
+        This object applies only when the cVoaAttenuationControlMode
+        object is set to 'automatic'. In this mode, the attenuation
+        level is continuously adjusted to maintain the desired 
+        power level, after attenuation, as specified by this object."
+    ::={ cVoaEntry 5 }
+
+
+-- MIB Conformance Statements
+
+cVoaMIBConformance    OBJECT IDENTIFIER ::= { ciscoVoaMIB 3 }
+
+cVoaMIBCompliances    OBJECT IDENTIFIER ::= { cVoaMIBConformance 1 }
+
+cVoaMIBGroups         OBJECT IDENTIFIER ::= { cVoaMIBConformance 2 }
+
+cVoaMIBCompliance MODULE-COMPLIANCE
+    STATUS    current
+    DESCRIPTION
+        "The compliance statement for platforms that provide
+        configuration and control of VOA modules."
+    MODULE    -- this module
+    MANDATORY-GROUPS { cVoaMIBBaseGroup }
+
+    ::={ cVoaMIBCompliances 1 }
+
+-- Units of Conformance
+
+cVoaMIBBaseGroup OBJECT-GROUP
+    OBJECTS {
+        cVoaAttenuationControlMode,
+        cVoaAttenuation,
+        cVoaAttenuationLastChange,
+        cVoaDesiredPower          
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of mandatory managed objects that provide basic
+        configuration and control of the VOA modules."
+    ::={ cVoaMIBGroups 1 }
+
+END

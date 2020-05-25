@@ -1,0 +1,309 @@
+-- *****************************************************************
+-- BDCOM-MEMORY-POOL-MIB
+--
+-- October 2003
+--
+-- Copyright (c) 2003 by BDCOM, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+BDCOM-MEMORY-POOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    Gauge32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    bdMgmt
+        FROM BDCOM-SMI
+    Percent
+        FROM BDCOM-QOS-PIB-MIB;
+
+bdcomMemoryPoolMIB MODULE-IDENTITY
+	LAST-UPDATED "200310160000Z"
+	ORGANIZATION "BDCOM, Inc."
+	CONTACT-INFO
+		" Tel:   +86-21-50800666  
+		 Postal: No.123,Juli RD,Zhangjiang Hitech Park,
+			 Shanghai Baud Data Communication Corporation Inc,
+			 Shanghai City 201203,
+		 	P.R.C "
+    	DESCRIPTION
+        	"MIB module for monitoring memory pools"
+   	REVISION        "200310160000Z"
+	DESCRIPTION
+		"Initial version of this MIB."
+    ::= { bdMgmt 48 }
+
+BDCOMMemoryPoolTypes ::= TEXTUAL-CONVENTION
+    STATUS        current
+    DESCRIPTION
+        "Represents the different types of memory pools that
+        may be present in a managed device.  Memory pools can
+        be roughly categorized into two groups, predefined
+        pools and dynamic pools.  The following pool types
+        are currently predefined:
+            1:  processor memory
+            2:  i/o memory
+            3:  pci memory
+            4:  fast memory
+            5:  multibus memory
+
+        Dynamic pools will have a pool type value greater than
+        any of the predefined types listed above.
+
+        Note that only the processor pool is required to be
+        supported by all devices.  Support for other pool types
+        is dependent on the device being managed."
+    SYNTAX        Integer32 (1..65535)
+
+bdcomMemoryPoolObjects
+    OBJECT IDENTIFIER ::= { bdcomMemoryPoolMIB 1 }
+
+bdcomMemoryPoolTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF BDCOMMemoryPoolEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "A table of memory pool monitoring entries."
+    ::= { bdcomMemoryPoolObjects 1 }
+
+bdcomMemoryPoolEntry OBJECT-TYPE
+    SYNTAX        BDCOMMemoryPoolEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "An entry in the memory pool monitoring table."
+    INDEX        { bdcomMemoryPoolType }
+    ::= { bdcomMemoryPoolTable 1 }
+
+BDCOMMemoryPoolEntry ::=
+    SEQUENCE {
+        bdcomMemoryPoolType               BDCOMMemoryPoolTypes,
+        bdcomMemoryPoolName               DisplayString,
+        bdcomMemoryPoolAlternate          Integer32,
+        bdcomMemoryPoolValid              TruthValue,
+        bdcomMemoryPoolUsed               Gauge32,
+        bdcomMemoryPoolFree               Gauge32,
+        bdcomMemoryPoolLargestFree        Gauge32
+    }
+
+bdcomMemoryPoolType OBJECT-TYPE
+    SYNTAX        BDCOMMemoryPoolTypes
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The type of memory pool for which this entry
+        contains information."
+    ::= { bdcomMemoryPoolEntry 1 }
+
+bdcomMemoryPoolName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A textual name assigned to the memory pool.  This
+        object is suitable for output to a human operator,
+        and may also be used to distinguish among the various
+        pool types, especially among dynamic pools."
+    ::= { bdcomMemoryPoolEntry 2 }
+
+bdcomMemoryPoolAlternate OBJECT-TYPE
+    SYNTAX        Integer32 (0..65535)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not this memory pool has an
+        alternate pool configured.  Alternate pools are
+        used for fallback when the current pool runs out
+        of memory.
+
+        If an instance of this object has a value of zero,
+        then this pool does not have an alternate.  Otherwise
+        the value of this object is the same as the value of
+        bdcomMemoryPoolType of the alternate pool."
+    ::= { bdcomMemoryPoolEntry 3 }
+
+bdcomMemoryPoolValid OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates whether or not the remaining objects in
+        this entry contain accurate data.  If an instance
+        of this object has the value false (which in and of
+        itself indicates an internal error condition), the
+        values of the remaining objects in the conceptual row
+        may contain inaccurate information (specifically, the
+        reported values may be less than the actual values)."
+    ::= { bdcomMemoryPoolEntry 4 }
+
+bdcomMemoryPoolUsed OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of bytes from the memory pool
+        that are currently in use by applications on the
+        managed device."
+    ::= { bdcomMemoryPoolEntry 5 }
+
+bdcomMemoryPoolFree OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the number of bytes from the memory pool
+        that are currently unused on the managed device.
+
+        Note that the sum of bdcomMemoryPoolUsed and
+        bdcomMemoryPoolFree is the total amount of memory
+        in the pool"
+    ::= { bdcomMemoryPoolEntry 6 }
+
+bdcomMemoryPoolLargestFree OBJECT-TYPE
+    SYNTAX        Gauge32
+    UNITS         "bytes"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Indicates the largest number of contiguous bytes
+        from the memory pool that are currently unused on
+        the managed device."
+    ::= { bdcomMemoryPoolEntry 7 }
+
+bdcomMemoryPoolUtilizationTable OBJECT-TYPE
+  SYNTAX      SEQUENCE OF BDCOMMemoryPoolUtilizationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "A table of memory pool utilization entries. Each of the
+     objects provides a general idea of how much of the memory
+     pool has been used over a given period of time. It is
+     determined as a weighted decaying average."
+  ::= { bdcomMemoryPoolObjects 2 }
+
+bdcomMemoryPoolUtilizationEntry OBJECT-TYPE
+  SYNTAX      BDCOMMemoryPoolUtilizationEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the memory pool utilization table."
+  AUGMENTS { bdcomMemoryPoolEntry }
+  ::= { bdcomMemoryPoolUtilizationTable 1 }
+
+BDCOMMemoryPoolUtilizationEntry ::=
+  SEQUENCE {
+    bdcomMemoryPoolUtilization1Min  Percent,
+    bdcomMemoryPoolUtilization5Min  Percent,
+    bdcomMemoryPoolUtilization10Min Percent
+  }
+
+bdcomMemoryPoolUtilization1Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization for 1 minute."
+    ::= { bdcomMemoryPoolUtilizationEntry 1 }
+
+bdcomMemoryPoolUtilization5Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization for 5 minutes."
+    ::= { bdcomMemoryPoolUtilizationEntry 2 }
+
+bdcomMemoryPoolUtilization10Min OBJECT-TYPE
+    SYNTAX        Percent
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is the memory pool utilization for 10 minutes."
+    ::= { bdcomMemoryPoolUtilizationEntry 3 }
+
+-- notifications
+
+bdcomMemoryPoolNotifications
+    OBJECT IDENTIFIER ::= { bdcomMemoryPoolMIB 2 }
+
+-- (no notifications are currently defined)
+
+
+-- conformance information
+
+bdcomMemoryPoolConformance
+    OBJECT IDENTIFIER ::= { bdcomMemoryPoolMIB 3 }
+bdcomMemoryPoolCompliances
+    OBJECT IDENTIFIER ::= { bdcomMemoryPoolConformance 1 }
+bdcomMemoryPoolGroups
+    OBJECT IDENTIFIER ::= { bdcomMemoryPoolConformance 2 }
+
+
+-- compliance statements
+
+bdcomMemoryPoolCompliance MODULE-COMPLIANCE
+    STATUS    deprecated -- superceded by bdcomMemoryPoolComplianceRev1
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the BDCOM Memory Pool MIB"
+    MODULE    -- this module
+        MANDATORY-GROUPS { bdcomMemoryPoolGroup }
+    ::= { bdcomMemoryPoolCompliances 1 }
+
+bdcomMemoryPoolComplianceRev1 MODULE-COMPLIANCE
+    STATUS        current
+    DESCRIPTION
+        "The compliance statement for entities which implement
+        the BDCOM Memory Pool MIB"
+    MODULE    -- this module
+        MANDATORY-GROUPS { bdcomMemoryPoolGroup }
+
+        GROUP bdcomMemoryPoolUtilizationGroup
+        DESCRIPTION
+            "Per memory pool utilization statistics is mandatory for
+            the managed system that supports memory pool utilization."
+    ::= { bdcomMemoryPoolCompliances 2 }
+
+
+-- units of conformance
+
+bdcomMemoryPoolGroup OBJECT-GROUP
+    OBJECTS {
+        bdcomMemoryPoolName,
+        bdcomMemoryPoolAlternate,
+        bdcomMemoryPoolValid,
+        bdcomMemoryPoolUsed,
+        bdcomMemoryPoolFree,
+        bdcomMemoryPoolLargestFree
+    }
+    STATUS        current
+    DESCRIPTION
+        "A collection of objects providing memory pool monitoring."
+    ::= { bdcomMemoryPoolGroups 1 }
+
+bdcomMemoryPoolUtilizationGroup OBJECT-GROUP
+    OBJECTS {
+        bdcomMemoryPoolUtilization1Min,
+        bdcomMemoryPoolUtilization5Min,
+        bdcomMemoryPoolUtilization10Min
+    }
+    STATUS        current
+    DESCRIPTION
+        "An optional group providing a collection of memory pool
+        utilization objects."
+    ::= { bdcomMemoryPoolGroups 2 }
+
+
+END

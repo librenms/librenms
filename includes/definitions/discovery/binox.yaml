@@ -1,0 +1,10 @@
+mib: PRVT-INTERWORKING-OS-MIB:PRVT-SYS-MON-MIB
+modules:
+    processors:
+          data:
+              -
+                  oid: cpuMonitoringUtilization
+                  num_oid: '.1.3.6.1.4.1.738.10.111.1.1.3.1.1.{{ $index }}'
+              -
+                  oid: prvtSysMonCurrentCpuUsage
+                  num_oid: '.1.3.6.1.4.1.738.10.111.3.1.1.{{ $index }}'

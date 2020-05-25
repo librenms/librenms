@@ -23,35 +23,64 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-// get the current LibreNMS install directory
+use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
+use LibreNMS\Exceptions\DatabaseConnectException;
+use LibreNMS\Util\Snmpsim;
+
 $install_dir = realpath(__DIR__ . '/..');
 
-require $install_dir . '/includes/defaults.inc.php';
+$init_modules = array('web', 'discovery', 'polling', 'nodb');
 
-// definitions, don't want to initialize mysql...
-$config['install_dir'] = $install_dir;
-$config['mib_dir'] = $install_dir . '/mibs';
-$config['snmpget'] = 'snmpget';
-
-// initialize the class loader
-require $install_dir . '/vendor/autoload.php';
-
-require $install_dir . '/includes/common.php';
-require $install_dir . '/html/includes/functions.inc.php';
-require $install_dir . '/includes/definitions.inc.php';
-require $install_dir . '/includes/rrdtool.inc.php';
-require $install_dir . '/includes/syslog.php';
-require $install_dir . '/includes/dbFacile.php';
-require $install_dir . '/includes/functions.php';
-
-if (getenv('SNMPSIM')) {
-    require $install_dir . '/includes/snmp.inc.php';
-} else {
-    require $install_dir . '/tests/mocks/mock.snmp.inc.php';
+if (!getenv('SNMPSIM')) {
+    $init_modules[] = 'mocksnmp';
 }
 
+require $install_dir . '/includes/init.php';
+chdir($install_dir);
+
 ini_set('display_errors', 1);
-error_reporting(E_ALL & ~E_WARNING);
-//error_reporting(E_ALL);
-//$debug=true;
-//$vdebug=true;
+//error_reporting(E_ALL & ~E_WARNING);
+
+$snmpsim = new Snmpsim('127.1.6.2', 1162, null);
+if (getenv('SNMPSIM')) {
+    $snmpsim->fork();
+
+    // make PHP hold on a reference to $snmpsim so it doesn't get destructed
+    register_shutdown_function(function (Snmpsim $ss) {
+        $ss->stop();
+    }, $snmpsim);
+}
+
+if (getenv('DBTEST')) {
+    global $migrate_result, $migrate_output;
+
+    // create testing table if needed
+    $db_config = \config("database.connections.testing");
+    $connection = new PDO("mysql:host={$db_config['host']}", $db_config['username'], $db_config['password']);
+    $connection->query("CREATE DATABASE IF NOT EXISTS {$db_config['database']} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
+    unset($connection); // close connection
+
+    // sqlite db file
+    // $dbFile = fopen(storage_path('testing.sqlite'), 'a+');
+    // ftruncate($dbFile, 0);
+    // fclose($dbFile);
+
+    // try to avoid erasing people's primary databases
+    if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
+        if (!getenv('SKIP_DB_REFRESH')) {
+            echo "Refreshing database...";
+            $migrate_result = Artisan::call('migrate:fresh', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+            $migrate_output = Artisan::output();
+            echo "done\n";
+        }
+    } else {
+        echo "Info: Refusing to reset main database: {$db_config['database']}.  Running migrations.\n";
+        $migrate_result = Artisan::call('migrate', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+        $migrate_output = Artisan::output();
+    }
+    unset($db_config);
+}
+
+Config::reload(); // reload the config including database config
+\LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache

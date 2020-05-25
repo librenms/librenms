@@ -1,0 +1,299 @@
+-- This module defines enterprise MIBs for monitoring resources
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-RESOURCE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenResource
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    ;
+
+netscreenResourceMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor
+         resource in netscreen box"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200205050000Z" -- May 05, 2002
+    DESCRIPTION
+        "Remove active session"
+    REVISION      "200104300000Z" -- April 30, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenResource 0 }
+
+nsResCPU OBJECT IDENTIFIER ::= { netscreenResource 1 }
+
+nsResCpuAvg OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Average System CPU utilization in percentage."
+    ::= { nsResCPU 1 }
+
+nsResCpuLast1Min OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Last one minute CPU utilization in percentage."
+    ::= { nsResCPU 2 }
+
+nsResCpuLast5Min OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Last five minutes CPU utilization in percentage."
+    ::= { nsResCPU 3 }
+
+nsResCpuLast15Min OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Last fifteen minutes CPU utilization in percentage."
+    ::= { nsResCPU 4 }
+
+nsResMem OBJECT IDENTIFIER ::= { netscreenResource 2 }
+
+nsResMemAllocate OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Memory allocated."
+    ::= { nsResMem 1 }
+
+nsResMemLeft OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Memory left."
+    ::= { nsResMem 2 }
+
+nsResMemFrag OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Memory fragment."
+    ::= { nsResMem 3 }
+
+nsResSession OBJECT IDENTIFIER ::= { netscreenResource 3 }
+
+nsResSessAllocate OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Allocate session number."
+    ::= { nsResSession 2 }
+
+nsResSessMaxium OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Maxium session number system can afford."
+    ::= { nsResSession 3 }
+
+nsResSessFailed OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Failed session allocation counters."
+    ::= { nsResSession 4 }
+
+nsResModTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NsResModEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+         "System status for multiple modules."
+    ::= { netscreenResource 4 }
+
+nsResModEntry OBJECT-TYPE
+    SYNTAX  NsResModEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "Each entry in the table holds a session status parameters associated 
+           with an instance of security module."
+    INDEX   { nsResModModId,  nsResModCpuId}
+    ::= { nsResModTable 1 }
+
+NsResModEntry ::=
+		SEQUENCE {
+          nsResModModId
+              Integer32,
+          nsResModCpuId
+              Integer32,
+	      nsResModCpuCurr 
+              Integer32,
+	      nsResModCpuLast1Min 
+              Integer32,
+	      nsResModCpuLast5Min 
+              Integer32,
+	      nsResModCpuLast15Min 
+              Integer32,
+	      nsResModMemAllocated 
+              Integer32,
+       	  nsResModMemLeft 
+              Integer32,
+	      nsResModSessAllocated
+              Integer32,
+	      nsResModSessMaximum 
+              Integer32,
+	      nsResModSessFailed 
+              Integer32,
+	      nsResModThresholdMem 
+              Integer32,
+	      nsResModThresholdCpu
+              Integer32,
+	      nsResModThresholdSession 
+              Integer32
+       }
+
+nsResModModId OBJECT-TYPE
+    SYNTAX  Integer32 (1..32)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Module ID for security module.  Each ID uniquely identifies a single Security Module."
+        ::= { nsResModEntry 1 }
+
+nsResModCpuId OBJECT-TYPE
+     SYNTAX  Integer32 (1..2)
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+          "CPU Identifier.  Each ID uniquely identifies a single CPU residing on a Security Module."
+     ::= { nsResModEntry 2 }
+
+nsResModCpuCurr OBJECT-TYPE
+     SYNTAX  Integer32 (1..100)
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+          "Current System CPU utilization in percentage."
+     ::= { nsResModEntry 3 }
+
+nsResModCpuLast1Min OBJECT-TYPE
+     SYNTAX  Integer32 (1..100)
+ 	 ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+         "Last one minute CPU utilization in percentage."
+     ::= { nsResModEntry 4 }
+
+nsResModCpuLast5Min OBJECT-TYPE
+     SYNTAX  Integer32 (1..100)
+ 	 ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+        "Last five minutes CPU utilization in percentage."
+     ::= { nsResModEntry 5 }
+
+nsResModCpuLast15Min OBJECT-TYPE
+     SYNTAX  Integer32 (1..100)
+   	 ACCESS  read-only
+     STATUS  mandatory
+    DESCRIPTION
+       "Last fifteen minutes CPU utilization in percentage."
+    ::= { nsResModEntry 6 }
+
+nsResModMemAllocated OBJECT-TYPE
+     SYNTAX  Integer32 
+	 ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+       "Current memory allocated for this cpu" 
+     ::= { nsResModEntry 7 }
+
+nsResModMemLeft OBJECT-TYPE
+    SYNTAX  Integer32 
+	ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Current free memory for this security module. Since this is shared memory the same value is returned for both the cpus."
+    ::= { nsResModEntry 8 }
+
+nsResModSessAllocated OBJECT-TYPE
+    SYNTAX  Integer32 
+	ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Number of sessions currently allocated for this Security Module's cpu."
+    ::= { nsResModEntry 9 }
+
+nsResModSessMaximum OBJECT-TYPE
+     SYNTAX  Integer32 
+     ACCESS  read-only
+     STATUS  mandatory
+     DESCRIPTION
+       "Maximum number of sessions supported by this Security Module's cpu."
+     ::= { nsResModEntry 10 }
+
+nsResModSessFailed OBJECT-TYPE
+    SYNTAX  Integer32 
+	ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+       "Number of sessions failed for this Security Module's cpu."
+    ::= { nsResModEntry 11 }
+
+nsResModThresholdMem OBJECT-TYPE
+    SYNTAX  Integer32 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+		"Memory utilization of the security module exceeds the threshold pre-defined."
+    ::= { nsResModEntry 12 }
+
+nsResModThresholdCpu OBJECT-TYPE
+    SYNTAX  Integer32 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+		"CPU utilization of the security module exceeds the threshold pre-defined."
+    ::= { nsResModEntry 13 }
+
+nsResModThresholdSession OBJECT-TYPE
+    SYNTAX  Integer32 
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+		"Session number of the security module exceeds the threshold pre-defined."
+    ::= { nsResModEntry 14 }
+
+END
+
+

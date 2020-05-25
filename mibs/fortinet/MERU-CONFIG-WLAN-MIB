@@ -1,0 +1,2099 @@
+-- *****************************************************************
+-- Meru Networks Enterprise Specific MIB
+--
+-- Copyright (c) 2005 by Meru Networks
+-- All rights reserved
+--
+-- *****************************************************************
+
+MERU-CONFIG-WLAN-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+    NOTIFICATION-TYPE, 
+    OBJECT-TYPE, 
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY,
+    enterprises, 
+    Counter32, 
+    Counter64, 
+    Gauge32, 
+    TimeTicks, 
+    IpAddress, 
+    Integer32
+        FROM SNMPv2-SMI
+    Ipv6Address
+        FROM IPV6-TC
+    TEXTUAL-CONVENTION, 
+    TimeInterval, 
+    TimeStamp,
+    DateAndTime, 
+    TruthValue, 
+    DisplayString, 
+    MacAddress, 
+    RowStatus
+        FROM SNMPv2-TC
+    mwConfiguration
+        FROM MERU-SMI
+    MwlAntennaType,
+    MwlAntennaLinkType,
+    MwlAntennaSet,
+    MwlAntennaSetLocation,
+    MwlEssIdType,
+    MwlPublishEssId,
+    MwlL2BridgingsBits,
+    MwlVlanType,
+    MwlESSRFVirtualizationMode,
+    MwlACMSupportsBits,
+    MwlDataplaneMode,
+    MwlBridgedVlanType,
+    MwlBandSteeringMode,
+    MwlPapBroadcastSsidMode,
+    MwlTransmitRateBits,
+    MwlTransmitRateAGBits,
+    MwlTransmitRateHTBits,
+    MwlTransmitRateVHT,
+    MwlVoiceClientType,
+    MwlApHwType,
+    MwlIfAdministrativeState,
+    MwlOperationalState,
+    MwlApRfType,
+    MwlApIfModeType,
+    MwlApMode,
+    MwlArrayDataTypeAction,
+    MwlBgProtectionModeType,
+    MwlHtProtectionModeType,
+    MwlMimoMode,
+    MwlIFRFVirtualizationMode,
+    MwlUplinkType,
+    MwlTxBeamSupport,
+    MwlChannelCenterFrequency,
+    MwlEssApAdminMode,
+    MwlTransmitRateBGBits,
+    MwlAvailabilityStatus,
+    MwlApIfConfigModeType,
+    MwlNotificationType,
+    MwlNotificationSeverity,
+    MwlTimerType,
+    MwlProfileOwner,
+    MwlDaysOfTheWeekBits,
+    MwlEnableDisableOption,
+    MwlChannelWidth,
+    MwlYesNoSwitch,
+    MwlOnOffSwitch
+        FROM MERU-TC;
+
+  mwConfigWlan  MODULE-IDENTITY
+    LAST-UPDATED "200506050000Z"
+    ORGANIZATION "Meru Networks"
+    CONTACT-INFO "support@merunetworks.com"
+    DESCRIPTION
+        "This MIB defines all the managed objects used to manage the Meru WLAN 
+         WLAN Configuration infrastructure"
+    ::= { mwConfiguration 3 } 
+  
+    mwMcaVars                                OBJECT IDENTIFIER ::= { mwConfigWlan 16 }
+    
+  
+  mwIf80211CapabilityTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwIf80211CapabilityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Antenna Property "
+    ::= { mwConfigWlan 1 }
+
+  mwIf80211CapabilityEntry  OBJECT-TYPE
+    SYNTAX MwIf80211CapabilityEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Antenna Property "
+    INDEX {  mwIf80211CapabilityTableIndex  }
+    ::= { mwIf80211CapabilityTable 1 }
+
+  MwIf80211CapabilityEntry  ::=  SEQUENCE { 
+       mwIf80211CapabilityTableIndex                               Integer32, 
+       mwIf80211CapabilityIfAGain                                  Unsigned32,
+       mwIf80211CapabilityIfBgGain                                 Unsigned32,
+       mwIf80211CapabilityIfLinkType                               MwlAntennaLinkType,
+       mwIf80211CapabilityIfConnectorType                          MwlAntennaType,
+       mwIf80211CapabilityIfIndex                                  Integer32,
+       mwIf80211CapabilityApHwType                                 MwlApHwType,
+       mwIf80211CapabilityIfNmsNodeId                              Integer32,
+       mwIf80211CapabilityIfAntennaSet                             MwlAntennaSet,
+       mwIf80211CapabilityIfConnectorGain                          Unsigned32,
+       mwIf80211CapabilityIfAntennaLocation                        MwlAntennaSetLocation,
+       mwIf80211CapabilityIfAntennaConnector                       Integer32 
+  }
+   
+   
+  mwIf80211CapabilityTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwIf80211CapabilityEntry 1 }
+
+  mwIf80211CapabilityIfAGain  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes 5GHz Gain(dBi)"
+    ::= { mwIf80211CapabilityEntry    2 }
+
+  mwIf80211CapabilityIfBgGain  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes 2.4GHz Gain(dBi)"
+    ::= { mwIf80211CapabilityEntry    3 }
+
+  mwIf80211CapabilityIfLinkType  OBJECT-TYPE
+    SYNTAX MwlAntennaLinkType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Link Type"
+    ::= { mwIf80211CapabilityEntry    4 }
+
+  mwIf80211CapabilityIfAntennaSet  OBJECT-TYPE
+    SYNTAX MwlAntennaSet
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Antenna Type"
+    ::= { mwIf80211CapabilityEntry    5 }
+
+  mwIf80211CapabilityIfConnectorType  OBJECT-TYPE
+    SYNTAX MwlAntennaType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Band"
+    ::= { mwIf80211CapabilityEntry    6 }
+
+  mwIf80211CapabilityIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwIf80211CapabilityEntry    7 }
+
+  mwIf80211CapabilityApHwType  OBJECT-TYPE
+    SYNTAX MwlApHwType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Model"
+    ::= { mwIf80211CapabilityEntry    8 }
+
+  mwIf80211CapabilityIfNmsNodeId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwIf80211CapabilityEntry    9 }
+
+  mwIf80211CapabilityIfConnectorGain  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Antenna Gain (dBi)"
+    ::= { mwIf80211CapabilityEntry   10 }
+
+  mwIf80211CapabilityIfAntennaLocation  OBJECT-TYPE
+    SYNTAX MwlAntennaSetLocation
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Location"
+    ::= { mwIf80211CapabilityEntry   11 }
+
+  mwIf80211CapabilityIfAntennaConnector  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Connector"
+    ::= { mwIf80211CapabilityEntry   12 }
+
+  mwEssTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwEssEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Profile "
+    ::= { mwConfigWlan 2 }
+
+  mwEssEntry  OBJECT-TYPE
+    SYNTAX MwEssEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Profile "
+    INDEX {  mwEssTableIndex  }
+    ::= { mwEssTable 1 }
+
+  MwEssEntry  ::=  SEQUENCE { 
+       mwEssTableIndex                                             Integer32, 
+       mwEssSsId                                                   DisplayString(SIZE (0..32)),
+       mwEssId                                                     DisplayString(SIZE (1..32)),
+       mwEssState                                                  MwlEnableDisableOption,
+       mwEssGreName                                                DisplayString(SIZE (0..32)),
+       mwEssRFVMode                                                MwlESSRFVirtualizationMode,
+       mwEssVlanName                                               DisplayString(SIZE (0..32)),
+       mwEssIdType                                                 MwlEssIdType,
+       mwEssApVlanTag                                              Unsigned32,
+       mwEssL2Bridging                                             MwlL2BridgingsBits,
+       mwEssEnableAPSD                                             MwlOnOffSwitch,
+       mwEssACMSupport                                             MwlACMSupportsBits,
+       mwEssDTIMPeriod                                             Integer32(1..255),
+       mwEssEfOverride                                             MwlOnOffSwitch,
+       mwEssQamSupport                                             MwlOnOffSwitch,
+       mwBackupEssId                                               DisplayString(SIZE (0..32)),
+       mwEssVlanSupport                                            MwlVlanType,
+       mwEssBaseTxRates                                            MwlTransmitRateBits,
+       mwEssFastHandoff                                            MwlOnOffSwitch,
+       mwPublishEssId                                              MwlPublishEssId,
+       mwEssVlanPoolName                                           DisplayString(SIZE (0..64)),
+       mwEssApVlanPolicy                                           MwlBridgedVlanType,
+       mwEssBandSteering                                           MwlBandSteeringMode,
+       mwEssABaseTxRates                                           MwlTransmitRateAGBits,
+       mwEssGBaseTxRates                                           MwlTransmitRateAGBits,
+       mwEssDataplaneMode                                          MwlDataplaneMode,
+       mwEssBGBaseTxRates                                          MwlTransmitRateBGBits,
+       mwEssANBaseTxRates                                          MwlTransmitRateAGBits,
+       mwEssDot11kEnabled                                          MwlOnOffSwitch,
+       mwEssBeaconInterval                                         Unsigned32,
+       mwEssAllowMulticast                                         MwlOnOffSwitch,
+       mwEssCountermeasure                                         MwlOnOffSwitch,
+       mwEssBGNBaseTxRates                                         MwlTransmitRateBGBits,
+       mwEssIpPrefixLookup                                         MwlOnOffSwitch,
+       mwEssMobilityDomain                                         Integer32(1..65535),
+       mwEssJoinOnDiscovery                                        MwlOnOffSwitch,
+       mwEssANBaseHTTxRates                                        MwlTransmitRateHTBits,
+       mwEssS1VHTBaseMCSSet                                        MwlTransmitRateVHT,
+       mwEssS2VHTBaseMCSSet                                        MwlTransmitRateVHT,
+       mwEssS3VHTBaseMCSSet                                        MwlTransmitRateVHT,
+       mwEssS4VHTBaseMCSSet                                        MwlTransmitRateVHT,
+       mwEssVoiceClientType                                        MwlVoiceClientType,
+       mwEssTimerProfileName                                       DisplayString,
+       mwEssPapBroadcastSsid                                       MwlPapBroadcastSsidMode,
+       mwEssSupportedTxRates                                       MwlTransmitRateBits,
+       mwEssBGNBaseHTTxRates                                       MwlTransmitRateHTBits,
+       mwEssASupportedTxRates                                      MwlTransmitRateAGBits,
+       mwEssGSupportedTxRates                                      MwlTransmitRateAGBits,
+       mwEssBGSupportedTxRates                                     MwlTransmitRateBGBits,
+       mwEssANSupportedTxRates                                     MwlTransmitRateAGBits,
+       mwEssS1VHTSupportMCSSet                                     MwlTransmitRateVHT,
+       mwEssS2VHTSupportMCSSet                                     MwlTransmitRateVHT,
+       mwEssS3VHTSupportMCSSet                                     MwlTransmitRateVHT,
+       mwEssS4VHTSupportMCSSet                                     MwlTransmitRateVHT,
+       mwEssSecurityProfileName                                    DisplayString,
+       mwEssBandSteeringTimeout                                    Unsigned32,
+       mwEssBGNSupportedTxRates                                    MwlTransmitRateBGBits,
+       mwEssEnableApVlanPriority                                   MwlOnOffSwitch,
+       mwEssANSupportedHTTxRates                                   MwlTransmitRateHTBits,
+       mwEssBGNSupportedHTTxRates                                  MwlTransmitRateHTBits,
+       mwEssReconnectPrimaryServer                                 Integer32(5..60),
+       mwEssMulticastMACTransparency                               MwlOnOffSwitch,
+       mwEssAccountingInterimInterval                              Unsigned32,
+       mwEssPrimaryAccountingRadiusName                            DisplayString,
+       mwEssVirtualInterfaceProfileName                            DisplayString(SIZE (0..32)),
+       mwEssWirelessToWirelessIsolation                            MwlOnOffSwitch,
+       mwEssMulticastToUnicastConversion                           MwlOnOffSwitch,
+       mwEssSecondaryAccountingRadiusName                          DisplayString,
+       mwEssOwner                                                  MwlProfileOwner,
+       mwEssRowStatus                                              RowStatus 
+  }
+   
+   
+  mwEssTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwEssEntry 1 }
+
+  mwEssSsId  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes SSID"
+    ::= { mwEssEntry    2 }
+
+  mwEssId  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Profile"
+    ::= { mwEssEntry    3 }
+
+  mwEssGreName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes GRE Tunnel Profile Name"
+    ::= { mwEssEntry    4 }
+
+  mwEssVlanName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Name"
+    ::= { mwEssEntry    5 }
+
+  mwEssL2Bridging  OBJECT-TYPE
+    SYNTAX MwlL2BridgingsBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Bridging"
+    ::= { mwEssEntry    8 }
+
+  mwEssDTIMPeriod  OBJECT-TYPE
+    SYNTAX Integer32(1..255)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes DTIM Period (number of beacons)"
+    ::= { mwEssEntry    9 }
+
+  mwEssVlanSupport  OBJECT-TYPE
+    SYNTAX MwlVlanType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Tunnel Interface Type"
+    ::= { mwEssEntry   10 }
+
+  mwEssBaseTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes B Base Transmit Rates  (Mbps)"
+    ::= { mwEssEntry   11 }
+
+  mwPublishEssId  OBJECT-TYPE
+    SYNTAX MwlPublishEssId
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes SSID Broadcast"
+    ::= { mwEssEntry   12 }
+
+  mwEssABaseTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateAGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes A Base Transmit Rates (Mbps)"
+    ::= { mwEssEntry   13 }
+
+  mwEssGBaseTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateAGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes G Base Transmit Rates (Mbps)"
+    ::= { mwEssEntry   14 }
+
+  mwEssDataplaneMode  OBJECT-TYPE
+    SYNTAX MwlDataplaneMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Dataplane Mode"
+    ::= { mwEssEntry   15 }
+
+  mwEssBGBaseTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateBGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes BG Base Transmit Rates (Mbps)"
+    ::= { mwEssEntry   16 }
+
+  mwEssANBaseTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateAGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AN Base Transmit Rates (Mbps)"
+    ::= { mwEssEntry   17 }
+
+  mwEssBeaconInterval  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Beacon Interval (msec)"
+    ::= { mwEssEntry   18 }
+
+  mwEssAllowMulticast  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Allow Multicast Flag"
+    ::= { mwEssEntry   19 }
+
+  mwEssBGNBaseTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateBGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes BGN Base Transmit Rates (Mbps)"
+    ::= { mwEssEntry   20 }
+
+  mwEssCountermeasure  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Countermeasure"
+    ::= { mwEssEntry   21 }
+
+  mwEssJoinOnDiscovery  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes New AP's Join ESS"
+    ::= { mwEssEntry   22 }
+
+  mwEssANBaseHTTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateHTBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AN Base HT Transmit Rates (MCS)"
+    ::= { mwEssEntry   23 }
+
+  mwEssSupportedTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes B Supported Transmit Rates  (Mbps)"
+    ::= { mwEssEntry   24 }
+
+  mwEssBGNBaseHTTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateHTBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes BGN Base HT Transmit Rates (MCS)"
+    ::= { mwEssEntry   25 }
+
+  mwEssASupportedTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateAGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes A Supported Transmit Rates (Mbps)"
+    ::= { mwEssEntry   26 }
+
+  mwEssGSupportedTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateAGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes G Supported Transmit Rates (Mbps)"
+    ::= { mwEssEntry   27 }
+
+  mwEssBGSupportedTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateBGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes BG Supported Transmit Rates (Mbps)"
+    ::= { mwEssEntry   29 }
+
+  mwEssANSupportedTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateAGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AN Supported Transmit Rates (Mbps)"
+    ::= { mwEssEntry   30 }
+
+  mwEssSecurityProfileName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Security Profile"
+    ::= { mwEssEntry   31 }
+
+  mwEssBGNSupportedTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateBGBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes BGN Supported Transmit Rates (Mbps)"
+    ::= { mwEssEntry   32 }
+
+  mwEssANSupportedHTTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateHTBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AN Supported HT Transmit Rates (MCS)"
+    ::= { mwEssEntry   33 }
+
+  mwEssBGNSupportedHTTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateHTBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes BGN Supported HT Transmit Rates (MCS)"
+    ::= { mwEssEntry   34 }
+
+  mwEssAccountingInterimInterval  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Accounting Interim Interval (seconds)"
+    ::= { mwEssEntry   36 }
+
+  mwEssPrimaryAccountingRadiusName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary RADIUS Accounting Server"
+    ::= { mwEssEntry   37 }
+
+  mwEssSecondaryAccountingRadiusName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Secondary RADIUS Accounting Server"
+    ::= { mwEssEntry   38 }
+
+  mwEssMulticastMACTransparency  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Multicast MAC Transparency"
+    ::= { mwEssEntry   39 }
+
+  mwEssBandSteering  OBJECT-TYPE
+    SYNTAX MwlBandSteeringMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Band Steering Mode"
+    ::= { mwEssEntry   43 }
+
+  mwEssBandSteeringTimeout  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Band Steering Timeout(seconds)"
+    ::= { mwEssEntry   44 }
+
+  mwEssApVlanTag  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VLAN Tag"
+    ::= { mwEssEntry   45 }
+
+  mwEssEnableApVlanPriority  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VLAN Priority"
+    ::= { mwEssEntry   46 }
+
+  mwEssOwner  OBJECT-TYPE
+    SYNTAX MwlProfileOwner
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Owner"
+    ::= { mwEssEntry   47 }
+
+  mwEssEnableAPSD  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes APSD Support"
+    ::= { mwEssEntry   49 }
+
+  mwEssState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enable/Disable"
+    ::= { mwEssEntry   50 }
+
+  mwEssMulticastToUnicastConversion  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Multicast-to-Unicast Conversion"
+    ::= { mwEssEntry   52 }
+
+  mwEssEfOverride  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Expedited Forward Override"
+    ::= { mwEssEntry   53 }
+
+  mwEssPapBroadcastSsid  OBJECT-TYPE
+    SYNTAX MwlPapBroadcastSsidMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes SSID Broadcast Preference"
+    ::= { mwEssEntry   54 }
+
+  mwEssVirtualInterfaceProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Virtual Interface Profile Name"
+    ::= { mwEssEntry   56 }
+
+  mwEssWirelessToWirelessIsolation  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Isolate Wireless To Wireless traffic"
+    ::= { mwEssEntry   58 }
+
+  mwEssRFVMode  OBJECT-TYPE
+    SYNTAX MwlESSRFVirtualizationMode
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Virtualization Mode"
+    ::= { mwEssEntry   59 }
+
+  mwEssS1VHTBaseMCSSet  OBJECT-TYPE
+    SYNTAX MwlTransmitRateVHT
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 1 Stream VHT Base MCS Set (MCS)"
+    ::= { mwEssEntry   62 }
+
+  mwEssS2VHTBaseMCSSet  OBJECT-TYPE
+    SYNTAX MwlTransmitRateVHT
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 2 Streams VHT Base MCS Set (MCS)"
+    ::= { mwEssEntry   63 }
+
+  mwEssS3VHTBaseMCSSet  OBJECT-TYPE
+    SYNTAX MwlTransmitRateVHT
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 3 Streams VHT Base MCS Set (MCS)"
+    ::= { mwEssEntry   64 }
+
+  mwEssS1VHTSupportMCSSet  OBJECT-TYPE
+    SYNTAX MwlTransmitRateVHT
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 1 Stream VHT Supported MCS Set (MCS)"
+    ::= { mwEssEntry   65 }
+
+  mwEssS2VHTSupportMCSSet  OBJECT-TYPE
+    SYNTAX MwlTransmitRateVHT
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 2 Streams VHT Supported MCS Set (MCS)"
+    ::= { mwEssEntry   66 }
+
+  mwEssS3VHTSupportMCSSet  OBJECT-TYPE
+    SYNTAX MwlTransmitRateVHT
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 3 Streams VHT Supported MCS Set (MCS)"
+    ::= { mwEssEntry   67 }
+
+  mwEssApVlanPolicy  OBJECT-TYPE
+    SYNTAX MwlBridgedVlanType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP VLAN Policy"
+    ::= { mwEssEntry   68 }
+
+  mwEssVoiceClientType  OBJECT-TYPE
+    SYNTAX MwlVoiceClientType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Voice Client Type"
+    ::= { mwEssEntry   70 }
+
+  mwEssIpPrefixLookup  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes IP Prefix Validation"
+    ::= { mwEssEntry   71 }
+
+  mwEssFastHandoff  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11r"
+    ::= { mwEssEntry   72 }
+
+  mwEssMobilityDomain  OBJECT-TYPE
+    SYNTAX Integer32(1..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11r Group"
+    ::= { mwEssEntry   73 }
+
+  mwEssVlanPoolName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..64))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Pool Name"
+    ::= { mwEssEntry   74 }
+
+  mwEssDot11kEnabled  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11k"
+    ::= { mwEssEntry   76 }
+
+  mwEssTimerProfileName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Timer Profile"
+    ::= { mwEssEntry   77 }
+
+  mwEssIdType  OBJECT-TYPE
+    SYNTAX MwlEssIdType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes EssId Type"
+    ::= { mwEssEntry   79 }
+
+  mwBackupEssId  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Backup ESS Profile"
+    ::= { mwEssEntry   80 }
+
+  mwEssACMSupport  OBJECT-TYPE
+    SYNTAX MwlACMSupportsBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes ACM Support"
+    ::= { mwEssEntry   82 }
+
+  mwEssS4VHTBaseMCSSet  OBJECT-TYPE
+    SYNTAX MwlTransmitRateVHT
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 4 Streams VHT Base MCS Set (MCS)"
+    ::= { mwEssEntry   83 }
+
+  mwEssS4VHTSupportMCSSet  OBJECT-TYPE
+    SYNTAX MwlTransmitRateVHT
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 4 Streams VHT Supported MCS Set (MCS)"
+    ::= { mwEssEntry   84 }
+
+  mwEssQamSupport  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes 1024 QAM Support"
+    ::= { mwEssEntry   85 }
+
+  mwEssReconnectPrimaryServer  OBJECT-TYPE
+    SYNTAX Integer32(5..60)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Reconnect Primary Server (minutes)"
+    ::= { mwEssEntry   86 }
+
+  mwEssRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwEssEntry 88 }
+
+  mwIf80211Table  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwIf80211Entry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Wireless Interface Configuration "
+    ::= { mwConfigWlan 3 }
+
+  mwIf80211Entry  OBJECT-TYPE
+    SYNTAX MwIf80211Entry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Wireless Interface Configuration "
+    INDEX {  mwIf80211TableIndex  }
+    ::= { mwIf80211Table 1 }
+
+  MwIf80211Entry  ::=  SEQUENCE { 
+       mwIf80211TableIndex                                         Integer32, 
+       mwIf80211IfMode                                             MwlApIfConfigModeType,
+       mwIf80211IfDescr                                            DisplayString(SIZE (0..256)),
+       mwIf80211RFVMode                                            MwlIFRFVirtualizationMode,
+       mwIf80211IfApMode                                           MwlApMode,
+       mwIf80211IfChannel                                          Integer32,
+       mwIf80211NOnlyMode                                          MwlOnOffSwitch,
+       mwIf80211IfMimoMode                                         MwlMimoMode,
+       mwIf80211IfVhtStatus                                        MwlEnableDisableOption,
+       mwIf80211STBCSupport                                        MwlOnOffSwitch,
+       mwIf80211channelWidth                                       MwlChannelWidth,
+       mwIf80211IfMeshStatus                                       MwlEnableDisableOption,
+       mwIf80211IfAdminStatus                                      MwlIfAdministrativeState,
+       mwIf80211IfTxPowerHigh                                      Integer32,
+       mwIf80211DFSChanRevertive                                   Integer32(30..1440),
+       mwIf80211DFSFallbackOption                                  MwlEnableDisableOption,
+       mwIf80211IfFallbackChannel                                  Integer32,
+       mwIf80211IfBgProtectionMode                                 MwlBgProtectionModeType,
+       mwIf80211IfHtProtectionMode                                 MwlHtProtectionModeType,
+       mwIf80211IfShortPreambleFlag                                MwlOnOffSwitch,
+       mwIf80211ProbeResponseThreshold                             Unsigned32,
+       mwIf80211TransmitBeamformingSupport                         MwlTxBeamSupport,
+       mwIf80211IfMtu                                              Unsigned32,
+       mwIf80211IfType                                             MwlApRfType,
+       mwIf80211IfIndex                                            Integer32,
+       mwIf80211IfNodeId                                           Unsigned32,
+       mwIf80211ApHwType                                           MwlApHwType,
+       mwIf80211IfNodeName                                         DisplayString,
+       mwIf80211UplinkType                                         MwlUplinkType,
+       mwIf80211IfOperStatus                                       MwlOperationalState,
+       mwIf80211IfLastChange                                       DateAndTime,
+       mwIf80211IfOperChannel                                      Integer32,
+       mwIf80211IfBandSupport                                      MwlApIfModeType,
+       mwIf80211IfNumAntennas                                      Integer32,
+       mwIf80211ChannelCenterFrequency                             MwlChannelCenterFrequency,
+       mwIf80211FallbackChannelCenterFrequency                     MwlChannelCenterFrequency 
+  }
+   
+   
+  mwIf80211TableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwIf80211Entry 1 }
+
+  mwIf80211IfMode  OBJECT-TYPE
+    SYNTAX MwlApIfConfigModeType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Band Selection"
+    ::= { mwIf80211Entry    2 }
+
+  mwIf80211IfDescr  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..256))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Description"
+    ::= { mwIf80211Entry    3 }
+
+  mwIf80211IfApMode  OBJECT-TYPE
+    SYNTAX MwlApMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Mode"
+    ::= { mwIf80211Entry    4 }
+
+  mwIf80211IfChannel  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary Channel"
+    ::= { mwIf80211Entry    5 }
+
+  mwIf80211NOnlyMode  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes 802.11n only mode"
+    ::= { mwIf80211Entry    7 }
+
+  mwIf80211IfMimoMode  OBJECT-TYPE
+    SYNTAX MwlMimoMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes MIMO Mode"
+    ::= { mwIf80211Entry   11 }
+
+  mwIf80211channelWidth  OBJECT-TYPE
+    SYNTAX MwlChannelWidth
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel Width"
+    ::= { mwIf80211Entry   13 }
+
+  mwIf80211IfAdminStatus  OBJECT-TYPE
+    SYNTAX MwlIfAdministrativeState
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Administrative Status"
+    ::= { mwIf80211Entry   17 }
+
+  mwIf80211IfTxPowerHigh  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Power(EIRP)"
+    ::= { mwIf80211Entry   18 }
+
+  mwIf80211IfBgProtectionMode  OBJECT-TYPE
+    SYNTAX MwlBgProtectionModeType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes B/G Protection Mode"
+    ::= { mwIf80211Entry   19 }
+
+  mwIf80211IfShortPreambleFlag  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Short Preamble"
+    ::= { mwIf80211Entry   20 }
+
+  mwIf80211IfMtu  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes MTU (bytes)"
+    ::= { mwIf80211Entry   21 }
+
+  mwIf80211IfType  OBJECT-TYPE
+    SYNTAX MwlApRfType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio Type"
+    ::= { mwIf80211Entry   22 }
+
+  mwIf80211IfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwIf80211Entry   23 }
+
+  mwIf80211IfNodeId  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwIf80211Entry   24 }
+
+  mwIf80211ApHwType  OBJECT-TYPE
+    SYNTAX MwlApHwType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Model"
+    ::= { mwIf80211Entry   25 }
+
+  mwIf80211IfNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwIf80211Entry   26 }
+
+  mwIf80211IfOperStatus  OBJECT-TYPE
+    SYNTAX MwlOperationalState
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operational Status"
+    ::= { mwIf80211Entry   27 }
+
+  mwIf80211IfLastChange  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Last Change Time"
+    ::= { mwIf80211Entry   28 }
+
+  mwIf80211IfOperChannel  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operating Channel"
+    ::= { mwIf80211Entry   29 }
+
+  mwIf80211IfBandSupport  OBJECT-TYPE
+    SYNTAX MwlApIfModeType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Band Support"
+    ::= { mwIf80211Entry   30 }
+
+  mwIf80211IfNumAntennas  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Number of Antennas"
+    ::= { mwIf80211Entry   40 }
+
+  mwIf80211ProbeResponseThreshold  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Probe Response Threshold"
+    ::= { mwIf80211Entry   42 }
+
+  mwIf80211IfMeshStatus  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Mesh Service Admin Status"
+    ::= { mwIf80211Entry   44 }
+
+  mwIf80211UplinkType  OBJECT-TYPE
+    SYNTAX MwlUplinkType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Uplink Type"
+    ::= { mwIf80211Entry   45 }
+
+  mwIf80211IfHtProtectionMode  OBJECT-TYPE
+    SYNTAX MwlHtProtectionModeType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes HT Protection Mode"
+    ::= { mwIf80211Entry   46 }
+
+  mwIf80211IfFallbackChannel  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes DFS Fallback Channel"
+    ::= { mwIf80211Entry   47 }
+
+  mwIf80211RFVMode  OBJECT-TYPE
+    SYNTAX MwlIFRFVirtualizationMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Virtualization Mode"
+    ::= { mwIf80211Entry   48 }
+
+  mwIf80211ChannelCenterFrequency  OBJECT-TYPE
+    SYNTAX MwlChannelCenterFrequency
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel Center Frequency Index (0=N/A)"
+    ::= { mwIf80211Entry   49 }
+
+  mwIf80211TransmitBeamformingSupport  OBJECT-TYPE
+    SYNTAX MwlTxBeamSupport
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Transmit Beamforming Support"
+    ::= { mwIf80211Entry   50 }
+
+  mwIf80211STBCSupport  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes STBC Support"
+    ::= { mwIf80211Entry   51 }
+
+  mwIf80211DFSFallbackOption  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes DFS Fallback Option"
+    ::= { mwIf80211Entry   52 }
+
+  mwIf80211DFSChanRevertive  OBJECT-TYPE
+    SYNTAX Integer32(30..1440)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes DFS Channel Revertive(minutes)"
+    ::= { mwIf80211Entry   53 }
+
+  mwIf80211FallbackChannelCenterFrequency  OBJECT-TYPE
+    SYNTAX MwlChannelCenterFrequency
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes DFS Fallback Channel Center Frequency (0=N/A)"
+    ::= { mwIf80211Entry   54 }
+
+  mwIf80211IfVhtStatus  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes VHT Service Status"
+    ::= { mwIf80211Entry   55 }
+
+  mwEssApTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwEssApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS-AP Configuration "
+    ::= { mwConfigWlan 4 }
+
+  mwEssApEntry  OBJECT-TYPE
+    SYNTAX MwEssApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS-AP Configuration "
+    INDEX {  mwEssApTableIndex  }
+    ::= { mwEssApTable 1 }
+
+  MwEssApEntry  ::=  SEQUENCE { 
+       mwEssApTableIndex                                           Integer32, 
+       mwEssApEssId                                                DisplayString,
+       mwEssApIfIndex                                              Integer32,
+       mwEssApMaxCalls                                             Unsigned32,
+       mwEssApApNodeId                                             Integer32(1..65535),
+       mwEssApBssId                                                MacAddress,
+       mwEssApIfMode                                               MwlApIfConfigModeType,
+       mwEssApAdminMode                                            MwlEssApAdminMode,
+       mwEssApApNodeName                                           DisplayString,
+       mwEssApBaseTxRates                                          MwlTransmitRateBGBits,
+       mwEssApChannelNumber                                        Integer32,
+       mwEssApIfOperChannel                                        Integer32,
+       mwEssApSupportedTxRates                                     MwlTransmitRateBGBits,
+       mwEssApRowStatus                                            RowStatus 
+  }
+   
+   
+  mwEssApTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwEssApEntry 1 }
+
+  mwEssApEssId  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes ESS Profile"
+    ::= { mwEssApEntry    2 }
+
+  mwEssApIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwEssApEntry    3 }
+
+  mwEssApMaxCalls  OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Max Calls"
+    ::= { mwEssApEntry    4 }
+
+  mwEssApApNodeId  OBJECT-TYPE
+    SYNTAX Integer32(1..65535)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwEssApEntry    5 }
+
+  mwEssApBssId  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes BSSID"
+    ::= { mwEssApEntry    6 }
+
+  mwEssApIfMode  OBJECT-TYPE
+    SYNTAX MwlApIfConfigModeType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Mode"
+    ::= { mwEssApEntry    7 }
+
+  mwEssApApNodeName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwEssApEntry    8 }
+
+  mwEssApBaseTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateBGBits
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Base Transmit Rates  (Mbps)"
+    ::= { mwEssApEntry    9 }
+
+  mwEssApChannelNumber  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Channel"
+    ::= { mwEssApEntry   10 }
+
+  mwEssApIfOperChannel  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Operating Channel"
+    ::= { mwEssApEntry   11 }
+
+  mwEssApSupportedTxRates  OBJECT-TYPE
+    SYNTAX MwlTransmitRateBGBits
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Supported Transmit Rates  (Mbps)"
+    ::= { mwEssApEntry   12 }
+
+  mwEssApAdminMode  OBJECT-TYPE
+    SYNTAX MwlEssApAdminMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Admin State"
+    ::= { mwEssApEntry   13 }
+
+  mwEssApRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwEssApEntry 14 }
+
+  mwMeshProfileTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwMeshProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Mesh Configuration "
+    ::= { mwConfigWlan 7 }
+
+  mwMeshProfileEntry  OBJECT-TYPE
+    SYNTAX MwMeshProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Mesh Configuration "
+    INDEX {  mwMeshProfileTableIndex  }
+    ::= { mwMeshProfileTable 1 }
+
+  MwMeshProfileEntry  ::=  SEQUENCE { 
+       mwMeshProfileTableIndex                                     Integer32, 
+       mwMeshProfileName                                           DisplayString(SIZE (1..32)),
+       mwMeshProfileDescr                                          DisplayString(SIZE (0..128)),
+       mwMeshProfileAdminMode                                      MwlEnableDisableOption,
+       mwMeshProfileMeshVlanTrunk                                  MwlEnableDisableOption,
+       mwMeshProfilePlugNPlayStatus                                MwlEnableDisableOption,
+       mwMeshProfilePSK                                            DisplayString(SIZE (0..66)),
+       mwMeshProfileRowStatus                                      RowStatus 
+  }
+   
+   
+  mwMeshProfileTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwMeshProfileEntry 1 }
+
+  mwMeshProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Name"
+    ::= { mwMeshProfileEntry    2 }
+
+  mwMeshProfileDescr  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..128))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Description"
+    ::= { mwMeshProfileEntry    3 }
+
+  mwMeshProfilePSK  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (0..66))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Pre-shared Key (Alphanumeric/Hexadecimal)"
+    ::= { mwMeshProfileEntry    4 }
+
+  mwMeshProfileAdminMode  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Admin Mode"
+    ::= { mwMeshProfileEntry    5 }
+
+  mwMeshProfilePlugNPlayStatus  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes PlugNPlay Status"
+    ::= { mwMeshProfileEntry    6 }
+
+  mwMeshProfileMeshVlanTrunk  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes VLAN Trunking"
+    ::= { mwMeshProfileEntry    7 }
+
+  mwMeshProfileRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwMeshProfileEntry 25 }
+
+  mwMeshApTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwMeshApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Mesh-AP member table "
+    ::= { mwConfigWlan 8 }
+
+  mwMeshApEntry  OBJECT-TYPE
+    SYNTAX MwMeshApEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Mesh-AP member table "
+    INDEX {  mwMeshApTableIndex  }
+    ::= { mwMeshApTable 1 }
+
+  MwMeshApEntry  ::=  SEQUENCE { 
+       mwMeshApTableIndex                                          Integer32, 
+       mwMeshApName                                                DisplayString(SIZE (1..32)),
+       mwMeshApAPId                                                Integer32,
+       mwMeshApDescr                                               DisplayString(SIZE (1..63)),
+       mwMeshApAPMac                                               MacAddress,
+       mwMeshApUpIfIndex                                           Integer32,
+       mwMeshApUpChannel                                           Integer32,
+       mwMeshApAvailState                                          MwlAvailabilityStatus,
+       mwMeshApParentAPId                                          Integer32,
+       mwMeshApParentAPMac                                         MacAddress,
+       mwMeshApDownIfIndex                                         Integer32,
+       mwMeshApDownChannel                                         Integer32,
+       mwMeshApRowStatus                                           RowStatus 
+  }
+   
+   
+  mwMeshApTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwMeshApEntry 1 }
+
+  mwMeshApName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Mesh Name"
+    ::= { mwMeshApEntry    2 }
+
+  mwMeshApAPId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP ID"
+    ::= { mwMeshApEntry    3 }
+
+  mwMeshApAPMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Mac Address"
+    ::= { mwMeshApEntry    4 }
+
+  mwMeshApAvailState  OBJECT-TYPE
+    SYNTAX MwlAvailabilityStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Available State"
+    ::= { mwMeshApEntry    5 }
+
+  mwMeshApParentAPId  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Parent AP ID"
+    ::= { mwMeshApEntry    6 }
+
+  mwMeshApParentAPMac  OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Parent AP Mac Address"
+    ::= { mwMeshApEntry    7 }
+
+  mwMeshApUpIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Uplink Interface Index"
+    ::= { mwMeshApEntry    8 }
+
+  mwMeshApUpChannel  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Uplink Channel"
+    ::= { mwMeshApEntry    9 }
+
+  mwMeshApDownIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Downlink Interface Index"
+    ::= { mwMeshApEntry   10 }
+
+  mwMeshApDownChannel  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Downlink Channel"
+    ::= { mwMeshApEntry   11 }
+
+  mwMeshApDescr  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..63))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes AP Name"
+    ::= { mwMeshApEntry   12 }
+
+  mwMeshApRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwMeshApEntry 13 }
+
+  mwDefaultIf80211SettingsTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwDefaultIf80211SettingsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Default Wireless Interface Settings "
+    ::= { mwConfigWlan 9 }
+
+  mwDefaultIf80211SettingsEntry  OBJECT-TYPE
+    SYNTAX MwDefaultIf80211SettingsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Default Wireless Interface Settings "
+    INDEX {  mwDefaultIf80211SettingsTableIndex  }
+    ::= { mwDefaultIf80211SettingsTable 1 }
+
+  MwDefaultIf80211SettingsEntry  ::=  SEQUENCE { 
+       mwDefaultIf80211SettingsTableIndex                          Integer32, 
+       mwDefaultIf80211SettingsIfMode                              MwlApIfConfigModeType,
+       mwDefaultIf80211SettingsIfChannel                           Integer32,
+       mwDefaultIf80211SettingsIfChannelWidth                      MwlChannelWidth,
+       mwDefaultIf80211SettingsIfIndex                             Integer32 
+  }
+   
+   
+  mwDefaultIf80211SettingsTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwDefaultIf80211SettingsEntry 1 }
+
+  mwDefaultIf80211SettingsIfIndex  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Interface Index"
+    ::= { mwDefaultIf80211SettingsEntry    2 }
+
+  mwDefaultIf80211SettingsIfMode  OBJECT-TYPE
+    SYNTAX MwlApIfConfigModeType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes RF Band Selection"
+    ::= { mwDefaultIf80211SettingsEntry    3 }
+
+  mwDefaultIf80211SettingsIfChannel  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Primary Channel"
+    ::= { mwDefaultIf80211SettingsEntry    4 }
+
+  mwDefaultIf80211SettingsIfChannelWidth  OBJECT-TYPE
+    SYNTAX MwlChannelWidth
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes ChannelWidth"
+    ::= { mwDefaultIf80211SettingsEntry    5 }
+
+  mwEventConfigurationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwEventConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Events Configuration Table "
+    ::= { mwConfigWlan 10 }
+
+  mwEventConfigurationEntry  OBJECT-TYPE
+    SYNTAX MwEventConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Events Configuration Table "
+    INDEX {  mwEventConfigurationTableIndex  }
+    ::= { mwEventConfigurationTable 1 }
+
+  MwEventConfigurationEntry  ::=  SEQUENCE { 
+       mwEventConfigurationTableIndex                              Integer32, 
+       mwEventConfigurationSnmp                                    MwlEnableDisableOption,
+       mwEventConfigurationState                                   MwlEnableDisableOption,
+       mwEventConfigurationSyslog                                  MwlEnableDisableOption,
+       mwEventConfigurationSeverity                                MwlNotificationSeverity,
+       mwEventConfigurationThreshold                               Integer32,
+       mwEventConfigurationEventType                               MwlNotificationType 
+  }
+   
+   
+  mwEventConfigurationTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwEventConfigurationEntry 1 }
+
+  mwEventConfigurationEventType  OBJECT-TYPE
+    SYNTAX MwlNotificationType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Event Name"
+    ::= { mwEventConfigurationEntry    2 }
+
+  mwEventConfigurationState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes State"
+    ::= { mwEventConfigurationEntry    3 }
+
+  mwEventConfigurationSeverity  OBJECT-TYPE
+    SYNTAX MwlNotificationSeverity
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Severity"
+    ::= { mwEventConfigurationEntry    4 }
+
+  mwEventConfigurationSyslog  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Syslog"
+    ::= { mwEventConfigurationEntry    5 }
+
+  mwEventConfigurationSnmp  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes SNMP"
+    ::= { mwEventConfigurationEntry    6 }
+
+  mwEventConfigurationThreshold  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Threshold Limit"
+    ::= { mwEventConfigurationEntry    7 }
+
+  mwAlarmConfigurationTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwAlarmConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Alarms Configuration Table "
+    ::= { mwConfigWlan 11 }
+
+  mwAlarmConfigurationEntry  OBJECT-TYPE
+    SYNTAX MwAlarmConfigurationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Alarms Configuration Table "
+    INDEX {  mwAlarmConfigurationTableIndex  }
+    ::= { mwAlarmConfigurationTable 1 }
+
+  MwAlarmConfigurationEntry  ::=  SEQUENCE { 
+       mwAlarmConfigurationTableIndex                              Integer32, 
+       mwAlarmConfigurationSnmp                                    MwlEnableDisableOption,
+       mwAlarmConfigurationState                                   MwlEnableDisableOption,
+       mwAlarmConfigurationSyslog                                  MwlEnableDisableOption,
+       mwAlarmConfigurationSeverity                                MwlNotificationSeverity,
+       mwAlarmConfigurationThreshold                               Integer32,
+       mwAlarmConfigurationAlarmType                               MwlNotificationType 
+  }
+   
+   
+  mwAlarmConfigurationTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwAlarmConfigurationEntry 1 }
+
+  mwAlarmConfigurationAlarmType  OBJECT-TYPE
+    SYNTAX MwlNotificationType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Alarm Name"
+    ::= { mwAlarmConfigurationEntry    2 }
+
+  mwAlarmConfigurationState  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Triggering Condition"
+    ::= { mwAlarmConfigurationEntry    3 }
+
+  mwAlarmConfigurationSeverity  OBJECT-TYPE
+    SYNTAX MwlNotificationSeverity
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Severity"
+    ::= { mwAlarmConfigurationEntry    4 }
+
+  mwAlarmConfigurationSyslog  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Syslog"
+    ::= { mwAlarmConfigurationEntry    5 }
+
+  mwAlarmConfigurationSnmp  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes SNMP"
+    ::= { mwAlarmConfigurationEntry    6 }
+
+  mwAlarmConfigurationThreshold  OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describes Threshold"
+    ::= { mwAlarmConfigurationEntry    7 }
+
+  mwTimerProfileTable  OBJECT-TYPE
+    SYNTAX SEQUENCE OF MwTimerProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Timer Profile Table "
+    ::= { mwConfigWlan 14 }
+
+  mwTimerProfileEntry  OBJECT-TYPE
+    SYNTAX MwTimerProfileEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+         "This object describes Timer Profile Table "
+    INDEX {  mwTimerProfileTableIndex  }
+    ::= { mwTimerProfileTable 1 }
+
+  MwTimerProfileEntry  ::=  SEQUENCE { 
+       mwTimerProfileTableIndex                                    Integer32, 
+       mwTimerProfileName                                          DisplayString(SIZE (1..32)),
+       mwTimerProfileTimerType                                     MwlTimerType,
+       mwTimerProfileAbsEndTime1                                   DateAndTime,
+       mwTimerProfileAbsEndTime2                                   DateAndTime,
+       mwTimerProfileAbsEndTime3                                   DateAndTime,
+       mwTimerProfileAbsStartTime1                                 DateAndTime,
+       mwTimerProfileAbsStartTime2                                 DateAndTime,
+       mwTimerProfileAbsStartTime3                                 DateAndTime,
+       mwTimerProfileDaysOfTheWeek                                 MwlDaysOfTheWeekBits,
+       mwTimerProfileInPeriodicEndTime1                            DisplayString,
+       mwTimerProfileInPeriodicEndTime2                            DisplayString,
+       mwTimerProfileInPeriodicEndTime3                            DisplayString,
+       mwTimerProfileInPeriodicStartTime1                          DisplayString,
+       mwTimerProfileInPeriodicStartTime2                          DisplayString,
+       mwTimerProfileInPeriodicStartTime3                          DisplayString,
+       mwTimerProfileOwner                                         MwlProfileOwner,
+       mwTimerProfileRowStatus                                     RowStatus 
+  }
+   
+   
+  mwTimerProfileTableIndex  OBJECT-TYPE
+    SYNTAX Integer32 
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "The index value of the  table "
+    ::= { mwTimerProfileEntry 1 }
+
+  mwTimerProfileName  OBJECT-TYPE
+    SYNTAX DisplayString(SIZE (1..32))
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Timer Profile Name"
+    ::= { mwTimerProfileEntry    2 }
+
+  mwTimerProfileOwner  OBJECT-TYPE
+    SYNTAX MwlProfileOwner
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object describes Owner"
+    ::= { mwTimerProfileEntry    3 }
+
+  mwTimerProfileTimerType  OBJECT-TYPE
+    SYNTAX MwlTimerType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Timer Profile Type"
+    ::= { mwTimerProfileEntry    4 }
+
+  mwTimerProfileAbsStartTime1  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Service Start Time 1"
+    ::= { mwTimerProfileEntry    5 }
+
+  mwTimerProfileAbsEndTime1  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Service End Time 1"
+    ::= { mwTimerProfileEntry    6 }
+
+  mwTimerProfileAbsStartTime2  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Service Start Time 2"
+    ::= { mwTimerProfileEntry    7 }
+
+  mwTimerProfileAbsEndTime2  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Service End Time 2"
+    ::= { mwTimerProfileEntry    8 }
+
+  mwTimerProfileAbsStartTime3  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Service Start Time 3"
+    ::= { mwTimerProfileEntry    9 }
+
+  mwTimerProfileAbsEndTime3  OBJECT-TYPE
+    SYNTAX DateAndTime
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Service End Time 3"
+    ::= { mwTimerProfileEntry   10 }
+
+  mwTimerProfileDaysOfTheWeek  OBJECT-TYPE
+    SYNTAX MwlDaysOfTheWeekBits
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Days Of The Week"
+    ::= { mwTimerProfileEntry   11 }
+
+  mwTimerProfileInPeriodicStartTime1  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Time Interval Start 1"
+    ::= { mwTimerProfileEntry   12 }
+
+  mwTimerProfileInPeriodicEndTime1  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Time Interval End 1"
+    ::= { mwTimerProfileEntry   13 }
+
+  mwTimerProfileInPeriodicStartTime2  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Time Interval Start 2"
+    ::= { mwTimerProfileEntry   14 }
+
+  mwTimerProfileInPeriodicEndTime2  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Time Interval End 2"
+    ::= { mwTimerProfileEntry   15 }
+
+  mwTimerProfileInPeriodicStartTime3  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Time Interval Start 3"
+    ::= { mwTimerProfileEntry   16 }
+
+  mwTimerProfileInPeriodicEndTime3  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Time Interval End 3"
+    ::= { mwTimerProfileEntry   17 }
+
+  mwTimerProfileRowStatus  OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object is used to create and delete rows in the table"
+    ::= { mwTimerProfileEntry 26 }
+
+  mwMcaVarsAutoChannelMode  OBJECT-TYPE
+    SYNTAX MwlEnableDisableOption
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Enable/Disable Auto Channel"
+    ::= { mwMcaVars    3 }
+
+  mwMcaVarsRadio1Channel  OBJECT-TYPE
+    SYNTAX Integer32(1..11)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio 1 Channel"
+    ::= { mwMcaVars    4 }
+
+  mwMcaVarsRadio1ChannelWidth  OBJECT-TYPE
+    SYNTAX MwlChannelWidth
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio 1 Channel Width"
+    ::= { mwMcaVars    5 }
+
+  mwMcaVarsRadio2Channel  OBJECT-TYPE
+    SYNTAX Integer32(36..165)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio 2 Channel"
+    ::= { mwMcaVars    6 }
+
+  mwMcaVarsRadio2ChannelWidth  OBJECT-TYPE
+    SYNTAX MwlChannelWidth
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Radio 2 Channel Width"
+    ::= { mwMcaVars    7 }
+
+  mwMcaVarsAutoPower  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Auto Power on/off"
+    ::= { mwMcaVars    8 }
+
+  mwMcaVarsFreeze  OBJECT-TYPE
+    SYNTAX MwlYesNoSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Freeze yes/no"
+    ::= { mwMcaVars    9 }
+
+  mwMcaVarsTimer  OBJECT-TYPE
+    SYNTAX Integer32(15..3600)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Timer"
+    ::= { mwMcaVars   10 }
+
+  mwMcaVarsDfs  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Dfs on/off"
+    ::= { mwMcaVars   11 }
+
+  mwMcaVarsTimerState  OBJECT-TYPE
+    SYNTAX MwlOnOffSwitch
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object describes Timer State on/off"
+    ::= { mwMcaVars   12 }
+
+  
+END
+   

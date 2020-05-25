@@ -1,0 +1,74 @@
+--  *****************************************************************
+--  DLINKSW-NETWORK-PORT-PROTECT-MIB.mib : DLINK discovery protocol MIB
+      
+--
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+DLINKSW-NETWORK-PROTOCOL-PORT-PROTECT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32
+                FROM SNMPv2-SMI
+        TruthValue
+                FROM SNMPv2-TC 
+		MODULE-COMPLIANCE,
+		OBJECT-GROUP
+		FROM SNMPv2-CONF       
+        dlinkIndustrialCommon
+            	FROM DLINK-ID-REC-MIB;
+            
+            
+    dlinkSwNetworkProtocolPortProtectMIB MODULE-IDENTITY
+        LAST-UPDATED "201711270000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for network protocol port protect."
+
+        REVISION "201711270000Z"
+        DESCRIPTION
+            " This is the first version of the MIB file.
+            "
+        ::= { dlinkIndustrialCommon 194 }
+
+-- -----------------------------------------------------------------------------
+    dNetworkProtocolPortProtectObjects          OBJECT IDENTIFIER ::= { dlinkSwNetworkProtocolPortProtectMIB 1 }
+    
+-- -----------------------------------------------------------------------------
+-- Notifications
+-- -----------------------------------------------------------------------------
+
+-- -----------------------------------------------------------------------------
+-- Objects
+-- -----------------------------------------------------------------------------
+    dNetworkProtocolPortProtectCtrl            OBJECT IDENTIFIER ::= { dNetworkProtocolPortProtectObjects 1 }
+
+    dNetworkProtocolPortProtectTCPState  OBJECT-TYPE
+        SYNTAX        TruthValue    
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "When enable it switch will not response for the closed TCP port."
+       DEFVAL { true }   	
+        ::= { dNetworkProtocolPortProtectCtrl 1 }
+       
+      dNetworkProtocolPortProtectUDPState  OBJECT-TYPE
+        SYNTAX        TruthValue    
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION
+            "When enable it switch will not response for the closed UDP port."
+       DEFVAL { true }   	
+        ::= { dNetworkProtocolPortProtectCtrl 2 }
+
+END

@@ -1,0 +1,79 @@
+-- Copyright 2017 BlueCat Networks. All rights reserved.
+-- *****************************************************************
+-- BCN-SMI-MIB.mib:  BlueCat Networks Enterprise Structure of
+--                   Management Information
+--
+-- December 2010, Fabian Ischia
+--
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+BCN-SMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    bluecatnetworks
+        FROM BLUECATNETWORKS-MIB;
+
+bcnSMI MODULE-IDENTITY
+    LAST-UPDATED "201011300000Z"
+    ORGANIZATION "BlueCat Networks Inc."
+    CONTACT-INFO
+        "Adonis Technical Support
+        BlueCat Networks Inc.
+ 		 
+        Tel: +1 866 491 2228 (toll free)
+ 		     +1 416 646 8400 (international) 
+        Email: support@bluecatnetworks.com"
+    DESCRIPTION
+        "The Structure of Management Information for
+        Bluecat Networks enterprise."
+    REVISION     "201011300000Z"
+ 	DESCRIPTION "Initial version of this MIB module."
+ 	::= { bcnModules 1 }
+
+-- bluecatnetworks.1 is assigned to bluecatnetworksId on BLUECATNETWORKS-MIB
+
+bcnProducts OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "bcnProducts is the root for the OID values defined in
+         BCN-PRODUCTS-MIB.
+         Products might include hardware and/or software."
+    ::= { bluecatnetworks 2 }
+
+bcnMgmt OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "bcnSystems is the main subtree for new MIBs."
+    ::= { bluecatnetworks 3 }
+
+bcnServices OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "bcnServices is the root for the OID values defined in 
+         BCN-SERVICES-MIB.
+         The intention is that the set of services define the type of
+         system."
+    ::= { bcnMgmt 1 }
+
+bcnModules OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "bcnModules provides a root object identifier from which 
+        MODULE-IDENTITY values may be assigned."
+    ::= { bluecatnetworks 4 }
+
+bcnExperimental OBJECT-IDENTITY
+    STATUS          current
+    DESCRIPTION
+        "The bcnExperimental branch is intended for work in progress mibs.
+        Objects in this part of the tree will be deleted when the work is
+        complete and moved to its permanent location."
+    ::= { bluecatnetworks 5 }
+
+
+END

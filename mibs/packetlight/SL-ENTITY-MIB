@@ -1,0 +1,599 @@
+-- *****************************************************************
+-- Modules MIB
+-- *****************************************************************
+
+SL-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, mib-2, NOTIFICATION-TYPE,
+    TimeTicks         
+        FROM SNMPv2-SMI
+    TDomain, TAddress, TEXTUAL-CONVENTION, DisplayString,
+    AutonomousType, RowStatus, TimeStamp, TruthValue, PhysAddress
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+	InterfaceIndex		               	
+		FROM IF-MIB
+    slMain				      		
+    	FROM SL-MAIN-MIB;
+
+slmEntity MODULE-IDENTITY
+    LAST-UPDATED "200008280000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+    DESCRIPTION
+		"The MIB module for representing multiple physical
+		entities supported by a single SNMP agent. The MIB
+		is based on the standard RFC-2737 entity-mib."
+    ::= { slMain 6 }
+
+-- Textual Conventions
+
+PhysicalIndex ::= TEXTUAL-CONVENTION
+    STATUS            current
+    DESCRIPTION
+            "An arbitrary value which uniquely identifies the physical
+            entity.  The value should be a small positive integer; index
+            values for different physical entities are not necessarily
+            contiguous.
+            The index 0 is for the Shelf.
+            The indices 1..100 are for the Cards.
+            The indices 101..102 are reserved for the Power-Supply.
+            The indices 103..110 are reserved for the Fans."
+    SYNTAX INTEGER (0..255)
+
+PhysicalClass ::= TEXTUAL-CONVENTION
+    STATUS            current
+    DESCRIPTION
+            "An enumerated value which provides an indication of the
+            general hardware type of a particular physical entity.
+            There are no restrictions as to the number of
+            slEntPhysicalEntries of each slEntPhysicalClass, which must be
+            instantiated by an agent.
+
+            The enumeration 'other' is applicable if the physical entity
+            class is known, but does not match any of the supported
+            values.
+
+            The enumeration 'unknown' is applicable if the physical
+            entity class is unknown to the agent.
+
+            The enumeration 'chassis' is applicable if the physical
+            entity class is an overall container for networking
+            equipment.  Any class of physical entity except a stack may
+            be contained within a chassis, and a chassis may only be
+            contained within a stack.
+
+            The enumeration 'backplane' is applicable if the physical
+            entity class is some sort of device for aggregating and
+            forwarding networking traffic, such as a shared backplane in
+            a modular ethernet switch.  Note that an agent may model a
+            backplane as a single physical entity, which is actually
+            implemented as multiple discrete physical components (within
+            a chassis or stack).
+
+            The enumeration 'container' is applicable if the physical
+            entity class is capable of containing one or more removable
+            physical entities, possibly of different types. For example,
+            each (empty or full) slot in a chassis will be modeled as a
+            container. Note that all removable physical entities should
+            be modeled within a container entity, such as field-
+            replaceable modules, fans, or power supplies.  Note that all
+            known containers should be modeled by the agent, including
+            empty containers.
+
+            The enumeration 'powerSupply' is applicable if the physical
+            entity class is a power-supplying component.
+
+            The enumeration 'fan' is applicable if the physical entity
+            class is a fan or other heat-reduction component.
+
+            The enumeration 'sensor' is applicable if the physical
+            entity class is some sort of sensor, such as a temperature
+            sensor within a router chassis.
+
+            The enumeration 'module' is applicable if the physical
+            entity class is some sort of self-contained sub-system.  If
+            it is removable, then it should be modeled within a
+            container entity, otherwise it should be modeled directly
+            within another physical entity (e.g., a chassis or another
+            module).
+
+            The enumeration 'port' is applicable if the physical entity
+            class is some sort of networking port, capable of receiving
+            and/or transmitting networking traffic.
+
+            The enumeration 'stack' is applicable if the physical entity
+            class is some sort of super-container (possibly virtual),
+            intended to group together multiple chassis entities.  A
+            stack may be realized by a 'virtual' cable, a real
+            interconnect cable, attached to multiple chassis, or may in
+            fact be comprised of multiple interconnect cables. A stack
+            should not be modeled within any other physical entities,
+            but a stack may be contained within another stack.  Only
+            chassis entities should be contained within a stack."
+    SYNTAX      INTEGER  {
+       other(1),
+       unknown(2),
+       chassis(3),
+       backplane(4),
+       container(5),     -- e.g., chassis slot or daughter-card holder
+       powerSupply(6),
+       fan(7),
+       sensor(8),
+       module(9),        -- e.g., plug-in card or daughter-card
+       port(10),
+       stack(11)         -- e.g., stack of multiple chassis entities
+    }
+
+PhysicalType ::= TEXTUAL-CONVENTION
+    STATUS            current
+    DESCRIPTION
+            "An enumerated value which provides an indication of the
+            general card type of a particular physical entity.
+            There are no restrictions as to the number of
+            slEntPhysicalEntries of each PhysicalType, which must be
+            instantiated by an agent."
+    SYNTAX      INTEGER  {
+       	powerModule(1),              -- PSU on slots 201,202
+    	fanModule(2),                -- FAN on slots 203 to 210
+    	switchModule(3),             -- MCC on slots 8 and 9
+    	trunkModule(4),              -- Trunk on slots 2..7 and 10..15
+    	oc12Module(5),               -- OC12
+    	gbeModule(6),                -- GBE
+    	fcModule(7),                 -- FC
+    	passiveModule(8),            -- Slots 1 and 16 and for 2..15 slots with Mux/IO
+    	trunkModuleTransponding(9),  --
+    	oc3Module(10),               -- OC3
+    	ds3Module(11),               -- DS3
+    	oc48tdmModule(12),           -- OC48
+    	transpondingModule(13),      -- Transponding
+    	edfaModule(14),              -- EDFA - an optical fiber amplifier
+    	transponding10GModule(15),   -- 10G Transponder
+    	trunk10GModule(16),          -- 10Gb Trunk 
+    	esconModule(17),             -- Escon
+    	gbeAggModule(18),            -- GBE Aggregation
+    	esconTrunkModule(19),        -- Escon with framer
+    	fc2gModule(20),              -- 2GB Fibre Channel
+        pl16000(90),                 -- 
+        pl10(91),                    -- PL-10
+        pl20(92),                    -- PL-20
+        pl100(93),                   -- PL-100
+        pl400PmPiggy(94),            -- PL-400 PM Piggy
+        pl400MuxPiggy(95),			 -- PL-400 Muxponder Piggy
+        pl400(96),					 -- PL-400 
+        pl1000(97),					 -- PL-1000 
+        pl200(98),					 -- PL-200 
+        pl400E(99),					 -- PL-400E 
+    	unknown(100),                -- Module type is unknown (yet)
+    	pl800(800)                   -- PL-800
+    }            
+
+
+CleiCode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "COMMON LANGUAGE Equipment Code.
+            The CLEI code contains an intelligent 
+            ten-character code that identifies the 
+            telecommunications equipment."
+    REFERENCE
+            "GR-383-CORE"
+    SYNTAX     DisplayString (SIZE (10))            
+
+-- MIB contains the following groups
+
+slEntityPhysical 		OBJECT IDENTIFIER ::= { slmEntity 1 }
+slEntityNotification	OBJECT IDENTIFIER ::= { slmEntity 2 }
+
+--           The Physical Entity Table 
+--
+-- This group contains a single table to identify physical system
+-- components, called the slEntPhysicalTable.
+--
+-- The slEntPhysicalTable contains one row per physical entity, and must
+-- always contain at least one row for an "overall" physical entity,
+-- which should have an slEntPhysicalClass value of 'stack(11)', '
+-- chassis(3)' or 'module(9)'.
+
+
+slEntPhysicalTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SlEntPhysicalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table contains one row per physical entity.  There is
+            always at least one row for an 'overall' physical entity."
+    ::= { slEntityPhysical 1 }
+
+slEntPhysicalEntry       OBJECT-TYPE
+    SYNTAX      SlEntPhysicalEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "Information about a particular physical entity."
+    INDEX   { slEntPhysicalIndex }
+    ::= { slEntPhysicalTable 1 }
+
+SlEntPhysicalEntry ::= SEQUENCE {
+      slEntPhysicalIndex		    	InterfaceIndex,
+      slEntPhysicalDescr          	SnmpAdminString,
+      slEntPhysicalClass          	PhysicalClass,
+      slEntPhysicalHardwareRev    	SnmpAdminString,
+      slEntPhysicalFirmwareRev    	SnmpAdminString,
+      slEntPhysicalSoftwareRev    	SnmpAdminString,
+      slEntPhysicalSerialNum      	SnmpAdminString,
+	  slEntPhysicalProtectionEntity	PhysicalIndex,
+	  slEntPhysicalProtectState		INTEGER,
+	  slEntPhysicalProtectMode    	INTEGER,
+	  slEntPhysicalStatus         	INTEGER,
+	  slEntPhysicalFailureDescription SnmpAdminString,
+	  slEntPhysicalAdminStatus   		INTEGER,
+	  slEntPhysicalOperStatus 		INTEGER,
+	  slEntPhysicalSysUptime	 		TimeTicks,
+	  slEntPhysicalType				PhysicalType,
+	  slEntPhysicalCleiCode			CleiCode,
+	  slEntPhysicalPartNumber			SnmpAdminString,
+      slEntPhysicalOemSerialNum      	SnmpAdminString,
+      slEntPhysicalProductionDate		SnmpAdminString
+	}
+
+slEntPhysicalIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The Slot number of the entity." 
+    ::= { slEntPhysicalEntry 1 }
+
+slEntPhysicalDescr OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual description of physical entity.  This object
+            should contain a string which identifies the manufacturer's
+            name for the physical entity, and should be set to a
+            distinct value for each version or model of the physical
+            entity. 
+            Example: PacketLight-Oc, PacketLight-Ethernet, ...
+            The actual value should be taken from the E2prom."
+    ::= { slEntPhysicalEntry 2 }
+
+slEntPhysicalClass OBJECT-TYPE
+    SYNTAX      PhysicalClass
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "An indication of the general hardware type of the physical
+            entity.
+
+            An agent should set this object to the standard enumeration
+            value which most accurately indicates the general class of
+            the physical entity, or the primary class if there is more
+            than one.
+
+            If no appropriate standard registration identifier exists
+            for this physical entity, then the value 'other(1)' is
+            returned. If the value is unknown by this agent, then the
+            value 'unknown(2)' is returned."
+    ::= { slEntPhysicalEntry 3 }
+
+slEntPhysicalHardwareRev    OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The vendor-specific hardware revision string for the
+            physical entity.  The preferred value is the hardware
+            revision identifier actually printed on the component itself
+            (if present).
+
+            Note that if revision information is stored internally in a
+            non-printable (e.g., binary) format, then the agent must
+            convert such information to a printable format, in an
+            implementation-specific manner.
+
+            If no specific hardware revision string is associated with
+            the physical component, or this information is unknown to
+            the agent, then this object will contain a zero-length
+            string."
+    ::= { slEntPhysicalEntry 4 }
+
+slEntPhysicalFirmwareRev    OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The vendor-specific firmware revision string for the
+            physical entity (normally the boot-revision).
+
+            Note that if revision information is stored internally in a
+            non-printable (e.g., binary) format, then the agent must
+            convert such information to a printable format, in an
+            implementation-specific manner.
+
+            If no specific firmware programs are associated with the
+            physical component, or this information is unknown to the
+            agent, then this object will contain a zero-length string."
+    ::= { slEntPhysicalEntry 5 }
+
+slEntPhysicalSoftwareRev    OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The vendor-specific software revision string for the
+            physical entity.
+
+            Note that if revision information is stored internally in a
+            non-printable (e.g., binary) format, then the agent must
+            convert such information to a printable format, in an
+            implementation-specific manner.
+
+            If no specific software programs are associated with the
+            physical component, or this information is unknown to the
+            agent, then this object will contain a zero-length string."
+    ::= { slEntPhysicalEntry 6 }
+
+slEntPhysicalSerialNum   OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The vendor-specific serial number string for the physical
+            entity.  The preferred value is the serial number string
+            actually printed on the component itself (if present).
+
+            On the first instantiation of an physical entity, the value
+            of slEntPhysicalSerialNum associated with that entity is set
+            to the correct vendor-assigned serial number, if this
+            information is available to the agent.  If a serial number
+            is unknown or non-existent, the slEntPhysicalSerialNum will be
+            set to a zero-length string instead.
+
+            Note that implementations which can correctly identify the
+            serial numbers of all installed physical entities do not
+            need to provide write access to the slEntPhysicalSerialNum
+            object. Agents which cannot provide non-volatile storage for
+            the slEntPhysicalSerialNum strings are not required to
+            implement write access for this object.
+
+            Not every physical component will have a serial number, or
+            even need one.  Physical entities for which the associated
+            value of the slEntPhysicalIsFRU object is equal to 'false(2)'
+            (e.g., the repeater ports within a repeater module), do not
+            need their own unique serial number. An agent does not have
+            to provide write access for such entities, and may return a
+            zero-length string.
+
+            If write access is implemented for an instance of
+            slEntPhysicalSerialNum, and a value is written into the
+            instance, the agent must retain the supplied value in the
+            slEntPhysicalSerialNum instance associated with the same
+            physical entity for as long as that entity remains
+            instantiated. This includes instantiations across all re-
+            initializations/reboots of the network management system,
+            including those which result in a change of the physical
+            entity's slEntPhysicalIndex value."
+    ::= { slEntPhysicalEntry 7 }
+
+slEntPhysicalProtectionEntity OBJECT-TYPE
+    SYNTAX      PhysicalIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The value of slEntPhysicalIndex for the physical entity which
+            'protects' this physical entity.  A value of zero indicates
+            this physical entity has no protecting physical
+            entity.
+            This object is not applicable should the protection be done
+            on a per-port basis."
+    ::= { slEntPhysicalEntry 8 }
+
+slEntPhysicalProtectState OBJECT-TYPE
+    SYNTAX      INTEGER {
+		working(1),
+		protecting(2),
+		noProtection(3)
+	}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The protection state of physical entity.
+            This object is not applicable should the protection be done
+            on a per-port basis.
+            In the case of Switch protection the following logic should be used:
+            1. If there is only one card is present - noProtection(3)
+            2. If the standby card is not ready - the active card
+               should have the value noProtection(3), and the standby
+               card should have the value protecting(2)
+            3. If the protecting card is ready - the active card should
+               have the value working(1) and the standby card should have
+               the value protecting(2)"
+    ::= { slEntPhysicalEntry 9 }
+
+slEntPhysicalProtectMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+		lock(1),      -- disable automatic protection
+		force(2),     -- disable auto, force change to other card
+		automatic(3)  -- automatic protection
+	}
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The protection mode of physical entity.
+            The default value is automatic(3)
+            This object is not applicable should the protection be done
+            on a per-port basis."
+    ::= { slEntPhysicalEntry 14 }
+
+slEntPhysicalStatus OBJECT-TYPE
+    SYNTAX      INTEGER (0..1023)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "The physical entity status bitmap:
+        	1 - Card is removed from the slot           
+          	2 - Communication Fault 
+          	4 - Major alarm inherited from the ports   
+          	8 - Card or port HW failure
+           16 - An internal SW failure detected
+		   32 - SW version mismatch detected
+           64 - Power A Failure
+          128 - Power B Failure
+          256 - HW version mismatch detected
+          512 - Minor alarm inherited from the ports"
+    ::= { slEntPhysicalEntry 15 }
+
+slEntPhysicalFailureDescription OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Text that describes the last entity failure."
+    ::= { slEntPhysicalEntry 16 }
+    
+slEntPhysicalAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   up(1),       -- ready to pass packets
+                   down(2),
+                   testing(3),  -- in some test mode
+                   warmBoot(4),
+                   coldBoot(5),
+                   hotBoot(7)
+               }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+               "The desired state of the interface.  The testing(3)
+               state indicates that no operational packets can be
+               passed.  When a managed system initializes, all
+               interfaces start with ifAdminStatus in the down(2)
+               state.  As a result of either explicit management
+               action or per configuration information retained by
+               the managed system, ifAdminStatus is then changed to
+               either the up(1) or testing(3) states (or remains in
+               the down(2) state).
+               State warmBoot(4) cause the card a Warm Start.
+               The state coldBoot(5)has two meanings. If the card is present
+               it means to reinitialize it with the factory defaults. This
+               is equivalent to Cold Start. 
+               Setting the object to the value hotBoot(7) cause the
+               card to reboot in a non service affecting manner.
+               If the card is not present it means that the former
+               configuration of this slot is not longer kept in the
+               system. In this case the slot is ready for insertion of
+               a new card of any type."
+    ::= { slEntPhysicalEntry 17 }
+
+slEntPhysicalOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                   up(1),        -- ready to pass packets
+                   down(2),
+                   testing(3),   -- while coming up
+                   notPresent(6)
+               }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+               "The current operational state of the interface.  
+               If slEntPhysicalAdminStatus is down(2) then
+               slEntPhysicalOperStatus should be down(2). 
+               If slEntPhysicalAdminStatus is changed to up(1) 
+               then slEntPhysicalOperStatus should change to
+               up(1) if the interface is ready to transmit and
+               receive network traffic It should remain in 
+               the down(2) state if and only if there is a 
+               fault that prevents it from going to the up(1) state; it should remain in the
+               notPresent(6) state if the interface has missing
+               (typically, hardware) components."
+    ::= { slEntPhysicalEntry 18 }
+
+slEntPhysicalSysUptime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of timer ticks since the last reboot of the module."
+    ::= { slEntPhysicalEntry 19 }
+
+slEntPhysicalType OBJECT-TYPE
+    SYNTAX      PhysicalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the physical module."
+    ::= { slEntPhysicalEntry 20 }
+
+slEntPhysicalCleiCode OBJECT-TYPE
+    SYNTAX      CleiCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Clei Code resides in the SEEP of each card."
+    ::= { slEntPhysicalEntry 21 }
+
+slEntPhysicalPartNumber    OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..12))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The card part number. This is a string of upto 12 characters."
+    ::= { slEntPhysicalEntry 22 }
+
+slEntPhysicalOemSerialNum   OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The oem-specific serial number string for the physical
+            entity.  The preferred value is the serial number string
+            actually printed on the component itself (if present).
+
+            On the first instantiation of an physical entity, the value
+            of slEntPhysicalSerialNum associated with that entity is set
+            to the correct vendor-assigned serial number, if this
+            information is available to the agent.  If a serial number
+            is unknown or non-existent, the slEntPhysicalSerialNum will be
+            set to a zero-length string instead.
+
+            Note that implementations which can correctly identify the
+            serial numbers of all installed physical entities do not
+            need to provide write access to the slEntPhysicalSerialNum
+            object. Agents which cannot provide non-volatile storage for
+            the slEntPhysicalSerialNum strings are not required to
+            implement write access for this object.
+
+            Not every physical component will have a serial number, or
+            even need one.  Physical entities for which the associated
+            value of the slEntPhysicalIsFRU object is equal to 'false(2)'
+            (e.g., the repeater ports within a repeater module), do not
+            need their own unique serial number. An agent does not have
+            to provide write access for such entities, and may return a
+            zero-length string.
+
+            If write access is implemented for an instance of
+            slEntPhysicalSerialNum, and a value is written into the
+            instance, the agent must retain the supplied value in the
+            slEntPhysicalSerialNum instance associated with the same
+            physical entity for as long as that entity remains
+            instantiated. This includes instantiations across all re-
+            initializations/reboots of the network management system,
+            including those which result in a change of the physical
+            entity's slEntPhysicalIndex value."
+    ::= { slEntPhysicalEntry 23 }
+
+slEntPhysicalProductionDate	OBJECT-TYPE
+	SYNTAX			SnmpAdminString
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"The entity production date in the format YYYY-WW."
+	::= { slEntPhysicalEntry 24 }
+
+
+END
+

@@ -1,0 +1,12 @@
+os: fusion
+text: 'IgniteNet FusionSwitch'
+type: network
+icon: ignitenet
+group: ignitenet
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.259.6.10.120

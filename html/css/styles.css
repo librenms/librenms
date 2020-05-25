@@ -348,6 +348,17 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   color: #555;
 }
 
+.graph-all-common {
+  display: block;
+  padding: 1px;
+  margin: 2px;
+  min-height:180px;
+  max-height:180px;
+  text-align: center;
+  float: left;
+  background-color: #f5f5f5;
+}
+
 .tablehead {
   font-weight: bold;
   font-size: 13px;
@@ -358,7 +369,6 @@ A.purple:visited, a.purple, .purple { color: #740074; }
 
 .box-desc {
   font-size: 12px;
-  font-style: italic;
 }
 
 .interface-desc {
@@ -397,13 +407,14 @@ A.purple:visited, a.purple, .purple { color: #740074; }
   color: #cc0000;
 }
 
-tr.device-overview:nth-child(odd) {
-  background: #ffffff;
-}
+.device-overview>.panel-body { padding-top: 0; padding-bottom: 0; }
+.device-overview>.panel-body>.row:nth-child(odd) { background-color: #f9f9f9; }
+.device-overview>.panel-body>.row:hover { background-color: #f5f5f5; }
+.device-overview>.panel-body>.row>div { padding: 3px 5px; }
+.device-overview>.panel-body>.row>div:first-child { font-weight: 500; }
 
-tr.device-overview:nth-child(even) {
-  background: #eeeeee;
-}
+#coordinates-row { cursor: pointer; }
+#location-map { padding: 15px; height: 400px; }
 
 a.list-device, a.list-device-ignored, a.list-device-down, a.list-device-ignored-up, a.list-device-disabled {
   font-weight: bold;
@@ -811,6 +822,22 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   color: #999999;
 }
 
+.sensor-low, a.sensor-low, a.sensor-low:visited {
+  color: #c11;
+}
+
+.sensor-high, a.sensor-high, a.sensor-high:visited {
+  color: #c11;
+}
+
+.sensor-ok, a.sensor-ok, a.sensor-ok:visited {
+  color: #11a;
+}
+
+a.sensor-ok:hover, a.sensor-low:hover, a.sensor-high:hover {
+  color: #990099;
+}
+
 #top {
   height:17px;
   padding:2px 21px 0px 21px;
@@ -838,6 +865,13 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   font-size: 12px;
   margin: 8px;
 }
+
+.infobox .rrd-pre {
+  background-color: #CCCCFF;
+  font-size: 12px;
+  white-space: pre-wrap;
+}
+
 
 .infobox-down {
 
@@ -1527,8 +1561,27 @@ tr.search:nth-child(odd) {
   font-weight: bold;
 }
 
+.overlib-contents {
+    background-color: #fff;
+}
+
 .minigraph-image {
   margin: 2px;
+}
+
+.minigraph-div {
+  display: block;
+  padding: 3px;
+  margin: 3px;
+  min-width: 183px;
+  max-width: 183px;
+  min-height: 90px;
+  max-height: 90px;
+  text-align: center;
+  float: left;
+  background-color: #e9e9e9;
+  border: solid 1px;
+  border-color: #e9e9e9;
 }
 
 .example-sports .league-name {
@@ -1553,7 +1606,7 @@ tr.search:nth-child(odd) {
 
 .scrollable-menu {
     height: auto;
-    max-height: 200px;
+    max-height: 600px;
     overflow-x: hidden;
 }
 
@@ -1580,8 +1633,19 @@ tr.search:nth-child(odd) {
 }
 
 .navbar-brand {
-  padding-left: 15px !important;
-  padding-top: 8px !important;
+  padding: 8px 15px 8px 15px !important;
+  line-height: 32px;
+}
+
+@media (min-width: 992px) and (max-width: 1280px) {
+  .navbar-brand {
+    display: none !important;
+  }
+}
+
+.navbar-brand img {
+  height: 100%;
+  max-width: 170px;
 }
 
 #visualization {
@@ -1647,8 +1711,12 @@ tr.search:nth-child(odd) {
 }
 
 .tt-suggestion:hover {
-	background-color: #0097CF;
-	color: #FFFFFF;
+  background-color: #0097CF;
+  color: #FFFFFF;
+}
+
+.tt-suggestion img {
+  width: 32px;
 }
 
 .gridster * {
@@ -1709,10 +1777,6 @@ tr.search:nth-child(odd) {
           border-top-right-radius: 4px;
 }
 
-.widget_body {
-    padding: 0.8em;
-}
-
 .mapTooltip {
     position : fixed;
     background-color : #B2B3B1;
@@ -1756,7 +1820,9 @@ tr.search:nth-child(odd) {
     height: 600px;
 }
 
-.edit-storage-input {
+.edit-storage-input,
+.edit-processor-input,
+.edit-mempool-input {
     width: 100px;
 }
 
@@ -1767,10 +1833,11 @@ label {
 .badge-navbar-user {
    border-radius: 40%;
    font-size: 65%;
-   padding: 5px;
+   padding: 4px;
    position: relative;
    top: -10px;
-   left: -5px;
+   left: -11px;
+   margin-right: -14px;
 }
 .badge-default {
   background-color: #777;
@@ -1821,16 +1888,6 @@ label {
         max-width: 45px;
         max-height: 50px;
     }
-    .device-header-table .device_icon img {
-       max-width: 20px;
-       max-height: 20px;
-    }
-    .device-header-table img {
-       max-width: 115px;
-       max-height: 40px;
-    }
-    .device-header-table {font-size : 8px;}
-    .device-header-table a {font-size : 11px;}
 }
 
 @media only screen and (max-width: 768px) and (min-width: 481px) {
@@ -1839,12 +1896,6 @@ label {
         max-width: 60px;
         max-height: 55px;
     }
-    .device-header-table img {
-       max-width: 150px;
-       max-height: 50px;
-    }
-    .device-header-table {font-size : 10px;}
-    .device-header-table a {font-size : 17px;}
 }
 
 
@@ -1877,6 +1928,16 @@ label {
     color: white;
 }
 
+.blueCluster {
+    background-color: rgba(23,162,184, 0);
+    background-color: rgba(23,162,184,0.7);
+    text-align: center;
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 14px;
+    color: white;
+}
+
 .greenCluster {
     background-color: rgba(0,255,0, 0);
     background-color: rgba(110, 204, 57, 0.6);
@@ -1899,9 +1960,11 @@ label {
 
 .edit-widget, .close-widget { cursor: pointer; }
 .widget_body {
+    padding: 0.8em;
     overflow-y: auto;
     width: 100%;
-    height: calc(100% - 35px);
+    height: calc(100% - 38px);
+    cursor: auto;
 }
 
 .device-availability, .service-availability {
@@ -1936,6 +1999,7 @@ label {
 }
 
 .availability-label {
+  border-radius: 0 .25em 0 .25em;
   float:right;
   margin:-8px;
 }
@@ -1991,7 +2055,6 @@ label {
 .widget-availability {
   float:left;
   margin:2px;
-  curosr: pointer;
 }
 
 .widget-availability-fixed {
@@ -2003,6 +2066,10 @@ label {
 .widget-availability-host {
   float:left;
   margin-bottom: 10px;
+}
+
+.widget-availability-host a:hover {
+  text-decoration: none;
 }
 
 .widget-availability-service {
@@ -2044,18 +2111,24 @@ label {
   line-height:34px;
 }
 
-@media only screen and (max-width: 1240px) and (min-width: 1200px) {
-    .nav > li > a {
-        padding: 4px 4px !important;
-        padding-top: 15px !important;
-    }
+.dashboard-widget-settings label {
+  line-height:34px;
 }
 
-@media only screen and (min-width: 1241px) {
-    .nav > li > a {
-        padding: 5px 5px !important;
-        padding-top: 15px !important;
-    }
+.dashboard-graph, .dashboard-graph img {
+  height: 100%;
+  width: 100%;
+}
+
+.dashboard-image {
+  padding: 2px;
+  height: 100%;
+  width: auto;
+}
+
+.nav > li > a {
+  padding-left: 10px;
+  padding-right: 5px;
 }
 
 /* devices layout modifications */
@@ -2072,11 +2145,7 @@ label {
 }
 
 .devices-search-header {
-    margin: 5px;
-}
-
-.devices-input-small {
-    line-height: 14px;
+    margin: 0 5px;
 }
 
 .devices-status-box-detail {
@@ -2098,9 +2167,9 @@ label {
     text-align: center;
 }
 
-.devices-headers-table-menu {
-    padding: 0;
+.devices-headers-table-menu > .actions {
     float: right;
+    margin-bottom: 5px;
 }
 
 .devices-overlib-box {
@@ -2114,18 +2183,198 @@ label {
     background-color: #f5f5f5;
 }
 
-.device-table-header-status {
-    width: 100px;
-    text-align: center;
+.device-table-metrics span {
+  display: inline-block;
+  white-space: nowrap;
 }
 
-.device-table-header-vendor {
-    width: 100px;
-    text-align: center;
+.device-table-metrics>a {
+  color:#000;
+  text-decoration:none;
+}
+
+.device-table-header-actions {
+  min-width: 110px;
+  text-align: center;
 }
 
 .device-table-icon {
-    text-align: center;
-    display: block;
-    width: 70px;
+  padding-left:7px;
+  display: inline-block;
+  width: 64px;
+  height: 32px;
+  line-height: 32px;
+}
+
+.device-table-icon img {
+  width: 32px;
+  max-height: 32px;
+}
+
+.device-icon img {
+    max-height: 32px;
+    max-width: 40px;
+}
+
+.device-icon {
+  display: inline-block;
+  height: 32px;
+  width: 40px;
+}
+
+.device-icon-header {
+  height: 52px;
+  max-width: 250px;
+  margin-right: 15px;
+}
+
+.alert-status {
+  display: inline-block;
+  width: 7px;
+  min-height: 27px;
+  height: 32px;
+}
+
+.alert-status-small {
+  display: inline-block;
+  width: 7px;
+  min-height: 16px;
+  height: 20px
+}
+
+.device-services-page {
+  font-weight: bold;
+  margin-left: 20px;
+  vertical-align: middle;
+}
+
+.device-services-page-no-service {
+  font-weight: bold;
+  vertical-align: middle;
+  padding: 15px;
+}
+
+.validation:invalid {
+    border-color: red;
+}
+
+.eventlog-status {
+  display: inline-block;
+  margin-right: 8px;
+  float: left;
+}
+
+/* Workaround for https://github.com/select2/select2/issues/291 */
+.select2-selection--multiple .select2-search--inline .select2-search__field {
+  width: auto !important;
+}
+
+.toast-top-right {
+  top: 34px;
+}
+
+.tooltip {
+    display: block !important;
+    z-index: 10000;
+}
+
+.tooltip .tooltip-inner {
+    background: black;
+    color: white;
+    border-radius: 16px;
+    padding: 5px 10px 4px;
+}
+
+.tooltip .tooltip-arrow {
+    width: 0;
+    height: 0;
+    border-style: solid;
+    position: absolute;
+    margin: 5px;
+    border-color: black;
+    z-index: 1;
+}
+
+.tooltip[x-placement^="top"] {
+    margin-bottom: 5px;
+}
+
+.tooltip[x-placement^="top"] .tooltip-arrow {
+    border-width: 5px 5px 0 5px;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    bottom: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.tooltip[x-placement^="bottom"] {
+    margin-top: 5px;
+}
+
+.tooltip[x-placement^="bottom"] .tooltip-arrow {
+    border-width: 0 5px 5px 5px;
+    border-left-color: transparent !important;
+    border-right-color: transparent !important;
+    border-top-color: transparent !important;
+    top: -5px;
+    left: calc(50% - 5px);
+    margin-top: 0;
+    margin-bottom: 0;
+}
+
+.tooltip[x-placement^="right"] {
+    margin-left: 5px;
+}
+
+.tooltip[x-placement^="right"] .tooltip-arrow {
+    border-width: 5px 5px 5px 0;
+    border-left-color: transparent !important;
+    border-top-color: transparent !important;
+    border-bottom-color: transparent !important;
+    left: -5px;
+    top: calc(50% - 5px);
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.tooltip[x-placement^="left"] {
+    margin-right: 5px;
+}
+
+.tooltip[x-placement^="left"] .tooltip-arrow {
+    border-width: 5px 0 5px 5px;
+    border-top-color: transparent !important;
+    border-right-color: transparent !important;
+    border-bottom-color: transparent !important;
+    right: -5px;
+    top: calc(50% - 5px);
+    margin-left: 0;
+    margin-right: 0;
+}
+
+.tooltip.popover .popover-inner {
+    background: #f9f9f9;
+    color: black;
+    padding: 24px;
+    border-radius: 5px;
+    box-shadow: 0 5px 30px rgba(0, 0, 0, .1);
+}
+
+.tooltip.popover .popover-arrow {
+    border-color: #f9f9f9;
+}
+
+.tooltip[aria-hidden='true'] {
+    visibility: hidden;
+    opacity: 0;
+    transition: opacity .15s, visibility .15s;
+}
+
+.tooltip[aria-hidden='false'] {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity .15s;
 }

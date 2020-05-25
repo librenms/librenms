@@ -1,0 +1,11 @@
+os: breeze
+text: 'Alvarion Breeze'
+type: wireless
+icon: alvarion
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+mib_dir:
+    - alvarion
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.12394.4.

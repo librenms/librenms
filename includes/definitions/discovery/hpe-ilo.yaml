@@ -1,0 +1,115 @@
+mib: CPQHLTH-MIB:CPQIDA-MIB:CPQSTDEQ-MIB:CPQHOST-MIB
+modules:
+    sensors:
+        power:
+            data:
+                -
+                    oid: cpqHeFltTolPowerSupplyTable
+                    value: cpqHeFltTolPowerSupplyCapacityUsed
+                    num_oid: '.1.3.6.1.4.1.232.6.2.9.3.1.7.{{ $index }}'
+                    index: 'cpqHeFltTolPowerSupplyBay.{{ $index }}'
+                    descr: 'PowerSupply #{{ $cpqHeFltTolPowerSupplyBay }}'
+                    high_limit: cpqHeFltTolPowerSupplyCapacityMaximum
+        temperature:
+            data:
+                -
+                    oid: cpqHeTemperatureTable
+                    value: cpqHeTemperatureCelsius
+                    num_oid: '.1.3.6.1.4.1.232.6.2.6.8.1.4.{{ $index }}'
+                    snmp_flags: '-OQUs'
+                    index: 'cpqHeTemperatureCelsius.{{ $index }}'
+                    descr: cpqHeTemperatureLocale
+                    high_limit: '90' #cpqHeTemperatureThreshold
+                -
+                    oid: cpqDaPhyDrvTable
+                    value: cpqDaPhyDrvCurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.232.3.2.5.1.1.70.{{ $index }}'
+                    snmp_flags: '-OQUs'
+                    index: 'cpqDaPhyDrvCurrentTemperature.{{ $index }}'
+                    descr: cpqDaPhyDrvLocationString
+        state:
+            data:
+                -
+                    oid: cpqDaPhyDrvTable
+                    value: cpqDaPhyDrvCondition
+                    num_oid: '.1.3.6.1.4.1.232.3.2.5.1.1.37.{{ $index }}'
+                    descr: 'Disk #{{ $cpqDaPhyDrvLocationString }}'
+                    index: 'cpqDaPhyDrvCondition.{{ $index }}'
+                    state_name: cpqDaPhyDrvCondition
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 2 }
+                        - { descr: failed, graph: 1, value: 4, generic: 2 }
+                -
+                    oid: cpqHeFltTolPowerSupplyTable
+                    value: cpqHeFltTolPowerSupplyCondition
+                    num_oid: '.1.3.6.1.4.1.232.6.2.9.3.1.4.{{ $index }}'
+                    descr: 'PowerSupply #{{ $cpqHeFltTolPowerSupplyBay }}'
+                    index: 'cpqHeFltTolPowerSupplyCondition.{{ $index }}'
+                    state_name: cpqHeFltTolPowerSupplyCondition
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: cpqHeFltTolFanTable
+                    value: cpqHeFltTolFanCondition
+                    num_oid: '.1.3.6.1.4.1.232.6.2.6.7.1.9.{{ $index }}'
+                    descr: 'Fan #{{ $cpqHeFltTolFanIndex }}'
+                    index: 'cpqHeFltTolFanCondition.{{ $index }}'
+                    state_name: cpqHeFltTolFanCondition
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: cpqSeCpuTable
+                    value: cpqSeCpuStatus
+                    num_oid: '.1.3.6.1.4.1.232.1.2.2.1.1.6.{{ $index }}'
+                    descr: 'Processor #{{ $cpqSeCpuSlot }}'
+                    index: 'cpqSeCpuStatus.{{ $index }}'
+                    state_name: cpqSeCpuStatus
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: cpqHeResMem2ModuleTable
+                    value: cpqHeResMem2ModuleCondition
+                    num_oid:  '.1.3.6.1.4.1.232.6.2.14.13.1.20.{{ $index }}'
+                    descr: cpqHeResMem2ModuleHwLocation
+                    index: 'cpqHeResMem2ModuleCondition.{{ $index }}'
+                    state_name: cpqHeResMem2ModuleCondition
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: degradedModuleIndexUnknown, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: cpqDaCntlrTable
+                    value: cpqDaCntlrCondition
+                    num_oid:  '.1.3.6.1.4.1.232.3.2.2.1.1.6.{{ $index }}'
+                    descr: 'Array Controller Slot#{{ $cpqDaCntlrSlot }}'
+                    index: 'cpqDaCntlrCondition.{{ $index }}'
+                    state_name: cpqDaCntlrCondition
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }
+                -
+                    oid: cpqDaLogDrvTable
+                    value: cpqDaLogDrvCondition
+                    num_oid:  '.1.3.6.1.4.1.232.3.2.3.1.1.11.{{ $index }}'
+                    descr: 'Logical Drive #{{ $cpqDaLogDrvIndex }}'
+                    index: 'cpqDaLogDrvCondition.{{ $index }}'
+                    state_name: cpqDaLogDrvCondition
+                    states:
+                        - { descr: other, graph: 1, value: 1, generic: 3 }
+                        - { descr: ok, graph: 1, value: 2, generic: 0 }
+                        - { descr: degraded, graph: 1, value: 3, generic: 1 }
+                        - { descr: failed, graph: 1, value: 4, generic: 1 }

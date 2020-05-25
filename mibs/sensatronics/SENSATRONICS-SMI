@@ -1,0 +1,84 @@
+-- *****************************************************************
+-- SENSATRONICS-SMI.txt:  Sensatronics LLC 
+--                        Structure of Management Information 
+-- 
+-- February 2004  Andrew F. Thompson 
+-- 
+-- Copyright (c) 2004 by Sensatronics LLC 
+-- All rights reserved. 
+--  
+-- *****************************************************************  
+SENSATRONICS-SMI DEFINITIONS ::= BEGIN
+  IMPORTS
+ 	MODULE-IDENTITY,
+ 	OBJECT-IDENTITY,
+ 	enterprises
+ 		FROM SNMPv2-SMI;
+  sensatronics MODULE-IDENTITY
+ 	LAST-UPDATED "200404200000Z"
+ 	ORGANIZATION "Sensatronics LLC"
+ 	CONTACT-INFO "
+     	 		Sensatronics LLC
+  			Postal: 20A Dunklee Rd
+ 			Bow, NH 03304
+ 			USA
+  		      Tel: +1 603 224 0617
+    			E-mail: dthompson@sensatronics.com"
+ 	DESCRIPTION
+ 		"The Structure of Management Information for the
+ 		Sensatronics enterprise."
+ 	REVISION      "200404200000Z"
+ 	DESCRIPTION
+ 		"Initial version of this MIB module." 	
+::= { enterprises 16174 }	-- assigned by IANA   
+consumerProducts OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION
+ 		"consumerProducts is the subtree root for consumer products developed
+             by Sensatronics" 	
+::= { sensatronics 1 }  
+
+envMonitors OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION
+ 		"envMonitors is the subtree root for all Sensatronics products designed
+             for environmental monitoring" 	
+::= { consumerProducts 1 }   
+
+consumerTools OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION 		
+            "consumerTools is the main subtree for tool development." 	
+::= { sensatronics 2 }  
+
+customProducts OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION 
+		"customProducts is the root OID for custom products produced by Sensatronics." 	
+::= { sensatronics 3 }  
+
+customTools OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION
+ 		"customTools provides a root object identifier 	
+      	for custom tools produced by Sensatronics for other companies." 	
+::= { sensatronics 4 }  
+
+productITTM OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION
+ 		"ITTM root" 	
+::= { envMonitors 1 }   
+
+productCRYO OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION
+ 		"Cryomonitor root" 	
+::= { envMonitors 2 }   
+
+productEM1 OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION
+ 		"Environmental Monitor 1 root" 	
+::= { envMonitors 3 }   
+END 

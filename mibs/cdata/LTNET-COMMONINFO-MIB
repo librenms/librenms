@@ -1,0 +1,89 @@
+
+
+LTNET-COMMONINFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE
+               FROM RFC-1212
+    DisplayString
+               FROM RFC1213-MIB 
+    NetworkAddress     FROM RFC1155-SMI 
+    ltnetRoot
+               FROM LTNET-ROOT
+     ;    
+ 
+
+ltnetCommonInfoGroup       OBJECT IDENTIFIER ::= { ltnetRoot 3 }
+ltnetIpSimpleInfo  OBJECT IDENTIFIER ::= { ltnetCommonInfoGroup 1 }
+ltnetSubJoinedInfo   OBJECT IDENTIFIER ::= { ltnetCommonInfoGroup 4 }
+
+ltnetIpNetAddress OBJECT-TYPE
+    SYNTAX    NetworkAddress
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+" "
+    ::= { ltnetIpSimpleInfo 1 }
+
+ltnetIpMask OBJECT-TYPE
+    SYNTAX    INTEGER (0..31)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+" "
+    ::= { ltnetIpSimpleInfo 2 }
+
+ltnetIpDefaultGateway OBJECT-TYPE
+    SYNTAX    NetworkAddress
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+" "
+    ::= { ltnetIpSimpleInfo 3 }
+
+ltnetIpDns OBJECT-TYPE
+    SYNTAX    NetworkAddress
+    ACCESS    read-write
+    STATUS    optional
+    DESCRIPTION
+" "
+    ::= { ltnetIpSimpleInfo 4 }
+
+ltnetIpPhysicalAddress  OBJECT-TYPE
+    SYNTAX    OCTET STRING
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION 
+          "This variable reports the media dependant 'physical' address of
+          the NE. This object was added to support the generation of traps."
+    ::= { ltnetIpSimpleInfo 5 }
+
+-- * 
+
+ltnetCommIdentifyNum OBJECT-TYPE
+     SYNTAX    OCTET STRING ( SIZE(6 .. 10) )
+     ACCESS    read-write
+     STATUS    optional
+     DESCRIPTION
+""
+        ::= { ltnetSubJoinedInfo   1 }
+
+ltnetCommonTime  OBJECT-TYPE
+     SYNTAX INTEGER
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+""
+     ::= { ltnetSubJoinedInfo   2 }
+
+ltnetAlarmDelayTime  OBJECT-TYPE
+     SYNTAX INTEGER ( 0..600 )
+     ACCESS read-write
+     STATUS mandatory
+     DESCRIPTION
+""
+     ::= { ltnetSubJoinedInfo   3 }
+
+
+END

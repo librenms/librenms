@@ -1,0 +1,473 @@
+NETGEAR-MULTICAST-MIB DEFINITIONS ::= BEGIN
+
+-- Netgear Inc Multicast Routing Package MIB
+-- Copyright Netgear Inc (2002-2007) All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Netgear Inc's confidential and proprietary
+-- intellectual property.  Netgear Inc retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Netgear Inc
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,
+    Integer32,IpAddress,Unsigned32
+                                        FROM SNMPv2-SMI
+    RowStatus                           FROM SNMPv2-TC
+    InetAddress,InetAddressType         FROM INET-ADDRESS-MIB
+    InterfaceIndex                      FROM IF-MIB
+    lb6m                            FROM QUANTA-LB6M-REF-MIB
+    pimBsrCandidateBSREntry             FROM PIM-BSR-MIB;
+               
+    fastPathMulticast MODULE-IDENTITY
+        LAST-UPDATED "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        ORGANIZATION "Netgear Inc"
+        CONTACT-INFO ""
+        DESCRIPTION
+          "The MIB definitions for Multicast Routing Flex package."
+           
+        -- Revision history.
+        REVISION
+          "201101260000Z" -- 26 Jan 2011 12:00:00 GMT
+        DESCRIPTION
+          "Postal address updated."
+        REVISION
+          "200901030000Z" -- 03 Jan 2009 12:00:00 GMT
+        DESCRIPTION
+          "Add agentIpStaticMRouteTable."
+        REVISION
+          "200705230000Z" -- 23 May 2007 12:00:00 GMT
+        DESCRIPTION
+          "Netgear branding related changes."
+        REVISION
+          "200311210000Z" -- 21 Nov 2003 12:00:00 GMT
+        DESCRIPTION
+          "Revisions made for new release."
+        REVISION
+          "200205081418Z"
+        DESCRIPTION
+          "Initial revision."
+          
+    ::= { lb6m 4 }
+
+
+    --**************************************************************************************
+    agentMulticastIGMPConfigGroup                      OBJECT IDENTIFIER ::= { fastPathMulticast 1 }
+    
+    agentMulticastIGMPAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables IGMP on the system."
+         DEFVAL { disable }
+         ::= { agentMulticastIGMPConfigGroup 1 }
+
+    
+    agentMulticastIGMPInterfaceTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentMulticastIGMPInterfaceEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION 
+                     "Provides Per-Interface configuration of IGMP."
+         ::= { agentMulticastIGMPConfigGroup 2 }
+    
+    agentMulticastIGMPInterfaceEntry OBJECT-TYPE
+         SYNTAX      AgentMulticastIGMPInterfaceEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION 
+                     "Information about a table entry."
+         INDEX       { agentMulticastIGMPInterfaceIfIndex }
+         ::= { agentMulticastIGMPInterfaceTable 1 }
+         
+    AgentMulticastIGMPInterfaceEntry ::= SEQUENCE {
+         agentMulticastIGMPInterfaceIfIndex
+              Integer32,
+         agentMulticastIGMPInterfaceAdminMode
+              INTEGER
+         }
+         
+    agentMulticastIGMPInterfaceIfIndex OBJECT-TYPE
+         SYNTAX      Integer32 (0..2147483647)
+         MAX-ACCESS  read-only
+         STATUS      obsolete
+         DESCRIPTION
+                     "Identifies the external interface number."
+         ::= { agentMulticastIGMPInterfaceEntry 1 }
+
+    agentMulticastIGMPInterfaceAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "This enables or disables IGMP on this interface."
+         DEFVAL { disable }
+         ::= { agentMulticastIGMPInterfaceEntry 2 }
+
+    --**************************************************************************************
+    agentMulticastPIMConfigGroup                      OBJECT IDENTIFIER ::= { fastPathMulticast 2 }
+    
+    agentMulticastPIMConfigMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     sparse(1),
+                     dense(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "This controls which PIM mode configuration the PIM-MIB displays."
+         DEFVAL { dense }
+         ::= { agentMulticastPIMConfigGroup 1 }
+    
+    --**************************************************************************************
+    agentMulticastPIMSMConfigGroup                      OBJECT IDENTIFIER ::= { fastPathMulticast 3 }
+    
+    agentMulticastPIMSMAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables PIM Sparse Mode on the system."
+         DEFVAL { disable }
+         ::= { agentMulticastPIMSMConfigGroup 1 }
+
+    agentMulticastPIMSMStaticRPTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentMulticastPIMSMStaticRPEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION 
+                     "Provides Per-Interface configuration of PIM-SM."
+         ::= { agentMulticastPIMSMConfigGroup 2 }
+    
+    agentMulticastPIMSMStaticRPEntry OBJECT-TYPE
+         SYNTAX      AgentMulticastPIMSMStaticRPEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION 
+                     "Information about a table entry."
+         INDEX       { agentMulticastPIMSMStaticRPIpAddr, 
+                       agentMulticastPIMSMStaticRPGroupIpAddr, 
+                       agentMulticastPIMSMStaticRPGroupIpMask }
+         ::= { agentMulticastPIMSMStaticRPTable 1 }
+         
+    AgentMulticastPIMSMStaticRPEntry ::= SEQUENCE {
+         agentMulticastPIMSMStaticRPIpAddr
+              IpAddress,
+         agentMulticastPIMSMStaticRPGroupIpAddr
+              IpAddress,
+         agentMulticastPIMSMStaticRPGroupIpMask
+              IpAddress,
+         agentMulticastPIMSMStaticRPStatus
+              RowStatus
+         }
+         
+    agentMulticastPIMSMStaticRPIpAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "IP Address of the RP."
+         ::= { agentMulticastPIMSMStaticRPEntry 1 }
+
+    agentMulticastPIMSMStaticRPGroupIpAddr OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "Group IP Address supported by the RP."
+         ::= { agentMulticastPIMSMStaticRPEntry 2 }
+
+    agentMulticastPIMSMStaticRPGroupIpMask OBJECT-TYPE
+         SYNTAX      IpAddress
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "Group mask for the group IP Address."
+         ::= { agentMulticastPIMSMStaticRPEntry 3 }
+
+    agentMulticastPIMSMStaticRPStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      obsolete
+         DESCRIPTION
+                     "Status of this entry in the Static RP Table.
+                     
+                     Allowed values are:
+                     
+                     active(1)      - This entry is active
+                     destroy(6)     - Setting an entry to this value removes the 
+                                      entry from the table."
+         ::= { agentMulticastPIMSMStaticRPEntry 4 }
+
+         
+    agentMulticastPIMSMInterfaceTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentMulticastPIMSMInterfaceEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION 
+                     "Provides Per-Interface configuration of PIM-SM."
+         ::= { agentMulticastPIMSMConfigGroup 3 }
+    
+    agentMulticastPIMSMInterfaceEntry OBJECT-TYPE
+         SYNTAX      AgentMulticastPIMSMInterfaceEntry
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION 
+                     "Allows configuration of parameters not provided in the 
+                      standard PIM-MIB."
+         INDEX { agentMulticastPIMSMInterfaceIndex }
+         ::= { agentMulticastPIMSMInterfaceTable 1 }
+         
+    AgentMulticastPIMSMInterfaceEntry ::= SEQUENCE {
+         agentMulticastPIMSMInterfaceIndex
+              Unsigned32,
+         agentMulticastPIMSMInterfaceCBSRHashMaskLength
+              Unsigned32,
+         agentMulticastPIMSMInterfaceCRPPreference
+              Integer32
+         }
+         
+    agentMulticastPIMSMInterfaceIndex OBJECT-TYPE
+         SYNTAX      Unsigned32
+         MAX-ACCESS  not-accessible
+         STATUS      obsolete
+         DESCRIPTION
+                     "Routing Interface associated with this PIM SM configuration entry."
+         ::= { agentMulticastPIMSMInterfaceEntry 1 }
+
+    agentMulticastPIMSMInterfaceCBSRHashMaskLength OBJECT-TYPE
+         SYNTAX      Unsigned32 (0..32)
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "The BSR hash mask length to be advertised in bootstrap messages if 
+                     this interface is elected as the bootstrap router. This hash mask 
+                     length will be used in the hash algorith for selecting the RP for 
+                     a particular group."
+         DEFVAL      { 30 }
+         ::= { agentMulticastPIMSMInterfaceEntry 2 }
+
+    agentMulticastPIMSMInterfaceCRPPreference OBJECT-TYPE
+         SYNTAX      Integer32 (-1|0..255)
+         MAX-ACCESS  read-write
+         STATUS      obsolete
+         DESCRIPTION
+                     "The preference value for the local interface as a Candidate 
+                     Rendezvous Point. The value of -1 is used to indicate that the local 
+                     interface is not a Candidate RP interface."
+         DEFVAL      { 0 }
+         ::= { agentMulticastPIMSMInterfaceEntry 3 }
+
+    --**************************************************************************************
+    agentMulticastPIMDMConfigGroup                      OBJECT IDENTIFIER ::= { fastPathMulticast 4 }
+    
+    agentMulticastPIMDMAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables PIM Dense Mode on the system."
+         DEFVAL { disable }
+         ::= { agentMulticastPIMDMConfigGroup 1 }
+         
+    --**************************************************************************************
+    agentMulticastRoutingConfigGroup                      OBJECT IDENTIFIER ::= { fastPathMulticast 5 }
+    
+    agentMulticastRoutingAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables Multicast Routing Mode on the system."
+         DEFVAL { disable }
+         ::= { agentMulticastRoutingConfigGroup 1 }
+    
+    --**************************************************************************************
+    agentMulticastDVMRPConfigGroup                      OBJECT IDENTIFIER ::= { fastPathMulticast 6 }
+    
+    agentMulticastDVMRPAdminMode OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables DVMRP on the system."
+         DEFVAL { disable }
+         ::= { agentMulticastDVMRPConfigGroup 1 }
+         
+    --**************************************************************************************
+    -- agentSnmpTrapFlagsConfigGroupMulticast
+    --
+    --**************************************************************************************
+    agentSnmpTrapFlagsConfigGroupMulticast       OBJECT IDENTIFIER ::= { fastPathMulticast 7 }
+         
+    agentSnmpDVMRPTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables DVMRP Traps on the system."
+         DEFVAL { disable }
+         ::= { agentSnmpTrapFlagsConfigGroupMulticast 1 }
+
+    agentSnmpPIMTrapFlag OBJECT-TYPE
+         SYNTAX      INTEGER {
+                     enable(1),
+                     disable(2)
+                  }
+         MAX-ACCESS  read-write
+         STATUS      current
+         DESCRIPTION
+                     "This enables or disables PIM Traps on the system."
+         DEFVAL { disable }
+         ::= { agentSnmpTrapFlagsConfigGroupMulticast 2 }
+
+    --**************************************************************************************
+    -- The Static Multicast Route Table
+    --
+    --**************************************************************************************
+    agentIpStaticMRouteTable OBJECT-TYPE
+         SYNTAX      SEQUENCE OF AgentIpStaticMRouteEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The table listing the Static Multicast Route Entries."
+         ::= { fastPathMulticast 8 }
+
+    agentIpStaticMRouteEntry OBJECT-TYPE
+         SYNTAX      AgentIpStaticMRouteEntry
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "Information about a table entry."
+         INDEX       { agentIpStaticMRouteSrcAddressType, agentIpStaticMRouteSrcIpAddr, agentIpStaticMRouteSrcNetMask}
+         ::= { agentIpStaticMRouteTable 1 }
+
+    AgentIpStaticMRouteEntry ::= SEQUENCE {
+         agentIpStaticMRouteSrcAddressType   InetAddressType,
+         agentIpStaticMRouteSrcIpAddr        InetAddress,
+         agentIpStaticMRouteSrcNetMask       Integer32,
+         agentIpStaticMRouteRpfIpAddr        InetAddress,
+         agentIpStaticMRouteIfIndex          InterfaceIndex,
+         agentIpStaticMRoutePreference       Integer32,
+         agentIpStaticMRouteStatus           RowStatus
+         }
+
+    agentIpStaticMRouteSrcAddressType OBJECT-TYPE
+         SYNTAX      InetAddressType
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The address type of this Multicast data source."
+         ::= { agentIpStaticMRouteEntry 1 }
+
+    agentIpStaticMRouteSrcIpAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  not-accessible
+         STATUS      current
+         DESCRIPTION
+                     "The address of the Multicast data source."
+         ::= { agentIpStaticMRouteEntry 2 }
+
+    agentIpStaticMRouteSrcNetMask OBJECT-TYPE
+         SYNTAX      Integer32(1..128)
+         MAX-ACCESS  not-accessible
+         STATUS      current
+     
+         DESCRIPTION
+                     "The network mask for the IP address of the Multicast data source."
+         ::= { agentIpStaticMRouteEntry 3 }
+
+    agentIpStaticMRouteRpfIpAddr OBJECT-TYPE
+         SYNTAX      InetAddress
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The RPF Address."
+         ::= { agentIpStaticMRouteEntry 4 }
+
+    agentIpStaticMRouteIfIndex OBJECT-TYPE
+         SYNTAX      InterfaceIndex
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The interface index is valid only for IPv6 and only if RPF address is link-local."
+         ::= { agentIpStaticMRouteEntry 5 }
+
+    agentIpStaticMRoutePreference OBJECT-TYPE
+         SYNTAX      Integer32(1..255)
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The preference of this route entry."
+         ::= { agentIpStaticMRouteEntry 6 }
+
+    agentIpStaticMRouteStatus OBJECT-TYPE
+         SYNTAX      RowStatus
+         MAX-ACCESS  read-create
+         STATUS      current
+         DESCRIPTION
+                     "The preference of this route entry."
+         ::= { agentIpStaticMRouteEntry 7 }
+
+   --***************************************************************************
+   -- Candidate BSR advertisement interval
+   --***************************************************************************
+    agentPIMBsrCandidateConfTable OBJECT-TYPE
+        SYNTAX       SEQUENCE OF AgentPIMBsrCandidateConfEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION  
+                     "Provides Candidate-BSR-Advertisements interval information."
+       ::= { agentMulticastPIMSMConfigGroup 4 }
+
+    agentPIMBsrCandidateConfEntry OBJECT-TYPE
+        SYNTAX        AgentPIMBsrCandidateConfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION  
+                      "Information about a table entry."
+       AUGMENTS { pimBsrCandidateBSREntry }
+       ::= { agentPIMBsrCandidateConfTable 1 }
+
+    AgentPIMBsrCandidateConfEntry ::=  SEQUENCE {
+        pimBsrCandidateBSRAdvInterval  Unsigned32 
+        }   
+
+    pimBsrCandidateBSRAdvInterval  OBJECT-TYPE
+       SYNTAX      Unsigned32
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION  
+                   "A Candidate BSR generates Candidate-BSR-Advertisements
+               periodically. This object represents the time interval
+               in seconds between two consecutive advertisements."
+       ::= { agentPIMBsrCandidateConfEntry 1 }
+
+END

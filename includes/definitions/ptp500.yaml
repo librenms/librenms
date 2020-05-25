@@ -1,0 +1,13 @@
+os: ptp500
+text: 'Cambium PTP 300/500'
+type: wireless
+icon: cambium
+mib_dir: cambium/500
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_wireless_ssr, text: 'Device SSR' }
+    - { graph: device_wireless_rate, text: 'Device Rate' }
+group: cambium
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.17713.5

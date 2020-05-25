@@ -1,9 +1,9 @@
 <?php
 
-if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware') {
-    $is_netiron = snmp_get($device, 'sysObjectID.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
+use Illuminate\Support\Str;
 
-    if (strpos($is_netiron, 'NI') === false && strpos($is_netiron, 'MLX') === false && strpos($is_netiron, 'Cer') === false) {
+if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware') {
+    if (Str::contains($device['sysDescr'], array('NetIron', 'MLX', 'CER')) === false) {
         echo 'Ironware Dynamic: ';
 
         $percent = snmp_get($device, 'snAgGblDynMemUtil.0', '-OvQ', 'FOUNDRY-SN-AGENT-MIB');
@@ -11,8 +11,7 @@ if ($device['os'] == 'ironware' || $device['os_type'] == 'ironware') {
         if (is_numeric($percent)) {
             discover_mempool($valid_mempool, $device, 0, 'ironware-dyn', 'Dynamic Memory', '1', null, null);
         } //end_if
-    } //end_if
-    else {
+    } else {
         echo 'NetIron: ';
 
         d_echo('caching');

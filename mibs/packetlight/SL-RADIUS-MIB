@@ -1,0 +1,128 @@
+SL-RADIUS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY,
+       Counter32, Integer32, Gauge32,
+       IpAddress, TimeTicks, mib-2      FROM SNMPv2-SMI
+	   TruthValue						FROM SNMPv2-TC
+       SnmpAdminString                  FROM SNMP-FRAMEWORK-MIB
+       MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+       slMain				        	FROM SL-MAIN-MIB;
+
+slRadiusMIB MODULE-IDENTITY
+	LAST-UPDATED "200712060000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"The MIB module for entities implementing the client side of
+         the Remote Access Dialin User Service (RADIUS) accounting
+         protocol."
+	::= { slMain 23 }
+
+
+slRadiusClientMIBObjects  OBJECT IDENTIFIER ::= { slRadiusMIB 1 }
+
+slRadiusClient  OBJECT IDENTIFIER ::= { slRadiusClientMIBObjects 1 }
+slRadiusTraps   OBJECT IDENTIFIER ::= { slRadiusClientMIBObjects 2 }
+
+
+SharedSecret ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Authentication Shared-Secret."
+    SYNTAX         OCTET STRING (SIZE (0..256))
+
+
+slRadiusEnabled OBJECT-TYPE
+      SYNTAX TruthValue
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "true(1) - radius is enabled
+             false(2) - radius is disabled."
+      ::= { slRadiusClient 1 }
+
+slRadiusServerTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF SlRadiusServerEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "The (conceptual) table listing the RADIUS accounting
+             servers with which the client shares a secret."
+      ::= { slRadiusClient 2 }
+
+slRadiusServerEntry OBJECT-TYPE
+      SYNTAX     SlRadiusServerEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+            "An entry (conceptual row) representing a RADIUS
+             accounting server with which the client shares a secret."
+      INDEX      { slRadiusServerIndex }
+      ::= { slRadiusServerTable 1 }
+
+SlRadiusServerEntry ::= SEQUENCE {
+      slRadiusServerIndex                           INTEGER,
+      slRadiusServerAddress                         IpAddress,
+      slRadiusServerPort	                        INTEGER,
+      slRadiusServerAdminStatus                     INTEGER,
+      slRadiusTimeout                               INTEGER,
+      slRadiusSharedSecret                          SharedSecret
+}
+
+slRadiusServerIndex OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-only
+      STATUS     current
+      DESCRIPTION
+            "1 - Primary
+             2 - Secondary."
+      ::= { slRadiusServerEntry 1 }
+
+slRadiusServerAddress OBJECT-TYPE
+      SYNTAX     IpAddress
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "The IP address of the RADIUS accounting server
+             referred to in this table entry."
+      ::= { slRadiusServerEntry 2 }
+
+slRadiusServerPort OBJECT-TYPE
+      SYNTAX     INTEGER
+      MAX-ACCESS read-write
+      STATUS     current
+      DESCRIPTION
+            "The port number of the server."
+      ::= { slRadiusServerEntry 3 }
+
+slRadiusServerAdminStatus  OBJECT-TYPE
+      SYNTAX INTEGER {
+      	up(1),
+      	down(2)
+      }
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "The admin status of the server."
+      ::= { slRadiusServerEntry 4 }
+
+slRadiusTimeout  OBJECT-TYPE
+      SYNTAX INTEGER
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+             "The server timeout specified in seconds. 
+             The range is 1..30 seconds. The default is 15 seconds"
+      ::= { slRadiusServerEntry 5 }
+
+slRadiusSharedSecret OBJECT-TYPE
+      SYNTAX SharedSecret
+      MAX-ACCESS read-write
+      STATUS current
+      DESCRIPTION
+            "The shared secret of the server."
+      ::= { slRadiusServerEntry 6 }
+
+
+END

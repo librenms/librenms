@@ -1,0 +1,1160 @@
+--  *****************************************************************
+--  DLINKSW-DHCP6-SERVER-MIB.mib : DHCPv6 Server MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+DLINKSW-DHCP6-SERVER-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32,
+        IpAddress
+            FROM SNMPv2-SMI
+        DisplayString,
+        RowStatus,
+        TruthValue,
+        DateAndTime
+                FROM SNMPv2-TC
+        MODULE-COMPLIANCE,
+	    OBJECT-GROUP
+		    FROM SNMPv2-CONF
+        InterfaceIndex
+            FROM IF-MIB
+        InetAddressPrefixLength, InetAddressIPv6
+            FROM INET-ADDRESS-MIB
+        dlinkIndustrialCommon			
+			FROM DLINK-ID-REC-MIB;	
+
+
+    dlinkSwDhcp6ServerMIB MODULE-IDENTITY
+        LAST-UPDATED "201310090000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+             Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for DHCPv6 Server."
+        REVISION "201301180000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'DHCPv6 Server'
+             functionality.
+            "
+        REVISION "201310090000Z"
+        DESCRIPTION
+             "modify node dDhcp6SBindExpire syntax to DateAndTime."
+        ::= { dlinkIndustrialCommon 223 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6ServerMIBNotifications    OBJECT IDENTIFIER ::= { dlinkSwDhcp6ServerMIB 0 }
+    dDhcp6ServerMIBObjects          OBJECT IDENTIFIER ::= { dlinkSwDhcp6ServerMIB 1 }
+    dDhcp6ServerMIBConformance      OBJECT IDENTIFIER ::= { dlinkSwDhcp6ServerMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6ServGeneral          OBJECT IDENTIFIER ::= { dDhcp6ServerMIBObjects 1}       
+    
+    dDhcp6ServiceEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object enables/disables the DHCPv6 server and relay service on 
+            the device."
+        DEFVAL          { false }    
+        ::= { dDhcp6ServGeneral 1 }
+
+    dDhcp6SCfgChanged OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The configuration changes of DHCPv6 server cannot take effect on-the-fly.
+            This ojbect indicates whether the DHCPv6 server configuration has changed
+            since the DHCPv6 service was enabled.
+            "
+        ::= { dDhcp6ServGeneral 2 }
+
+    
+    dDhcp6SExcludedAddressTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SExcludedAddressEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of configurations about a range of IPv6 addresses that
+            the DHCPv6 server should not assign to DHCPv6 client."
+        ::= { dDhcp6ServGeneral 3 }
+
+    dDhcp6SExcludedAddressEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SExcludedAddressEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contans information about an IP address range
+            that the DHCPv6 server should not assign to DHCPv6 client."
+        INDEX {            
+            dDhcp6SExcludedAddressBeginAddr, 
+            dDhcp6SExcludedAddressEndAddr 
+        }
+    ::= { dDhcp6SExcludedAddressTable 1 }
+
+    DDhcp6SExcludedAddressEntry ::=      SEQUENCE {        
+        dDhcp6SExcludedAddressBeginAddr          InetAddressIPv6,
+        dDhcp6SExcludedAddressEndAddr            InetAddressIPv6,
+        dDhcp6SExcludedAddressRowStatus          RowStatus
+    }
+   
+    dDhcp6SExcludedAddressBeginAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the first IPv6 address of this excluded
+            address range."
+        ::= { dDhcp6SExcludedAddressEntry 1 }
+
+    dDhcp6SExcludedAddressEndAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the last IPv6 address of this excluded
+            address range."
+        ::= { dDhcp6SExcludedAddressEntry 2 }
+
+    dDhcp6SExcludedAddressRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dDhcp6SExcludedAddressEntry 3 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6SLocalPoolTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SLocalPoolEntry
+        MAX-ACCESS      not-accessible
+        STATUS      current
+        DESCRIPTION
+            "A list of configurations contains information for local IPv6
+            prefix pools."
+        ::= { dDhcp6ServGeneral 4 }
+
+    dDhcp6SLocalPoolEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SLocalPoolEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains information about a local IPv6 prefix pool
+            that will be assigned to DHCPv6 client."
+        INDEX { dDhcp6SLocalPoolName }
+        ::= { dDhcp6SLocalPoolTable 1 }
+
+    DDhcp6SLocalPoolEntry ::=      SEQUENCE {        
+        dDhcp6SLocalPoolName                DisplayString,
+        dDhcp6SLocalPoolPrefix              InetAddressIPv6,
+        dDhcp6SLocalPoolPrefixLen           InetAddressPrefixLength,
+        dDhcp6SLocalPoolPrefixAssignLen     InetAddressPrefixLength,
+        dDhcp6SLocalPoolFreeAddrNum         Unsigned32,
+        dDhcp6SLocalPoolInUseAddrNum        Unsigned32,
+        dDhcp6SLocalPoolRowStatus           RowStatus
+    }
+
+    dDhcp6SLocalPoolName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of this local IPv6 prefix pool."
+        ::= { dDhcp6SLocalPoolEntry 1 }
+    
+    dDhcp6SLocalPoolPrefix OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv6 prefix address of the local pool."
+        ::= { dDhcp6SLocalPoolEntry 2 }    
+    
+    dDhcp6SLocalPoolPrefixLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv6 prefix length in bits of the local pool."
+        ::= { dDhcp6SLocalPoolEntry 3 }   
+     
+    dDhcp6SLocalPoolPrefixAssignLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the prefix length in bits to delegate to DHCPv6
+            client from the pool. The value of dDhcp6SLocalPoolPrefixAssignLen
+            cannot be less than the value of dDhcp6SLocalPoolPrefixLen. 
+            "
+        ::= { dDhcp6SLocalPoolEntry 4 }          
+    
+    dDhcp6SLocalPoolFreeAddrNum OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of prefixes which are available to
+            be allocated."
+        ::= { dDhcp6SLocalPoolEntry 5 }       
+    
+    dDhcp6SLocalPoolInUseAddrNum OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the number of already allocated prefixes."
+        ::= { dDhcp6SLocalPoolEntry 6 }           
+     
+    dDhcp6SLocalPoolRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row."
+        ::= { dDhcp6SLocalPoolEntry 7 }
+    
+-- -----------------------------------------------------------------------------
+    dDhcp6ServPoolMgmt         OBJECT IDENTIFIER ::= { dDhcp6ServerMIBObjects 2}
+    
+    dDhcp6SPoolTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SPoolEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table of DHCPv6 pool Information."
+        ::= { dDhcp6ServPoolMgmt 1 }
+
+    dDhcp6SPoolEntry OBJECT-TYPE
+        SYNTAX      DDhcp6SPoolEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6SPoolTable."
+        INDEX  { dDhcp6SPoolName }
+        ::= { dDhcp6SPoolTable 1 }
+
+    DDhcp6SPoolEntry ::= SEQUENCE {
+            dDhcp6SPoolName         DisplayString,
+            dDhcp6SPoolRowStatus    RowStatus
+        }
+
+    dDhcp6SPoolName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The name of this pool."
+        ::= { dDhcp6SPoolEntry 1 }
+
+    dDhcp6SPoolRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDhcp6SPoolEntry 2 }
+        
+-- -----------------------------------------------------------------------------
+    dDhcp6SPoolDomainNameTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SPoolDomainNameEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table of domain name information in DHCPv6 pools."
+        ::= { dDhcp6ServPoolMgmt 2 }
+
+    dDhcp6SPoolDomainNameEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SPoolDomainNameEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6SPoolDomainNameTable.
+            The first instance identifier index value identifies the 
+            dDhcp6SPoolEntry that a domain name (dDhcp6SPoolDomainNameEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dDhcp6SPoolEntry is deleted."
+        INDEX  { 
+            dDhcp6SPoolName, 
+            dDhcp6SPoolDomainNameAdminIndex
+        }
+        ::= { dDhcp6SPoolDomainNameTable 1 }
+
+    DDhcp6SPoolDomainNameEntry ::= SEQUENCE {           
+        dDhcp6SPoolDomainNameAdminIndex		Unsigned32,
+        dDhcp6SPoolDomainName               DisplayString,
+        dhcp6ServerDomainNameRowStatus      RowStatus
+    }
+    
+    dDhcp6SPoolDomainNameAdminIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..8)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the order of preference of a domain name 
+            in a DHCPv6 pool. The number of domain name can be specified in a 
+            DHCPv6 pool is project dependent."
+        ::= { dDhcp6SPoolDomainNameEntry 1 }
+           
+    dDhcp6SPoolDomainName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The domain name of the corresponding entry."
+        ::= { dDhcp6SPoolDomainNameEntry 2 }
+
+    dhcp6ServerDomainNameRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDhcp6SPoolDomainNameEntry 3 }
+
+-- -----------------------------------------------------------------------------       
+    dDhcp6SPoolDnsServerTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SPoolDnsServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A list of DNS server configurations for DHCPv6 pools."                               
+        ::= { dDhcp6ServPoolMgmt 3 }
+
+    dDhcp6SPoolDnsServerEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SPoolDnsServerEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry contains DNS server configuration in a DHCPv6 pool.
+            The first instance identifier index value identifies the 
+            dDhcp6SPoolEntry that a DNS server (dDhcp6SPoolDnsServerEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dDhcp6SPoolEntry is deleted." 
+        INDEX { 
+            dDhcp6SPoolName, 
+            dDhcp6SPoolDnsServerIndex
+        }
+        ::= { dDhcp6SPoolDnsServerTable 1 }
+
+    DDhcp6SPoolDnsServerEntry ::=    SEQUENCE {
+        dDhcp6SPoolDnsServerIndex		Unsigned32,
+        dDhcp6SPoolDnsServerAddr    	InetAddressIPv6,
+        dDhcp6SPoolDnsServerRowStatus   RowStatus				
+    }
+  
+    dDhcp6SPoolDnsServerIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 (1..8)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This objects indicates the order of preference of a DNS server in a 
+            DHCPv6 pool."
+        ::= { dDhcp6SPoolDnsServerEntry 1 }
+
+    dDhcp6SPoolDnsServerAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "The IPv6 address of the DNS server."
+        ::= { dDhcp6SPoolDnsServerEntry 2 }
+
+    dDhcp6SPoolDnsServerRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The status of this conceptual row." 
+        ::= { dDhcp6SPoolDnsServerEntry 3}              
+
+-- ----------------------------------------------------------------------------- 
+    dDhcp6SPoolAddrPrefixTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SPoolAddrPrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table of address prefix information in DHCPv6 pools."
+        ::= { dDhcp6ServPoolMgmt 4 }
+
+    dDhcp6SPoolAddrPrefixEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SPoolAddrPrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6SPoolAddrPrefixTable.
+            The first instance identifier index value identifies the 
+            dDhcp6SPoolEntry that a address-prefix (dDhcp6SPoolAddrPrefixEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dDhcp6SPoolEntry is deleted. "
+        INDEX  {  dDhcp6SPoolName }
+        ::= { dDhcp6SPoolAddrPrefixTable 1 }
+
+    DDhcp6SPoolAddrPrefixEntry ::= SEQUENCE {           
+        dDhcp6SPoolAddrPrefixAddr  		    InetAddressIPv6,
+        dDhcp6SPoolAddrPrefixLength         InetAddressPrefixLength,
+        dDhcp6SPoolAddrPrefixVLtime         Unsigned32,
+        dDhcp6SPoolAddrPrefixPLtime         Unsigned32,
+        dDhcp6SPoolAddrPrefixRowStatus      RowStatus
+    }        
+    
+    dDhcp6SPoolAddrPrefixAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates IPv6 address prefix to be assigned to client."
+        ::= { dDhcp6SPoolAddrPrefixEntry 1 }
+    
+    dDhcp6SPoolAddrPrefixLength OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the length in bits of the address prefix."
+        ::= { dDhcp6SPoolAddrPrefixEntry 2 }    
+    
+    dDhcp6SPoolAddrPrefixVLtime OBJECT-TYPE
+        SYNTAX          Unsigned32 (60 .. 4294967295)
+        UNITS           "seconds"         
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The valid lifetime of the address prefix in seconds."
+        DEFVAL      { 2592000 }    
+        ::= { dDhcp6SPoolAddrPrefixEntry 3 } 
+
+    dDhcp6SPoolAddrPrefixPLtime OBJECT-TYPE
+        SYNTAX          Unsigned32 (60 .. 4294967295)
+        UNITS           "seconds"
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The preferred lifetime of the address prefix in seconds."             
+        DEFVAL      { 604800  }      
+        ::= { dDhcp6SPoolAddrPrefixEntry 4 }
+             
+    dDhcp6SPoolAddrPrefixRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."        
+        ::= { dDhcp6SPoolAddrPrefixEntry 5 }   
+        
+-- -----------------------------------------------------------------------------
+    dDhcp6SPoolAddrAssignTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SPoolAddrAssignEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table of address assignment information in DHCPv6 pools."
+        ::= { dDhcp6ServPoolMgmt 6 }
+
+    dDhcp6SPoolAddrAssignEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SPoolAddrAssignEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6SPoolAddrAssignTable.
+            The first instance identifier index value identifies the 
+            dDhcp6SPoolEntry that an address-assignment (dDhcp6SPoolAddrAssignEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dDhcp6SPoolEntry is deleted.            
+            "
+        INDEX  { 
+            dDhcp6SPoolName,
+            dDhcp6SPoolAddrAssignAddr
+        }
+        ::= { dDhcp6SPoolAddrAssignTable 1 }
+
+    DDhcp6SPoolAddrAssignEntry ::= SEQUENCE {           
+        dDhcp6SPoolAddrAssignAddr  		       InetAddressIPv6,
+        dDhcp6SPoolAddrAssignLength            InetAddressPrefixLength,
+        dDhcp6SPoolAddrAssignClientDuid        OCTET STRING,
+        dDhcp6SPoolAddrAssignSetIaid           TruthValue,
+        dDhcp6SPoolAddrAssignIaid              Unsigned32,
+        dDhcp6SPoolAddrAssignVLtime            Unsigned32,
+        dDhcp6SPoolAddrAssignPLtime            Unsigned32,
+        dDhcp6SPoolAddrAssignRowStatus         RowStatus
+    }        
+    
+    dDhcp6SPoolAddrAssignAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv6 address to be assigned to client."
+        ::= { dDhcp6SPoolAddrAssignEntry 1 }
+    
+    dDhcp6SPoolAddrAssignLength OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the length in bits of the address."
+        ::= { dDhcp6SPoolAddrAssignEntry 2 }    
+    
+    dDhcp6SPoolAddrAssignClientDuid OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the DHCP unique identifier (DUID) of 
+            the client to get the address."
+        ::= { dDhcp6SPoolAddrAssignEntry 3 }    
+    
+    dDhcp6SPoolAddrAssignSetIaid OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether dDhcp6SPoolAddrAssignIaid is set or not."
+        DEFVAL      { false }            
+        ::= { dDhcp6SPoolAddrAssignEntry 4 }  
+    
+    dDhcp6SPoolAddrAssignIaid OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Identity association identifier (IAID) of the
+            entry. The value of dDhcp6SPoolAddrAssignIaid uniquely identifies a 
+            collection of non-temporary addresses (IA_NA) assigned on the client.
+            dDhcp6SPoolAddrAssignIaid is only valid when dDhcp6SPoolAddrAssignSetIaid
+            is 'true'."
+        ::= { dDhcp6SPoolAddrAssignEntry 5 }
+    
+    dDhcp6SPoolAddrAssignVLtime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates valid lifetime of the assigned address in seconds. 
+            The valid lifetime should be greater than preferred lifetime."
+        DEFVAL      { 2592000 }
+        ::= { dDhcp6SPoolAddrAssignEntry 6 }
+    
+    dDhcp6SPoolAddrAssignPLtime OBJECT-TYPE
+        SYNTAX          Unsigned32 (60 .. 4294967295)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates preferred lifetime of the assigned address in seconds. 
+            The valid lifetime should be greater than preferred lifetime."
+        DEFVAL      { 604800 }                   
+        ::= { dDhcp6SPoolAddrAssignEntry 7 }
+                                   
+    dDhcp6SPoolAddrAssignRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDhcp6SPoolAddrAssignEntry 8 }   
+        
+-- -----------------------------------------------------------------------------
+    dDhcp6SPoolPdTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SPoolPdEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table of prefix delegation information in DHCPv6 pools."
+        ::= { dDhcp6ServPoolMgmt 7 }
+
+    dDhcp6SPoolPdEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SPoolPdEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6SPoolPdTable.
+            The first instance identifier index value identifies the 
+            dDhcp6SPoolEntry that a prefix delegation (dDhcp6SPoolPdEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dDhcp6SPoolEntry is deleted.            
+            "
+        INDEX  { 
+            dDhcp6SPoolName,
+            dDhcp6SPoolPdPrefix,
+            dDhcp6SPoolPdPrefixLength
+        }
+        ::= { dDhcp6SPoolPdTable 1 }
+
+    DDhcp6SPoolPdEntry ::= SEQUENCE {           
+        dDhcp6SPoolPdPrefix     		InetAddressIPv6,
+        dDhcp6SPoolPdPrefixLength       InetAddressPrefixLength,
+        dDhcp6SPoolPdClientDuid         OCTET STRING,
+        dDhcp6SPoolPdSetIaid            TruthValue,
+        dDhcp6SPoolPdIaid               Unsigned32,
+        dDhcp6SPoolPdVLtime             Unsigned32,
+        dDhcp6SPoolPdPLtime             Unsigned32,
+        dDhcp6SPoolPdRowStatus          RowStatus
+    }        
+   
+    dDhcp6SPoolPdPrefix OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates IPv6 prefix to be delegated to client."
+        ::= { dDhcp6SPoolPdEntry 1 }
+    
+    dDhcp6SPoolPdPrefixLength OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the length in bits of the prefix."
+        ::= { dDhcp6SPoolPdEntry 2 }    
+    
+    dDhcp6SPoolPdClientDuid OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the DHCP unique identifier (DUID) of 
+            the client to get the address."
+        ::= { dDhcp6SPoolPdEntry 3 }    
+    
+    dDhcp6SPoolPdSetIaid OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether dDhcp6SPoolPdIaid is set or not."
+        DEFVAL      { false }            
+        ::= { dDhcp6SPoolPdEntry 4 }  
+    
+    dDhcp6SPoolPdIaid OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Identity association identifier (IAID) of the
+            entry. The value of dDhcp6SPoolPdIaid uniquely identifies a 
+            collection of prefixes assigned to the requesting router.  
+            dDhcp6SPoolPdIaid is only valid when dDhcp6SPoolAddrAssignSetIaid
+            is 'true'."
+        ::= { dDhcp6SPoolPdEntry 5 }
+           
+    dDhcp6SPoolPdVLtime OBJECT-TYPE
+        SYNTAX          Unsigned32 (60 .. 4294967295)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates valid lifetime of the allocated prefix in seconds. 
+            The valid lifetime should be greater than preferred lifetime."
+         DEFVAL      { 2592000 }                  
+        ::= { dDhcp6SPoolPdEntry 6 }
+    
+    dDhcp6SPoolPdPLtime OBJECT-TYPE
+        SYNTAX          Unsigned32 (60 .. 4294967295)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates preferred lifetime of the address in seconds. 
+            The preferred lifetime should be less than valid lifetime."
+         DEFVAL      { 604800  }                  
+        ::= { dDhcp6SPoolPdEntry 7 }
+                            
+    dDhcp6SPoolPdRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDhcp6SPoolPdEntry 8 }
+        
+-- -----------------------------------------------------------------------------
+    dDhcp6SPoolPdLocPoolTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SPoolPdLocPoolEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table of local prefix pool association in DHCPv6 pools."
+        ::= { dDhcp6ServPoolMgmt 8 }
+
+    dDhcp6SPoolPdLocPoolEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SPoolPdLocPoolEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6SPoolPdLocPoolTable.
+            The first instance identifier index value identifies the 
+            dDhcp6SPoolEntry that a local prefix pool association (dDhcp6SPoolPdLocPoolEntry)
+            belongs to. An entry is removed from this table when its 
+            corresponding dDhcp6SPoolEntry is deleted.            
+            "
+        INDEX  {  dDhcp6SPoolName }
+        ::= { dDhcp6SPoolPdLocPoolTable 1 }
+
+    DDhcp6SPoolPdLocPoolEntry ::= SEQUENCE {           
+        dDhcp6SPoolPdLocPoolName           DisplayString,        
+        dDhcp6SPoolPdLocPoolVLtime         Unsigned32,
+        dDhcp6SPoolPdLocPoolPLtime         Unsigned32,
+        dDhcp6SPoolPdLocPoolRowStatus      RowStatus
+    }        
+    
+    dDhcp6SPoolPdLocPoolName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The name of the associated local IPv6 prefix pool."
+        ::= { dDhcp6SPoolPdLocPoolEntry 1 }
+    
+    dDhcp6SPoolPdLocPoolVLtime OBJECT-TYPE
+        SYNTAX          Unsigned32 (60 .. 4294967295)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates valid lifetime for the delegated prefix in 
+            seconds. The valid lifetime should be greater than preferred lifetime."
+         DEFVAL      { 2592000 }                  
+        ::= { dDhcp6SPoolPdLocPoolEntry 2 }
+    
+    dDhcp6SPoolPdLocPoolPLtime OBJECT-TYPE
+        SYNTAX          Unsigned32 (60 .. 4294967295)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates preferred lifetime for the delegated prefix in
+            seconds. The preferred lifetime should be less than valid lifetime."
+         DEFVAL      { 604800  }                  
+        ::= { dDhcp6SPoolPdLocPoolEntry 3 }
+    
+    dDhcp6SPoolPdLocPoolRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDhcp6SPoolPdLocPoolEntry 4 }
+            
+-- -----------------------------------------------------------------------------    
+    dDhcp6ServIfMgmt         OBJECT IDENTIFIER ::= { dDhcp6ServerMIBObjects 3}
+    
+    dDhcp6ServIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6ServIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table contains interface-specific DHCPv6 server service
+             configuration.
+             An entry is created/removed when DHCPv6 server service is
+             specified/unspecified.
+             When DHCPv6 server service is specified on an interface means
+             DHCPv6 server feature is enabled on that interface.
+             "
+        ::= { dDhcp6ServIfMgmt 1 }
+
+    dDhcp6ServIfEntry OBJECT-TYPE
+        SYNTAX          DDhcp6ServIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6ServIfTable."
+        INDEX  { dDhcp6ServIfIndex }
+        ::= { dDhcp6ServIfTable 1 }
+
+    DDhcp6ServIfEntry ::= SEQUENCE {
+            dDhcp6ServIfIndex           InterfaceIndex,
+            dDhcp6ServIfPoolName        DisplayString,
+            dDhcp6ServIfRapidCommit     TruthValue,
+            dDhcp6ServIfAllowHint       TruthValue,
+            dDhcp6ServIfPreference      Unsigned32,
+            dDhcp6ServIfRowStatus       RowStatus
+        }
+
+    dDhcp6ServIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+             Only VLAN interfaces are valid interfaces."
+        ::= { dDhcp6ServIfEntry 1 }
+
+    dDhcp6ServIfPoolName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (1..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the name of the DHCPv6 pool used to serve
+            the request received on the interface."
+        ::= { dDhcp6ServIfEntry 2 }
+
+    dDhcp6ServIfRapidCommit OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether allow proceeding of two-message
+            exchange."
+        DEFVAL      { false }
+        ::= { dDhcp6ServIfEntry 3 }
+
+    dDhcp6ServIfAllowHint OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether delegate the prefix based on the 
+            prefix hint by the client. By default, the prefix hint by client is
+            ignored."
+        DEFVAL      { false }
+        ::= { dDhcp6ServIfEntry 4 }
+        
+    dDhcp6ServIfPreference OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..255)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the preference value to be advertised by the
+            server. The larger value indicates the higher priority."
+        DEFVAL      { 0 }
+        ::= { dDhcp6ServIfEntry 5 }
+
+    dDhcp6ServIfRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The row status variable, used according to installation
+             and removal conventions for conceptual rows."
+        ::= { dDhcp6ServIfEntry 6 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6ServInfo          OBJECT IDENTIFIER ::= { dDhcp6ServerMIBObjects 4}     
+      
+    dDhcp6SBindingTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6SBindingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table contains DHCPv6 binding information."
+        ::= { dDhcp6ServInfo 1 }
+
+    dDhcp6SBindingEntry OBJECT-TYPE
+        SYNTAX          DDhcp6SBindingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6SBindingTable."
+        INDEX  { 
+            dDhcp6SBindIfIndex,
+            dDhcp6SBindClientDuid,
+            dDhcp6SBindIaType,
+            dDhcp6SBindIaId,
+            dDhcp6SBindAddrOrPrefix,  
+            dDhcp6SBindAddrOrPrefixLen    
+        }
+        ::= { dDhcp6SBindingTable 1 }
+
+    DDhcp6SBindingEntry ::= SEQUENCE {
+            dDhcp6SBindIfIndex              InterfaceIndex,
+            dDhcp6SBindClientDuid           OCTET STRING,
+            dDhcp6SBindIaType               INTEGER,
+            dDhcp6SBindIaId                 Unsigned32,
+            dDhcp6SBindAddrOrPrefix         InetAddressIPv6,
+            dDhcp6SBindAddrOrPrefixLen      InetAddressPrefixLength,
+            dDhcp6SBindClientLinkLocalAddr  InetAddressIPv6,
+            dDhcp6SBindIaT1                 Unsigned32,
+            dDhcp6SBindIaT2                 Unsigned32,           
+            dDhcp6SBindVLtime               Unsigned32,
+            dDhcp6SBindPLtime               Unsigned32,
+            dDhcp6SBindExpire               DateAndTime,
+            dDhcp6SBindClear       		    INTEGER                 
+        }
+        
+    dDhcp6SBindIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex of the VLAN interface on which the binding is located."
+        ::= { dDhcp6SBindingEntry 1 }  
+           
+    dDhcp6SBindClientDuid OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the DHCP unique identifier (DUID) of 
+            the client."
+        ::= { dDhcp6SBindingEntry 2 }  
+    
+    dDhcp6SBindIaType OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            other(0),
+            iapd(1),
+            iana(2)
+        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The type of binding IA (Identity association).
+            other(0) - The other types not specified here.
+            iapd(1)  - Prefix Delegation
+            iana(2)  - Non-temporary Addresses
+            "
+        ::= { dDhcp6SBindingEntry 3 }  
+              
+     dDhcp6SBindIaId OBJECT-TYPE
+        SYNTAX          Unsigned32 (60 .. 4294967295)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Identity association identifier (IAID) of the
+            entry. "
+        ::= { dDhcp6SBindingEntry 4 }
+    
+    dDhcp6SBindAddrOrPrefix OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv6 address or prefix allocated to the client."
+        ::= { dDhcp6SBindingEntry 5 }
+    
+    dDhcp6SBindAddrOrPrefixLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the length in bits of the IPv6 address or
+            prefix allocated/delegated to the client."
+        ::= { dDhcp6SBindingEntry 6 }
+    
+    dDhcp6SBindClientLinkLocalAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IPv6 link local address or prefix
+            allocated/delegated to the client."
+        ::= { dDhcp6SBindingEntry 7 }    
+        
+    dDhcp6SBindIaT1 OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates T1 of the IA. At time T1 for an IA, the
+            client initiates a Renew/Reply message exchange to extend the 
+            lifetimes on any addresses in the IA."               
+        ::= { dDhcp6SBindingEntry 8 }
+    
+    dDhcp6SBindIaT2 OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates T2 of the IA. 
+            At time T2 for an IA, the client initiates a Rebind/Reply message 
+            exchange with any available server."               
+        ::= { dDhcp6SBindingEntry 9 }
+        
+    dDhcp6SBindVLtime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates valid lifetime for the binding in seconds."                
+        ::= { dDhcp6SBindingEntry 10 }
+                        
+    dDhcp6SBindPLtime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates preferred lifetime for the binding in seconds."                
+        ::= { dDhcp6SBindingEntry 11 }
+                           
+    dDhcp6SBindExpire OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the expiration of the binding entry.
+		    The special value of all '00'Hs indicates that the binding will never
+		    be expired (infinite)."	
+        ::= { dDhcp6SBindingEntry 12 }    
+                          
+    dDhcp6SBindClear  OBJECT-TYPE
+   		SYNTAX      INTEGER	{   
+   		    clear(1),
+			noOp(2)
+		}
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+			"This object is used to clear the binding entry when
+			set to 'clear'.
+			No action is taken if this object is set to 'noOp'.
+			When read, the value 'noOp' is returned."	
+		::= { dDhcp6SBindingEntry 13 }                                        
+		
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************			   		
+	dDhcp6ServerCompliances OBJECT IDENTIFIER ::= { dDhcp6ServerMIBConformance 1 }
+		
+	dDhcp6ServerCompliance MODULE-COMPLIANCE
+		STATUS current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-DHCP6-SERVER-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dDhcp6SGblCfgGroup,
+		    dDhcp6SLocalPoolGroup,
+		    dDhcp6SPoolGroup,
+		    dDhcp6SInterfaceGroup,
+		    dDhcp6SNonTempAddrAssignGroup,
+		    dDhcp6SInfoGroup
+		}
+		
+		GROUP       dDhcp6SPrefixDelegationGroup 
+           DESCRIPTION 
+              "This group is required only if the Prefix-Delegation feature
+              is implemented by the agent."
+		
+		::= { dDhcp6ServerCompliances 1 }
+		
+	dDhcp6ServerGroups OBJECT IDENTIFIER ::= { dDhcp6ServerMIBConformance 2 }
+		
+	dDhcp6SGblCfgGroup OBJECT-GROUP
+		OBJECTS { 
+			dDhcp6ServiceEnabled,
+            dDhcp6SCfgChanged,
+			dDhcp6SExcludedAddressRowStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing global configuration about DHCPv6
+			server."
+		::= { dDhcp6ServerGroups 1 }
+					
+	dDhcp6SLocalPoolGroup OBJECT-GROUP
+		OBJECTS { 
+		    dDhcp6SLocalPoolPrefix, 
+		    dDhcp6SLocalPoolPrefixLen,
+		    dDhcp6SLocalPoolPrefixAssignLen,		   
+		    dDhcp6SLocalPoolRowStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing DHCP class configuration."
+		::= { dDhcp6ServerGroups 2 }
+		
+	dDhcp6SPoolGroup OBJECT-GROUP
+		OBJECTS { 		    
+		    dDhcp6SPoolRowStatus, 
+		    dDhcp6SPoolDomainName,
+		    dhcp6ServerDomainNameRowStatus,
+		    dDhcp6SPoolDnsServerAddr,
+		    dDhcp6SPoolDnsServerRowStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing DHCP relay agent configuration 
+			of a class or address range of a class under a DHCP pool."
+		::= { dDhcp6ServerGroups 3 }
+		
+	dDhcp6SInterfaceGroup  OBJECT-GROUP		
+		OBJECTS { 		    
+		    dDhcp6ServIfPoolName,
+		    dDhcp6ServIfRapidCommit,
+		    dDhcp6ServIfAllowHint,
+		    dDhcp6ServIfPreference,
+		    dDhcp6ServIfRowStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing interface-specific configuration
+			for DHCPv6 Server feature."
+		::= { dDhcp6ServerGroups 4 }
+	
+	dDhcp6SNonTempAddrAssignGroup  OBJECT-GROUP		
+		OBJECTS { 		    
+		    dDhcp6SPoolAddrPrefixAddr,
+		    dDhcp6SPoolAddrPrefixLength,
+		    dDhcp6SPoolAddrPrefixVLtime,
+		    dDhcp6SPoolAddrPrefixPLtime,
+		    dDhcp6SPoolAddrPrefixRowStatus,
+		    dDhcp6SPoolAddrAssignAddr,
+		    dDhcp6SPoolAddrAssignLength,
+		    dDhcp6SPoolAddrAssignClientDuid,
+		    dDhcp6SPoolAddrAssignSetIaid,
+		    dDhcp6SPoolAddrAssignIaid,
+		    dDhcp6SPoolAddrAssignVLtime,
+		    dDhcp6SPoolAddrAssignPLtime,
+		    dDhcp6SPoolAddrAssignRowStatus		    
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing non-temporary addresses configuration
+			for DHCPv6 Server feature."
+		::= { dDhcp6ServerGroups 5 }
+  
+    dDhcp6SPrefixDelegationGroup  OBJECT-GROUP	 	
+		OBJECTS { 		    
+		    dDhcp6SPoolPdPrefix,
+		    dDhcp6SPoolPdPrefixLength,
+		    dDhcp6SPoolPdClientDuid,
+		    dDhcp6SPoolPdSetIaid,
+		    dDhcp6SPoolPdIaid,
+		    dDhcp6SPoolPdVLtime,
+		    dDhcp6SPoolPdPLtime,
+		    dDhcp6SPoolPdRowStatus,
+		    dDhcp6SPoolPdLocPoolName,
+		    dDhcp6SPoolPdLocPoolVLtime,
+		    dDhcp6SPoolPdLocPoolPLtime,
+		    dDhcp6SPoolPdLocPoolRowStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing prefix-delegation configuration
+			for DHCPv6 Server feature."
+		::= { dDhcp6ServerGroups 6 } 
+
+    dDhcp6SInfoGroup  OBJECT-GROUP		
+		OBJECTS { 		    
+		    dDhcp6SLocalPoolFreeAddrNum,
+		    dDhcp6SLocalPoolInUseAddrNum,
+		    dDhcp6SBindClientLinkLocalAddr,
+		    dDhcp6SBindIaT1,
+		    dDhcp6SBindIaT2,
+		    dDhcp6SBindVLtime,
+		    dDhcp6SBindPLtime,
+		    dDhcp6SBindExpire,
+		    dDhcp6SBindClear
+		}
+		STATUS current
+		DESCRIPTION 
+			"A collection of objects providing dynamic information for DHCPv6
+			Server feature."
+		::= { dDhcp6ServerGroups 7 }  
+		             
+END
+  
+  

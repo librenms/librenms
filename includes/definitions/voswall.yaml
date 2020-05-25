@@ -1,0 +1,11 @@
+os: voswall
+group: unix
+text: Voswall
+type: firewall
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+processor_stacked: true
+discovery:
+    - sysDescr:
+        - Voswall

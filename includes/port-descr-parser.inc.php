@@ -16,7 +16,7 @@ if ($type && $descr) {
     $port_ifAlias['type']    = $type;
     $port_ifAlias['descr']   = $descr;
     $port_ifAlias['circuit'] = $circuit;
-    $port_ifAlias['speed']   = $speed;
+    $port_ifAlias['speed']   = substr($speed, 0, 32);
     $port_ifAlias['notes']   = $notes;
 
     d_echo($port_ifAlias);

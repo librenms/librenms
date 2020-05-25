@@ -1,0 +1,169 @@
+mib: EES-POWER-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: psTemperatureTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.7.3.1.2.{{ $index }}'
+                    value: psTemperatureMeasurement
+                    index: 'psTemperatureMeasurement.{{ $index }}'
+                    descr: psTemperatureName
+                    skip_value_lt: 0
+        voltage:
+            data:
+                -
+                    oid: systemVoltage
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'systemVoltage.{{ $index }}'
+                    descr: 'System Voltage'
+                    skip_values: 2147483647
+                -
+                    oid: psBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.1.{{ $index }}'
+                    divisor: 1000
+                    index: 'psBatteryVoltage.{{ $index }}'
+                    descr: 'Battery Voltage'
+                    skip_values: 2147483647
+                -
+                    oid: psInputLineAVoltage
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.1.{{ $index }}'
+                    divisor: 1000
+                    index: 'psInputLineAVoltage.{{ $index }}'
+                    descr: 'Input Line A Voltage'
+                    skip_values: 2147483647
+                -
+                    oid: psInputLineBVoltage
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'psInputLineBVoltage.{{ $index }}'
+                    descr: 'Input Line B Voltage'
+                    skip_values: 2147483647
+                -
+                    oid: psInputLineCVoltage
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.6.3.{{ $index }}'
+                    divisor: 1000
+                    index: 'psInputLineCVoltage.{{ $index }}'
+                    descr: 'Input Line C Voltage'
+                    skip_values: 2147483647
+                -
+                    oid: psConverterVoltage
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.13.4.{{ $index }}'
+                    divisor: 1000
+                    index: 'psConverterVoltage.{{ $index }}'
+                    descr: 'Convertor Voltage'
+                    skip_values: 2147483647
+        current:
+            data:
+                -
+                    oid: systemCurrent
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.3.{{ $index }}'
+                    divisor: 1000
+                    index: 'systemCurrent.{{ $index }}'
+                    descr: 'System Current'
+                    skip_values: 2147483647
+                -
+                    oid: psTotalBatteryCurrent
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.2.{{ $index }}'
+                    divisor: 1000
+                    index: 'psTotalBatteryCurrent.{{ $index }}'
+                    descr: 'Battery Current'
+                    skip_values: 2147483647
+                -
+                    oid: psBatteryTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.5.5.1.2.{{ $index }}'
+                    value: psBatteryCurrent
+                    index: 'psBatteryTable.{{ $index }}'
+                    descr: psBatteryName
+                -
+                    oid: psRectifierTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.11.4.1.6.{{ $index }}'
+                    value: psRectifierCurrent
+                    divisor: 1000
+                    index: 'psRectifierTable.{{ $index }}'
+                    descr: psRectifierIdent
+                -
+                    oid: psDistributionLoadTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.12.2.1.2.{{ $index }}'
+                    value: psDistributionLoadCurrent
+                    divisor: 1000
+                    index: 'psDistributionLoadTable.{{ $index }}'
+                    descr: psDistributionLoadName
+                -
+                    oid: psDistributionGeneralTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.12.3.1.2.{{ $index }}'
+                    value: psDistributionGeneralCurrent
+                    divisor: 1000
+                    index: 'psDistributionGeneralTable.{{ $index }}'
+                    descr: psDistributionGeneralName
+                -
+                    oid: psTotalConverterCurrent
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.13.5.{{ $index }}'
+                    index: 'psTotalConverterCurrent.{{ $index }}'
+                    descr: 'Converter Current'
+                    skip_values: 2147483647
+                -
+                    oid: psConverterTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.13.6.1.6.{{ $index }}'
+                    value: psConverterCurrent
+                    divisor: 1000
+                    index: 'psConverterTable.{{ $index }}'
+                    descr: psConverterIdent
+        state:
+            data:
+                -
+                    oid: systemStatus
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.1.{{ $index }}'
+                    descr: 'System Status'
+                    index: 'systemStatus.{{ $index }}'
+                    states:
+                        - { descr: unknown, graph: 1, value: 1, generic: 3 }
+                        - { descr: normal, graph: 1, value: 2, generic: 0 }
+                        - { descr: warning, graph: 1, value: 3, generic: 1 }
+                        - { descr: minor, graph: 1, value: 4, generic: 1 }
+                        - { descr: major, graph: 1, value: 5, generic: 2 }
+                        - { descr: critical, graph: 1, value: 6, generic: 2 }
+                        - { descr: unmanaged, graph: 1, value: 7, generic: 1 }
+                        - { descr: restricted, graph: 1, value: 8, generic: 1 }
+                        - { descr: testing, graph: 1, value: 9, generic: 3 }
+                        - { descr: disabled, graph: 1, value: 10, generic: 1 }
+                -
+                    oid: psStatusCommunication
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.8.{{ $index }}'
+                    descr: 'Communication Status'
+                    index: 'psStatusCommunication.{{ $index }}'
+                    states:
+                        - { descr: unknown, graph: 1, value: 1, generic: 3 }
+                        - { descr: normal, graph: 1, value: 2, generic: 0 }
+                        - { descr: interupt, graph: 1, value: 3, generic: 2 }
+                -
+                    oid: psStatusBatteryMode
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.9.{{ $index }}'
+                    descr: 'Battery Status'
+                    index: 'psStatusBatteryMode.{{ $index }}'
+                    states:
+                        - { descr: unknown, graph: 1, value: 1, generic: 3 }
+                        - { descr: floatCharging, graph: 1, value: 2, generic: 1 }
+                        - { descr: shortTest, graph: 1, value: 3, generic: 1 }
+                        - { descr: bcForTest, graph: 1, value: 4, generic: 1 }
+                        - { descr: manualTesting, graph: 1, value: 5, generic: 1 }
+                        - { descr: planTesting, graph: 1, value: 6, generic: 1 }
+                        - { descr: acFailTesting, graph: 1, value: 7, generic: 1 }
+                        - { descr: acFail, graph: 1, value: 8, generic: 2 }
+                        - { descr: manualBC, graph: 1, value: 9, generic: 1 }
+                        - { descr: autoBC, graph: 1, value: 10, generic: 1 }
+                        - { descr: cyclicBC, graph: 1, value: 11, generic: 1 }
+                        - { descr: masterBC, graph: 1, value: 12, generic: 1 }
+                        - { descr: masterBT, graph: 1, value: 13, generic: 1 }
+                -
+                    oid: psTemperatureTable
+                    num_oid: '.1.3.6.1.4.1.6302.2.1.2.7.3.1.5.{{ $index }}'
+                    value: psTemperatureAlarmStatus
+                    index: 'psTemperatureAlarmStatus.{{ $index }}'
+                    descr: psTemperatureName
+                    states:
+                        - { descr: high, graph: 1, value: 1, generic: 2 }
+                        - { descr: low, graph: 1, value: 2, generic: 2 }
+                        - { descr: fail, graph: 1, value: 3, generic: 2 }
+                        - { descr: none, graph: 1, value: 4, generic: 3 }

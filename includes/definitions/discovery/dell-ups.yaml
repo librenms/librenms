@@ -1,0 +1,18 @@
+mib: DELL-SNMP-UPS-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: productStatusGlobalStatus
+                    value: productStatusGlobalStatus
+                    num_oid: '.1.3.6.1.4.1.674.10902.2.110.1.{{ $index }}'
+                    descr: 'Current Status'
+                    index: '{{ $index }}'
+                    states:
+                        - { value: 1, descr: other, graph: 1, generic: 3 }
+                        - { value: 2, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: non-critical, graph: 1, generic: 1 }
+                        - { value: 5, descr: critical, graph: 1, generic: 2 }
+                        - { value: 6, descr: non-recoverable, graph: 1, generic: 2 }

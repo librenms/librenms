@@ -1,0 +1,341 @@
+-- This file was automatically generated from ciena-ws-typedefs.yang. Do not edit.
+
+CIENA-WS-TYPEDEFS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, Unsigned32
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC;
+
+cienaWsTypedefsMIB MODULE-IDENTITY
+    LAST-UPDATED "201706140000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This YANG module defines Ciena's commonly used typedefs"
+    REVISION "201706140000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Added typedef xcvr-profile-id.
+Added typedef string-maxl-15.
+Added xcvr-serdes-tx-eq enum.
+Added xcvr-serdes-rx-emphasis enum.
+Added xcvr-serdes-rx-amplitude enum.
+Added trace-mismatch-mode enum.
+Added trace-mismatch-fail-mode enum.
+Added trace-tx-oper-mode enum."
+    REVISION "201702280000Z"
+    DESCRIPTION "Waveserver Release 1.4
+Added typedef string-maxl-44.
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+Updated enum definition for typedef connector-type-desc-enum to remove the parentheses in some enum names.
+Added typedef decimal-3-dig.
+Added typedef decimal-2-dig-small.
+Added range statement for decimal-1-dig, decimal-2-dig and decimal-3-dig"
+    REVISION "201603030000Z"
+    DESCRIPTION "Waveserver Rel 1.1 revised.  
+Modified range of typedef 'tx-power-lvl'."
+    REVISION "201502250000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 13 }
+
+ChannelsNumber ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Channel number common type, channel range are defined from 0 to 4."
+    SYNTAX Unsigned32
+
+ConnectorTypeDescEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Human readable description of Vendor's connector type byte value. Reference SFF-8024, table 4-3"
+    SYNTAX INTEGER { unknownorunspecified(0), sc(1), fibrechannelstyle1copperconnector(2), fibrechannelstyle2copperconnector(3), bnc(4), fibrechannelcoaxheaders(5), fiberjack(6), lc(7), mtrj(8), mu(9), sg(10), opticalpigtail(11), mpo1x12(12), mpo2x16(13), hssdcii(32), copperpigtail(33), rj45(34), noseparableconnector(35), mxc2x16(36) }
+
+Decimal1Dig ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS current
+    DESCRIPTION "Decimal value up to 1 digits."
+    SYNTAX Integer32(-2147483640..2147483640)
+
+Decimal2Dig ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS current
+    DESCRIPTION "Decimal value up to 2 digits."
+    SYNTAX Integer32(-2147483600..2147483600)
+
+Decimal2DigSmall ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS current
+    DESCRIPTION "Decimal value up to 2 digits."
+    SYNTAX Integer32(-3000000..3000000)
+
+Decimal3Dig ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS current
+    DESCRIPTION "Decimal value up to 3 digits."
+    SYNTAX Integer32(-2147483000..2147483000)
+
+DescriptionString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "128a"
+    STATUS current
+    DESCRIPTION "String type for description used in Ciena defined modules. Max length of 128 characters, plus null. "
+    SYNTAX OCTET STRING(SIZE(0..128))
+
+EnabledDisabledEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Enabled and Disabled enum toggle used in Ciena defined modules."
+    SYNTAX INTEGER { disabled(0), enabled(1) }
+
+EnabledDisabledNaEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Enabled, Disabled, and not-applicable enum used in Ciena defined modules."
+    SYNTAX INTEGER { disabled(0), enabled(1), na(2) }
+
+EnhancedOptsEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { na(0), yes(1), no(2) }
+
+LicenseStatusEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { notcompliant(0), compliant(1) }
+
+LineModuleTypeBits ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX BITS { wl3eline(0) }
+
+LineSysEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { coloured(0), colourless(1), contentionless(2), cscolored(3), cscolorless(4) }
+
+MacString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "20a"
+    STATUS current
+    DESCRIPTION "MAC address string."
+    SYNTAX OCTET STRING(SIZE(1..20))
+
+ModemChannel ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Modem channel value."
+    SYNTAX Integer32
+
+ModemFrequency ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS current
+    DESCRIPTION "Modem frequency, in GHz."
+    SYNTAX Integer32(-2147483640..2147483640)
+
+ModuleTypeBits ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX BITS { integrated(0), fieldreplaceable(1) }
+
+ModuleTypeEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { unknown(0), integrated(1), fieldreplaceable(2) }
+
+NameString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS current
+    DESCRIPTION "String type for object names used in Ciena defined modules. It must be a non empty string that is at most 32 characters long."
+    SYNTAX OCTET STRING(SIZE(1..32))
+
+OnOffEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Off and On enum toggle used in Ciena defined modules."
+    SYNTAX INTEGER { off(0), on(1) }
+
+PortId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Logical port id that uniquely identifies a port."
+    SYNTAX Unsigned32
+
+PortName ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX OCTET STRING(SIZE(1..32))
+
+PtpId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "PTP ID"
+    SYNTAX Unsigned32
+
+RecoverLinkDispersionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Value for Fast Receiver Recovery Path Link Dispersion. 100000 means Auto."
+    SYNTAX Integer32
+
+ServiceDomainIdx ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Service Domain Index"
+    SYNTAX Unsigned32
+
+ServiceIdx ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Service Index"
+    SYNTAX Unsigned32
+
+StringMaxl128 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "128a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 128 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..128))
+
+StringMaxl15 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "15a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 15 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..15))
+
+StringMaxl16 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "16a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 16 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..16))
+
+StringMaxl254 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "254a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 254 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..254))
+
+StringMaxl256 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "256a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 256 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..256))
+
+StringMaxl32 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 32 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..32))
+
+StringMaxl44 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "44a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 44 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..44))
+
+StringMaxl50 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "50a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 50 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..50))
+
+StringMaxl64 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "64a"
+    STATUS current
+    DESCRIPTION "Standard string that has a max length of 64 characters. Can be used for various nodes that may require string of this length."
+    SYNTAX OCTET STRING(SIZE(0..64))
+
+StringSci ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "32a"
+    STATUS current
+    DESCRIPTION "String in Scientific Notation format with a max length of 32 characters."
+    SYNTAX OCTET STRING(SIZE(0..32))
+
+TraceMismatchFailMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { alarmoff(0), alarmon(1) }
+
+TraceMismatchMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { operatoronly(1), sapi(2), dapi(3), sapianddapi(4) }
+
+TraceTxOperMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { manual(0), auto(1) }
+
+TxPowerLvl ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS current
+    DESCRIPTION "Modem Tx Power Level."
+    SYNTAX Integer32(-2147483640..2147483640)
+
+UpDownEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Down and Up enum toggle used in Ciena defined modules."
+    SYNTAX INTEGER { down(0), up(1) }
+
+VendorDateString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "9a"
+    STATUS current
+    DESCRIPTION "Vendor's manufacturing date code string, 8 characters long."
+    SYNTAX OCTET STRING(SIZE(0..9))
+
+VendorRvString ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4a"
+    STATUS current
+    DESCRIPTION "Vendor Revision String. 2 characters."
+    SYNTAX OCTET STRING(SIZE(0..4))
+
+WlSpacing ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Wave length spacing, 50 GHz or 100 GHz. Flexigrid currently not supported."
+    SYNTAX INTEGER { fixed50ghz(0), fixed100ghz(1), fixed200ghz(2), flexgrid(3) }
+
+XcvrId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "XCVR ID"
+    SYNTAX Unsigned32
+
+XcvrMode ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { blank(0), mode10gig(1), mode40gig(2), mode100gig(3), mode16qam(4), modeqpsk(5), mode8qam(6) }
+
+XcvrProfileId ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "XCVR Profile ID"
+    SYNTAX Unsigned32
+
+XcvrSerdesRxAmplitude ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Receiver Output Amplitude. For Ciena-branded plugs, this value must be 'unspecified'."
+    SYNTAX INTEGER { ampUnspecified(-1), amp0(0), amp1(1), amp2(2), amp3(3) }
+
+XcvrSerdesRxEmphasis ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Receiver Output Emphasis, in dB. For Ciena-branded plugs, this value must be 'unspecified'."
+    SYNTAX INTEGER { empUnspecified(-1), emp0(0), emp1(1), emp2(2), emp3(3), emp4(4), emp5(5), emp6(6), emp7(7) }
+
+XcvrSerdesTxEq ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "Transmitter Input Equalization, in dB. For Ciena-branded plugs, this value must be 'unspecified'."
+    SYNTAX INTEGER { eqUnspecified(-1), eq0(0), eq1(1), eq2(2), eq3(3), eq4(4), eq5(5), eq6(6), eq7(7), eq8(8), eq9(9), eq10(10) }
+
+XcvrType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { notavailable(0), unsupported(1), qsfpplus(2), qsfp28(3), wavelogic3extreme(4) }
+
+YesNoEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "No and Yes enum toggle used in Ciena defined modules."
+    SYNTAX INTEGER { no(0), yes(1) }
+
+YesNoNaEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "No and Yes enum toggle used in Ciena defined modules."
+    SYNTAX INTEGER { no(0), yes(1), na(2) }
+
+
+
+END -- End module

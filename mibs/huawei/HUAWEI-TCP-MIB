@@ -1,0 +1,147 @@
+-- =================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved
+-- 
+-- Description: The HUAWEI-TCP-MIB provides information about TCP. 
+--              Now only trap for MD5 authentication failures is provided 
+--              
+-- Reference:
+-- Version:     V1.01
+-- History:
+--              xujin,2004.6.26,publish 
+-- =================================================================
+
+    HUAWEI-TCP-MIB DEFINITIONS ::= BEGIN
+ 
+        IMPORTS
+            hwDatacomm            
+                FROM HUAWEI-MIB            
+            tcpConnLocalAddress, tcpConnLocalPort, tcpConnRemAddress, tcpConnRemPort            
+                FROM RFC1213-MIB            
+            OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP            
+                FROM SNMPv2-CONF            
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE            
+                FROM SNMPv2-SMI            
+            DisplayString            
+                FROM SNMPv2-TC;
+    
+    
+
+        hwTCP MODULE-IDENTITY 
+            LAST-UPDATED "201708170908Z"        -- Aug 18, 2017 at 00:00 GMT
+            ORGANIZATION 
+                "Huawei Technologies Co.,Ltd."
+            CONTACT-INFO 
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com"
+            DESCRIPTION 
+                "The HUAWEI-TCP-MIB provides information about TCP. 
+                Now only trap for MD5 authentication failures is provided,
+                which include local address, local port, remote address, remote 
+                port. When MD5 authentication fails, the trap will send."
+                
+              REVISION     "201708170908Z"
+                            DESCRIPTION  
+                            "
+                            Modify the description.
+                            "     
+
+                REVISION     "200406090908Z"
+                            DESCRIPTION  
+                            "
+                            V1.00, Inital version.
+                            "     
+            ::= { hwDatacomm 34 }
+
+        
+    
+    
+--
+-- Node definitions
+--
+    
+        hwTCPObjects OBJECT IDENTIFIER ::= { hwTCP 1 }
+
+        
+        hwTCPProtocol OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This variable indicates which protocol use MD5 authentication.
+                If protocol is BGP, this variable will be the BGP string;
+                If protocol is LDP, this variable will be the LDP string;
+                If protocol is unknown, this variable will be the Unknown protocol string."
+            ::= { hwTCPObjects 1 }
+
+        
+        hwTCPVrfName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This variable indicates which VPN the TCP connection belongs to.
+                If the TCP connection belongs to public net, this variable is null."
+            ::= { hwTCPObjects 2 }
+
+        
+        hwTCPTraps OBJECT IDENTIFIER ::= { hwTCP 2 }
+
+        
+        hwTCPMD5AuthenFail NOTIFICATION-TYPE
+            OBJECTS { tcpConnLocalAddress, tcpConnLocalPort, tcpConnRemAddress, tcpConnRemPort, hwTCPProtocol, 
+                hwTCPVrfName }
+            STATUS current
+            DESCRIPTION 
+                "This trap indicates that MD5 authentication failed.
+The trap information includes the local address, local port number, remote address, remote port number, and protocol type.
+When MD5 authentication fails, this trap will be sent to the information center and displayed on the screen."
+            ::= { hwTCPTraps 1 }
+
+        
+        hwTCPConformance OBJECT IDENTIFIER ::= { hwTCP 3 }
+
+        
+        hwTCPCompliances OBJECT IDENTIFIER ::= { hwTCPConformance 1 }
+
+        
+--  this module
+        hwTCPCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for entities which 
+                implement the Huawei TCP MIB."
+            MODULE -- this module
+                MANDATORY-GROUPS { hwTCPTrapGroup, hwTCPForTrapGroup }
+            ::= { hwTCPCompliances 1 }
+
+        
+        hwTCPGroups OBJECT IDENTIFIER ::= { hwTCPConformance 2 }
+
+        
+        hwTCPTrapGroup NOTIFICATION-GROUP
+            NOTIFICATIONS { hwTCPMD5AuthenFail }
+            STATUS current
+            DESCRIPTION 
+                "A collection of objects providing mandatory TCP trap information."
+            ::= { hwTCPGroups 1 }
+
+        
+        hwTCPForTrapGroup OBJECT-GROUP
+            OBJECTS { hwTCPProtocol, hwTCPVrfName }
+            STATUS current
+            DESCRIPTION 
+                "These objects are required for entities
+                which support notification applications."
+            ::= { hwTCPGroups 2 }
+
+        
+    
+    END
+
+--
+-- HUAWEI-TCP-MIB.mib
+--

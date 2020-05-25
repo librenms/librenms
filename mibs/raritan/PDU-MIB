@@ -4,10 +4,11 @@ IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE     FROM SNMPv2-SMI
     enterprises, Integer32, Unsigned32, IpAddress   FROM SNMPv2-SMI
     MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP FROM SNMPv2-CONF
-    TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime  FROM SNMPv2-TC;
+    InetAddress,InetAddressType FROM INET-ADDRESS-MIB
+    TEXTUAL-CONVENTION, DisplayString, MacAddress, DateAndTime, TruthValue  FROM SNMPv2-TC;
 
 raritan MODULE-IDENTITY
-    LAST-UPDATED "201102140000Z"      -- February 14, 2011
+    LAST-UPDATED "201602220000Z"      -- February 22,2016
     ORGANIZATION "Raritan"
     CONTACT-INFO "
                   Author:       Raritan Americas, Inc.
@@ -19,6 +20,185 @@ raritan MODULE-IDENTITY
                  "
     DESCRIPTION  "This mib describes the SNMP functions of the Dominion PX
                   Power Distribution Unit by Raritan Computer."
+
+
+    REVISION     "201602220000Z"      -- February 22,2016
+    DESCRIPTION  "1) Added inletCurrentUnbalanceHysteresis to inletTable.
+                        
+                  " 
+
+
+    REVISION     "201602030000Z"      -- February 3,2016
+    DESCRIPTION  "1) Added varbind sensorDescr to the following traps
+                      managingenvironmentalSensor,
+                      unmanagingenvironmentalSensor.
+                        
+                  " 
+
+
+    REVISION     "201511020000Z"      -- November 2,2015
+    DESCRIPTION  "1) Added ipmiOverLAN to the info table.
+                        
+                  " 
+
+
+    REVISION     "201510260000Z"      -- October 26,2015
+    DESCRIPTION  "1) Added Comment above primaryNTPServerAddressType
+                        
+                  " 
+
+
+    REVISION     "201510160000Z"      -- October 16,2015
+    DESCRIPTION  "1) Modified DESCRIPTION clauses of the following traps. 
+                      ipmiOverLANEnabled,
+                      ipmiOverLANDisabled
+                   
+                  2)  Added the following traps to the NOTIFICATION-GROUP trapsGroup
+                      ipmiOverLANEnabled,
+                      ipmiOverLANDisabled
+                        
+                  " 
+
+    REVISION     "201510020000Z"      -- October 2,2015
+    DESCRIPTION  "1) Modified DESCRIPTION clause of thresholdAlarm trap
+                      
+                        
+                  " 
+    
+
+
+    REVISION     "201506190000Z"      -- June 19,2015
+    DESCRIPTION  "1) Modified DESCRIPTION clauses of 
+                      dataLogAvgExternalSensorValue,
+                      dataLogMaxExternalSensorValue,
+                      dataLogAvgExternalSensorValue
+
+                  2) Modified DESCRIPTION CLAUSE of reorderexternalSensorTableEntries 
+                        
+                  " 
+
+
+    REVISION     "201503110000Z"      -- March 11,2015
+    DESCRIPTION  "1) Added the following under info.
+                     thresholdValue,
+                     sensorValue
+                     
+                   2) Added thresholdValue and sensorValue to the following traps
+                        thresholdAlarm
+                        
+                  " 
+
+
+    REVISION     "201404030000Z"      -- April 3,2014
+    DESCRIPTION  "1) Modified the DESCRIPTION of the following.
+                     inletActiveEnergy
+                     inletPoleMaxCurrent
+                     inletPoleActivePower
+                     inletPoleApparentPower
+                     inletPolePowerFactor
+                     inletPoleActiveEnergy
+                     neutralCurrentUpperWarning
+                     neutralCurrentUppeCritical
+                     dataLogAvgInletPoleActivePower
+                     dataLogMaxInletPoleActivePower
+                     dataLogMinInletPoleActivePower
+                     dataLogAvgInletPoleApparentPower
+                     dataLogMaxInletPoleApparentPower
+                     dataLogMinInletPoleApparentPower
+                     dataLogAvgInletPoleActiveEnergy
+                     dataLogMaxInletPoleActiveEnergy
+                     dataLogMinInletPoleActiveEnergy
+                     currentUnbalance
+                   2) Added the following traps
+                        managingenvironmentalSensor,
+                        unmanagingenvironmentalSensor 
+                  " 
+
+
+    REVISION     "201203220000Z"      -- March 22,2012
+    DESCRIPTION  "1) Added dataLogExternalSensorChanged to  dataLogExternalSensorTable.
+                   
+                  " 
+
+    REVISION     "201203150000Z"      -- March 15,2012
+    DESCRIPTION  "1) Added support for NTP servers.
+                     Added the following objects under info
+                       synchronizeWithNTPServer, useDHCPProvidedNTPServer,
+                       primaryNTPServerAddressType, primaryNTPServerAddress,
+                       secondaryNTPServerAddressType, secondaryNTPServerAddress,
+                       daylightSavingsTime 
+                  " 
+
+
+    REVISION     "201203140000Z"      -- March 14,2012
+    DESCRIPTION  "1) Added support for external sensors in the data log
+                      Added dataLogExternalSensorTable
+                  " 
+
+    REVISION     "201111300000Z"      -- Novemebr 30, 2011
+    DESCRIPTION  "1) Modified DESCRIPTION of configureAlerts to note that Policy Name is case-sensitive
+                  "                 
+
+
+    REVISION     "201111070000Z"      -- November 7, 2011
+    DESCRIPTION  "1) Added configureAlerts under info
+                     Added SensorClassEnumeration, EventTypeEnumeration, EventDirectionEnumeration
+                 "
+
+    REVISION     "201110060000Z"      -- October 6, 2011
+    DESCRIPTION  "1) Added fipsMode under info
+                  2) Added EnabledDisabledEnumeration
+                  3) Added fipsModeEnabled and fipsModeDisabled traps
+                 "
+
+    REVISION     "201105170000Z"      -- May 17, 2011
+    DESCRIPTION  "1) Added altitude under info
+                 "
+
+    REVISION     "201105110000Z"      -- May 11, 2011
+    DESCRIPTION  "1) Modified the DESCRIPTION clause of dataLoggingInterval and measurementsPerLogEntry
+                  2) Added reorderExternaSensorTableEntries to specify the order of the entries in externalSensorTable
+                  3) Added voltageMeasurementFailure trap 
+                 "
+
+    REVISION     "201104180000Z"      -- April 18, 2011
+    DESCRIPTION  "1) Added  dataLogAvgActivePower,dataLogMaxActivePower,dataLogMinActivePower, 
+                            dataLogAvgApparentPower,dataLogMaxApparentPower, dataLogMinApparentPower 
+                        to DataLogEntryStruct
+
+                  2) Added  dataLogAvgOutletCurrent,dataLogMaxOutletCurrent,dataLogMinOutletCurrent, 
+                            dataLogAvgOutletVoltage,dataLogMaxOutletVoltage,dataLogMinOutletVoltage,
+                            dataLogAvgOutletPowerFactor,dataLogMaxOutletPowerFactor,dataLogMinOutletPowerFactor,
+                            dataLogAvgOutletWattHours,dataLogMaxOutletWattHours,dataLogMinOutletWattHours
+                         to DataLogOutletEntryStruct
+
+                 3) Added  dataLogAvgCircuitBreakerCurrent,dataLogMaxCircuitBreakerCurrent,dataLogMinCircuitBreakerCurrent
+                         to DataLogCircuitBreakerEntryStruct
+
+                 4) Added  dataLogAvgInletCurrentUnbalance,dataLogMaxInletCurrentUnbalance,dataLogMinInletCurrentUnbalance,
+                           dataLogAvgInletActivePower,dataLogMaxInletActivePower,dataLogMinInletActivePower,
+                           dataLogAvgInletApparentPower,dataLogMaxInletApparentPower,dataLogMinInletApparentPower,
+                           dataLogAvgInletActiveEnergy,dataLogMaxInletActiveEnergy,dataLogMinInletActiveEnergy,
+                         to DataLogInletEntryStruct
+
+                 5) Added  dataLogAvgInletPoleCurrent,dataLogMaxInletPoleCurrent,dataLogMinInletPoleCurrent,
+                           dataLogAvgInletPoleVoltage,dataLogMaxInletPoleVoltage,dataLogMinInletPoleVoltage,
+                           dataLogAvgInletPoleActivePower,dataLogMaxInletPoleActivePower,dataLogMinInletPoleActivePower,    
+                           dataLogAvgInletPoleApparentPower,dataLogMaxInletPoleApparentPower,dataLogMinInletPoleApparentPower,       
+                           dataLogAvgInletPoleActiveEnergy,dataLogMaxInletPoleActiveEnergy,dataLogMinInletPoleActiveEnergy 
+                         to DataLogInletPoleEntryStruct 
+  
+                 6) Added measurementsPerLogEntry under info.
+
+                 7) Deprecated dataLogActivePower,dataLogApparentPower,dataLogOutletCurrent,
+                               dataLogOutletVoltage,dataLogOutletPowerFactor, dataLogOutletOnTime,
+                               dataLogCircuitBreakerCurrent,dataLogOutletWattHours,dataLogInletPoleCurrent,           
+                               dataLogInletPoleVoltage,dataLogInletCurrentUnbalance,dataLogInletActivePower,
+                               dataLogInletApparentPower,dataLogInletActiveEnergy
+
+                 8) Deprecated  dataLoggingInterval
+                                     
+                 "
 
     REVISION     "201102140000Z"      -- February 14, 2011
     DESCRIPTION  "1) Added  PowerCIMStatusEnumeration and powerCIMStatus
@@ -151,6 +331,7 @@ dataLogCircuitBreaker  OBJECT IDENTIFIER ::= { board 15 }
 dataLogInputLine    OBJECT IDENTIFIER ::= { board 14 }
 dataLogInlet     OBJECT IDENTIFIER ::= { board 12 }
 dataLogInletPole  OBJECT IDENTIFIER ::= { board 13 }
+dataLogExternalSensor  OBJECT IDENTIFIER ::= { board 16 }
 
 
 unitReadings    OBJECT IDENTIFIER ::= { unit 1 }
@@ -332,9 +513,10 @@ complianceRev3      MODULE-COMPLIANCE
                 ::= { compliances 4 }
 
 complianceRev4      MODULE-COMPLIANCE
-                STATUS current
+                STATUS deprecated
                 DESCRIPTION
-                    "The requirements for conformance to the PDU-MIB."
+                    "The requirements for conformance to the PDU-MIB. This is deprecated and the new compliance 
+                     ComplianceRev5 has been added"
                 MODULE -- this module
 
                 GROUP infoGroup
@@ -374,9 +556,63 @@ complianceRev4      MODULE-COMPLIANCE
                     "The pdu Data group."
                 ::= { compliances 5 }
 
+
+complianceRev5      MODULE-COMPLIANCE
+                STATUS current
+                DESCRIPTION
+                    "The requirements for conformance to the PDU-MIB."
+                MODULE -- this module
+
+                GROUP infoGroupRev2
+                DESCRIPTION
+                    "The info group."
+
+                GROUP inletsGroup
+                DESCRIPTION
+                    "The inlets group."
+
+                GROUP outletsGroup
+                DESCRIPTION
+                    "The outlets group."
+
+                GROUP unitSensorsGroupRev2
+                DESCRIPTION
+                    "The unit sensor readings association group."
+
+                GROUP externalSensorsGroup
+                DESCRIPTION
+                    "The external sesnors sensor association group."
+
+                GROUP trapsGroup
+                DESCRIPTION
+                    "The traps group."
+
+                GROUP inletPoleGroup
+                DESCRIPTION
+                    "The line current group."
+
+		GROUP circuitBreakerGroup
+                DESCRIPTION
+                    "The Circuit Breaker group."
+
+                GROUP dataLogGroupRev2
+                DESCRIPTION
+                    "The pdu Data group."
+                ::= { compliances 6 }
+
 -- units of conformance
 
 infoGroup       OBJECT-GROUP
+                OBJECTS { 
+                          dataLoggingInterval
+                         }
+                STATUS  deprecated
+                DESCRIPTION
+                    "A collection of objects providing basic information
+                     about the pdu."
+                ::= { groups 1 }
+
+infoGroupRev2       OBJECT-GROUP
                 OBJECTS { firmwareVersion,
                           serialNumber,
                           ipAddress,
@@ -401,7 +637,6 @@ infoGroup       OBJECT-GROUP
                           ratedPower,
                           outletSwitching,
                           dataLogging,
-                          dataLoggingInterval,
                           dataCollectionInterval,
                           outletEnergySupport,
                           currentUnbalanceSupport,
@@ -413,13 +648,29 @@ infoGroup       OBJECT-GROUP
                           lastUpgradeStatus,
                           lastUpgradeTimestamp,
                           lastUpgradeErrorDescription,
-                          powerCIMStatus   
+                          powerCIMStatus,
+                          measurementsPerLogEntry,
+                          psocNumber,
+                          altitude,
+                          configureAlerts,
+                          fipsMode,
+                          synchronizeWithNTPServer,
+                          useDHCPProvidedNTPServer,
+                          primaryNTPServerAddressType,
+                          primaryNTPServerAddress,
+                          secondaryNTPServerAddressType,
+                          secondaryNTPServerAddress,
+                          daylightSavingsTime,
+                          thresholdValue,  
+                          sensorValue,
+                          ipmiOverLAN
                          }
                 STATUS  current
                 DESCRIPTION
                     "A collection of objects providing basic information
                      about the pdu."
-                ::= { groups 1 }
+                ::= { groups 22 }
+
 
 outletsGroup    OBJECT-GROUP
                 OBJECTS { outletCount,
@@ -535,7 +786,15 @@ trapsGroup      NOTIFICATION-GROUP
                                 bulkConfigurationCopied,
                                 environmentalSensorsConnectivityLost,
                                 externalOnOffSensorStateChange,
-                                environmentalSensorsConnectivityRestored     }
+                                environmentalSensorsConnectivityRestored,
+                                voltageMeasurementError,
+                                fipsModeEnabled,
+                                fipsModeDisabled,
+                                managingenvironmentalSensor,
+                                unmanagingenvironmentalSensor,
+                                ipmiOverLANEnabled,
+                                ipmiOverLANDisabled
+                                     }
                 STATUS  current
                 DESCRIPTION
                     "A collection of traps."
@@ -668,12 +927,77 @@ dataLogGroupRev   OBJECT-GROUP
                                      dataLogInletCurrentUnbalance,
                                      dataLogInletActivePower,
                                      dataLogInletApparentPower,
-                                     dataLogInletActiveEnergy 
+                                     dataLogInletActiveEnergy
+                                     }
+                           STATUS  deprecated
+                           DESCRIPTION
+                               "A collection of objects describing the pdu data.
+                                This group is being deprecated in favor of dataLogGroupRev2"
+                           ::= { groups 17 }
+
+dataLogGroupRev2   OBJECT-GROUP
+                           OBJECTS { dataLogCount,
+                                     dataLogLatestIndex,
+                                     dataLogTimeStamp,
+                                     dataLogAvgActivePower,
+                                     dataLogMaxActivePower,
+                                     dataLogMinActivePower,
+                                     dataLogAvgApparentPower,
+                                     dataLogMaxApparentPower,
+                                     dataLogMinApparentPower,
+                                     dataLogAvgOutletCurrent,
+                                     dataLogMaxOutletCurrent,
+                                     dataLogMinOutletCurrent, 
+                                     dataLogAvgOutletVoltage,
+                                     dataLogMaxOutletVoltage,
+                                     dataLogMinOutletVoltage,
+                                     dataLogAvgOutletPowerFactor,
+                                     dataLogMaxOutletPowerFactor,
+                                     dataLogMinOutletPowerFactor,
+                                     dataLogAvgOutletWattHours,
+                                     dataLogMaxOutletWattHours,
+                                     dataLogMinOutletWattHours,
+                                     dataLogAvgCircuitBreakerCurrent,
+                                     dataLogMaxCircuitBreakerCurrent,
+                                     dataLogMinCircuitBreakerCurrent,
+                                     dataLogAvgInletCurrentUnbalance,
+                                     dataLogMaxInletCurrentUnbalance,
+                                     dataLogMinInletCurrentUnbalance,
+                                     dataLogAvgInletActivePower,
+                                     dataLogMaxInletActivePower,
+                                     dataLogMinInletActivePower,
+                                     dataLogAvgInletApparentPower,
+                                     dataLogMaxInletApparentPower,
+                                     dataLogMinInletApparentPower,
+                                     dataLogAvgInletActiveEnergy,
+                                     dataLogMaxInletActiveEnergy,
+                                     dataLogMinInletActiveEnergy,
+                                     dataLogAvgInletPoleCurrent,
+                                     dataLogMaxInletPoleCurrent,
+                                     dataLogMinInletPoleCurrent,
+                                     dataLogAvgInletPoleVoltage,
+                                     dataLogMaxInletPoleVoltage,
+                                     dataLogMinInletPoleVoltage,
+                                     dataLogAvgInletPoleActivePower,    
+                                     dataLogMaxInletPoleActivePower,     
+                                     dataLogMinInletPoleActivePower,    
+                                     dataLogAvgInletPoleApparentPower,      
+                                     dataLogMaxInletPoleApparentPower,       
+                                     dataLogMinInletPoleApparentPower,       
+                                     dataLogAvgInletPoleActiveEnergy,       
+                                     dataLogMaxInletPoleActiveEnergy,       
+                                     dataLogMinInletPoleActiveEnergy,
+                                     dataLogExternalSensorChanged,
+                                     dataLogExternalSensorState,
+                                     dataLogAvgExternalSensorValue,
+                                     dataLogMaxExternalSensorValue,
+                                     dataLogMinExternalSensorValue
                                      }
                            STATUS  current
                            DESCRIPTION
                                "A collection of objects describing the pdu data."
-                           ::= { groups 17 }
+                           ::= { groups 21 }
+
 
 inletPoleGroup   OBJECT-GROUP
                            OBJECTS { inletPoleCount,
@@ -713,7 +1037,8 @@ inletsGroup    OBJECT-GROUP
                           inletVoltageLowerWarning,
                           inletVoltageLowerCritical,
                           inletCurrentHysteresis,
-                          inletVoltageHysteresis
+                          inletVoltageHysteresis,
+                          inletCurrentUnbalanceHysteresis
                           }
                 STATUS  current
                 DESCRIPTION
@@ -739,7 +1064,8 @@ externalSensorsGroup   OBJECT-GROUP
                                     externalSensorUpperWarningThreshold,
                                     externalSensorState,
                                     externalSensorValue,
-                                    externalSensorHysteresis
+                                    externalSensorHysteresis,
+                                    reorderexternalSensorTableEntries 
                                      }
                            STATUS  current
                            DESCRIPTION
@@ -1006,6 +1332,42 @@ PowerCIMStatusEnumeration ::= TEXTUAL-CONVENTION
                                                   on(1)
                                                   }
 
+EnabledDisabledEnumeration ::= TEXTUAL-CONVENTION
+                          STATUS  current
+                          DESCRIPTION
+                              "The status of a PowerCIM"
+                          SYNTAX        INTEGER { disabled(0),
+                                                  enabled(1)
+                                                  }
+
+SensorClassEnumeration ::= TEXTUAL-CONVENTION
+                          STATUS  current
+                          DESCRIPTION
+                              "The class of sensor in the event"
+                          SYNTAX        INTEGER { externalTemperature(0),
+                                                  externalHumidity(1),
+						  externalAirFlow(2),
+						  externalAirPressure(3)
+                                                  }
+
+EventTypeEnumeration ::= TEXTUAL-CONVENTION
+                          STATUS  current
+                          DESCRIPTION
+                              "The event type"
+                          SYNTAX        INTEGER { aboveUpperCritical(0),
+                                                  aboveUpperNonCritical(1),
+                                                  belowLowerNonCritical(2),
+                                                  belowLowerCritical(3)
+                                                  }
+EventDirectionEnumeration ::= TEXTUAL-CONVENTION
+                          STATUS  current
+                          DESCRIPTION
+                              "The event direction"
+                          SYNTAX        INTEGER { asserted(0),
+                                                  deasserted(1),
+                                                  both(2)
+                                                  }
+
 -- the info group
 
 firmwareVersion OBJECT-TYPE
@@ -1215,11 +1577,22 @@ dataLogging          OBJECT-TYPE
 dataLoggingInterval       OBJECT-TYPE
                 SYNTAX        Integer32
                 MAX-ACCESS    read-write
-                STATUS        current
+                STATUS        deprecated
                 DESCRIPTION
                     "Data Logging periodicity in seconds. This is the periodicity of the data in the buffer.
                      This value must be a multiple of 3 between 3 and 600. For example, 60 is valid, 
-                     but 64 is not valid"
+                     but 64 is not valid
+                     This is being deprecated in favor of measurementsPerLogEntry.
+                     The mapping is as follows.
+                     
+                      dataLoggingInterval   measurementsPerLogEntry 
+                            3n                      n
+
+                      Example:  dataLoggingInterval  is 60, so every 60 seconds (or 20th sample) 
+                                     data will be placed in the data log
+                                measurementsPerLogEntry is 20, so the data log sill store the minimum, average 
+                                 and maximum of every 20 samples
+                      "
                 ::= { info 30 } 
 
 dataCollectionInterval       OBJECT-TYPE
@@ -1369,6 +1742,246 @@ powerCIMStatus              OBJECT-TYPE
                                  "
                                     ::= { info 42 }
 
+
+measurementsPerLogEntry       OBJECT-TYPE
+                                    SYNTAX        Integer32
+                                    MAX-ACCESS    read-write
+                                    STATUS        current
+                                    DESCRIPTION
+                                      "The number of measurements used for each entry in the log.
+                                         1<= Value <= 200
+                                         Default is 20
+                                       This is related to dataLoggingInterval as shown below
+                                      
+                                           dataLoggingInterval   measurementsPerLogEntry 
+                                                3n                      n
+
+                                      Example:  dataLoggingInterval  is 60, so every 60 seconds (or 20th sample) 
+                                                   data will be placed in the data log
+                                                measurementsPerLogEntry is 20, so the data log sill store the minimum, average 
+                                                   and maximum of every 20 samples"
+                                   ::= { info 43} 
+
+psocNumber       OBJECT-TYPE
+                                    SYNTAX        Integer32
+                                    MAX-ACCESS    accessible-for-notify
+                                    STATUS        current
+                                    DESCRIPTION
+                                      "The psoc (Outlet Controller) number"
+                                   ::= { info 44} 
+
+altitude       OBJECT-TYPE
+                                    SYNTAX        Integer32(0..3000)
+                                    MAX-ACCESS    read-write
+                                    STATUS        current
+                                    DESCRIPTION
+                                      "The altitude (height above sea level) of the PDU in meters.
+                                        0 <= Value <= 3000; default value is 0 meters "
+                                   ::= { info 45} 
+
+configureAlerts    OBJECT-TYPE
+                                      SYNTAX        DisplayString
+                                      MAX-ACCESS    read-write
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "This is an operation. It has write-only semantics. 
+                                           GET operation will return the empty string.
+                                           For SET operations, it configures alerts 
+                                           The format is a comma separated list of the following parameters.
+                                                sensorClass, eventType, eventDirection, policyName
+                                                   For sensorclass: use the SensorClass eumeration 
+                                                   For eventType: use the EventType enumeration
+                                                   For eventDirection: use the EventDirection enumeration
+                                                   For Policy Name: use the name of the policy; the Policy Name is case sensitive
+                                           Note: setting this variable will overwrite the existing policy 
+                                                
+
+                                            Example: if the External Temperature  upper non-critical threshold is either asserted and deasserted,
+                                                       then  execute the policy named multiple destinations
+                                                   the string would be 
+                                                    0,1,2,multiple destinations 
+
+                                                
+                                            
+                                            "
+                                      ::= { info 46 }
+
+fipsMode       OBJECT-TYPE
+                                    SYNTAX        EnabledDisabledEnumeration
+                                    MAX-ACCESS    read-write
+                                    STATUS        current
+                                    DESCRIPTION
+                                      "The fips mode: either enabled or disabled.
+                                       The mode can be set (changed) only if both of the following conditions hold
+                                         a) the user is admin
+                                         b) snmpv3 is being used.
+                                       Changing this mode will result in a reboot of the PX
+                                       When the PX is in FIPS mode, the follwing conditions hold.
+                                         a) FIPS approved algorithms must be used
+                                         b) snmp v1 & v2c are not supported
+                                         b) snmp v3 must be used with AES and SHA
+                                         c) https must be used; http is not supported
+                                         d) Radius authentication is not supported
+                                         e) Ldaps must be used; ldap is not supported
+                                         f) ipmi v2.0 must be used  
+                                       "
+                                   ::= { info 47}
+
+
+
+
+synchronizeWithNTPServer OBJECT-TYPE
+                                  SYNTAX          EnabledDisabledEnumeration
+                                  MAX-ACCESS      read-write
+                                  STATUS          current
+                                  DESCRIPTION
+                                      "Will time be obtained using NTP?
+                                       Deafault is disabled, i.e. time will not be obtained from NTP servers."
+                                  
+                                  ::= { info 48 }
+
+useDHCPProvidedNTPServer OBJECT-TYPE
+                                  SYNTAX          EnabledDisabledEnumeration
+                                  MAX-ACCESS      read-write
+                                  STATUS          current
+                                  DESCRIPTION
+                                      "Will the NTP server addresses be provided by DHCP/BOOTP?
+                                       This is used only if synchronizeWithNTPServer is enabled 
+                                       Default is enabled, i.e. DHCP provided NTP servers will be used "
+                                  
+                                  ::= { info 49 }
+
+
+--   Corresponding InetAddressType objects and InetAddress objects must be consistent.
+--     primaryNTPServerAddressType and primaryNTPServerAddress must be consistent 
+--     secondaryNTPServerAddressType and secondaryNTPServerAddress must be consistent 
+
+--    Attempts to set an InetAddress object to a value inconsistent with the associated InetAddressType 
+--       must fail with an inconsistentValue error.
+--   Example:
+--       Suppose  InetAddressType = ipv4 and InetAddress = 192.168.25.67
+--       Setting InetAddress to www.xyz.com will return inconsistentValue error
+
+
+--   When InetAddressType is changed to a type inconsistent with InetAddress, InetAddress may not display 
+--   the correct value until the format of InetAddress is changed to be consistent with InetAddressType
+--   Example:    
+--      Suppose  InetAddressType = ipv4 and InetAddress = 192.168.25.67
+--      InetAddressType is set to dns.
+--      A GET operation on InetAddress may not display the correct value.
+--      InetAddress is changed to www.xyz.com 
+--      A GET operation on InetAddress displays the correct value.
+
+--   Recommended Approach to changing IP address representation.
+
+--     1) First change InetAddressType to the correct type.
+--     2) Next change InetAddress to a value consistent with the type.
+
+--        Example: Change from IPv4 address to hostname
+--         Intially: InetAddressType = ipv4
+--                   InetAddress = 192.168.25.67
+--         Change: InetAddressType = dns
+--                 InetAddress = 192.67.29.36
+
+
+primaryNTPServerAddressType OBJECT-TYPE
+                                  SYNTAX          InetAddressType
+                                  MAX-ACCESS      read-write
+                                  STATUS          current
+                                  DESCRIPTION
+                                      "Represents the type of the corresponding instance
+                                       of primaryNTPServerAddress object.
+                                    
+
+                                      "
+                                  DEFVAL          { ipv4 } 
+                                  ::= { info 50 }
+
+primaryNTPServerAddress     OBJECT-TYPE
+                                 SYNTAX          InetAddress
+                                 MAX-ACCESS      read-write
+                                 STATUS          current
+                                 DESCRIPTION
+                                    "The address of the primary ntp server." 
+                                 ::= { info 51 }
+
+
+secondaryNTPServerAddressType OBJECT-TYPE
+                                  SYNTAX          InetAddressType
+                                  MAX-ACCESS      read-write
+                                  STATUS          current
+                                  DESCRIPTION
+                                      "Represents the type of the corresponding instance
+                                       of secondaryNTPServerAddress object.
+                                       Default is ipv4"
+                                 
+                                  ::= { info 52 }
+
+secondaryNTPServerAddress     OBJECT-TYPE
+                                 SYNTAX          InetAddress
+                                 MAX-ACCESS      read-write
+                                 STATUS          current
+                                 DESCRIPTION
+                                    "The address of the secondary ntp server." 
+                                 ::= { info 53 }
+
+
+
+
+
+daylightSavingsTime      OBJECT-TYPE
+                                  SYNTAX          EnabledDisabledEnumeration
+                                  MAX-ACCESS      read-write
+                                  STATUS          current
+                                  DESCRIPTION
+                                     "Is daylight savings time enabled? 
+                                      Default is disabled "
+                      
+                                  ::= { info 55 }
+
+
+thresholdValue  OBJECT-TYPE
+                                     SYNTAX        DisplayString
+                                     MAX-ACCESS    accessible-for-notify
+                                     STATUS        current
+                                     DESCRIPTION
+                                         "The value of the threshold that has been triggered (or cleared).
+                                          It is used in the thresholdAlarm trap for external numeric sensors only."
+                                   ::= { info 56 }
+
+
+sensorValue  OBJECT-TYPE
+                                     SYNTAX        DisplayString
+                                     MAX-ACCESS    accessible-for-notify
+                                     STATUS        current
+                                     DESCRIPTION
+                                         "The sensor reading that triggered (or cleared) the threshold.
+                                          It is used in the thresholdAlarm trap for external numeric sensors only."
+                                   ::= { info 57 }
+
+
+
+
+ipmiOverLAN       OBJECT-TYPE
+                                    SYNTAX        EnabledDisabledEnumeration
+                                    MAX-ACCESS    read-write
+                                    STATUS        current
+                                    DESCRIPTION
+                                      "IPMI over LAN Mode: either enabled or disabled.
+                                       It is strongly recommended that SNMPv3 be used to change the mode;
+                                       SNMPv2c may also be used, but is not recommended.
+                                       If SNMPv3 is used, then the change can be made only by users belonging to the Admin group.
+                                       Changing the mode will result in a reboot of the PX.
+                                       
+                                       "
+                                   ::= { info 58}
+
+
+
+
+ 
+
+
 -- the inlets group
 
 -- Implementation for managing the inlets
@@ -1426,7 +2039,8 @@ InletEntryStruct ::= SEQUENCE {  inletIndex                         Integer32,
                                  inletCurrentUnbalanceUpperCritical Percentage,
                                  inletCurrentUnbalanceUpperWarning  Percentage,
                                  inletCurrentHysteresis             Unsigned32,
-                                 inletVoltageHysteresis             Unsigned32
+                                 inletVoltageHysteresis             Unsigned32,
+                                 inletCurrentUnbalanceHysteresis    Unsigned32
                               }
 
 inletIndex                           OBJECT-TYPE
@@ -1462,7 +2076,9 @@ inletCurrent                         OBJECT-TYPE
                                       DESCRIPTION
                                           "A unique value for the current sensor
                                            attached to the inlet.  This value is
-                                           reported in milliamps (1/1000th of an amp)"
+                                           reported in milliamps (1/1000th of an amp).
+                                           This OID does not apply to 3 phase systems;
+					   a value of 0 will be reported for same."
                                       ::= { inletEntry 7 }
 
 inletVoltage                         OBJECT-TYPE
@@ -1472,7 +2088,9 @@ inletVoltage                         OBJECT-TYPE
                                       DESCRIPTION
                                           "A unique value for the voltage sensor
                                            attached to the intlet.This value is
-                                           reported in millivolts (1/1000th of a volt)"
+                                           reported in millivolts (1/1000th of a volt).
+                                           This OID does not apply to 3 phase systems;
+					   a value of 0 will be reported for same."
                                       ::= { inletEntry 8 }
 
 inletActivePower                     OBJECT-TYPE
@@ -1508,7 +2126,8 @@ inletActiveEnergy                         OBJECT-TYPE
                                       MAX-ACCESS    read-only
                                       STATUS        current
                                       DESCRIPTION
-                                          "The value of the cumulative active energy for this inlet.
+                                          "This object has an invalid value if outletEnergySupport = 'No';
+                                           In all other cases, it is the value of the cumulative active energy for this inlet.
                                            This value is reported in WattHours"
                                       ::= { inletEntry 12 }
 
@@ -1552,7 +2171,8 @@ inletCurrentLowerWarning             OBJECT-TYPE
                                       DESCRIPTION
                                            "The value of the lower warning (non-critical)
                                             current threshold for the inlet. This value is
-                                           reported in milliamps (1/1000th of an amp)"
+                                           reported in milliamps (1/1000th of an amp).
+                                           This OID is valid for inline meter PDU's. only"
                                       ::= { inletEntry 22 }
 
 inletCurrentLowerCritical            OBJECT-TYPE
@@ -1562,7 +2182,8 @@ inletCurrentLowerCritical            OBJECT-TYPE
                                       DESCRIPTION
                                            "The value of the lower critical current 
                                             threshold for the inlet. This value is
-                                           reported in milliamps (1/1000th of an amp)"
+                                           reported in milliamps (1/1000th of an amp).
+                                           This OID is valid for inline meter PDU's only."
                                       ::= { inletEntry 23 }
 
 inletVoltageUpperWarning             OBJECT-TYPE
@@ -1572,7 +2193,7 @@ inletVoltageUpperWarning             OBJECT-TYPE
                                       DESCRIPTION
                                            "The value of the upper warning (non-critical)
                                             current threshold for the inlet. This value is
-                                           reported in millivolts (1/1000th of an amp)"
+                                            reported in millivolts (1/1000th of a volt)"
                                       ::= { inletEntry 24 }
 
 inletVoltageUpperCritical            OBJECT-TYPE
@@ -1582,7 +2203,7 @@ inletVoltageUpperCritical            OBJECT-TYPE
                                       DESCRIPTION
                                            "The value of the upper critical current 
                                             threshold for the inlet. This value is
-                                           reported in millivolts (1/1000th of an amp)"
+                                           reported in millivolts (1/1000th of a volt)"
                                       ::= { inletEntry 25 }
 
 inletVoltageLowerWarning             OBJECT-TYPE
@@ -1592,7 +2213,7 @@ inletVoltageLowerWarning             OBJECT-TYPE
                                       DESCRIPTION
                                            "The value of the lower warning (non-critical)
                                             current threshold for the inlet. This value is
-                                           reported in millivolts (1/1000th of an amp)"
+                                            reported in millivolts (1/1000th of a volt)"
                                       ::= { inletEntry 26 }
 
 inletVoltageLowerCritical            OBJECT-TYPE
@@ -1602,7 +2223,7 @@ inletVoltageLowerCritical            OBJECT-TYPE
                                       DESCRIPTION
                                            "The value of the lower critical current 
                                             threshold for the inlet. This value is
-                                           reported in millivolts (1/1000th of an amp)"
+                                            reported in millivolts (1/1000th of a volt)"
                                       ::= { inletEntry 27 }
 
 inletCurrentUnbalanceUpperCritical     OBJECT-TYPE
@@ -1627,8 +2248,8 @@ inletCurrentHysteresis        OBJECT-TYPE
                                       MAX-ACCESS    read-write
                                       STATUS        current
                                       DESCRIPTION
-                                          "The hysteresis used for deassertions
-                                           "
+                                          "The hysteresis used for deassertions. This value is
+                                           reported in milliamps (1/1000th of an amp)"
                                       ::= { inletEntry 30 }
 
 
@@ -1637,9 +2258,18 @@ inletVoltageHysteresis        OBJECT-TYPE
                                       MAX-ACCESS    read-write
                                       STATUS        current
                                       DESCRIPTION
-                                          "The hysteresis used for deassertions
-                                           "
+                                          "The hysteresis used for deassertions. This value is
+                                           reported in millivolts (1/1000th of a volt)"
                                       ::= { inletEntry 31 }
+
+inletCurrentUnbalanceHysteresis        OBJECT-TYPE
+                                      SYNTAX        Unsigned32
+                                      MAX-ACCESS    read-write
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The hysteresis used for deassertions. This value is
+                                           reported in percent"
+                                      ::= { inletEntry 32 }
 
 -- the  inletPole group
 
@@ -1728,7 +2358,9 @@ inletPoleMaxCurrent                      OBJECT-TYPE
                                       MAX-ACCESS    read-only
                                       STATUS        current
                                       DESCRIPTION
-                                           "A unique value for the max. current sensor
+                                           "This object has an invalid value for a single-phase PDU.
+                                            If inletPoleCount = 1, then the value is invalid;
+                                            In all other cases, it is the value of the max. current sensor
                                            attached to the inlet Pole.  This value is
                                            reported in milliamps (1/1000th of an amp)"
                                       ::= { inletPoleEntry 5 }
@@ -1738,10 +2370,10 @@ inletPoleActivePower                     OBJECT-TYPE
                                       MAX-ACCESS    read-only
                                       STATUS        current
                                       DESCRIPTION
-                                          "A unique value for the active power for the line/pole.
-                                           This value is available only for 3-phase inline meters; 
-                                           for all other cases, the value will be zero.
-                                           This value is reported in Watts."
+                                          "This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the active power for the line/pole.
+                                           The value is reported in Watts."
                                       ::= { inletPoleEntry 7 }
 
 inletPoleApparentPower                   OBJECT-TYPE
@@ -1749,10 +2381,10 @@ inletPoleApparentPower                   OBJECT-TYPE
                                       MAX-ACCESS    read-only
                                       STATUS        current
                                       DESCRIPTION
-                                          "A unique value for the apparent power for the line/pole. 
-                                           This value is available only for 3-phase inline meters; 
-                                           for all other cases, the value will be zero. 
-                                           This value is reported in Volt-Amps"
+                                          "This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the apparent power for the line/pole.
+                                           The value is reported in Volt-Amps"
                                       ::= { inletPoleEntry 8 }
 
 inletPolePowerFactor                     OBJECT-TYPE
@@ -1760,9 +2392,10 @@ inletPolePowerFactor                     OBJECT-TYPE
                                       MAX-ACCESS    read-only
                                       STATUS        current
                                       DESCRIPTION
-                                          "A unique value for the power factor
-                                           of the inlet pole. The reading represents a
-                                           percentage in the range of 0% to 100%."
+                                          "This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the power factor for the line/pole
+                                           The reading represents a percentage in the range of 0% to 100%."
                                       ::= { inletPoleEntry 9 }
 
 inletPoleActiveEnergy                   OBJECT-TYPE
@@ -1770,10 +2403,10 @@ inletPoleActiveEnergy                   OBJECT-TYPE
                                       MAX-ACCESS    read-only
                                       STATUS        current
                                       DESCRIPTION
-                                          "The value of the cumulative active energy for this line/pole.
-                                           This value is available only for 3-phase inline meters; 
-                                           for all other cases, the value will be zero.
-                                           This value is reported in WattHours"
+                                          "This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the cumulative active energy for the line/pole.
+                                           The value is reported in WattHours"
                                       ::= { inletPoleEntry 11 }
 
 
@@ -1969,8 +2602,8 @@ outletCurrentHysteresis        OBJECT-TYPE
                                       MAX-ACCESS    read-write
                                       STATUS        current
                                       DESCRIPTION
-                                          "The hysteresis used for deassertions
-                                           "
+                                          "The hysteresis used for deassertions. This value is
+                                           reported in milliamps (1/1000th of an amp)"
                                       ::= { outletEntry 24 }
 
 outletCurrentRating                   OBJECT-TYPE
@@ -2148,7 +2781,9 @@ neutralCurrentUpperWarning   OBJECT-TYPE
                           MAX-ACCESS    read-write
                           STATUS        current
                           DESCRIPTION
-                              "The value of the upper warning (non-critical) threshold for the neutral current"
+                              "This object has an invalid value if inletPoleCount is not equal to 4.
+                               If inletPoleCount = 4, then it is the value of the upper warning (non-critical) threshold 
+                               for the neutral current"
                           ::= { unitReadings 96 }
 
 neutralCurrentUpperCritical  OBJECT-TYPE
@@ -2156,7 +2791,9 @@ neutralCurrentUpperCritical  OBJECT-TYPE
                           MAX-ACCESS    read-write
                           STATUS        current 
                           DESCRIPTION
-                              "The value of the upper critical threshold for the neutral current. "
+                              "This object has an invalid value if inletPoleCount is not equal to 4.
+                               If inletPoleCount = 4, then it is the value of the upper critical threshold 
+                               for the neutral current."
                           ::= { unitReadings 97 }
 
 unitTempLowerWarning      OBJECT-TYPE
@@ -2197,10 +2834,10 @@ currentUnbalance         OBJECT-TYPE
                          STATUS        current
                          DESCRIPTION
                             "A string displaying the current unbalance in percent. 
-                             It will have the value NA if 
-                              the feature is disabled, 
-                              the PX is not a 3-phase unit,or
-                              the average of the line currents is zero"
+                             It will have the value NA if
+                              the PX is not a 3-phase unit (inletPoleCount = 1),or
+                              the feature is disabled (currentUnbalanceSupport = 'No'), or
+                              the average of the line currents is zero (inletPoleCurrent = 0 for 1 <= inlePoleIndex <= 3)"
                          ::= { unitReadings 84 }
 
 currentUnbalanceUpperWarning      OBJECT-TYPE
@@ -2224,8 +2861,8 @@ unitOrLineCurrentHysteresis      OBJECT-TYPE
                                       MAX-ACCESS    read-write
                                       STATUS        current
                                       DESCRIPTION
-                                          "The hysteresis used for deassertions
-                                           "
+                                          "The hysteresis used for deassertions. This value is
+                                           reported in milliamps (1/1000th of an amp)"
                                       ::= { unitReadings 98 }
 
 unitOrLineVoltageHysteresis      OBJECT-TYPE
@@ -2233,8 +2870,8 @@ unitOrLineVoltageHysteresis      OBJECT-TYPE
                                       MAX-ACCESS    read-write
                                       STATUS        current
                                       DESCRIPTION
-                                          "The hysteresis used for deassertions
-                                           "
+                                          "The hysteresis used for deassertions. This value is
+                                           reported in millivolts (1/1000th of a volt)"
                                       ::= { unitReadings 99 }
 
 
@@ -2565,7 +3202,53 @@ externalSensorCount                  OBJECT-TYPE
                                       STATUS        current
                                       DESCRIPTION
                                           "The number of external sensors"
-                                      ::= { externalSensors 1 }
+                                      ::= { externalSensors 1}
+
+reorderexternalSensorTableEntries    OBJECT-TYPE
+                                      SYNTAX        DisplayString
+                                      MAX-ACCESS    read-write
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "This is an operation. It has write-only semantics. 
+                                           GET operation will return the empty string.
+                                           For SET operations, it specifies the new order of the externalSensorTable entries.
+ 
+                                           a) The list must contain entries for each managed sensor, even if the sensor is not being moved.
+                                           b) The list must not have more than 16 entries.
+                                           c) 1 <= Valid sensorID <= 16
+                                           d) The length of the list is the value of the largest sensorID in the 
+                                                original (before the move) list of managed sensors.
+                                           e) Each sensorID must appear only once in the list.
+                                           f) If there are missing numbers in the original list of sensorIDs, 
+                                                then each missing number must be indicated by a comma.
+
+
+                                           EXAMPLE 1: Managed sensors have IDs 1,2,3,4,5
+                                              Move 1 to 13; 2 to 8; 3 to 9; 4 is not moved; 5 moves to 2
+                                              Existing Position     New Position
+                                               1                -->     13
+                                               2                -->     8
+                                               3                -->     9
+                                               4                -->     4
+                                               5                -->     2
+                                              Since the largest sensorID before the move is 5, the length of the list is 5
+                                              Comma separated list is 13,8,9,4,2 
+
+                                           EXAMPLE 2: Managed sensors have IDs 2,5,6,7,11
+                                             Sensor IDs 1,3,4,8,9,10 do not appear in the list.
+                                             These positions must be indicated by commas.
+                                             Move 2 to 13; 5 to 8; 6 to 9; 7 to 16; 11 does not move
+                                              Existing Position     New Position
+                                               2                -->     13
+                                               5                -->     8
+                                               6                -->     9
+                                               7                -->     16
+                                               11               -->    11
+                                             Since the  largest sensorID before the move is 11, the length of the list is 11
+                                             Comma separated list is    ,13,,,8,9,16,,,,11
+                                            
+                                            "
+                                      ::= { externalSensors 2 }
 
 externalSensorTable     OBJECT-TYPE
                 SYNTAX        SEQUENCE OF ExternalSensorEntryStruct
@@ -2678,7 +3361,8 @@ externalBinarySensorSubtype         OBJECT-TYPE
                                       MAX-ACCESS    read-only
                                       STATUS        current
                                       DESCRIPTION
-                                          "The subtype of the binary sensor"
+                                          "The subtype of the binary sensor
+                                           This OID is valid for discrete sensors only."
                                       ::= { externalSensorEntry 9 }
 
 externalSensorUnits             OBJECT-TYPE
@@ -2973,7 +3657,7 @@ circuitBreakerCurrentHysteresis        OBJECT-TYPE
                                       STATUS        current
                                       DESCRIPTION
                                           "The hysteresis used for deassertions
-                                           "
+                                           reported in milliamps (1/1000th of an amp)"
                                       ::= { circuitBreakerEntry 10 }
 
 -- the line Voltage group
@@ -3092,10 +3776,16 @@ dataLogEntry     OBJECT-TYPE
                     INDEX         { dataLogIndex  }
                     ::= { dataLogTable 1 }
 
-DataLogEntryStruct ::= SEQUENCE { dataLogIndex                Integer32,
+DataLogEntryStruct ::= SEQUENCE { dataLogIndex                   Integer32,
                                   dataLogTimeStamp               Unsigned32,
-                                  dataLogActivePower              Watts,
-                                  dataLogApparentPower            VoltAmps}
+                                  dataLogActivePower             Watts,
+                                  dataLogApparentPower           VoltAmps,
+                                  dataLogAvgActivePower          Watts,
+                                  dataLogMaxActivePower          Watts,
+                                  dataLogMinActivePower          Watts,
+                                  dataLogAvgApparentPower        VoltAmps,
+                                  dataLogMaxApparentPower        VoltAmps,
+                                  dataLogMinApparentPower        VoltAmps}
 
 dataLogIndex                    OBJECT-TYPE
                                    SYNTAX        Integer32(1..256)
@@ -3119,18 +3809,71 @@ dataLogTimeStamp                   OBJECT-TYPE
 dataLogActivePower         OBJECT-TYPE
                           SYNTAX      Watts
                           MAX-ACCESS  read-only
-                          STATUS      current
+                          STATUS      deprecated
                           DESCRIPTION
-                              "The value for the pdu's active power sensor in watts."
+                              "The value for the pdu's active power sensor in watts.
+                               This has been deprecated in favor of 
+                                  dataLogAvgActivePower, dataLogMaxActivePower,dataLogMinActivePower "
                           ::= { dataLogEntry 3 }
 
 dataLogApparentPower         OBJECT-TYPE
                           SYNTAX      VoltAmps
                           MAX-ACCESS  read-only
+                          STATUS      deprecated
+                          DESCRIPTION
+                              "The value for the pdu's apparent power sensor in volt-amps.
+                               This has been deprecated in favor of 
+                                  dataLogAvgApparentPower, dataLogMaxApparentPower,dataLogMinApparentPower "
+                          ::= { dataLogEntry 4 }
+
+dataLogAvgActivePower       OBJECT-TYPE
+                          SYNTAX      Watts
+                          MAX-ACCESS  read-only
                           STATUS      current
                           DESCRIPTION
-                              "The value for the pdu's apparent power sensor in volt-amps."
-                          ::= { dataLogEntry 4 }
+                              "The average  active power for this measurement period"
+                          ::= { dataLogEntry 5 }
+
+
+dataLogMaxActivePower         OBJECT-TYPE
+                          SYNTAX      Watts
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The maximum  active power for this measurement period"
+                          ::= { dataLogEntry 6 }
+
+dataLogMinActivePower         OBJECT-TYPE
+                          SYNTAX      Watts
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The minimum  active power for this measurement period"
+                          ::= { dataLogEntry 7 }
+
+dataLogAvgApparentPower       OBJECT-TYPE
+                          SYNTAX      VoltAmps
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The average  apparent power for this measurement period"
+                          ::= { dataLogEntry 8 }
+
+dataLogMaxApparentPower         OBJECT-TYPE
+                          SYNTAX      VoltAmps
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The maximum  apparent power for this measurement period"
+                          ::= { dataLogEntry 9 }
+
+dataLogMinApparentPower         OBJECT-TYPE
+                          SYNTAX      VoltAmps
+                          MAX-ACCESS  read-only
+                          STATUS      current
+                          DESCRIPTION
+                              "The minimum  apparent power for this measurement period"
+                          ::= { dataLogEntry 10 }
 
 -- the outlets data group
 
@@ -3165,7 +3908,19 @@ DataLogOutletEntryStruct ::= SEQUENCE { dataLogOutletIndex                      
                                  dataLogOutletVoltage                      MilliVolts,
                                  dataLogOutletPowerFactor                  PowerFactorPercentage,
                                  dataLogOutletOnTime                       Unsigned32,
-                                 dataLogOutletWattHours                    WattHours
+                                 dataLogOutletWattHours                    WattHours,
+                                 dataLogAvgOutletCurrent                   MilliAmps,
+                                 dataLogMaxOutletCurrent                   MilliAmps,
+                                 dataLogMinOutletCurrent                   MilliAmps,
+                                 dataLogAvgOutletVoltage                   MilliVolts,
+                                 dataLogMaxOutletVoltage                   MilliVolts,
+                                 dataLogMinOutletVoltage                   MilliVolts,
+                                 dataLogAvgOutletPowerFactor               PowerFactorPercentage,
+                                 dataLogMaxOutletPowerFactor               PowerFactorPercentage,
+                                 dataLogMinOutletPowerFactor               PowerFactorPercentage,
+                                 dataLogAvgOutletWattHours                 WattHours,
+                                 dataLogMaxOutletWattHours                 WattHours,
+                                 dataLogMinOutletWattHours                 WattHours
                                   }
 
 dataLogOutletIndex                           OBJECT-TYPE
@@ -3180,31 +3935,37 @@ dataLogOutletIndex                           OBJECT-TYPE
 dataLogOutletCurrent                         OBJECT-TYPE
                                       SYNTAX        MilliAmps
                                       MAX-ACCESS    read-only
-                                      STATUS        current
+                                      STATUS        deprecated
                                       DESCRIPTION
                                           "A unique value for the current sensor
                                            attached to the outlet.  This value is
-                                           reported in milliamps (1/1000th of an amp)"
+                                           reported in milliamps (1/1000th of an amp)
+                                           This has been deprecated in favor of 
+                                              dataLogAvgOutletCurrent , dataLogMaxOutletCurrent ,dataLogMinOutletCurrent  "
                                       ::= { dataLogOutletEntry 2 }
 
 dataLogOutletVoltage                         OBJECT-TYPE
                                       SYNTAX        MilliVolts
                                       MAX-ACCESS    read-only
-                                      STATUS        current
+                                      STATUS        deprecated
                                       DESCRIPTION
                                           "A unique value for the voltage sensor
                                            attached to the outlet.This value is
-                                           reported in millivolts (1/1000th of a volt)"
+                                           reported in millivolts (1/1000th of a volt)
+                                           This has been deprecated in favor of 
+                                              dataLogAvgOutletVoltage , dataLogMaxOutletVoltage ,dataLogMinOutletVoltage "
                                       ::= { dataLogOutletEntry 3 }
 
 dataLogOutletPowerFactor                     OBJECT-TYPE
                                       SYNTAX        PowerFactorPercentage
                                       MAX-ACCESS    read-only
-                                      STATUS        current
+                                      STATUS        deprecated
                                       DESCRIPTION
                                           "A unique value for the power factor
                                            of the outlet. The reading represents a
-                                           percentage in the range of 0% to 100%."
+                                           percentage in the range of 0% to 100%.
+                                           This has been deprecated in favor of 
+                                              dataLogAvgOutletPowerFactor, dataLogMaxOutletPowerFactor,dataLogMinOutletPowerFactor "
                                       ::= { dataLogOutletEntry 4 }
 
 dataLogOutletOnTime                              OBJECT-TYPE
@@ -3219,11 +3980,145 @@ dataLogOutletOnTime                              OBJECT-TYPE
 dataLogOutletWattHours                         OBJECT-TYPE
                                       SYNTAX        WattHours
                                       MAX-ACCESS    read-only
-                                      STATUS        current
+                                      STATUS        deprecated
                                       DESCRIPTION
                                           "The cumulative Active Energy for this outlet. This value is
-                                           reported in WattHours"
+                                           reported in WattHours
+                                           This has been deprecated in favor of 
+                                              dataLogAvgOutletWattHours , dataLogMaxOutletWattHours ,dataLogMinOutletWattHours"
                                       ::= { dataLogOutletEntry 6 }
+
+dataLogAvgOutletCurrent                         OBJECT-TYPE
+                                      SYNTAX        MilliAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Average value for the measurement period:
+                                            A unique value for the current sensor
+                                           attached to the outlet.  This value is
+                                           reported in milliamps (1/1000th of an amp)"
+                                      ::= { dataLogOutletEntry 7 }
+
+dataLogMaxOutletCurrent                         OBJECT-TYPE
+                                      SYNTAX        MilliAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Maximum value for the measurement period:
+                                           A unique value for the current sensor
+                                           attached to the outlet.  This value is
+                                           reported in milliamps (1/1000th of an amp)"
+                                      ::= { dataLogOutletEntry 8 }
+
+dataLogMinOutletCurrent                         OBJECT-TYPE
+                                      SYNTAX        MilliAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Minimum value for the measurement period:
+                                            A unique value for the current sensor
+                                           attached to the outlet.  This value is
+                                           reported in milliamps (1/1000th of an amp)"
+                                      ::= { dataLogOutletEntry 9 }
+
+dataLogAvgOutletVoltage                         OBJECT-TYPE
+                                      SYNTAX        MilliVolts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Average value for the measurement period:
+                                           A unique value for the voltage sensor
+                                           attached to the outlet.This value is
+                                           reported in millivolts (1/1000th of a volt)"
+                                      ::= { dataLogOutletEntry 10 }
+
+dataLogMaxOutletVoltage                         OBJECT-TYPE
+                                      SYNTAX        MilliVolts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Maximum value for the measurement period:
+                                           A unique value for the voltage sensor
+                                           attached to the outlet.This value is
+                                           reported in millivolts (1/1000th of a volt)"
+                                      ::= { dataLogOutletEntry 11 }
+
+dataLogMinOutletVoltage                         OBJECT-TYPE
+                                      SYNTAX        MilliVolts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Minimum value for the measurement period:
+                                            A unique value for the voltage sensor
+                                           attached to the outlet.This value is
+                                           reported in millivolts (1/1000th of a volt)"
+                                      ::= { dataLogOutletEntry 12 }
+
+
+dataLogAvgOutletPowerFactor                         OBJECT-TYPE
+                                      SYNTAX       PowerFactorPercentage
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Average value for the measurement period:
+                                           A unique value for the power factor
+                                           of the outlet. The reading represents a
+                                           percentage in the range of 0% to 100%"
+                                      ::= { dataLogOutletEntry 13 }
+
+dataLogMaxOutletPowerFactor                         OBJECT-TYPE
+                                      SYNTAX        PowerFactorPercentage
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Maximum value for the measurement period:
+                                           A unique value for the power factor
+                                           of the outlet. The reading represents a
+                                           percentage in the range of 0% to 100%"
+                                      ::= { dataLogOutletEntry 14 }
+
+dataLogMinOutletPowerFactor                         OBJECT-TYPE
+                                      SYNTAX        PowerFactorPercentage
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Minimum value for the measurement period:
+                                           A unique value for the power factor
+                                           of the outlet. The reading represents a
+                                           percentage in the range of 0% to 100%"
+                                      ::= { dataLogOutletEntry 15 }
+
+dataLogAvgOutletWattHours                         OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Average value for the measurement period:
+                                            The cumulative Active Energy for this outlet. This value is
+                                           reported in WattHours"
+                                      ::= { dataLogOutletEntry 16 }
+
+dataLogMaxOutletWattHours                         OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Maximum value for the measurement period:
+                                             The cumulative Active Energy for this outlet. This value is
+                                           reported in WattHours"
+                                      ::= { dataLogOutletEntry 17 }
+
+dataLogMinOutletWattHours                         OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                          "The Minimum value for the measurement period:
+                                             The cumulative Active Energy for this outlet. This value is
+                                           reported in WattHours"
+                                      ::= { dataLogOutletEntry 18 }
+
+
 
 -- the circuitBreaker Data group
 
@@ -3252,7 +4147,10 @@ dataLogCircuitBreakerEntry     OBJECT-TYPE
                     ::= { dataLogCircuitBreakerTable 1 }
 
 DataLogCircuitBreakerEntryStruct ::= SEQUENCE { dataLogCircuitBreakerIndex                     Integer32,
-                                             dataLogCircuitBreakerCurrent                   MilliAmps }
+                                                dataLogCircuitBreakerCurrent                   MilliAmps,
+                                                dataLogAvgCircuitBreakerCurrent                MilliAmps,
+                                                dataLogMaxCircuitBreakerCurrent                MilliAmps,
+                                                dataLogMinCircuitBreakerCurrent                MilliAmps  }
 
 dataLogCircuitBreakerIndex                    OBJECT-TYPE
                                    SYNTAX        Integer32(1..256)
@@ -3266,11 +4164,45 @@ dataLogCircuitBreakerIndex                    OBJECT-TYPE
 dataLogCircuitBreakerCurrent                          OBJECT-TYPE
                                    SYNTAX        MilliAmps
                                    MAX-ACCESS    read-only
-                                   STATUS        current
+                                   STATUS        deprecated
                                    DESCRIPTION
                                        "The value of the current reported
-                                       in MilliAmps."
+                                       in MilliAmps.
+                                        This has been deprecated in favor of 
+                                              dataLogAvgCircuitBreakerCurrent, dataLogMaxOutletCircuitBreakerCurrent,
+                                              dataLogMinCircuitBreakerCurrent "
                                    ::= { dataLogCircuitBreakerEntry 2 }
+
+dataLogAvgCircuitBreakerCurrent                      OBJECT-TYPE
+                                   SYNTAX        MilliAmps
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Average value for the measurement period:
+                                        The value of the current reported
+                                       in MilliAmps."
+                                   ::= { dataLogCircuitBreakerEntry 3 }
+
+dataLogMaxCircuitBreakerCurrent                      OBJECT-TYPE
+                                   SYNTAX        MilliAmps
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Maximum value for the measurement period:
+                                        The value of the current reported
+                                       in MilliAmps."
+                                   ::= { dataLogCircuitBreakerEntry 4 }
+
+dataLogMinCircuitBreakerCurrent                      OBJECT-TYPE
+                                   SYNTAX        MilliAmps
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Minimum value for the measurement period:
+                                         The value of the current reported
+                                       in MilliAmps."
+                                   ::= { dataLogCircuitBreakerEntry 5 }
+
 
 -- the Input Line group
 
@@ -3367,7 +4299,19 @@ DataLogInletEntryStruct ::= SEQUENCE { dataLogInletIndex                      In
                                        dataLogInletCurrentUnbalance           DisplayString,
                                        dataLogInletActivePower                Watts,
                                        dataLogInletApparentPower              VoltAmps,
-                                       dataLogInletActiveEnergy               WattHours
+                                       dataLogInletActiveEnergy               WattHours,
+                                       dataLogAvgInletCurrentUnbalance        DisplayString,
+                                       dataLogMaxInletCurrentUnbalance        DisplayString,
+                                       dataLogMinInletCurrentUnbalance        DisplayString,
+                                       dataLogAvgInletActivePower             Watts,
+                                       dataLogMaxInletActivePower             Watts,
+                                       dataLogMinInletActivePower             Watts,
+                                       dataLogAvgInletApparentPower           VoltAmps,
+                                       dataLogMaxInletApparentPower           VoltAmps,
+                                       dataLogMinInletApparentPower           VoltAmps,
+                                       dataLogAvgInletActiveEnergy            WattHours,
+                                       dataLogMaxInletActiveEnergy            WattHours,
+                                       dataLogMinInletActiveEnergy            WattHours
                               }
 
 dataLogInletIndex                           OBJECT-TYPE
@@ -3382,39 +4326,177 @@ dataLogInletIndex                           OBJECT-TYPE
 dataLogInletCurrentUnbalance             OBJECT-TYPE
                                       SYNTAX        DisplayString
                                       MAX-ACCESS    read-only
-                                      STATUS        current
+                                      STATUS        deprecated
                                       DESCRIPTION
                                          "A string displaying the current unbalance in percent. 
                                            It will have the value NA if the feature is disabled, 
-                                           the PX is not a 3-phase unit,or the average of the line currents is zero"
+                                           the PX is not a 3-phase unit,or the average of the line currents is zero
+                                           This has been deprecated in favor of 
+                                              dataLogAvgInletCurrentUnbalance, dataLogMaxInletCurrentUnbalance,
+                                              dataLogMinInletCurrentUnbalance "
                                       ::= { dataLogInletEntry 10 }
 
 dataLogInletActivePower                     OBJECT-TYPE
                                       SYNTAX        Watts
                                       MAX-ACCESS    read-only
-                                      STATUS        current
+                                      STATUS        deprecated
                                       DESCRIPTION
                                           "The active power for the inlet
-                                           This value is reported in Watts."
+                                           This value is reported in Watts.
+                                           This has been deprecated in favor of 
+                                              dataLogAvgInletActivePower, dataLogMaxInletActivePower,
+                                              dataLogMinInletActivePower"
                                       ::= { dataLogInletEntry 11 }
 
 dataLogInletApparentPower                   OBJECT-TYPE
                                       SYNTAX        VoltAmps
                                       MAX-ACCESS    read-only
-                                      STATUS        current
+                                      STATUS        deprecated
                                       DESCRIPTION
                                           "The apparent power for the inlet.  
-                                           This value is reported in Volt-Amps"
+                                           This value is reported in Volt-Amps
+                                           This has been deprecated in favor of 
+                                              dataLogAvgInletApparentPower, dataLogMaxInletApparentPower,
+                                              dataLogMinInletApparentPower"
                                       ::= { dataLogInletEntry 12 }
 
 dataLogInletActiveEnergy                         OBJECT-TYPE
                                       SYNTAX        WattHours
                                       MAX-ACCESS    read-only
-                                      STATUS        current
+                                      STATUS        deprecated
                                       DESCRIPTION
                                           "The value of the cumulative active energy for this inlet.
-                                           This value is reported in WattHours"
+                                           This value is reported in WattHours
+                                           This has been deprecated in favor of 
+                                              dataLogAvgInletActiveEnergy, dataLogMaxInletActiveEnergy,
+                                              dataLogMinInletActiveEnergy"
                                       ::= { dataLogInletEntry 13 }
+
+dataLogAvgInletCurrentUnbalance             OBJECT-TYPE
+                                      SYNTAX        DisplayString
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The average value of the current unbalance for this measurement period
+                                           A string displaying the current unbalance in percent. 
+                                           It will have the value NA if the feature is disabled, 
+                                           the PX is not a 3-phase unit,or the average of the line currents is zero"
+                                      ::= { dataLogInletEntry 14 }
+
+dataLogMaxInletCurrentUnbalance             OBJECT-TYPE
+                                      SYNTAX        DisplayString
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Maximum value for the measurement period:
+                                           A string displaying the current unbalance in percent. 
+                                           It will have the value NA if the feature is disabled, 
+                                           the PX is not a 3-phase unit,or the average of the line currents is zero"
+                                      ::= { dataLogInletEntry 15 }
+
+dataLogMinInletCurrentUnbalance             OBJECT-TYPE
+                                      SYNTAX        DisplayString
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Minimum value for the measurement period:
+                                           A string displaying the current unbalance in percent. 
+                                           It will have the value NA if the feature is disabled, 
+                                           the PX is not a 3-phase unit,or the average of the line currents is zero"
+                                      ::= { dataLogInletEntry 16 }
+
+dataLogAvgInletActivePower             OBJECT-TYPE
+                                      SYNTAX        Watts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Average value for the measurement period:
+                                          The active power for the inlet
+                                           This value is reported in Watts."
+                                      ::= { dataLogInletEntry 17 }
+
+dataLogMaxInletActivePower             OBJECT-TYPE
+                                      SYNTAX        Watts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Maximum value for the measurement period:
+                                           The active power for the inlet
+                                           This value is reported in Watts."
+                                      ::= { dataLogInletEntry 18 }
+
+dataLogMinInletActivePower             OBJECT-TYPE
+                                      SYNTAX        Watts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Minimum value for the measurement period:
+                                           The active power for the inlet
+                                           This value is reported in Watts."
+                                      ::= { dataLogInletEntry 19 }
+
+dataLogAvgInletApparentPower             OBJECT-TYPE
+                                      SYNTAX        VoltAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Average value for the measurement period:
+                                          The apparent power for the inlet.  
+                                           This value is reported in Volt-Amps"
+                                      ::= { dataLogInletEntry 20 }
+
+dataLogMaxInletApparentPower             OBJECT-TYPE
+                                      SYNTAX        VoltAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Maximum value for the measurement period:
+                                           The apparent power for the inlet.  
+                                           This value is reported in Volt-Amps"
+                                      ::= { dataLogInletEntry 21 }
+
+dataLogMinInletApparentPower             OBJECT-TYPE
+                                      SYNTAX        VoltAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Minimum value for the measurement period:
+                                           The apparent power for the inlet.  
+                                           This value is reported in Volt-Amps"
+                                      ::= { dataLogInletEntry 22 }
+
+dataLogAvgInletActiveEnergy              OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         " The Average value for the measurement period:
+                                           The value of the cumulative active energy for this inlet.
+                                           This value is reported in WattHours"
+                                      ::= { dataLogInletEntry 23 }
+
+dataLogMaxInletActiveEnergy              OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Maximum value for the measurement period:
+                                           The value of the cumulative active energy for this inlet.
+                                           This value is reported in WattHours"
+                                      ::= { dataLogInletEntry 24 }
+
+dataLogMinInletActiveEnergy              OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "The Minimum value for the measurement period:
+                                           The value of the cumulative active energy for this inlet.
+                                           This value is reported in WattHours"
+                                      ::= { dataLogInletEntry 25 }
+
+
+
 
 -- the dataLogInletPoleTable
 
@@ -3441,7 +4523,22 @@ dataLogInletPoleEntry     OBJECT-TYPE
 
 DataLogInletPoleEntryStruct ::= SEQUENCE { dataLogInletPoleIndex                Integer32,
                                           dataLogInletPoleCurrent               MilliAmps,
-                                          dataLogInletPoleVoltage               MilliVolts}
+                                          dataLogInletPoleVoltage               MilliVolts,
+                                          dataLogAvgInletPoleCurrent            MilliAmps,
+                                          dataLogMaxInletPoleCurrent            MilliAmps,
+                                          dataLogMinInletPoleCurrent            MilliAmps,
+                                          dataLogAvgInletPoleVoltage            MilliVolts,
+                                          dataLogMaxInletPoleVoltage            MilliVolts,
+                                          dataLogMinInletPoleVoltage            MilliVolts,
+                                          dataLogAvgInletPoleActivePower        Watts,    
+                                          dataLogMaxInletPoleActivePower        Watts,     
+                                          dataLogMinInletPoleActivePower        Watts,    
+                                          dataLogAvgInletPoleApparentPower      VoltAmps,      
+                                          dataLogMaxInletPoleApparentPower      VoltAmps,       
+                                          dataLogMinInletPoleApparentPower      VoltAmps,       
+                                          dataLogAvgInletPoleActiveEnergy       WattHours,       
+                                          dataLogMaxInletPoleActiveEnergy       WattHours,       
+                                          dataLogMinInletPoleActiveEnergy       WattHours}
 
 dataLogInletPoleIndex                    OBJECT-TYPE
                                    SYNTAX        Integer32(1..256)
@@ -3455,26 +4552,342 @@ dataLogInletPoleIndex                    OBJECT-TYPE
 dataLogInletPoleCurrent                          OBJECT-TYPE
                                    SYNTAX        MilliAmps
                                    MAX-ACCESS    read-only
-                                   STATUS        current
+                                   STATUS        deprecated
                                    DESCRIPTION
                                        "The value of the current reported
                                        in MilliAmps.
                                           For Single Phase: Input Line Current
                                           For 3phase Delta-wired: Current for L1, L2, L3
-                                          For 3phase WYE-wired: Current for L1, L2, L3, N"
+                                          For 3phase WYE-wired: Current for L1, L2, L3, N
+                                          This has been deprecated in favor of 
+                                              dataLogAvgInletPoleCurrent, dataLogMaxInletPoleCurrent,
+                                              dataLogMinInletPoleCurrent"
                                    ::= { dataLogInletPoleEntry 2 }
 
 dataLogInletPoleVoltage                          OBJECT-TYPE
                                    SYNTAX        MilliVolts
                                    MAX-ACCESS    read-only
-                                   STATUS        current
+                                   STATUS        deprecated
                                    DESCRIPTION
                                        "The value of the voltage reported
                                        in MilliVolts.
                                           For Single Phase: Input Line Voltage
                                           For 3phase Delta-wired: Voltages for L1-L2, L2-L3, L3-L1
-                                          For 3phase WYE-wired: Voltages for L1-N, L2-N, L3-N"
+                                          For 3phase WYE-wired: Voltages for L1-N, L2-N, L3-N
+                                          This has been deprecated in favor of 
+                                              dataLogAvgInletPoleVoltage, dataLogMaxInletPoleVoltage,
+                                              dataLogMinInletPoleVoltage"
                                    ::= { dataLogInletPoleEntry 3 }
+
+dataLogAvgInletPoleCurrent                          OBJECT-TYPE
+                                   SYNTAX        MilliAmps
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Average value for the measurement period:
+                                        The value of the current reported
+                                       in MilliAmps.
+                                          For Single Phase: Input Line Current
+                                          For 3phase Delta-wired: Current for L1, L2, L3
+                                          For 3phase WYE-wired: Current for L1, L2, L3, N"
+                                   ::= { dataLogInletPoleEntry 4 }
+
+dataLogMaxInletPoleCurrent                          OBJECT-TYPE
+                                   SYNTAX        MilliAmps
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Maximum value for the measurement period:
+                                         The value of the current reported
+                                       in MilliAmps.
+                                          For Single Phase: Input Line Current
+                                          For 3phase Delta-wired: Current for L1, L2, L3
+                                          For 3phase WYE-wired: Current for L1, L2, L3, N"
+                                   ::= { dataLogInletPoleEntry 5 }
+
+
+dataLogMinInletPoleCurrent                        OBJECT-TYPE
+                                   SYNTAX        MilliAmps
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Minimum value for the measurement period:
+                                        The value of the current reported
+                                       in MilliAmps.
+                                          For Single Phase: Input Line Current
+                                          For 3phase Delta-wired: Current for L1, L2, L3
+                                          For 3phase WYE-wired: Current for L1, L2, L3, N"
+                                   ::= { dataLogInletPoleEntry 6 }
+
+dataLogAvgInletPoleVoltage                          OBJECT-TYPE
+                                   SYNTAX        MilliVolts
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Average value for the measurement period:
+                                        The value of the voltage reported
+                                       in MilliVolts.
+                                          For Single Phase: Input Line Voltage
+                                          For 3phase Delta-wired: Voltages for L1-L2, L2-L3, L3-L1
+                                          For 3phase WYE-wired: Voltages for L1-N, L2-N, L3-N"
+                                   ::= { dataLogInletPoleEntry 7 }
+
+dataLogMaxInletPoleVoltage                          OBJECT-TYPE
+                                   SYNTAX        MilliVolts
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Maximum value for the measurement period:
+                                        The value of the voltage reported
+                                       in MilliVolts.
+                                          For Single Phase: Input Line Voltage
+                                          For 3phase Delta-wired: Voltages for L1-L2, L2-L3, L3-L1
+                                          For 3phase WYE-wired: Voltages for L1-N, L2-N, L3-N"
+                                   ::= { dataLogInletPoleEntry 8 }
+
+dataLogMinInletPoleVoltage                          OBJECT-TYPE
+                                   SYNTAX        MilliVolts
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Minimum value for the measurement period: 
+                                          The value of the voltage reported
+                                       in MilliVolts.
+                                          For Single Phase: Input Line Voltage
+                                          For 3phase Delta-wired: Voltages for L1-L2, L2-L3, L3-L1
+                                          For 3phase WYE-wired: Voltages for L1-N, L2-N, L3-N"
+                                   ::= { dataLogInletPoleEntry 9 }
+
+
+dataLogAvgInletPoleActivePower             OBJECT-TYPE
+                                      SYNTAX        Watts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Average value of the active power 
+                                           for the measurement period.
+                                           The value is reported in Watts."
+                                      ::= { dataLogInletPoleEntry 10 }
+
+dataLogMaxInletPoleActivePower             OBJECT-TYPE
+                                      SYNTAX        Watts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         " This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Maximum value of the active power 
+                                           for the measurement period.
+                                           The value is reported in Watts."
+                                      ::= { dataLogInletPoleEntry 11 }
+
+dataLogMinInletPoleActivePower             OBJECT-TYPE
+                                      SYNTAX        Watts
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         " This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Minimum value of the active power 
+                                           for the measurement period.
+                                           The value is reported in Watts."
+                                      ::= { dataLogInletPoleEntry 12 }
+
+dataLogAvgInletPoleApparentPower             OBJECT-TYPE
+                                      SYNTAX        VoltAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         "This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Average value of the apparent power 
+                                           for the measurement period.  
+                                           The value is reported in Volt-Amps"
+                                      ::= { dataLogInletPoleEntry 13 }
+
+dataLogMaxInletPoleApparentPower             OBJECT-TYPE
+                                      SYNTAX        VoltAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         " This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Maximum value of the apparent power 
+                                           for the measurement period.  
+                                           The value is reported in Volt-Amps"
+                                      ::= { dataLogInletPoleEntry 14 }
+
+dataLogMinInletPoleApparentPower             OBJECT-TYPE
+                                      SYNTAX        VoltAmps
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         " This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Minimum value of the apparent power 
+                                           for the measurement period. 
+                                           The value is reported in Volt-Amps"
+                                      ::= { dataLogInletPoleEntry 15 }
+
+dataLogAvgInletPoleActiveEnergy              OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         " This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Average value of the active energy
+                                           for the measurement period.
+                                           The value is reported in WattHours"
+                                      ::= { dataLogInletPoleEntry 16 }
+
+dataLogMaxInletPoleActiveEnergy              OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         " This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Maximum value of the active energy
+                                           for the measurement period.
+                                           The value is reported in WattHours"
+                                      ::= { dataLogInletPoleEntry 17 }
+
+dataLogMinInletPoleActiveEnergy              OBJECT-TYPE
+                                      SYNTAX        WattHours
+                                      MAX-ACCESS    read-only
+                                      STATUS        current
+                                      DESCRIPTION
+                                         " This object has a valid value only for inline meters.
+                                            If inlineMeter = 'No', then the value is invalid;
+                                           In all other cases, it is the the Minimum value of the active energy
+                                           for the measurement period.
+                                           The value is reported in WattHours"
+                                      ::= { dataLogInletPoleEntry 18 }
+
+
+
+
+-- the external sensors Data group
+
+-- Implementation for external sensors
+
+-- the external sensor table
+
+-- The externalSensorTable table contains information on the external sensors.
+
+dataLogExternalSensorTable     OBJECT-TYPE
+                    SYNTAX        SEQUENCE OF DataLogExternalSensorEntryStruct
+                    MAX-ACCESS    not-accessible
+                    STATUS        current
+                    DESCRIPTION
+                        "A list of external sensor entries. The number of
+                         entries is given by the value of externalSensorCount."
+                    ::= { dataLogExternalSensor 1 }
+
+dataLogExternalSensorEntry     OBJECT-TYPE
+                    SYNTAX        DataLogExternalSensorEntryStruct
+                    MAX-ACCESS    not-accessible
+                    STATUS        current
+                    DESCRIPTION
+                        "An entry in the data log containing external sensor values"
+                    INDEX         { dataLogIndex, dataLogExternalSensorIndex }
+                    ::= { dataLogExternalSensorTable 1 }
+
+DataLogExternalSensorEntryStruct ::= SEQUENCE { dataLogExternalSensorIndex                   Integer32,
+                                                dataLogExternalSensorChanged                 DisplayString,
+                                                dataLogExternalSensorState                   StateOfSensorEnumeration,
+                                                dataLogAvgExternalSensorValue                Integer32,
+                                                dataLogMaxExternalSensorValue                Integer32,
+                                                dataLogMinExternalSensorValue                Integer32  }
+
+dataLogExternalSensorIndex                    OBJECT-TYPE
+                                   SYNTAX        Integer32(1..256)
+                                   MAX-ACCESS    not-accessible
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "A unique value for each external sensor. Its value
+                                        ranges between 1 and externalSensorCount."
+                                   ::= { dataLogExternalSensorEntry 1 }
+
+dataLogExternalSensorChanged                  OBJECT-TYPE
+                                   SYNTAX        DisplayString
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "Indicates whether there has been a change in the sensor type/subtype/channel number for this sensorID.
+                                        This can occur if sensorIDs have been reassigned as a result of 
+                                           a GUI operation or a SET operation on reorderexternalSensorTableEntries.
+                                   
+                                        Format: SerialNumber=xxxxxxxx; SensorType=dd; SensorSubType=d; ChannelNumber=d
+                                        SensorSubType and ChannelNumber are present only if NewSensorType=onOff 
+                                        If there was no change from the previous sample, then
+                                              this string is empty.
+
+                                        Examples:
+                                             Sensor changed to Temperature: 
+                                                         SerialNumber=AEI8160083; SensorType=10;
+                                             Sensor changed to onOff/SmokeDetection:      
+                                                         SerialNumber=AEI8160083; SensorType=14; SensorSubType= 18; ChannelNumber=1
+                                             Sensor Channel Number changed: 
+                                                         SerialNumber=AEI8160083; SensorType=14; SensorSubType= 18; ChannelNumber=2
+                                             Sensor SubType changed: 
+                                                         SerialNumber=AEI8160083; SensorType=14; SensorSubType= 19; ChannelNumber=2
+                                          "
+                                   ::= { dataLogExternalSensorEntry 2 }
+
+dataLogExternalSensorState                          OBJECT-TYPE
+                                   SYNTAX        StateOfSensorEnumeration
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The sensor state.
+                                       "
+                                   ::= { dataLogExternalSensorEntry 3 }
+
+dataLogAvgExternalSensorValue                      OBJECT-TYPE
+                                   SYNTAX        Integer32
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Average of the sensor values
+                                        Does not apply (gets will return 0) 
+                                           to onOff, trip, vibration, waterDetection, 
+                                           smokeDetection sensors.
+                                        This value is not valid if dataLogExternalSensorState is unavailable(-1).
+                                       "
+                                   ::= { dataLogExternalSensorEntry 4 }
+
+dataLogMaxExternalSensorValue                      OBJECT-TYPE
+                                   SYNTAX        Integer32
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Maximum of the sensor values
+                                        Does not apply (gets will return 0) 
+                                           to onOff, trip, vibration, waterDetection, 
+                                           smokeDetection sensors
+                                        This value is not valid if dataLogExternalSensorState is unavailable(-1).
+                                       "
+                                   ::= { dataLogExternalSensorEntry 5 }
+
+dataLogMinExternalSensorValue                      OBJECT-TYPE
+                                   SYNTAX        Integer32
+                                   MAX-ACCESS    read-only
+                                   STATUS        current
+                                   DESCRIPTION
+                                       "The Minimum of the sensor values.
+                                        Does not apply (gets will return 0) 
+                                           to onOff, trip, vibration, waterDetection, 
+                                           smokeDetection sensors
+                                        This value is not valid if dataLogExternalSensorState is unavailable(-1).
+                                       "
+                                   ::= { dataLogExternalSensorEntry 6 }
+
+
+
 
 -- Start the traps
 
@@ -3698,11 +5111,15 @@ thresholdAlarm                       NOTIFICATION-TYPE
                                                thresholdDescr,
                                                thresholdSeverity,
                                                thresholdEventType,
-                                               sensorIdentificationString }
+                                               sensorIdentificationString,
+                                               thresholdValue,
+                                               sensorValue  }
                                      STATUS current
                                      DESCRIPTION
                                          "Configured sensor theshold event. The 'thresholdEventType' variable will indicate whether or not
-                                          the threshold triggered or cleared."
+                                          the threshold triggered or cleared.
+                                          thresholdValue and sensorValue have valid values only for external temperature and humidity sensors.
+                                          "
                                      ::= { traps 45 }
 
 -- Outlet Grouping Connectivity Application traps
@@ -3810,6 +5227,96 @@ environmentalSensorsConnectivityRestored        NOTIFICATION-TYPE
                                          " connectivity to environmental Sensor was restored"
                                      ::= { traps 57 }
 
+
+voltageMeasurementError        NOTIFICATION-TYPE
+                                           OBJECTS { objectName,
+                                               objectInstance,
+                                               ipAddress,
+                                               psocNumber
+                                              }
+                                             STATUS current
+                                          DESCRIPTION
+                                         " voltage measurement error, a Psoc (Outlet Controller) reported  zero voltage and non-zero current.
+                                           Voltage, power and energy measurements may be in error "
+                                     ::= { traps 58 }
+
+
+fipsModeEnabled   NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName
+                                    }
+                          STATUS current
+                          DESCRIPTION
+                              "FIPS Mode Enabled "
+                          ::= { traps 59 }
+
+
+fipsModeDisabled   NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName
+                                    }
+                          STATUS current
+                          DESCRIPTION
+                              "FIPS Mode Disabled "
+                          ::= { traps 60 }
+
+
+managingenvironmentalSensor       NOTIFICATION-TYPE
+                                           OBJECTS { objectName,
+                                               objectInstance,
+                                               ipAddress,
+                                               sensorDescr,
+                                               externalSensorNumber,
+                                               externalSensorType, 
+                                               externalSensorName,                      
+                                               externalSensorChannelNumber, 
+                                               externalBinarySensorSubtype,             
+                                               externalSensorSerialNumber }
+                                             STATUS current
+                                          DESCRIPTION
+                                         " begin managing environmental Sensor "
+                                     ::= { traps 61 }
+
+
+                                   
+unmanagingenvironmentalSensor       NOTIFICATION-TYPE
+                                           OBJECTS { objectName,
+                                               objectInstance,
+                                               ipAddress,
+                                               sensorDescr,
+                                               externalSensorNumber,
+                                               externalSensorType, 
+                                               externalSensorName,                      
+                                               externalSensorChannelNumber, 
+                                               externalBinarySensorSubtype,             
+                                               externalSensorSerialNumber }
+                                             STATUS current
+                                          DESCRIPTION
+                                         " cease managing environmental Sensor"
+                                     ::= { traps 62 }
+
+ipmiOverLANEnabled   NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName
+                                    }
+                          STATUS current
+                          DESCRIPTION
+                              "IPMI Over LAN Mode has been Enabled "
+                          ::= { traps 63 }
+
+
+ipmiOverLANDisabled   NOTIFICATION-TYPE
+                          OBJECTS { objectName,
+                                    objectInstance,
+                                    userName
+                                    }
+                          STATUS current
+                          DESCRIPTION
+                              "IPMI Over LAN Mode has been Disabled "
+                          ::= { traps 64 }
 
                                    
 

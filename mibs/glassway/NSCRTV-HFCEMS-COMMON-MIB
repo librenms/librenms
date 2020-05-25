@@ -1,0 +1,859 @@
+NSCRTV-HFCEMS-COMMON-MIB DEFINITIONS ::= BEGIN
+
+-- *****************************************************************************
+--                           附录E 公用MIB
+-- *****************************************************************************
+
+IMPORTS
+    OBJECT-TYPE      FROM RFC-1212
+    TRAP-TYPE        FROM RFC-1215
+    Counter          FROM RFC1155-SMI
+    NetworkAddress   FROM RFC1155-SMI
+    IpAddress        FROM RFC1155-SMI
+    DisplayString    FROM RFC1213-MIB
+    nscrtvHFCemsTree FROM NSCRTV-ROOT
+    commonIdent      FROM NSCRTV-ROOT;
+
+-- *
+-- *  Common MIB中使用的分组定义
+-- *
+
+    commonAdminGroup        OBJECT IDENTIFIER ::= { commonIdent 1 }
+    commonAdminUseRf        OBJECT IDENTIFIER ::= { commonIdent 2 }
+    commonAdminUseEthernet  OBJECT IDENTIFIER ::= { commonIdent 3 }
+    
+    commonMACGroup          OBJECT IDENTIFIER ::= { commonAdminUseRf 1 }
+    commonRfGroup           OBJECT IDENTIFIER ::= { commonAdminUseRf 2 }
+    
+    commonMacAddress        OBJECT IDENTIFIER ::= { commonMACGroup 1 }
+    commonBackoffParams     OBJECT IDENTIFIER ::= { commonMACGroup 2 }
+    commonMacStats          OBJECT IDENTIFIER ::= { commonMACGroup 3 }
+    
+    commonAgentGroup        OBJECT IDENTIFIER ::= { commonAdminUseEthernet 1 }
+    commonDeviceGroup       OBJECT IDENTIFIER ::= { commonAdminUseEthernet 2 }
+
+-- *
+-- *   NE管理组
+-- *
+
+    commonNELogicalID OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..40))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "指定NE的逻辑标识符（LogicID），此值一般与NE的其他属性无关。
+            此对象值应存放在非易失性存储器中。"
+        ::= { commonAdminGroup 1 }
+
+    commonNEVendor OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "NE设备生产厂家。"
+        ::= { commonAdminGroup 2 }
+
+    commonNEModelNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "NE设备的型号。"
+        ::= { commonAdminGroup 3 }
+
+    commonNESerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "NE设备的序列号。"
+        ::= { commonAdminGroup 4 }
+
+    commonNEVendorInfo OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "NE设备供应商的其它特殊指定信息。"
+        ::= { commonAdminGroup 5 }
+
+    commonNEStatus OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "与7.5.4 STATRESP PDU中的Status参数对应
+            Bit 0: CHNLRQST
+            Bit 1: CNTNRM
+            Bit 2: CNTCUR
+            Bit 3: MAJOR ALARMS
+            Bit 4: MINOR ALARMS
+            Bit 5: RSVD1
+            Bit 6: RSVD2
+            Bit 7: RSVD3"
+        ::= { commonAdminGroup 6 }
+    
+    commonReset OBJECT-TYPE
+        SYNTAX INTEGER { reset (1) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "写入'1'将复位NE设备，写入其它值将不起作用。读此对象时返回值'1'，对设备无
+            影响。"
+        ::= { commonAdminGroup 7 }
+
+    commonAlarmDetectionControl OBJECT-TYPE
+        SYNTAX INTEGER {
+            detectionDisabled (1),
+            detectionEnabled (2),
+            detectionEnabledAndRegenerate (3)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "此对象用于控制NE的告警检测。
+            当模拟属性表或离散属性表中的一个MIB对象达到设定的门限，就认为告警已发生，并且
+            作为最新的告警记录在告警记录表（alarmLogTable）中添加一项，告警陷阱将同时产生。
+            如有一个MIB对象的值不在正常状态，则在当前告警表（currentAlarmTable）中也会添加
+            一项记录。
+            
+            detectionDisabled(1)将停止与模拟属性表/离散属性表相关的告警检测过程，NE将不再
+            产生告警。detectionEnabled(2)允许告警检测进行，检测从detectionEnabled被设置之
+            前应答器所处的状态开始继续进行。
+            
+            detectionEnabledAndRegenerate(3)清除所有告警信息并且允许告警检测进行。模拟属性
+            表和离散属性表的所有告警属性将恢复到告警检测运行之前的正常值上。任何仍处于告警
+            状态的属性将不会产生“恢复正常”告警，设置此值将清除告警记录表alarmLogTable和
+            当前告警表currentAlarmTable的内容。
+            
+            detectionEnabledAndRegenerate的作用是临时的，当将commonAlarmDetectionControl
+            设置为detectionEnabledAndRegnerate后，其SNMP应答包含此值，以后如果再读此对象值
+            时，响应为detectionEnabled。
+            
+            detectionDisabled值不影响hfcColdStart 或hfcWarmStart 陷阱的产生。
+            将来新增的陷阱除非在其描述中有专门规定，否则一律不受此对象的影响。
+            
+            此对象应保存在非易失性存储器中，缺省值为detectionEnabled。"
+        ::= { commonAdminGroup 8 }
+
+    commonNetworkAddress OBJECT-TYPE
+        SYNTAX NetworkAddress
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "NE的网络IP地址，NE产生Trap时应包含此地址。此值应保存在非易失性存储器中。此
+            值可以在注册时通过MAC命令或通过厂商的本地接口来设置。"
+        ::= { commonAdminGroup 9 }
+    
+    commonCheckCode OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "此对象用于应答器配置的检测码的报告。检测码的计算包括应答器（包括被管理设备）
+            的物理配置参数和存放在非易失性存储器中的所有对象参数。计算检测码的算法由厂商
+            规定。
+            该对象的值应保存在非易失性存储器中，应答器重启动时，将重新计算检测码并与重启
+            动前的值进行比较，以决定是否应产生一个hfcColdStart 或 hfcWarmStart陷阱。
+            当对此对象进行写操作（SetRequest）时，检测码将被重新计算，并填入对SetRequest
+            作出的GetResponse应答中。此时，将不产生hfcColdStart 或 hfcWarmStart 陷阱。"
+        ::= { commonAdminGroup 10 }
+
+    commonTrapCommunityString OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..64))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "定义Trap中的共同体字符串。缺省值是'public'。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonAdminGroup 11 }
+    
+    commonTamperStatus OBJECT-TYPE
+        SYNTAX INTEGER { intact (1), compromised (2) }
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "报告NE设备的安全开关(如盖子是否打开)状态，此对象要求在离散属性表中对应一个
+            条目。intact表示正常，compromised表示告警。"
+        ::= { commonAdminGroup 12 }
+    
+    commonInternalTemperature OBJECT-TYPE
+        SYNTAX INTEGER (-128..127)
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "NE设备的内部温度，单位为摄氏度。此对象要求在属性表中对应一个条目。"
+        ::= { commonAdminGroup 13 }
+    
+    commonTime OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "NE的当前时间的POSIX表示（自1970年1月1日0时以来的秒数）。"
+        ::= { commonAdminGroup 14 }
+
+    commonVarBindings OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "此对象表示能被NE接收的SNMP消息变量绑定表项的最大数目。其值为0表示对绑定最大
+            数目没有限制。"
+        ::= { commonAdminGroup 15 }
+    
+    commonResetCause OBJECT-TYPE
+        SYNTAX INTEGER {
+            other (1),
+            powerup (2),
+            command (3),
+            watchdog (4),
+            craft (5)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "表示NE最近一次复位的原因。"
+        ::= { commonAdminGroup 16 }
+    
+    commonCraftStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            disconnected (1),
+            connected (2)
+            }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "此对象表示NE本地接口（如RS232或RS485接口）的状态。NE并不一定要支持本地接口。
+            NE 本地接口的状态不影响其MAC 接口的功能； 如果不支持本地接口， 其值为
+            disconnected。"
+        ::= { commonAdminGroup 17 }
+
+    commonDeviceOID OBJECT-TYPE
+        SYNTAX OBJECT IDENTIFIER
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "此对象为一个OID指针，用于指向被管设备MIB(如光节点、双向放大器等)。 "
+        ::= { commonAdminGroup 18 }
+    
+    commonDeviceId OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(32))
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "此对象的内容由被管设备厂商指定，它包含厂商和产品的特殊的ASCII码文本信息。"
+        ::= { commonAdminGroup 19 }
+
+-- *****************************************************************************
+-- *   MAC层协议管理组
+-- *****************************************************************************
+
+-- *
+-- *   NE地址管理
+-- *
+
+    commonPhysAddress OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "NE的MAC（物理）地址。"
+        ::= { commonMacAddress 1 }
+    
+    commonMaxMulticastAddresses OBJECT-TYPE
+        SYNTAX INTEGER (4..255)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "NE设备支持的最大组播地址数目。"
+        ::= { commonMacAddress 2 }
+
+    commonMulticastAddressTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CommonMulticastAddressEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "组播地址表，此对象的值应保存在非易失性存储器中。"
+        ::= { commonMacAddress 3 }
+    
+    commonMulticastAddressEntry OBJECT-TYPE
+        SYNTAX CommonMulticastAddressEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "组播地址表目。"
+        INDEX { commonMulticastAddressIndex }
+        ::= { commonMulticastAddressTable 1 }
+    
+    CommonMulticastAddressEntry ::=
+        SEQUENCE{
+            commonMulticastAddressIndex
+                INTEGER,
+            commonMulticastAddressNumber
+                OCTET STRING
+            }
+
+    commonMulticastAddressIndex OBJECT-TYPE
+        SYNTAX INTEGER (1..255)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "组播地址索引。"
+        ::= { commonMulticastAddressEntry 1 }
+    
+    commonMulticastAddressNumber OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(6))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "组播地址，I/G位为1有效。"
+        ::= { commonMulticastAddressEntry 2 }
+
+-- *
+-- *   backoff算法相关参数
+-- *
+
+    commonBackoffPeriod OBJECT-TYPE
+        SYNTAX INTEGER (0..16383)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "Backoff算法的基准时间（ms），初始化缺省值为6ms。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonBackoffParams 1 }
+
+    commonACKTimeoutWindow OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "NE等待HE发送ACK响应的超时时间（ms），初始化缺省值为19ms。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonBackoffParams 2 }
+    
+    commonMaximumMACLayerRetries OBJECT-TYPE
+        SYNTAX INTEGER (0..255)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "NE发送数据包的最大重试次数。初始化缺省值为16。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonBackoffParams 3 }
+    
+    commonMaxPayloadSize OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "上下行信道数据包所支持的最大有效载荷（payload）的长度。"
+        ::= { commonBackoffParams 4 }
+
+    commonBackoffMinimumExponent OBJECT-TYPE
+        SYNTAX INTEGER (0..15)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "本标准正文中MAC层规范定义的backoff算法的最小指数值，缺省值为6。
+            此值不得大于commonBackoffMaximumValue值。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonBackoffParams 5 }
+    
+    commonBackoffMaximumExponent OBJECT-TYPE
+        SYNTAX INTEGER (0..15)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "本标准正文中MAC层规范定义的backoff算法的最大指数值，缺省值为15。
+            此值不得小于commonBackoffMinimum值。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonBackoffParams 6 }
+
+-- *
+-- *   MAC层通信统计
+-- *
+
+    commonForwardPathLOSEvents OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "下行信道LOS发生数目，复位为0。"
+        ::= { commonMacStats 1 }
+
+    commonForwardPathFramingErrors OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "下行信道帧错误数目，复位为0。"
+        ::= { commonMacStats 2 }
+    
+    commonForwardPathCRCErrors OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "下行CRC校验错误数目，复位为0。"
+        ::= { commonMacStats 3 }
+    
+    commonInvalidMacCmds OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "无效的MAC层命令错误数目，复位为0。"
+        ::= { commonMacStats 4 }
+
+    commonBackwardPathCollisionTimes OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "上行数据包碰撞次数，复位为0。"
+        ::= { commonMacStats 5 }
+
+-- *
+-- *   RF接口组
+-- *
+ 
+    commonReturnPathFrequency OBJECT-TYPE
+        SYNTAX INTEGER (0..1000000000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "上行信道频率，单位为Hz。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonRfGroup 1 }
+    
+    commonForwardPathFrequency OBJECT-TYPE
+        SYNTAX INTEGER (0..1000000000)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "下行信道频率，单位为Hz。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonRfGroup 2 }
+    
+    commonProvisionedReturnPowerLevel OBJECT-TYPE
+        SYNTAX INTEGER (0..127)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "上行信道功率电平，单位为dBuV。
+            内部使用时此值将被舍入到最接近的支持值。读此对象时返回实际值而不是舍入值。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonRfGroup 3 }
+
+    commonForwardPathReceiveLevel OBJECT-TYPE
+        SYNTAX INTEGER (0..127)
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "下行信道接收功率电平，单位为dBuV。"
+        ::= { commonRfGroup 4 }
+    
+    commonMaxReturnPower OBJECT-TYPE
+        SYNTAX INTEGER (0..127)
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "最大上行信道功率电平，单位为dBuV。
+            此对象的值应保存在非易失性存储器中。"
+        ::= { commonRfGroup 5 }
+
+-- *
+-- *   代理管理组
+-- *
+ 
+    commonAgentBootWay OBJECT-TYPE
+        SYNTAX INTEGER {
+            bootDefault (1),
+            bootBOOTP (2),
+            bootTFTP (3)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "代理启动方法"
+        ::= { commonAgentGroup 1 }
+    
+    commonAgentReset OBJECT-TYPE
+        SYNTAX INTEGER { reset(1) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "代理重启动，写入'1'将使代理重新启动，写入其它值将不起作用。读此对象时返回
+            值'1'，对代理无影响。"
+        ::= { commonAgentGroup 2 }
+
+    commonAgentMaxTraps OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "代理检测到告警时向管理机发送TRAP的最大次数，0表示采用厂商的预设缺省值。"
+        ::= { commonAgentGroup 3 }
+    
+    commonAgentTrapMinInterval OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "代理发送TRAP的最小间隔，单位为s。"
+        ::= { commonAgentGroup 4 }
+    
+    commonAgentTrapMaxInterval OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "代理发送TRAP的最大间隔，单位为s。"
+        ::= { commonAgentGroup 5 }
+    
+    commonTrapAck OBJECT-TYPE
+        SYNTAX OCTET STRING ( SIZE ( 17..255 ) )
+        ACCESS read-write
+        STATUS optional
+        DESCRIPTION
+            "该变量用于通知Snmp代理，它所发出的告警Trap信息管理主机已经收到，不用重发。该
+            变量的内容和告警MIB 中alarmLogInformation 相同。代理收到后通过分析
+            alarmLogInformation 可以明确地知道管理主机应答的是哪一条告警Trap信息，从而停止
+            该告警Trap信息的重发。"
+        ::= { commonAgentGroup 6 }
+
+    commonAgentTrapTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CommonAgentTrapEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "代理TRAP信息表。"
+        ::= { commonAgentGroup 7 }
+    
+    commonAgentTrapEntry OBJECT-TYPE
+        SYNTAX CommonAgentTrapEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "代理TRAP信息表目。"
+        INDEX { commonAgentTrapIndex }
+        ::= { commonAgentTrapTable 1 }
+    
+    CommonAgentTrapEntry ::= SEQUENCE {
+        commonAgentTrapIndex
+            INTEGER,
+        commonAgentTrapIP
+            IpAddress,
+        commonAgentTrapCommunity
+            DisplayString,
+        commonAgentTrapStatus
+            INTEGER
+        }
+    
+    commonAgentTrapIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "TRAP表索引。"
+        ::= { commonAgentTrapEntry 1 }
+
+    commonAgentTrapIP OBJECT-TYPE
+        SYNTAX IpAddress
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "发TRAP时目的主机的IP地址。"
+        ::= { commonAgentTrapEntry 2 }
+    
+    commonAgentTrapCommunity OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..64))
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "发送TRAP时的共同体字符串。"
+        ::= { commonAgentTrapEntry 3 }
+    
+    commonAgentTrapStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+            commonAgentTrapEnable (1),
+            commonAgentTrapDisable (2)
+            }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "表示该TRAP项是否启用。"
+        ::= { commonAgentTrapEntry 4 }
+
+-- *
+-- *   设备管理组
+-- *
+
+    commonDeviceNum OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "表示该代理当前正在管理的设备数量。"
+        ::= { commonDeviceGroup 1 }
+
+    commonDeviceInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF CommonDeviceInfoEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "代理当前正在管理的设备公共信息列表。"
+        ::= { commonDeviceGroup 2 }
+    
+    commonDeviceInfoEntry OBJECT-TYPE
+        SYNTAX CommonDeviceInfoEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "代理当前正在管理的设备公共信息列表表目。"
+        INDEX { commonDeviceSlot }
+        ::= { commonDeviceInfoTable 1 }
+
+    CommonDeviceInfoEntry ::= SEQUENCE {
+        commonDeviceSlot
+            INTEGER,
+        commonDevicesID
+            OCTET STRING,
+        commonDeviceVendor
+            DisplayString,
+        commonDeviceModelNumber
+            DisplayString,
+        commonDeviceSerialNumber
+            DisplayString,
+        commonDeviceVendorInfo
+            DisplayString,
+        commonDeviceStatus
+            OCTET STRING,
+        commonDeviceReset
+            INTEGER,
+        commonDeviceAlarmDetectionControl
+            INTEGER,
+        commonDeviceMACAddress
+            OCTET STRING,
+        commonDeviceTamperStatus
+            INTEGER,
+        commonDeviceInternalTemperature
+            INTEGER,
+        commonDeviceResetCause
+            INTEGER,
+        commonDeviceCraftStatus
+            INTEGER,
+        commonDevicesOID
+            OBJECT IDENTIFIER,
+        commonDeviceAcct
+            Counter,
+        commonDeviceName
+            DisplayString,
+        commonDeviceMFD
+            DisplayString,
+        commonDeviceFW
+            DisplayString
+        }
+
+    commonDeviceSlot OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "代理当前正在管理的设备公共信息列表的表索引。"
+        ::= { commonDeviceInfoEntry 1 }
+    
+    commonDevicesID OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(0..40))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "厂商指定的设备的标识"
+        ::= { commonDeviceInfoEntry 2 }
+
+    commonDeviceVendor OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "设备生产厂家。"
+        ::= { commonDeviceInfoEntry 3 }
+
+    commonDeviceModelNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "设备的型号。"
+        ::= { commonDeviceInfoEntry 4 }
+
+    commonDeviceSerialNumber OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "设备的序列号。"
+        ::= { commonDeviceInfoEntry 5 }
+    
+    commonDeviceVendorInfo OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "设备供应商的其它特殊指定信息。"
+        ::= { commonDeviceInfoEntry 6 }
+    
+    commonDeviceStatus OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "设备状态
+            Bit 0: RSVD0
+            Bit 1: RSVD1
+            Bit 2: RSVD2
+            Bit 3: MAJOR ALARMS
+            Bit 4: MINOR ALARMS
+            Bit 5: RSVD5
+            Bit 6: RSVD6
+            Bit 7: RSVD7"
+        ::= { commonDeviceInfoEntry 7 }
+
+    commonDeviceReset OBJECT-TYPE
+        SYNTAX INTEGER { reset (1) }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "写入'1'将复位设备，写入其它值将不起作用。读此对象时返回值'1'，对设备无
+            影响。"
+        ::= { commonDeviceInfoEntry 8 }
+    
+    commonDeviceAlarmDetectionControl OBJECT-TYPE
+        SYNTAX INTEGER 
+        {
+            detectionDisabled (1),
+            detectionEnabled (2),
+            detectionEnabledAndRegenerate (3)
+        }
+        ACCESS read-write
+        STATUS mandatory
+        DESCRIPTION
+            "此对象用于控制设备的告警检测。"
+        ::= { commonDeviceInfoEntry 9 }
+    
+    commonDeviceMACAddress OBJECT-TYPE
+        SYNTAX OCTET STRING
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "设备MAC地址。"
+        ::= { commonDeviceInfoEntry 10 }
+
+    commonDeviceTamperStatus OBJECT-TYPE
+        SYNTAX INTEGER { intact (1), compromised (2) }
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "报告设备的安全开关(如盖子是否打开)状态，此对象要求在离散属性表中对应一个条目。
+            intact表示正常，compromised表示告警。"
+        ::= { commonDeviceInfoEntry 11 }
+    
+    commonDeviceInternalTemperature OBJECT-TYPE
+        SYNTAX INTEGER (-128..127)
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "设备的内部温度，单位为摄氏度。此对象要求在属性表中对应一个条目。"
+        ::= { commonDeviceInfoEntry 12 }
+
+    commonDeviceResetCause OBJECT-TYPE
+        SYNTAX INTEGER 
+        {
+            other (1),
+            powerup (2),
+            command (3),
+            watchdog (4),
+            craft (5)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "表示设备最近一次复位的原因。"
+        ::= { commonDeviceInfoEntry 13 }
+
+    commonDeviceCraftStatus OBJECT-TYPE
+        SYNTAX INTEGER 
+        {
+            disconnected (1),
+            connected (2)
+        }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "此对象表示设备本地接口（如RS232或RS485接口）的状态。"
+        ::= { commonDeviceInfoEntry 14 }
+    
+    commonDevicesOID OBJECT-TYPE
+        SYNTAX OBJECT IDENTIFIER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "目标标识符串，指向该设备的具体实现。"
+        ::= { commonDeviceInfoEntry 15 }
+    
+    commonDeviceAcct OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS optional
+        DESCRIPTION
+            "表示设备的累计工作时间，单位为s。"
+        ::= { commonDeviceInfoEntry 16 }
+
+    commonDeviceName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "设备名称。"
+        ::= { commonDeviceInfoEntry 17 }
+    
+    commonDeviceMFD OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(10))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "设备生产日期。"
+        ::= { commonDeviceInfoEntry 18 }
+    
+    commonDeviceFW OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..255))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "设备固件信息。"
+        ::= { commonDeviceInfoEntry 19 }
+
+-- *
+-- * hfcColdStart和 hfcWarmStart 陷阱用于替代标准SNMP陷阱coldStart和warmStart，以便
+-- * 将应答器物理地址包含在陷阱消息中。
+-- * TRAP-TYPE宏由RFC1215定义。
+-- *
+
+    hfcColdStart TRAP-TYPE
+        ENTERPRISE nscrtvHFCemsTree
+        VARIABLES { commonPhysAddress, commonNELogicalID}
+        DESCRIPTION
+            "hfcColdStart陷阱表示发送方协议实体正重新初始化，并且代理配置或协议实体可能有
+            改变。此陷阱仅在应答器注册成功后发送。"
+        ::= 0
+    
+    hfcWarmStart TRAP-TYPE
+        ENTERPRISE nscrtvHFCemsTree
+        VARIABLES { commonPhysAddress, commonNELogicalID }
+        DESCRIPTION
+            "hfcWarmStart陷阱表示发送方协议实体正重新初始化，并且代理配置或协议实体没有任
+            何改变。此陷阱仅在应答器注册完成后发送。"
+        ::= 2
+
+--******************************************************************************
+END

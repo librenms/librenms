@@ -1,0 +1,178 @@
+-- Alcatel-Lucent OXE Real-Time Monitoring MIB
+-- Revision: 1.2
+-- Date: 2008/09/11
+-- Feature Internal Reference - 3EU_29000_0125_DTZZA (External Specification)
+
+A4400-RTM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises FROM RFC1155-SMI
+        OBJECT-TYPE FROM RFC-1212
+        a4400CPU FROM A4400-CPU-MIB
+;
+
+ipDomainTable	OBJECT-TYPE
+		SYNTAX SEQUENCE OF IpDomainEntry
+        ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Table for IP Domains."
+		::= { a4400CPU 3 }
+
+ipDomainEntry OBJECT-TYPE
+	SYNTAX IpDomainEntry
+	ACCESS read-only
+	STATUS current
+	INDEX { ipDomain }
+    ::= { ipDomainTable 1 }
+
+IpDomainEntry ::= SEQUENCE {
+	ipDomain INTEGER,
+	confAvailable INTEGER,
+	confBusy INTEGER,
+	confOutOfOrder INTEGER,
+	dspRessAvailable INTEGER,
+	dspRessBusy INTEGER,
+	dspRessOutOfService INTEGER,
+	dspRessOverrun INTEGER,
+	cacAllowed INTEGER,
+	cacUsed INTEGER,
+	cacOverrun INTEGER,
+}
+
+ipDomain OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"IP Domain number as found in MAO."
+	::= { ipDomainEntry 1 }
+
+confAvailable OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Conference circuits available for given IP Domain"
+	::= { ipDomainEntry 2 }
+
+confBusy OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Conference circuits busy for given IP Domain"
+	::= { ipDomainEntry 3 }
+
+confOutOfOrder OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Conference circuits out of order for given IP Domain"
+	::= { ipDomainEntry 4 }
+
+dspRessAvailable OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressors available for given IP Domain"
+	::= { ipDomainEntry 5 }
+
+dspRessBusy OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressors busy for given IP Domain"
+	::= { ipDomainEntry 6 }
+
+dspRessOutOfService OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Compressors out of order for given IP Domain"
+	::= { ipDomainEntry 7 }
+
+dspRessOverrun OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Cumulated compressors overrun for given IP Domain"
+	::= { ipDomainEntry 8 }
+
+cacAllowed OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Number of allowed external communications for given IP Domain"
+	::= { ipDomainEntry 9 }
+
+cacUsed OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Current number of external communications for given IP Domain"
+	::= { ipDomainEntry 10 }
+
+cacOverrun OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Cumulated CAC overrun since system startup for given IP Domain"
+	::= { ipDomainEntry 11 }
+
+pbxRole	OBJECT-TYPE
+        SYNTAX INTEGER {
+		       INDETERMINATE(0),
+		       MAIN(1),
+		       STAND-BY(2),
+		       ACTIVE-PCS(3),
+		       INACTIVE-PCS(4),
+		}
+        ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The PBX role."
+		::= { a4400CPU 4 }
+
+sipRegSets   OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Registered SIP sets."
+		::= { a4400CPU 5 }
+
+sipUnregSets   OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Unregistered SIP sets."
+		::= { a4400CPU 6 }
+
+setsInService   OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of sets in service."
+		::= { a4400CPU 7 }
+
+setsOutOfService   OBJECT-TYPE
+                SYNTAX INTEGER
+                ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of sets out of service."
+		::= { a4400CPU 8 }
+
+END
+

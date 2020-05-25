@@ -1,0 +1,567 @@
+-- ============================================================================
+-- AT-IGMP.MIB, Allied Telesis enterprise MIB:
+--              Internet Group Management Protocol
+--
+-- Copyright (c) 2007 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-IGMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,OBJECT-TYPE,Unsigned32,IpAddress
+    							FROM SNMPv2-SMI
+    DisplayString,TruthValue,MacAddress
+    					      	FROM SNMPv2-TC
+    InterfaceIndex              FROM IF-MIB
+    modules					    FROM AT-SMI-MIB
+;
+
+igmp 	MODULE-IDENTITY
+    LAST-UPDATED "200708080000Z" -- August 8, 2007
+    ORGANIZATION "Allied Telesis, Inc."
+    CONTACT-INFO
+            " Stan Xiang,Hamish Kellahan
+              Allied Telesis
+              EMail: support@alliedtelesis.co.nz"
+    DESCRIPTION
+            "The MIB module for IGMP Management."
+    REVISION     "200708080000Z" -- August 8, 2007
+
+    DESCRIPTION
+            "Initial version, to support IGMP membership status polling."
+    ::= { modules 139 }
+
+
+igmpIntInfo	   OBJECT IDENTIFIER ::= { igmp 1 }
+igmpIntMember OBJECT IDENTIFIER ::= { igmp 9 }
+igmpSnooping OBJECT IDENTIFIER ::= { igmp 10 }
+--
+--  The IGMP Interface Table
+--
+igmpInterfaceTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IgmpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing IGMP capable IP interfaces."
+    ::= { igmpIntInfo 1 }
+
+
+igmpInterfaceEntry OBJECT-TYPE
+    SYNTAX     IgmpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the igmpInterfaceTable."
+    INDEX      { igmpInterface }
+    ::= { igmpInterfaceTable 1 }
+
+
+IgmpInterfaceEntry ::= SEQUENCE {
+    igmpInterface	            INTEGER,
+	igmpInterfaceName			DisplayString,
+	igmpQueryTimeout			Unsigned32,
+	igmpProxy					INTEGER
+}
+
+
+igmpInterface  OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The index value of the interface for which IGMP is
+            enabled. This table is indexed by this value."
+    ::= { igmpInterfaceEntry 1 }
+
+
+igmpInterfaceName  OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The name of the interface for which IGMP or MLD is
+            enabled."
+    ::= { igmpInterfaceEntry 2 }
+
+igmpQueryTimeout  OBJECT-TYPE
+    SYNTAX     Unsigned32(0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "It represents the maximum expected time interval, in seconds,
+			between successive IGMP general query messages arriving on 
+			the interface. A vlaue of zero means there is no limits."
+    ::= { igmpInterfaceEntry 3 }
+
+
+igmpProxy  OBJECT-TYPE
+    SYNTAX     INTEGER	
+    			{
+				   off(0),
+				   upstream(1),
+				   downstream(2)
+				}
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The object represents states of igmp proxy. When it has a value of
+             0 then it means the inteface proxy is currently disabled. When it 
+             has a value of	1 then it means IGMP is performing upstream inteface
+             proxying. When it has a value of 2 then it means IGMP is performing
+             downstream inteface proxying."
+    ::= { igmpInterfaceEntry 4 }
+
+
+igmpIntStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IgmpIntStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing statistics for IGMP capable IP interfaces."
+    ::= { igmpIntInfo 2 }
+
+
+igmpIntStatsEntry OBJECT-TYPE
+    SYNTAX     IgmpIntStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the igmpIntStatsTable."
+    INDEX      { igmpInterface }
+    ::= { igmpIntStatsTable 1 }
+
+
+IgmpIntStatsEntry ::= SEQUENCE {
+	igmpInQuery					Unsigned32,
+	igmpInReportV1				Unsigned32,
+	igmpInReportV2				Unsigned32,
+	igmpInLeave					Unsigned32,
+	igmpInTotal					Unsigned32,
+	igmpOutQuery				Unsigned32,
+	igmpOutTotal				Unsigned32,
+	igmpBadQuery				Unsigned32,
+	igmpBadReportV1				Unsigned32,
+	igmpBadReportV2				Unsigned32,
+	igmpBadLeave				Unsigned32,
+	igmpBadTotal				Unsigned32
+}
+
+
+igmpInQuery OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP Query messages received by the interface."
+    ::= { igmpIntStatsEntry 1 }
+
+
+igmpInReportV1 OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP version 1 Report messages received by the interface."
+    ::= { igmpIntStatsEntry 2 }
+
+
+igmpInReportV2 OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP version 2 Report messages received by the interface."
+    ::= { igmpIntStatsEntry 3 }	
+
+
+igmpInLeave	   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP Leave Group messages received by the interface."
+    ::= { igmpIntStatsEntry 4 }
+
+
+igmpInTotal	   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The total number of IGMP messages received by the interface."
+    ::= { igmpIntStatsEntry 5 }
+
+
+igmpOutQuery OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The total number of IGMP Query messages that were transmitted
+			by the switch over the interface."
+    ::= { igmpIntStatsEntry 6 }
+
+
+
+igmpOutTotal	   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The total number of IGMP messages that were transmitted
+			by the switch over the interface."
+    ::= { igmpIntStatsEntry 7 }
+
+
+igmpBadQuery OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP membership query messages with
+			 errors that were received by the interface."
+    ::= { igmpIntStatsEntry 8 }
+
+
+igmpBadReportV1 OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP Version 1 membership report messages
+             with errors that were received by the interface."
+    ::= { igmpIntStatsEntry 9 }
+
+
+igmpBadReportV2 OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP Version 2 membership report	messages 
+            with errors that were received by the interface."
+    ::= { igmpIntStatsEntry 10 }	
+
+
+igmpBadLeave	   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The number of IGMP Leave Group messages with errors
+			that were received by the interface."
+    ::= { igmpIntStatsEntry 11 }
+
+
+igmpBadTotal	   OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The total number of IGMP messages with errors that were
+			received by the interface.."
+    ::= { igmpIntStatsEntry 12 }
+
+
+--
+--  The IGMP igmpIntMember Tables
+--
+
+igmpIntGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IgmpIntGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table listing the IP multicast groups of
+            which there are members on a particular interface."
+    ::= { igmpIntMember 1 }
+
+igmpIntGroupEntry OBJECT-TYPE
+    SYNTAX     IgmpIntGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) in the igmpGroupTable."
+    INDEX      { igmpInterface }
+    ::= { igmpIntGroupTable 1 }
+
+
+IgmpIntGroupEntry ::= SEQUENCE {
+    igmpIntGroupAddress            IpAddress,
+    igmpLastHost				IpAddress,
+    igmpRefreshTime				Unsigned32
+}
+
+igmpIntGroupAddress OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP multicast group address for which this entry
+            contains information."
+    ::= { igmpIntGroupEntry 1 }
+
+
+igmpLastHost   OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The IP address of the last host reporting a membership.
+             If it is static, then 0.0.0.0 presents."
+    ::= { igmpIntGroupEntry 2 }
+
+
+igmpRefreshTime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The time in seconds until the membership group is deleted 
+            if another membership report is not received. A value of 
+            0xffffffff means infinity."
+    ::= { igmpIntGroupEntry 3 }
+
+
+
+--  ===================
+--  IGMP Snooping Group
+--  ===================
+igmpSnoopAdminInfo OBJECT IDENTIFIER ::= {igmpSnooping 1}
+
+igmpSnoopAdminEnabled OBJECT-TYPE
+	SYNTAX      TruthValue
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Indicates whether IGMP Snooping is globally enabled."
+	::= { igmpSnoopAdminInfo 1 }
+
+
+--  IGMP Snooping VLAN Table
+
+igmpSnoopVlanTable OBJECT-TYPE
+    SYNTAX			SEQUENCE OF IgmpSnoopVlanEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION
+            "The (conceptual) table listing the layer 2 interfaces 
+            performing IGMP snooping."
+    ::= { igmpSnooping 2 }
+
+igmpSnoopVlanEntry OBJECT-TYPE
+    SYNTAX			IgmpSnoopVlanEntry
+    MAX-ACCESS		not-accessible
+    STATUS			current
+    DESCRIPTION
+            "An entry (conceptual row) in the IGMP Snooping Vlan Table."
+    INDEX      { igmpSnoopVID }
+    ::= { igmpSnoopVlanTable 1 }
+
+IgmpSnoopVlanEntry ::= SEQUENCE {
+    igmpSnoopVID		INTEGER,
+	igmpSnoopVlanName			DisplayString,
+	igmpSnoopFastLeave			INTEGER,
+	igmpSnoopQuerySolicit		TruthValue,
+	igmpSnoopStaticRouterPorts	DisplayString
+}
+
+igmpSnoopVID  OBJECT-TYPE
+    SYNTAX     		INTEGER
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+            "The 802.1 VLAN ID of the layer 2 interface performing 
+            IGMP snooping."
+    ::= { igmpSnoopVlanEntry 1 }
+
+igmpSnoopVlanName  OBJECT-TYPE
+    SYNTAX     		DisplayString
+    MAX-ACCESS 		read-only
+    STATUS     		current
+    DESCRIPTION
+            "The name of the layer 2 interface performing IGMP snooping."
+    ::= { igmpSnoopVlanEntry 2 }
+
+igmpSnoopFastLeave OBJECT-TYPE
+	SYNTAX			INTEGER	{
+					   off(0),
+					   single(1),
+					   multi(2)
+					}
+
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+			"Indicates whether FastLeave is enabled, and operating 
+			in Single-Host or Multi-Host mode."
+	::= { igmpSnoopVlanEntry 3 }
+
+
+igmpSnoopQuerySolicit OBJECT-TYPE
+	SYNTAX			TruthValue
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+			"Indicates whether query solicitation is on"
+	::= { igmpSnoopVlanEntry 4 }
+
+
+igmpSnoopStaticRouterPorts OBJECT-TYPE
+	SYNTAX			DisplayString
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+			"Indicates the configured static multicast router ports."
+	::= { igmpSnoopVlanEntry 5 }
+
+
+-- IGMP Snooping Group Table
+
+igmpSnoopGroupTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF IgmpSnoopGroupEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"The (conceptual) table of IGMP Groups snooped on a 
+		layer 2 interface."
+	::= { igmpSnooping 3 }
+
+igmpSnoopGroupEntry OBJECT-TYPE
+	SYNTAX			IgmpSnoopGroupEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"A (conceptual) row in the IGMP Snooping Group table."
+	INDEX { igmpSnoopVID, igmpSnoopGroupAddress }
+	::= { igmpSnoopGroupTable 1 }
+
+IgmpSnoopGroupEntry	::= SEQUENCE {
+	igmpSnoopGroupAddress	IpAddress,
+	igmpSnoopGroupTimer		Unsigned32
+}
+
+igmpSnoopGroupAddress OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS 		read-only
+	STATUS			current
+	DESCRIPTION
+			"The Multicast Group IP Address detected on a 
+			layer 2 interface."
+	::= { igmpSnoopGroupEntry 1 }
+
+igmpSnoopGroupTimer OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS 		read-only
+	STATUS			current
+	DESCRIPTION
+			"The time remaining before the multicast group is 
+			deleted from the layer 2 interface."
+	::= { igmpSnoopGroupEntry 2 }
+
+
+-- IGMP Snooping Port Table
+
+igmpSnoopPortTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF IgmpSnoopPortEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"A (conceptual) table of ports in a layer 2 interface 
+		that are currently members of a multicast group."
+	::= { igmpSnooping 4 }
+
+igmpSnoopPortEntry	OBJECT-TYPE
+	SYNTAX			IgmpSnoopPortEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"A (conceptual) row in the IGMP Snooping Port Table."
+	INDEX { igmpSnoopVID, igmpSnoopGroupAddress, igmpSnoopPortNumber }
+	::= { igmpSnoopPortTable 1 }
+
+IgmpSnoopPortEntry ::= SEQUENCE {
+	igmpSnoopPortNumber		INTEGER,
+	igmpSnoopPortIsStatic	TruthValue,
+	igmpSnoopPortTimer		Unsigned32
+}
+
+igmpSnoopPortNumber	OBJECT-TYPE
+	SYNTAX			INTEGER
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Provides the number of a port in a multicast group."
+	::= { igmpSnoopPortEntry 1 }
+
+igmpSnoopPortIsStatic OBJECT-TYPE
+	SYNTAX			TruthValue
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Indicates whether a port has been administratively added
+		to a multicast group."
+	::= { igmpSnoopPortEntry 2 }
+
+igmpSnoopPortTimer	OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Indicates the time remaining before the port is removed."
+	::= { igmpSnoopPortEntry 3 }
+
+-- IGMP Snooping Host Table
+
+igmpSnoopHostTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF IgmpSnoopHostEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"A (conceptual) table of hosts receiving multicast data."
+	::= { igmpSnooping 5 }
+
+igmpSnoopHostEntry OBJECT-TYPE
+	SYNTAX			IgmpSnoopHostEntry
+	MAX-ACCESS		not-accessible
+	STATUS			current
+	DESCRIPTION
+		"A (conceptual) row in the IGMP Snooping Host Table."
+	INDEX { igmpSnoopVID, igmpSnoopGroupAddress, igmpSnoopPortNumber, igmpSnoopHostMAC }
+	::= { igmpSnoopHostTable 1 }
+
+IgmpSnoopHostEntry ::= SEQUENCE {
+	igmpSnoopHostMAC		MacAddress,
+	igmpSnoopHostIpAddress	IpAddress,
+	igmpSnoopHostTimer		Unsigned32
+}
+
+igmpSnoopHostMAC OBJECT-TYPE
+	SYNTAX			MacAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Provides the Media Access Control Address of an IGMP Host."
+	::= { igmpSnoopHostEntry 1 }
+
+igmpSnoopHostIpAddress OBJECT-TYPE
+	SYNTAX			IpAddress
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Provides the Internet Protocol Address of an IGMP Host."
+	::= { igmpSnoopHostEntry 2 }
+
+igmpSnoopHostTimer OBJECT-TYPE
+	SYNTAX			Unsigned32
+	MAX-ACCESS		read-only
+	STATUS			current
+	DESCRIPTION
+		"Indicates the time remaining before the host times out."
+	::= { igmpSnoopHostEntry 3 }
+
+
+END

@@ -1,0 +1,11 @@
+os: ros
+text: 'Siemens Ruggedcom Switches (ROS)'
+type: network
+empty_ifdescr: true
+icon: siemens
+mib_dir:
+    - ros
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.15004.2.1
+        - .1.3.6.1.4.1.15004.2.2

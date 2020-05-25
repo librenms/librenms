@@ -3,6 +3,12 @@ group: vrp
 text: 'Huawei VRP'
 type: network
 icon: huawei
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - huawei
 discovery:
     - sysDescr:
         - VRP (R) Software

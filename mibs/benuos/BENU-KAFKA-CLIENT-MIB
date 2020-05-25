@@ -1,0 +1,140 @@
+BENU-KAFKA-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Integer32 , MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, Unsigned32
+      FROM SNMPv2-SMI
+
+   benuWAG FROM BENU-WAG-MIB;
+
+benuKafkaClientMIB  MODULE-IDENTITY 
+            LAST-UPDATED "201510210000Z" -- Oct 21, 2015
+
+
+            ORGANIZATION "Benu Networks,Inc"
+            CONTACT-INFO "Benu Networks,Inc
+                          Corporate Headquarters
+                          300 Concord Road, Suite 110
+                          Billerica, MA 01821 USA
+                          Tel: +1 978-223-4700
+                          Fax: +1 978-362-1908
+                          Email: info@benunets.com"
+            DESCRIPTION
+               "This MIB module defines management information
+                related to the KAFKA client.
+
+                Copyright (C)  2013 by Benu Networks, Inc.
+                All rights reserved."
+
+            REVISION "201510210000Z" --  Oct 21, 2015
+            DESCRIPTION "Initial Version"
+
+    ::= { benuWAG 12 }
+
+-- declare top-level MIB objects for each component
+
+bKafkaClientObjects  OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION
+      "KAFKA client information is defined in this branch."
+   ::= { benuKafkaClientMIB 1 }
+
+
+-- KAFKA client latency Table
+
+bKafkaClientLatencyTable  OBJECT-TYPE
+   SYNTAX      SEQUENCE OF BKafkaClientLatencyEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "Latency information list for KAFKA client."
+   ::= { bKafkaClientObjects 1 }
+
+bKafkaClientLatencyEntry  OBJECT-TYPE
+   SYNTAX      BKafkaClientLatencyEntry
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION 
+      "A logical row in the bKafkaClientLatencyTable."
+   INDEX {
+      bKafkaClientLatencyStatsInterval
+   }
+   ::= { bKafkaClientLatencyTable 1}
+
+BKafkaClientLatencyEntry ::= SEQUENCE {
+    bKafkaClientLatencyStatsInterval                         Integer32,
+    bKafkaClientLatencyStatsIntervalDuration                 Integer32,
+    bKafkaClientLatencyTotalPktCount                         Unsigned32,
+    bKafkaClientLatencyMaxProcessingTime                     Unsigned32,
+    bKafkaClientLatencyMinProcessingTime                     Unsigned32,
+    bKafkaClientLatencyAvgProcessingTime                     Unsigned32,
+    bKafkaClientLatencyProcessTimeMorethan1MSPktCount        Unsigned32
+}
+
+bKafkaClientLatencyStatsInterval  OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  not-accessible
+   STATUS      current
+   DESCRIPTION
+      "The interval during which the measurements were accumulated. The
+       interval index one indicates the latest interval for which statistics
+       accumulation was completed. Older the statistics data, greater the interval
+       index value.
+       In a system supporting a history of n intervals with IntervalCount(1)
+       and IntervalCount(n), the most and least recent intervals respectively, the
+       following applies at the end of an interval:
+       - discard the value of IntervalCount(n)
+       - the value of IntervalCount(i) becomes that of IntervalCount(i+1) for
+         1 <= i < n
+       - the value of IntervalCount(1) becomes that of CurrentCount." 
+   ::= { bKafkaClientLatencyEntry 1 }
+
+bKafkaClientLatencyStatsIntervalDuration     OBJECT-TYPE
+   SYNTAX      Integer32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Kafka client latency stats interval duration."
+   ::= { bKafkaClientLatencyEntry 2 }
+
+bKafkaClientLatencyTotalPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The count of total number of packets handled by Kafka client."
+   ::= { bKafkaClientLatencyEntry 3 }
+
+bKafkaClientLatencyMaxProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Maximum packet processing time handled by Kafka client in micro seconds."
+   ::= { bKafkaClientLatencyEntry 4 }
+
+bKafkaClientLatencyMinProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Minimum packet processing time handled by Kafka client in micro seconds."
+   ::= { bKafkaClientLatencyEntry 5 }
+
+bKafkaClientLatencyAvgProcessingTime     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Average packet processing time handled by Kafka client in micro seconds."
+   ::= { bKafkaClientLatencyEntry 6 }
+
+bKafkaClientLatencyProcessTimeMorethan1MSPktCount     OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "Number of packets took more than 1 milli second processing time handled by Kafka client."
+   ::= { bKafkaClientLatencyEntry 7 }
+
+END
+

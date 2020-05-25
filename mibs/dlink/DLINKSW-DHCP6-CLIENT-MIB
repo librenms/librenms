@@ -1,0 +1,664 @@
+--  *****************************************************************
+--  DLINKSW-DHCP6-CLIENT-MIB.mib : DHCPv6 Client MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+DLINKSW-DHCP6-CLIENT-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32        
+                FROM SNMPv2-SMI
+        DisplayString,
+        TruthValue,
+        RowStatus
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF 
+        InterfaceIndex,
+        InterfaceIndexOrZero
+            FROM IF-MIB
+        InetAddressPrefixLength, InetAddressIPv6
+            FROM INET-ADDRESS-MIB
+        dlinkIndustrialCommon			
+			FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwDhcp6ClientMIB MODULE-IDENTITY
+        LAST-UPDATED "201301180000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "         D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:    +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for DHCPv6 Client."
+        REVISION     "201301180000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'DHCPv6 Client'
+            functionality."
+        ::= { dlinkIndustrialCommon 222 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6ClientNotifications    OBJECT IDENTIFIER ::= { dlinkSwDhcp6ClientMIB 0 }
+    dDhcp6ClientObjects          OBJECT IDENTIFIER ::= { dlinkSwDhcp6ClientMIB 1 }
+    dDhcp6ClientConformance      OBJECT IDENTIFIER ::= { dlinkSwDhcp6ClientMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dDhcp6ClientGeneral          OBJECT IDENTIFIER ::= { dDhcp6ClientObjects 1 }
+
+    dDhcp6ClientDuid OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The DHCP Unique Identity (DUID) of DHCPv6 Client."
+        ::= { dDhcp6ClientGeneral 1 }
+ 
+    dhcp6ClientRestartIf OBJECT-TYPE
+        SYNTAX      InterfaceIndexOrZero
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Specifies the ifIndex of the interface on which DHCPv6 client will
+            be restart.
+            The agent will return an inconsistentValue error on sets if DHCPv6
+            client is not enabled on the interface.         	            
+            The special value 0 is return when read."
+        ::= { dDhcp6ClientGeneral 2 }
+
+
+-- -----------------------------------------------------------------------------
+    dDhcp6ClientIfObjects          OBJECT IDENTIFIER ::= { dDhcp6ClientObjects 2 }
+    dDhcp6CIfTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6CIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "A table contains all DHCPv6 client entries which consists of
+             DHCPv6 client related configuration. An entry is created to set a
+             value different from the default on an interface. If an entry is
+             deleted, all configurations are reverted to default."
+        ::= { dDhcp6ClientIfObjects 1 }
+
+    dDhcp6CIfEntry OBJECT-TYPE
+        SYNTAX          DDhcp6CIfEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6CIfTable."
+        INDEX  { dDhcp6CIfIndex }
+        ::= { dDhcp6CIfTable 1 }
+
+    DDhcp6CIfEntry ::= SEQUENCE {
+        dDhcp6CIfIndex                  InterfaceIndex, 
+        dDhcp6CIfAcquireAddrEnabled     TruthValue,   
+        dDhcp6CIfAcqAddrRapidCommit     TruthValue, 
+        dDhcp6CIfMinRefresh             Unsigned32,
+        dDhcp6CIfRowStatus              RowStatus
+    }
+
+    dDhcp6CIfIndex  OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+            Only VLAN interfaces are valid interfaces."
+        ::= { dDhcp6CIfEntry 1 }
+        
+    dDhcp6CIfAcquireAddrEnabled OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether acquires an IPv6 address on an
+            interface from the DHCPv6 server." 
+        DEFVAL      { false }    
+        ::= { dDhcp6CIfEntry 2 }
+           
+    dDhcp6CIfAcqAddrRapidCommit OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates whether the two-message
+            exchange for address allocation and other configuration is used.
+            When dDhcp6CIfAcquireAddrEnabled is 'false', dDhcp6CIfRapidCommit
+            cannot be set to 'true'." 
+        DEFVAL      { false }    
+        ::= { dDhcp6CIfEntry 3 }
+     
+    dDhcp6CIfMinRefresh OBJECT-TYPE
+        SYNTAX          Unsigned32 (600..4294967295)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the minimum acceptable information refresh 
+            time in seconds. If the client receives a information refresh time
+            less than the configured minimum refresh time, the configured 
+            minimum refresh time will be used."
+        DEFVAL      { 86400 }
+        ::= { dDhcp6CIfEntry 4 }
+                    
+     dDhcp6CIfRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+           "The status of this conceptual row." 
+        ::= { dDhcp6CIfEntry 5 } 
+                 
+-- -----------------------------------------------------------------------------   	
+   	 dDhcp6CIfPrefixDeleCfgTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6CIfPrefixDeleCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "The table contains information about prefix delegation request 
+             of DHCPv6 client. An entry is created/removed when enable/disable
+             request for prefix delegation through a specified interface."
+        ::= { dDhcp6ClientIfObjects 3 }
+
+    dDhcp6CIfPrefixDeleCfgEntry OBJECT-TYPE
+        SYNTAX          DDhcp6CIfPrefixDeleCfgEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6CIfPrefixDeleCfgTable."
+        INDEX  { dDhcp6CIfPdCfgIfIndex }
+        ::= { dDhcp6CIfPrefixDeleCfgTable 1 }
+
+    DDhcp6CIfPrefixDeleCfgEntry ::= SEQUENCE {
+        dDhcp6CIfPdCfgIfIndex      InterfaceIndex,              
+        dDhcp6CIfPdCfgPrefixName   DisplayString,
+        dDhcp6CIfPdCfgHintAddr     InetAddressIPv6,
+        dDhcp6CIfPdCfgHintLen      InetAddressPrefixLength,
+        dDhcp6CIfPdCfgRapidCommit  TruthValue,
+        dDhcp6CIfPdCfgRowStatus    RowStatus
+    }
+    
+    dDhcp6CIfPdCfgIfIndex  OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+             Only VLAN interfaces are valid interfaces."
+        ::= { dDhcp6CIfPrefixDeleCfgEntry 1 }
+        
+    dDhcp6CIfPdCfgPrefixName OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates a IPv6 general prefix name.           
+            The prefix acquired from the server will be stored in the IPv6
+            general prefix pool represented by this object, which will be in
+            turn used in configuration of IPv6 addresses.
+            The zero length indicates the general prefix name is not configured.
+            Either dDhcp6CIfPdCfgPrefixName or dDhcp6CIfPdCfgHintAddr can be configured
+            on an interface.
+            If neither dDhcp6CIfPdCfgPrefixName nor dDhcp6CIfPdCfgHintAddr is 
+            configured, this indicates the request for prefix delegation
+            through a specified interface is disabled and the entry will be
+            deleted."
+        ::= { dDhcp6CIfPrefixDeleCfgEntry 2 }
+        
+    dDhcp6CIfPdCfgHintAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates an IPv6 prefix to be sent in the prefix
+            delegation request message as a hint.
+            The special value of all '00'Hs indicates that hint IPv6 prefix is 
+            not configured.
+            Either dDhcp6CIfPdCfgPrefixName or dDhcp6CIfPdCfgHintAddr can be configured
+            on an interface.
+            If neither dDhcp6CIfPdCfgPrefixName nor dDhcp6CIfPdCfgHintAddr is  
+            configured, this indicates the request for prefix delegation
+            through a specified interface is disabled and the entry will be
+            deleted."           
+        ::= { dDhcp6CIfPrefixDeleCfgEntry 3 }
+
+    dDhcp6CIfPdCfgHintLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength 
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The length of the prefix (in bits).
+             It indicates the length of hint prefix."
+        ::= { dDhcp6CIfPrefixDeleCfgEntry 4 }
+ 
+    dDhcp6CIfPdCfgRapidCommit OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates that whether proceed with two-message
+            exchange for prefix delegation.  The rapid-commit option will be
+            filled in the Solicit message to request two messages handshake." 
+        ::= { dDhcp6CIfPrefixDeleCfgEntry 5 }
+   	
+   	 dDhcp6CIfPdCfgRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+           "The status of this conceptual row." 
+        ::= { dDhcp6CIfPrefixDeleCfgEntry 6 }
+        		
+-- -----------------------------------------------------------------------------
+    dDhcp6ClientStatusObjects    OBJECT IDENTIFIER ::= { dDhcp6ClientObjects 3 }
+    
+    dDhcp6CIfStateTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6CIfStateEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "The table contains per-interface DHCPv6 client state information."
+        ::= { dDhcp6ClientStatusObjects 1 }
+
+    dDhcp6CIfStateEntry OBJECT-TYPE
+        SYNTAX      DDhcp6CIfStateEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6CIfStateTable."
+        INDEX  { dDhcp6CIfStateIfIndex }
+        ::= { dDhcp6CIfStateTable 1 }
+
+    DDhcp6CIfStateEntry ::= SEQUENCE {
+            dDhcp6CIfStateIfIndex       InterfaceIndex,
+            dDhcp6CIfStateCode          INTEGER,
+            dDhcp6CIfStatusEventExpire  Unsigned32              
+        }
+        
+    dDhcp6CIfStateIfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+             Only VLAN interfaces are valid interfaces."
+        ::= { dDhcp6CIfStateEntry 1 }
+        
+    dDhcp6CIfStateCode OBJECT-TYPE
+        SYNTAX      INTEGER { invalid(0), init(1), request(2),
+                              release(3), active(4), renew(5), rebind(6) }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "DHCPv6 Client running state."
+        ::= { dDhcp6CIfStateEntry 2 }
+     
+    dDhcp6CIfStatusEventExpire OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Next event expire time of DHCPv6 Client.
+             It is valid when DHCPv6 Client in 
+             REQUEST and REBIND state."
+        ::= { dDhcp6CIfStateEntry 3 }
+        
+-- -----------------------------------------------------------------------------    
+    dDhcp6CIfAcquiredIaTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6CIfAcquiredIaEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "The table contains the list of the known DHCPv6 servers."
+        ::= { dDhcp6ClientStatusObjects 2 }
+
+    dDhcp6CIfAcquiredIaEntry OBJECT-TYPE
+        SYNTAX      DDhcp6CIfAcquiredIaEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6CIfAcquiredIaTable."
+        INDEX  { 
+            dDhcp6CIfAcquiredIaType,
+            dDhcp6CIfAcquiredIaId,
+            dDhcp6CIfAcquiredIaIfIndex }
+        ::= { dDhcp6CIfAcquiredIaTable 1 }
+
+    DDhcp6CIfAcquiredIaEntry ::= SEQUENCE {                  
+            dDhcp6CIfAcquiredIaType             INTEGER,
+            dDhcp6CIfAcquiredIaId               Unsigned32,
+            dDhcp6CIfAcquiredIaIfIndex          InterfaceIndex,      
+            dDhcp6CIfAcquiredIaServerAddr       InetAddressIPv6,
+            dDhcp6CIfAcquiredIaServerDUID       OCTET STRING,
+            dDhcp6CIfAcquiredIaServerPref       Unsigned32,                  
+            dDhcp6CIfAcquiredIaT1               Unsigned32,
+            dDhcp6CIfAcquiredIaT2               Unsigned32,            
+            dDhcp6CIfAcquiredIaExpireTime       Unsigned32         
+        }
+   
+    dDhcp6CIfAcquiredIaType OBJECT-TYPE
+        SYNTAX          INTEGER { other(0), iapd(1), iana(2) }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The acquired IA type.
+             other(0) - none of the following.
+             iapd(1)  - the type of the IA is Prefix Delegation.
+             iana(2)  - the type of the IA is non-temporary addresses."             
+        ::= { dDhcp6CIfAcquiredIaEntry 1 }
+
+    dDhcp6CIfAcquiredIaId OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..4294967295)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The acquired IA identify."
+        ::= { dDhcp6CIfAcquiredIaEntry 2 }
+
+     dDhcp6CIfAcquiredIaIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex value of the interface.
+            Only VLAN interfaces are valid interfaces."
+        ::= { dDhcp6CIfAcquiredIaEntry 3 }
+      
+    dDhcp6CIfAcquiredIaServerAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The address of DHCPv6 server."
+        ::= { dDhcp6CIfAcquiredIaEntry 4 }
+                
+    dDhcp6CIfAcquiredIaServerDUID OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The DUID of the corresponding DHCPv6 server."
+        ::= { dDhcp6CIfAcquiredIaEntry 5 }
+
+    dDhcp6CIfAcquiredIaServerPref OBJECT-TYPE
+        SYNTAX          Unsigned32 (0..4294967295)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The preference of the corresponding DHCPv6 server."
+        ::= { dDhcp6CIfAcquiredIaEntry 6 }
+   
+    dDhcp6CIfAcquiredIaT1 OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The T1 timer of the acquired IA."             
+        ::= { dDhcp6CIfAcquiredIaEntry 7 }
+
+    dDhcp6CIfAcquiredIaT2 OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The T2 timer of the acquired IA."  
+        ::= { dDhcp6CIfAcquiredIaEntry 8 }
+ 
+    dDhcp6CIfAcquiredIaExpireTime OBJECT-TYPE        
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The expire time of acquired IA."            
+        ::= { dDhcp6CIfAcquiredIaEntry 9 }
+               
+-- -----------------------------------------------------------------------------
+    dDhcp6CIfAddrTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6CIfAddrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "The table contains per-interface DHCPv6 address acquired from DHCPv6
+             server."
+        ::= { dDhcp6ClientStatusObjects 3 }
+
+    dDhcp6CIfAddrEntry OBJECT-TYPE
+        SYNTAX          DDhcp6CIfAddrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6CIfAddrTable."
+        INDEX  { 
+            dDhcp6CIfAcquiredIaId,
+            dDhcp6CIfAddrInetAddr
+        }
+        ::= { dDhcp6CIfAddrTable 1 }
+
+    DDhcp6CIfAddrEntry ::= SEQUENCE {           
+            dDhcp6CIfAddrInetAddr           InetAddressIPv6,           
+            dDhcp6CIfAddrPreferLifeTime     Unsigned32,
+            dDhcp6CIfAddrValidLifeTime      Unsigned32,                  
+            dDhcp6CIfAddrExpireTime         Unsigned32
+    }
+
+    dDhcp6CIfAddrInetAddr OBJECT-TYPE
+        SYNTAX         InetAddressIPv6
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+            "The acquired address from DHCPv6 server."            
+        ::= { dDhcp6CIfAddrEntry 1 }
+   
+    dDhcp6CIfAddrPreferLifeTime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The prefer lifetime of the acquired address."             
+        ::= { dDhcp6CIfAddrEntry 2 }
+      
+    dDhcp6CIfAddrValidLifeTime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The valid lifetime of the acquired address."
+        ::= { dDhcp6CIfAddrEntry 3 } 
+                          
+    dDhcp6CIfAddrExpireTime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The expire time of the acquired address."           
+        ::= { dDhcp6CIfAddrEntry 4 }  
+  
+-- -----------------------------------------------------------------------------
+    dDhcp6CIfPrefixTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DDhcp6CIfPrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+             "The table contains all acquired prefixes from DHCPv6 server(s)."
+        ::= { dDhcp6ClientStatusObjects 4 }
+
+    dDhcp6CIfPrefixEntry OBJECT-TYPE
+        SYNTAX          DDhcp6CIfPrefixEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Defines an entry in the dDhcp6CIfPrefixTable."
+        INDEX  { 
+              dDhcp6CIfAcquiredIaId,
+              dDhcp6CIfPrefixAddr,
+              dDhcp6CIfPrefixAddrLen }
+        ::= { dDhcp6CIfPrefixTable 1 }
+
+    DDhcp6CIfPrefixEntry ::= SEQUENCE {          
+            dDhcp6CIfPrefixAddr             InetAddressIPv6,
+            dDhcp6CIfPrefixAddrLen          InetAddressPrefixLength,
+            dDhcp6CIfPrefixPreferLifeTime   Unsigned32,
+            dDhcp6CIfPrefixValidLifeTime    Unsigned32,                  
+            dDhcp6CIfPrefixExpireTime       Unsigned32
+        }
+    
+    dDhcp6CIfPrefixAddr OBJECT-TYPE
+        SYNTAX          InetAddressIPv6
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The address of the acquired prefix."
+        ::= { dDhcp6CIfPrefixEntry 1 }
+
+    dDhcp6CIfPrefixAddrLen OBJECT-TYPE
+        SYNTAX          InetAddressPrefixLength
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The prefix length of the acquired prefix."
+           
+        ::= { dDhcp6CIfPrefixEntry 2 }
+        
+    dDhcp6CIfPrefixPreferLifeTime OBJECT-TYPE
+        SYNTAX          Unsigned32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The prefer lifetime of the acquired prefix."             
+        ::= { dDhcp6CIfPrefixEntry 3 }
+
+    dDhcp6CIfPrefixValidLifeTime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The valid lifetime of the acquired prefix."             
+        ::= { dDhcp6CIfPrefixEntry 4 }
+
+    dDhcp6CIfPrefixExpireTime OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The expire time of the acquired prefix"
+        ::= { dDhcp6CIfPrefixEntry 5 }
+        
+--  ***************************************************************************	
+--  Conformance
+--  ***************************************************************************
+    dDhcp6ClientCompliances OBJECT IDENTIFIER ::= { dDhcp6ClientConformance 1 }
+		
+	dDhcp6ClientCompliance MODULE-COMPLIANCE
+		STATUS          current
+		DESCRIPTION 
+			"The compliance statement for entities which implement the 
+			DLINKSW-DHCP6-CLIENT-MIB."
+		MODULE -- this module
+		MANDATORY-GROUPS { 
+		    dDhcp6CBasicGroup,
+		    dDhcp6CBasicStatusGroup
+		}	
+		
+		OBJECT dDhcp6CIfMinRefresh
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is complaint to support read only if the implementation doesn't
+            support setting acceptable information refresh time."
+        
+        OBJECT dDhcp6CIfAcqAddrRapidCommit
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is complaint to support read only if the implementation doesn't
+            support rapid-commit for acquiring address."  
+                     
+		GROUP       dDhcp6CPrefixDelegationGroup
+        DESCRIPTION
+              "This group is required only if the agent supports requesting
+              for prefix delegation through a specified interface."
+                
+		GROUP       dDhcp6CPrefixDelegStatusGroup
+        DESCRIPTION
+              "This group is required only if the agent supports requesting
+              for prefix delegation through a specified interface."
+        
+        OBJECT dDhcp6CIfPdCfgRapidCommit
+        MIN-ACCESS      read-only
+        DESCRIPTION
+            "It is complaint to support read only if the implementation doesn't
+            support rapid-commit for requesting the prefix delegation."
+                        
+	    ::= { dDhcp6ClientCompliances 1 }
+		
+	dDhcp6ClientGroups OBJECT IDENTIFIER ::= { dDhcp6ClientCompliances 2 }
+		
+    dDhcp6CBasicGroup OBJECT-GROUP
+		OBJECTS { 
+		    dDhcp6ClientDuid, 
+		    dhcp6ClientRestartIf, 
+		    dDhcp6CIfAcquireAddrEnabled, 
+		    dDhcp6CIfAcqAddrRapidCommit, 
+		    dDhcp6CIfMinRefresh, 
+			dDhcp6CIfRowStatus 
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to  
+			acquiring IPv6 address on an interface from DHCPv6 server."						
+		::= { dDhcp6ClientGroups 1 }
+
+		
+	dDhcp6CBasicStatusGroup OBJECT-GROUP
+		OBJECTS { 
+		    dDhcp6CIfStateCode, 
+		    dDhcp6CIfStatusEventExpire, 		   
+		    dDhcp6CIfAcquiredIaServerAddr, 
+		    dDhcp6CIfAcquiredIaServerDUID, 
+		    dDhcp6CIfAcquiredIaServerPref, 
+		    dDhcp6CIfAcquiredIaT1, 
+		    dDhcp6CIfAcquiredIaT2, 
+			dDhcp6CIfAcquiredIaExpireTime, 
+			dDhcp6CIfAddrPreferLifeTime, 
+			dDhcp6CIfAddrValidLifeTime, 
+			dDhcp6CIfAddrExpireTime
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects about the status 
+			of acquired IPv6 address and the information about DHCPv6 server."
+		::= { dDhcp6ClientGroups 2 }
+
+		
+	dDhcp6CPrefixDelegationGroup OBJECT-GROUP
+		OBJECTS { 
+		    dDhcp6CIfPdCfgPrefixName, 
+		    dDhcp6CIfPdCfgHintAddr, 
+		    dDhcp6CIfPdCfgHintLen, 
+		    dDhcp6CIfPdCfgRapidCommit, 
+		    dDhcp6CIfPdCfgRowStatus
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects related to  
+			acquiring IPv6 prefix on an interface from DHCPv6 server."
+		::= { dDhcp6ClientGroups 3 }
+		
+	dDhcp6CPrefixDelegStatusGroup OBJECT-GROUP
+		OBJECTS { 		 
+		    dDhcp6CIfPrefixPreferLifeTime, 
+		    dDhcp6CIfPrefixValidLifeTime, 
+		    dDhcp6CIfPrefixExpireTime
+		}
+		STATUS current
+		DESCRIPTION 
+			"This group contains the collection of objects about the status 
+			of the acquired prefixes."
+		::= { dDhcp6ClientGroups 4 }
+
+END
+

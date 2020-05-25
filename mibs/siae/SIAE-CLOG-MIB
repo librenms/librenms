@@ -1,0 +1,243 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--                 
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano 
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-CLOG-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+             Unsigned32
+        FROM SNMPv2-SMI
+             DisplayString
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             alarmTrap
+        FROM SIAE-ALARM-MIB
+             accessControlLoginIpAddress
+        FROM SIAE-USER-MIB
+             equipIpSnmpAgentAddress
+        FROM SIAE-EQUIP-MIB;
+
+    commandLog MODULE-IDENTITY
+        LAST-UPDATED "201503230000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: help@siaemic.com
+            "
+        DESCRIPTION
+            "Recorder of the commands entered from SNMP/CLI/WEB
+            "
+        REVISION "201503230000Z"
+        DESCRIPTION
+            "Removed alarmTrapNumber from commandLogFtpStatusTrap and IMPORTS.
+            "
+        REVISION "201406230000Z"
+        DESCRIPTION
+            "Fixed IMPORTS of accessControlLoginIpAddress
+            "
+        REVISION "201402030000Z"
+        DESCRIPTION
+            "Improved description of commandLogMibVersion
+            "
+        REVISION "201312180000Z"
+        DESCRIPTION 
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 40 }
+
+----------------------------------------------------------------------------------
+--  object identifier inside the module
+----------------------------------------------------------------------------------
+
+----------------------------------------------------------------------------------
+--  commandLog GROUP
+----------------------------------------------------------------------------------
+--
+--  This group is used to manage the command log.
+--
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    commandLogMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+    ::= {commandLog 1}
+
+--
+-------  The following objects are used  to map the "action"
+-------  (delete log record or transfer the log using FTP):
+--
+
+    commandLogActionRequest  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             notActive (0),
+                             delete    (1),
+                             read      (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This leaf is used to delete record or to read it by FTP."
+    ::= {commandLog 2}
+
+    commandLogFtpFile  OBJECT-TYPE
+        SYNTAX      DisplayString    (SIZE(0..255))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This leaf is reserved to file path where to transfer data."
+    ::= {commandLog 3}
+
+--
+-------  The following objects are used to filter
+-------  commands when an action (read or delete) is required
+--
+    commandLogMgmtInterfaceFilter  OBJECT-TYPE
+        SYNTAX        BITS {
+            cli(0),        -- local CLIe
+            web(1),        -- WEB interface
+            snmp(2),       -- SNMP management
+            remoteCli(3)   -- CLI on SSH, TELNET ...
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Select which items are to be read or deleted 
+             according to interface used to enter the registered command.
+             Bits set to 1 select the relative interface, bits set to 0
+             filter the relative interface"
+    ::= {commandLog 4}
+
+    commandLogStartTimeFilter  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The events with EventTime greater than this object are
+             read/delete from the log.
+             Null value means no filter."
+    ::= {commandLog 5}
+
+    commandLogEndTimeFilter  OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The events with EventTime less than this object are read/delete
+             from the log.
+             Null value means no filter."
+    ::= {commandLog 6}
+
+   commandLogUserNameFilter  OBJECT-TYPE
+        SYNTAX       DisplayString     (SIZE(0..31))
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "Name of the user that sent the request for the filter to manage
+             commands in the record. ** value means no filter."
+    ::= {commandLog 7}
+
+    commandLogSourceAddressFilter  OBJECT-TYPE
+        SYNTAX      DisplayString     (SIZE(0..16))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "IP address of source machine of filter to manage
+             commands in the record. 0 value means no filter."
+    ::= {commandLog 8}
+
+--
+-------  The following objects are used to manage
+-------  action in the FTP transfer
+--
+
+    commandLogFtpStatus  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             transferring  (1),
+                             completed     (2),
+                             interrupted   (3),
+                             empty         (4)
+                            }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This leaf is used for the status of transfer."
+    ::= {commandLog 9}
+
+    commandLogFtpStatusTrapNotification  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                             trapDisable        (1),
+                             trapEnable         (2),
+                             trapEnableWithACK  (3)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enables/disables the trap generation on FTP tranfer operation."
+    ::= {commandLog 10}
+
+   commandLogLastCommandTime OBJECT-TYPE
+        SYNTAX            Unsigned32
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+            "Describes the time, in seconds since 01/01/1970, of the last
+             SNMP command. The commands saves must be from a LOM. Some type
+             of commands, as login action or timestamp set, are skipped."
+   ::= {commandLog 11}
+
+   commandLogLastCommandUser OBJECT-TYPE
+        SYNTAX            DisplayString    (SIZE(0..31))
+        MAX-ACCESS        read-only
+        STATUS            current
+        DESCRIPTION
+            "Describes the user that have made of the last SNMP command.
+             The commands saves must be from a LOM. Some type
+             of commands, as login action or timestamp set, are skipped."
+   ::= {commandLog 12}
+
+
+-----------------------
+--
+--  The commandLog Group generates the following TRAP:
+--
+-----------------------
+
+    commandLogFtpStatusTrap  NOTIFICATION-TYPE
+        OBJECTS  {equipIpSnmpAgentAddress, commandLogFtpStatus, accessControlLoginIpAddress}
+        STATUS current
+        DESCRIPTION
+            "This event is generated when the status of FTP transfer is changed.
+             The data passed with the event are:
+                1) equipIpSnmpAgentAddress
+                2) commandLogFtpStatus
+                3) accessControlLoginIpAddress"
+    ::= {alarmTrap 4001}
+
+------ End group -----------------------------------------------------------------
+
+END
+

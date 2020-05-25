@@ -1,0 +1,543 @@
+-- ============================================================================
+-- at-license.mib, Allied Telesis enterprise MIB:
+-- License MIB for the AlliedWare Plus(tm) operating system
+--
+-- Copyright (c) 2008 by Allied Telesis, Inc.
+-- All rights reserved.
+--
+-- ============================================================================
+
+    AT-LICENSE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+            sysinfo
+                FROM AT-SMI-MIB
+            Integer32, OBJECT-TYPE, MODULE-IDENTITY
+                FROM SNMPv2-SMI
+            DisplayString, RowStatus, TruthValue
+                FROM SNMPv2-TC;
+
+
+        license MODULE-IDENTITY
+            LAST-UPDATED "201404290000Z"
+            ORGANIZATION
+                "Allied Telesis Labs New Zealand"
+            CONTACT-INFO
+                "http://www.alliedtelesis.com"
+            DESCRIPTION
+                "The license MIB, for listing applied software licenses, adding
+                new licenses, and deleting existing licenses."
+            REVISION "201404290000Z"
+            DESCRIPTION
+                "Added more descriptions to the baseLicenseStackId and
+                 licenseStackId"
+            REVISION "201009070000Z"
+            DESCRIPTION
+                "Generic syntax tidy up"
+            REVISION "201008300000Z"
+            DESCRIPTION
+                "Added support for adding or deleting a license to/from all
+                devices in a stack, using a single operation."
+            REVISION "201006140509Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "200811100000Z"
+            DESCRIPTION
+                "Initial revision."
+            ::= { sysinfo 22 }
+
+
+
+
+--
+-- Node definitions
+--
+
+-- ---------------------------------------------------------- --
+-- The Base Software License Table
+-- ---------------------------------------------------------- --
+
+        baseLicenseTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF BaseLicenseEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table representing the installed base software licenses on the device."
+            ::= { license 1 }
+
+
+        baseLicenseEntry OBJECT-TYPE
+            SYNTAX BaseLicenseEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each entry represents the base software license on a device."
+            INDEX { baseLicenseStackId }
+            ::= { baseLicenseTable 1 }
+
+
+        BaseLicenseEntry ::=
+            SEQUENCE {
+                baseLicenseStackId
+                    Integer32,
+                baseLicenseName
+                    DisplayString,
+                baseLicenseQuantity
+                    Integer32,
+                baseLicenseType
+                    DisplayString,
+                baseLicenseIssueDate
+                    DisplayString,
+                baseLicenseExpiryDate
+                    DisplayString,
+                baseLicenseFeatures
+                    OCTET STRING
+             }
+
+        baseLicenseStackId OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the base license entry.
+                 The stack member ID is used as an index to search the table."
+            ::= { baseLicenseEntry 1 }
+
+
+        baseLicenseName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the base license."
+            ::= { baseLicenseEntry 2 }
+
+
+        baseLicenseQuantity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of licenses issued for this entry."
+            ::= { baseLicenseEntry 3 }
+
+
+        baseLicenseType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of base license issued."
+            ::= { baseLicenseEntry 4 }
+
+
+        baseLicenseIssueDate OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date of issue of the base license."
+            ::= { baseLicenseEntry 5 }
+
+
+        baseLicenseExpiryDate OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date that the base license expires on."
+            ::= { baseLicenseEntry 6 }
+
+
+        baseLicenseFeatures OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The featureset that this license enables. Each bit in the returned octet
+                string represents a particular feature that can be license-enabled.
+
+                The bit position within the string maps to the feature entry with the
+                same index, in licenseFeatureTable. A binary '1' indicates that the
+                feature is included in the license, with a '0' indicating that it is not "
+            ::= { baseLicenseEntry 7 }
+
+
+-- ---------------------------------------------------------- --
+-- The Installed Software License Table
+-- ---------------------------------------------------------- --
+        licenseTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF LicenseEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table representing the installed software licenses on the device."
+            ::= { license 2 }
+
+
+        licenseEntry OBJECT-TYPE
+            SYNTAX LicenseEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each entry represents a single installed software license on the device."
+            INDEX { licenseStackId, licenseIndex }
+            ::= { licenseTable 1 }
+
+
+        LicenseEntry ::=
+            SEQUENCE {
+                licenseStackId
+                    Integer32,
+                licenseIndex
+                    Integer32,
+                licenseName
+                    DisplayString,
+                licenseCustomer
+                    DisplayString,
+                licenseQuantity
+                    Integer32,
+                licenseType
+                    DisplayString,
+                licenseIssueDate
+                    DisplayString,
+                licenseExpiryDate
+                    DisplayString,
+                licenseFeatures
+                    OCTET STRING,
+                licenseRowStatus
+                    RowStatus
+             }
+
+        licenseStackId OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the license entry.
+                 The stack member ID is used as an index to search the table."
+            ::= { licenseEntry 1 }
+
+
+        licenseIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the license entry."
+            ::= { licenseEntry 2 }
+
+
+        licenseName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the license."
+            ::= { licenseEntry 3 }
+
+
+        licenseCustomer OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the customer of the license."
+            ::= { licenseEntry 4 }
+
+
+        licenseQuantity OBJECT-TYPE
+            SYNTAX Integer32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The number of licenses issued for this entry."
+            ::= { licenseEntry 5 }
+
+
+        licenseType OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The type of license issued."
+            ::= { licenseEntry 6 }
+
+
+        licenseIssueDate OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date of issue of the license."
+            ::= { licenseEntry 7 }
+
+
+        licenseExpiryDate OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The date that the license expires on."
+            ::= { licenseEntry 8 }
+
+
+        licenseFeatures OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The featureset that this license enables. Each bit in the returned octet
+                string represents a particular feature that can be license-enabled.
+
+                The bit position within the string maps to the feature entry with the
+                same index, in licenseFeatureTable. A binary '1' indicates that the
+                feature is included in the license, with a '0' indicating that it is not "
+            ::= { licenseEntry 9 }
+
+
+        licenseRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The current status of the license. The following values may be returned
+                when reading this object:
+
+                	active (1)        - The license is currently installed and valid.
+                	notInService (2)  - The license has expired or is invalid.
+
+                The following values may be written to this object:
+
+                	destroy (6)       - The license will be removed from the device -
+                	                    this may result in some features being
+                	                    disabled. Note that a stacked device that has a
+                	                    license de-installed on it may not be able to
+                	                    rejoin the stack after reboot, unless the license
+                	                    is also de-installed on all other devices in the
+                	                    stack."
+            ::= { licenseEntry 10 }
+
+
+-- ---------------------------------------------------------- --
+-- The Available Software Features Table
+-- ---------------------------------------------------------- --
+        licenseFeatureTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF LicenseFeatureEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A table of all features that must be license-enabled to be utilised on
+                the device."
+            ::= { license 3 }
+
+
+        licenseFeatureEntry OBJECT-TYPE
+            SYNTAX LicenseFeatureEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Each entry represents a single feature that must be license-enabled in
+                order to be utilised on the device."
+            INDEX { licenseFeatureIndex }
+            ::= { licenseFeatureTable 1 }
+
+
+        LicenseFeatureEntry ::=
+            SEQUENCE {
+                licenseFeatureIndex
+                    Integer32,
+                licenseFeatureName
+                    DisplayString,
+                licenseFeatureStkMembers
+                    OCTET STRING
+             }
+
+        licenseFeatureIndex OBJECT-TYPE
+            SYNTAX Integer32 (1..2147483647)
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "The index of the feature which must be license-enabled."
+            ::= { licenseFeatureEntry 1 }
+
+
+        licenseFeatureName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The name of the feature under licensing control."
+            ::= { licenseFeatureEntry 2 }
+
+
+        licenseFeatureStkMembers OBJECT-TYPE
+            SYNTAX OCTET STRING
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "A bitmap with each bit representing an individual stacking
+                member. Bit one represents stacking member one etc.
+
+                A bit value of '1' indicates that the applicable feature is
+                enabled on the matching device. A '0' indicates that it is
+                disabled."
+            ::= { licenseFeatureEntry 3 }
+
+
+-- ---------------------------------------------------------- --
+-- Objects to install a new software license.
+-- ---------------------------------------------------------- --
+        licenseNew OBJECT IDENTIFIER ::= { license 4 }
+
+
+        licenseNewStackId OBJECT-TYPE
+            SYNTAX Integer32 (0..2147483647)
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The stack ID of the member upon which the new license is to be
+                installed. Setting this object to the value zero, will result
+                in the license being installed on all stack members."
+            ::= { licenseNew 1 }
+
+
+        licenseNewName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The name of the new license to be installed."
+            ::= { licenseNew 2 }
+
+
+        licenseNewKey OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The key for the new license to be installed."
+            ::= { licenseNew 3 }
+
+
+        licenseNewInstall OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is used to install a new software license on the
+                device. To commence installation, a valid license name and key
+                must first have been set via the licenseNewName and
+                licenseNewKey objects respectively. The current value of
+                licenseNewInstallStatus must also be idle(1), indicating that
+                no other license installation operation is in progress. This
+                object should then be set to the value true(1).
+
+                The status of the installation operation can be determined by
+                reading object licenseNewInstallStatus. Once installed, the
+                software modules affected by any newly enabled features will
+                automatically be restarted.
+
+                Note that a stacked device that has a new license installed on
+                it may not be able to rejoin the stack after reboot, unless the
+                license is also added to all other devices in the stack.
+
+                When read, the object shall always return false(2)."
+            ::= { licenseNew 4 }
+
+
+        licenseNewInstallStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+                idle(1),
+                processing(2),
+                success(3),
+                failure(4)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Shows the current status of the last requested license
+                installation request. One of the following values will be
+                returned:
+
+                idle (1)       - No new operation has been requested.
+                processing (2) - The last request is in progress.
+                success (3)    - The last request was successful.
+                failure (4)    - The last request failed.
+
+                Upon completion of a stack license installation operation, the
+                first read of this object will return a success/failure
+                indication. Subsequent reads will then return idle(1)."
+            ::= { licenseNew 5 }
+
+
+-- ---------------------------------------------------------- --
+-- Objects to remove a software license from all stack members
+-- on which it exists.
+-- ---------------------------------------------------------- --
+        licenseStackRemove OBJECT IDENTIFIER ::= { license 5 }
+
+
+        licenseStackRemoveName OBJECT-TYPE
+            SYNTAX DisplayString
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "The name of the license to be removed from all stack members on
+                which it currently exists. All existing licenses with the given
+                name must activate the same feature set, in order for the
+                removal operation to be successful."
+            ::= { licenseStackRemove 1 }
+    
+    
+        licenseStackRemoveExecute OBJECT-TYPE
+            SYNTAX TruthValue
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object is used to remove a new license from all stack
+                members on which it exists. To commence removal, a valid
+                license name must first have been set via
+                licenseStackRemoveName. The current value of
+                licenseStackRemoveStatus must also be idle(1), indicating that
+                no other license installation operation is in progress. This
+                object should then be set to the value true(1).
+
+                The status of the removal operation can be determined by
+                reading object licenseStackRemoveStatus. Once removed, the
+                software modules affected by any newly disabled features will
+                automatically be restarted.
+
+                When read, the object shall always return false(2)."
+            ::= { licenseStackRemove 2 }
+    
+    
+        licenseStackRemoveStatus OBJECT-TYPE
+            SYNTAX INTEGER {
+                idle(1),
+                processing(2),
+                success(3),
+                failure(4)
+            }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Shows the current status of the last requested stack license
+                removal request. One of the following values will be returned:
+
+                idle (1)       - No new removal operation has been requested.
+                processing (2) - The last request is in progress.
+                success (3)    - The last request was successful.
+                failure (4)    - The last request failed.
+
+                Upon completion of a stack license removal operation, the first
+                read of this object will return a success/failure indication.
+                Subsequent reads will then return idle(1)."
+            ::= { licenseStackRemove 3 }
+    
+    
+    END
+
+--
+-- at-license.mib
+--

@@ -1,0 +1,9 @@
+os: omnitron-iconverter
+text: 'Omnitron iConverter'
+type: management
+icon: omnitron
+mib_dir:
+    - omnitron
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.7342.5.

@@ -1,0 +1,93 @@
+-- ***********************************************************************
+-- HILLSTONE-NTP-MIB 
+--
+-- Copyright (c) 2009 by Hillstone Networks, Inc.
+-- All rights reserved.
+-- 
+-- Version:      V3    
+-- Description:	 Hillstone Networks NTP MIB Object Identifier Assignments
+-- ***********************************************************************
+--
+
+HILLSTONE-NTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	hillstoneNTP
+		FROM HILLSTONE-SMI
+	OBJECT-TYPE
+		FROM RFC-1212;	
+
+          -- textual conventions
+
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+hillstoneNTPMibObjects OBJECT IDENTIFIER ::= { hillstoneNTP 1 }
+
+hillstoneNTPServConfTable OBJECT-TYPE
+      
+	SYNTAX SEQUENCE OF HillstoneNTPServConfEntry
+      
+	MAX-ACCESS not-accessible
+      
+	STATUS current
+      
+	DESCRIPTION
+          
+		"The table is used in configure the informatioin of this ntp server"
+      
+	::= { hillstoneNTPMibObjects 1 }
+	
+  HillstoneNTPServConfEntry OBJECT-TYPE
+      
+	SYNTAX HillstoneNTPServConfEntry
+      
+	MAX-ACCESS not-accessible
+      
+	STATUS current
+      
+	DESCRIPTION
+
+		"The entry is used in ip address informatioin of this dns server"
+	INDEX { hillstoneNTPServName }
+      
+	::= { hillstoneNTPServConfTable 1 } 
+	
+  HillstoneNTPServConfEntry ::=
+      SEQUENCE{
+          hillstoneNTPServName
+              DisplayString,
+          hillstoneNTPServStatus
+              INTEGER
+      }
+        
+  hillstoneNTPServName OBJECT-TYPE
+      SYNTAX DisplayString
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The index of this NTP server table"
+      ::= { HillstoneNTPServConfEntry 1 }
+  
+
+  hillstoneNTPServStatus OBJECT-TYPE
+      SYNTAX INTEGER
+          {
+              sourceMaster(1),
+              sourcePeer(2),
+              selected(3),
+              candidate(4),
+              configured(5)	
+          }
+      MAX-ACCESS read-only
+      STATUS current
+      DESCRIPTION
+          "The status of this NTP server. 1:source(master);2:source(peer);3:selected;4:candidate;5:configured;"
+      ::= { HillstoneNTPServConfEntry 2 } 
+                
+END

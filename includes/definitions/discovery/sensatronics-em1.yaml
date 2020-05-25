@@ -1,0 +1,63 @@
+mib: SENSATRONICS-EM1:SENSATRONICS-ITTM:SENSATRONICS-SMI
+modules:
+   sensors:
+      temperature:
+         data:
+             -
+                 oid: group1
+                 value: group1TempDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.1.3.{{ $index }}'
+                 index: 'group1TempDataStr.{{ $index }}'
+                 descr: '{{ $group1Name }} {{ $group1TempName }}'
+                 skip_values: -999.9
+             -
+                 oid: group2
+                 value: group2TempDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.2.3.{{ $index }}'
+                 index: 'group2TempDataStr.{{ $index }}'
+                 descr: '{{ $group2Name }} {{ $group2TempName }}'
+                 skip_values: -999.9
+             -
+                 oid: group3
+                 value: group3TempDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.3.3.{{ $index }}'
+                 index: 'group3TempDataStr.{{ $index }}'
+                 descr: '{{ $group3Name }} {{ $group3TempName }}'
+                 skip_values: -999.9
+             -
+                 oid: group4
+                 value: group4TempDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.4.3.{{ $index }}'
+                 index: 'group4TempDataStr.{{ $index }}'
+                 descr: '{{ $group4Name }} {{ $group4TempName }}'
+                 skip_values: -999.9
+      humidity:
+         data:
+             -
+                 oid: group1
+                 value: group1HumidDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.1.6.{{ $index }}'
+                 index: 'group1HumidDataStr.{{ $index }}'
+                 descr: '{{ $group1Name }} {{ $group1HumidName }}'
+                 skip_values: -999.9
+             -
+                 oid: group2
+                 value: group2HumidDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.2.6.{{ $index }}'
+                 index: 'group2HumidDataStr.{{ $index }}'
+                 descr: '{{ $group2Name }} {{ $group2HumidName }}'
+                 skip_values: -999.9
+             -
+                 oid: group3
+                 value: group3HumidDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.3.6.{{ $index }}'
+                 index: 'group3HumidDataStr.{{ $index }}'
+                 descr: '{{ $group3Name }} {{ $group3HumidName }}'
+                 skip_values: -999.9
+             -
+                 oid: group4
+                 value: group4HumidDataStr
+                 num_oid: '.1.3.6.1.4.1.16174.1.1.3.3.4.6.{{ $index }}'
+                 descr: '{{ $group4Name }} {{ $group4HumidName }}'
+                 index: 'group4HumidDataStr.{{ $index }}'
+                 skip_values: -999.9

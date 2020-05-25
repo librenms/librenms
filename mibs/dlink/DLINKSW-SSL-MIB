@@ -1,0 +1,570 @@
+--  *****************************************************************
+--  DLINKSW-SSL-MIB.mib : Secure Socket Layer MIB
+--
+--  Copyright (c) 2016 D-Link Corporation, all rights reserved.
+--
+--  *****************************************************************
+
+-- MODIFICTION HISTORY:
+-- -----------------------------------------------------------------------------
+--
+-- 2016/7/5, Eugene Song
+-- Description:
+--  [Modification]
+		-- [New Object] dSslServicePolicyVersions, Support for SSL/TLS version control. 
+		--				ssl3_0(0),
+		--				tls1_0(1),
+		--				tls1_1(2),
+		--				tls1_2(3)
+		-- [Modification Object] dSslServicePolicyCipherSuites, Support for additional cipher suites: 
+		--				rsaAes128CbcSha(5),
+		--				rsaAes256CbcSha(6),
+		--				rsaAes128CbcSha256(7),
+		--				rsaAes256CbcSha256(8),
+		--				dheDssAes256CbcSha(9),
+		--				dheRsaAes256CbcSha(10)
+--	    
+-- Notes: Requested by Eugene Song and for DGS1510-R1.40.
+-------------------------------------------------------------------------------
+
+
+DLINKSW-SSL-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32
+            FROM SNMPv2-SMI
+        RowStatus, TruthValue,DisplayString
+            FROM SNMPv2-TC
+        OBJECT-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF
+        InetAddressType,InetAddress
+            FROM INET-ADDRESS-MIB
+        dlinkIndustrialCommon
+            FROM DLINK-ID-REC-MIB;
+
+
+    dlinkSwSslMIB MODULE-IDENTITY
+        LAST-UPDATED "201607050000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "This MIB module defines objects for Secure Socket Layer (SSL)."
+			
+        REVISION "201607050000Z"
+        DESCRIPTION
+               "1. Support for SSL/TLS version control.
+                2. Support for additional Cipher suites:
+                            rsaAes128CbcSha 
+                            rsaAes256CbcSha
+                            rsaAes128CbcSha256           
+                            rsaAes256CbcSha256          
+                            dheDssAes256CbcSha           
+                            dheRsaAes256CbcSha"
+			 
+        REVISION "201310300000Z"
+        DESCRIPTION
+            "This is the first version of the MIB file for 'SSL'
+             functionality."
+    ::= { dlinkIndustrialCommon 7}
+
+-- -----------------------------------------------------------------------------
+    dlinkSslNotifications    OBJECT IDENTIFIER ::= { dlinkSwSslMIB 0 }
+    dlinkSslObjects          OBJECT IDENTIFIER ::= { dlinkSwSslMIB 1 }
+    dlinkSslConformance      OBJECT IDENTIFIER ::= { dlinkSwSslMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dSslCryptoPkiImportCertTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSslCryptoPkiImportCertEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table of importing certificates and key pairs. There will at any
+            time be either 0 or 1 rows in this table, and the only valid index
+            for this table is 1.  It is only a table so that we may take
+            advantage of the RowStatus textual convention for configuring the
+            importing parameters.
+            The row in this table is volatile; that is, it is lost if the SNMP
+            agent is rebooted."
+           ::= { dlinkSslObjects 1 }
+
+    dSslCryptoPkiImportCertEntry OBJECT-TYPE
+        SYNTAX          DSslCryptoPkiImportCertEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The row in the dSslCryptoPkiImportCertTable containing the importing
+            parameters.
+            Once an entry has been activated, the importing parameters cannot be
+            modified.  In order to use a new value, you need delete the old entry
+            and create a new one."
+        INDEX    { dSslCryPkiImportCertIndex }
+        ::= { dSslCryptoPkiImportCertTable 1 }
+
+    DSslCryptoPkiImportCertEntry ::=
+        SEQUENCE {
+            dSslCryPkiImportCertIndex           Integer32,
+            dSslCryPkiImportCertTrustPoint      DisplayString,
+            dSslCryPkiImportCertSrcType         INTEGER,
+            dSslCryPkiImportFilename            DisplayString,
+            dSslCryPkiImportCertAddrType        InetAddressType,
+            dSslCryPkiImportCertAddr            InetAddress,
+            dSslCryPkiImportFileType            BITS,
+            dSslCryPkiImportPwdPhrase           DisplayString,
+            dSslCryPkiImportErrorStatus         DisplayString,
+            dSslCryPkiImportRowStatus           RowStatus
+        }
+
+    dSslCryPkiImportCertIndex OBJECT-TYPE
+        SYNTAX          Integer32 (1)
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The index which uniquely identifies this row."
+        ::= { dSslCryptoPkiImportCertEntry 1 }
+
+    dSslCryPkiImportCertTrustPoint OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE (0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Name of the trustpoint to which the certificates and key pairs
+             will be imported."
+        DEFVAL      { "" }
+        ::= {  dSslCryptoPkiImportCertEntry 2 }
+
+    dSslCryPkiImportCertSrcType OBJECT-TYPE
+        SYNTAX          INTEGER {
+            filesystem(1),
+            tftp(2) }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "An indication of the source from where the certificates/key pairs
+             will be imported.
+             filesystem(1) - The certificates/key pairs will be imported from the
+                switch's file system.
+             tftp(2) - The certificates/key pairs will be imported via tftp."
+        DEFVAL   { filesystem }
+        ::= { dSslCryptoPkiImportCertEntry 3 }
+
+    dSslCryPkiImportFilename OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE (0..64))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "If dSslCryPkiImportCertSrcType is 'filesystem', this object
+            indicates the file name and path of the importing certificate
+            and key pairs in switch's file system. The supported file systems
+            are project dependent.
+            If dSslCryPkiImportCertSrcType is 'tftp', this object indicates
+            the file name and path where the switch should import via TFTP
+            server. By default, the switch will appends this name with .ca,
+            .prv and .crt for CA certificate, private key and certificate
+            respectively."
+        ::= {  dSslCryptoPkiImportCertEntry 4 }
+
+    dSslCryPkiImportCertAddrType OBJECT-TYPE
+        SYNTAX          InetAddressType
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The type of address in the corresponding dSslCryPkiImportCertAddr
+            object. "
+           ::= { dSslCryptoPkiImportCertEntry 5 }
+
+    dSslCryPkiImportCertAddr OBJECT-TYPE
+        SYNTAX          InetAddress
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "The address of TFTP server."
+        ::= {  dSslCryptoPkiImportCertEntry 6 }
+
+    dSslCryPkiImportPwdPhrase OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE (0..64))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the encrypted password phrase that is used to undo
+            encryption when the private keys are imported."
+        ::= {  dSslCryptoPkiImportCertEntry 7 }
+
+    dSslCryPkiImportFileType OBJECT-TYPE
+        SYNTAX BITS {
+            ca(0),
+            local(1)}
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "An object indicates what kind of certificate will be imported.
+            Setting a type's bit to 1 means the type of certificate will
+            be imported.
+            ca (0)    - Import CA certificate.
+            local (1) - Import local certificate and key pairs."
+--        DEFVAL { {} }   no bits set.
+        ::= { dSslCryptoPkiImportCertEntry 8 }
+
+    dSslCryPkiImportErrorStatus OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE (0..255))
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "A textual description of the current status of the importing.
+            The status information includes: idle, in progress, success, aborted,
+            idle, corruptFile, no server...."
+           ::= { dSslCryptoPkiImportCertEntry 9 }
+
+    dSslCryPkiImportRowStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The status of this import entry.  This object may not be set to
+            'active' if the following columnar objects exist in this row:
+            dSslCryPkiImportCertTrustPoint, dSslCryPkiImportFilename, and
+            dSslCryPkiImportFileType.
+            Besides, if dSslCryPkiImportCertSrcType is 'tftp' the columnar
+            objects dSslCryPkiImportCertAddrType and dSslCryPkiImportCertAddr
+            must be configured."
+        ::= { dSslCryptoPkiImportCertEntry 10 }
+
+-- -----------------------------------------------------------------------------
+    dSslConfiguration  OBJECT IDENTIFIER ::= { dlinkSslObjects 2 }
+
+    dSslCryptoPkiTrustpointTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSslCryptoPkiTrustpointEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table defines and configures trustpoint(s) in the switch."
+        ::= { dSslConfiguration 1 }
+
+    dSslCryptoPkiTrustpointEntry OBJECT-TYPE
+        SYNTAX          DSslCryptoPkiTrustpointEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The row in the dSslCryptoPkiTrustpointTable containing the
+            trustpoint parameters.
+            An entry is created/removed when a name for a specific
+            trustpoint is generated or deleted via CLI or by issuing appropriate
+            sets to this table using snmp."
+        INDEX  { dSslCryptoPkiTrustpointName }
+        ::= { dSslCryptoPkiTrustpointTable 1 }
+
+    DSslCryptoPkiTrustpointEntry ::=
+        SEQUENCE {
+            dSslCryptoPkiTrustpointName         DisplayString,
+            dSslCryptoPkiTrustpointPrimary      TruthValue,
+            dSslCryptoPkiTrustpointRowStatus    RowStatus }
+
+    dSslCryptoPkiTrustpointName OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Name of the trustpoint for which this entry pertains to."
+        ::= { dSslCryptoPkiTrustpointEntry 1 }
+
+    dSslCryptoPkiTrustpointPrimary OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object specifies a given trustpoint as primary.
+            This trustpoint can be used as default trustpoint when
+            the application doesn't explicitly specify which certificate
+            authority (CA) trustpoint should be used.
+
+            Only one trustpoint can be specified as primary. That is the
+            last trustpoint you specify as primary will overwrite the
+            previous one."
+        DEFVAL    { false }
+        ::= { dSslCryptoPkiTrustpointEntry 2 }
+
+    dSslCryptoPkiTrustpointRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Status of this trustpoint."
+        ::= { dSslCryptoPkiTrustpointEntry 3 }
+
+-- -----------------------------------------------------------------------------
+    dSslCryptoPkiCertTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSslCryptoPkiCertEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table manages CA certificate(s) or the switch
+            certificate(s) and keys."
+        ::= { dSslConfiguration 2 }
+
+    dSslCryptoPkiCertEntry OBJECT-TYPE
+        SYNTAX          DSslCryptoPkiCertEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The row in the dSslCryptoPkiCertTable containing the
+            parameters of a certificate.
+            An entry in this table appears automatically whenever
+            the certificate or keypairs is imported successfully.
+            An entry is removed when a certificate name is deleted
+            via CLI or by issuing appropriate sets to this table using snmp."
+        INDEX  { dSslCryptoPkiTrustpointName,dSslCryptoPkiCertName }
+        ::= { dSslCryptoPkiCertTable 1 }
+
+    DSslCryptoPkiCertEntry ::=
+        SEQUENCE {
+            dSslCryptoPkiCertName           DisplayString,
+            dSslCryptoPkiCertCAType         INTEGER,
+            dSslCryptoPkiCertRemoveCtrl     INTEGER }
+
+    dSslCryptoPkiCertName OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE (0..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the name of the certificate for which this entry
+            pertains to."
+        ::= { dSslCryptoPkiCertEntry 1 }
+
+    dSslCryptoPkiCertCAType OBJECT-TYPE
+        SYNTAX  INTEGER {
+            ca(1),
+            localCertificate(2),
+            localPrivateKey(3) }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the type of the certificate.
+            ca(1) -  CA certificate.
+            localCertificate(2) - local certificate.
+            localPrivateKey(3) -  local private key."
+        ::= { dSslCryptoPkiCertEntry 2 }
+
+    dSslCryptoPkiCertRemoveCtrl OBJECT-TYPE
+        SYNTAX          INTEGER {
+            delete(1),
+            noOp(2) }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object is used to delete this entry.
+            No action is taken if this object is set to 'noOp'.
+            When read, the value 'noOp' is returned."
+        ::= { dSslCryptoPkiCertEntry 3 }
+
+-- -----------------------------------------------------------------------------
+   dSslServicePolicyTable  OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DSslServicePolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table controlls the parameters of SSL service policies."
+        ::= { dSslConfiguration 3 }
+
+    dSslServicePolicyEntry OBJECT-TYPE
+        SYNTAX          DSslServicePolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "The row in the dSslServicePolicyTable containing the
+            parameters of a SSL service policy.
+
+            An entry is created/removed when a name for a specific
+            policy is generated or deleted via CLI or by issuing appropriate
+            sets to this table using snmp."
+        INDEX  { dSslServicePolicyName }
+        ::= { dSslServicePolicyTable 1 }
+
+    DSslServicePolicyEntry ::=
+        SEQUENCE {
+            dSslServicePolicyName               DisplayString,
+            dSslServicePolicyVersions           BITS,
+            dSslServicePolicyCipherSuites       BITS,
+            dSslServicePolicyTrustpoint         DisplayString,
+            dSslServicePolicyCacheTimeout       Unsigned32,
+            dSslServicePolicyRowStatus          RowStatus }
+
+    dSslServicePolicyName OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE (1..32))
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Indicates the name of the policy for which this entry pertains to."
+        ::= { dSslServicePolicyEntry 1 }	
+		
+    dSslServicePolicyCipherSuites OBJECT-TYPE
+        SYNTAX          BITS {
+            dheDss3DesEdeCbcSha(0),
+            rsa3desEdeCbcSha(1),
+            rsaRc4128Sha(2),
+            rsaRc4128Md5(3),
+            rsaExportRc440Md5(4),
+            rsaAes128CbcSha(5),
+            rsaAes256CbcSha(6),
+            rsaAes128CbcSha256(7),
+            rsaAes256CbcSha256(8),
+            dheDssAes256CbcSha(9),
+            dheRsaAes256CbcSha(10)
+            }
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates a ciphersuite should be used by the secure
+            service when negotiating a connection with a remote peer. Setting
+            a ciphersuite's bit to 1 enables the ciphersuite. Setting this bit
+            to 0 disables it.
+
+            dheDss3DesEdeCbcSha(0): Uses ephemeral Diffie-Hellman key exchange with 3DES-EDE-CBC
+                encryption and SHA for message digest.
+
+            rsa3desEdeCbcSha(1): Uses RSA key exchange with 3DES-EDE-CBC for
+                message encryption and SHA for message digest.
+
+            rsaRc4128Sha(2): Uses RSA key exchange with RC4 128-bit
+                encryption for message encryption and SHA for message digest.
+
+            rsaRc4128Md5(3): Uses RSA key exchange with RC4 128-bit
+                encryption for message encryption and MD5 for message digest.
+
+            rsaExportRc440Md5(4): Uses RSA EXPORT key exchange with RC4 40
+                bits for message encryption and MD5 for message digest.
+				
+            rsaAes128CbcSha(5): Uses RSA key exchange with AES 128
+                bits for message encryption and SHA for message digest.	
+
+            rsaAes256CbcSha(6): Uses RSA exchange with AES 256
+                bits for message encryption and SHA for message digest.
+
+            rsaAes128CbcSha256(7): Uses RSA key exchange with AES 128
+                bits for message encryption and SHA256 for message digest.
+				
+            rsaAes256CbcSha256(8): Uses RSA key exchange with AES 256
+                bits for message encryption and SHA256 for message digest.
+
+            dheDssAes256CbcSha(9): Uses ephemeral Diffie-Hellman key exchange with AES 256
+                bits for message encryption and SHA for message digest.
+
+            dheRsaAes256CbcSha(10): Uses ephemeral Diffie-Hellman key exchange with AES 256
+                bits for message encryption and SHA for message digest."
+--        DEFVAL  { { dheDss3DesEdeCbcSha, rsa3desEdeCbcSha, rsaRc4128Sha,
+--                    rsaRc4128Md5, rsaExportRc440Md5 } }
+        ::= { dSslServicePolicyEntry 2}
+
+
+    dSslServicePolicyTrustpoint OBJECT-TYPE
+        SYNTAX          DisplayString  (SIZE (0..32))
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "Specifies the name of the trustpoint that should be used in SSL
+            handshake.
+
+            When secure-trustpoint is not specified, the primary trustpoint
+            (the value of dSslCryptoPkiTrustpointPrimary is 'true') will be
+            used.
+
+            If no trustpoint is specified (empty string), the built-in
+            certificate/key pairs will be used."
+        ::= { dSslServicePolicyEntry 3 }
+
+    dSslServicePolicyCacheTimeout OBJECT-TYPE
+        SYNTAX          Unsigned32 (60..86400)
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Cache Timeout value in the policy for
+            SSL module to refresh the session resume data kept in database."
+        DEFVAL    { 600 }
+        ::= { dSslServicePolicyEntry 4}
+
+    dSslServicePolicyRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+               "Status of this policy."
+        ::= { dSslServicePolicyEntry 5 }
+		
+	dSslServicePolicyVersions OBJECT-TYPE
+		SYNTAX      BITS {
+						ssl3_0(0),
+						tls1_0(1),
+						tls1_1(2),
+						tls1_2(3)
+					}
+		MAX-ACCESS  read-create
+		STATUS      current
+		DESCRIPTION
+			"This object indicates the SSL or TLS versions are enabled or not in the system.
+			 If the bit is 1 , indicate that version is enabled , else is disabled ."
+		::= { dSslServicePolicyEntry 6 }			
+
+-- -----------------------------------------------------------------------------
+-- Conformance
+-- -----------------------------------------------------------------------------
+    dlinkSslCompliances OBJECT IDENTIFIER ::= { dlinkSslConformance 1 }
+
+    dlinkSslGroups OBJECT IDENTIFIER ::= { dlinkSslConformance 2 }
+
+    dlinkSslCompliance MODULE-COMPLIANCE
+        STATUS   current
+        DESCRIPTION
+            "The compliance statement for entities which implement the
+            DLINKSW-SSL-MIB."
+        MODULE MANDATORY-GROUPS {
+            dSslImportCertGroup,
+            dSslTrustPointConfigGroup,
+            dSslServicePolicyGroup }
+        ::= { dlinkSslCompliances 1 }
+
+    dSslImportCertGroup OBJECT-GROUP
+        OBJECTS {
+            dSslCryPkiImportCertTrustPoint,
+            dSslCryPkiImportCertSrcType,
+            dSslCryPkiImportFilename,
+            dSslCryPkiImportCertAddrType,
+            dSslCryPkiImportCertAddr,
+            dSslCryPkiImportPwdPhrase,
+            dSslCryPkiImportFileType,
+            dSslCryPkiImportErrorStatus,
+            dSslCryPkiImportRowStatus }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects for manage importing certificates and key pairs."
+        ::= { dlinkSslGroups 1 }
+
+    dSslTrustPointConfigGroup OBJECT-GROUP
+        OBJECTS {
+            dSslCryptoPkiTrustpointPrimary,
+            dSslCryptoPkiTrustpointRowStatus,
+            dSslCryptoPkiCertCAType,
+            dSslCryptoPkiCertRemoveCtrl }
+        STATUS current
+        DESCRIPTION
+            "A collection of objects for manage trustpoints and certificates and key pairs."
+        ::= { dlinkSslGroups 2 }
+
+    dSslServicePolicyGroup OBJECT-GROUP
+        OBJECTS {
+            dSslServicePolicyCipherSuites,
+            dSslServicePolicyTrustpoint,
+            dSslServicePolicyCacheTimeout,
+            dSslServicePolicyRowStatus }
+        STATUS current
+            DESCRIPTION
+                "A collection of objects for manage trustpoints and certificates and key pairs."
+            ::= { dlinkSslGroups 3 }
+END

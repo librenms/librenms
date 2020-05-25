@@ -1,0 +1,5129 @@
+--- ArubaOS 8.5.0.0_70258
+   AI-AP-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       TEXTUAL-CONVENTION
+           FROM SNMPv2-TC
+
+       MODULE-IDENTITY,
+       OBJECT-TYPE,
+       snmpModules,
+       Integer32,
+       Counter32,
+       Counter64,
+       IpAddress,
+       NOTIFICATION-TYPE
+           FROM SNMPv2-SMI
+
+       DisplayString,
+       PhysAddress,
+       TimeInterval,
+       RowStatus,
+       StorageType,
+       TestAndIncr,
+       MacAddress,
+       TruthValue,
+       DateAndTime
+       FROM SNMPv2-TC
+
+       OBJECT-GROUP
+           FROM SNMPv2-CONF
+                aiEnterpriseMibModules
+                        FROM ARUBA-MIB;
+
+   aiMIB MODULE-IDENTITY 
+       LAST-UPDATED "0804160206Z"
+       ORGANIZATION "Aruba Wireless Networks"
+       CONTACT-INFO
+            "Postal:    1322 Crossman Avenue
+                        Sunnyvale, CA 94089     
+            E-mail:     dl-support@arubanetworks.com
+            Phone:      +1 408 227 4500"
+       DESCRIPTION
+           "This MIB is for managing Aruba Instant WLAN"
+       REVISION        "0804160206Z"
+       DESCRIPTION
+           "The initial revision."
+       ::= { aiEnterpriseMibModules 1 }
+
+ArubaEnableValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents a Flag which is either Enabled or Disabled."
+    SYNTAX       INTEGER { enabled(1), disabled(2) }
+
+
+ArubaFrameType ::= TEXTUAL-CONVENTION
+   	STATUS       current
+   	DESCRIPTION
+           "Represents the Frame type."
+    SYNTAX       INTEGER {
+						associateRequest(0),
+						associateResponse(1),
+						reassociateRequest(2),
+						reassociateResponse(3),
+						probeRequest(4),
+						probeResponse(5),
+						beacon(8),
+						atim(9),
+						disassociate(10),
+						auth(11),
+						deauth(12)
+				 }
+
+ArubaPhyType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the PHY-type of the access point or client.  Wired clients will
+		  show 'wired' in user MIB entries.
+		"
+	SYNTAX       INTEGER {
+		 				dot11a(1),
+						dot11b(2),
+						dot11g(3),
+						dot11ag(4),
+						wired(5)
+					  }
+        
+ArubaHTMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the HT status of the access point or client.
+		"
+	SYNTAX       INTEGER {
+		 				none(1),
+						ht20(2),
+						ht40(3)
+					  }
+        
+ArubaHTExtChannel ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the extension channel offset relative to the current channel."
+	SYNTAX       INTEGER {
+		 				none(1),
+						above(2),
+						below(3)
+					  }
+        
+ArubaMonEncryptionType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the encryption type supported by the access point."
+	SYNTAX       INTEGER {
+		 				open(0),
+						wep(1),
+						wpa(2),
+						wpa2(3),
+						wpa3(4)
+					  }
+
+ArubaMonEncryptionCipher ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the WPA encryption cipher supported by the access point."
+	SYNTAX       INTEGER {
+		 				none(0),
+						wep40(1),
+						wep104(2),
+						tkip(3),
+						aesccmp(4),
+						other(5),
+						gcm256(6)
+					  }
+
+ArubaMonAuthAlgorithm ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the WPA authentication algorithm supported by the access point."
+	SYNTAX       INTEGER {
+		 				none(0),
+						psk(1),
+						dot1x(2),
+						ft8021x(3),
+						ftpsk(4),
+						dot1x256(5),
+						psk256(6),
+						tdls(7),
+						sae(8),
+						ftsae(9),
+						other(10),
+						suiteb(11),
+						owe(12)
+					  }
+                      
+ArubaSwitchRole ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the role of the controller"
+	SYNTAX       INTEGER {
+		 				master(1),
+						local(2),
+						backupmaster(3)
+					  }
+          
+ArubaSupportStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents if a feature is supported or unsupported."
+	SYNTAX       INTEGER {
+		 				unsupported(1),
+						supported(2)
+					  }
+         
+ArubaActiveState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents if a feature is active or inactive."
+	SYNTAX       INTEGER {
+		 				active(1),
+						inactive(2)
+					  }
+          
+ArubaACLDomain ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents both the source and destination to which an ACL rule will
+		  be applied.
+		"
+	SYNTAX       INTEGER {
+		 				alias(1),
+						any(2),
+						user(3),
+						host(4),
+						network(5)
+					  }
+           
+ArubaACLNetworkServiceType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the network service in an ACL Rule."
+	SYNTAX       INTEGER {
+		 				alias(1),
+						any(2),
+						tcp(3),
+						udp(4),
+						protocol(5)
+					  }
+            
+ArubaACLAction ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Actions in an ACL rule."
+	SYNTAX       INTEGER {
+		 				deny(1),
+						permit(2),
+						srcNAT(3),
+						dstNAT(4),
+						redirect(5)
+					  }
+             
+ArubaDaysOfWeek ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Actions in an ACL rule."
+	SYNTAX       INTEGER {
+		 				sun(1),
+						mon(2),
+						tue(3),
+						wed(4),
+						thu(5),
+						fri(6),
+						sat(7)
+					  }
+              
+ArubaAuthenticationMethods ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Authentication Method."
+	SYNTAX       INTEGER {
+		 				none(0),
+		 				web(1),
+						mac(2),
+						vpn(3),
+						dot1x(4),
+						kerberos(5),
+						secureId(7),
+						pubcookie(15),
+						xSec(16),
+						xSecMachine(17),
+						via-vpn(28),
+						other(255)
+					  }
+     
+ArubaSubAuthenticationMethods ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Sub Authentication Method (e.g. EAP type)."
+	SYNTAX       INTEGER {
+		 				authPAP(1),
+						authCHAP(2),
+						authMSCHAP(3),
+						authMSCHAPv2(4),
+						eapTLS(5),
+						eapTTLS(6),
+						eapLEAP(7),
+						eapMD5(8),
+						eapPEAP(9)
+					  }
+
+ArubaEncryptionType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Encryption Method."
+	SYNTAX       INTEGER {
+		 				none(0),
+		 				static-wep(1),
+					    dynamic-wep(2),
+						wpa-psk-tkip(3),
+						wpa-tkip(4),
+						wpa-psk-aes(5),
+						wpa-aes(6),
+						wpa2-psk-tkip(7),
+						wpa2-tkip(8),
+						wpa2-psk-aes(9),
+						wpa2-aes(10),
+                        xSec(11),
+                        bSec-128(12),
+                        bSec-256(13),
+                        aes-128-cmac(14),
+                        unknown(15),
+                        ft-psk(16),
+                        ft-8021x(17),
+                        wpa3-cnsa(18),
+                        owe-aes(20),
+                        wpa3-sae-aes(21),
+                        wpa3-aes-gcmp-256(22)
+					  }
+     
+ArubaUserForwardMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" User Forwarding Mode."
+	SYNTAX       INTEGER {
+		 				tunnel-encrypted(0),
+                        bridge(1),
+		 				tunnel-decrypted(2),
+					    split-tunnel(3)
+					  }
+
+ArubaRogueApType ::= TEXTUAL-CONVENTION
+   STATUS	  current
+   DESCRIPTION
+   		"Represents the Rogue AP Type. "
+   SYNTAX      INTEGER {
+						valid(1),
+						interfering(2),
+						unsecure(3),
+		 				dos(4),
+						unknown(5),
+						knownInterfering(6),
+						suspectedUnsecure(7)
+					 }
+          
+ArubaAPMatchType ::= TEXTUAL-CONVENTION
+   STATUS	  current
+   DESCRIPTION
+   		"Represents the match type of a suspected rogue AP. "
+   SYNTAX      INTEGER {
+						unknown(0),
+						configuredWiredMac(1),
+						ethernetWiredMac(2),
+						apWiredMac(3),
+		 				externalWiredMac(4),
+						manual(5),
+						baseBSSIDOverride(6),
+						mms(7),
+						ethernetGatewayWiredMac(8),
+						classificationDisabled(9),
+						apBSSID(10),
+						propagatedEthernetWiredMac(11),
+						apRule(12),
+						systemWiredMac(13),
+						systemGatewayMac(14)
+					 }
+
+ArubaAPMatchMethod ::= TEXTUAL-CONVENTION
+   STATUS	  current
+   DESCRIPTION
+   		"Represents the match method of a suspected rogue AP. "
+   SYNTAX      INTEGER {
+						notApplicable(0),
+						exactMatch(1),
+						plusOneMatch(2),
+						minusOneMatch(3),
+						ouiMatch(4)
+					 }
+
+ArubaStationType ::= TEXTUAL-CONVENTION
+   STATUS	  current
+   DESCRIPTION
+   		"Represents the station type. "
+   SYNTAX      INTEGER {
+						valid(1),
+						interfering(2),
+		 				dos(3)
+					 }
+          
+ArubaEncryptionMethods ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Actions in an ACL rule."
+    SYNTAX      BITS{
+						disabled(0),
+						static-wep(1),
+						dynamic-wep(2),
+						static-wpa(3),
+						dynamic-wpa(4),
+						wpa2-psk-aes(5),
+						wpa2-8021x-aes(6),
+						wpa2PreAuth(7),
+						xsec(8),
+						wpa-psk-aes(9),
+						wpa-aes(10),
+						wpa2-psk-tkip(11),
+						wpa2-8021x-tkip(12),
+						bSec-128(13),
+						bSec-256(14),
+						owe-aes(16),
+						wpa3-sae-aes(17),
+						wpa3-cnsa(18),
+						wpa3-aes-ccm-128(19),
+						mpsk-aes(21),
+						wpa3-aes-gcm-256(22)
+						}
+
+ ArubaHashAlgorithms ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Actions in an ACL rule."
+	SYNTAX       INTEGER {
+		 				md5(1),
+						sha(2)
+					  }
+  
+ArubaVlanValidRange	::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the Valid Vlan Id Range."
+	SYNTAX		INTEGER(1..4095)
+  
+ArubaPortMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the controller port mode."
+	SYNTAX		INTEGER {
+					access(1),
+					dot1q(2)
+				}
+  
+ArubaDot1dState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the controller port spanning tree state."
+	SYNTAX		INTEGER {
+					disabled(1),
+					blocked(2),
+					listening(3),
+					learning(4),
+					forwarding(5)
+				}
+  
+ArubaPoeState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"Represents the POE mode."
+	SYNTAX		INTEGER {
+					disabled(1),
+					enabled(2),
+					enabledCisco(3),
+                                        notAvailable(4)
+				}
+ 
+ArubaCardType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Type of the hardware module.
+		"
+	SYNTAX		INTEGER {
+					lc1(1),
+					lc2(2),
+					sc1(3),
+					sc2(4),
+					sw2400(5),
+					sw800(6),
+					sw200(7),
+					m3mk1(8),
+					sw3200(9),
+					sw3400(10),
+					sw3600(11),
+					sw650(12),
+					sw651(13),
+					reserved1(14),
+					reserved2(15),
+					sw620(16)
+				}
+ 
+ArubaESIServerMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The mode of the ESI server.
+		"
+	SYNTAX		INTEGER {
+					bridged(1),
+					routed(2),
+					nat(3)
+				}
+ 
+ArubaESIServerStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The status of the ESI server.
+		"
+	SYNTAX		INTEGER {
+					up(1),
+					down(2)
+				}
+
+ArubaIfType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The type of interface referred to by the value of ifIndex.
+		"
+	SYNTAX		INTEGER {
+					port(1),
+					vlan(2),
+					tunnel(3),
+					loopback(4)
+				}
+
+ArubaVoipProtocolType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The type of VoIP protocols supported.
+		"
+	SYNTAX       INTEGER{
+		 				sccp(1),
+						svp(2),
+						vocera(3),
+						sip(4),
+						unknown(10)
+		 		 }
+
+ArubaAccessPointMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The mode of the access point.
+		"
+	SYNTAX       INTEGER{
+		 				airMonitor(1),
+						accessPoint(2),
+						accessPointAndMonitor(3),
+						meshPortal(4),
+						meshPoint(5),
+						rfprotectSensor(6),
+						spectrumSensor(7)
+		 		 }
+
+ArubaAuthServerType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The type of the auth server.
+		"
+         SYNTAX       INTEGER{
+		 				internaldb(1),
+						radius(2),
+						ldap(3),
+						kerberos(4),
+						tacacs(5)
+					  }
+
+ArubaAddressType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Address Type. 
+		"
+	SYNTAX       INTEGER{
+		 				srcAddress(1),
+						dstAddress(2),
+						bssid(3)
+		 		 }
+
+ArubaBlackListReason ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Black List Reason. 
+		"
+	SYNTAX       INTEGER {
+		 				userDefined(1),
+						mitmAttack(2),
+						authFailure(3),
+						pingFlood(4),
+						sessionFlood(5),
+						synFlood(6),
+						sessionBlacklist(7),
+						ipSpoofing(8),
+						esiBlacklist(9),
+						other(100)
+		 			  }
+
+ArubaDBType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		DataBase Type. 
+		"
+	SYNTAX       INTEGER {
+		 				mssql(1),
+						mysql(2)
+		 			  }
+
+
+ArubaVrrpState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		DataBase Type. 
+		"
+	SYNTAX       INTEGER {
+						initialize(1),
+						backup(2),
+		 				master(3)
+		 			  }
+
+
+ArubaOperStateValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents Operational state of an interface."
+    SYNTAX       INTEGER { up(1), down(2), testing(3) }
+
+
+
+ArubaAntennaSetting ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+            "Represents the status of the external antenna."
+    SYNTAX       INTEGER { notPresent(1), enabled(2), disabled(3) }
+
+ArubaAPStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The status of the access point.
+		"
+	SYNTAX		INTEGER { up(1), down(2) }
+
+ArubaPortSpeed ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Port Speed.
+		"
+	SYNTAX		INTEGER { speed10Mbps(1), 
+						  speed100Mbps(2), 
+						  speed1000Mbps(3), 
+						  speedAuto(4),
+						  speed10Gbps(5)
+						}
+
+ArubaPortDuplex ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Port Duplexity.
+		"
+	SYNTAX		INTEGER { half(1), 
+						  full(2), 
+						  auto(3)
+						}
+
+ArubaPortType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		Port Type.
+		"
+	SYNTAX		INTEGER { fastethernet(1), 
+						  gigabitethernet(2),
+						  xgigabitethernet(3) 
+						}
+
+ArubaEnet1Mode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents the Mode of the Ethernet port on the Access Point"
+	SYNTAX       INTEGER {
+		 				activeStandby(1),
+						tunnel(2),
+						bridge(3),
+						notApplicable(4),
+						split(5)
+					  }
+ 
+ArubaUnprovisionedStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents whether the AP is provisioned or not."
+	SYNTAX       INTEGER {
+		 				yes(1),
+						no(2)
+					  }
+ 
+ArubaMonitorMode ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+  		" Represents whether the AP has any radios dedicated to monitoring."
+	SYNTAX       INTEGER {
+		 				unknown(0),
+		 				all(1),
+						none(2),
+						mixed(3)
+					  }
+ 
+ArubaConfigurationState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION	
+		"Configuration Transfer Types."
+	SYNTAX		INTEGER {
+					success(1),
+					error(2)
+				}
+ 
+ArubaConfigurationChangeType ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION	
+		"Configuration Change Types."
+	SYNTAX		INTEGER {
+					create(1),
+					delete(2),
+					modify(3)
+				}
+
+ArubaCallStates ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The Call state.
+		"
+	SYNTAX		INTEGER {
+				idle(0),
+				initiated(1),
+				connecting(2),
+				delivered(3),
+				connected(4),
+				offered(5),
+				alerting(6),
+				releasing(7),
+				cancelling(8),
+				challenging(9),
+				transient(10),
+				blockwait(11),
+				succ(12),
+				fail(13),
+				aborted(14),
+				blocked(15)
+			}
+   
+ArubaVoipProtocol ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  VoIP protocol used
+		"
+	SYNTAX		INTEGER {
+			sccp(1), 
+			svp(2), 
+			vocera(3), 
+			sip(9), ua(11) 
+	}
+
+ArubaVoipRegState ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  VoIP registered state
+		"
+	SYNTAX		INTEGER {
+			unknown(0), 
+			registering(1), 
+			unregistering(2), 
+			challenge(3), 
+			registered(4), 
+			unregistered(5)
+	}
+
+ArubaVoiceCdrDirection ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  VoIP CDR direction
+		"
+	SYNTAX		INTEGER {
+			og(0), 
+			ic(1)
+	}
+
+ArubaVoiceCacBit ::= TEXTUAL-CONVENTION
+	STATUS    current
+	DESCRIPTION
+		"
+			Voice CAC bit flags
+		"
+	SYNTAX 	BITS {
+			cacActiveLoadBalancing(0),
+			cacHighCapThresholdReached(1),
+			cacHandRsrvThresholdReached(2),
+			cacPeakCapacityReached(3)
+	}
+	
+ArubaMeshRole ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  Mesh role
+		"
+	SYNTAX		INTEGER {
+			nonmesh(0),
+			point(1), 
+			portal(2)
+	}
+
+ArubaHTRate ::= TEXTUAL-CONVENTION
+   	STATUS       current
+   	DESCRIPTION
+           "Represents HT rate"
+    SYNTAX       INTEGER {
+					unknown(0),
+					ht6dot5(1),
+					ht13(2),
+					ht13dot5(3),
+					ht15(4),
+					ht19dot5(5),
+					ht26(6),
+					ht27(7),
+					ht30(8),
+					ht39(9),
+					ht40dot5(10),
+					ht45(11),
+					ht52(12),
+					ht54(13),
+					ht58dot5(14),
+					ht60(15),
+					ht65(16),
+					ht78(17),
+					ht81(18),
+					ht90(19),
+					ht104(20),
+					ht108(21),
+					ht117(22),
+					ht120(23),
+					ht121dot5(24),
+					ht130(25),
+					ht135(26),
+					ht150(27),
+					ht162(28),
+					ht180(29),
+					ht216(30),
+					ht240(31),
+					ht243(32),
+					ht270(33),
+					ht300(34)
+				 }
+
+ArubaUSBStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  USB device status
+		"
+	SYNTAX		INTEGER {
+			unknown(0),
+			notPresent(1), 
+			inactive(2),
+			active(3)
+	}
+
+ArubaARMChangeReason ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		The reason for ARM based change.
+		"
+	SYNTAX       INTEGER {
+                       radarDetected(1),
+                       radarCleared(2),
+                       txHang(3),
+                       txHangClear(4),
+                       fortyMhzIntol(5),
+                       cancel40mhzIntol(6),
+                       fortyMhzAlign(7),
+                       armInterference(8),
+                       armInvalidCh(9),
+                       armErrorThresh(10),
+                       armNoiseThresh(11),
+                       armEmptyCh(12),
+                       armRogueCont(13),
+                       armDecreasePower(14),
+                       armIncreasePower(15),
+                       armTurnOffRadio(16),
+                       armTurnOnRadio(17)
+   }
+
+ArubaAPMasterStatus ::= TEXTUAL-CONVENTION
+	STATUS		current
+	DESCRIPTION
+		"
+		  AP status as seen by the master controller
+          (used to indicate a status change).
+		"
+	SYNTAX		INTEGER {
+			up(1),
+			down(2), 
+			move(3)
+	}
+
+ArubaAPUplinkType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "
+          AP uplink type
+        "
+    SYNTAX       INTEGER {
+            ethernet(1),
+            usb(2),
+            pppoe(3),
+            wifi(4)
+    }
+
+ArubaAPUplinkChangeReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify the reason for AP uplink change.
+
+        linkFailure - The uplink went down
+        vpnFailure  - VPN tunnel could not be sustained using the uplink
+        preemption  - The uplink was pre-empted by a higher-priority uplink"
+    SYNTAX  INTEGER {
+        linkFailure(1),
+        vpnFailure(2),
+        preemption(3),
+        internetFailover(4)
+    }
+
+ArubaPortalServerDownReason ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used to specify the reason for Portal server down.
+
+        connectFail - Connect Portal server fail"
+    SYNTAX  INTEGER {
+        connectFail(1)
+    }
+
+   aiInfoGroup                OBJECT IDENTIFIER ::= { aiMIB 1 }
+   aiStateGroup               OBJECT IDENTIFIER ::= { aiMIB 2 }
+   aiManagedInfoGroup         OBJECT IDENTIFIER ::= { aiMIB 3 }
+
+
+   aiVirtualControllerKey  OBJECT-TYPE 
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "Unique Virtual Controller key"
+        ::= { aiInfoGroup 1 }
+
+   aiVirtualControllerName  OBJECT-TYPE 
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "Virtual Controller name"
+        ::= { aiInfoGroup 2 }
+
+   aiVirtualControllerOrganization  OBJECT-TYPE 
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "Virtual Controller organization"
+        ::= { aiInfoGroup 3 }
+
+   aiVirtualControllerVersion  OBJECT-TYPE 
+         SYNTAX       DisplayString
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "Software Version"
+        ::= { aiInfoGroup 4 }
+
+   aiVirtualControllerIPAddress OBJECT-TYPE
+       SYNTAX      IpAddress 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Virtual Controller IP Address. If this is not set, returns 0.0.0.0"
+       ::= { aiInfoGroup 5 }
+
+   aiMasterIPAddress OBJECT-TYPE
+       SYNTAX      IpAddress 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "IP Address of AP where virtual controller software is active"
+       ::= { aiInfoGroup 6 }
+    
+   aiWlanSSIDTable  OBJECT-TYPE 
+         SYNTAX       SEQUENCE OF AiWlanSSIDEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            ""
+        ::= { aiInfoGroup 7 }
+
+   aiWlanSSIDEntry OBJECT-TYPE 
+       SYNTAX      AiWlanSSIDEntry
+       MAX-ACCESS  not-accessible       
+       STATUS       current 
+       DESCRIPTION
+          " "
+          INDEX { aiSSIDIndex }
+        ::= { aiWlanSSIDTable 1}
+
+   AiWlanSSIDEntry ::=
+   SEQUENCE {
+        aiSSIDIndex       		    Integer32,
+        aiSSID            		    OCTET STRING,
+        aiSSIDStatus      		    INTEGER,
+        aiSSIDClientNum             Integer32,
+        aiSSIDHide                  INTEGER
+   }
+
+   aiSSIDIndex OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "SSID Index"
+       ::= { aiWlanSSIDEntry 1 }
+
+   aiSSID OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "SSID"
+       ::= { aiWlanSSIDEntry 2 }
+
+   aiSSIDStatus OBJECT-TYPE
+       SYNTAX      INTEGER {
+                        enable(0), 
+                        disable(1)
+                    }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Indicates the whether the SSID is enabled(0) or disabled(1)"
+       ::= { aiWlanSSIDEntry 3 }
+
+   aiSSIDClientNum   OBJECT-TYPE       
+        SYNTAX      Integer32       
+        MAX-ACCESS  read-only       
+        STATUS      current       
+        DESCRIPTION            
+            "Client Number of per SSID"       
+        ::= { aiWlanSSIDEntry 4 }
+
+   aiSSIDHide OBJECT-TYPE
+       SYNTAX      INTEGER {
+                        enable(1), 
+                        disable(0)
+                    }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Indicates the whether the SSID is hide enabled(1) or disabled(0)"
+            ::= { aiWlanSSIDEntry 5 }
+
+   aiMeshTable  OBJECT-TYPE 
+         SYNTAX       SEQUENCE OF AiMeshEntry
+         MAX-ACCESS   not-accessible
+         STATUS       current
+         DESCRIPTION
+            ""
+        ::= { aiInfoGroup 15 }
+   
+   aiMeshEntry OBJECT-TYPE 
+       SYNTAX      AiMeshEntry
+       MAX-ACCESS  not-accessible       
+       STATUS       current 
+       DESCRIPTION
+          " "
+          INDEX { aiMeshIndex }
+        ::= { aiMeshTable 1}
+
+   AiMeshEntry ::=
+   SEQUENCE {
+        aiMeshIndex       Integer32,
+        aiMeshPointMac    MacAddress,
+        aiMeshPortalMac   DisplayString,
+        aiMeshChannel     DisplayString,
+        aiMeshAvgRssi     Integer32,
+        aiMeshHops        Integer32,
+        aiMeshAge         Integer32,
+        aiMeshCost        DisplayString,
+        aiMeshRelation    DisplayString
+   }
+
+   aiMeshIndex OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Index"
+       ::= { aiMeshEntry 1 }
+
+   aiMeshPointMac OBJECT-TYPE
+       SYNTAX      MacAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Point Mac Address"
+       ::= { aiMeshEntry 2 }
+  
+   aiMeshPortalMac OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Portal Mac Address"
+       ::= { aiMeshEntry 3 }
+
+   aiMeshChannel OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Channel"
+       ::= { aiMeshEntry 4 }
+
+   aiMeshAvgRssi OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Average RSSI"
+       ::= { aiMeshEntry 5 }
+
+   aiMeshHops OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Hops"
+       ::= { aiMeshEntry 6 }
+
+   aiMeshAge OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Age"
+       ::= { aiMeshEntry 7 }
+
+   aiMeshCost OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Cost"
+       ::= { aiMeshEntry 8 }
+
+   aiMeshRelation OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Mesh Relation"
+       ::= { aiMeshEntry 9 }
+    
+   aiAccessPointTable  OBJECT-TYPE
+        SYNTAX       SEQUENCE OF AiAccessPointEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+             "This contains all access points connected to the
+             virtual controller. This table is empty on AP where
+             virtual controller is not active"
+        ::= { aiStateGroup 1 }
+
+    aiAccessPointEntry OBJECT-TYPE
+        SYNTAX       AiAccessPointEntry
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+          " "
+       INDEX { aiAPMACAddress }
+        ::= { aiAccessPointTable 1 }
+	   
+    AiAccessPointEntry ::= 
+    SEQUENCE {
+        aiAPMACAddress      MacAddress,
+        aiAPName            DisplayString,
+        aiAPIPAddress       IpAddress,
+        aiAPSerialNum       DisplayString,
+        aiAPModel           OBJECT IDENTIFIER,
+        aiAPModelName       DisplayString,
+        aiAPCPUUtilization  Integer32,
+        aiAPMemoryFree      Integer32,
+        aiAPUptime          TimeTicks,
+        aiAPTotalMemory     Integer32,
+        aiAPStatus          INTEGER,
+        aiAPHwopmode        INTEGER,
+        aiAPRole            DisplayString 
+   }
+
+   aiAPMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Access Point MAC Address"
+      ::= { aiAccessPointEntry 1 }
+
+   aiAPName OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point name"
+       ::= { aiAccessPointEntry 2 }
+
+   aiAPIPAddress OBJECT-TYPE
+       SYNTAX      IpAddress 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point IP Address"
+       ::= { aiAccessPointEntry 3 }
+
+   aiAPSerialNum OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point Serial Number"
+       ::= { aiAccessPointEntry 4 }
+
+   aiAPModel OBJECT-TYPE
+       SYNTAX      OBJECT IDENTIFIER
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point System OID"
+       ::= { aiAccessPointEntry 5 }
+
+   aiAPModelName OBJECT-TYPE
+       SYNTAX      DisplayString (SIZE(0..32))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point Model Name"
+       ::= { aiAccessPointEntry 6 }
+
+   aiAPCPUUtilization OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point CPU Utilization"
+       ::= { aiAccessPointEntry 7 }
+
+   aiAPMemoryFree OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Amount of memory free in the access point in bytes"
+       ::= { aiAccessPointEntry 8 }
+
+   aiAPUptime OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Access Point uptime"
+       ::= { aiAccessPointEntry 9 }
+
+   aiAPTotalMemory OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total amount of memory available in the AP in bytes"
+       ::= { aiAccessPointEntry 10 }
+
+   aiAPStatus OBJECT-TYPE
+       SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                    }
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Indicates the Access Point Status"
+       ::= { aiAccessPointEntry 11 }
+   
+   aiAPHwopmode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        default(0),
+                        rsdbsplit(1),
+                        rsdb5g(2),
+                        rsdb2g(3),
+                        dual5gon(4),
+                        dual5goff(5)
+
+                    }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+             "AP HW OPMODE"
+        ::= { aiAccessPointEntry 12 }
+    
+   aiAPRole OBJECT-TYPE
+        SYNTAX      DisplayString
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+               "AP State"
+        ::= { aiAccessPointEntry 13 }
+
+    aiRadioTable  OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF AiRadioEntry
+       MAX-ACCESS   not-accessible              
+       STATUS       current 
+       DESCRIPTION 
+                "This table contains all radios of all access points
+                connected to the virtual controller. This table is
+                indexed by Access Point MAC Address and radio number"
+       ::= { aiStateGroup 2 } 
+
+   aiRadioEntry OBJECT-TYPE 
+       SYNTAX       AiRadioEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { aiRadioAPMACAddress, aiRadioIndex }
+       ::= { aiRadioTable 1 } 
+
+   AiRadioEntry ::=
+   SEQUENCE {
+        aiRadioAPMACAddress      MacAddress,
+        aiRadioIndex             Integer32,
+        aiRadioMACAddress        MacAddress,
+        aiRadioChannel           DisplayString,
+        aiRadioTransmitPower     Integer32,
+        aiRadioNoiseFloor        Integer32,
+        aiRadioUtilization4      Integer32,
+        aiRadioUtilization64     Integer32,
+        aiRadioTxTotalFrames     Counter32,
+        aiRadioTxMgmtFrames      Counter32,
+        aiRadioTxDataFrames      Counter32,
+        aiRadioTxDataBytes       Counter32,
+        aiRadioTxDrops           Counter32,
+        aiRadioRxTotalFrames     Counter32,
+        aiRadioRxDataFrames      Counter32,
+        aiRadioRxDataBytes       Counter32,
+        aiRadioRxMgmtFrames      Counter32,
+        aiRadioRxBad             Counter32,
+        aiRadioPhyEvents         Counter32,
+        aiRadioStatus            INTEGER,
+        aiRadioClientNum         Integer32,
+        aiRadioMode              DisplayString
+   }
+
+   aiRadioAPMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "MAC Address of access point where this radio is active"
+      ::= { aiRadioEntry 1 }
+
+   aiRadioIndex OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio number"
+      ::= { aiRadioEntry 2 }
+
+
+   aiRadioMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio MAC Address"
+      ::= { aiRadioEntry 3 }
+
+
+   aiRadioChannel OBJECT-TYPE
+       SYNTAX       DisplayString
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+          "
+            Radio channel. First byte contains primary channel and
+            first two bits on second byte contains indicator for secondary
+            channel. If first two bits of second byte is 0, it is a 20MHz
+            channel. If first two bits of second byte is 01, secondary channel is
+            above primary channel, if first two bits of second by is 10, secondary
+            channel is below the primary channel.
+          "
+      ::= { aiRadioEntry 4 }
+
+   aiRadioTransmitPower OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio transmit power"
+      ::= { aiRadioEntry 5 }
+
+   aiRadioNoiseFloor OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio noise floor in dBm"
+      ::= { aiRadioEntry 6 }
+
+   aiRadioUtilization4 OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio channel utilization 4 second average"
+      ::= { aiRadioEntry 7 }
+
+   aiRadioUtilization64 OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio channel utilization 64 second average"
+      ::= { aiRadioEntry 8 }
+
+   aiRadioTxTotalFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Total transmitted frames"
+      ::= { aiRadioEntry 9 }
+
+   aiRadioTxMgmtFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Transmitted management frames"
+      ::= { aiRadioEntry 10 }
+
+   aiRadioTxDataFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Transmitted data frames"
+      ::= { aiRadioEntry 11 }
+
+   aiRadioTxDataBytes OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Transmitted data bytes"
+      ::= { aiRadioEntry 12 }
+
+   aiRadioTxDrops OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Total frames dropped during transmission"
+      ::= { aiRadioEntry 13 }
+
+   aiRadioRxTotalFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Total received frames"
+      ::= { aiRadioEntry 14 }
+
+   aiRadioRxDataFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Received data frames"
+      ::= { aiRadioEntry 15 }
+
+   aiRadioRxDataBytes OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Received data bytes"
+      ::= { aiRadioEntry 16 }
+
+   aiRadioRxMgmtFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Received management frames"
+      ::= { aiRadioEntry 17 }
+
+   aiRadioRxBad OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Frames received in error"
+      ::= { aiRadioEntry 18 }
+
+   aiRadioPhyEvents OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Number of phy events that indicates frames not received
+            because of interference"
+      ::= { aiRadioEntry 19 }
+
+   aiRadioStatus    OBJECT-TYPE
+       SYNTAX       INTEGER {
+                        up(1),
+                        down(2)
+                    }
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio state of AP - UP/DOWN"
+      ::= { aiRadioEntry 20 }
+
+   aiRadioClientNum OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Client Number of per Radio"
+      ::= { aiRadioEntry 21 }
+   
+   aiRadioMode    OBJECT-TYPE
+       SYNTAX       DisplayString 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Radio state of AP - access/monitor"
+      ::= { aiRadioEntry 22 }
+   
+   aiWlanTable  OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF AiWlanEntry
+       MAX-ACCESS   not-accessible              
+       STATUS       current 
+       DESCRIPTION 
+                "This table contains all BSSIDs active on this virtual
+                controller. This table is indexed by Access Point MAC 
+                Address and a WLAN Index"
+       ::= { aiStateGroup 3 } 
+
+   aiWlanEntry OBJECT-TYPE 
+       SYNTAX       AiWlanEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { aiWlanAPMACAddress, aiWlanIndex }
+       ::= { aiWlanTable 1 } 
+
+   AiWlanEntry ::=
+   SEQUENCE {
+        aiWlanAPMACAddress      MacAddress,
+        aiWlanIndex             Integer32,
+        aiWlanESSID             DisplayString,
+        aiWlanMACAddress        MacAddress,
+        aiWlanTxTotalFrames     Counter32,
+        aiWlanTxDataFrames      Counter32,
+        aiWlanTxDataBytes       Counter32,
+        aiWlanRxTotalFrames     Counter32,
+        aiWlanRxDataFrames      Counter32,
+        aiWlanRxDataBytes       Counter32
+   }
+
+   aiWlanAPMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "MAC Address of access point where WLAN is active"
+      ::= { aiWlanEntry 1 }
+
+   aiWlanIndex OBJECT-TYPE
+       SYNTAX       Integer32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Index of WLAN. This is a unique index assigned to the WLAN
+            active on the access point."
+      ::= { aiWlanEntry 2 }
+
+   aiWlanESSID OBJECT-TYPE
+       SYNTAX       DisplayString
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "ESSID of WLAN"
+      ::= { aiWlanEntry 3 }
+
+   aiWlanMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "BSSID of WLAN"
+      ::= { aiWlanEntry 4 }
+
+   aiWlanTxTotalFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Total transmitted frames"
+      ::= { aiWlanEntry 5 }
+
+   aiWlanTxDataFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Transmitted data frames"
+      ::= { aiWlanEntry 6 }
+
+   aiWlanTxDataBytes OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Transmitted data bytes"
+      ::= { aiWlanEntry 7 }
+
+   aiWlanRxTotalFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Total received frames"
+      ::= { aiWlanEntry 8 }
+
+   aiWlanRxDataFrames OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Received data frames"
+      ::= { aiWlanEntry 9 }
+
+   aiWlanRxDataBytes OBJECT-TYPE
+       SYNTAX       Counter32
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Received data bytes"
+      ::= { aiWlanEntry 10 }
+   
+   aiClientTable  OBJECT-TYPE 
+       SYNTAX       SEQUENCE OF AiClientEntry
+       MAX-ACCESS   not-accessible              
+       STATUS       current 
+       DESCRIPTION 
+                "This table contains information about all clients
+                connected to the virtual controller. When a client roams
+                from one access point to another, all counters in this 
+                table are reset to 0. aiClientUptime also get reset on a
+                mobility event"
+       ::= { aiStateGroup 4 } 
+
+   aiClientEntry OBJECT-TYPE 
+       SYNTAX       AiClientEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { aiClientMACAddress }
+       ::= { aiClientTable 1 } 
+
+   AiClientEntry ::=
+   SEQUENCE {
+        aiClientMACAddress      MacAddress,
+        aiClientWlanMACAddress  MacAddress,
+        aiClientIPAddress       IpAddress,
+        aiClientAPIPAddress     IpAddress,
+        aiClientName            DisplayString,
+        aiClientOperatingSystem DisplayString,
+        aiClientSNR             Integer32,
+        aiClientTxDataFrames    Counter32,
+        aiClientTxDataBytes     Counter32,
+        aiClientTxRetries       Counter32,
+        aiClientTxRate          Integer32,
+        aiClientRxDataFrames    Counter32,
+        aiClientRxDataBytes     Counter32,
+        aiClientRxRetries       Counter32,
+        aiClientRxRate          Integer32,
+        aiClientUptime          TimeTicks
+   }
+
+   aiClientMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "MAC Address of client"
+      ::= { aiClientEntry 1 }
+
+   aiClientWlanMACAddress OBJECT-TYPE
+       SYNTAX       MacAddress 
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "BSSID of WLAN where client is associated"
+      ::= { aiClientEntry 2 }
+
+   aiClientIPAddress OBJECT-TYPE
+       SYNTAX      IpAddress 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client IP Address"
+       ::= { aiClientEntry 3 }
+
+
+   aiClientAPIPAddress OBJECT-TYPE
+       SYNTAX      IpAddress 
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Associated Access Point IP Address"
+       ::= { aiClientEntry 4 }
+
+   aiClientName OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Name of user using the client"
+       ::= { aiClientEntry 5 }
+
+   aiClientOperatingSystem OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client operating system"
+       ::= { aiClientEntry 6 }
+
+   aiClientSNR OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Signal to noise ratio of client connection to the access point"
+       ::= { aiClientEntry 7 }
+
+   aiClientTxDataFrames OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total frames transmitted by the client"
+       ::= { aiClientEntry 8 }
+
+   aiClientTxDataBytes OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total bytes transmitted by the client"
+       ::= { aiClientEntry 9 }
+
+   aiClientTxRetries OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total number of retry frames transmitted by the client"
+       ::= { aiClientEntry 10 }
+
+   aiClientTxRate OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Transmit rate of client in mbps"
+       ::= { aiClientEntry 11 }
+
+   aiClientRxDataFrames OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total frames received by the client"
+       ::= { aiClientEntry 12 }
+
+   aiClientRxDataBytes OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total bytes received by the client"
+       ::= { aiClientEntry 13 }
+
+   aiClientRxRetries OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Total number of retry frames received by the client"
+       ::= { aiClientEntry 14 }
+
+   aiClientRxRate OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Receive rate of client in mbps"
+       ::= { aiClientEntry 15 }
+
+   aiClientUptime OBJECT-TYPE
+       SYNTAX      TimeTicks
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Client uptime. On mobility event all counters are reset to
+            0 and uptime gets reset to 0."
+       ::= { aiClientEntry 16 }
+
+
+--- Begining of voice client location entry       
+
+   aiVoiceClientTable  OBJECT-TYPE
+       SYNTAX       SEQUENCE OF AiVoiceClientEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION
+            "Table of voice clients"
+       ::= { aiStateGroup 5 }
+
+   aiVoiceClientEntry   OBJECT-TYPE
+       SYNTAX       AiVoiceClientEntry
+       MAX-ACCESS   not-accessible
+       STATUS       current
+       DESCRIPTION 
+            "Entry of a voice client"
+           INDEX        { aiClientMac }
+       ::= { aiVoiceClientTable 1}
+   
+   AiVoiceClientEntry ::=
+   SEQUENCE {
+        aiClientMac      MacAddress, 
+        aiClientIP       IpAddress,
+        aiClientAPMac    MacAddress,
+        aiClientAPName   DisplayString
+   }
+
+   aiClientMac  OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "MAC address of voice client"
+        ::= { aiVoiceClientEntry 1 }
+
+
+   aiClientIP   OBJECT-TYPE
+       SYNTAX       IpAddress
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "IP address of voice client"
+       ::= { aiVoiceClientEntry 2 }
+   
+   aiClientAPMac  OBJECT-TYPE
+        SYNTAX      MacAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "MAC address of AP on which voice client is associated currently"
+        ::= { aiVoiceClientEntry 3 }
+
+
+   aiClientAPName   OBJECT-TYPE
+       SYNTAX       DisplayString
+       MAX-ACCESS   read-only
+       STATUS       current
+       DESCRIPTION
+            "Name of AP on which voice client is associated currently"
+       ::= { aiVoiceClientEntry 4 }
+
+--- End of voice client location entry
+
+--- Begin of Interfer AP entry
+   aiInterferAccessPointTable  OBJECT-TYPE 
+    SYNTAX       SEQUENCE OF AiInterferAccessPointEntry
+    MAX-ACCESS   not-accessible              
+    STATUS       current 
+    DESCRIPTION 
+             "This contains all interfer access points infomation"
+    ::= { aiInfoGroup 8 } 
+
+   aiInterferAccessPointEntry OBJECT-TYPE 
+       SYNTAX       AiInterferAccessPointEntry 
+       MAX-ACCESS   not-accessible            
+       STATUS       current 
+       DESCRIPTION 
+             " "
+          INDEX { aiInterferAPIndex }
+       ::= { aiInterferAccessPointTable 1 } 
+
+   AiInterferAccessPointEntry ::=
+   SEQUENCE {
+        aiInterferAPIndex           Integer32,
+        aiInterferAPBSSID           MacAddress,
+        aiInterferAPESSID           OCTET STRING,
+        aiInterferAPChannel         DisplayString,
+        aiInterferAPPhyType         DisplayString,
+        aiInterferAPEncr            DisplayString,
+        aiInterferAPAvgSnr          Integer32,
+        aiInterferAPType            DisplayString
+   }
+    
+    aiInterferAPIndex OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Interfer Access Point Index"
+       ::= { aiInterferAccessPointEntry 1 }
+
+    aiInterferAPBSSID  OBJECT-TYPE
+       SYNTAX      MacAddress
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Interfer Access Point MAC"
+       ::= { aiInterferAccessPointEntry 2 }
+
+    aiInterferAPESSID OBJECT-TYPE
+       SYNTAX      OCTET STRING (SIZE(0..64))
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Interfer Access Point ESSID"
+       ::= { aiInterferAccessPointEntry 3 }
+       
+    aiInterferAPChannel OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Interfer Access Point Channel"
+       ::= { aiInterferAccessPointEntry 4 }
+   
+    aiInterferAPPhyType OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Interfer Access Point Phy Type"
+       ::= { aiInterferAccessPointEntry 5 }
+
+    aiInterferAPEncr OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Interfer Access Point Encryption"
+       ::= { aiInterferAccessPointEntry 6 }
+
+       
+    aiInterferAPAvgSnr OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Interfer Access Point Average Snr"
+       ::= { aiInterferAccessPointEntry 7 }
+
+    aiInterferAPType OBJECT-TYPE
+       SYNTAX      DisplayString
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+            "Interfer Access Point AP Type"
+       ::= { aiInterferAccessPointEntry 8 }
+
+--- End of Interfer AP entry
+   
+   aiManagedModeSinceLastSync OBJECT-TYPE 
+         SYNTAX       DisplayString 
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "Time since last config was applied"
+        ::= { aiManagedInfoGroup 1 }
+
+
+-- aiTrapsGroup
+-- This group defines all the traps generated by the switch.
+
+	aiTrapsGroup         	OBJECT IDENTIFIER ::= { aiMIB 200 }
+
+--Trap Object Group contains objects used in the traps.
+
+	aiTrapObjectsGroup         	OBJECT IDENTIFIER ::= { aiTrapsGroup 1 }
+
+--Trap Definitions Group contains Traps definitions.
+
+	aiTrapDefinitionsGroup      OBJECT IDENTIFIER ::= { aiTrapsGroup 2 }
+
+	wlsxTrapAPMacAddress OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate 
+            the wired MAC address of an access point, for which the trap is being raised.
+        			"
+	::= {aiTrapObjectsGroup 1 }
+
+	wlsxTrapAPIpAddress OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate 
+            the IP address of an access point, for which the trap is being raised.
+        			"
+	::= {aiTrapObjectsGroup 2 }
+
+	wlsxTrapAPBSSID OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the BSSID of the
+            access point, for which the trap is being raised.
+        			"
+	::= {aiTrapObjectsGroup 3 }
+
+	wlsxTrapEssid OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the SSID of the
+          access point, for which the trap is being raised.
+        			"
+	::= {aiTrapObjectsGroup 4 }
+
+	wlsxTrapTargetAPBSSID OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the BSSID of the
+            access point, for which we are raising the trap. If an
+            Air Monitor is sending the trap then this will indicate
+            AP. If an access point is sending the trap, then it will point
+            to itself.
+        			"
+	::= {aiTrapObjectsGroup 5 }
+
+	wlsxTrapTargetAPSSID OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the SSID of the
+          access point, for which the trap is being raised. If an
+          Air Monitor is sending the trap then this will indicate
+          AP. If an access point is sending the trap, then it will point
+          to itself.
+        			"
+	::= {aiTrapObjectsGroup 6 }
+
+	wlsxTrapTargetAPChannel OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the channel of the
+          access point, for which the trap is being raised. If an
+          wlsxr monitor is sending the trap then this will indicate
+          AP. If an access point is sending the trap, then it will point
+          to itself.
+        			"
+	::= {aiTrapObjectsGroup 7 }
+
+	wlsxTrapNodeMac OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the MAC address of
+          a node.
+        			"
+	::= {aiTrapObjectsGroup 8 }
+
+	wlsxTrapSourceMac OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the MAC address of
+          the source.
+        			"
+	::= {aiTrapObjectsGroup 9 }
+
+	wlsxReceiverMac OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the MAC address of
+          the receiver.
+        			"
+	::= {aiTrapObjectsGroup 10 }
+
+	wlsxTrapTransmitterMac OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the MAC address of
+          the transmitter.
+        			"
+	::= {aiTrapObjectsGroup 11 }
+
+	wlsxTrapReceiverMac OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the MAC address of
+          the receiver.
+        			"
+	::= {aiTrapObjectsGroup 12 }
+
+	wlsxTrapSnr OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Signal to Noise
+          ratio.
+        			"
+	::= {aiTrapObjectsGroup 13 }
+
+	wlsxTrapSignatureName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Signature Name.
+        			"
+	::= {aiTrapObjectsGroup 14 }
+
+	wlsxTrapFrameType OBJECT-TYPE
+		SYNTAX		ArubaFrameType
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Frame Type
+        			"
+	::= {aiTrapObjectsGroup 15 }
+
+	wlsxTrapAddressType OBJECT-TYPE
+		SYNTAX		ArubaAddressType
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Address type.
+        			"
+	::= {aiTrapObjectsGroup 16 }
+
+	wlsxTrapAPLocation OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Location of the AP.
+        			"
+	::= {aiTrapObjectsGroup 17 }
+
+	wlsxTrapAPChannel OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Current Channel.
+        			"
+	::= {aiTrapObjectsGroup 18 }
+
+	wlsxTrapAPTxPower OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the AP Transmit Power.
+        			"
+	::= {aiTrapObjectsGroup 19 }
+
+	wlsxTrapMatchedMac OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the MAC address
+        			"
+	::= {aiTrapObjectsGroup 20 }
+
+	wlsxTrapMatchedIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the IP address
+        			"
+	::= {aiTrapObjectsGroup 21 }
+
+	wlsxTrapRogueIfoURL OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used to point to the WEBUI Rogue AP information URL.
+        			"
+	::= {aiTrapObjectsGroup 22 }
+
+	wlsxTrapVlanId OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the VLAN Id.
+        			"
+	::= {aiTrapObjectsGroup 23 }
+
+	wlsxTrapAdminStatus OBJECT-TYPE
+		SYNTAX		ArubaEnableValue
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the admin status of
+            VLAN.
+        			"
+	::= {aiTrapObjectsGroup 24 }
+
+	wlsxTrapOperStatus OBJECT-TYPE
+		SYNTAX		ArubaOperStateValue
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the admin status of
+            VLAN.
+        			"
+	::= {aiTrapObjectsGroup 25 }
+
+	wlsxTrapAuthServerName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+            Authentication Server used for Authentication.
+        			"
+	::= {aiTrapObjectsGroup 26 }
+
+	wlsxTrapAuthServerTimeout OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+            Authentication Server Timeout.
+        			"
+	::= {aiTrapObjectsGroup 27 }
+
+	wlsxTrapCardSlot OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+           Slot in which this card is present.
+        			"
+	::= {aiTrapObjectsGroup 28 }
+
+	wlsxTrapTemperatureValue OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+            Temperature Value.
+        			"
+	::= {aiTrapObjectsGroup 29 }
+
+	wlsxTrapProcessName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+            Process name.
+        			"
+	::= {aiTrapObjectsGroup 30 }
+
+	wlsxTrapFanNumber OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+            Fan Number.
+        			"
+	::= {aiTrapObjectsGroup 31 }
+
+	wlsxTrapVoltageType OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+            type of Voltage.
+        			"
+	::= {aiTrapObjectsGroup 32 }
+
+	wlsxTrapVoltageValue OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+            voltage value in Float.
+        			"
+	::= {aiTrapObjectsGroup 33 }
+
+	wlsxTrapStationBlackListReason OBJECT-TYPE
+		SYNTAX		ArubaBlackListReason
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            The Reason for which a station is black listed.
+        			"
+	::= {aiTrapObjectsGroup 34 }
+
+	wlsxTrapSpoofedIpAddress OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in a trap to identify a spoofed IP address.
+        			"
+	::= {aiTrapObjectsGroup 35 }
+
+	wlsxTrapSpoofedOldPhyAddress OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in a trap to identify an old MAC address.
+        			"
+	::= {aiTrapObjectsGroup 36 }
+
+	wlsxTrapSpoofedNewPhyAddress OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in a trap to identify a New MAC address.
+        			"
+	::= {aiTrapObjectsGroup 37 }
+
+	wlsxTrapDBName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in a trap to identify name of the database.
+        			"
+	::= {aiTrapObjectsGroup 38 }
+
+	wlsxTrapDBUserName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in a trap to identify name of the database user.
+        			"
+	::= {aiTrapObjectsGroup 39 }
+
+	wlsxTrapDBIpAddress OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in a trap to identify the IpAddress of the 
+            Database.
+        			"
+	::= {aiTrapObjectsGroup 40 }
+
+	wlsxTrapDBType OBJECT-TYPE
+		SYNTAX		ArubaDBType
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in a trap to identify the port of the user.
+        			"
+	::= {aiTrapObjectsGroup 41 }
+
+	wlsxTrapVrrpID OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object contains the Virtual Router Identifier.
+        			"
+	::= {aiTrapObjectsGroup 42 }
+
+	wlsxTrapVrrpMasterIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object contains the Master IP address.
+        			"
+	::= {aiTrapObjectsGroup 43 }
+
+	wlsxTrapVrrpOperState OBJECT-TYPE
+		SYNTAX		ArubaVrrpState
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the VRRP Operational state.
+        			"
+	::= {aiTrapObjectsGroup 44 }
+
+	wlsxTrapESIServerGrpName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the External Services Interface (ESI) Server
+            Group name
+        			"
+	::= {aiTrapObjectsGroup 45 }
+
+	wlsxTrapESIServerName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the External Services Interface (ESI) Server
+            Name
+        			"
+	::= {aiTrapObjectsGroup 46 }
+
+	wlsxTrapESIServerIpAddress OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the External Services Interface (ESI) Server
+            IP address
+        			"
+	::= {aiTrapObjectsGroup 47 }
+
+	wlsxTrapLicenseDaysRemaining OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents number of the days remaining prior to a 
+            license expiry.
+        			"
+	::= {aiTrapObjectsGroup 48 }
+
+	wlsxTrapSwitchIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the controller IP address. 
+        			"
+	::= {aiTrapObjectsGroup 49 }
+
+	wlsxTrapSwitchRole OBJECT-TYPE
+		SYNTAX		ArubaSwitchRole
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the Role of the controller. 
+        			"
+	::= {aiTrapObjectsGroup 50 }
+
+	wlsxTrapUserIpAddress OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents IP address of the User.
+        			"
+	::= {aiTrapObjectsGroup 51 }
+
+	wlsxTrapUserPhyAddress OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents MAC address of the User.
+        			"
+	::= {aiTrapObjectsGroup 52 }
+
+	wlsxTrapUserName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the user name.
+        			"
+	::= {aiTrapObjectsGroup 53 }
+
+	wlsxTrapUserRole OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the Authentication method of the user.
+        			"
+	::= {aiTrapObjectsGroup 54 }
+
+	wlsxTrapUserAuthenticationMethod OBJECT-TYPE
+		SYNTAX		ArubaAuthenticationMethods
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the Authentication method of the user.
+        			"
+	::= {aiTrapObjectsGroup 55 }
+
+	wlsxTrapAPRadioNumber OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the radio number.
+        			"
+	::= {aiTrapObjectsGroup 56 }
+
+	wlsxTrapRogueInfoURL OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+			This object is used to point to the WEBGUI Rogue AP information 
+			URL.
+        			"
+	::= {aiTrapObjectsGroup 57 }
+
+	wlsxTrapInterferingAPInfoURL OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+			This object is used to point to the WEBGUI Rogue interfering 
+			AP information URL.
+        			"
+	::= {aiTrapObjectsGroup 58 }
+
+	wlsxTrapPortNumber OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the
+           port number.
+        			"
+	::= {aiTrapObjectsGroup 59 }
+
+	wlsxTrapTime OBJECT-TYPE
+		SYNTAX		DateAndTime
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in all the enterprise traps to indicate the
+           the time when the trap is generated on the controller.
+        			"
+	::= {aiTrapObjectsGroup 60 }
+
+	wlsxTrapHostIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the Trap host. 
+        			"
+	::= {aiTrapObjectsGroup 61 }
+
+	wlsxTrapHostPort OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the Trap host port. 
+        			"
+	::= {aiTrapObjectsGroup 62 }
+
+	wlsxTrapConfigurationId OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the ID of the configuration, to be used in traps.
+        			"
+	::= {aiTrapObjectsGroup 63 }
+
+	wlsxTrapCTSURL OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the URL from which the transfer should happen.
+        			"
+	::= {aiTrapObjectsGroup 64 }
+
+	wlsxTrapCTSTransferType OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents  the transfer type, upload or download.
+        			"
+	::= {aiTrapObjectsGroup 65 }
+
+	wlsxTrapConfigurationState OBJECT-TYPE
+		SYNTAX		ArubaConfigurationState
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents state of the configuration transfer.
+        			"
+	::= {aiTrapObjectsGroup 66 }
+
+	wlsxTrapUpdateFailureReason OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the reason for the update failure.
+        			"
+	::= {aiTrapObjectsGroup 67 }
+
+	wlsxTrapUpdateFailedObj OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This variable represents the AMAPI object which is the reason for the the update failure.
+        			"
+	::= {aiTrapObjectsGroup 68 }
+
+	wlsxTrapTableEntryChangeType OBJECT-TYPE
+		SYNTAX		ArubaConfigurationChangeType
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents type of the configuration change. 
+        			"
+	::= {aiTrapObjectsGroup 69 }
+
+	wlsxTrapGlobalConfigObj OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This variable represents the AMAPI object corresponding to the global configuration change.
+        			"
+	::= {aiTrapObjectsGroup 70 }
+
+	wlsxTrapTableGenNumber OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents generation number of a table. Used in the MMS, to keep track of the table content changes.
+        			"
+	::= {aiTrapObjectsGroup 71 }
+
+	wlsxTrapLicenseId OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the license ID.
+        			"
+	::= {aiTrapObjectsGroup 72 }
+
+	wlsxTrapConfidenceLevel OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the Confidence Level as a percentage
+        			"
+	::= {aiTrapObjectsGroup 73 }
+
+	wlsxTrapMissingLicenses OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This variable indicates any licenses that are not present during a configuration update
+        			"
+	::= {aiTrapObjectsGroup 74 }
+
+	wlsxVoiceCurrentNumCdr OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents  the number of CDRs in buffer.
+        			"
+	::= {aiTrapObjectsGroup 75 }
+
+	wlsxTrapTunnelId OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This Object represents the tunnel ID.
+        			"
+	::= {aiTrapObjectsGroup 76 }
+
+	wlsxTrapTunnelStatus OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This Object represents the tunnel Status.
+        			"
+	::= {aiTrapObjectsGroup 77 }
+
+	wlsxTrapTunnelUpReason OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This Object represents the tunnel up reason.
+        			"
+	::= {aiTrapObjectsGroup 78 }
+
+	wlsxTrapTunnelDownReason OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This Object represents the tunnel down reason.
+        			"
+	::= {aiTrapObjectsGroup 79 }
+
+	wlsxTrapApSerialNumber OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object represents the AP Serial Number.
+        			"
+	::= {aiTrapObjectsGroup 80 }
+
+	wlsxTrapTimeStr OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object represents the Time in String format.
+        			"
+	::= {aiTrapObjectsGroup 81 }
+
+	wlsxTrapMasterIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the master IP address. 
+        			"
+	::= {aiTrapObjectsGroup 82 }
+
+	wlsxTrapLocalIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the Local IP address.
+        			"
+	::= {aiTrapObjectsGroup 83 }
+
+	wlsxTrapMasterName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the master controller name.
+        			"
+	::= {aiTrapObjectsGroup 84 }
+
+	wlsxTrapLocalName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the local controller name.
+        			"
+	::= {aiTrapObjectsGroup 85 }
+
+	wlsxTrapPrimaryControllerIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the IP address of the AP's primary controller.
+        			"
+	::= {aiTrapObjectsGroup 86 }
+
+	wlsxTrapBackupControllerIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the IP address of the AP's backup controller.
+        			"
+	::= {aiTrapObjectsGroup 87 }
+
+	wlsxTrapSpoofedFrameType OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Spoofed Frame Type
+        			"
+	::= {aiTrapObjectsGroup 88 }
+
+	wlsxTrapAssociationType OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the type of association
+        			"
+	::= {aiTrapObjectsGroup 89 }
+
+	wlsxTrapDeviceIpAddress OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the IP address of a device seen by an AP.
+        			"
+	::= {aiTrapObjectsGroup 90 }
+
+	wlsxTrapDeviceMac OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object represents the MAC address of a device seen by an AP.
+        			"
+	::= {aiTrapObjectsGroup 91 }
+
+	wlsxTrapVcIpAddress OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the Ip Address of a Voice client.
+        			"
+	::= {aiTrapObjectsGroup 92 }
+
+	wlsxTrapVcMacAddress OBJECT-TYPE
+		SYNTAX		MacAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the MAC address of a Voice client.
+        			"
+	::= {aiTrapObjectsGroup 93 }
+
+	wlsxTrapAPName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Name of the AP.
+        			"
+	::= {aiTrapObjectsGroup 94 }
+
+	wlsxTrapApMode OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This Object represents the AP Mode.
+        			"
+	::= {aiTrapObjectsGroup 95 }
+
+	wlsxTrapAPPrevChannel OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Previous Channel.
+        			"
+	::= {aiTrapObjectsGroup 96 }
+
+	wlsxTrapAPPrevChannelSec OBJECT-TYPE
+		SYNTAX		ArubaHTExtChannel
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Previous Secondary Channel.
+        			"
+	::= {aiTrapObjectsGroup 97 }
+
+	wlsxTrapAPPrevTxPower OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate previous AP Transmit Power.
+        			"
+	::= {aiTrapObjectsGroup 98 }
+
+	wlsxTrapAPCurMode OBJECT-TYPE
+		SYNTAX		ArubaAccessPointMode
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This Object represents the APs Current Mode.
+        			"
+	::= {aiTrapObjectsGroup 99 }
+
+	wlsxTrapAPPrevMode OBJECT-TYPE
+		SYNTAX		ArubaAccessPointMode
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This Object represents the APs Previous Mode.
+        			"
+	::= {aiTrapObjectsGroup 100 }
+
+	wlsxTrapAPARMChangeReason OBJECT-TYPE
+		SYNTAX		ArubaARMChangeReason
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This Object represents the APs Previous Mode.
+        			"
+	::= {aiTrapObjectsGroup 101 }
+
+	wlsxTrapAPChannelSec OBJECT-TYPE
+		SYNTAX		ArubaHTExtChannel
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+          This object is used in the traps to indicate the Current Secondary Channel.
+        			"
+	::= {aiTrapObjectsGroup 102 }
+
+	wlsxTrapUserAttributeChangeType OBJECT-TYPE
+		SYNTAX		ArubaConfigurationChangeType
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents type of the configuration change. 
+        			"
+	::= {aiTrapObjectsGroup 103 }
+
+	wlsxTrapApControllerIp OBJECT-TYPE
+		SYNTAX		IpAddress
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            IP address of the controller to which the AP is
+            (or was most recently) registered.
+        			"
+	::= {aiTrapObjectsGroup 104 }
+
+	wlsxTrapApMasterStatus OBJECT-TYPE
+		SYNTAX		ArubaAPMasterStatus
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            Status of the AP as seen by the master when the status changes.
+        			"
+	::= {aiTrapObjectsGroup 105 }
+
+	wlsxTrapCaName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the name of the trustpoint.
+        			"
+	::= {aiTrapObjectsGroup 106 }
+
+	wlsxTrapCrlName OBJECT-TYPE
+		SYNTAX		DisplayString(SIZE(0..64))
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object is used in the traps to indicate the name of the crl.
+        			"
+	::= {aiTrapObjectsGroup 107 }
+
+	wlsxTrapCount OBJECT-TYPE
+		SYNTAX		Integer32
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+			"			
+            This object represents the number of occurrence of this trap.
+        			"
+	::= {aiTrapObjectsGroup 108 }
+
+    wlsxTrapAPPreviousUplinkType OBJECT-TYPE
+        SYNTAX      ArubaAPUplinkType
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object specifies the up link type for an AP.
+                    "
+    ::= {aiTrapObjectsGroup 130 }
+
+    wlsxTrapAPPreviousUplinkActiveTime OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object specifies the up link type for an AP.
+                    "
+    ::= {aiTrapObjectsGroup 131 }
+
+    wlsxTrapAPActiveUplinkType OBJECT-TYPE
+        SYNTAX      ArubaAPUplinkType
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object specifies the up link type for an AP.
+                    "
+    ::= {aiTrapObjectsGroup 132 }
+
+    wlsxTrapAPUplinkChangeReason OBJECT-TYPE
+        SYNTAX      ArubaAPUplinkChangeReason
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object specifies the up link change reason.
+                    "
+    ::= {aiTrapObjectsGroup 133 }
+
+	wlsxTrapAPManagedModeConfigFailure OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object indicates the error for the failure of config apply on IAP.
+                    "
+    ::= {aiTrapObjectsGroup 138 }
+
+    wlsxTrapAuthServerAddress OBJECT-TYPE 
+        SYNTAX      IpAddress
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object is used in the traps to indicate the
+            Authentication Server IP used for Authentication.
+                    "
+    ::= {aiTrapObjectsGroup 139 }
+
+    wlsxTrapPortalServerName OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object is used in the traps to indicate the
+            Captive Portal Server used for Authentication.
+                    "
+    ::= {aiTrapObjectsGroup 140 }
+
+    wlsxTrapPortalServerAddress OBJECT-TYPE 
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object is used in the traps to indicate the
+            Captive Portal Server IP or host name used for Authentication.
+                    "
+    ::= {aiTrapObjectsGroup 141 }
+
+    wlsxTrapPortalServerDownReason OBJECT-TYPE 
+        SYNTAX      ArubaPortalServerDownReason
+        MAX-ACCESS  accessible-for-notify
+        STATUS      current
+        DESCRIPTION
+            "
+            This object specifies the captive portal server down reason.
+                    "
+    ::= {aiTrapObjectsGroup 142 }
+
+    wlsxTrapStationBlackListReasonStr OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..32))
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                    "                       
+            This object is used in the traps to indicate the
+            type of Blacklist reason.
+                                "
+    ::= {aiTrapObjectsGroup 144 }
+
+-- Definition of traps
+
+	wlsxNodeRateAnomaly NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapFrameType,wlsxTrapNodeMac,
+				wlsxTrapSnr,wlsxTrapAPBSSID,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that a node is exceeding the threshold set for 
+            the frame type.
+        	"
+	::= {aiTrapDefinitionsGroup 1003 }
+
+	wlsxNUserEntryCreated NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserIpAddress,wlsxTrapUserPhyAddress}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that a new user was created.
+        	"
+	::= {aiTrapDefinitionsGroup 1014 }
+
+	wlsxNUserEntryDeleted NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserIpAddress,wlsxTrapUserPhyAddress}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that a user was deleted.
+        	"
+	::= {aiTrapDefinitionsGroup 1015 }
+
+	wlsxNUserEntryAuthenticated NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserIpAddress,wlsxTrapUserPhyAddress,
+				wlsxTrapUserName,wlsxTrapUserAuthenticationMethod,
+				wlsxTrapUserRole}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that a user is Authenticated.
+        	"
+	::= {aiTrapDefinitionsGroup 1016 }
+
+	wlsxNUserEntryDeAuthenticated NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserIpAddress,wlsxTrapUserPhyAddress}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that a user is Deauthenticated.
+        	"
+	::= {aiTrapDefinitionsGroup 1017 }
+
+	wlsxNUserAuthenticationFailed NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserName, wlsxTrapUserIpAddress,wlsxTrapUserPhyAddress,wlsxTrapAuthServerName,wlsxTrapAuthServerAddress,wlsxTrapAPBSSID,wlsxTrapAPName}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that a user authentication has failed.
+        	"
+	::= {aiTrapDefinitionsGroup 1018 }
+
+	wlsxNAuthServerReqTimedOut NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserName, wlsxTrapUserIpAddress,wlsxTrapUserPhyAddress,wlsxTrapAuthServerName,wlsxTrapAuthServerAddress,wlsxTrapAPBSSID,wlsxTrapAPName}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that the authentication server request timed out.
+        	"
+	::= {aiTrapDefinitionsGroup 1019 }
+
+	wlsxNAuthServerTimedOut NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAuthServerName,wlsxTrapAuthServerTimeout}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that the authentication server timed out.
+        	"
+	::= {aiTrapDefinitionsGroup 1020 }
+
+	wlsxNAuthServerIsUp NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAuthServerName, wlsxTrapAuthServerAddress}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that an authentication server is up.
+        	"
+	::= {aiTrapDefinitionsGroup 1021 }
+
+	wlsxNAccessPointIsUp NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress}
+		STATUS		current
+		DESCRIPTION
+			"			
+            A Trap which indicates that an access point up.
+        	"
+	::= {aiTrapDefinitionsGroup 1040 }
+
+	wlsxNAccessPointIsDown NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress}
+		STATUS		current
+		DESCRIPTION
+			"			
+            A Trap which indicates that an access point down.
+        	"
+	::= {aiTrapDefinitionsGroup 1041 }
+
+	wlsxNChannelChanged NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPBSSID,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that an access point at Location 
+            wlsxTrapAPLocation has changed the channel.
+        	"
+	::= {aiTrapDefinitionsGroup 1043 }
+
+	wlsxNStationAddedToBlackList NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac,wlsxTrapStationBlackListReason,
+                                wlsxTrapStationBlackListReasonStr}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that the station is black listed. 
+        	"
+	::= {aiTrapDefinitionsGroup 1044 }
+
+	wlsxNStationRemovedFromBlackList NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that the station is removed from the black list. 
+        	"
+	::= {aiTrapDefinitionsGroup 1045 }
+
+	wlsxNRadioAttributesChanged NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPIpAddress,wlsxTrapAPChannel,
+				wlsxTrapAPTxPower}
+		STATUS		current
+		DESCRIPTION
+			"			
+            A Trap which indicates changes in the Radio attributes of an 
+            access point.
+        	"
+	::= {aiTrapDefinitionsGroup 1049 }
+
+	wlsxUnsecureAPDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel,
+				wlsxTrapMatchedMac,wlsxTrapMatchedIp,
+				wlsxTrapRogueInfoURL}
+		STATUS		current
+		DESCRIPTION
+			"			This trap indicates that an unauthorized access point is connected to the wired network. The access point is declared Rogue because it was matched to a MAC address.  	"
+	::= {aiTrapDefinitionsGroup 1053 }
+
+	wlsxUnsecureAPResolved NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+                This trap indicates that a previously detected access point, classified as Rogue,
+                is no longer present in the network.
+			"
+	::= {aiTrapDefinitionsGroup 1054 }
+
+	wlsxStaImpersonation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM detected Station Impersonation.
+			"
+	::= {aiTrapDefinitionsGroup 1055 }
+
+	wlsxReservedChannelViolation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+				This trap indicates that an AM detected an access point
+				which is violating the Reserved Channel configuration.
+			"
+	::= {aiTrapDefinitionsGroup 1056 }
+
+	wlsxValidSSIDViolation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP has detected an access point is violating 
+            Valid SSID configuration by using an SSID that is reserved for use by a valid AP only. 
+			"
+	::= {aiTrapDefinitionsGroup 1057 }
+
+	wlsxChannelMisconfiguration NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an access point that has a channel misconfiguration 
+            because it is using a channel that is not valid.   
+			"
+	::= {aiTrapDefinitionsGroup 1058 }
+
+	wlsxOUIMisconfiguration NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an access point that has an OUI misconfiguration because
+            it is using an OUI that is not valid.
+			"
+	::= {aiTrapDefinitionsGroup 1059 }
+
+	wlsxSSIDMisconfiguration NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an access point that has an SSID misconfiguration because it is using
+            an SSID that is not valid.
+			"
+	::= {aiTrapDefinitionsGroup 1060 }
+
+	wlsxShortPreableMisconfiguration NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an access point has bad Short preamble
+			configuration.
+			"
+	::= {aiTrapDefinitionsGroup 1061 }
+
+	wlsxWPAMisconfiguration NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an access point that is misconfigured because it is not using WPA.
+			"
+	::= {aiTrapDefinitionsGroup 1062 }
+
+	wlsxAdhocNetworkDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM has detected an Ad hoc
+			network.
+			"
+	::= {aiTrapDefinitionsGroup 1063 }
+
+	wlsxAdhocNetworkRemoved NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that a previously detected Ad hoc Network is no
+            longer present in the network.
+			"
+	::= {aiTrapDefinitionsGroup 1064 }
+
+	wlsxStaPolicyViolation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapNodeMac,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that Protection was enforced because a valid station's association to a non-valid access point violated Valid Station policy.
+	                "
+	::= {aiTrapDefinitionsGroup 1065 }
+
+	wlsxRepeatWEPIVViolation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+		    This trap indicates that an AP detected that a valid access point is using the same WEP initialization vector in consecutive packets.
+			"
+	::= {aiTrapDefinitionsGroup 1066 }
+
+	wlsxWeakWEPIVViolation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that a valid access point is using a Weak WEP initialization vector.
+	"
+	::= {aiTrapDefinitionsGroup 1067 }
+
+	wlsxChannelInterferenceDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP has detected channel interference.
+			"
+	::= {aiTrapDefinitionsGroup 1068 }
+
+	wlsxChannelInterferenceCleared NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that a previously detected channel interference
+            is no longer present. 
+			"
+	::= {aiTrapDefinitionsGroup 1069 }
+
+	wlsxAPInterferenceDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP has detected interference for an access point.
+			"
+	::= {aiTrapDefinitionsGroup 1070 }
+
+	wlsxAPInterferenceCleared NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that the previously detected interference for an access point
+            is no longer present. 
+			"
+	::= {aiTrapDefinitionsGroup 1071 }
+
+	wlsxStaInterferenceDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapNodeMac,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP has detected interference for a station.
+			"
+	::= {aiTrapDefinitionsGroup 1072 }
+
+	wlsxStaInterferenceCleared NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapNodeMac,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that the previously detected interference for a station
+            is no longer present. 
+			"
+	::= {aiTrapDefinitionsGroup 1073 }
+
+	wlsxFrameRetryRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that an access point has exceeded the configured upper threshold for Frame Retry Rate.
+			"
+	::= {aiTrapDefinitionsGroup 1074 }
+
+	wlsxFrameReceiveErrorRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapTargetAPChannel,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that an access point has exceeded the configured upper threshold for Frame Receive Error Rate.
+			"
+	::= {aiTrapDefinitionsGroup 1075 }
+
+	wlsxFrameFragmentationRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapTargetAPChannel,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that an access point exceeded the configured upper threshold for Frame Fragmentation Rate.
+			"
+	::= {aiTrapDefinitionsGroup 1076 }
+
+	wlsxFrameBandWidthRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that a station or access point has exceeded the configured upper threshold for Bandwidth rate. 
+			"
+	::= {aiTrapDefinitionsGroup 1077 }
+
+	wlsxFrameLowSpeedRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that a station has exceeded the configured upper threshold for Low speed rate. 
+			"
+	::= {aiTrapDefinitionsGroup 1078 }
+
+	wlsxFrameNonUnicastRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that a station has exceeded the configured upper threshold for Non Unicast traffic rate. 
+			"
+	::= {aiTrapDefinitionsGroup 1079 }
+
+	wlsxLoadbalancingEnabled NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM is reporting that an AP 
+			has enabled Load balancing.
+			"
+	::= {aiTrapDefinitionsGroup 1080 }
+
+	wlsxLoadbalancingDisabled NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM is reporting that an AP
+			has enabled Load balancing.
+			"
+	::= {aiTrapDefinitionsGroup 1081 }
+
+	wlsxChannelFrameRetryRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP has detected that the configured upper threshold for Frame Retry Rate was exceeded on a channel. 
+			"
+	::= {aiTrapDefinitionsGroup 1082 }
+
+	wlsxChannelFrameFragmentationRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP has detected that the configured upper threshold for Frame Fragmentation Rate was exceeded on a channel. 
+			"
+	::= {aiTrapDefinitionsGroup 1083 }
+
+	wlsxChannelFrameErrorRateExceeded NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP has detected that the configured upper threshold for Frame Receive Error Rate was exceeded on a channel. 
+			"
+	::= {aiTrapDefinitionsGroup 1084 }
+
+	wlsxSignatureMatchAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match in a frame from an access point.
+			"
+	::= {aiTrapDefinitionsGroup 1085 }
+
+	wlsxSignatureMatchSta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapSourceMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match in a frame from a Station.
+			"
+	::= {aiTrapDefinitionsGroup 1086 }
+
+	wlsxChannelRateAnomaly NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapFrameType,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected frames on a channel which 
+            exceed the configured IDS rate threshold.
+	"
+	::= {aiTrapDefinitionsGroup 1087 }
+
+	wlsxNodeRateAnomalyAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapFrameType,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected frames transmitted or received by an 
+            access point, which exceed the configured IDS rate threshold.
+	"
+	::= {aiTrapDefinitionsGroup 1088 }
+
+	wlsxNodeRateAnomalySta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapFrameType,wlsxTrapNodeMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected frames transmitted or received by a 
+            node, which exceed the configured IDS rate threshold.
+			"
+	::= {aiTrapDefinitionsGroup 1089 }
+
+	wlsxEAPRateAnomaly NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that the rate of EAP Handshake packets 
+            received by an AP has exceeded the configured IDS EAP Handshake rate threshold.
+	"
+	::= {aiTrapDefinitionsGroup 1090 }
+
+	wlsxSignalAnomaly NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+		    This trap indicates that an AM detected a Signal Anomaly.
+			"
+	::= {aiTrapDefinitionsGroup 1091 }
+
+	wlsxSequenceNumberAnomalyAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM received packets from an AP
+			which exceeds the acceptable sequence number difference. 
+            The acceptable sequence number difference is an IDS configuration 
+            object.
+	"
+	::= {aiTrapDefinitionsGroup 1092 }
+
+	wlsxSequenceNumberAnomalySta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM received packets from a Node
+			which exceeds the acceptable sequence number difference. 
+            The acceptable sequence number difference is an IDS configuration 
+            object.
+	"
+	::= {aiTrapDefinitionsGroup 1093 }
+
+	wlsxDisconnectStationAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapFrameType,wlsxTrapSourceMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM detected a station Disconnect 
+            attack.
+	"
+	::= {aiTrapDefinitionsGroup 1094 }
+
+	wlsxApFloodAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that the number of potential fake APs detected by 
+			an AP has exceeded the configured IDS threshold. This is the total number of fake APs observed across all bands.
+                        "
+	::= {aiTrapDefinitionsGroup 1095 }
+
+	wlsxAdhocNetwork NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM detected an Ad hoc 
+			Network. An Station is connected to an ad hoc AP.
+			"
+	::= {aiTrapDefinitionsGroup 1096 }
+
+	wlsxWirelessBridge NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTransmitterMac,wlsxTrapReceiverMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a Wireless Bridge when a WDS frame was seen between the transmitter and receiver addresses.
+			"
+	::= {aiTrapDefinitionsGroup 1097 }
+
+	wlsxInvalidMacOUIAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAddressType,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an invalid MAC OUI in the BSSID of a frame.  An invalid MAC OUI suggests that the frame may be spoofed.
+			"
+	::= {aiTrapDefinitionsGroup 1098 }
+
+	wlsxInvalidMacOUISta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAddressType,wlsxTrapNodeMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an invalid MAC OUI in the SRC or DST address of a frame. An invalid MAC OUI suggests that the frame may be spoofed.
+			"
+	::= {aiTrapDefinitionsGroup 1099 }
+
+	wlsxWEPMisconfiguration NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an access point that is misconfigured because it does not have Privacy enabled.
+			"
+	::= {aiTrapDefinitionsGroup 1100 }
+
+	wlsxStaRepeatWEPIVViolation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapNodeMac,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that a valid station is using the same WEP initialization vector in consecutive packets.
+			"
+	::= {aiTrapDefinitionsGroup 1101 }
+
+	wlsxStaWeakWEPIVViolation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapNodeMac,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that a valid station is using a Weak WEP initialization vector.
+			"
+	::= {aiTrapDefinitionsGroup 1102 }
+
+	wlsxStaAssociatedToUnsecureAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapNodeMac,wlsxTrapAPLocation,
+				wlsxTrapAPChannel,wlsxTrapRogueInfoURL}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM detected a client associated
+			with a Rogue access point.
+			"
+	::= {aiTrapDefinitionsGroup 1103 }
+
+	wlsxStaUnAssociatedFromUnsecureAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapNodeMac}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that a previously detected rogue access point 
+            association is no longer present.
+			"
+	::= {aiTrapDefinitionsGroup 1104 }
+
+	wlsxAdhocNetworkBridgeDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM has detected an Ad hoc
+			network that is bridging to a wired network
+			"
+	::= {aiTrapDefinitionsGroup 1105 }
+
+	wlsxInterferingApDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel,
+				wlsxTrapInterferingAPInfoURL}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an access point classified as Interfering. The access point 
+            is declared Interfering because it is neither authorized or classified as Rogue. 
+			"
+	::= {aiTrapDefinitionsGroup 1106 }
+
+	wlsxColdStart NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime}
+		STATUS		current
+		DESCRIPTION
+			"			
+            An enterprise version of cold start trap, which contains the controller time stamp.
+        	"
+	::= {aiTrapDefinitionsGroup 1111 }
+
+	wlsxWarmStart NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime}
+		STATUS		current
+		DESCRIPTION
+			"			
+            An enterprise version of warm start trap, which contains the controller time stamp.
+        	"
+	::= {aiTrapDefinitionsGroup 1112 }
+
+	wlsxAPImpersonation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected AP Impersonation because the number of beacons seen has exceeded the expected number by the configured percentage threshold.
+            The expected number is calculated based on the Beacon Interval Field in the Beacon frame.
+			"
+	::= {aiTrapDefinitionsGroup 1113 }
+
+	wlsxNAuthServerIsDown NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAuthServerName, wlsxTrapAuthServerAddress}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that an authentication server is down.
+        	"
+	::= {aiTrapDefinitionsGroup 1115 }
+
+	wlsxWindowsBridgeDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM has detected a station
+		        that is bridging from a wireless network 
+                        to a wired network
+			"
+	::= {aiTrapDefinitionsGroup 1129 }
+
+	wlsxSignAPNetstumbler NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Netstumbler from an access point.
+	"
+	::= {aiTrapDefinitionsGroup 1134 }
+
+	wlsxSignStaNetstumbler NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapSourceMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Netstumbler from a Station.
+	"
+	::= {aiTrapDefinitionsGroup 1135 }
+
+	wlsxSignAPAsleap NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for ASLEAP from an access point.
+	"
+	::= {aiTrapDefinitionsGroup 1136 }
+
+	wlsxSignStaAsleap NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapSourceMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for ASLEAP from a Station.
+	"
+	::= {aiTrapDefinitionsGroup 1137 }
+
+	wlsxSignAPAirjack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for AirJack from an access point.
+	"
+	::= {aiTrapDefinitionsGroup 1138 }
+
+	wlsxSignStaAirjack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapSourceMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for AirJack from a Station.
+	"
+	::= {aiTrapDefinitionsGroup 1139 }
+
+	wlsxSignAPNullProbeResp NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Null-Probe-Response from an access point.
+	"
+	::= {aiTrapDefinitionsGroup 1140 }
+
+	wlsxSignStaNullProbeResp NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapSourceMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Null-Probe-Response from a Station.
+	"
+	::= {aiTrapDefinitionsGroup 1141 }
+
+	wlsxSignAPDeauthBcast NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Deauth-Broadcast from an access point.
+	"
+	::= {aiTrapDefinitionsGroup 1142 }
+
+	wlsxSignStaDeauthBcast NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSignatureName,wlsxTrapSourceMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Deauth-Broadcast from a Station.
+	"
+	::= {aiTrapDefinitionsGroup 1143 }
+
+	wlsxWindowsBridgeDetectedAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP is detecting an access point that is bridging from a wireless network
+            to a wired network.
+			"
+	::= {aiTrapDefinitionsGroup 1144 }
+
+	wlsxWindowsBridgeDetectedSta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP is detecting a station that is bridging from a wireless network
+            to a wired network.
+			"
+	::= {aiTrapDefinitionsGroup 1145 }
+
+	wlsxAdhocNetworkBridgeDetectedAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM has detected an Ad hoc
+			network that is bridging to a wired network
+			"
+	::= {aiTrapDefinitionsGroup 1146 }
+
+	wlsxAdhocNetworkBridgeDetectedSta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM has detected an Ad hoc
+			network that is bridging to a wired network
+			"
+	::= {aiTrapDefinitionsGroup 1147 }
+
+	wlsxDisconnectStationAttackAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapFrameType,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM detected a station disconnect 
+            attack.
+	"
+	::= {aiTrapDefinitionsGroup 1148 }
+
+	wlsxDisconnectStationAttackSta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapFrameType,wlsxTrapSourceMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AM detected a station Disconnect 
+            attack.
+	"
+	::= {aiTrapDefinitionsGroup 1149 }
+
+	wlsxSuspectUnsecureAPDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPRadioNumber,wlsxTrapMatchedMac,
+				wlsxTrapMatchedIp,wlsxTrapConfidenceLevel,
+				wlsxTrapAPLocation,wlsxTrapRogueInfoURL}
+		STATUS		current
+		DESCRIPTION
+			"			This trap indicates that an access point, classified as Suspected Rogue, has been
+                detected by a Controller. The AP is suspected to be rogue, 
+                with the supplied confidence level, because it was matched to 
+                the wired MAC address. 
+			"
+	::= {aiTrapDefinitionsGroup 1150 }
+
+	wlsxSuspectUnsecureAPResolved NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPRadioNumber}
+		STATUS		current
+		DESCRIPTION
+			"			
+		This trap indicates that a previously detected access point, classified Suspected 
+                Rogue, is either no longer present in the network or
+                has changed its state.
+			"
+	::= {aiTrapDefinitionsGroup 1151 }
+
+	wlsxHtGreenfieldSupported NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+	    This trap indicates that an AP detected an access point that supports HT Greenfield mode.
+	"
+	::= {aiTrapDefinitionsGroup 1157 }
+
+	wlsxHT40MHzIntoleranceAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+	    This trap indicates that an AP is detecting an access point with the HT 40MHz intolerance setting.
+	"
+	::= {aiTrapDefinitionsGroup 1158 }
+
+	wlsxHT40MHzIntoleranceSta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapSnr,
+				wlsxTrapAPChannel,wlsxTrapFrameType,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+		This trap indicates that the system is detecting an HT 40MHz Intolerance setting from a Station.
+	"
+	::= {aiTrapDefinitionsGroup 1159 }
+
+	wlsxNAuthServerAllInService NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapESIServerGrpName}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that all authentication servers is a server group are brought back in service.
+        	"
+	::= {aiTrapDefinitionsGroup 1160 }
+
+	wlsxNAdhocNetwork NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an ad hoc 
+			network where a station is connected to an ad hoc access point.
+			"
+	::= {aiTrapDefinitionsGroup 1161 }
+
+	wlsxNAdhocNetworkBridgeDetectedAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an ad hoc
+			network that is bridging to a wired network.
+			"
+	::= {aiTrapDefinitionsGroup 1162 }
+
+	wlsxNAdhocNetworkBridgeDetectedSta NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapSourceMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapTargetAPSSID,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an ad hoc
+			network that is bridging to a wired network.
+			"
+	::= {aiTrapDefinitionsGroup 1163 }
+
+
+	wlsxClientFloodAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that the number of potential fake clients detected by 
+			an AP has exceeded the configured IDS threshold. This is the total number of fake clients observed across all bands.
+	"
+	::= {aiTrapDefinitionsGroup 1170 }
+
+	wlsxValidClientNotUsingEncryption NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapNodeMac,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+		    This trap indicates that an AP detected an unencrypted data frame between a valid client and an access point.
+			"
+	::= {aiTrapDefinitionsGroup 1171 }
+
+	wlsxAdhocUsingValidSSID NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an ad hoc network using a valid/protected SSID.
+	"
+	::= {aiTrapDefinitionsGroup 1172 }
+
+	wlsxAPSpoofingDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapSpoofedFrameType,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected that one of its virtual APs is being spoofed using MAC spoofing.
+	"
+	::= {aiTrapDefinitionsGroup 1173 }
+
+	wlsxClientAssociatingOnWrongChannel NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapSpoofedFrameType,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a client trying to associate to one of its BSSIDs on the wrong channel.  This can be a sign that the BSSID is 
+            being spoofed in order to fool the client into thinking the AP is operating on another channel.
+			"
+	::= {aiTrapDefinitionsGroup 1174 }
+
+	wlsxNDisconnectStationAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapSourceMac,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP has determined that a client is under Disconnect Attack because the rate of Assoc/Reassoc Response packets
+            received by that client exceeds the configured threshold.
+	"
+	::= {aiTrapDefinitionsGroup 1175 }
+
+	wlsxNStaUnAssociatedFromUnsecureAP NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapNodeMac,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP that had previously detected a client association to a Rogue access point is no longer detecting that association.
+			"
+	::= {aiTrapDefinitionsGroup 1176 }
+
+	wlsxOmertaAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapNodeMac,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an Omerta attack.
+	"
+	::= {aiTrapDefinitionsGroup 1177 }
+
+	wlsxTKIPReplayAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a TKIP replay attack. If successful this could be the precursor to more
+			advanced attacks.
+	"
+	::= {aiTrapDefinitionsGroup 1178 }
+
+	wlsxChopChopAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a ChopChop attack.
+	"
+	::= {aiTrapDefinitionsGroup 1179 }
+
+	wlsxFataJackAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapNodeMac,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a FATA-Jack attack.
+	"
+	::= {aiTrapDefinitionsGroup 1180 }
+
+	wlsxInvalidAddressCombination NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapAPChannel,
+				wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an invalid source and destination combination.
+	"
+	::= {aiTrapDefinitionsGroup 1181 }
+
+	wlsxValidClientMisassociation NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapNodeMac,wlsxTrapAssociationType,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a misassociation between a valid client and an unsafe AP.
+			"
+	::= {aiTrapDefinitionsGroup 1182 }
+
+	wlsxMalformedHTIEDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a malformed HT Information Element. This can be the result of a misbehaving wireless driver or it may be an indication of a new wireless attack. 
+			"
+	::= {aiTrapDefinitionsGroup 1183 }
+
+	wlsxMalformedAssocReqDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a malformed association request with a NULL SSID.
+	"
+	::= {aiTrapDefinitionsGroup 1184 }
+
+	wlsxOverflowIEDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a management frame with a malformed information element. The declared length of the element is larger than the entire frame containing the element. This may be used to corrupt or crash wireless drivers. 
+	"
+	::= {aiTrapDefinitionsGroup 1185 }
+
+	wlsxOverflowEAPOLKeyDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a key in an EAPOL Key message with a specified length greater than the length of the entire message.
+	"
+	::= {aiTrapDefinitionsGroup 1186 }
+
+	wlsxMalformedFrameLargeDurationDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapAPChannel,wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an unusually large duration in a wireless frame. This may be an attempt to block other devices from transmitting.
+	"
+	::= {aiTrapDefinitionsGroup 1187 }
+
+	wlsxMalformedFrameWrongChannelDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapTargetAPChannel,wlsxTrapAPChannel,
+				wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a beacon on one channel advertising another channel. This could be an attempt to lure clients away from a valid AP.
+	"
+	::= {aiTrapDefinitionsGroup 1188 }
+
+	wlsxMalformedAuthFrame NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapNodeMac,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an authentication frame with
+            either a bad algorithm (similar to Fata-Jack) or a bad transaction.
+	"
+	::= {aiTrapDefinitionsGroup 1189 }
+
+	wlsxCTSRateAnomaly NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that the rate of CTS packets 
+            received by an AP exceeds the configured IDS threshold.
+			"
+	::= {aiTrapDefinitionsGroup 1190 }
+
+	wlsxRTSRateAnomaly NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that the rate of RTS packets 
+            received by an AP exceeds the configured IDS threshold.
+			"
+	::= {aiTrapDefinitionsGroup 1191 }
+
+	wlsxNRogueAPDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+				This trap indicates that an unauthorized access point is connected to the wired network. The access point is 
+                classified as Rogue by the system.
+			"
+	::= {aiTrapDefinitionsGroup 1192 }
+
+	wlsxNRogueAPResolved NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+                This trap indicates that a previously detected access point, classified as Rogue,
+                is either no longer present in the network or it changed its state.
+			"
+	::= {aiTrapDefinitionsGroup 1193 }
+
+	wlsxNeighborAPDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an access point has been classified as a Neighbor by the system. 
+			"
+	::= {aiTrapDefinitionsGroup 1194 }
+
+	wlsxNInterferingAPDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an access point has been classified as Interfering by the system. The access point 
+            is declared Interfering because it is not authorized, nor has it been classified as a Rogue. 
+			"
+	::= {aiTrapDefinitionsGroup 1195 }
+
+	wlsxNSuspectRogueAPDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPChannel,wlsxTrapConfidenceLevel}
+		STATUS		current
+		DESCRIPTION
+			"			
+		This trap indicates that an access point, classified as Suspected Rogue, is 
+                detected by the system. The AP is suspected to be rogue 
+                with the supplied confidence level. 
+			"
+	::= {aiTrapDefinitionsGroup 1196 }
+
+	wlsxNSuspectRogueAPResolved NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+		This trap indicates that a previously detected access point, classified as Suspected 
+                Rogue, is either no longer present in the network or
+                has changed its state.
+			"
+	::= {aiTrapDefinitionsGroup 1197 }
+
+	wlsxBlockAckAttackDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapSourceMac,
+				wlsxTrapReceiverMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapSnr}
+		STATUS		current
+		DESCRIPTION
+			"			
+        This trap indicates that an attempt has been made to deny service to
+        the source address by spoofing a block ACK add request that sets a
+        sequence number window outside the currently used window.
+	"
+	::= {aiTrapDefinitionsGroup 1198 }
+
+	wlsxHotspotterAttackDetected NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapNodeMac,
+				wlsxTrapSourceMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapSnr,
+				wlsxTrapTargetAPSSID}
+		STATUS		current
+		DESCRIPTION
+			"			
+        This trap indicates that a new AP has appeared immediately following a client probe request.
+        This is indicative of the Hotspotter tool or similar that attempts to trap clients with a fake
+        hotspot or other wireless network.
+	"
+	::= {aiTrapDefinitionsGroup 1199 }
+
+	wlsxNSignatureMatch NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTransmitterMac,
+				wlsxTrapReceiverMac,wlsxTrapSignatureName,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match in a frame.
+			"
+	::= {aiTrapDefinitionsGroup 1200 }
+
+	wlsxNSignatureMatchNetstumbler NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTransmitterMac,
+				wlsxTrapReceiverMac,wlsxTrapSignatureName,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Netstumbler in a frame.
+	"
+	::= {aiTrapDefinitionsGroup 1201 }
+
+	wlsxNSignatureMatchAsleap NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTransmitterMac,
+				wlsxTrapReceiverMac,wlsxTrapSignatureName,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for ASLEAP in a frame.
+	"
+	::= {aiTrapDefinitionsGroup 1202 }
+
+	wlsxNSignatureMatchAirjack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTransmitterMac,
+				wlsxTrapReceiverMac,wlsxTrapSignatureName,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Airjack in a frame.
+	"
+	::= {aiTrapDefinitionsGroup 1203 }
+
+	wlsxNSignatureMatchNullProbeResp NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTransmitterMac,
+				wlsxTrapReceiverMac,wlsxTrapSignatureName,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Null-Probe-Response in a frame.
+	"
+	::= {aiTrapDefinitionsGroup 1204 }
+
+	wlsxNSignatureMatchDeauthBcast NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTransmitterMac,
+				wlsxTrapReceiverMac,wlsxTrapSignatureName,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Deauth-Broadcast in a frame.
+	"
+	::= {aiTrapDefinitionsGroup 1205 }
+
+	wlsxNSignatureMatchDisassocBcast NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTransmitterMac,
+				wlsxTrapReceiverMac,wlsxTrapSignatureName,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Disassoc-Broadcast in a frame.
+	"
+	::= {aiTrapDefinitionsGroup 1206 }
+
+	wlsxNSignatureMatchWellenreiter NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTransmitterMac,
+				wlsxTrapReceiverMac,wlsxTrapSignatureName,
+				wlsxTrapSnr,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation,
+				wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a signature match for Wellenreiter in a frame.
+	"
+	::= {aiTrapDefinitionsGroup 1207 }
+
+	wlsxAPDeauthContainment NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapNodeMac,
+				wlsxTrapAPChannel,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP has attempted to contain an access point by disconnecting its client.
+      	"
+	::= {aiTrapDefinitionsGroup 1208 }
+
+	wlsxClientDeauthContainment NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapAPChannel,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP has attempted to contain a client by disconnecting it from the AP that it is associated with.
+      	"
+	::= {aiTrapDefinitionsGroup 1209 }
+
+	wlsxAPWiredContainment NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapNodeMac,
+				wlsxTrapDeviceIpAddress,wlsxTrapDeviceMac,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP has attempted to contain an access point by disrupting traffic to its client on the wired interface.
+      	"
+	::= {aiTrapDefinitionsGroup 1210 }
+
+	wlsxClientWiredContainment NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapDeviceIpAddress,wlsxTrapDeviceMac,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP has attempted to contain a client by disrupting traffic to it on the wired interface.
+      	"
+	::= {aiTrapDefinitionsGroup 1211 }
+
+	wlsxAPTaggedWiredContainment NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapNodeMac,
+				wlsxTrapDeviceIpAddress,wlsxTrapDeviceMac,
+				wlsxTrapVlanId,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP has attempted to contain an access point by disrupting traffic to its client on the wired interface.
+      	"
+	::= {aiTrapDefinitionsGroup 1212 }
+
+	wlsxClientTaggedWiredContainment NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapNodeMac,wlsxTrapTargetAPBSSID,
+				wlsxTrapDeviceIpAddress,wlsxTrapDeviceMac,
+				wlsxTrapVlanId,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP has attempted to contain a client by disrupting traffic to it on the wired interface.
+      	"
+	::= {aiTrapDefinitionsGroup 1213 }
+
+	wlsxTarpitContainment NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapNodeMac,
+				wlsxTrapAPChannel,wlsxTrapTargetAPChannel,
+				wlsxTrapSourceMac,wlsxTrapAPMacAddress,
+				wlsxTrapAPRadioNumber,wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP has attempted to contain an access point by moving a client that is attempting to associate to it to a tarpit.
+      	"
+	::= {aiTrapDefinitionsGroup 1214 }
+
+	wlsxAPChannelChange NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPChannel,wlsxTrapAPChannelSec,
+				wlsxTrapAPPrevChannel,wlsxTrapAPPrevChannelSec,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPARMChangeReason}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP changed its channel.
+      	"
+	::= {aiTrapDefinitionsGroup 1216 }
+
+	wlsxAPPowerChange NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPTxPower,wlsxTrapAPPrevTxPower,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP changed its transmit power level.
+      	"
+	::= {aiTrapDefinitionsGroup 1217 }
+
+	wlsxAPModeChange NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPCurMode,wlsxTrapAPPrevMode,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation}
+		STATUS		current
+		DESCRIPTION
+			"			
+	This trap indicates that an AP changed its mode from AP to APMonitor or vice versa.
+      	"
+	::= {aiTrapDefinitionsGroup 1218 }
+
+	wlsxUserEntryAttributesChanged NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserIpAddress,wlsxTrapUserPhyAddress,
+				wlsxTrapAPBSSID,wlsxTrapAPName,
+				wlsxTrapCardSlot,wlsxTrapPortNumber,
+				wlsxTrapUserAttributeChangeType}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that the user entry attributes have changed.
+        	"
+	::= {aiTrapDefinitionsGroup 1219 }
+
+	wlsxPowerSaveDosAttack NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapNodeMac,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected a Power Save DoS attack.
+			"
+	::= {aiTrapDefinitionsGroup 1220 }
+
+	wlsxNAPMasterStatusChange NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapApControllerIp,
+				wlsxTrapApMasterStatus}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that the status of the AP as seen by
+            the master controller has changed.
+        	"
+	::= {aiTrapDefinitionsGroup 1221 }
+
+	wlsxNAdhocUsingValidSSID NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapTargetAPBSSID,wlsxTrapTargetAPSSID,
+				wlsxTrapSourceMac,wlsxTrapSnr,
+				wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+				wlsxTrapAPLocation,wlsxTrapAPChannel}
+		STATUS		current
+		DESCRIPTION
+			"			
+			This trap indicates that an AP detected an ad hoc network node using a valid/protected SSID.
+	"
+	::= {aiTrapDefinitionsGroup 1222 }
+
+	wlsxMgmtUserAuthenticationFailed NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserName,wlsxTrapUserIpAddress,
+				wlsxTrapUserPhyAddress,wlsxTrapAuthServerName,
+                wlsxTrapAuthServerAddress}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that a management user authentication has failed.
+        	"
+	::= {aiTrapDefinitionsGroup 1224 }
+
+    wlsxAPActiveUplinkChanged NOTIFICATION-TYPE
+        OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPPreviousUplinkType,
+                wlsxTrapAPPreviousUplinkActiveTime,wlsxTrapAPActiveUplinkType,
+                wlsxTrapAPUplinkChangeReason}
+        STATUS      current
+        DESCRIPTION
+            "
+              When the active uplink of an AP changes, a notification is
+              sent to the Management Entity with the new uplink type
+            "
+    ::= {aiTrapDefinitionsGroup 1252 }
+
+    wlsxAPManagedModeConfigFailureTrap NOTIFICATION-TYPE
+        OBJECTS {wlsxTrapTime, wlsxTrapAPManagedModeConfigFailure}
+        STATUS      current
+        DESCRIPTION
+            "
+              Indicated failure in applying config.
+            "
+    ::= {aiTrapDefinitionsGroup 1255 }
+
+    wlsxNAuthServerAcctTimedOut NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapUserName,wlsxTrapUserIpAddress,
+				wlsxTrapUserPhyAddress,wlsxTrapAuthServerName,
+				wlsxTrapAuthServerAddress,wlsxTrapAPBSSID,
+				wlsxTrapAPName}
+		STATUS		current
+		DESCRIPTION
+			"			
+         This trap indicates that the authentication server accounting timed out.
+        	"
+	::= {aiTrapDefinitionsGroup 1256 }
+
+    wlsxPortalServerDown NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapPortalServerName, wlsxTrapPortalServerAddress,
+				wlsxTrapAPName,wlsxTrapPortalServerDownReason}
+		STATUS		current
+		DESCRIPTION
+			"			
+         This trap indicates that the portal server is down.
+        	"
+	::= {aiTrapDefinitionsGroup 1259 }
+
+    wlsxPortalServerUp NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapPortalServerName, wlsxTrapPortalServerAddress,
+				wlsxTrapAPName}
+		STATUS		current
+		DESCRIPTION
+			"			
+         This trap indicates that the portal server is up.
+        	"
+	::= {aiTrapDefinitionsGroup 1260 }
+
+    wlsxIAPVoiceClientLocationUpdate NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapVcIpAddress, wlsxTrapVcMacAddress,
+				wlsxTrapAPMacAddress, wlsxTrapAPName}
+		STATUS		current
+		DESCRIPTION
+			"			
+         The trap represents a IAP voice client location update.
+        	"
+	::= {aiTrapDefinitionsGroup 1262 }
+
+    wlsxWPAFTAttack NOTIFICATION-TYPE
+        OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPRadioNumber,
+                wlsxTrapAPLocation,wlsxTrapNodeMac,
+                wlsxTrapAPChannel,wlsxTrapTargetAPBSSID}
+        STATUS      current
+        DESCRIPTION
+            "
+        This trap indicates there is a possible attack of the Fast BSS Transition causing a WPA key re-installation.
+        This can be indicative of a security breach where an attacker can hijack a client's association and/or
+        decrypt an otherwise secure connection.
+            "
+    ::= {aiTrapDefinitionsGroup 1267 }
+
+    wlsxMitMDetected NOTIFICATION-TYPE
+        OBJECTS {wlsxTrapTime, wlsxTrapAPLocation,wlsxTrapAPMacAddress,
+                wlsxTrapAPRadioNumber,wlsxTrapSourceMac,
+                wlsxTrapTargetAPBSSID,wlsxTrapAPChannel,
+                wlsxTrapSnr}
+        STATUS      current
+        DESCRIPTION
+            "
+        This trap indicates that an AP detected a possible channel-based Man in the Middle attack by someone using spoofed beacons with an invalid Channel Switch Announcement.
+            "
+    ::= {aiTrapDefinitionsGroup 1268 }
+
+    wlsxAPLoopDetected NOTIFICATION-TYPE
+        OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPName,
+                wlsxTrapPortNumber}
+        STATUS      current
+        DESCRIPTION
+            "           
+            This trap indicates that loop is detected on AP's secure jack port.
+            "
+    ::= {aiTrapDefinitionsGroup 1271 }
+
+    wlsxAPBROADCASTSTORM NOTIFICATION-TYPE
+        OBJECTS {wlsxTrapTime, wlsxTrapAPMacAddress,wlsxTrapAPName,
+                wlsxTrapPortNumber}
+        STATUS      current
+        DESCRIPTION
+            "           
+            This trap indicates that broadcast storm is detected on AP's secure jack port.
+            "
+    ::= {aiTrapDefinitionsGroup 1272 }
+
+	wlsxCLEARPASSSERVERINVALID NOTIFICATION-TYPE
+		OBJECTS {wlsxTrapTime, wlsxTrapAuthServerName}
+		STATUS		current
+		DESCRIPTION
+			"			
+            This trap indicates that clearpass server is not valid when using the CA to verity the server for download-role.
+        	"
+	::= {aiTrapDefinitionsGroup 1274 }
+
+END

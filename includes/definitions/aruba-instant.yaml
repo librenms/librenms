@@ -1,0 +1,13 @@
+os: aruba-instant
+text: 'Aruba Instant'
+type: wireless
+icon: aruba
+mib_dir:
+    - arubaos
+over:
+    - { graph: device_wireless_ap-count, text: 'AP Count' }
+    - { graph: device_wireless_clients, text: 'Client Count' }
+discovery:
+    -
+      sysObjectID: .1.3.6.1.4.1.14823.1.2. #Aruba apProducts (Aruba Instant)
+      sysDescr: ArubaOS

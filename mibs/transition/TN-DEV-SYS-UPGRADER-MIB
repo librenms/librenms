@@ -1,0 +1,585 @@
+-- ***********************************************************************************************
+-- TN-DEV-SYS-UPGRADER-MIB.my:  Transition Networks Enterprise MIB for TN device upgrader feature
+--
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+
+TN-DEV-SYS-UPGRADER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString, RowStatus, TruthValue
+                FROM SNMPv2-TC
+    InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises, IpAddress FROM SNMPv2-SMI
+    TimeStamp, TruthValue FROM SNMPv2-TC
+    entPhysicalIndex FROM ENTITY-MIB
+    tnDevMgmt FROM TN-MGMT-MIB;
+
+
+tnDevSysUpgraderMIB MODULE-IDENTITY
+    LAST-UPDATED "201206010000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+                "       Transition Networks
+                        Technical Support
+
+                        10900 Red Circle Drive
+                        Minnetonka, MN 55343 USA
+                        Tel: +1-800-526-9267
+
+                    E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib provides functionalities for managing the upgrade procedure for ION and newer switches."
+
+    REVISION      "201206010000Z"
+    DESCRIPTION
+        "Initial Revision of this module"
+        ::= { tnDevMgmt 30 }
+
+
+tnDevSysUpgraderNotifications        OBJECT IDENTIFIER ::= { tnDevSysUpgraderMIB 0 }
+
+tnDevSysUpgrader        OBJECT IDENTIFIER ::= { tnDevSysUpgraderMIB 1 }
+
+--
+-- ION upgrade operation table
+--
+
+tnUpgradeOpTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnUpgradeOpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table to manage ION upgrade operation."
+    ::= { tnDevSysUpgrader 1 }
+
+tnUpgradeOpEntry OBJECT-TYPE
+    SYNTAX TnUpgradeOpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing ION upgrade action."
+    INDEX   { entPhysicalIndex }
+    ::= { tnUpgradeOpTable 1 }
+
+TnUpgradeOpEntry ::=
+    SEQUENCE {
+       upgradeOpCommand          INTEGER,
+       upgradeOpStatus           INTEGER
+    }
+
+upgradeOpCommand   OBJECT-TYPE
+    SYNTAX       INTEGER
+                 {
+                     none(1),
+                     upgrade(2),
+                     done(3)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "
+            none      perform nothing.
+
+            upgrade   perform the required upgrade operation. This
+                      operation is valid only if upgradeOpStatus object
+                      returns value 'none'.
+
+            done      This operation is valid only if upgradeOpStatus
+                      object returns value 'none'. upgrade manager would do
+                      the required cleanup of previous upgrade
+                      operation and make the system ready for any new
+                      upgrade operation. This is needed because the
+                      system maintains the status of the previous
+                      upgrade operation for a maximum time
+                      before it does the cleanup. During this period
+                      no new upgrade operation is allowed. "
+    ::= { tnUpgradeOpEntry 1 }
+
+upgradeOpStatus   OBJECT-TYPE
+    SYNTAX       INTEGER
+                 {
+                     none(1),
+                     inProgress(2)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The status of the specified operation.
+                  none(1)        - no operation was performed.
+                  inProgress(2)  - specified operation is active."
+    ::= { tnUpgradeOpEntry 2 }
+
+--
+-- ION upgrade result table
+--
+tnUpgradeResultTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnUpgradeResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A Table showing the result of the upgrade operation."
+    ::= { tnDevSysUpgrader 2 }
+
+tnUpgradeResultEntry OBJECT-TYPE
+    SYNTAX TnUpgradeResultEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing the status of the upgrade operation."
+    INDEX   { entPhysicalIndex, upgradeResultIndex }
+    ::= { tnUpgradeResultTable 1 }
+
+TnUpgradeResultEntry ::=
+    SEQUENCE {
+       upgradeResultIndex        INTEGER,
+       upgradeResultModule       INTEGER,
+       upgradeResultStatus       INTEGER,
+       upgradeResultReason       DisplayString,
+       upgradeResultTimeStarted  TimeStamp,
+       upgradeResultTimeCompleted  TimeStamp
+    }
+
+upgradeResultIndex OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This is an arbitrary interger which indentifies uniquely
+        an entry in this table. "
+    ::= { tnUpgradeResultEntry 1 }
+
+upgradeResultModule OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The physical entity of the modle for which this
+         status is being shown. "
+    ::= { tnUpgradeResultEntry 2 }
+
+upgradeResultStatus   OBJECT-TYPE
+    SYNTAX       INTEGER
+                 {
+                     none(1),
+                     inProgress(2),
+                     failure(3),
+                     success(4)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The status of the specified operation.
+                  none(1)        - no operation was performed.
+                  inProgress(2)  - specified operation is active.
+                  failure(3)     - the selected operation has failed.
+                  success(4)     - specified operation has completed
+                                   successfully."
+    ::= { tnUpgradeResultEntry 3 }
+
+upgradeResultReason  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..31))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "Specifies the description of the cause of 'failed' state
+                  of the object 'upgradeResultStatus'.
+                  This object would be a null string if value of
+                  'upgradeResultStatus' is anything other than 'failure'."
+    ::= { tnUpgradeResultEntry 4 }
+
+upgradeResultTimeStarted  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "Specifies the time the upgrade operation was started."
+    ::= { tnUpgradeResultEntry 5 }
+
+upgradeResultTimeCompleted  OBJECT-TYPE
+    SYNTAX       TimeStamp
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "Specifies the time the upgrade operation was completed."
+    ::= { tnUpgradeResultEntry 6 }
+
+--
+-- ION upgrade target table
+--
+tnUpgradeTargetTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnUpgradeTargetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A Table listing the modules to be upgraded."
+    ::= { tnDevSysUpgrader 3 }
+
+tnUpgradeTargetEntry OBJECT-TYPE
+    SYNTAX TnUpgradeTargetEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Each entry provides the module that needs to be upgraded."
+    INDEX   { entPhysicalIndex, upgradeTargetIndex }
+    ::= { tnUpgradeTargetTable 1 }
+
+TnUpgradeTargetEntry ::=
+    SEQUENCE {
+       upgradeTargetIndex        INTEGER,
+       upgradeTargetModule       INTEGER,
+       upgradeTargetEntryStatus  RowStatus
+    }
+
+upgradeTargetIndex OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This is an arbitrary interger which indentifies uniquely
+        an entry in this table. "
+    ::= { tnUpgradeTargetEntry 1 }
+
+upgradeTargetModule OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION "target indentified by entPhysicalIndex."
+    ::= { tnUpgradeTargetEntry 2 }
+
+upgradeTargetEntryStatus OBJECT-TYPE
+    SYNTAX        RowStatus
+    MAX-ACCESS    read-create
+    STATUS        current
+    DESCRIPTION
+        "The status of this table entry."
+    ::= { tnUpgradeTargetEntry 3 }
+
+--
+-- TN upgrade get index table
+--
+tnUpgradeGetIndexTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnUpgradeGetIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A Table listing the Index for read-create usage."
+    ::= { tnDevSysUpgrader 4 }
+
+tnUpgradeGetIndexEntry OBJECT-TYPE
+    SYNTAX TnUpgradeGetIndexEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Each entry provides the index that needs to be used."
+    INDEX   { entPhysicalIndex }
+    ::= { tnUpgradeGetIndexTable 1 }
+
+TnUpgradeGetIndexEntry ::=
+    SEQUENCE {
+       nextTargetIndex        INTEGER,
+       nextFirmwareIndex      INTEGER
+    }
+
+nextTargetIndex OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is an arbitrary interger which indentifies uniquely
+         an entry in ionUpgradeTarget table. "
+    ::= { tnUpgradeGetIndexEntry 1 }
+
+nextFirmwareIndex OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This is an arbitrary interger which indentifies uniquely
+         an entry in ionFirmware table. "
+    ::= { tnUpgradeGetIndexEntry 2 }
+
+---
+---  TN upgrade Firmware DB table
+---
+tnUpgradeFirmwareTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnUpgradeFirmwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A Table listing the modules to be upgraded."
+    ::= { tnDevSysUpgrader 5 }
+
+tnUpgradeFirmwareEntry OBJECT-TYPE
+    SYNTAX TnUpgradeFirmwareEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Each entry provides the module that needs to be upgraded."
+    INDEX   { entPhysicalIndex, upgradeFirmwareIndex }
+    ::= { tnUpgradeFirmwareTable 1 }
+
+TnUpgradeFirmwareEntry ::=
+    SEQUENCE {
+       upgradeFirmwareIndex      INTEGER,
+       upgradeFirmwareCardType   DisplayString,
+       upgradeFirmwareRevision   DisplayString,
+       upgradeFirmwareFileName   DisplayString,
+       upgradeFirmwareBuildDate  DisplayString
+    }
+
+upgradeFirmwareIndex OBJECT-TYPE
+    SYNTAX        INTEGER
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This is an arbitrary interger which indentifies uniquely
+         an entry in this table. "
+    ::= { tnUpgradeFirmwareEntry 1 }
+
+upgradeFirmwareCardType  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (1..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "which kind of SIC this firmware belongs to."
+    ::= { tnUpgradeFirmwareEntry 2 }
+
+upgradeFirmwareRevision  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (1..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "firmware revision."
+    ::= { tnUpgradeFirmwareEntry 3 }
+
+upgradeFirmwareFileName  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (1..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "firmware file name."
+    ::= { tnUpgradeFirmwareEntry 4 }
+
+upgradeFirmwareBuildDate  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (1..32))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "Build date and time."
+    ::= { tnUpgradeFirmwareEntry 5 }
+
+---
+--- TN upgrade firmware DB update table
+---
+
+tnUpgradeFirmwareDBTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnUpgradeFirmwareDBEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "A Table to update the firmware DB."
+    ::= { tnDevSysUpgrader 6 }
+
+tnUpgradeFirmwareDBEntry OBJECT-TYPE
+    SYNTAX TnUpgradeFirmwareDBEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry provides the way to update the firmware DB."
+    INDEX   { entPhysicalIndex }
+    ::= { tnUpgradeFirmwareDBTable 1 }
+
+TnUpgradeFirmwareDBEntry ::=
+    SEQUENCE {
+       upgradeFirmwareDBFileName    DisplayString,
+       upgradeFirmwareDBOpCommand    INTEGER,
+       upgradeFirmwareDBOpResult    INTEGER,
+       upgradeFirmwareDBResultReason    DisplayString
+    }
+
+upgradeFirmwareDBFileName  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (1..32))
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "firmware DB archive file name."
+    ::= { tnUpgradeFirmwareDBEntry 1 }
+
+upgradeFirmwareDBOpCommand   OBJECT-TYPE
+    SYNTAX       INTEGER
+                 {
+                     none(1),
+                     update(2)
+                 }
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION  "
+            none      perform nothing.
+
+            update   perform the required upgrade operation. This
+                      operation is valid only if upgradeOpStatus object
+                      returns value 'none'."
+
+    ::= { tnUpgradeFirmwareDBEntry 2 }
+
+upgradeFirmwareDBOpResult   OBJECT-TYPE
+    SYNTAX       INTEGER
+                 {
+                     none(1),
+                     inProgress(2),
+                     failure(3),
+                     success(4)
+                 }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "The status of the specified operation.
+                  none(1)        - no operation was performed.
+                  inProgress(2)  - specified operation is active.
+                  failure(3)     - the selected operation has failed.
+                  success(4)     - specified operation has completed
+                                   successfully."
+    ::= { tnUpgradeFirmwareDBEntry 3 }
+
+upgradeFirmwareDBResultReason  OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..31))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION  "Specifies the description of the cause of 'failed' state
+                  of the object 'upgradeResultStatus'.
+                  This object would be a null string if value of
+                  'upgradeFirmwareDBOpStatus' is anything other than 'failure'."
+    ::= { tnUpgradeFirmwareDBEntry 4 }
+
+--- Firmware
+--- tnFWUpgrade    OBJECT IDENTIFIER ::= { tnFWUpgradeMIB 1 }
+
+tnFirmwareUpgradeTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF TnFirmwareUpgradeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "This table contains configuration to upgrade the firmware of the device.
+        This applies to the stand-alone switches."
+        ::= { tnDevSysUpgrader 7 }
+
+tnFirmwareUpgradeEntry OBJECT-TYPE
+        SYNTAX      TnFirmwareUpgradeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+        "A entry in the table contains additional information related to a device."
+        INDEX       { entPhysicalIndex }
+        ::= { tnFirmwareUpgradeTable 1 }
+
+TnFirmwareUpgradeEntry ::= SEQUENCE
+{
+    fwDownloadFile    DisplayString,
+    fwDownloadTFTPServerType InetAddressType,
+    fwDownloadTFTPServer InetAddress,
+    fwDownloadAction INTEGER,
+    fwDownloadStatus INTEGER,
+    fwDownloadType INTEGER
+}
+
+fwDownloadFile  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..127))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The file name to be downloaded from the TFTP server when a
+        download is next requested via this MIB.  This value is set to
+        the zero-length string when no file name has been specified."
+    ::= { tnFirmwareUpgradeEntry 1 }
+
+fwDownloadTFTPServerType  OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "TFTP server address type."
+    ::= { tnFirmwareUpgradeEntry 2 }
+
+fwDownloadTFTPServer  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The Address of the TFTP server that contains the firmware
+        to load when a download is next requested via this MIB.
+        This value is set to zero length when no address has been
+        specified."
+    ::= { tnFirmwareUpgradeEntry 3 }
+
+fwDownloadAction  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                  notDownloading(1),
+                  downloadToActive(2),
+                  downloadToBackup(3),
+                  swap(4)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "When this object is set to downloadToActive(2) or
+        downloadToBackup(3), the device upgrades and continues until
+        it is time to reset.  It will then
+        begin download of the image specified
+        by fwDownloadFile from the server specified by
+        fwDownloadTFTPServer using the TFTP protocol.  If
+        downloadToBackup(3) is specified, the new image is downloaded
+        as the backup image and the device waits for the user to do active
+        this image and reset the device.  If downloadToActive(2)
+        is specified, the new image is written to the flash EPROM
+        memory after its checksum has been verified to be correct.
+        When the download process is completed, the device will
+        warm boot to restart the newly loaded application.
+        When the device is not downloading, this object will have
+        a value of notDownloading(1). Selecting swap(4) will swap
+        the current and backup firmware"
+    ::= { tnFirmwareUpgradeEntry 4 }
+
+fwDownloadStatus  OBJECT-TYPE
+    SYNTAX     INTEGER {
+                    downloadSuccess(1),
+                    downloadStatusUnknown(2),
+                    downloadErrorIP(3),
+                    downloadErrorTFTP(4),
+                    downloadErrorBusy(5),
+                    downloadErrorMalloc(6),
+                    downloadErrorInvalid(7),
+                    downloadErrorFlashProgram(8),
+                    downloadErrorSame(9),
+                    downloadErrorCurrentUnknown(10),
+                    downloadErrorCurrentNotFound(11),
+                    downloadErrorUpdateNotFound(12),
+                    downloadErrorUpdateCRC(13),
+                    downloadErrorUpdateSize(14),
+                    downloadErrorFlashErase(15),
+                    downloadErrorIncorrectImageVersion(16)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The status of the last download procedure, if any.  This
+        object will have a value of downloadStatusUnknown(2) if no
+        download process has been performed."
+    ::= { tnFirmwareUpgradeEntry 5 }
+
+fwDownloadType  OBJECT-TYPE
+    SYNTAX     INTEGER {system(1), perph(2)}
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "System or peripheral download."
+    ::= { tnFirmwareUpgradeEntry 6 }
+
+
+---
+--- NOTIFICATIONS FOR THIS MIB
+---
+
+tnUpgradeEvt    NOTIFICATION-TYPE
+    OBJECTS {
+        upgradeResultModule, upgradeResultStatus
+    }
+    STATUS current
+    DESCRIPTION
+    " A tnUpgradeEvt is sent when a sic finishes the upgrading. "
+    ::= { tnDevSysUpgraderNotifications 1 }
+
+END

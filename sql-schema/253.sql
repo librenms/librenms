@@ -1,0 +1,3 @@
+CREATE TABLE `poller_cluster` (`id` int(11) NOT NULL AUTO_INCREMENT, `node_id` varchar(255) NOT NULL, `poller_name` varchar(255) NOT NULL, `poller_version` varchar(255) NOT NULL DEFAULT '', `poller_groups` varchar(255) NOT NULL DEFAULT '', `last_report` datetime NOT NULL, `master` tinyint(1) NOT NULL, PRIMARY KEY (`node_id`), UNIQUE KEY `id` (`id`));
+CREATE TABLE `poller_cluster_stats` (`id` int(11) NOT NULL AUTO_INCREMENT, `parent_poller` int(11) NOT NULL DEFAULT 0, `poller_type` varchar(64) NOT NULL DEFAULT '', `depth` int(11) unsigned NOT NULL, `devices` int(11) unsigned NOT NULL, `worker_seconds` double unsigned NOT NULL, `workers` int(11) unsigned NOT NULL, `frequency` int(11) unsigned NOT NULL, PRIMARY KEY (`parent_poller`,`poller_type`), UNIQUE KEY `id` (`id`));
+

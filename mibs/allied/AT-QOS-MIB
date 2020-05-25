@@ -1,0 +1,875 @@
+-- ============================================================================
+-- AT-QOS.MIB, Allied Telesis enterprise MIB: Quality Of Service module
+--
+-- Copied from ATR-QOS.MIB of pre 2.9.1 release
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-QOS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Counter32,
+    Counter64,
+    Integer32,
+    Gauge32
+        FROM SNMPv2-SMI
+
+    DisplayString
+        FROM SNMPv2-TC
+
+	modules
+		FROM AT-SMI-MIB
+;
+
+qos MODULE-IDENTITY
+    LAST-UPDATED "200412011525Z"
+    ORGANIZATION "Allied Telesis, Inc"
+	CONTACT-INFO
+	    "http://www.alliedtelesis.com"
+	DESCRIPTION
+	    "This MIB file contains definitions of managed objects for the
+	    handling QoS on Allied Telesis switches. There are a
+                number of tables designed to be generic to
+	    all ATR switches supporting QoS in silicon, and well as tables for
+	    specific AT switches or switch familes."
+
+    REVISION "200412011525Z"
+DESCRIPTION
+	"Initial Revision"
+
+::= { modules 99 }
+
+-- ============================================================================
+-- ============================================================================
+-- QoS Switch group
+-- ============================================================================
+-- ============================================================================
+
+qosSwitch OBJECT IDENTIFIER ::= { qos 1 }
+
+-- =================================================
+-- QoS Switch Port table
+-- =================================================
+
+qosSwitchPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosSwitchPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Generic port configuration for QoS, indexed by port index."
+    ::= { qosSwitch 1 }
+
+qosSwitchPortEntry OBJECT-TYPE
+    SYNTAX      QosSwitchPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A single switch port entry for QoS."
+    INDEX   { qosSwitchPortIndex }
+    ::= { qosSwitchPortTable 1 }
+
+QosSwitchPortEntry ::=
+    SEQUENCE {
+        qosSwitchPortIndex
+            Integer32,
+        qosSwitchPortPolicyIndex
+            Integer32
+    }
+
+qosSwitchPortIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port index of the port entry. This index is the same port number
+        used in CLI commands, and the same index as appears in other MIB
+        tables related to switch ports."
+    ::= { qosSwitchPortEntry 1 }
+
+qosSwitchPortPolicyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Policy index of the policy for this port. Policy index numbers for
+        CLI commands start at 0, while SNMP indexes must start at 1. This
+        means that the policy index in this MIB variable is 1 more than the
+        index for the same policy as entered for CLI commands."
+    ::= { qosSwitchPortEntry 2 }
+
+-- ============================================================================
+-- Policy table
+-- ============================================================================
+
+qosSwitchPolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosSwitchPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "QoS policy configuration, indexed by policy index."
+    ::= { qosSwitch 2 }
+
+qosSwitchPolicyEntry OBJECT-TYPE
+    SYNTAX      QosSwitchPolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A policy entry containing configuration information for
+         a single policy."
+    INDEX       { qosSwitchPolicyIndex }
+    ::= { qosSwitchPolicyTable 1 }
+
+QosSwitchPolicyEntry ::=
+    SEQUENCE {
+        qosSwitchPolicyIndex
+            Integer32,
+        qosSwitchPolicyDescription
+            OCTET STRING,
+        qosSwitchPolicyDefaultTCDropBWClass3
+            INTEGER,
+        qosSwitchPolicyDefaultTCIgnoreBWClass
+            INTEGER,
+        qosSwitchPolicyDefaultTCMarkValue
+            Integer32,
+        qosSwitchPolicyDefaultTCMaxBandwidth
+            Integer32,
+        qosSwitchPolicyDefaultTCMaxBurstSize
+            Integer32,
+        qosSwitchPolicyDefaultTCMinBandwidth
+            Integer32,
+        qosSwitchPolicyDefaultTCMinBurstSize
+            Integer32,
+        qosSwitchPolicyDefaultTCPremarking
+            INTEGER,
+        qosSwitchPolicyDefaultTCRemarking
+            INTEGER
+    }
+
+qosSwitchPolicyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..256)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of this policy entry. Policy index numbers for
+        CLI commands start at 0, while SNMP indexes must start at 1. This
+        means that the policy index in this MIB variable is 1 more than the
+        index for the same policy as entered for CLI commands."
+    ::= { qosSwitchPolicyEntry 1 }
+
+qosSwitchPolicyDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An optional description for the policy, as entered via the CLI."
+    ::= { qosSwitchPolicyEntry 2 }
+
+qosSwitchPolicyDefaultTCDropBWClass3 OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no(0),
+                    yes(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether traffic that exceeds the bandwidth for the
+        default traffic class be dropped or not. The bandwidth limit is the
+        combined total of the variables qosSwitchPolicyDefaultTCMaxBandwidth
+        and qosSwitchPolicyDefaultTCMaxBurstSize. A value of yes(1) indicates
+        that traffic exceeding the bandwidth limit is dropped immediately. A
+        value of no(0) indicates that the excess traffic is marked as
+        bandwidth class 3 and is therefore eligible for dropping by the RED
+        curve settings."
+    ::= { qosSwitchPolicyEntry 3 }
+
+qosSwitchPolicyDefaultTCIgnoreBWClass OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no(0),
+                    yes(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the traffic metering stage acknowledges any
+        bandwidth class assigned to flows processed by the default traffic
+        class. If set to yes(1), previously assigned bandwidth classes will
+        be ignored will be ignored and the bandwidth class of the traffic
+        will be set according to the meter conformance level of the flow."
+    ::= { qosSwitchPolicyEntry 4 }
+
+qosSwitchPolicyDefaultTCMarkValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..63 | 256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When the qosSwitchPolicyDefaultTCPremarking variable is set to
+        usemarkvalue(1), this variable specifies the index into the DSCP
+        MAP table to use for remarking. A value in the range 0 to 63
+        indicates the DSCP to use, the value 256 indicates that no DSCP
+        value has been defined for the default traffic class for this policy."
+    ::= { qosSwitchPolicyEntry 5 }
+
+qosSwitchPolicyDefaultTCMaxBandwidth OBJECT-TYPE
+    SYNTAX      Integer32 (0..16000000 | 2147483647)
+	UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum bandwidth available to the default traffic
+        class. Traffic under this bandwidth will be designated as bandwidth
+        class 2. The value 2147483647 indicates that there is no limit on
+        the maximum bandwidth for the default traffic class for this
+        policy."
+    ::= { qosSwitchPolicyEntry 6 }
+
+qosSwitchPolicyDefaultTCMaxBurstSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..16000000)
+	UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum bandwidth above the bandwidth specified by
+        qosSwitchPolicyDefaultTCMaxBandwidth before traffic is marked as
+        bandwidth class 3."
+    ::= { qosSwitchPolicyEntry 7 }
+
+qosSwitchPolicyDefaultTCMinBandwidth OBJECT-TYPE
+    SYNTAX      Integer32 (0..16000000 | 2147483647)
+	UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum bandwidth reserved for the default traffic
+        class. Traffic under this bandwidth will be marked as bandwidth
+        class 1. The value 2147483647 indicates that there is no limit on
+        the minimum bandwidth for the default traffic class for this
+        policy."
+    ::= { qosSwitchPolicyEntry 8 }
+
+qosSwitchPolicyDefaultTCMinBurstSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..16000000)
+	UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum amount of data above the bandwidth specified
+        in the variable qosSwitchPolicyDefaultTCMinBandwidth before traffic
+        is marked as bandwidth class 2."
+    ::= { qosSwitchPolicyEntry 9 }
+
+qosSwitchPolicyDefaultTCPremarking OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    usemarkvalue(1),
+                    usedscp(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the QoS action to take on traffic in the default traffic
+        class before metering actions are taken. If none(0) is specified,
+        the traffic is passed to the metering stage. If usemarkvalue(1) is
+        specified, the QoS settings are taken from the variable
+        qosSwitchPolicyDefaultTCMarkValue used as an index into the DCSP
+        MAP table. If usedscp(2) is specified, the DSCP value in the data
+        frames is used as an index into the DSCP MAP table."
+    ::= { qosSwitchPolicyEntry 10 }
+
+qosSwitchPolicyDefaultTCRemarking OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    usedscpmap(1),
+                    bwclass(2),
+                    priority(3),
+                    bwclass_priority(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the action to take after the metering stage for traffic
+        in the default traffic class. The metering stage assigns a
+        temporary value of bandwidth class to the flow which is used to
+        determine its per-hop behaviour. If this variable is set to
+        bwclass(2) or bwclass_priority(4), the temporary bandwidth class
+        becomes the new bandwidth class for the flow. If priority(3) or
+        bwclass_priority(4) is specified, the currently
+        assigned queue for frames in this traffic class is used in
+        conjunction with the temporary bandwidth class to determine the new
+        value of the VLAN Tag User Priority field. If usedscpmap(1) is
+        specified, the temporary value is used (in conjunction with the
+        DSCP of the frame) as an index into the DSCP MAP table, which then
+        assigns the actual, new values for bandwidth class, DSCP, Egress
+        Queue and VLAN Tag User Priority. A value of none(0) for this
+        variable means that no remarking of the packet is done after the
+		metering stage."
+    ::= { qosSwitchPolicyEntry 11 }
+
+-- ============================================================================
+-- Traffic Class table
+-- ============================================================================
+
+qosSwitchTrafficClassTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosSwitchTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Traffic class configuration, indexed by traffic class index."
+    ::= { qosSwitch 3 }
+
+qosSwitchTrafficClassEntry OBJECT-TYPE
+    SYNTAX      QosSwitchTrafficClassEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A traffic class entry containing configuration information for
+        a single traffic class."
+    INDEX   { qosSwitchTrafficClassIndex }
+    ::= { qosSwitchTrafficClassTable 1 }
+
+QosSwitchTrafficClassEntry ::=
+    SEQUENCE {
+        qosSwitchTrafficClassIndex
+            Integer32,
+    qosSwitchTrafficClassPolicyNumber
+	Integer32,
+        qosSwitchTrafficClassDescription
+            OCTET STRING,
+        qosSwitchTrafficClassDropBWClass3
+            INTEGER,
+        qosSwitchTrafficClassIgnoreBWClass
+            INTEGER,
+        qosSwitchTrafficClassMarkValue
+            Integer32,
+        qosSwitchTrafficClassMaxBandwidth
+            Integer32,
+        qosSwitchTrafficClassMaxBurstSize
+            Integer32,
+        qosSwitchTrafficClassMinBandwidth
+            Integer32,
+        qosSwitchTrafficClassMinBurstSize
+            Integer32,
+        qosSwitchTrafficClassPremarking
+            INTEGER,
+        qosSwitchTrafficClassRemarking
+            INTEGER
+    }
+
+qosSwitchTrafficClassIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..1024)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of this traffic class entry. Traffic class index numbers
+        for CLI commands start at 0, while SNMP indexes must start at 1. 
+        This means that the traffic class index in this MIB variable is 1
+        more than the index for the same traffic class as entered for CLI
+        commands."
+    ::= { qosSwitchTrafficClassEntry 1 }
+
+qosSwitchTrafficClassPolicyNumber OBJECT-TYPE
+    SYNTAX      Integer32 (0..256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Policy index of the policy to which this traffic class belongs.
+        Policy index numbers for CLI commands start at 0, while SNMP
+        indexes must start at 1. This means that the policy index in this
+        MIB variable is 1 more than the index for the same policy as
+        entered for CLI commands. A value of 0 for this variable means
+        that the traffic class has not been added to a policy yet."
+    ::= { qosSwitchTrafficClassEntry 2 }
+
+qosSwitchTrafficClassDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An optional description for this traffic class."
+    ::= { qosSwitchTrafficClassEntry 3 }
+
+qosSwitchTrafficClassDropBWClass3 OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no(0),
+                    yes(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether traffic that exceeds the bandwidth for
+        this traffic class be dropped or not. The bandwidth limit is the
+        combined total of the variables qosSwitchTrafficClassMaxBandwidth
+        and qosSwitchTrafficClassMaxBurstSize A value of yes(1) indicates
+        that traffic exceeding the bandwidth limit is dropped immediately. A
+        value of no(0) indicates that the excess traffic is marked as
+        bandwidth class 3 and is therefore eligible for dropping by the RED
+        curve settings."
+    ::= { qosSwitchTrafficClassEntry 4 }
+
+qosSwitchTrafficClassIgnoreBWClass OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    no(0),
+                    yes(1)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies whether the traffic metering stage acknowledges any
+        bandwidth class assigned to flows processed by this traffic
+        class. If set to yes(1), previously assigned bandwidth classes will
+        be ignored will be ignored and the bandwidth class of the traffic
+        will be set according to the meter conformance level of the flow."
+    ::= { qosSwitchTrafficClassEntry 5 }
+
+qosSwitchTrafficClassMarkValue OBJECT-TYPE
+    SYNTAX      Integer32 (0..63 | 256)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "When the qosSwitchTrafficClassPremarking variable is set to
+        usemarkvalue(1), this variable specifies the index into the DSCP
+        MAP table to use for remarking. A value in the range 0 to 63
+        indicates the DSCP to use, the value 256 indicates that no DSCP
+        value has been defined for this traffic class."
+    ::= { qosSwitchTrafficClassEntry 6 }
+
+qosSwitchTrafficClassMaxBandwidth OBJECT-TYPE
+    SYNTAX      Integer32 (0..16000000 | 2147483647)
+	UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum bandwidth available to this traffic
+        class. Traffic under this bandwidth will be designated as bandwidth
+        class 2. The value 2147483647 indicates that there is no limit on
+        the maximum bandwidth for this traffic class."
+    ::= { qosSwitchTrafficClassEntry 7 }
+
+qosSwitchTrafficClassMaxBurstSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..16000000)
+	UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum bandwidth above the bandwidth specified by
+        qosSwitchTrafficClassMaxBandwidth before traffic is marked as
+        bandwidth class 3."
+    ::= { qosSwitchTrafficClassEntry 8 }
+
+qosSwitchTrafficClassMinBandwidth OBJECT-TYPE
+    SYNTAX      Integer32 (0..16000000 | 2147483647)
+	UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum bandwidth reserved for this traffic
+        class. Traffic under this bandwidth will be marked as bandwidth
+        class 1. The value 2147483647 indicates that there is no limit on
+        the minimum bandwidth for this traffic class."
+    ::= { qosSwitchTrafficClassEntry 9 }
+
+qosSwitchTrafficClassMinBurstSize OBJECT-TYPE
+    SYNTAX      Integer32 (0..16000000)
+	UNITS		"kbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum amount of data above the bandwidth specified
+        in the variable qosSwitchTrafficClassMinBandwidth before traffic
+        is marked as bandwidth class 2."
+    ::= { qosSwitchTrafficClassEntry 10 }
+
+qosSwitchTrafficClassPremarking OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    usemarkvalue(1),
+                    usedscp(2)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the QoS action to take on traffic in this traffic
+        class before metering actions are taken. If none(0) is specified,
+        the traffic is passed to the metering stage. If usemarkvalue(1) is
+        specified, the QoS settings are taken from the variable
+        qosSwitchTrafficClassMarkValue used as an index into the DCSP
+        MAP table. If usedscp(2) is specified, the DSCP value in the data
+        frames is used as an index into the DSCP MAP table."
+    ::= { qosSwitchTrafficClassEntry 11 }
+
+qosSwitchTrafficClassRemarking OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    usedscpmap(1),
+                    bwclass(2),
+                    priority(3),
+                    bwclass_priority(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the action to take after the metering stage for traffic
+        in this traffic class. The metering stage assigns a
+        temporary value of bandwidth class to the flow which is used to
+        determine its per-hop behaviour. If this variable is set to
+        bwclass(2) or bwclass_priority(3), the temporary bandwidth class
+        becomes the new bandwidth class for the flow. If priority(3) or
+        bwclass_priority(4) is specified, the currently
+        assigned queue for frames in this traffic class is used in
+        conjunction with the temporary bandwidth class to determine the new
+        value of the VLAN Tag User Priority field. If usedscpmap(1) is
+        specified, the temporary value is used (in conjunction with the
+        DSCP of the frame) as an index into the DSCP MAP table, which then
+        assigns the actual, new values for bandwidth class, DSCP, Egress
+        Queue and VLAN Tag User Priority. A value of none(0) for this
+        variable means that no remarking of the packet is done after the
+		metering stage."
+    ::= { qosSwitchTrafficClassEntry 12 }
+
+-- ============================================================================
+-- ============================================================================
+-- 8948 specific stuff. The tables in this section are specific to the 8948
+-- switch, because they relate directly to the hardware used in this switch.
+-- Other switches that use the same hardware will also support this MIB table.
+-- ============================================================================
+-- ============================================================================
+
+qosSwitch8948 OBJECT IDENTIFIER ::= { qosSwitch 4 }
+
+-- ============================================================================
+-- 8948 port table - 8948 specific extensions to the qosSwitchPortTable
+-- ============================================================================
+
+qosSwitch8948PortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosSwitch8948PortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port configuration, indexed by port index."
+    ::= { qosSwitch8948 1 }
+
+qosSwitch8948PortEntry OBJECT-TYPE
+    SYNTAX      QosSwitch8948PortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A single switch port entry."
+    AUGMENTS    { qosSwitchPortEntry }
+    ::= { qosSwitch8948PortTable 1 }
+
+QosSwitch8948PortEntry ::=
+    SEQUENCE {
+        qosSwitch8948PortDefaultTCCountersAggregateBytes
+            Counter64,
+        qosSwitch8948PortDefaultTCCountersBwConformanceClass1Bytes
+            Counter64,
+        qosSwitch8948PortDefaultTCCountersBwConformanceClass2Bytes
+            Counter64,
+        qosSwitch8948PortDefaultTCCountersBwConformanceClass3Bytes
+            Counter64,
+        qosSwitch8948PortDefaultTCCountersDroppedBytes
+            Counter64,
+        qosSwitch8948PortQueueLength
+		    Gauge32,
+        qosSwitch8948PortQueue0Length
+		    Gauge32,
+        qosSwitch8948PortQueue1Length
+		    Gauge32,
+        qosSwitch8948PortQueue2Length
+		    Gauge32,
+        qosSwitch8948PortQueue3Length
+		    Gauge32,
+        qosSwitch8948PortQueue4Length
+		    Gauge32,
+        qosSwitch8948PortQueue5Length
+		    Gauge32,
+        qosSwitch8948PortQueue6Length
+		    Gauge32,
+        qosSwitch8948PortQueue7Length
+		    Gauge32
+    }
+
+qosSwitch8948PortDefaultTCCountersAggregateBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of bytes classified by the default traffic class
+        on this port."
+    ::= { qosSwitch8948PortEntry 1 }
+
+qosSwitch8948PortDefaultTCCountersBwConformanceClass1Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes classified by the default traffic class on
+        this port conforming to bandwidth class 1."
+    ::= { qosSwitch8948PortEntry 2 }
+
+qosSwitch8948PortDefaultTCCountersBwConformanceClass2Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes classified by the default traffic class on
+        this port conforming to bandwidth class 2."
+    ::= { qosSwitch8948PortEntry 3 }
+
+qosSwitch8948PortDefaultTCCountersBwConformanceClass3Bytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes classified by the default traffic class on
+        this port conforming to bandwidth class 3."
+    ::= { qosSwitch8948PortEntry 4 }
+
+qosSwitch8948PortDefaultTCCountersDroppedBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes dropped by the default traffic class on
+        this port."
+    ::= { qosSwitch8948PortEntry 5 }
+
+qosSwitch8948PortQueueLength OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of packets currently queued for transmission on
+        this port."
+    ::= { qosSwitch8948PortEntry 6 }
+
+qosSwitch8948PortQueue0Length OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets currently queued for transmission on this
+        port in queue 0.
+        The numbering of queues indicates the priority of handling the
+        traffic in that queue, with the higher queue number getting
+        higher priority. The priority values in packets are mapped to
+        queues via a priority to queue mapping. The default priority to
+        queue mapping is as follows:
+        Priority	Queue
+        value       number
+        7           7
+        6           6
+        5           5
+        4           4
+        3           3
+        2           1
+        1           0
+        0           2
+        This mapping allows the default priority value of 0 to map to a
+        queue which is not the lowest priority queue, allowing traffic
+        classes to be assigned a lower priority queue than the default."
+    ::= { qosSwitch8948PortEntry 7 }
+
+qosSwitch8948PortQueue1Length OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets currently queued for transmission on this
+        port in queue 1. See the description for qosSwitch8948PortQueue0Length
+        to understand the meaning of queue numbers."
+    ::= { qosSwitch8948PortEntry 8 }
+
+qosSwitch8948PortQueue2Length OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets currently queued for transmission on this
+        port in queue 2. See the description for qosSwitch8948PortQueue0Length
+        to understand the meaning of queue numbers."
+    ::= { qosSwitch8948PortEntry 9 }
+
+qosSwitch8948PortQueue3Length OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets currently queued for transmission on this
+        port in queue 3. See the description for qosSwitch8948PortQueue0Length
+        to understand the meaning of queue numbers."
+    ::= { qosSwitch8948PortEntry 10 }
+
+qosSwitch8948PortQueue4Length OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets currently queued for transmission on this
+        port in queue 4. See the description for qosSwitch8948PortQueue0Length
+        to understand the meaning of queue numbers."
+    ::= { qosSwitch8948PortEntry 11 }
+
+qosSwitch8948PortQueue5Length OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets currently queued for transmission on this
+        port in queue 5. See the description for qosSwitch8948PortQueue0Length
+        to understand the meaning of queue numbers."
+    ::= { qosSwitch8948PortEntry 12 }
+
+qosSwitch8948PortQueue6Length OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets currently queued for transmission on this
+        port in queue 6. See the description for qosSwitch8948PortQueue0Length
+        to understand the meaning of queue numbers."
+    ::= { qosSwitch8948PortEntry 13 }
+
+qosSwitch8948PortQueue7Length OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of packets currently queued for transmission on this
+        port in queue 7. See the description for qosSwitch8948PortQueue0Length
+        to understand the meaning of queue numbers."
+    ::= { qosSwitch8948PortEntry 14 }
+
+-- ============================================================================
+-- Traffic Class counters table
+-- ============================================================================
+
+qosSwitch8948TrafficClassCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF QosSwitch8948TrafficClassCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Traffic class counters indexed by port, policy and traffic
+        class."
+    ::= { qosSwitch8948 2 }
+
+qosSwitch8948TrafficClassCountersEntry OBJECT-TYPE
+    SYNTAX      QosSwitch8948TrafficClassCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A traffic class counters entry containing QOS counters for a
+        particular port, policy and traffic class."
+    INDEX       { qosSwitch8948TCCountersPortIndex,
+                  qosSwitch8948TCCountersPolicyIndex,
+                  qosSwitch8948TCCountersTrafficClassIndex }
+    ::= { qosSwitch8948TrafficClassCountersTable 1 }
+
+QosSwitch8948TrafficClassCountersEntry ::=
+    SEQUENCE {
+        qosSwitch8948TCCountersPortIndex
+            Integer32,
+        qosSwitch8948TCCountersPolicyIndex
+            Integer32,
+        qosSwitch8948TCCountersTrafficClassIndex
+            Integer32,
+        qosSwitch8948TCCountersAggregateBytes
+            Counter32,
+        qosSwitch8948TCCountersBwConformanceClass1Bytes
+            Counter32,
+        qosSwitch8948TCCountersBwConformanceClass2Bytes
+            Counter32,
+        qosSwitch8948TCCountersBwConformanceClass3Bytes
+            Counter32,
+        qosSwitch8948TCCountersDroppedBytes
+            Counter32
+    }
+
+qosSwitch8948TCCountersPortIndex OBJECT-TYPE
+    SYNTAX      Integer32 (0..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the port for this entry in the traffic class
+        counter table. This index is the same as the port index in the
+        port table and is the same as the port number of the port in
+        user commands."
+    ::= { qosSwitch8948TrafficClassCountersEntry 1 }
+
+qosSwitch8948TCCountersPolicyIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..256)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the policy for this entry in the traffic class
+        counter table. Each port can only have one policy assigned at a
+        time. Policy index numbers for CLI commands start at 0, while SNMP
+        indexes must start at 1. This means that the policy index in this
+        MIB variable is 1 more than the index for the same policy as
+        entered for CLI commands."
+    ::= { qosSwitch8948TrafficClassCountersEntry 2 }
+
+qosSwitch8948TCCountersTrafficClassIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..1024)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of the traffic class for this entry in the traffic
+        class counter table. The index is one of the indices defined for
+        traffic classes for this port and policy. Traffic class indices
+        for CLI commands start at 0, while SNMP indices must start at 1.
+        This means that the traffic class index in this MIB variable is 1
+        more than the index for the same traffic class as entered for CLI
+        commands."
+    ::= { qosSwitch8948TrafficClassCountersEntry 3 }
+
+qosSwitch8948TCCountersAggregateBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of bytes classified by this traffic class for
+		this policy on this port."
+    ::= { qosSwitch8948TrafficClassCountersEntry 4 }
+
+qosSwitch8948TCCountersBwConformanceClass1Bytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes classified by this traffic class for this
+        policy on this port conforming to bandwidth class 1."
+    ::= { qosSwitch8948TrafficClassCountersEntry 5 }
+
+qosSwitch8948TCCountersBwConformanceClass2Bytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes classified by this traffic class for this
+        policy on this port conforming to bandwidth class 2."
+    ::= { qosSwitch8948TrafficClassCountersEntry 6 }
+
+qosSwitch8948TCCountersBwConformanceClass3Bytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes classified by this traffic class for this
+        policy on this port conforming to bandwidth class 3."
+    ::= { qosSwitch8948TrafficClassCountersEntry 7 }
+
+qosSwitch8948TCCountersDroppedBytes OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of bytes dropped by this traffic class for this
+        policy on this port."
+    ::= { qosSwitch8948TrafficClassCountersEntry 8 }
+
+END

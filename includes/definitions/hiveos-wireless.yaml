@@ -1,0 +1,13 @@
+os: hiveos-wireless
+text: 'Aerohive HiveOS'
+type: wireless
+icon: aerohive
+mib_dir:
+    - aerohive
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_wireless_clients, text: 'Wifi Clients' }
+discovery:
+    - sysDescr_regex:
+        - '/^(Hive)*AP[\w]+(?:_n)?, HiveOS/'

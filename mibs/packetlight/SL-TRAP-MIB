@@ -1,0 +1,113 @@
+SL-TRAP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+	slAlarmIfIndex,
+    slAlarmType, 
+	slAlarmSeverity, 
+	slAlarmServiceAffect,
+    slAlarmActive FROM SL-ALARM-MIB
+	slTestsIfLoopIfIndex, 
+	slTestsIfLoopType, 
+	slTestsTrapsLoopbackActive FROM SL-TESTS-MIB
+	optApsConfigUserWorkingIndex, 
+	optApsConfigActiveConnectionRx FROM SL-OPT-APS-MIB
+	slEventIfIndex,
+    slEventType,
+    slEventVal,
+    slEventUser, 
+	slGenEventIfIndex,
+    slGenEventType,
+    slGenEventVal,
+    slGenEventUser,
+    slEventInventoryIfIndex,
+    slEventInventoryAction,
+    slEventInventoryType,
+    slEventInventorySerial,
+    slEventInventoryPartnum FROM SL-EVENT-MIB
+	edfaIfIndex,
+	edfaStatus,
+	edfaOperControlMode FROM SL-EDFA-MIB
+	tftpStatus FROM RAD-MIB
+	packetlight FROM SL-NE-MIB;
+
+
+slAlarmTrapV1 TRAP-TYPE
+	ENTERPRISE packetlight
+	VARIABLES {slAlarmIfIndex,
+       		   slAlarmType, 
+       		   slAlarmSeverity, 
+       		   slAlarmServiceAffect,
+       		   slAlarmActive }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 101
+
+slTestsTrapsLoopbackTableChangedV1 TRAP-TYPE
+	ENTERPRISE packetlight
+	VARIABLES {
+		slTestsIfLoopIfIndex, 
+		slTestsIfLoopType, 
+		slTestsTrapsLoopbackActive }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 122
+
+edfaStatusChangeV1 TRAP-TYPE
+	ENTERPRISE packetlight
+	VARIABLES {
+		edfaIfIndex,
+		edfaStatus }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 128
+
+edfaControlModeChangeV1 TRAP-TYPE
+	ENTERPRISE packetlight
+	VARIABLES {
+		edfaIfIndex,
+		edfaOperControlMode }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 129
+
+optApsTrapSwitchoverV1 TRAP-TYPE
+	ENTERPRISE packetlight
+	VARIABLES {
+		optApsConfigUserWorkingIndex, 
+		optApsConfigActiveConnectionRx }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 130
+
+slEventTrapV1 TRAP-TYPE
+	ENTERPRISE packetlight
+	VARIABLES {
+		slEventIfIndex,
+       	slEventType,
+       	slEventVal,
+       	slEventUser }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 131
+
+tftpStatusChangeTrapV1 TRAP-TYPE
+	ENTERPRISE packetlight
+	VARIABLES {
+		tftpStatus }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 132
+
+slEventInventoryTrapV1 TRAP-TYPE
+	ENTERPRISE packetlight
+    VARIABLES {	slEventInventoryIfIndex,
+       			slEventInventoryAction,
+       			slEventInventoryType,
+       			slEventInventorySerial,
+       			slEventInventoryPartnum }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 133
+
+slGenEventTrapV1 TRAP-TYPE
+	ENTERPRISE packetlight
+	VARIABLES {
+		slGenEventIfIndex,
+       	slGenEventType,
+       	slGenEventVal,
+       	slGenEventUser }
+	DESCRIPTION "SNMPv1 trap equivalent definition"
+	::= 134
+
+END

@@ -1,0 +1,287 @@
+
+AC-PM-Analog-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION             FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+		Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		audioCodes,       
+		acRegistrations,
+		acGeneric, 
+		acProducts,acBoardMibs,acPerformance		FROM AUDIOCODES-TYPES-MIB;
+
+       
+acPMAnalog  MODULE-IDENTITY       
+    LAST-UPDATED "201208020214Z"          --Thursday, August 2 2012
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+			 AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+			 Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+		
+
+    DESCRIPTION       
+    "The AC-PM-Analog MIB offers performance monitoring
+For the Analog related elements in Audiocodes' devices.
+The Configuration sub-tree is for configuring the interval
+Period length for the entire AC-PM-Analog MIB, and the 
+different tables' thresholds.
+The Data sub-tree presents the tables of monitored
+elements.
+
+Note  - for the entire MIB the value (-1) means the value
+Asked for is either not supported or currently not relevant
+(this is for when values asked for are for intervals not yet
+recorded."
+
+
+
+    ::= {acPerformance 9}  
+
+
+
+
+
+
+
+
+     acPMAnalogConfiguration OBJECT IDENTIFIER ::= {acPMAnalog 1}
+
+
+     acPMAnalogConfigurationPeriodLength OBJECT-TYPE
+       SYNTAX Unsigned32 (0..894780)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Length of monitoring intervals for entire MIB.
+Time is in minutes."
+       ::= {acPMAnalogConfiguration 1}
+
+
+
+     acPMAnalogConfigurationResetTotalCounters OBJECT-TYPE
+       SYNTAX INTEGER {
+                  resetCountersDone(1)
+,
+                  resetTotalCounters(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Total-Counters Reset.  To reset the total counters, set the
+value of this object to resetTotalCounters(2)."
+       ::= {acPMAnalogConfiguration 2}
+
+
+
+     acPMAnalogUtilsAttributes OBJECT IDENTIFIER ::= {acPMAnalogConfiguration 31}
+
+
+     acPMAnalogUtilsAttributesOffHookChannelsHighThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "High threshold."
+       ::= {acPMAnalogUtilsAttributes 1}
+
+
+
+     acPMAnalogUtilsAttributesOffHookChannelsLowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Low threshold."
+       ::= {acPMAnalogUtilsAttributes 2}
+
+
+
+     acPMAnalogData OBJECT IDENTIFIER ::= {acPMAnalog 2}
+
+
+     acPMAnalogDataAcPMAnalogTimeFromStartOfInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The time in seconds since the start of the current interval.
+MIB specific."
+       ::= {acPMAnalogData 1}
+
+
+
+     acPMAnalogUtils OBJECT IDENTIFIER ::= {acPMAnalogData 31}
+
+
+     -- ****************************************
+     -- acPMOffHookChannels table decleration
+     -- ****************************************
+     acPMOffHookChannelsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcPMOffHookChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Number of active (off-hook) analog lines."
+       ::= {acPMAnalogUtils 21}
+
+
+
+     -- ****************************************
+     -- acPMOffHookChannels table entry
+     -- ****************************************
+     acPMOffHookChannelsEntry OBJECT-TYPE
+       SYNTAX AcPMOffHookChannelsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acPMOffHookChannelsInterval}
+       ::= {acPMOffHookChannelsTable 1}
+
+
+
+     -- ****************************************
+     -- acPMOffHookChannels TABLE
+     -- ****************************************
+     AcPMOffHookChannelsEntry ::= SEQUENCE {
+       acPMOffHookChannelsInterval                     Unsigned32,
+       acPMOffHookChannelsVal                          Gauge32,
+       acPMOffHookChannelsAverage                      Integer32,
+       acPMOffHookChannelsMax                          Integer32,
+       acPMOffHookChannelsMin                          Integer32,
+       acPMOffHookChannelsVolume                       Integer32,
+       acPMOffHookChannelsTimeBelowLowThreshold        Integer32,
+       acPMOffHookChannelsTimeBetweenThresholds        Integer32,
+       acPMOffHookChannelsTimeAboveHighThreshold       Integer32,
+       acPMOffHookChannelsFullDayAverage               Integer32
+     }
+
+
+
+     acPMOffHookChannelsInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Interval index.
+0 - current period (incomplete monitoring - mid period).
+1 - Last full period.
+2 - One before last."
+       ::= {acPMOffHookChannelsEntry 1}
+
+
+
+     acPMOffHookChannelsVal OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Value of gauge or counter."
+       ::= {acPMOffHookChannelsEntry 2}
+
+
+
+     acPMOffHookChannelsAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Average value with in the period time."
+       ::= {acPMOffHookChannelsEntry 3}
+
+
+
+     acPMOffHookChannelsMax OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Maximum value with in the period time."
+       ::= {acPMOffHookChannelsEntry 4}
+
+
+
+     acPMOffHookChannelsMin OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Minimum value with in the period time."
+       ::= {acPMOffHookChannelsEntry 5}
+
+
+
+     acPMOffHookChannelsVolume OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Activity volume."
+       ::= {acPMOffHookChannelsEntry 6}
+
+
+
+     acPMOffHookChannelsTimeBelowLowThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is below what was determined
+as the low threshold."
+       ::= {acPMOffHookChannelsEntry 7}
+
+
+
+     acPMOffHookChannelsTimeBetweenThresholds OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is above what was determined
+as the high threshold."
+       ::= {acPMOffHookChannelsEntry 8}
+
+
+
+     acPMOffHookChannelsTimeAboveHighThreshold OBJECT-TYPE
+       SYNTAX Integer32 (-1..100)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Percent of interval time for which gauge is between what were
+determined as the low and high thresholds."
+       ::= {acPMOffHookChannelsEntry 9}
+
+
+
+     acPMOffHookChannelsFullDayAverage OBJECT-TYPE
+       SYNTAX Integer32 (-1..2147483647)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The average of full 24 hours."
+       ::= {acPMOffHookChannelsEntry 10}
+
+
+
+
+
+END

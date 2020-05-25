@@ -1,0 +1,1062 @@
+-- *****************************************************************
+-- UBQS-ENTITY-MIB  : Ubiquoss FRU Control MIB file
+--
+-- June 2009, Hyung Eun Park
+--
+-- Copyright (c) 2009 by Ubiquoss, Corp.
+-- All rights reserved.    
+--
+-- *****************************************************************
+--
+
+UBQS-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Unsigned32,
+    Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TimeStamp,
+    TruthValue
+        FROM SNMPv2-TC
+    entPhysicalIndex,
+    entPhysicalName,
+    entPhysicalDescr,
+    entPhysicalContainedIn
+        FROM ENTITY-MIB
+    ubiMgmtv2
+        FROM UBQS-SMI;
+  
+  
+ubiEntityMIB MODULE-IDENTITY
+    LAST-UPDATED    "200906160000Z"
+    ORGANIZATION 	"Ubiquoss Corp."
+	CONTACT-INFO
+		"	Ubiquoss
+			Customer Service
+
+		 Postal: 24F Milennium B/D,
+		 	467-12, Dogok-Dong,
+			GangNam-Gu, Seoul 135-270
+			Korea
+
+		   Tel: 82-2-2190-3100"     
+    DESCRIPTION
+        "The UBQS-ENTITY-MIB is used to monitor
+        and configure operational status of 
+        Field Replaceable Units (FRUs) and other managable 
+        physical entities of the system listed in the 
+        Entity-MIB (RFC 2737) entPhysicalTable."
+    ::= { ubiMgmtv2 3 }
+
+
+-- ***********************************************************   
+-- TEXTUAL-CONVENTION
+-- Define the composed syntax 
+-- ***********************************************************
+
+ModuleOperType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "Operational module states.  Valid values are :
+
+        	unknown(1)            Module is not in one of other states
+         					  normal operational states:
+
+        	ok(2)                 Module is operational.
+
+        	disabled(3)           Module is administratively disabled.
+
+        	selfTest(6)           Module is performing selfTest.
+
+
+         failure states:
+
+        	failed(7)              Module has failed due to some condition
+                              not stated above.
+                              
+        	dormant(12)            Module is waiting for an external or
+                              internal event to become operational.
+		"
+    SYNTAX          INTEGER  {
+                        other(1),
+                        ok(2),
+                        disabled(3)
+     }      
+
+UbiSensorDataType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "sensor measurement data types.  valid values are:
+        other(1):        a measure other than those listed below
+        unknown(2):      unknown measurement, or 
+                         arbitrary, relative numbers    
+        volts(3):      electric potential
+        amperes(4):      electric current
+        celsius(5):      temperature
+        dBm(6):         dB relative to 1mW of power     
+        percentRH(8):    percent relative humidity
+        rpm(9):         shaft revolutions per minute
+        cmm(10),:        cubic meters per minute (airflow)
+        truthvalue(11):  value takes { true(1), false(2) }
+        specialEnum(12): value takes user defined enumerated values
+        watts(13):        power
+        hertz(14):        frequency
+        "
+    SYNTAX INTEGER {
+        other(1),
+        unknown(2),
+        volts(3),
+        amperes(4),   
+        celsius(5),
+        dBm(6),
+        percentRH(8),
+        rpm(9),
+        cmm(10),
+        truthvalue(11),
+        specialEnum(12),
+        watts(13),
+        hertz(14)
+    }          
+    
+UbiSensorDataScale ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "International System of Units (SI) prefixes."
+    SYNTAX INTEGER {
+        yocto(1),   -- 10^-24
+        zepto(2),   -- 10^-21
+        atto(3),    -- 10^-18
+        femto(4),   -- 10^-15
+        pico(5),    -- 10^-12
+        nano(6),    -- 10^-9
+        micro(7),   -- 10^-6
+        milli(8),   -- 10^-3
+        units(9),   -- 10^0
+        kilo(10),   -- 10^3
+        mega(11),   -- 10^6
+        giga(12),   -- 10^9
+        tera(13),   -- 10^12
+        exa(14),    -- 10^15
+        peta(15),   -- 10^18
+        zetta(16),  -- 10^21
+        yotta(17)   -- 10^24
+    }
+
+UbiSensorPrecision ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "When in the range 1 to 9, SensorPrecision is the number 
+        of decimal places in the fractional part of 
+        a SensorValue fixed-point number.  When in the range -8 to
+        -1, SensorPrecision is the number of accurate digits in 
+        a SensorValue fixed-point number.
+
+        SensorPrecision is 0 for non-fixed-point numbers.
+
+        Agent implementors must choose a value for SensorPrecision 
+        so that the precision and accuracy of a SensorValue is 
+        correctly indicated.
+
+        For example, a temperature sensor that can measure 0o to 
+        100o C in 0.1o increments, +/- 0.05o, would have a 
+        SensorPrecision of 1, a SensorDataScale of units(0), and a 
+        SensorValue ranging from 0 to 1000.  
+        The SensorValue would be interpreted as (degrees C * 10).
+
+        If that temperature sensor's precision were 0.1o but its 
+        accuracy were only +/- 0.5o, then the SensorPrecision would 
+        be 0. The SensorValue would be interpreted as degrees C.
+
+        Another example: a fan rotation speed sensor that measures RPM 
+        from 0 to 10,000 in 100 RPM increments, with an accuracy of 
+        +50/-37 RPM, would have a SensorPrecision of -2, a 
+        SensorDataScale of units(9), and a SensorValue ranging from 0 
+        to 10000. The 10s and 1s digits of SensorValue would always 
+        be 0.
+        "
+    SYNTAX INTEGER (-8..9)
+
+UbiSensorValue_cisco ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "For sensors that measure voltsAC, voltsDC, 
+        amperes, watts, hertz, celsius, cmm
+        this item is a fixed point number ranging from 
+        -999,999,999 to +999,999,999.  Use the value 
+        -1000000000 to indicate underflow. Use the value 
+        +1000000000 to indicate overflow.  Use SensorPrecision
+        to indicate how many fractional digits the SensorValue
+        has.
+
+
+        For sensors that measure percentRH, this item
+        is a number ranging from 0 to 100.
+
+        For sensors that measure rpm, this item
+        can take only nonnegative values, 0..999999999.
+
+        For sensors of type truthvalue, this item 
+        can take only two values: true(1), false(2).
+
+        For sensors of type specialEnum, this item
+        can take any value in the range (-1000000000..1000000000),
+        but the meaning of each value is specific to the 
+        sensor.
+
+        For sensors of type other and unknown, 
+        this item can take any value in the range 
+        (-1000000000..1000000000), but the meaning of the values 
+        are specific to the sensor.
+
+        Use Entity-MIB entPhysicalTable.entPhysicalVendorType
+        to learn about the sensor type.
+    "
+    SYNTAX INTEGER (-1000000000..1000000000)
+ 				         
+ 				         
+UbiSensorValue ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Represent the sensor value"
+    SYNTAX OCTET STRING 				         
+
+    
+UbiTcIdentifier ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        ""
+    SYNTAX INTEGER {     
+   		unknown(0),  
+    	other(1),
+		gbic(2),
+		module(3),
+		sfp(4),
+		xbi(5),
+		xenpak(6),
+		xfp(7),
+		xff(8),
+		xfp_e(9),
+		xpak(10),
+		x2(11)
+    }
+
+    
+UbiTcEncodingType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        ""
+    SYNTAX INTEGER {
+		unknown(0),     
+		other(1),
+		enc_64b(2),    
+		enc_4b5b(3),		
+		enc_8b10b(4),
+		enc_sonet(5),
+		enc_nrz(6),
+		enc_rz(7),
+		enc_manchester(8)
+	}
+
+UbiTcConnectorType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        ""
+    SYNTAX INTEGER {
+		unknown(0),     
+		other(1),
+		sc(2),
+		fiber_style1_copper(3),
+		fiber_stype2_copper(4),
+		bnc_tnc(5),
+		fiber_coaxial(6),
+		fiberjack(7),     
+		lc(8),
+		mt_rj(9),
+		sg(10),
+		optical_pigtail(11),
+		hssdc2(12),
+		copper_pigtail(13)			
+	}
+
+
+   
+-- ***********************************************************
+-- ubiEntityMIB
+-- *********************************************************** 
+
+ubiEntityMIBObjects  			OBJECT IDENTIFIER		::= { ubiEntityMIB 1 }
+ubiEntityMIBNotificationPrefix  OBJECT IDENTIFIER		::= { ubiEntityMIB 2 }
+ubiEntityMIBConformance  		OBJECT IDENTIFIER	 	::= { ubiEntityMIB 3 }
+        
+
+ubiEntityNotificationEnables  	OBJECT IDENTIFIER		::= { ubiEntityMIBObjects 1 }
+ubiExtSlot  					OBJECT IDENTIFIER		::= { ubiEntityMIBObjects 4 }
+ubiTransceiver  				OBJECT IDENTIFIER		::= { ubiEntityMIBObjects 5 }
+
+ubiFruNotifications  				OBJECT IDENTIFIER	 	::= { ubiEntityMIBNotificationPrefix 0 }
+ubiEntitySensorNotifications  		OBJECT IDENTIFIER	 	::= { ubiEntityMIBNotificationPrefix 1 }
+
+    	 
+-- ***********************************************************
+-- ubiEntityEnableFruControlNotification
+-- ***********************************************************      
+
+
+	ubiFRUControlEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"This variable indicates whether the system
+        	produces the following notifications:
+        	ubiEntityFRUInserted, ubiEntityFRURemoved.
+
+        	A false value will prevent these notifications
+       	 from being generated."
+  	 	DEFVAL          { false } 
+    	::= { ubiEntityNotificationEnables 1 }         
+    	
+  	ubiEntSensorThresholdNotificationEnabled OBJECT-TYPE
+    	SYNTAX          TruthValue
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"This variable indicates whether the system
+        	produces the following notification:
+        	ubiEntSensorThreshold.
+
+        	A false value will prevent these notifications 
+        	from being generated."
+  	 	DEFVAL          { false } 
+    	::= { ubiEntityNotificationEnables 2 }     
+
+                                                                    
+-- ***********************************************************
+-- ubiEntityModuleTable
+-- *********************************************************** 
+
+	ubiModuleTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiModuleEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains one row per module entity."
+    	::= { ubiEntityMIBObjects 2 }
+
+
+	ubiModuleEntry OBJECT-TYPE
+    	SYNTAX          UbiModuleEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Information about a particular module entity."
+    	INDEX           { entPhysicalIndex } 
+    	::= { ubiModuleTable 1 }
+
+	UbiModuleEntry ::= SEQUENCE {                  
+		ubiModuleId								INTEGER,
+		ubiModuleType							DisplayString,
+        ubiModuleOperStatus             		ModuleOperType,
+        ubiModuleStatusLastChangeTime   		TimeStamp,
+        ubiModuleSerialNumber			  		DisplayString, 
+        ubiModuleSlotNumber     				Integer32,
+       	ubiModulePortNumber     				Integer32,
+       	ubiModuleAction            				INTEGER,
+       }
+ 
+   	ubiModuleId OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The unique module ID." 
+    	::= { ubiModuleEntry 1 }
+ 
+  	ubiModuleType OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The textual type of this module." 
+    	::= { ubiModuleEntry 2 }
+
+	ubiModuleOperStatus OBJECT-TYPE
+    	SYNTAX          ModuleOperType
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The operational state of this module." 
+    	::= { ubiModuleEntry 3 }
+  
+	ubiModuleStatusLastChangeTime OBJECT-TYPE
+    	SYNTAX          TimeStamp
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+       		"The value of sysUpTime when ubiModuleOperStatus
+        	is changed." 
+    	::= { ubiModuleEntry 4 }     
+    	
+ 	ubiModuleSerialNumber OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   
+        	"The serial number of this module."
+        ::= { ubiModuleEntry 5 }
+ 
+  	ubiModuleSlotNumber OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"This value is determined by the number of slot 
+        	where the module is located." 
+    	::= { ubiModuleEntry 6 }   
+
+ 	ubiModulePortNumber OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"This value is determined by the number of port 
+        	where the module is located." 
+    	::= { ubiModuleEntry 7 }   
+
+	ubiModuleAction 		OBJECT-TYPE
+    	SYNTAX          INTEGER    	   
+    	{   
+    			other(1),
+				reset(2)
+    	}
+    	MAX-ACCESS      read-write
+    	STATUS          current
+    	DESCRIPTION
+        	"This object, when read, returns one of the
+ 			following results:
+ 	    		other(1):   module permanently enabled
+ 			
+ 			Setting this object to one of the acceptable values 
+ 			gives the following results:
+ 	  			other(1):  gives an error
+ 	  			reset(2):  resets the module's control logic
+ 				Setting this object to any other values results in
+ 				an error." 
+    	::= { ubiModuleEntry 8 }
+ 
+ 
+ 
+-- ***********************************************************
+-- ubiSlotEntity
+-- ***********************************************************   
+
+	ubiSlotTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiSlotEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains one row per slot entity."
+    	::= { ubiEntityMIBObjects 3 }
+
+	ubiSlotEntry OBJECT-TYPE
+    	SYNTAX          UbiSlotEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"Information about a particular slot entity."
+    	INDEX           { entPhysicalIndex } 
+    	::= { ubiSlotTable 1 }
+
+	UbiSlotEntry ::= SEQUENCE { 
+		ubiSlotModuleId					INTEGER,       
+		ubiSlotId						INTEGER,  
+		ubiSlotType						DisplayString,
+		ubiSlotOperStatus 			 	ModuleOperType,
+       	ubiSlotPortNumber     			Integer32,
+       	ubiSlotSerialNumber             DisplayString
+	}                       
+	
+ 	ubiSlotModuleId OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The unique module ID." 
+    	::= { ubiSlotEntry 1 } 
+ 
+  	ubiSlotId OBJECT-TYPE
+    	SYNTAX          INTEGER
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The unique slot ID." 
+    	::= { ubiSlotEntry 2 }
+ 
+  	ubiSlotType OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The textual type of this slot." 
+    	::= { ubiSlotEntry 3 }
+
+	ubiSlotOperStatus OBJECT-TYPE
+    	SYNTAX          ModuleOperType 
+    	MAX-ACCESS      read-only
+   	 	STATUS          current
+    	DESCRIPTION
+        	"The status of this slot." 
+    	::= { ubiSlotEntry 4 }
+
+ 	ubiSlotPortNumber OBJECT-TYPE
+    	SYNTAX          Integer32
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"This value is determined by the number of port 
+        	where the slot is located." 
+    	::= { ubiSlotEntry 5 }   
+   
+ 	ubiSlotSerialNumber OBJECT-TYPE
+        SYNTAX        DisplayString
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   
+        	"The serial number of this slot."
+        ::= { ubiSlotEntry 6 }
+                 
+                 
+-- ***********************************************************
+-- ubiExtSlotTable
+-- *********************************************************** 
+
+ 	ubiIEEE1588SlotOperStatus OBJECT-TYPE
+    	SYNTAX          INTEGER {           
+    		equip(1),
+    		unequip(2)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The operational status of the slot for 
+        	IEEE 1588 specification." 
+    	::= { ubiExtSlot 1 }   
+                 
+
+ 	ubiMngSlotOperStatus OBJECT-TYPE
+    	SYNTAX          INTEGER {           
+    		equip(1),
+    		unequip(2)
+    	}
+    	MAX-ACCESS      read-only
+    	STATUS          current
+    	DESCRIPTION
+        	"The operational status of the slot for 
+        	mng specification." 
+    	::= { ubiExtSlot 2 }   
+                 
+-- ***********************************************************
+-- ubiTransceiver
+-- ***********************************************************
+  
+ 	ubiTransceiverMonitoring OBJECT-TYPE
+    	SYNTAX          TruthValue
+     	MAX-ACCESS      read-write
+    	STATUS          current    
+    	DESCRIPTION
+        "This variable indicates whether the system produces 
+        the log and notification for transceiver sensor."
+	   	::= { ubiTransceiver 3 }         
+	   	
+	   	
+-- ***********************************************************
+-- ubiEntitySensorTable
+-- ***********************************************************
+  
+	ubiEntitySensorTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiEntitySensorEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains objects which provide information 
+        	 about the transceiver sensor of physical entity."
+    	::= { ubiTransceiver 1 }
+
+	ubiEntitySensorEntry OBJECT-TYPE
+    	SYNTAX          UbiEntitySensorEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An entry containing management information applicable 
+        	to the transceiver sensor of a particular physical entity."
+    	INDEX           { entPhysicalIndex  } 
+    	::= { ubiEntitySensorTable 1 }
+                                                
+	UbiEntitySensorEntry ::= SEQUENCE {            
+			ubiEntSensorType							UbiSensorDataType,     
+			ubiEntSensorScale							UbiSensorDataScale,
+			ubiEntSensorValue                       	UbiSensorValue,
+			ubiEntSensorEventStatus 					INTEGER,
+			ubiEntSensorEventUpdateTime					TimeStamp,		
+			ubiEntSensorAlarmHighThreshold				UbiSensorValue,   
+			ubiEntSensorWarningHighThreshold			UbiSensorValue,    
+			ubiEntSensorWarningLowThreshold				UbiSensorValue,
+			ubiEntSensorAlarmLowThreshold				UbiSensorValue,			
+			--ubiEntSensorPrecision 					UbiSensorPrecision,    
+			ubiEntSensorName							DisplayString
+
+	}
+  
+ 	ubiEntSensorType OBJECT-TYPE
+    	SYNTAX          UbiSensorDataType
+     	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        "This variable indicates the type of data reported 
+         by the entSensorValue.  
+         valid values are:
+	        other(1):        a measure other than those listed below
+	        unknown(2):      unknown measurement, or 
+	                         arbitrary, relative numbers    
+	        voltsAC(3):      electric potential
+	        voltsDC(4):      electric potential
+	        amperes(5):      electric current
+	        celsius(6):      temperature
+	        dBm(7):         dB relative to 1mW of power     
+		"
+	   	::= { ubiEntitySensorEntry 1 }   
+  
+  	ubiEntSensorScale OBJECT-TYPE
+    	SYNTAX          UbiSensorDataScale
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates the exponent to apply
+            to sensor values reported by entSensorValue." 
+    	::= { ubiEntitySensorEntry 2 }    
+ 
+ -- 	ubiEntSensorPrecision OBJECT-TYPE
+ --   	SYNTAX          UbiSensorPrecision
+ --   	MAX-ACCESS      read-only
+ --   	STATUS          current
+ --  		DESCRIPTION
+ --       	"" 
+ --   	::= { ubiEntitySensorEntry 3 }  
+
+ 
+  	ubiEntSensorValue OBJECT-TYPE
+    	SYNTAX          UbiSensorValue
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable reports the most recent measurement seen
+             by the sensor." 
+    	::= { ubiEntitySensorEntry 3 } 
+ 
+ 	ubiEntSensorEventStatus OBJECT-TYPE
+    	SYNTAX          INTEGER {     
+    		none(0),
+    	 	normal(1),
+    	 	highAlarm(2),   
+     	 	highWarning(3),
+     	 	lowWarning(4),  
+    	 	lowAlarm(5)
+       	}
+    	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+        	"This variable indicates the present 
+        	current event status of the sensor."
+	   	::= { ubiEntitySensorEntry 4 }    
+
+ 
+  	ubiEntSensorEventUpdateTime OBJECT-TYPE
+    	SYNTAX          TimeStamp
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"The value of sysUpTime when the status of 
+        	entity sensor is changed." 
+    	::= { ubiEntitySensorEntry 5 } 
+
+   	ubiEntSensorAlarmHighThreshold OBJECT-TYPE
+        SYNTAX			UbiSensorValue
+        MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates the value of 
+        	the high alarm threshold."
+       	::= { ubiEntitySensorEntry 6 }    				 
+  
+  
+   	ubiEntSensorWarningHighThreshold OBJECT-TYPE
+        SYNTAX			UbiSensorValue
+        MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates the value of 
+        	the high warning threshold."
+       	::= { ubiEntitySensorEntry 7 }    				 
+
+   	ubiEntSensorWarningLowThreshold OBJECT-TYPE
+        SYNTAX			UbiSensorValue
+        MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates the value of 
+        	the low warning threshold."
+       	::= { ubiEntitySensorEntry 8 }   
+
+   	ubiEntSensorAlarmLowThreshold OBJECT-TYPE
+        SYNTAX			UbiSensorValue
+        MAX-ACCESS      read-write
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates the value of 
+        	the low alarm threshold."
+       	::= { ubiEntitySensorEntry 9 }    
+       	
+   	ubiEntSensorName OBJECT-TYPE
+        SYNTAX			DisplayString
+        MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates the name of 
+        	 the sensor entity."
+       	::= { ubiEntitySensorEntry 10 }    
+                                        
+-- ***********************************************************
+-- ubiTransceiverInfoTable
+-- ***********************************************************
+  
+	ubiTransceiverInfoTable OBJECT-TYPE
+    	SYNTAX          SEQUENCE OF UbiTransceiverInfoEntry 
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"This table contains objects which provide information 
+        	 about the transceiver of physical entity."
+    	::= { ubiTransceiver 2 }
+
+	ubiTransceiverInfoEntry OBJECT-TYPE
+    	SYNTAX          UbiTransceiverInfoEntry
+    	MAX-ACCESS      not-accessible
+    	STATUS          current
+    	DESCRIPTION
+        	"An entry containing management information applicable 
+        	to the transceiver of a particular physical entity."
+    	INDEX           { entPhysicalIndex  } 
+    	::= { ubiTransceiverInfoTable 1 }
+                                                
+	UbiTransceiverInfoEntry ::= SEQUENCE {            
+			ubiTcIdentifier           			UbiTcIdentifier,
+			ubiTcVendorOUI						DisplayString,
+			ubiTcVendorName						DisplayString,
+			ubiTcVendorPartNumber				DisplayString,
+			ubiTcVendorRevisionLevel			DisplayString,	
+			ubiTcVendorSerialNumber				DisplayString,	
+			ubiTcVendorManufacturingDate		DisplayString,	
+			ubiTcWaveLength						Integer32,
+			ubiTcConnector			    		UbiTcConnectorType,
+			ubiTcLength							Integer32,   
+	}
+  
+ 	ubiTcIdentifier OBJECT-TYPE
+    	SYNTAX          UbiTcIdentifier
+     	MAX-ACCESS      read-only
+    	STATUS          current    
+    	DESCRIPTION
+		"This variable indicates the transceiver indentifier.
+		 valid value are:
+		      	unknown(0),  
+		    	other(1),
+				gbic(2),
+				module(3),
+				sfp(4),
+				xbi(5),
+				xenpak(6),
+				xfp(7),
+				xff(8),
+				xfp_e(9),
+				xpak(10),
+				x2(11)
+		"
+	   	::= { ubiTransceiverInfoEntry 1 }   
+  
+  	ubiTcVendorOUI OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION      
+ 			"This variable indicates a textual string containing 
+			information about the IEEE company ID of transceiver vendor"  
+    	::= { ubiTransceiverInfoEntry 2 }    
+
+  	ubiTcVendorName OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"A textual string containing information about the
+            transceiver name." 
+    	::= { ubiTransceiverInfoEntry 3 }   
+
+  	ubiTcVendorPartNumber OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"A textual string containing information about the
+            part number of the transceiver." 
+    	::= { ubiTransceiverInfoEntry 4 }   
+ 
+  	ubiTcVendorRevisionLevel OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+       	    "A textual string containing information about the
+             revision level of the transceiver part number." 
+    	::= { ubiTransceiverInfoEntry 5 }   
+ 
+  	ubiTcVendorSerialNumber OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+			"This variable indicates a textual string containing 
+			information about the transceiver serial number."   	
+       	::= { ubiTransceiverInfoEntry 6 }  
+                                                 
+  	ubiTcVendorManufacturingDate OBJECT-TYPE
+    	SYNTAX          DisplayString
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates a manufacturing date 
+        	of transceiver"
+    	::= { ubiTransceiverInfoEntry 7 }    
+       
+  	ubiTcWaveLength OBJECT-TYPE
+    	SYNTAX          Integer32      
+    	UNITS			"Nanometer"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates a wave length 
+        	of transceiver." 
+    	::= { ubiTransceiverInfoEntry 8 }        
+       
+  	ubiTcConnector OBJECT-TYPE
+    	SYNTAX          UbiTcConnectorType
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates a connector type 
+        	of transceiver."  
+    	::= { ubiTransceiverInfoEntry 9 }    
+
+  	ubiTcLength OBJECT-TYPE
+    	SYNTAX          Integer32   
+    	UNITS			"Meter"
+    	MAX-ACCESS      read-only
+    	STATUS          current
+   		DESCRIPTION
+        	"This variable indicates a length 
+        	of transceiver." 
+    	::= { ubiTransceiverInfoEntry 10 }    
+                
+                                                 
+-- ***********************************************************
+-- ubiEntityFRUMIBNotificationPrefix
+-- ***********************************************************  
+	ubiFRUInserted NOTIFICATION-TYPE
+    	OBJECTS         { 
+    					entPhysicalContainedIn,    
+    					entPhysicalDescr,
+    				  	entPhysicalName	  	 
+    					}
+    	STATUS          current
+    	DESCRIPTION
+        	"The ubiEntityFRUInserted notification indicates that a FRU was
+        	inserted. The varbind for this notification indicates the
+        	entPhysicalIndex of the inserted FRU, and the entPhysicalIndex
+        	of the FRU's container."
+   		::= { ubiFruNotifications 1 }
+
+	ubiFRURemoved NOTIFICATION-TYPE
+    	OBJECTS         { 
+    					entPhysicalContainedIn,    
+    					entPhysicalDescr,
+    				  	entPhysicalName	  
+    				    }
+    	STATUS          current
+    	DESCRIPTION
+       		"The ubiEntityFRURemoved notification indicates that a FRU was
+        	removed. The varbind for this notification indicates the
+        	entPhysicalIndex of the removed FRU, and the entPhysicalIndex
+        	of the FRU's container."
+   		::= { ubiFruNotifications 2 }
+ 
+-- ***********************************************************
+-- ubiDdmMIBNotificationPrefix
+-- ***********************************************************       
+         
+	ubiEntSensorThreshold NOTIFICATION-TYPE
+    	OBJECTS {
+    			entPhysicalDescr,  
+    			ubiEntSensorEventStatus,
+    			ubiEntSensorValue,       
+    			ubiEntSensorAlarmHighThreshold,      
+       			ubiEntSensorWarningHighThreshold,
+    			ubiEntSensorWarningLowThreshold, 
+    			ubiEntSensorAlarmLowThreshold, 
+    	}             
+    	STATUS          current
+    	DESCRIPTION
+        	"The ubiEntSensorThreshold notification indicates that 
+        	the status of transceiver sensor was changed."
+   	::= { ubiEntitySensorNotifications 1 }
+          
+ 
+-- ***********************************************************
+-- ubiEntityMIBConformance
+-- ***********************************************************  
+
+-- conformance information
+
+ubiEntityMIBCompliances  OBJECT IDENTIFIER		::= { ubiEntityMIBConformance 1 }
+ubiEntityMIBGroups  OBJECT IDENTIFIER			::= { ubiEntityMIBConformance 2 }
+
+
+--
+-- compliance statements
+--
+	ubiEntityMIBCompliance MODULE-COMPLIANCE
+    	STATUS          current
+    	DESCRIPTION
+        	"An Entity-MIB implementation can implement this group to
+        	provide FRU status and control."
+   	 	MODULE          -- this module
+    	MANDATORY-GROUPS {
+    					ubiEntityMIBModuleGroup,
+    					ubiEntityMIBSlotGroup,
+                        ubiEntityMIBNotificationGroup,
+                        ubiEntiryMIBIEEE1588SlotGroup,
+                        ubiEntityMIBTransceiverGroup
+                        }
+
+    	GROUP           ubiEntityMIBModuleGroup
+    	DESCRIPTION
+        	"The ubiEntityMIBModuleGroup must be implemented for
+        	FRUs that are of module type."
+
+    	GROUP           ubiEntityMIBSlotGroup
+    	DESCRIPTION
+        	"The ubiEntityMIBSlotGroup must be
+        	implemented for FRUs that of slot type"
+        	   
+    	GROUP           ubiEntityMIBNotificationGroup
+    	DESCRIPTION
+        	"The ubiEntityMIBNotificationGroup must be
+        	implemented for FRUs that have notification"           	
+        
+        GROUP			ubiEntiryMIBIEEE1588SlotGroup
+        DESCRIPTION
+        	"The ubiEntiryMIBIEEE1588SlotGroup must be
+        	 implemented for FRUs that of slot for 
+        	 IEEE 1588 specification."     
+        GROUP		ubiEntityMIBTransceiverGroup
+        DESCRIPTION
+        	"The ubiEntityMIBTransceiverGroup must be implemented 
+        	for transceiver."
+    	::= { ubiEntityMIBCompliances 1 }
+
+-- units of conformance
+
+	ubiEntityMIBModuleGroup OBJECT-GROUP
+    	OBJECTS         {
+                        ubiEntityModuleAdminStatus,
+                        ubiEntityModuleOperStatus,
+                        ubiEntityModuleStatusLastChangeTime
+                    	}
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to get the
+        	operational state and redundancy state of the modules"
+    	::= { ubiEntityMIBGroups 1 }
+
+	ubiEntitySlotGroup NOTIFICATION-GROUP
+   		NOTIFICATIONS    { ubiEntitySlotOperStatus }
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to get the
+        	operational state and redundancy state of the slot."
+    	::= { ubiEntityMIBGroups 2 }    
+ 
+	ubiEntityMIBNotificationGroup OBJECT-GROUP
+    	OBJECTS         { 
+      						ubiEntityEnableFruControlNotification,
+    						ubiEntityFRUInserted,
+    					  	ubiEntityFRURemoved
+    					}
+    	STATUS          current
+    	DESCRIPTION
+        	"TThe collection of objects which are 
+        	used to send a notification."
+    	::= { ubiEntityMIBGroups 3 }
+
+
+	ubiEntiryMIBIEEE1588SlotGroup   OBJECT-GROUP
+    	OBJECTS         { 
+      						ubiIEEE1588SlotOperStatus
+      		}
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to get the
+        	operational state of the slot for IEEE 1588."
+    	::= { ubiEntityMIBGroups 4 }
+
+	
+	ubiEntityMIBTransceiverGroup    OBJECT-GROUP
+    	OBJECTS         { 
+     		ubiEntSensorType,     
+			ubiEntSensorScale,
+			ubiEntSensorValue,
+			ubiEntSensorEventStatus,
+			ubiEntSensorEventUpdateTime,		
+			ubiEntSensorAlarmHighThreshold,   
+			ubiEntSensorWarningHighThreshold,    
+			ubiEntSensorWarningLowThreshold	,
+			ubiEntSensorAlarmLowThreshold,	      		
+			ubiTcIdentifier,
+			ubiTcVendorOUI,
+			ubiTcVendorName,
+			ubiTcVendorPartNumber,
+			ubiTcVendorRevisionLevel,	
+			ubiTcVendorSerialNumber,	
+			ubiTcVendorManufacturingDate,	
+			ubiTcWaveLength	,
+			ubiTcConnector,
+			ubiTcLength
+		}
+    	STATUS          current
+    	DESCRIPTION
+        	"The collection of objects which are used to get the
+        	information of transceiver."
+    	::= { ubiEntityMIBGroups 5 }
+
+
+END
+
+
+

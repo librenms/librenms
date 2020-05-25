@@ -1,0 +1,26 @@
+mib: CIENA-WS-XCVR-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - cwsXcvrTemperatureThresholdLowAlarmThreshold
+                    - cwsXcvrTemperatureThresholdHighAlarmThreshold
+                    - cwsXcvrCienaIdDescription
+        temperature:
+            data:
+                -
+                    oid: cwsXcvrTemperatureTable
+                    value: cwsXcvrTemperatureActual
+                    num_oid: '.1.3.6.1.4.1.1271.3.4.15.13.1.2.{{ $index }}'
+                    descr: 'Module {{ $subindex0 }} - {{ $cwsXcvrCienaIdDescription }}'
+                    index: 'cwsXcvrTemperatureTable.{{ $index }}'
+                    group: 'Modules'
+                    low_limit: cwsXcvrTemperatureThresholdLowAlarmThreshold
+                    high_limit: cwsXcvrTemperatureThresholdHighAlarmThreshold 
+                    skip_values:
+                        -
+                            oid: cwsXcvrTemperatureThresholdHighAlarmThreshold
+                            op: '<='
+                            value: 0
+

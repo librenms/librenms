@@ -1,0 +1,85 @@
+-- ICT MIB file for ICT Digital Series.
+--
+-- Date		Version
+-- =============================
+-- 10/4/12	v1.00
+--
+--  Renamed from ICT-MIB to ICT-DIGITAL-SERIES-MIB
+
+ICT-DIGITAL-SERIES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, IpAddress	FROM RFC1155-SMI
+	DisplayString		FROM RFC1213-MIB
+	OBJECT-TYPE		FROM RFC-1212
+	TRAP-TYPE		FROM RFC-1215;
+
+ictPower			OBJECT IDENTIFIER ::= { enterprises 39145 }
+
+digitalSeries			OBJECT IDENTIFIER ::= { ictPower 11 }
+
+deviceModel			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Model Number"
+	::= { digitalSeries 1 }
+
+deviceName			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Device Name"
+	::= { digitalSeries 2 }
+
+deviceHardware			OBJECT-TYPE
+	SYNTAX			INTEGER (0..127)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Hardware Version"
+	::= { digitalSeries 3 }
+
+deviceFirmware			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Firmware Version"
+	::= { digitalSeries 4 }
+
+deviceMacAddress		OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"MAC Address"
+	::= { digitalSeries 5 }
+
+inputVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Input Voltage (VAC)"
+	::= { digitalSeries 6 }
+
+outputVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Voltage (VDC)"
+	::= { digitalSeries 7 }
+
+outputCurrent			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"System Current (Amps)"
+	::= { digitalSeries 8 }
+
+outputEnable			OBJECT-TYPE
+	SYNTAX			INTEGER { ENABLED(1), DISABLED(2) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Enable Status (a value of 1 indicates Output is Enabled, and a value of 2 indicates Output is Disabled)"
+	::= { digitalSeries 9 }
+
+
+END

@@ -1,0 +1,610 @@
+
+AcPerfMediaServices DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+       OBJECT-TYPE, 
+       MODULE-IDENTITY                             FROM SNMPv2-SMI
+       enterprises                                 FROM SNMPv2-SMI;
+
+	audioCodes       OBJECT IDENTIFIER ::= {enterprises 5003}
+	acRegistrations  OBJECT IDENTIFIER ::= {audioCodes 7}
+	acGeneric        OBJECT IDENTIFIER ::= {audioCodes 8}
+	acProducts       OBJECT IDENTIFIER ::= {audioCodes 9}	
+	acPerformance    OBJECT IDENTIFIER ::= {audioCodes 10}	
+
+       
+acPerfMediaServices  MODULE-IDENTITY       
+    LAST-UPDATED "200407121505Z"          --Monday, July 12, 2004
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	     AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+	     Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+
+    DESCRIPTION       
+    "This MIB defines the enterprise-specific objects needed
+     to support performance management of the AudioCodes product.
+     Performance measurements are grouped into the following MIB trees:
+
+            acPerfIvr  - performance measurements related to the IVR service
+            acPerfBct  - performance measurements related to the BCT service
+            acPerfConf - performance measurements related to the Conferencing service
+            acPerfTt   - performance measurements related to the Test Trunk service"
+
+
+    REVISION "200311200000Z"
+       DESCRIPTION
+         "Version 4.4. November 20, 2003. Made these changes:
+             o  Initial revision"
+
+    ::= {acPerformance 2}
+
+--
+-- Abbreviations used:
+--   Annc       announcement(s)
+--   IVR        Interactive Voice Response
+--   Conf       Conferencing
+--   NE         network element
+--   TT         Test Trunks
+--
+
+-- The following conventions are used in this MIB:
+
+--   The "Product" attribute lists the products in which the
+--   performance measurement is maintained. Current products
+--   are:
+--
+--     Media Servers
+--       IPmedia 2000
+--     Media Gateways
+--       Mediant 2000/5000/8000 (wireline)
+--       Stretto 2000/5000/8000 (wireless)
+--
+
+--   The "Capabilities" attribute lists the capabilities that must be
+--   configured on the system for the performance measurement to be
+--   maintained.  The possible values are IVR, Conferencing, BCT, TT
+--   and Trunking Gateway. Some performance measurements are not
+--   related to any particular capabilities. In those cases, the value
+--   of Capabilities attribute is "All".
+
+--
+-- Notes on IVR Service Performance Measurements
+--
+
+-- In response to a request to play an announcement, the media server
+-- may play multiple audio segments. The media server maintains
+-- performance data for the overall announcement request as well as
+-- for the individual segments.
+
+-- In naming of the performance measurements, "Play" is used to refer
+-- to the overall announcement request. "PlaySegment" is used to refer
+-- to the playing of an individual segment.
+
+--
+-- Notes on Play Collect
+--
+
+-- Play Collect involves playing of an initial prompt, collection of digits, followed
+-- by actions which are dependent on the digits (or lack of digits) that are collected.
+-- These are the prompts that can be specified (all are optional):
+--
+--    ip    initial prompt
+--    nd    no digits reprompt (if not specified, use rp)
+--    rp    reprompt (if not specified, use ip)
+--    fa    failure, played once at end
+--    sa    success, played once at end
+--
+-- The request can specify the number of attempts, before playing the fa prompt. If no
+-- number of attempts value is supplied on the request, then a default is used.
+--
+-- The prompts can be either simple or complex announcements.
+--
+-- Continuous Digit Collect operations, which can be considered a special type of play
+-- collect, are not tracked by any of the acPlayCollect performance measurements,
+-- but are instead tracked in a special group of performance measurements.
+
+--
+-- Notes on Continuous Digit Collect
+--
+
+-- Continuous Digit Collect - Digits are collected during the entire
+-- life of a call. No prompts are played.  Continuous Digit Collect
+-- is typically used in a BCT call.
+--
+-- Continuous Digit Collect operations can be considered a special type of play
+-- collect, but are not tracked by any of the acPlayCollect performance measurements.
+
+
+
+ 
+ 
+
+
+
+
+
+
+     acPerfIvr                     OBJECT IDENTIFIER ::= {acPerfMediaServices 1}
+
+
+     acPerfIvrPlayRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The total number of announcement requests received from the call
+     agent.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 1}
+
+
+
+     acPerfIvrPlaySuccessful OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of announcement requests processed successfully.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 2}
+
+
+
+     acPerfIvrPlayFailedDueToLackOfResources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of announcement requests which failed to be played because
+     some resource was not available.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 3}
+
+
+
+     acPerfIvrPlayInProgress OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of announcement operations that are currently in progress.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 4}
+
+
+
+     acPerfIvrPlayDuration OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The duration, in seconds, of all successful announcement
+    requests. The average duration of all requests (average hold time)
+    can be computed by dividing acPerfPlayDuration by acPerfPlaySuccessful.
+    Products:     IPmedia 2000"
+       ::= {acPerfIvr 5}
+
+
+
+     acPerfIvrPlayFailedDueToProvMismatch OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of announcement requests which failed because of a provisioning mismatch.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 6}
+
+
+
+     acPerfIvrPlayCollectRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of play collect requests.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 7}
+
+
+
+     acPerfIvrPlayCollectSuccessful OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of play collects completed successfully. A request is considered successful
+     if the entire sequence, from initial prompt to success/failure prompt, is played out
+     without a failure due to lack of resources, provisioning mismatch, or any other
+     media server failure. The failure of the user to enter the proper digits is not a
+     reason for failure of the request.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 8}
+
+
+
+     acPerfIvrPlayCollectFailedDueToLackOfResources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of play collect requests that failed due to lack of resources.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 9}
+
+
+
+     acPerfIvrPlayCollectFailedDueToProvMismatch OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of play collect requests that failed due a provisioning mismatch.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 10}
+
+
+
+     acPerfIvrPlayCollectInProgress OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of play collect operations that are currently in progress.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 11}
+
+
+
+     acPerfIvrPlayCollectDuration OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The duration, in seconds, of all successful play collect
+    requests. The average duration of all requests
+    can be computed by dividing acPlayCollectDuration by acPlayCollectSuccessful.
+    Products:     IPmedia 2000"
+       ::= {acPerfIvr 12}
+
+
+
+     acPerfIvrContDigitCollectRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of continuous digit collect requests.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 13}
+
+
+
+     acPerfIvrContDigitCollectSuccessful OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of continuous digit collects completed successfully.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 14}
+
+
+
+     acPerfIvrContDigitCollectFailedDueToLackOfResources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of continuous digit collect requests that failed due to lack of resources.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 15}
+
+
+
+     acPerfIvrContDigitCollectInProgress OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of continuous digit collect operations that are currently in progress.
+     Products:     IPmedia 2000"
+       ::= {acPerfIvr 16}
+
+
+
+     acPerfIvrContDigitCollectDuration OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The duration, in seconds, of all successful continuous digit collect
+    requests. The average duration of all requests
+    can be computed by dividing acDCCollectDuration by acDCCollectSuccessful.
+    Products:     IPmedia 2000"
+       ::= {acPerfIvr 17}
+
+
+
+     acPerfBct                     OBJECT IDENTIFIER ::= {acPerfMediaServices 2}
+
+
+     acPerfBctRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The total number of BCT contexts opened since the media server initialized
+     Products:     IPmedia 2000"
+       ::= {acPerfBct 1}
+
+
+
+     acPerfBctSuccessful OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of BCT requests processed successfully.
+     Products:     IPmedia 2000"
+       ::= {acPerfBct 2}
+
+
+
+     acPerfBctFailedDueToLackOfResources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of BCT requests which failed to be played because
+     some resource was not available.
+     Products:     IPmedia 2000"
+       ::= {acPerfBct 3}
+
+
+
+     acPerfBctInProgress OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of BCT calls that are currently in progress.
+     Products:     IPmedia 2000"
+       ::= {acPerfBct 4}
+
+
+
+     acPerfBctDuration OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The duration, in seconds, of all successful BCT contexts. The average
+    duration of all contexts can be computed by dividing acPerfBCTDuration
+    by acPerfBCTSuccessful.
+    Products:     IPmedia 2000"
+       ::= {acPerfBct 5}
+
+
+
+     acPerfBctTotalParticipants OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The total number of BCT participants since the media server initialized
+     Products:     IPmedia 2000"
+       ::= {acPerfBct 6}
+
+
+
+     acPerfBctCurrentNumberOfParticipants OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of participants in all BCT calls that are currently in progress.
+     Products:     IPmedia 2000"
+       ::= {acPerfBct 7}
+
+
+
+     acPerfConf                    OBJECT IDENTIFIER ::= {acPerfMediaServices 3}
+
+
+     acPerfConfRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The total number of conferences processed since the last application restart.   This is the number of conferences created
+    and not the number of members.
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 1}
+
+
+
+     acPerfConfSuccessful OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "Number of conference requests processed successfully. 
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 2}
+
+
+
+     acPerfConfInProgress OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of conferences currently in progress.
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 3}
+
+
+
+     acPerfConfDuration OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The duration, in seconds, of all successful conference requests. The average
+    duration of all requests can be computed by dividing acPerfConfDuration
+    by acPerfConfSuccessful.
+    Products:     IPmedia 2000"
+       ::= {acPerfConf 4}
+
+
+
+     acPerfConfFailedDueToLackOfResources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of times a conference request was rejected due to lack of resources
+     since the last application restart.
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 5}
+
+
+
+     acPerfConfAddRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of requests to add a conferee to an existing conference.
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 6}
+
+
+
+     acPerfConfAddSuccessful OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of times a conferee was added successfuly to an existing conference.
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 7}
+
+
+
+     acPerfConfAddFailedDueToLackOfResources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of times a conferee could not be added to an existing conference
+     due to a lack of resources.
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 8}
+
+
+
+     acPerfConfPortsUsed OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The total number of ports that were reserved for conferences since the last
+     application restart.
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 9}
+
+
+
+     acPerfConfPortsReserved OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of conference ports currently reserved. This includes
+     play ports, monitor ports and regular conferee ports.
+     
+     A monitor port may be reserved by the call agent when setting up
+     a conference. The monitor port can then be used by one or more
+     listen-only conferees.
+
+     Products:     IPmedia 2000"
+       ::= {acPerfConf 10}
+
+
+
+     acPerfTt                      OBJECT IDENTIFIER ::= {acPerfMediaServices 4}
+
+
+     acPerfTtRequests OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of test trunk calls requested.
+     Products:     IPmedia 2000"
+       ::= {acPerfTt 1}
+
+
+
+     acPerfTtSuccessful OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of test trunk calls that were successfully setup and torn down. 
+    This PM is not a reflection on whether  the test actually passed or failed.
+     Products:     IPmedia 2000"
+       ::= {acPerfTt 2}
+
+
+
+     acPerfTtInProgress OBJECT-TYPE
+       SYNTAX Gauge32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of test trunk calls that are currently in progress.
+     Products:     IPmedia 2000"
+       ::= {acPerfTt 3}
+
+
+
+     acPerfTtDuration OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The duration, in seconds, of all successful test trunk requests.  This number
+    is  The time between a test trunk call being initiated and completed.  The average duration
+    of all requests can be computed by dividing acPerfTtDuration by acPerfTtSuccessful.
+    Products:     IPmedia 2000"
+       ::= {acPerfTt 4}
+
+
+
+     acPerfTtFailedDueToLackOfResources OBJECT-TYPE
+       SYNTAX Counter32
+       MAX-ACCESS read-only
+       STATUS deprecated
+       DESCRIPTION
+           "The number of times a test trunk request was rejected due to lack of resources
+     since the last application restart.
+     Products:     IPmedia 2000"
+       ::= {acPerfTt 5}
+
+
+
+
+
+END

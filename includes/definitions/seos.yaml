@@ -1,0 +1,9 @@
+os: seos
+text: 'Redback Networks SmartEdge'
+type: network
+icon: ericsson
+mib_dir:
+    - ericsson
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.2352.1

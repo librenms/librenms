@@ -1,0 +1,1178 @@
+-- ============================================================================
+-- AT-PAE.MIB, Allied Telesis enterprise MIB: Port Authentication
+--
+-- Copied from ATR-PAE.MIB of pre 2.9.1 release
+--
+-- Copyright (c) 2006 by Allied Telesis, Inc.
+-- All rights reserved.
+-- 
+-- ============================================================================
+
+AT-PAE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE,
+    Counter32,
+    Unsigned32,
+    TimeTicks
+        FROM SNMPv2-SMI
+
+    MacAddress,
+    TEXTUAL-CONVENTION,
+    TruthValue,
+    DisplayString
+        FROM SNMPv2-TC
+
+    InterfaceIndex
+        FROM IF-MIB
+    modules
+        FROM AT-SMI-MIB
+;
+
+portAuth MODULE-IDENTITY
+    LAST-UPDATED "200701151100Z"
+    ORGANIZATION "Allied Telesis, Inc"
+    CONTACT-INFO
+        "http://www.alliedtelesis.com"
+    DESCRIPTION
+        "Description of atrDot1xUnauthenticated is modified."   
+    REVISION "200701151100Z"
+
+    DESCRIPTION
+        "The Port Access Entity module for managing AT
+        Port Authentication."
+    
+    REVISION "200412210000Z"
+    DESCRIPTION
+	"Initial Revision"
+    ::= { modules 118 }
+
+
+atrPaeMib OBJECT IDENTIFIER ::= { portAuth 1 }
+
+atrPaeMIBObjects OBJECT IDENTIFIER ::= { atrPaeMib 1 }
+
+-- ---------------------------------------------------------- --
+-- Textual Conventions
+-- ---------------------------------------------------------- --
+
+AtrPaeControlledDirections ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The control mode values for the Authenticator PAE."
+    SYNTAX      INTEGER {
+                    both(0),
+                    in(1)
+                }
+
+AtrPaeControlledPortStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The status values of the Authenticator PAE controlled
+        Port."
+    SYNTAX      INTEGER {
+                    authorised(1),
+                    unauthorised(2)
+                }
+
+AtrPaeControlledPortControl ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "The control values of the Authenticator PAE controlled
+        Port."
+    SYNTAX      INTEGER {
+                    forceUnauthorised(1),
+                    auto(2),
+                    forceAuthorised(3)
+                }
+        
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- groups in the PAE MIB
+-- ---------------------------------------------------------- --
+
+atrDot1xPaeSystem               OBJECT IDENTIFIER ::= { atrPaeMIBObjects 1 }
+atrDot1xPaeAuthenticator        OBJECT IDENTIFIER ::= { atrPaeMIBObjects 2 }
+atrDot1xTraps                   OBJECT IDENTIFIER ::= { atrPaeMIBObjects 3 }
+atrMacBasedAuthPaeSystem        OBJECT IDENTIFIER ::= { atrPaeMIBObjects 4 }
+atrMacBasedAuthPaeAuthenticator OBJECT IDENTIFIER ::= { atrPaeMIBObjects 5 }
+atrMacBasedAuthTraps            OBJECT IDENTIFIER ::= { atrPaeMIBObjects 6 }
+ 
+
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- The Dot1X PAE System Group
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- The Dot1X PAE Port Table
+-- ---------------------------------------------------------- --
+
+atrDot1xPaePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AtrDot1xPaePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system level information for each port
+        supported by the Port Access Entity.  An entry appears
+        in this table for each port of this system."
+    REFERENCE
+        "9.6.1"
+    ::= { atrDot1xPaeSystem 2 }
+
+atrDot1xPaePortEntry OBJECT-TYPE
+    SYNTAX      AtrDot1xPaePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number, protocol version, and
+        initialisation control for a Port."
+    INDEX { atrDot1xPaePortNumber, atrDot1xPaePortSuppMacAddress }
+    ::= { atrDot1xPaePortTable 1 }
+
+AtrDot1xPaePortEntry ::=
+    SEQUENCE {
+        atrDot1xPaePortNumber
+            InterfaceIndex,
+        atrDot1xPaePortProtocolVersion
+            Unsigned32,
+        atrDot1xPaePortCapabilities
+            BITS,
+        atrDot1xPaePortInitialise
+            TruthValue,
+        atrDot1xPaePortReauthenticate
+            TruthValue,
+        atrDot1xPaePortSuppMacAddress
+            MacAddress
+        }
+
+atrDot1xPaePortNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port number associated with this Port."
+    REFERENCE
+        "9.6.1, Port number"
+    ::= { atrDot1xPaePortEntry 1 }
+
+atrDot1xPaePortProtocolVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol version associated with this Port."
+    REFERENCE
+        "9.6.1, Protocol version"
+    ::= { atrDot1xPaePortEntry 2 }
+
+atrDot1xPaePortCapabilities OBJECT-TYPE
+    SYNTAX      BITS {
+                    atrDot1xPaePortAuthCapable(0),
+                        -- Authenticator functions are supported
+                    atrDot1xPaePortSuppCapable(1)
+                        -- Supplicant functions are supported
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the PAE functionality that this Port
+        supports and that may be managed through this MIB."
+    REFERENCE
+        "9.6.1, PAE Capabilities"
+    ::= { atrDot1xPaePortEntry 3 }
+
+atrDot1xPaePortInitialise OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The initialisation control for this Port. Setting this
+        attribute TRUE causes the Port to be initialised.
+        The attribute value reverts to FALSE once initialisation
+        has completed."
+    REFERENCE
+        "9.6.1.2, Initialise Port"
+    ::= { atrDot1xPaePortEntry 4 }
+
+atrDot1xPaePortReauthenticate OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The reauthentication control for this port. Setting
+    this attribute TRUE causes the Authenticator PAE state
+    machine for the Port to reauthenticate the Supplicant.
+    Setting this attribute FALSE has no effect.
+    This attribute always returns FALSE when it is read."
+  REFERENCE
+    "9.4.1.3 Reauthenticate"
+::= { atrDot1xPaePortEntry 5 }
+
+atrDot1xPaePortSuppMacAddress OBJECT-TYPE  
+  SYNTAX  MacAddress
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The six character MAC Address of the attached
+    supplicant."
+::= { atrDot1xPaePortEntry 6 }
+
+-- ---------------------------------------------------------- --
+-- The Dot1X PAE Authenticator Group
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- The Dot1X Authenticator Configuration Table
+-- ---------------------------------------------------------- --
+
+atrDot1xAuthConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AtrDot1xAuthConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the configuration objects for the
+        Authenticator PAE associated with each port.
+        An entry appears in this table for each port that may
+        authenticate access to itself."
+    REFERENCE
+        "9.4.1 Authenticator Configuration"
+    ::= { atrDot1xPaeAuthenticator 1 }
+
+atrDot1xAuthConfigEntry OBJECT-TYPE
+    SYNTAX      AtrDot1xAuthConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The configuration information for an Authenticator
+        PAE."
+    INDEX { atrDot1xPaePortNumber, atrDot1xPaePortSuppMacAddress }
+    ::= { atrDot1xAuthConfigTable 1 }
+
+AtrDot1xAuthConfigEntry ::=
+    SEQUENCE {
+        atrDot1xAuthPaeState
+            INTEGER,
+        atrDot1xAuthBackendAuthState
+            INTEGER,
+        atrDot1xAuthAdminControlledDirections
+            AtrPaeControlledDirections,
+        atrDot1xAuthOperControlledDirections
+            AtrPaeControlledDirections,
+        atrDot1xAuthAuthControlledPortStatus
+            AtrPaeControlledPortStatus,
+        atrDot1xAuthAuthControlledPortControl
+            AtrPaeControlledPortControl,
+        atrDot1xAuthQuietPeriod
+            Unsigned32,
+        atrDot1xAuthTxPeriod
+            Unsigned32,
+        atrDot1xAuthSuppTimeout
+            Unsigned32,
+        atrDot1xAuthServerTimeout
+            Unsigned32,
+        atrDot1xAuthMaxReq
+            Unsigned32,
+        atrDot1xAuthReAuthPeriod
+            Unsigned32,
+        atrDot1xAuthReAuthEnabled
+            TruthValue,
+        atrDot1xAuthKeyTxEnabled
+            TruthValue,
+		atrDot1xAuthPreAuthVlan
+			DisplayString,
+		atrDot1xAuthPostAuthVlan
+			DisplayString,
+		atrDot1xAuthLastAuthReason
+			INTEGER,
+		atrDot1XAuthVlanAssignment
+			TruthValue,
+		atrDot1XAuthSecureVlan
+			TruthValue,
+		atrDot1xAuthGuestVlan
+			DisplayString,
+		atrDot1XAuthMibReset
+			TruthValue,
+		atrDot1xAuthTrap
+			INTEGER
+        }
+
+atrDot1xAuthPaeState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    initialise(1),
+                    disconnected(2),
+                    connecting(3),
+                    authenticating(4),
+                    authenticated(5),
+                    aborting(6),
+                    held(7),
+                    forceAuth(8),
+                    forceUnauth(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, Authenticator PAE state"
+    ::= { atrDot1xAuthConfigEntry 1 }
+
+atrDot1xAuthBackendAuthState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    request(1),
+                    response(2),
+                    success(3),
+                    fail(4),
+                    timeout(5),
+                    idle(6),
+                    initialise(7)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the Backend Authentication
+        state machine."
+    REFERENCE
+        "9.4.1, Backend Authentication state"
+    ::= { atrDot1xAuthConfigEntry 2 }
+
+atrDot1xAuthAdminControlledDirections OBJECT-TYPE
+    SYNTAX      AtrPaeControlledDirections
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the administrative controlled
+        directions parameter for the Port."
+    REFERENCE
+        "9.4.1, Admin Control Mode"
+    ::= { atrDot1xAuthConfigEntry 3 }
+
+atrDot1xAuthOperControlledDirections OBJECT-TYPE
+    SYNTAX      AtrPaeControlledDirections
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the operational controlled
+        directions parameter for the Port."
+    REFERENCE
+        "9.4.1, Oper Control Mode"
+    ::= { atrDot1xAuthConfigEntry 4 }
+
+atrDot1xAuthAuthControlledPortStatus OBJECT-TYPE
+    SYNTAX      AtrPaeControlledPortStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the controlled Port
+        status parameter for the Port."
+    REFERENCE
+        "9.4.1, AuthControlledPortStatus"
+    ::= { atrDot1xAuthConfigEntry 5 }
+
+atrDot1xAuthAuthControlledPortControl OBJECT-TYPE
+    SYNTAX      AtrPaeControlledPortControl
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current value of the controlled Port
+        control parameter for the Port."
+    REFERENCE
+        "9.4.1, AuthControlledPortControl"
+    ::= { atrDot1xAuthConfigEntry 6 }
+
+atrDot1xAuthQuietPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the quietPeriod constant
+        currently in use by the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, quietPeriod"
+    DEFVAL { 60 }
+    ::= { atrDot1xAuthConfigEntry 7 }
+
+atrDot1xAuthTxPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the txPeriod constant
+        currently in use by the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, txPeriod"
+    DEFVAL { 30 }
+    ::= { atrDot1xAuthConfigEntry 8 }
+
+atrDot1xAuthSuppTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the suppTimeout constant
+        currently in use by the Backend Authentication state
+        machine."
+    REFERENCE
+        "9.4.1, suppTimeout"
+    DEFVAL { 30 }
+    ::= { atrDot1xAuthConfigEntry 9 }
+
+atrDot1xAuthServerTimeout OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the serverTimeout constant
+        currently in use by the Backend Authentication state
+        machine."
+    REFERENCE
+        "9.4.1, serverTimeout"
+    DEFVAL { 30 }
+    ::= { atrDot1xAuthConfigEntry 10 }
+
+atrDot1xAuthMaxReq OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the maxReq constant currently in use by
+        the Backend Authentication state machine."
+    REFERENCE
+        "9.4.1, maxReq"
+    DEFVAL { 2 }
+    ::= { atrDot1xAuthConfigEntry 11 }
+
+atrDot1xAuthReAuthPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the reAuthPeriod constant
+        currently in use by the Reauthentication Timer state
+        machine."
+    REFERENCE
+        "9.4.1, reAuthPeriod"
+    DEFVAL { 3600 }
+    ::= { atrDot1xAuthConfigEntry 12 }
+
+atrDot1xAuthReAuthEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enable/disable control used by the Reauthentication
+        Timer state machine (8.5.5.1)."
+    REFERENCE
+        "9.4.1, reAuthEnabled"
+    DEFVAL { false }
+    ::= { atrDot1xAuthConfigEntry 13 }
+
+atrDot1xAuthKeyTxEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the keyTransmissionEnabled constant
+        currently in use by the Authenticator PAE state
+        machine."
+    REFERENCE
+        "9.4.1, keyTransmissionEnabled"
+    ::= { atrDot1xAuthConfigEntry 14 }
+
+atrDot1xAuthPreAuthVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN name of the VLAN that this port belonged to
+         prior to RADIUS authentication."
+    ::= { atrDot1xAuthConfigEntry 15 }
+
+atrDot1xAuthPostAuthVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The VLAN name of the VLAN that this port belongs to
+         since RADIUS authentication."
+    ::= { atrDot1xAuthConfigEntry 16 }
+
+atrDot1xAuthLastAuthReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    never(1),
+                    adminReset(2),
+                    logoff(3),
+                    authTimeout(4),
+                    serverReject(5),
+                    serverTimeout(6),
+                    noActiveServers(7),
+                    invalidVlan(8),
+                    conflictingVlan(9),
+                    forcedUnauth(10),
+                    serverAuthed(11),
+                    forcedAuthed(12)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Should the supplicant have failed authentication, this records
+        the reason for the last failure. Never is returned in the case the
+        supplicant has never failed."
+    REFERENCE
+        ""
+    ::= { atrDot1xAuthConfigEntry 17 }
+   
+atrDot1XAuthVlanAssignment OBJECT-TYPE
+     SYNTAX TruthValue
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+       "Specifies whether VLAN Assignment is to be performed on the 
+       port. When set to TRUE, the VLAN Assignment mechanism will run,
+	    when set to FALSE it will not."
+		::= { atrDot1xAuthConfigEntry 18 }
+
+atrDot1XAuthSecureVlan OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Only valid in Multi-Supplicant mode, this parameter defines
+        whether to allow supplicants to authenticate on a port, when there
+        is already an authenticated aupplicant on the port"
+    ::= { atrDot1xAuthConfigEntry 19 }
+
+atrDot1xAuthGuestVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This value defines a temporary VLAN to assign to a port while there
+        is no 802.1X host connected to it."
+    ::= { atrDot1xAuthConfigEntry 20 }
+
+atrDot1XAuthMibReset OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Only valid in Multi-Supplicant mode, this parameter defines
+        whether to age out MIB information stored for old supplicants."
+    ::= { atrDot1xAuthConfigEntry 21 }
+
+atrDot1xAuthTrap OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    success(1),
+                    failure(2),
+                    both(3),
+                    none(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies what events trigger an SNMP trap."
+    REFERENCE
+        ""
+    ::= { atrDot1xAuthConfigEntry 22 }
+
+-- ---------------------------------------------------------- --
+-- The Dot1X Authenticator Statistics Table
+-- ---------------------------------------------------------- --
+
+atrDot1xAuthStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AtrDot1xAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the statistics objects for the
+         Authenticator PAE associated with each Port.
+         An entry appears in this table for each port that may
+         authenticate access to itself."
+    REFERENCE
+        "9.4.2 Authenticator Statistics"
+    ::= { atrDot1xPaeAuthenticator 2 }
+
+atrDot1xAuthStatsEntry OBJECT-TYPE
+    SYNTAX      AtrDot1xAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics information for an Authenticator PAE."
+    INDEX { atrDot1xPaePortNumber, atrDot1xPaePortSuppMacAddress }
+    ::= { atrDot1xAuthStatsTable 1 }
+
+AtrDot1xAuthStatsEntry ::=
+    SEQUENCE {
+        atrDot1xAuthEapolFramesRx
+            Counter32,
+        atrDot1xAuthEapolFramesTx
+            Counter32,
+        atrDot1xAuthEapolStartFramesRx
+            Counter32,
+        atrDot1xAuthEapolLogoffFramesRx
+            Counter32,
+        atrDot1xAuthEapolRespIdFramesRx
+            Counter32,
+        atrDot1xAuthEapolRespFramesRx
+            Counter32,
+        atrDot1xAuthEapolReqIdFramesTx
+            Counter32,
+        atrDot1xAuthEapolReqFramesTx
+            Counter32,
+        atrDot1xAuthInvalidEapolFramesRx
+            Counter32,
+        atrDot1xAuthEapLengthErrorFramesRx
+            Counter32,
+        atrDot1xAuthLastEapolFrameVersion
+            Unsigned32
+        }
+
+atrDot1xAuthEapolFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid EAPOL frames of any type
+        that have been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL frames received"
+    ::= { atrDot1xAuthStatsEntry 1 }
+
+atrDot1xAuthEapolFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames of any type
+        that have been transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL frames transmitted"
+    ::= { atrDot1xAuthStatsEntry 2 }
+
+atrDot1xAuthEapolStartFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL Start frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Start frames received"
+    ::= { atrDot1xAuthStatsEntry 3 }
+
+atrDot1xAuthEapolLogoffFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL Logoff frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Logoff frames received"
+    ::= { atrDot1xAuthStatsEntry 4 }
+
+atrDot1xAuthEapolRespIdFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Resp/Id frames that have
+        been received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Resp/Id frames received"
+    ::= { atrDot1xAuthStatsEntry 5 }
+
+atrDot1xAuthEapolRespFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of valid EAP Response frames
+        (other than Resp/Id frames) that have been
+        received by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Response frames received"
+    ::= { atrDot1xAuthStatsEntry 6 }
+
+atrDot1xAuthEapolReqIdFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Req/Id frames that have been
+        transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Req/Id frames transmitted"
+    ::= { atrDot1xAuthStatsEntry 7 }
+
+atrDot1xAuthEapolReqFramesTx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAP Request frames
+        (other than Rq/Id frames) that have been
+        transmitted by this Authenticator."
+    REFERENCE
+        "9.4.2, EAPOL Request frames transmitted"
+    ::= { atrDot1xAuthStatsEntry 8 }
+
+atrDot1xAuthInvalidEapolFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames that have been
+        received by this Authenticator in which the
+        frame type is not recognised."
+    REFERENCE
+        "9.4.2, Invalid EAPOL frames received"
+    ::= { atrDot1xAuthStatsEntry 9 }
+
+atrDot1xAuthEapLengthErrorFramesRx OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of EAPOL frames that have been received
+        by this Authenticator in which the Packet Body
+        Length field is invalid."
+    REFERENCE
+        "9.4.2, EAP length error frames received"
+    ::= { atrDot1xAuthStatsEntry 10 }
+
+atrDot1xAuthLastEapolFrameVersion OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The protocol version number carried in the
+        most recently received EAPOL frame."
+    REFERENCE
+        "9.4.2, Last EAPOL frame version"
+    ::= { atrDot1xAuthStatsEntry 11 }
+
+
+-- ---------------------------------------------------------- --
+-- The Dot1X Last Auth Entry
+-- ---------------------------------------------------------- --
+
+    atrDot1xAuthenticated NOTIFICATION-TYPE
+        OBJECTS { atrDot1xPaePortNumber,
+                  atrDot1xPaePortSuppMacAddress,
+                  atrDot1xAuthPreAuthVlan,
+                  atrDot1xAuthPostAuthVlan,
+                  atrDot1xAuthLastAuthReason }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a supplicant is authenticated on a port."
+        ::= { atrDot1xTraps 1 }
+
+    atrDot1xUnauthenticated NOTIFICATION-TYPE
+        OBJECTS { atrDot1xPaePortNumber,
+                  atrDot1xPaePortSuppMacAddress,
+                  atrDot1xAuthPreAuthVlan,
+                  atrDot1xAuthPostAuthVlan,
+                  atrDot1xAuthLastAuthReason }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a supplicant who was previously authorised on 
+                a port, is no longer authorised. This can be due to an authentication 
+                timeout, log off or disconnection of the port."
+        ::= { atrDot1xTraps 2 }
+
+    atrDot1xFailedAuth NOTIFICATION-TYPE
+        OBJECTS { atrDot1xPaePortNumber,
+                  atrDot1xPaePortSuppMacAddress,
+                  atrDot1xAuthPreAuthVlan,
+                  atrDot1xAuthPostAuthVlan,
+                  atrDot1xAuthLastAuthReason }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a supplicant is unable to be authorised on a port."
+        ::= { atrDot1xTraps 3 }
+
+-- ---------------------------------------------------------- --
+-- The MAC Based Auth PAE Port Table
+-- ---------------------------------------------------------- --
+
+atrMacBasedAuthPaePortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AtrMacBasedAuthPaePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of system level information for each port
+        supported by the Port Access Entity.  An entry appears
+        in this table for each port of this system."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthPaeSystem 1 }
+
+atrMacBasedAuthPaePortEntry OBJECT-TYPE
+    SYNTAX      AtrMacBasedAuthPaePortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Port number, protocol version, and
+        initialisation control for a Port."
+    INDEX { atrMacBasedAuthPaePortNumber, atrMacBasedAuthPaePortSuppMacAddress }
+    ::= { atrMacBasedAuthPaePortTable 1 }
+
+AtrMacBasedAuthPaePortEntry ::=
+    SEQUENCE {
+        atrMacBasedAuthPaePortNumber
+            InterfaceIndex,
+        atrMacBasedAuthPaePortInitialise
+            TruthValue,
+        atrMacBasedAuthPaePortReauthenticate
+            TruthValue,
+        atrMacBasedAuthPaePortSuppMacAddress
+            MacAddress
+        }
+
+atrMacBasedAuthPaePortNumber OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Port number associated with this Port."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthPaePortEntry 1 }
+
+atrMacBasedAuthPaePortInitialise OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The initialisation control for this Port. Setting this
+        attribute TRUE causes the Port to be initialised.
+        The attribute value reverts to FALSE once initialisation
+        has completed."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthPaePortEntry 2 }
+
+atrMacBasedAuthPaePortReauthenticate OBJECT-TYPE
+  SYNTAX TruthValue
+  MAX-ACCESS read-write
+  STATUS current
+  DESCRIPTION
+    "The reauthentication control for this port. Setting
+    this attribute TRUE causes the Authenticator PAE state
+    machine for the Port to reauthenticate the Supplicant.
+    Setting this attribute FALSE has no effect.
+    This attribute always returns FALSE when it is read."
+  REFERENCE
+    ""
+::= { atrMacBasedAuthPaePortEntry 3 }
+
+atrMacBasedAuthPaePortSuppMacAddress OBJECT-TYPE  
+  SYNTAX  MacAddress
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+    "The six character MAC Address of the attached
+    supplicant."
+::= { atrMacBasedAuthPaePortEntry 4 }
+
+-- ---------------------------------------------------------- --
+-- The MAC Based Auth PAE Authenticator Group
+-- ---------------------------------------------------------- --
+
+-- ---------------------------------------------------------- --
+-- The MAC Based Auth Authenticator Configuration Table
+-- ---------------------------------------------------------- --
+
+atrMacBasedAuthConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AtrMacBasedAuthConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that contains the configuration objects for the
+        Authenticator PAE associated with each port.
+        An entry appears in this table for each port that may
+        authenticate access to itself."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthPaeAuthenticator 1 }
+
+atrMacBasedAuthConfigEntry OBJECT-TYPE
+    SYNTAX      AtrMacBasedAuthConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The configuration information for an Authenticator
+        PAE."
+    INDEX { atrMacBasedAuthPaePortNumber, atrMacBasedAuthPaePortSuppMacAddress }
+    ::= { atrMacBasedAuthConfigTable 1 }
+
+AtrMacBasedAuthConfigEntry ::=
+    SEQUENCE {
+        atrMacBasedAuthPaeState
+            INTEGER,
+        atrMacBasedAuthBackendAuthState
+            INTEGER,
+        atrMacBasedAuthControlledPortStatus
+            AtrPaeControlledPortStatus,
+        atrMacBasedAuthControlledPortControl
+            AtrPaeControlledPortControl,
+        atrMacBasedAuthQuietPeriod
+            Unsigned32,
+        atrMacBasedAuthReAuthPeriod
+            Unsigned32,
+        atrMacBasedAuthReAuthEnabled
+            TruthValue,
+        atrMacBasedAuthPreAuthVlan
+            DisplayString,
+        atrMacBasedAuthPostAuthVlan
+            DisplayString,
+        atrMacBasedAuthLastAuthReason
+            INTEGER,
+        atrMacBasedAuthVlanAssignment
+            TruthValue,
+        atrMacBasedAuthSecureVlan
+            TruthValue,
+        atrMacBasedAuthMibReset
+            TruthValue,
+		atrMacBasedAuthTrap
+			INTEGER
+        }
+
+atrMacBasedAuthPaeState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    initialise(1),
+                    disconnected(2),
+                    connecting(3),
+                    authenticating(4),
+                    authenticated(5),
+                    aborting(6),
+                    held(7),
+                    forceAuth(8),
+                    forceUnauth(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the Authenticator PAE state
+        machine."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthConfigEntry 1 }
+
+atrMacBasedAuthBackendAuthState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    request(1),
+                    success(2),
+                    fail(3),
+                    timeout(4),
+                    idle(5),
+                    initialise(6)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the Backend Authentication
+        state machine."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthConfigEntry 2 }
+
+atrMacBasedAuthControlledPortStatus OBJECT-TYPE
+    SYNTAX      AtrPaeControlledPortStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the controlled Port
+        status parameter for the Port."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthConfigEntry 3 }
+
+atrMacBasedAuthControlledPortControl OBJECT-TYPE
+    SYNTAX      AtrPaeControlledPortControl
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current value of the controlled Port
+        control parameter for the Port."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthConfigEntry 4 }
+
+atrMacBasedAuthQuietPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the quietPeriod constant
+        currently in use by the Authenticator PAE state
+        machine."
+    REFERENCE
+        ""
+    DEFVAL { 60 }
+    ::= { atrMacBasedAuthConfigEntry 5 }
+
+atrMacBasedAuthReAuthPeriod OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value, in seconds, of the reAuthPeriod constant
+        currently in use by the Reauthentication Timer state
+        machine."
+    REFERENCE
+        ""
+    DEFVAL { 3600 }
+    ::= { atrMacBasedAuthConfigEntry 6 }
+
+atrMacBasedAuthReAuthEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The enable/disable control used by the Reauthentication
+        Timer state machine."
+    REFERENCE
+        ""
+    DEFVAL { false }
+    ::= { atrMacBasedAuthConfigEntry 7 }
+
+atrMacBasedAuthPreAuthVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+
+
+    STATUS      current
+    DESCRIPTION
+        "The VLAN name of the VLAN that this port belonged to
+        prior to RADIUS authentication."
+    ::= { atrMacBasedAuthConfigEntry 8 }
+
+atrMacBasedAuthPostAuthVlan OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+
+
+    STATUS      current
+    DESCRIPTION
+        "The VLAN name of the VLAN that this port belongs to
+        since RADIUS authentication."
+    ::= { atrMacBasedAuthConfigEntry 9 }
+
+atrMacBasedAuthLastAuthReason OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    never(1),
+                    adminReset(2),
+                    logoff(3),
+                    authTimeout(4),
+                    serverReject(5),
+                    serverTimeout(6),
+                    noActiveServers(7),
+                    invalidVlan(8),
+                    conflictingVlan(9),
+                    forcedUnauth(10),
+                    serverAuthed(11),
+                    forcedAuthed(12)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Should the supplicant have failed authentication, this records
+        the reason for the last failure. Never is returned in the case the
+        supplicant has never failed."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthConfigEntry 10 }
+   
+atrMacBasedAuthVlanAssignment OBJECT-TYPE
+     SYNTAX TruthValue
+     MAX-ACCESS read-write
+     STATUS current
+     DESCRIPTION
+       "Specifies whether VLAN Assignment is to be performed on the 
+       port. When set to TRUE, the VLAN Assignment mechanism will run,
+	    when set to FALSE it will not."
+		::= { atrMacBasedAuthConfigEntry 11 }
+
+atrMacBasedAuthSecureVlan OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Only valid in Multi-Supplicant mode, this parameter defines
+        whether to allow supplicants to authenticate on a port, when there
+        is already an authenticated aupplicant on the port"
+    ::= { atrMacBasedAuthConfigEntry 12 }
+
+atrMacBasedAuthMibReset OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Only valid in Multi-Supplicant mode, this parameter defines
+        whether to age out MIB information stored for old supplicants."
+    ::= { atrMacBasedAuthConfigEntry 13 }
+
+atrMacBasedAuthTrap OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    success(1),
+                    failure(2),
+                    both(3),
+                    none(4)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies what events trigger an SNMP trap."
+    REFERENCE
+        ""
+    ::= { atrMacBasedAuthConfigEntry 14 }
+
+-- ---------------------------------------------------------- --
+-- The MAC Based Auth Last Auth Entry
+-- ---------------------------------------------------------- --
+
+    atrMacBasedAuthAuthenticated NOTIFICATION-TYPE
+        OBJECTS { atrMacBasedAuthPaePortNumber,
+                  atrMacBasedAuthPaePortSuppMacAddress,
+                  atrMacBasedAuthPreAuthVlan,
+                  atrMacBasedAuthPostAuthVlan,
+                  atrMacBasedAuthLastAuthReason }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a supplicant is authenticated on a port."
+        ::= { atrMacBasedAuthTraps 1 }
+
+    atrMacBasedAuthUnauthenticated NOTIFICATION-TYPE
+        OBJECTS { atrMacBasedAuthPaePortNumber,
+                  atrMacBasedAuthPaePortSuppMacAddress,
+                  atrMacBasedAuthPreAuthVlan,
+                  atrMacBasedAuthPostAuthVlan,
+                  atrMacBasedAuthLastAuthReason }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a supplicant who was previously authorised on 
+                a port, is no longer authorised. This can be due to a authentication 
+                timeout or a failed reauthentication."
+        ::= { atrMacBasedAuthTraps 2 }
+
+    atrMacBasedAuthFailedAuth NOTIFICATION-TYPE
+        OBJECTS { atrMacBasedAuthPaePortNumber,
+                  atrMacBasedAuthPaePortSuppMacAddress,
+                  atrMacBasedAuthPreAuthVlan,
+                  atrMacBasedAuthPostAuthVlan,
+                  atrMacBasedAuthLastAuthReason }
+        STATUS  current
+        DESCRIPTION
+                "Triggered when a supplicant is unable to be authorised on a port."
+        ::= { atrMacBasedAuthTraps 3 }
+
+END

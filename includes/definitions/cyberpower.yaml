@@ -1,0 +1,15 @@
+os: cyberpower
+text: Cyberpower
+type: power
+icon: cyberpower
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.3808
+poller_modules:
+    ports: false
+discovery_modules:
+    ports: false
+nobulk: true

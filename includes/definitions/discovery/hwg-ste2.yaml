@@ -1,0 +1,43 @@
+mib: STE2-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: sensTable
+                    value: sensValue
+                    num_oid: '.1.3.6.1.4.1.21796.4.9.3.1.5.{{ $index }}'
+                    descr: sensName
+                    index: '{{ $index }}'
+                    divisor: 10
+                    skip_values: 
+                        -
+                            oid: sensUnit
+                            op: '!='
+                            value: 1
+        humidity:
+            data:
+                -
+                    oid: sensTable
+                    value: sensValue
+                    num_oid: '.1.3.6.1.4.1.21796.4.9.3.1.5.{{ $index }}'
+                    descr: sensName
+                    index: '{{ $index }}'
+                    divisor: 10
+                    skip_values: 
+                        -
+                            oid: sensUnit
+                            op: '!='
+                            value: 4
+        state:
+            data:
+                -
+                    oid: inpTable
+                    value: inpAlarmState
+                    num_oid: '.1.3.6.1.4.1.21796.4.9.1.1.4.{{ $index }}'
+                    descr: 'Alarm: {{ $inpName }}'
+                    index: 'inpAlarmState.{{ $index }}'
+                    state_name: inpAlarmState
+                    states:
+                        - { descr: normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: alarm, graph: 0, value: 1, generic: 2 }

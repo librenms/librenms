@@ -1,0 +1,106 @@
+-- This file was automatically generated from ciena-ws-ptp-pluggable.yang. Do not edit.
+
+CIENA-WS-PTP-PLUGGABLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    cwsPtpTxStatusEntry
+        FROM CIENA-WS-PTP-MIB
+    ChannelsNumber, PtpId
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsPtpPluggableMIB MODULE-IDENTITY
+    LAST-UPDATED "201702280000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This YANG module defines Ciena's XCVR ptp pluggable specific data. It augments the ciena-ws-ptp module. The pluggable PTP is the signal carried by the pluggable transceiver at a client port. Automatically provisioned at transceiver installation."
+    REVISION "201702280000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3"
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201504290000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 10 }
+
+cwsPtpAugPtpPluggableTxStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsPtpAugPtpPluggableTxStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsPtpPluggableMIB 3 }
+
+cwsPtpAugPtpPluggableTxStatusEntry OBJECT-TYPE
+    SYNTAX CwsPtpAugPtpPluggableTxStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsPtpAugPtpPluggableTxStatusTable."
+    AUGMENTS { cwsPtpTxStatusEntry }
+    ::= { cwsPtpAugPtpPluggableTxStatusTable 1 }
+
+CwsPtpAugPtpPluggableTxStatusEntry ::= SEQUENCE { 
+    cwsPtpPluggableTxStatusLossOfSignal TruthValue,
+    cwsPtpPluggableTxStatusLossOfLock TruthValue 
+}
+
+cwsPtpPluggableTxStatusLossOfSignal OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tx Loss of Signal. QSFP28 only attribute."
+    ::= { cwsPtpAugPtpPluggableTxStatusEntry 1 }
+
+cwsPtpPluggableTxStatusLossOfLock OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tx Loss of Lock."
+    ::= { cwsPtpAugPtpPluggableTxStatusEntry 2 }
+
+
+
+-- Conformance statements
+cienaWsPtpPluggableObjects OBJECT IDENTIFIER
+    ::= { cienaWsPtpPluggableMIB 1 }
+
+cienaWsPtpPluggableConformance OBJECT IDENTIFIER
+    ::= { cienaWsPtpPluggableMIB 2 }
+
+cienaWsPtpPluggableGroups OBJECT IDENTIFIER
+    ::= { cienaWsPtpPluggableConformance 1 }
+
+cienaWsPtpPluggableGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsPtpPluggableTxStatusLossOfSignal,
+        cwsPtpPluggableTxStatusLossOfLock
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsPtpPluggableGroups 1 }
+
+cienaWsPtpPluggableCompliances OBJECT IDENTIFIER
+    ::= { cienaWsPtpPluggableConformance 2 }
+
+cienaWsPtpPluggableCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsPtpPluggableGroup }
+    ::= { cienaWsPtpPluggableCompliances 1 }
+
+END -- End module

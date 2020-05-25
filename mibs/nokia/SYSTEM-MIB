@@ -1,0 +1,67 @@
+SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+-- ===========================================================================
+--  This specification is published by Alcatel under Non-Disclosure
+--  Agreement(s) (NDA) with specific parties and has to be considered as
+--  Confidential Information as defined in such NDA.
+--  Alcatel reserves the right to revise this document for any reason,
+--  including but not limited to conformity with standards promulgated by
+--  various agencies, utilisation of advances in the state of the technical
+--  areas, or the reflection of changes in the design of any equipment,
+--  techniques, or procedures described or referred to herein.
+--  The product specifications and other technical or performance information
+--  contained herein are subject to change without notice.
+--  Updates of this document will be issued under the above NDA's.
+--  Alcatel makes no representation or warranty, expressed or implied, with
+--  respect to the sufficiency, accuracy, or utility of any information or
+--  opinion contained herein. Alcatel expressly advises that any use of for 
+--  any purpose or reliance upon this technical reference is at the risk of
+--  the user and that Alcatel shall not be liable for any damage or injury
+--  incurred by any person arising out of the sufficiency, accuracy, or
+--  utility of any information or opinion contained herein.
+--  This document is not to be construed as a suggestion to any manufacturer
+--  to modify or change any of its products, nor does this document represent
+--  any commitment by Alcatel to sell or purchase any product.
+--  Nothing contained herein shall be construed as conferring by implication,
+--  estoppel, or otherwise any license or right under any patent, whether or
+--  not the use of any information herein necessarily employs an invention of
+--  any existing or later issued patent.
+--  Alcatel reserves the right not to offer any or all of these products and
+--  to withdraw any or all of them at any future time.
+--  Copyright (C) 1997, Alcatel. All Rights Reserved.
+-- ===========================================================================
+
+--  MODULE-IDENTITY
+--  LAST-UPDATED   "200607130000Z"
+--  ORGANIZATION   "Alcatel"
+--  CONTACT-INFO
+--
+--          Email:  asam.mibsupport@alcatel.be"
+--
+--  DESCRIPTION
+--        "This MIB module defines the proprietary asam branch.
+--
+--  REVISION "200607130000Z"  -* July 13, 2006
+--  DESCRIPTION
+--        "Version:  3FE23453EAAA_V3.2.0.0.0
+--         Editor:   Marc Van Vlimmeren
+--         Changes:  Editorial updates"
+--
+--  REVISION "200601230000Z"  -* January 23, 2006
+--  DESCRIPTION
+--        "Version:  3FE23453EAAA_V2.4.1.0.0
+--         Editor:   Bart Bogaert
+--         Changes:  Implemented BDFhw70643: strict syntax checks (smilint)"
+--
+-- ========================================================================
+
+    IMPORTS enterprises
+        FROM RFC1155-SMI
+    ;
+
+    alcatel OBJECT IDENTIFIER ::= { enterprises 637 }
+    asd     OBJECT IDENTIFIER ::= { alcatel 61 }
+    asam    OBJECT IDENTIFIER ::= { asd 1 }
+    ant     OBJECT IDENTIFIER ::= { asd 2 }
+
+END

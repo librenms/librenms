@@ -1,0 +1,136 @@
+mib: TIC-RMTI4-G9000-G2020-MIB
+modules:
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: upsInputLLVoltageAB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.2.2.{{ $index }}'
+                    index: 'upsInputLLVoltageAB.{{ $index }}'
+                    descr: Input LL (AB)
+                -
+                    oid: upsInputLLVoltageBC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.2.3.{{ $index }}'
+                    index: 'upsInputLLVoltageBC.{{ $index }}'
+                    descr: Input (BC)
+                -
+                    oid: upsInputLLVoltageCA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.2.4.{{ $index }}'
+                    index: 'upsInputLLVoltageCA.{{ $index }}'
+                    descr: Input (CA)
+                -
+                    oid: upsOutputLLVoltageAB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.3.3.{{ $index }}'
+                    index: 'upsOutputLLVoltageAB.{{ $index }}'
+                    descr: Output LL (AB)
+                -
+                    oid: upsOutputLLVoltageBC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.3.4.{{ $index }}'
+                    index: 'upsOutputLLVoltageBC.{{ $index }}'
+                    descr: Output (BC)
+                -
+                    oid: upsOutputLLVoltageCA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.3.5.{{ $index }}'
+                    index: 'upsOutputLLVoltageCA.{{ $index }}'
+                    descr: Output (CA)
+                -
+                    oid: upsBypassLLVoltageAB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.4.2.{{ $index }}'
+                    index: 'upsBypassLLVoltageAB.{{ $index }}'
+                    descr: Bypass LL (AB)
+                -
+                    oid: upsBypassLLVoltageBC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.4.3.{{ $index }}'
+                    index: 'upsBypassLLVoltageBC.{{ $index }}'
+                    descr: Bypass (BC)
+                -
+                    oid: upsBypassLLVoltageCA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.4.4.{{ $index }}'
+                    index: 'upsBypassLLVoltageCA.{{ $index }}'
+                    descr: Bypass (CA)
+                -
+                    oid: upsBatteryVoltage
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.5.4.{{ $index }}'
+                    index: 'upsBatteryVoltage.{{ $index }}'
+                    descr: Battery
+        current:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: upsInputCurrentPhaseA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.2.8.{{ $index }}'
+                    index: 'upsInputCurrentPhaseA.{{ $index }}'
+                    descr: Input Phase A
+                -
+                    oid: upsInputCurrentPhaseB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.2.9.{{ $index }}'
+                    index: 'upsInputCurrentPhaseB.{{ $index }}'
+                    descr: Input Phase B
+                -
+                    oid: upsInputCurrentPhaseC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.2.10.{{ $index }}'
+                    index: 'upsInputCurrentPhaseC.{{ $index }}'
+                    descr: Input Phase C
+                -
+                    oid: upsOutputCurrentPhaseA
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.3.6.{{ $index }}'
+                    index: 'upsOutputCurrentPhaseA.{{ $index }}'
+                    descr: Output Phase A
+                -
+                    oid: upsOutputCurrentPhaseB
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.3.7.{{ $index }}'
+                    index: 'upsOutputCurrentPhaseB.{{ $index }}'
+                    descr: Output Phase B
+                -
+                    oid: upsOutputCurrentPhaseC
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.3.8.{{ $index }}'
+                    index: 'upsOutputCurrentPhaseC.{{ $index }}'
+                    descr: Output Phase C
+        frequency:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: upsInputFrequency
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.2.11.{{ $index }}'
+                    index: 'upsInputFrequency.{{ $index }}'
+                    descr: Input
+                -
+                    oid: upsOutputFrequency
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.3.9.{{ $index }}'
+                    index: 'upsOutputFrequency.{{ $index }}'
+                    descr: Output
+                -
+                    oid: upsBypassFrequency
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.4.5.{{ $index }}'
+                    index: 'upsBypassFrequency.{{ $index }}'
+                    descr: Bypass
+        runtime:
+            data:
+                -
+                    oid: upsEstimatedBatteryRuntime
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.5.3.{{ $index }}'
+                    index: 'upsEstimatedBatteryRuntime.{{ $index }}'
+                    descr: Estimated runtime
+        charge:
+            data:
+                -
+                    oid: upsBatteryChargeCurrent
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.5.8.{{ $index }}'
+                    index: 'upsBatteryChargeCurrent.{{ $index }}'
+                    descr: Battery charge
+        state:
+            data:
+                -
+                    oid: upsBatteryStatus
+                    num_oid: '.1.3.6.1.4.1.186.1.19.2.5.1.5.1.{{ $index }}'
+                    descr: 'Battery status'
+                    index: 'upsBatteryStatus.{{ $index }}'
+                    states:
+                        - { descr: unknown, graph: 1, value: 1, generic: 3 }
+                        - { descr: batteryNormal, graph: 1, value: 2, generic: 0 }
+                        - { descr: batteryLow, graph: 1, value: 3, generic: 1 }
+                        - { descr: batteryDepleted, graph: 1, value: 4, generic: 2 }
+                        - { descr: batteryDischarging, graph: 1, value: 5, generic: 2 }
+                        - { descr: batteryFailure, graph: 1, value: 6, generic: 2 }

@@ -1,0 +1,568 @@
+-- *********************************************************************
+-- **
+-- ** BATM Advanced Communications.
+-- **
+-- *********************************************************************
+-- ** Filename: PRVT-BIST-MIB.mib
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications and contains
+-- proprietary and confidential information. This file is made
+-- available to authorized BATM customers on the express
+-- condition that neither it, nor any of the information contained
+-- therein, shall be disclosed to third parties or be used for any
+-- purpose other than to replace, modify or upgrade firmware and/or
+-- software components of BATM manufactured equipment within the
+-- authorized customer's network, and that such transfer be
+-- completed in accordance with the instructions provided by
+-- BATM. Any other use is strictly prohibited.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SOFTWARE PROGRAMS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+--
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SOFTWARE CONTAINED IN THIS FILE.
+--
+-- ----------------------------------------------------------------------------
+--
+PRVT-BIST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+Integer32
+FROM SNMPv2-SMI
+
+switch,
+reportsL2IfaceUnit,
+reportsL2IfaceSlot,
+reportsL2IfacePort
+FROM PRVT-SWITCH-MIB
+
+TEXTUAL-CONVENTION
+FROM SNMPv2-TC;
+
+prvtBISTMib MODULE-IDENTITY
+LAST-UPDATED "200502160000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"The BIST MIB module for managing build-in self-tests and retrieving the results."
+
+-- revision history
+REVISION "200502160000Z"
+DESCRIPTION
+"Fixed spelling errors and changed the contact info."
+
+REVISION "200410140000Z"
+DESCRIPTION
+"Added functionality to schedule the self-test through SNMP, namely the bistSelfTestExecute
+and bistSelfTestExecuteStatus objects. Added functionality to monitor the result of all self-tests
+that can be executed by the enable mode self-test command."
+
+REVISION "200311180000Z"
+DESCRIPTION
+"Initial version."
+
+::= { switch 108 }
+
+TestResult ::= TEXTUAL-CONVENTION
+STATUS current
+DESCRIPTION
+"This value represents the result of the test."
+SYNTAX INTEGER {
+passed(1),
+failed(2),
+unknown(3),
+notAvailable(4)
+}
+
+--
+-- Groups
+--
+
+prvtBISTNotifications OBJECT IDENTIFIER ::= { prvtBISTMib 0 }
+prvtBISTObjects OBJECT IDENTIFIER ::= { prvtBISTMib 1 }
+prvtBISTConformance OBJECT IDENTIFIER ::= { prvtBISTMib 2 }
+
+--
+-- prvtBISTObjects
+--
+bistConfig OBJECT IDENTIFIER ::= { prvtBISTObjects 1 }
+bistStatus OBJECT IDENTIFIER ::= { prvtBISTObjects 2 }
+bistResult OBJECT IDENTIFIER ::= { prvtBISTObjects 3 }
+
+--
+-- bistConfig
+--
+bistSelfTestExecute OBJECT-TYPE
+SYNTAX INTEGER {
+noop(1), -- no operation
+execute(2) -- start the test
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Setting this object to execute(2) starts the execution of the BIST test and
+stores the results in bistResult.
+
+This object does not execute port tests and does not influence the content
+of portTestTable.
+
+The results of the test execution are displayed in bistResult. A GET on this
+object always returns noop(1)."
+::= { bistConfig 1 }
+
+--
+-- bistStatus
+--
+bistSelfTestExecuteStatus OBJECT-TYPE
+SYNTAX INTEGER {
+not-started(1),
+in-progress(2),
+success(3),
+error(4)
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"This object displays the status of the last BIST execution. A value of
+not-started(1) indicates that the test has not been manually executed since
+start-up.
+
+A value of in-progress(2) indicates that the test is still being executed.
+success(3) indicates that the test has been executed, error(4) is returned,
+if the test was not executed due to an internal software error."
+::= { bistStatus 1 }
+
+--
+-- bistResult
+--
+bistCPU OBJECT IDENTIFIER ::= { bistResult 1 }
+bistRAM OBJECT IDENTIFIER ::= { bistResult 2 }
+bistUART OBJECT IDENTIFIER ::= { bistResult 3 }
+bistSwitchCore OBJECT IDENTIFIER ::= { bistResult 4 }
+bistNVRAM OBJECT IDENTIFIER ::= { bistResult 5 }
+bistPowerSupply OBJECT IDENTIFIER ::= { bistResult 6 }
+bistOnboardPower OBJECT IDENTIFIER ::= { bistResult 7 }
+bistFan OBJECT IDENTIFIER ::= { bistResult 8 }
+bistTemperature OBJECT IDENTIFIER ::= { bistResult 9 }
+bistUPS OBJECT IDENTIFIER ::= { bistResult 10 }
+bistPorts OBJECT IDENTIFIER ::= { bistResult 11 }
+
+--
+-- bistCPU
+--
+cPUTestTable OBJECT-TYPE
+SYNTAX SEQUENCE OF CPUTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the CPU test Table for verification, via SNMP, of the functionality of
+the OS device CPU"
+::= { bistCPU 1 }
+
+cPUTestEntry OBJECT-TYPE
+SYNTAX CPUTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "cpuTestEntry"
+INDEX { cpuTestType }
+::= { cPUTestTable 1 }
+
+CPUTestEntry ::= SEQUENCE {
+cpuTestType INTEGER,
+cpuTestResult TestResult
+}
+
+cpuTestType OBJECT-TYPE
+SYNTAX INTEGER {
+bistCPUValidation(1),
+bistCPUUsage(2)
+}
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"CPU test type:
+bistCPUValidation(1), Verifying the functionality of the CPU.
+bistCPUUsage(2), Verifying the CPU usage."
+::= { cPUTestEntry 1 }
+
+cpuTestResult OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The result of the current CPU test."
+::= { cPUTestEntry 2 }
+
+--
+-- bistRAM
+--
+ramTestTable OBJECT-TYPE
+SYNTAX SEQUENCE OF RamTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the RAM test Table for verification, via SNMP, of the functionality of
+the OS device RAM"
+::= { bistRAM 1 }
+
+ramTestEntry OBJECT-TYPE
+SYNTAX RamTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "ramTestEntry"
+INDEX { ramTestType }
+::= { ramTestTable 1 }
+
+RamTestEntry ::= SEQUENCE {
+ramTestType INTEGER,
+ramTestResult TestResult
+}
+
+ramTestType OBJECT-TYPE
+SYNTAX INTEGER {
+bistRAMValidation(1),
+bistRAMUsage(2)
+}
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"RAM test type:
+bistRAMValidation(1), Verifying the RAM functionality.
+bistRAMUsage(2), Verifying the RAM usage."
+::= { ramTestEntry 1 }
+
+ramTestResult OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The result of the current CPU test."
+::= { ramTestEntry 2 }
+
+--
+-- bistUART
+--
+uartExistTestTable OBJECT-TYPE
+SYNTAX SEQUENCE OF UartExistTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the test Table for verification, via SNMP, of the existence of UARTs in
+the OS device"
+::= { bistUART 1 }
+
+uartExistTestEntry OBJECT-TYPE
+SYNTAX UartExistTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "uartExistTestEntry"
+INDEX { uartIndex }
+::= { uartExistTestTable 1 }
+
+UartExistTestEntry ::= SEQUENCE {
+uartIndex Integer32,
+uartExistTestResult TestResult
+}
+
+uartIndex OBJECT-TYPE
+SYNTAX Integer32(1..65535)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The UART index e.g. 1,2 .. NUM of UARTs in the device"
+::= { uartExistTestEntry 1 }
+
+uartExistTestResult OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The result of the current UART test."
+::= { uartExistTestEntry 2 }
+
+--
+-- bistSwitchCore
+--
+bistCrossbarExistence OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Verifying Crossbar Existence."
+::= { bistSwitchCore 1 }
+
+--
+-- bistNVRAM
+--
+nvramTestTable OBJECT-TYPE
+SYNTAX SEQUENCE OF NvramTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the NVRAM test Table for verification, via SNMP, of the functionality of
+the OS device NVRAM content"
+::= { bistNVRAM 1 }
+
+nvramTestEntry OBJECT-TYPE
+SYNTAX NvramTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "nvramTestEntry"
+INDEX { nvramTestType }
+::= { nvramTestTable 1 }
+
+NvramTestEntry ::= SEQUENCE {
+nvramTestType INTEGER,
+nvramTestResult TestResult
+}
+
+nvramTestType OBJECT-TYPE
+SYNTAX INTEGER {
+bistBootLoaderValidation(1),
+bistApplicationValidation(2),
+bistStartupConfigValidation(3),
+bistScriptFileSystemValidation(4),
+bistJavaImageValidation(5),
+bistPROMValidation(6)
+}
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"RAM test type:
+bistRAMValidation(1), Verifying the Boot Loader Image.
+bistApplicationValidation(2), Verifying the Application Image.
+bistStartupConfigValidation(3), Verifying the Startup Configuration File.
+bistScriptFileSystemValidation(4), Verifying the Script File System.
+bistJavaImageValidation(5), Verifying the Java Image.
+bistPROMValidation(6), Verifying the PROM."
+::= { nvramTestEntry 1 }
+
+nvramTestResult OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The result of the current NVRAM test."
+::= { nvramTestEntry 2 }
+
+--
+-- bistPowerSupply
+--
+powerSupplyTestTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PowerSupplyTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the test Table for verification, via SNMP, of the status of the power supplies
+in the OS device. Each power supply installed has a row index, determined by its
+physical position."
+::= { bistPowerSupply 1 }
+
+powerSupplyTestEntry OBJECT-TYPE
+SYNTAX PowerSupplyTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "powerSupplyTestEntry"
+INDEX { powerSupplyIndex }
+::= { powerSupplyTestTable 1 }
+
+PowerSupplyTestEntry ::= SEQUENCE {
+powerSupplyIndex Integer32,
+powerSupplyTestResult TestResult
+}
+
+powerSupplyIndex OBJECT-TYPE
+SYNTAX Integer32(1..65535)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The powerSupplyIndex index e.g. 1,2 .. number of the power supply in the device"
+::= { powerSupplyTestEntry 1 }
+
+powerSupplyTestResult OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Verifying the operation of the Power Supply."
+::= { powerSupplyTestEntry 2 }
+
+--
+-- bistOnboardPower
+--
+onboardPowerTestTable OBJECT-TYPE
+SYNTAX SEQUENCE OF OnboardPowerTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the test Table for verification, via SNMP, of the
+functionality of the OS device onboard power"
+::= { bistOnboardPower 1 }
+
+onboardPowerTestEntry OBJECT-TYPE
+SYNTAX OnboardPowerTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "onboardPowerEntry"
+INDEX { onboardPowerTestType }
+::= { onboardPowerTestTable 1 }
+
+OnboardPowerTestEntry ::= SEQUENCE {
+onboardPowerTestType INTEGER,
+onboardPowerTestResult TestResult
+}
+
+onboardPowerTestType OBJECT-TYPE
+SYNTAX INTEGER {
+bistOnboardPowerPHY(1),
+bistOnboardPowerCPU(2),
+bistOnboardPowerOC(3),
+bistOnboardPower3-2V(4),
+bistOnboardPower2-5V(5),
+bistOnboardPower1-8V(6),
+bistOnboardPower1-5V(7),
+bistOnboardPower1-25V(8)
+}
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Onboard power test type:
+bistOnboardPowerPHY(1), Verifying Onboard Power PHY.
+bistOnboardPowerCPU(2), Verifying Onboard Power CPU.
+bistOnboardPowerOC(3), Verifying Onboard Power OC.
+bistOnboardPower3-2V(4), Verifying Onboard Power 3.2V.
+bistOnboardPower2-5V(5), Verifying Onboard Power 2.5V.
+bistOnboardPower1-8V(6), Verifying Onboard Power 1.8V.
+bistOnboardPower1-5V(7), Verifying Onboard Power 1.5V.
+bistOnboardPower1-25V(8) Verifying Onboard Power 1.25V."
+::= { onboardPowerTestEntry 1 }
+
+onboardPowerTestResult OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The result of the current onboard power test."
+::= { onboardPowerTestEntry 2 }
+
+--
+-- bistFan
+--
+fanTestTable OBJECT-TYPE
+SYNTAX SEQUENCE OF FanTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the test Table for verification, via SNMP, of the status of the fans
+in the OS device. Each fan installed has a row index, determined by its physical
+position."
+::= { bistFan 1 }
+
+fanTestEntry OBJECT-TYPE
+SYNTAX FanTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION "fanTestEntry"
+INDEX { fanIndex }
+::= { fanTestTable 1 }
+
+FanTestEntry ::= SEQUENCE {
+fanIndex Integer32,
+fanTestResult TestResult
+}
+
+fanIndex OBJECT-TYPE
+SYNTAX Integer32 (1..65535)
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"The fan index e.g. 1,2 .. number of the fan in the device"
+::= { fanTestEntry 1 }
+
+fanTestResult OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Verifying the operation of the fan."
+::= { fanTestEntry 2 }
+
+--
+-- bistTemperatureTest
+--
+bistTemperatureTest OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Verifying the Temperature."
+::= { bistTemperature 1 }
+
+--
+-- bistUPSTest
+--
+bistUPSTest OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Verifying UPS."
+::= { bistUPS 1 }
+
+--
+-- bistPorts
+--
+portsTestTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PortsTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the ports test Table for verification, via SNMP, of the functionality of
+all LAN-ports (to be performed with local loop-back)"
+::= { bistPorts 1 }
+
+portsTestEntry OBJECT-TYPE
+SYNTAX PortsTestEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Defines the ports test entry for verification, via SNMP, of the functionality of
+a LAN-port (to be performed with local loop-back)"
+INDEX { reportsL2IfaceUnit, reportsL2IfaceSlot,reportsL2IfacePort }
+::= { portsTestTable 1 }
+
+PortsTestEntry ::= SEQUENCE {
+portTest TestResult
+}
+
+portTest OBJECT-TYPE
+SYNTAX TestResult
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Verifying the functionality of a LAN-port (to be performed with local loop-back)."
+::= { portsTestEntry 1 }
+
+END
+

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Observium to LibreNMS conversion
 
 ####################### SCRIPT DESCRIPTION ########################

@@ -1,0 +1,85 @@
+mib: SPAGENT-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: spStatus
+                    num_oid: '.1.3.6.1.4.1.3854.1.1.2.{{ $index }}'
+                    descr: 'Probe Status'
+                    group: Probes
+                    states:
+                        - { descr: noStatus, graph: 1, value: 1, generic: 3 }
+                        - { descr: normal, graph: 1, value: 2, generic: 0 }
+                        - { descr: critical, graph: 1, value: 4, generic: 2 }
+                        - { descr: sensorError, graph: 1, value: 7, generic: 3 }
+                -
+                    oid: sensorProbeSwitchTable
+                    value: sensorProbeSwitchStatus
+                    num_oid: '.1.3.6.1.4.1.3854.1.2.2.1.18.1.3.{{ $index }}'
+                    descr: sensorProbeSwitchDescription
+                    group: Switches
+                    index: 'hhmsSensorArraySwitchStatus.{{ $index }}'
+                    skip_values:
+                        -
+                          oid: sensorProbeSwitchOnline
+                          op: '!='
+                          value: 2
+                    states:
+                        - { descr: noStatus, graph: 1, value: 1, generic: 3 }
+                        - { descr: normal, graph: 1, value: 2, generic: 0 }
+                        - { descr: critical, graph: 1, value: 4, generic: 2 }
+                        - { descr: sensorError, graph: 1, value: 7, generic: 3 }
+        humidity:
+            data:
+                -
+                    oid: sensorProbeHumidityTable
+                    value: sensorProbeHumidityRaw
+                    num_oid: '.1.3.6.1.4.1.3854.1.2.2.1.17.1.13.{{ $index }}'
+                    descr: sensorProbeHumidityDescription
+                    divisor: 10
+                    low_limit: sensorProbeHumidityLowCritical
+                    low_warn_limit: sensorProbeHumidityLowWarning
+                    warn_limit: sensorProbeHumidityHighWarning
+                    high_limit: sensorProbeHumidityHighCritical
+                    skip_values:
+                        -
+                          oid: sensorProbeHumidityOnline
+                          op: '!='
+                          value: 2
+        current:
+            data:
+                -
+                    oid: current4to20mASensorTable
+                    value: current4to20mASensorRaw
+                    num_oid: '.1.3.6.1.4.1.3854.2.5.5.1.20.{{ $index }}'
+                    descr: current4to20mASensorDescription
+                    divisor: 10
+                    low_limit: current4to20mASensorLowCritical
+                    low_warn_limit: current4to20mASensorLowWarning
+                    warn_limit: current4to20mASensorHighWarning
+                    high_limit: current4to20mASensorHighCritical
+        voltage:
+            data:
+                -
+                    oid: dcVoltageSensorTable
+                    value: dcVoltageSensorRaw
+                    num_oid: '.1.3.6.1.4.1.3854.2.5.6.1.20.{{ $index }}'
+                    descr: dcVoltageSensorDescription
+                    divisor: 10
+                    low_limit: dcVoltageSensorLowCritical
+                    low_warn_limit: dcVoltageSensorLowWarning
+                    warn_limit: dcVoltageSensorHighWarning
+                    high_limit: dcVoltageSensorHighCritical
+        airflow:
+            data:
+                -
+                    oid: airflowSensorTable
+                    value: airflowSensorRaw
+                    num_oid: '.1.3.6.1.4.1.3854.2.5.7.1.20.{{ $index }}'
+                    descr: airflowSensorDescription
+                    divisor: 10
+                    low_limit: airflowSensorLowCritical
+                    low_warn_limit: airflowSensorLowWarning
+                    warn_limit: airflowSensorHighWarning
+                    high_limit: airflowSensorHighCritical

@@ -8,4 +8,4 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     - sysDescr:
-        - PY CB Eth Switch
+        - 'PY CB Eth Switch'

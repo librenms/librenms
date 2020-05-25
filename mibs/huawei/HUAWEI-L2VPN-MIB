@@ -1,0 +1,410 @@
+-- HUAWEI-L2VPN-MIB.mib
+--  ==================================================================
+-- Copyright (C) 2015 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI L2VPN Management MIB
+-- Reference:
+-- Version:     V2.03
+-- History:
+--              V1.0 WangSongTao, 2009-02-26, publish 
+-- ==================================================================
+    
+    HUAWEI-L2VPN-MIB DEFINITIONS ::= BEGIN
+    
+        IMPORTS
+            hwDatacomm           
+                FROM HUAWEI-MIB
+                    EnabledStatus
+                FROM P-BRIDGE-MIB
+                    OBJECT-GROUP, MODULE-COMPLIANCE
+                FROM SNMPv2-CONF                 
+                    sysUpTime         
+                FROM SNMPv2-MIB
+                    OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
+                FROM SNMPv2-SMI
+                  InterfaceIndexOrZero          
+                FROM IF-MIB;
+        -- 1.3.6.1.4.1.2011.5.25.119.8
+            hwL2VpnAttribute MODULE-IDENTITY 
+                LAST-UPDATED "201507131700Z"               -- July 13, 2015 at 17:00 GMT
+                ORGANIZATION
+                     "Huawei Technologies Co.,Ltd."
+                CONTACT-INFO 
+                     "Huawei Industrial Base
+                       Bantian, Longgang
+                        Shenzhen 518129
+                        People's Republic of China
+                        Website: http://www.huawei.com
+                        Email: support@huawei.com
+                      "
+                DESCRIPTION
+                     "The HUAWEI-L2VPN-MIB contains objects to
+                      manage global Attributes of L2VPN."
+                 
+                REVISION "201507131700Z"                    -- July 13, 2015 at 17:00 GMT
+                DESCRIPTION
+                     "Add L2vpnIfTable  to hwL2VpnAttribute."
+
+                REVISION "201503161750Z"                    -- Mar 16, 2015 at 17:50 GMT
+                DESCRIPTION
+                     "Add 1 leaf nodes to hwL2VpnAttribute."
+
+                REVISION "201406181000Z"                    -- June 18, 2014 at 10:00 GMT
+                DESCRIPTION
+                     "Add 11 leaf nodes to hwL2VpnAttribute."
+
+                ::= { hwL2Vpn 8 }                
+-- 
+-- Node definitions
+-- 
+  
+        -- 1.3.6.1.4.1.2011.5.25.119
+        hwL2Vpn OBJECT IDENTIFIER ::= { hwDatacomm 119 }
+                
+--         
+-- The Global Attributes Group of The mpls L2vpn
+-- 
+  
+-- 
+-- The Leaf Nodes of hwL2VpnAttribute
+-- 
+        -- 1.3.6.1.4.1.2011.5.25.119.8.1
+        hwL2VpnEnable OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates whether enabled mpls L2vpn capability or not."
+            ::= { hwL2VpnAttribute 1 }                
+            
+        -- 1.3.6.1.4.1.2011.5.25.119.8.2
+        hwL2VpnWorkingMode OBJECT-TYPE
+            SYNTAX INTEGER
+                {
+                pwe3(1),
+                martini(2),
+                unknown(3)
+                }
+            MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                "This object indicates the working mode of mpls L2vpn."
+            ::= { hwL2VpnAttribute 2 }
+
+        -- 1.3.6.1.4.1.2011.5.25.119.8.4
+        hwL2VpnLocalCCCNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the local ccc number have created."
+            ::= { hwL2VpnAttribute 4 }
+
+        -- 1.3.6.1.4.1.2011.5.25.119.8.5
+        hwL2VpnRemoteCCCNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the remote ccc number have created."
+            ::= { hwL2VpnAttribute 5 }
+
+        -- 1.3.6.1.4.1.2011.5.25.119.8.6
+        hwL2VpnSvcNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the static vc number have created."
+            ::= { hwL2VpnAttribute 6 }
+
+        -- 1.3.6.1.4.1.2011.5.25.119.8.7
+        hwL2VpnLdpVcNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the ldp vc number have created."
+            ::= { hwL2VpnAttribute 7 }
+
+        -- 1.3.6.1.4.1.2011.5.25.119.8.8
+        hwL2VpnBgpVcNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the bgp vc number have created."
+            ::= { hwL2VpnAttribute 8 }
+
+        -- 1.3.6.1.4.1.2011.5.25.119.8.9
+        hwL2VpnVsiNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the vsi number have created."
+            ::= { hwL2VpnAttribute 9 }
+
+         -- 1.3.6.1.4.1.2011.5.25.119.8.10
+        hwL2VpnBgpVsiNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the bgp vsi number have created."
+            ::= { hwL2VpnAttribute 10 }
+
+         -- 1.3.6.1.4.1.2011.5.25.119.8.11
+        hwL2VpnVsiVcNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the vsi vc number have created."
+            ::= { hwL2VpnAttribute 11 }
+
+         -- 1.3.6.1.4.1.2011.5.25.119.8.12
+        hwVplsVcNumberMaxNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the max vpls vc number."
+            ::= { hwL2VpnAttribute 12 }
+
+         -- 1.3.6.1.4.1.2011.5.25.119.8.13
+        hwVplsVcNumberUpperThreshold OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the vpls vc number is upper than threshold."
+            ::= { hwL2VpnAttribute 13 }  
+            
+         -- 1.3.6.1.4.1.2011.5.25.119.8.14
+        hwL2VpnVcLimitClass OBJECT-TYPE
+            SYNTAX INTEGER
+            {
+                vll(1),
+                vpls(2)
+            }
+            MAX-ACCESS accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "This object indicates the class of l2vpn vc limit."
+            ::= { hwL2VpnAttribute 14 }  
+        
+          -- 1.3.6.1.4.1.2011.5.25.119.8.15
+        hwL2VpnSwitchVcNumber OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This object indicates the number of MS-PWs already created."
+            ::= { hwL2VpnAttribute 15 }    
+ --          
+-- The L2VPN's Ac if  Table
+-- 
+-- 1.3.6.1.4.1.2011.5.25.119.8.16
+        hwL2vpnAcIfTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF HwL2vpnAcIfEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "This table is the interface configuration table used by L2VPN. Users
+                can read interface by it."  
+            ::= { hwL2VpnAttribute 16}  
+            
+         hwL2vpnAcIfEntry OBJECT-TYPE
+            SYNTAX HwL2vpnAcIfEntry 
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Provides the information of a interface entry."  
+             INDEX { hwL2vpnAcIfIndex}
+            ::= { hwL2vpnAcIfTable 1}
+			
+    HwL2vpnAcIfEntry ::=
+            SEQUENCE { 
+                hwL2vpnAcIfIndex
+                    InterfaceIndexOrZero,
+                hwL2vpnAcIfPhyType
+                    Unsigned32,
+                hwL2vpnAcIfLinkType
+                    Unsigned32,
+                hwL2vpnAcIfEncap
+                    Unsigned32,
+                hwL2vpnAcIfMinEncapNum
+                    Unsigned32,
+                hwL2vpnAcIfMaxEncapNum
+                    Unsigned32,
+                hwL2vpnAcIfEncapStep
+                    Unsigned32,
+                hwL2vpnAcIfMinJitterBuffer
+                    Unsigned32,
+                hwL2vpnAcIfMaxJitterBuffer
+                    Unsigned32,
+                hwL2vpnAcIfJitterBufferStep
+                    Unsigned32,
+                hwL2vpnAcIfCfgTtpHeader
+                    EnabledStatus,
+                hwL2vpnAcIfMinIdleCode
+                    Unsigned32,
+                hwL2vpnAcIfMaxIdleCode 
+	                Unsigned32
+             }
+		
+        hwL2vpnAcIfIndex OBJECT-TYPE
+            SYNTAX InterfaceIndexOrZero
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+            "A unique value, greater than zero, for each
+               interface.  It is recommended that values are assigned
+               contiguously starting from 1.  The value for each
+               interface sub-layer must remain constant at least from
+               one re-initialization of the entity's network
+               management system to the next re-initialization."
+            ::= { hwL2vpnAcIfEntry 1 }
+			
+        hwL2vpnAcIfPhyType OBJECT-TYPE
+            SYNTAX Unsigned32(0..256)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "The type of interface. Additional values for ifType
+             are assigned by the Internet Assigned Numbers
+             Authority (IANA), through updating the syntax of the
+             IANAifType textual convention."
+            ::= { hwL2vpnAcIfEntry 2 }
+
+        hwL2vpnAcIfLinkType OBJECT-TYPE
+            SYNTAX Unsigned32(0..256)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "Specifies the LinkType"
+            ::= { hwL2vpnAcIfEntry 3 }
+
+        hwL2vpnAcIfEncap OBJECT-TYPE
+            SYNTAX Unsigned32(0..256)
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+             "Specifies the encapsulation of the Virtual Circuit supported by the interface."
+            ::= { hwL2vpnAcIfEntry 4 }
+
+        hwL2vpnAcIfMinEncapNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "Specifies the minimum number of TDM frames."
+            ::= { hwL2vpnAcIfEntry 5 }
+
+        hwL2vpnAcIfMaxEncapNum OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION  
+             "Specifies the maximum number of TDM frames."
+            ::= { hwL2vpnAcIfEntry 6 }
+
+        hwL2vpnAcIfEncapStep OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Specifies the step of TDM frames."
+            ::= { hwL2vpnAcIfEntry 7 }
+
+        hwL2vpnAcIfMinJitterBuffer OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Specifies the minimum number of JitterBuffer."
+            ::= { hwL2vpnAcIfEntry 8 }
+
+        hwL2vpnAcIfMaxJitterBuffer OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Specifies the maximum number of JitterBuffer."
+            ::= { hwL2vpnAcIfEntry 9 }
+
+        hwL2vpnAcIfJitterBufferStep OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Specifies the step of JitterBuffer."
+            ::= { hwL2vpnAcIfEntry 10 }
+
+        hwL2vpnAcIfCfgTtpHeader OBJECT-TYPE
+            SYNTAX EnabledStatus          
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Denotes the rtp-header option is enable or not"
+            ::= { hwL2vpnAcIfEntry 11 }
+
+        hwL2vpnAcIfMinIdleCode OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+            "Specifies the minimum number of IdleCode."
+            ::= { hwL2vpnAcIfEntry 12 }
+
+        hwL2vpnAcIfMaxIdleCode OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION 
+            "Specifies the maximum number of IdleCode."
+            ::= { hwL2vpnAcIfEntry 13 }	                                  
+-- 
+--  Conformance information
+-- 
+        -- 1.3.6.1.4.1.2011.5.25.119.8.3
+        hwL2VpnMIBConformance OBJECT IDENTIFIER ::= { hwL2VpnAttribute 3 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.119.8.3.1
+        hwL2VpnMIBCompliances OBJECT IDENTIFIER ::= { hwL2VpnMIBConformance 1 }
+        
+-- this module
+        -- 1.3.6.1.4.1.2011.5.25.119.8.3.1.1
+        hwL2VpnMIBCompliance MODULE-COMPLIANCE
+            STATUS current
+            DESCRIPTION 
+                "The compliance statement for systems supporting
+                 the HUAWEI-L2VPN-MIB."
+            MODULE -- this module
+            MANDATORY-GROUPS { hwL2VpnMIBGroup }
+            ::= { hwL2VpnMIBCompliances 1 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.119.8.3.2
+        hwL2VpnMIBGroups OBJECT IDENTIFIER ::= { hwL2VpnMIBConformance 2 }
+        
+        -- 1.3.6.1.4.1.2011.5.25.119.8.3.2.1
+        hwL2VpnMIBGroup OBJECT-GROUP
+            OBJECTS { hwL2VpnEnable, hwL2VpnWorkingMode, hwL2VpnLocalCCCNumber, hwL2VpnRemoteCCCNumber, hwL2VpnSvcNumber, hwL2VpnLdpVcNumber, hwL2VpnBgpVcNumber,hwL2VpnVsiNumber,hwL2VpnBgpVsiNumber,hwL2VpnVsiVcNumber,hwVplsVcNumberMaxNum,hwVplsVcNumberUpperThreshold,hwL2VpnVcLimitClass,hwL2VpnSwitchVcNumber }
+            STATUS current
+            DESCRIPTION 
+                "The L2VPN's attributes group."
+            ::= { hwL2VpnMIBGroups 1 }                
+
+             hwL2vpnAcIfGroup OBJECT-GROUP
+            OBJECTS{hwL2vpnAcIfIndex,hwL2vpnAcIfPhyType,hwL2vpnAcIfLinkType,hwL2vpnAcIfEncap,hwL2vpnAcIfMinEncapNum,hwL2vpnAcIfMaxEncapNum,hwL2vpnAcIfEncapStep,hwL2vpnAcIfMinJitterBuffer,
+                               hwL2vpnAcIfMaxJitterBuffer,hwL2vpnAcIfJitterBufferStep,hwL2vpnAcIfCfgTtpHeader,hwL2vpnAcIfMinIdleCode,hwL2vpnAcIfMaxIdleCode }
+            STATUS current
+            DESCRIPTION 
+                "The L2vpn's Interface group."
+            ::= { hwL2VpnMIBGroups 2}          
+    END
+
+--
+-- HUAWEI-L2VPN-MIB.mib
+--

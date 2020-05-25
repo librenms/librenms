@@ -1,0 +1,635 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-EXT-LAG-MIB.my
+ --
+ --
+ CIENA-CES-EXT-LAG-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS
+    Unsigned32, Integer32, Counter32, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString, TEXTUAL-CONVENTION, RowStatus, MacAddress
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    cienaGlobalSeverity, cienaGlobalMacAddress
+        FROM CIENA-GLOBAL-MIB
+    cienaCesConfig, cienaCesNotifications
+        FROM CIENA-SMI;
+
+	
+ cienaCesExtLagMIB MODULE-IDENTITY
+          LAST-UPDATED "201802130000Z"
+          ORGANIZATION "Ciena Corp."
+          CONTACT-INFO
+          "   Mib Meister
+              7035 Ridge Road
+              Hanover, Maryland 21076
+              USA
+              Phone:  +1 800 921 1144
+              Email:  support@ciena.com"
+	      DESCRIPTION
+		    "This MIB module is an extension to the ieee8023-lag-mib.
+		    This MIB defines the mgmt objects for the creation and 
+		    deletion of LAGs."
+
+          REVISION  "201802130000Z"
+              DESCRIPTION
+                    "Added Agg's Admin and Oper State MIB Objects to cienaCesExtLagEntry table.
+              The new objects are cienaCesExtAggAdminState and cienaCesExtAggOperState."
+          REVISION  "201706070000Z"
+              DESCRIPTION
+                    "Updated contact info."
+          REVISION  "201609280000Z"
+              DESCRIPTION
+                    "Added Marker Timeout MIB Objects to cienaCesExtLag table.
+              The new object added is cienaCesExtAggMarkerTimeout."
+          REVISION  "201609160000Z"
+              DESCRIPTION
+                    "Added Notification MIB Objects to cienaCesNotifications table.
+              The new object added is cienaCesExtLagMclagStateChange."
+          REVISION  "201609140000Z"
+              DESCRIPTION
+                    "Added Minimum Link Agg MIB Objects to cienaCesExtLagEntry table.
+              The new objects are cienaCesExtAggMinimumLinkAggregation and cienaCesExtAggMinimumLinkThreshold."
+          REVISION  "201609070000Z"
+              DESCRIPTION
+		            "Added MC-LAG related MIB objects to cienaCesExtLagEntry table.
+              The new objects are cienaCesExtLagProtectionMode, cienaCesExtAggICL,
+              cienaCesExtAggRole, cienaCesExtAggRgNodeId, cienaCesExtAggRgDynamicPriority, cienaCesExtAggRgOperKey,
+              cienaCesExtAggRedundancyState, cienaCesExtAggConnectState, cienaCesExtAggRgMismatchStatus,
+              cienaCesExtAggPeerSystemMac, cienaCesExtAggPeerRgNodeId, cienaCesExtAggPeerRgDynamicPriority, 
+              cienaCesExtAggPeerRgOperKey, cienaCesExtAggPeerRgNumAddedPorts, cienaCesExtAggPeerRgNumAvailablePorts,
+              cienaCesExtAggDisconnectRx, cienaCesExtAggDisconnectTx, cienaCesExtAggConfigMismatchRx,
+              cienaCesExtAggKeyMismatchCount, cienaCesExtAggOutOfSequenceRx, cienaCesExtAggPeerUnreachableCount,
+              cienaCesExtAggUnknownRx, cienaCesExtAggTotalRx, cienaCesExtAggTotalTx, cienaCesExtAggTotalDownTime,
+              cienaCesExtAggUpTime, cienaCesExtAggTimeInProtectState, cienaCesExtAggLastTimeProtected,
+              cienaCesExtAggNumberOfSwitchovers, cienaCesExtAggMultiChassis."
+          REVISION  "201608100000Z"
+              DESCRIPTION
+                    "Added total number of member ports related MIB Objects to cienaCesExtLagEntry table.
+              The new objects are cienaCesExtAggTotalAddedPorts and cienaCesExtAggTotalProtectionPorts."
+              ::= { cienaCesConfig 3 }
+
+ --
+ -- Node definitions
+ --	
+ 
+ cienaCesExtLagMIBObjects OBJECT IDENTIFIER ::= { cienaCesExtLagMIB 1 }
+ 
+ cienaCesExtLag  OBJECT IDENTIFIER ::= { cienaCesExtLagMIBObjects 1 }
+ 
+ --
+ -- Conformance Information
+ --
+ cienaCesExtLagMIBConformance	OBJECT IDENTIFIER ::= { cienaCesExtLagMIB 2 }
+ cienaCesExtLagMIBCompliances OBJECT IDENTIFIER ::= { cienaCesExtLagMIBConformance 1 }
+ cienaCesExtLagMIBGroups	OBJECT IDENTIFIER ::= { cienaCesExtLagMIBConformance 2 }
+
+ -- Notifications
+
+ cienaCesExtLagMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 21 } 
+ cienaCesExtLagMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesExtLagMIBNotificationPrefix 0 }
+
+ cienaCesMaxLags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of LAGs that this device supports."
+    ::= { cienaCesExtLag 1 }
+    
+ cienaCesNumLags OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current number of LAGs that are configured on this device."
+    ::= { cienaCesExtLag 2 }
+    
+ cienaCesExtLagTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesExtLagEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing all the LAGs."  
+     ::= { cienaCesExtLag 3 }
+		
+ cienaCesExtLagEntry OBJECT-TYPE
+     SYNTAX      CienaCesExtLagEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesExtLagTable."
+     INDEX { cienaCesExtAggId }
+     ::= { cienaCesExtLagTable 1 }
+		
+ CienaCesExtLagEntry ::=  SEQUENCE { 
+     cienaCesExtAggId                         Integer32,
+     cienaCesExtAggName                       DisplayString,
+     cienaCesExtAggIndex                      Integer32,     
+     cienaCesExtAggMode	                      INTEGER,
+     cienaCesExtLagProtectionRevertState      INTEGER,
+     cienaCesExtLagProtectionRevertTimer      INTEGER,     
+     cienaCesExtAggTotalAddedPorts            Unsigned32,
+     cienaCesExtAggTotalProtectionPorts       Unsigned32,
+     cienaCesExtLagProtectionMode             INTEGER,
+     cienaCesExtAggICL                        DisplayString,
+     cienaCesExtAggRole                       INTEGER,
+     cienaCesExtAggRgNodeId                   Unsigned32,
+     cienaCesExtAggRgDynamicPriority          Unsigned32,
+     cienaCesExtAggRgOperKey                  Unsigned32,
+     cienaCesExtAggRedundancyState            INTEGER,
+     cienaCesExtAggConnectState               INTEGER,
+     cienaCesExtAggRgMismatchStatus           INTEGER,
+     cienaCesExtAggPeerSystemMac              MacAddress,
+     cienaCesExtAggPeerRgNodeId               Unsigned32,
+     cienaCesExtAggPeerRgDynamicPriority      Unsigned32,
+     cienaCesExtAggPeerRgOperKey              Unsigned32,
+     cienaCesExtAggPeerRgNumAddedPorts        Unsigned32,
+     cienaCesExtAggPeerRgNumAvailablePorts    Unsigned32,
+     cienaCesExtAggDisconnectRx               Counter32,
+     cienaCesExtAggDisconnectTx               Counter32,
+     cienaCesExtAggConfigMismatchRx           Counter32,
+     cienaCesExtAggKeyMismatchCount           Counter32,
+     cienaCesExtAggOutOfSequenceRx            Counter32,
+     cienaCesExtAggPeerUnreachableCount       Counter32,
+     cienaCesExtAggUnknownRx                  Counter32,
+     cienaCesExtAggTotalRx                    Counter32,
+     cienaCesExtAggTotalTx                    Counter32,
+     cienaCesExtAggTotalDownTime              Unsigned32,
+     cienaCesExtAggUpTime                     Unsigned32,
+     cienaCesExtAggTimeInProtectState         Unsigned32,
+     cienaCesExtAggLastTimeProtected          Unsigned32,
+     cienaCesExtAggNumberOfSwitchovers        Counter32,
+     cienaCesExtAggMultiChassis               INTEGER,
+     cienaCesExtAggMinimumLinkAggregation     INTEGER,
+     cienaCesExtAggMinimumLinkThreshold       Integer32,
+     cienaCesExtAggAdminState                 INTEGER,
+     cienaCesExtAggOperState                  INTEGER
+ }
+
+ cienaCesExtAggId OBJECT-TYPE
+     SYNTAX     Integer32 (1..2147483647)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+           "Object that specifies a unique entry in the
+           cienaCesExtLagTable. A management station wishing
+           to create a LAG should use a pseudo-random value 
+           for this object when creating an instance of a 
+           cienaCesExtLagEntry."
+     ::= { cienaCesExtLagEntry 1 }
+
+ cienaCesExtAggName OBJECT-TYPE
+     SYNTAX      DisplayString (SIZE(1..32))
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "The name assigned to this LAG by the management
+	   station. This object can only be set while creating the LAG. The LAG
+	   cannot be renamed once it is created." 
+     ::= { cienaCesExtLagEntry 2 }
+
+ cienaCesExtAggIndex OBJECT-TYPE
+    SYNTAX       Integer32 (1..2147483647)
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The unique identifier allocated to this LAG by
+        the local system.  This attribute identifies an
+        LAG instance among the subordinate managed
+        objects of the containing object.
+        This value is read-only. This object refers to the 
+	dot3adAggIndex in the ieee-8023-lag-mib."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.1"
+    ::= { cienaCesExtLagEntry 3 }		
+	
+ cienaCesExtAggMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+			lacp(1),
+			manual(2)
+		 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the mode in which the given aggregation is operating." 
+     ::= { cienaCesExtLagEntry 4 } 
+ 
+ cienaCesExtLagProtectionRevertState OBJECT-TYPE
+     SYNTAX      INTEGER {
+     				on(1),
+     				off(2)
+     				}     				
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies that if the primary port goes from operationally disabled to operationally enabled it 
+            shall become active, and one of the secondary ports shall become backup if this MIB object is set to 'on' and the
+            cienaCesLagProtectionRevertTimer timer expires." 
+     ::= { cienaCesExtLagEntry 5 }
+ 
+ cienaCesExtLagProtectionRevertTimer OBJECT-TYPE
+     SYNTAX      INTEGER (0..60000)     				
+     UNITS		 "msec"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the revert protection timer value."
+     DEFVAL		{5000}
+     ::= { cienaCesExtLagEntry 6 } 
+
+ cienaCesExtAggTotalAddedPorts OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the total number of member ports present in the LAG group."
+     ::= { cienaCesExtLagEntry 7 }
+
+ cienaCesExtAggTotalProtectionPorts OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the total number of protection member ports present in the LAG group."
+     ::= { cienaCesExtLagEntry 8 }
+
+ cienaCesExtLagProtectionMode OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        proprietary(1),
+                        standard(2),
+                        none(3)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the LACP protection-mode in which the given aggregation is operating."
+     ::= { cienaCesExtLagEntry 9 }
+
+ cienaCesExtAggICL OBJECT-TYPE
+     SYNTAX         DisplayString
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the inter-chassis link name that the multi-chassis LAG is using."
+     ::= { cienaCesExtLagEntry 10 }
+
+ cienaCesExtAggRole OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        primary(1),
+                        backup(2),
+                        none(3)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies if the MC-LAG node is primary or backup"
+     ::= { cienaCesExtLagEntry 11 }
+
+ cienaCesExtAggRgNodeId OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the MC-LAG RG node ID."
+     ::= { cienaCesExtLagEntry 12 }
+
+ cienaCesExtAggRgDynamicPriority OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the MC-LAG RG node dynamically assigned priority."
+     ::= { cienaCesExtLagEntry 13 }
+
+ cienaCesExtAggRgOperKey OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the MC-LAG RG node operational key."
+     ::= { cienaCesExtLagEntry 14 }
+
+ cienaCesExtAggRedundancyState OBJECT-TYPE
+     SYNTAX      INTEGER  {
+                          down(1),
+                          unavailable(2),
+                          active(3),
+                          standby(4),
+                          standalone(5),
+                          none(6)
+                  }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the oper state of the MC-LAG node"
+     ::= { cienaCesExtLagEntry 15 }
+
+ cienaCesExtAggConnectState OBJECT-TYPE
+     SYNTAX      INTEGER  {
+                         init(1),
+                         disconnected(2),
+                         connected(3),
+                         mismatch(4),
+                         none(5)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the Connect State of the MC-LAG node."
+     ::= { cienaCesExtLagEntry 16 }
+
+ cienaCesExtAggRgMismatchStatus OBJECT-TYPE
+     SYNTAX      INTEGER  {
+                         no(1),
+                         rgpeer(2),
+                         partner(3),
+                         version(4),
+                         none(5)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the Mismatch Status of the MC-LAG node."
+     ::= { cienaCesExtLagEntry 17 }
+
+ cienaCesExtAggPeerSystemMac OBJECT-TYPE
+     SYNTAX         MacAddress
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "This object specifies the MC-LAG peer node system MAC address."
+    ::= { cienaCesExtLagEntry 18 }
+
+ cienaCesExtAggPeerRgNodeId  OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the MC-LAG peer RG node ID."
+     ::= { cienaCesExtLagEntry 19 }
+
+ cienaCesExtAggPeerRgDynamicPriority OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the MC-LAG peer RG node dynamically assigned priority."
+     ::= { cienaCesExtLagEntry 20 }
+
+ cienaCesExtAggPeerRgOperKey OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the MC-LAG peer RG node operational key."
+     ::= { cienaCesExtLagEntry 21 }
+
+ cienaCesExtAggPeerRgNumAddedPorts OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies number of ports added to the MC-LAG peer RG node."
+     ::= { cienaCesExtLagEntry 22 }
+
+ cienaCesExtAggPeerRgNumAvailablePorts OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies number of ports available to the MC-LAG peer RG node."
+     ::= { cienaCesExtLagEntry 23 }
+
+ cienaCesExtAggDisconnectRx OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the number of Disconnect messages received by the MC-LAG node."
+     ::= { cienaCesExtLagEntry 24 }
+
+ cienaCesExtAggDisconnectTx OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the number of Disconnect messages transmitted by the MC-LAG node."
+     ::= { cienaCesExtLagEntry 25 }
+
+ cienaCesExtAggConfigMismatchRx OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the number of mismatch config messages received by the MC-LAG node."
+     ::= { cienaCesExtLagEntry 26 }
+
+ cienaCesExtAggKeyMismatchCount OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the number of messages received with mismatching key by the MC-LAG node."
+     ::= { cienaCesExtLagEntry 27 }
+
+ cienaCesExtAggOutOfSequenceRx OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the number of out of sequence messages received by the MC-LAG node."
+     ::= { cienaCesExtLagEntry 28 }
+
+ cienaCesExtAggPeerUnreachableCount OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the number of times peer was unreachable."
+     ::= { cienaCesExtLagEntry 29 }
+
+ cienaCesExtAggUnknownRx OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the number unknown messages received by the MC-LAG node."
+     ::= { cienaCesExtLagEntry 30 }
+
+ cienaCesExtAggTotalRx OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the total number of messages received by the MC-LAG node."
+     ::= { cienaCesExtLagEntry 31 }
+
+ cienaCesExtAggTotalTx OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the total number of messages transmitted by MC-LAG node."
+     ::= { cienaCesExtLagEntry 32 }
+
+ cienaCesExtAggTotalDownTime OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies total time for which the MC-LAG node has been operationally down."
+     ::= { cienaCesExtLagEntry 33 }
+
+ cienaCesExtAggUpTime OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies time for which the MC-LAG node has been operationally up."
+     ::= { cienaCesExtLagEntry 34 }
+
+ cienaCesExtAggTimeInProtectState OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies time for which the MC-LAG node has been in protection state."
+     ::= { cienaCesExtLagEntry 35 }
+
+ cienaCesExtAggLastTimeProtected OBJECT-TYPE
+     SYNTAX      Unsigned32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies time of day of the last MC-LAG protection switching."
+     ::= { cienaCesExtLagEntry 36 }
+
+ cienaCesExtAggNumberOfSwitchovers OBJECT-TYPE
+     SYNTAX      Counter32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the number of MC-LAG protection switching."
+     ::= { cienaCesExtLagEntry 37 }
+
+ cienaCesExtAggMultiChassis OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        yes(1),
+                        no(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies if the LAG is an MC-LAG"
+     ::= { cienaCesExtLagEntry 38 }
+
+ cienaCesExtAggMinimumLinkAggregation OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        on(1),
+                        off(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object enables minimum link aggregation mode for the LAG group"
+     DEFVAL      {off}
+     ::= { cienaCesExtLagEntry 39 }
+
+ cienaCesExtAggMinimumLinkThreshold OBJECT-TYPE
+     SYNTAX      Integer32 (1..8)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies minimum link threshold value for minimum link aggregation mode."
+     DEFVAL      {1}
+     ::= { cienaCesExtLagEntry 40 }
+ 
+ cienaCesExtAggAdminState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object displays current value of Admin state of the LAG group"
+     DEFVAL      {down}
+     ::= { cienaCesExtLagEntry 41 }
+
+ cienaCesExtAggOperState OBJECT-TYPE
+     SYNTAX      INTEGER {
+                        up(1),
+                        down(2)
+                 }
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object displays current value of Oper State of the LAG group"
+     DEFVAL      {down}
+     ::= { cienaCesExtLagEntry 42 }
+
+--
+-- lag Protection Table
+-- 
+ cienaCesLagProtectionTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF CienaCesLagProtectionEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+            "The (conceptual) table listing the protection ports for each aggregation."  
+     ::= { cienaCesExtLag 4 }
+		
+ cienaCesLagProtectionEntry OBJECT-TYPE
+     SYNTAX      CienaCesLagProtectionEntry
+     MAX-ACCESS  not-accessible
+     STATUS      current
+     DESCRIPTION
+           "An entry (conceptual row) in the cienaCesLagProtectionTable."
+     INDEX { cienaCesExtAggId, cienaCesLagProtectionPort  }
+     ::= { cienaCesLagProtectionTable 1 }
+		
+ CienaCesLagProtectionEntry ::=  SEQUENCE {      
+     cienaCesLagProtectionPort				INTEGER
+ }
+ 
+ cienaCesLagProtectionPort OBJECT-TYPE
+     SYNTAX      INTEGER (1..65535)
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies the protection port number. It is also used as an index in the table." 
+     ::= { cienaCesLagProtectionEntry 1 }
+
+ cienaCesExtAggMarkerTimeout OBJECT-TYPE
+     SYNTAX      Unsigned32 (0..1000)
+     UNITS       "msec"
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+           "This object specifies time for which Marker PDUs are sent periodically."
+     ::= { cienaCesExtLag 5 }
+
+ --
+ -- Notification
+ --     
+ cienaCesExtLagMclagStateChange NOTIFICATION-TYPE
+	OBJECTS	{
+                cienaGlobalSeverity, 
+                cienaGlobalMacAddress,
+				cienaCesExtAggIndex,
+				cienaCesExtAggRedundancyState				
+            }
+	STATUS	current
+	DESCRIPTION
+		"This notification is sent when MC-LAG oper state changes.
+		 Var binding cienaCesExtAggId represents the MC-LAG PGID." 
+	::= { cienaCesExtLagMIBNotifications 1 }
+
+ END
+ 
+
+

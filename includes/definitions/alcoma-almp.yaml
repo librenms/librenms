@@ -1,0 +1,11 @@
+os: alcoma-almp
+text: Alcoma
+type: wireless
+over:
+    - { graph: device_wireless_rssi, text: 'Wireless rssi' }
+    - { graph: device_wireless_snr, text: 'Wireles snr' }
+    - { graph: device_wireless_power, text: 'Wireless power' }
+discovery:
+    - sysObjectID: .1.3.6.1.4.1.12140.2
+mib_dir:
+    - alcoma

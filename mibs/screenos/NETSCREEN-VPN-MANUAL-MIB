@@ -1,0 +1,219 @@
+-- This module defines enterprise MIBs for VPN Manual Key
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VPN-MANUAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenVpn, netscreenVpnMibModule
+        FROM NETSCREEN-SMI
+    Integer32, IpAddress, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenVpnManualMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines NetScreen private MIBs for VPN Manual
+         Key"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311130000Z" -- November 13, 2003
+    DESCRIPTION
+        "Correct spelling mistake"
+    REVISION      "200205210000Z" -- May 21, 2002
+    DESCRIPTION
+        "Zwang add sha-256 in nsVpnManualKeyEspAuthAlg"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "no comment"
+    REVISION      "200105140000Z" -- May 14, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVpnMibModule 2 }
+
+NsVpnManualKeyEntry ::= SEQUENCE
+{
+    nsVpnManualKeyIndex         Integer32,
+    nsVpnManualKeyTunName       DisplayString,
+    nsVpnManualKeyGW            IpAddress,
+    nsVpnManualKeySILocal       Integer32,
+    nsVpnManualKeySIRemote      Integer32,
+    nsVpnManualKeyTunnelType    INTEGER,
+    nsVpnManualKeyEspEncAlg     INTEGER,
+    nsVpnManualKeyEspAuthAlg    INTEGER,
+    nsVpnManualKeyAhHash        INTEGER,
+    nsVpnManualKeyMonitorEnable INTEGER,
+    nsVpnManualKeyTunToTrust    INTEGER,
+    nsVpnManualKeyVsys          Integer32
+}
+
+nsVpnManualKey OBJECT IDENTIFIER ::= { netscreenVpn 2 }
+
+nsVpnManualKeyTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsVpnManualKeyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table specifies the configuration attributes for
+         NetScreen device's manual key setting."
+    ::= { nsVpnManualKey 1 }
+
+nsVpnManualKeyEntry OBJECT-TYPE
+    SYNTAX        NsVpnManualKeyEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry in the nsVpnManualKeyTable holds a set of
+         configuration  parameters associated with an instance of manual
+         key."
+    INDEX
+        { nsVpnManualKeyIndex }
+    ::= { nsVpnManualKeyTable 1 }
+
+nsVpnManualKeyIndex OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "A unique value for manual key table.  Its value ranges between
+         0 and 65535 and may not be contiguous."
+    ::= { nsVpnManualKeyEntry 1 }
+
+nsVpnManualKeyTunName OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..32))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VPN tunnel name that uses this manual key configuration."
+    ::= { nsVpnManualKeyEntry 2 }
+
+nsVpnManualKeyGW OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VPN tunnel peer gateway IP address."
+    ::= { nsVpnManualKeyEntry 3 }
+
+nsVpnManualKeySILocal OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Local Security Index."
+    ::= { nsVpnManualKeyEntry 4 }
+
+nsVpnManualKeySIRemote OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Remote Security Index."
+    ::= { nsVpnManualKeyEntry 5 }
+
+nsVpnManualKeyTunnelType OBJECT-TYPE
+    SYNTAX        INTEGER {
+        esp(0),
+        ah(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "VPN tunnel type."
+    ::= { nsVpnManualKeyEntry 6 }
+
+nsVpnManualKeyEspEncAlg OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        des-cbc(1),
+        tripple-des-cbc(2),
+        aes-cbc(3),
+        aes-192(4),
+        aes-256(5)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ESP Encryption Algorithm when manual key vpn tunnel type is
+         ESP."
+    ::= { nsVpnManualKeyEntry 7 }
+
+nsVpnManualKeyEspAuthAlg OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        md5(1),
+        sha(2),
+        sha256(3)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "ESP Authentication Algorithm when manual key vpn tunnel type
+         is ESP."
+    ::= { nsVpnManualKeyEntry 8 }
+
+nsVpnManualKeyAhHash OBJECT-TYPE
+    SYNTAX        INTEGER {
+        null(0),
+        md5(1),
+        sha(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "AH Hash Algorithm when manual key vpn tunnel type is AH."
+    ::= { nsVpnManualKeyEntry 9 }
+
+nsVpnManualKeyMonitorEnable OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Enable monitor vpn tunnel's link status."
+    ::= { nsVpnManualKeyEntry 10 }
+
+nsVpnManualKeyTunToTrust OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Tunnel to Trusted Interface"
+    ::= { nsVpnManualKeyEntry 11 }
+
+nsVpnManualKeyVsys OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "vsys this vpn manual key setting belongs to."
+    ::= { nsVpnManualKeyEntry 12 }
+
+END
+
+

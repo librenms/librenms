@@ -1,24 +1,38 @@
 source: General/Updating.md
-## Updating your install ##
+path: blob/master/doc/
 
-If you would like to perform a manual update
-then you can do this by running the following command as the **librenms** user:
+By default, LibreNMS is set to automatically update. If you have
+disabled this feature then you can perform a manual update.
+
+# Manual update
+
+If you would like to perform a manual update then you can do this by
+running the following command as the `librenms` user:
 
 `./daily.sh`
 
 This will update both the core LibreNMS files but also update the database
 structure if updates are available.
 
-## Configuring the update channel ##
-LibreNMS follows the master branch on github for daily updates.
-You can change to the monthly releases by setting:
+# Advanced users
 
-`$config['update_channel'] = 'release';`
+If you absolutely must update manually without using `./daily.sh` then
+you can do so by running the following commands:
 
-## Disabling automatic updates ##
-LibreNMS by default performs updates on a daily basis. This can be disabled
-by ensuring:
+```bash
+cd /opt/librenms
+git pull
+composer install --no-dev
+./build-base.php
+./validate.php
+```
+
+You should continue to run daily.sh.  This does database cleanup and
+other processes in addition to updating. You can disable the daily.sh
+update process as described below.
+
+# Disabling automatic updates
+
+LibreNMS by default performs updates on a daily basis. This can be disabled by setting:
 
 `$config['update'] = 0;`
-
-is no longer commented out. 

@@ -1,0 +1,3300 @@
+LIEBERT-GP-POWER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-IDENTITY, 
+    OBJECT-TYPE,
+    Integer32, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    lgpPower, 
+    liebertPowerModuleReg
+        FROM LIEBERT-GP-REGISTRATION-MIB
+    ;
+
+-- =============================================================================
+-- Module Identification and Registration
+-- =============================================================================
+
+liebertGlobalProductsPowerModule MODULE-IDENTITY
+  LAST-UPDATED "201307100000Z"
+  ORGANIZATION "Liebert Corporation"
+  CONTACT-INFO
+      "Contact:   Technical Support
+
+      Postal:
+      Liebert Corporation
+      1050 Dearborn Drive
+      P.O. Box 29186
+      Columbus OH, 43229
+      US
+
+      Tel: +1 (800) 222-5877
+
+      E-mail: liebert.monitoring@vertivco.com
+      Web:    www.vertivco.com
+
+      Author:  Gregory M. Hoge"
+
+   DESCRIPTION
+      "The MIB module used to register Liebert POWER related SNMP OIDs.
+
+      Copyright 2000-2008 Liebert Corporation. All rights reserved.
+      Reproduction of this document is authorized on the condition
+      that the forgoing copyright notice is included.
+
+      This Specification is supplied 'AS IS' and Liebert Corporation
+      makes no warranty, either express or implied, as to the use,
+      operation, condition, or performance of the Specification."
+
+   REVISION "201307100000Z"
+   DESCRIPTION
+    "Added support for GXT4 economic operation mode and outlet control."
+
+   REVISION "200811170000Z"
+   DESCRIPTION
+    "Added support for NXL unit."
+
+   REVISION "200807020000Z"
+   DESCRIPTION
+    "Replaced INTEGER with Integer32 (SMIv2).
+     Minor spelling fixes and formatting."
+
+   REVISION "200801100000Z"
+   DESCRIPTION
+    "Modified contact email address and removed redundant
+    lgpPwrMeasurementPointNumLines."
+
+   REVISION "200602220000Z"
+   DESCRIPTION
+    "Added support for Liebert DS Unit."
+
+   ::= { liebertPowerModuleReg 1 }
+
+-- =============================================================================
+--  lgpPower - Liebert Power Registrations
+-- =============================================================================
+
+lgpPwrBattery OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert Power Battery object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Power Battery Group."
+    ::= { lgpPower 1 }
+
+lgpPwrMeasurements OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree registers Liebert Power Measurement object
+        identifiers.  The sub-tree contains tables and well known power
+        measurement points."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are defined
+         below in the sub-section titled Liebert Power Measurement Group."
+    ::= { lgpPower 2 }
+
+lgpPwrStatus OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree registers Liebert Power Status object
+        identifiers.  This is the location of power related status information
+        that does not fit into a more specific category such as the
+        lgpPwrConversion sub-tree."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are defined
+         below in the sub-section titled Liebert Power Status Group"
+    ::= { lgpPower 3 }
+
+lgpPwrSettings OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree registers Liebert Power Static Switch object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are defined
+         below in the sub-section titled Liebert Power Settings Group."
+    ::= { lgpPower 4 }
+
+lgpPwrConversion OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert Power Conversion object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Power Conversion Group."
+    ::= { lgpPower 5 }
+
+lgpPwrControl OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert Power Control object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Power Control Group."
+    ::= { lgpPower 6 }
+
+lgpPwrTopology OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert Power Topology object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Power Topology Group."
+    ::= { lgpPower 7 }
+
+lgpPwrStatistic OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert Power Statistic object
+        identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Power Statistic Group."
+    ::= { lgpPower 8 }
+
+lgpPwrConfig OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree is used to register Liebert Power Configuration
+         Object identifiers."
+    REFERENCE
+        "The registrations for the objects in this sub-tree are
+        defined below in the sub-section titled Liebert Power Configuration
+        Group."
+    ::= { lgpPower 9 }
+
+-- =============================================================================
+-- lgpPwrBattery - Liebert Power Battery Group
+-- =============================================================================
+
+lgpPwrNumberInstalledBatteryModules OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of battery modules installed in the device."
+    ::= { lgpPwrBattery 1 }
+
+lgpPwrNumberFailedBatteryModules OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of battery modules in the device that have failed."
+    ::= { lgpPwrBattery 2 }
+
+lgpPwrNumberRedundantBatteryModules OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of redundant battery modules in the device."
+    ::= { lgpPwrBattery 3 }
+
+lgpPwrNumberActiveBatteryModules OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active battery modules in the device."
+    ::= { lgpPwrBattery 4 }
+
+lgpPwrConfigLowBatteryWarningTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the device's estimated minutes of remaining battery
+        at which a lgpEventLowBatteryWarning notification will be sent."
+    ::= { lgpPwrBattery 5 }
+
+lgpPwrNumberBatteryModuleWarnings OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of battery modules in the device that have a warning."
+    ::= { lgpPwrBattery 6 }
+
+lgpPwrBatteryCount OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of batteries installed."
+    ::= { lgpPwrBattery 7 }
+
+lgpPwrBatteryTestResult OBJECT-TYPE
+    SYNTAX      INTEGER 
+    {
+        unknown(1), 
+        passed(2), 
+        failed(3), 
+        inProgress(4),
+        systemFailure(5), 
+        inhibited(6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The outcome of the previous battery test."
+    ::= { lgpPwrBattery 8 }
+
+lgpPwrNominalBatteryCapacity OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The nominal battery capacity of the system (in minutes) at full load."
+    ::= { lgpPwrBattery 9 }
+
+lgpPwrBatteryFloatVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Volt"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The battery float voltage of the system."
+    ::= { lgpPwrBattery 10 }
+
+lgpPwrBatteryEndOfDischargeVoltage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The battery voltage threshold at which the batteries are considered
+        completely discharged."
+    ::= { lgpPwrBattery 11 }
+
+lgpPwrAutomaticBatteryTestInterval OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "hours"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The automatic battery test interval."
+    ::= { lgpPwrBattery 12 }
+
+lgpPwrAutomaticBatteryTestCountdown OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The time remaining before the next battery test."
+    ::= { lgpPwrBattery 13 }
+
+lgpPwrBatteryChargeStatus OBJECT-TYPE
+    SYNTAX      INTEGER 
+    {
+        fullycharged(1), 
+        notfullycharged(2),
+        charging(3), 
+        discharging(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the system's battery charge.
+        A value of 'charging' indicates the batteries are currently charging.
+        A value of 'discharging' indicates the batteries are currently
+        discharging.  A value of 'fullycharged' indicates the batteries are
+        charged to their full capacity.  A value of 'notfullycharged' indicates
+        the battery charge is neither fully charged, charging or discharging."
+    ::= { lgpPwrBattery 14 }
+
+lgpPwrBatteryLifeEnhancer OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the battery life enhancer.  When 'on', it will
+        preserve battery life."
+    ::= { lgpPwrBattery 15 }
+
+lgpPwrBatteryCharger OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the battery charger."
+    ::= { lgpPwrBattery 16 }
+
+lgpPwrBatteryChargeMode OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        float(1), 
+        equalize(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mode of the battery charger: 'float' charging or 'equalize'
+        charging."
+    ::= { lgpPwrBattery 17 }
+
+lgpPwrBatteryTimeRemaining OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An estimate of the time to battery charge depletion under the present
+        load conditions if the utility power is off and remains off, or if it
+        were to be lost and remain off.
+
+        NOTE: A UPS is expected to provide a battery time remaining value 
+        when not operating on battery. However, if the system is not capable of 
+        providing this information, then this point will return 65535 to
+        indicate that the value is unavailable."
+    ::= { lgpPwrBattery 18 }
+
+lgpPwrBatteryCapacity OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present percentage of battery capacity."
+    ::= { lgpPwrBattery 19 }
+
+lgpPwrBatteryCabinet OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree contains items related to battery cabinets."
+    ::= { lgpPwrBattery 20 }
+
+    lgpPwrBatteryCabinetCount OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Count"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The number of battery cabinets installed with this device.
+             Note some devices may not permit writing a value to this object."
+        ::= { lgpPwrBatteryCabinet  1 }
+
+    lgpPwrBatteryCabinetType OBJECT-TYPE
+        SYNTAX      INTEGER 
+        {
+           notSpecified(1),
+           internal(2),
+           external(3),
+           lrt(4)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The type of battery cabinet(s) installed on this device.
+             Enumeration definitions:
+                 notSpecified - The type has not been specified in the
+                                device's configuration.
+                 internal     - Battery cabinets are internal to the device.
+                 external     - Device has external battery cabinets installed.
+                 lrt          - Long Run Time cabinets.
+             Note some devices may not permit writing a value to this object."
+        ::= { lgpPwrBatteryCabinet 2 }
+
+    lgpPwrBatteryCabinetRatedCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 Amp-hour"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Battery cabinet rated capacity (tenths of Amp-hours).
+             This assumes that each cabinet is of the same type and capacity.
+             This is not a sum of the rating for all attached cabinets.
+             Note some devices may not permit writing a value to this object."
+        ::= { lgpPwrBatteryCabinet 3 }
+
+    lgpPwrBatteryLeadAcidCellCount OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Count"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Battery cell count - lead-acid. The number of cells that comprise 
+            the lead acid battery string."
+        ::= { lgpPwrBatteryCabinet 4 }
+
+    lgpPwrBatteryNiCadCellCount OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Count"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Battery cell count - nickel-cadmium. The number of cells that 
+            comprise the nickel-cadmium battery string."
+        ::= { lgpPwrBatteryCabinet 5 }
+
+lgpPwrBatteryAmpHoursConsumed OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Amp-hour"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The cumulative battery Amp-hours withdrawn over the life of the
+        battery. This value persists across reboots. Typically, this value is
+        reset back to zero when the batteries are replaced."
+    ::= { lgpPwrBattery 21 }
+
+lgpPwrBatteryAmpHoursDischargeConsumed OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Amp-hour"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The battery Amp-hours withdrawn during the current/latest
+        discharge. This value does not persist across reboots."
+    ::= { lgpPwrBattery 22 }
+
+lgpPwrBatteryLastDischargeTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time of the last battery discharge. Typically this is the
+        time when the discharge starts. This value persists across reboots. 
+        The date and time are determined in seconds since the epoch on 
+        January 1, 1970."
+    ::= { lgpPwrBattery 23 }
+
+lgpPwrBatteryLastCommissionTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The date and time when the battery system was put into service.
+        This information persists across system reboot events. It is the
+        responsibility of Service to reset this date/time when the batteries
+        are replaced. The date and time are determined in seconds since the 
+        epoch on January 1, 1970."
+    ::= { lgpPwrBattery 24 }
+
+lgpPwrBatteryPresentDischargeTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total time spent on battery during the current or last discharge.
+
+        NOTE: While not discharging, some systems may display zero instead of
+        the last discharge."
+    ::= { lgpPwrBattery 25 }
+
+lgpPwrBatteryCapacityStatus OBJECT-TYPE
+    SYNTAX     INTEGER 
+    {
+        unknown(1),
+        batteryNormal(2),
+        batteryLow(3),
+        batteryDepleted(4)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The indication of the capacity remaining in the UPS
+        system's batteries.
+
+        NOTE: In a single-module system, this point is intended to have the same 
+        behavior as the RFC1628 point upsBatteryStatus."
+    ::= { lgpPwrBattery 26 }
+
+lgpPwrBatteryCircuitBreakerState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        unknown(0),
+        open(1), 
+        closed(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Battery Circuit Breaker."
+    ::= { lgpPwrBattery 27 }
+
+-- =============================================================================
+-- lgpPwrMeasurements - Liebert Power Measurement Group
+-- =============================================================================
+
+-- -----------------------------------------------------------------------------
+-- Well Known Power Measurement Points
+-- -----------------------------------------------------------------------------
+
+lgpPwrWellKnownMeasurementPoints OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree registers well known Liebert Power Measurement
+         Points.  The object identifier names usually imply locations
+         where the measurement is taken -- such as 'input', 'output'
+         and 'bypass'."
+    REFERENCE
+        "These well known measurement identifiers are referenced in the
+         'lgpPwrMeasurementPointId' column in the
+         'lgpPwrMeasurementPointTable'."
+        ::= { lgpPwrMeasurements 1 }
+
+    lgpPwrSource1Input      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register a source 1 input as a
+            well known measurement point.  It is intended that no sub-trees
+            be created below this node.
+
+            Power input to the managed device from power source 1.
+            Many power systems contain more than one input source and
+            many of them have more than one measurement point per input
+            source.  This identifier represents one input source for the
+            system but does not necessarily represent the 'first' one.
+            The input sources' numbering with respect to
+            'lgpPwrSource1Input' etc. may depend on the physical wiring
+            of the system when it was installed."
+        ::= { lgpPwrWellKnownMeasurementPoints 1 }
+
+    lgpPwrSource2Input      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register a source 2 input as a
+            well known measurement point.  It is intended that no sub-trees
+            be created below this node.
+
+            Power input to the managed device from power source 2.
+            Many power systems contain more than one input source and
+            many of them have more than one measurement point per input
+            source.  This identifier represents one input source for the
+            system but does not necessarily represent the 'first' one.
+            The input sources' numbering with respect to
+            'lgpPwrSource2Input' etc. may depend on the physical wiring
+            of the system when it was installed."
+        ::= { lgpPwrWellKnownMeasurementPoints 2 }
+
+    lgpPwrSourcePdu1Input      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register a source PDU 1 input as a
+            well known measurement point.  It is intended that no sub-trees
+            be created below this node.
+
+            Power input to the managed device from power distribution
+            unit 1. Many power systems contain more than one input source
+            and many of them have more than one measurement point per input
+            source.  This identifier represents one input source for the
+            system but does not necessarily represent the 'first' one.
+            The input sources' numbering with respect to
+            'lgpPwrSourcePdu1Input' etc. may depend on the physical wiring
+            of the system when it was installed."
+        ::= { lgpPwrWellKnownMeasurementPoints 3 }
+
+    lgpPwrSourcePdu2Input      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register a source PDU 2 input as a
+            well known measurement point.  It is intended that no sub-trees
+            be created below this node.
+
+            Power input to the managed device from power distribution
+            unit 1.  Many power systems contain more than one input source
+            and many of them have more than one measurement point per input
+            source.  This identifier represents one input source for the
+            system but does not necessarily represent the 'first' one.
+            The input sources' numbering with respect to
+            'lgpPwrSourcePdu2Input' etc. may depend on the physical wiring
+            of the system when it was installed."
+        ::= { lgpPwrWellKnownMeasurementPoints 4 }
+
+    lgpPwrOutputToLoad      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register the output to the critical
+            load as a well known measurement point.  It is intended that
+            no sub-trees be created below this node."
+        ::= { lgpPwrWellKnownMeasurementPoints 5 }
+
+    lgpPwrMeasBattery     OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register a battery as a well known
+            measurement point.  It is intended that no sub-trees be created
+            below this node."
+        ::= { lgpPwrWellKnownMeasurementPoints 6 }
+
+    lgpPwrMeasBypass      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register a bypass as a well known
+            measurement point.  It is intended that no sub-trees be created
+            below this node."
+        ::= { lgpPwrWellKnownMeasurementPoints 7 }
+
+    lgpPwrMeasDcBus      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register a DC bus as a well known
+            measurement point.  It is intended that no sub-trees be created
+            below this node."
+        ::= { lgpPwrWellKnownMeasurementPoints 8 }
+
+    lgpPwrMeasSystemOutput      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register the output of a
+            multi-module system as a well known measurement point.
+            It is intended that no sub-trees be created below this node.
+
+            This identifier represents the power related data of the
+            system."
+        ::= { lgpPwrWellKnownMeasurementPoints 9 }
+
+    lgpPwrMeasBatteryCabinet      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This sub-tree is used to register the voltage between the 
+            most negative and the most postive terminals of a battery
+            cabinet. To determine the cabinet being described in a
+            multi-cabinet system, this point implements an additional
+            two indexes. The first index describes the module the cabinet
+            is located in. The second index describes the cabinet
+            number. In an SMS(Single-Module System) the first index is
+            always 1.
+
+            Example: lgpPwrMeasBatteryCabinet.2.4
+
+            'lgpPwrMeasBatteryCabinet' = Point is a battery cabinet.
+                                  '.2' = Cabinet is in the second module.
+                                  '.4' = Cabinet number 4"
+        ::= { lgpPwrWellKnownMeasurementPoints 10 }
+
+-- -----------------------------------------------------------------------------
+-- AC Power Measurement Point Table
+-- -----------------------------------------------------------------------------
+
+lgpPwrMeasurementPointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpPwrMeasurementPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains a list of AC power measurement point entries.
+         The table contains zero, one, or many rows, depending upon the number
+         of power related measurement points available.  The NMS cannot
+         create or delete rows from the table. The rows are created by the
+         agent based upon the capabilities of the managed device.  Each row
+         in the table represents a series of measurements on a given point
+         or location within the system.  Measurement points/locations are
+         identified by the object identifier 'lgpPwrMeasurementPointId' in the
+         'LgpPwrMeasurementPointEntry' object.  The actual measurement being
+         taken at that identified point is identified by the other
+         corresponding columns in the LgpPwrMeasurementPointEntry for the
+         particular row of the table."
+    REFERENCE
+        "The measurement points represented by 'lgpPwrMeasurementPointId'
+        can be found in the sub-tree lgpPwrWellKnownMeasurementPoints.
+        Additional measurement detail on a 'per line' basis is available in
+        the lgpPwrLineMeasurementTable"
+    ::= { lgpPwrMeasurements 2 }
+
+    lgpPwrMeasurementPointEntry OBJECT-TYPE
+        SYNTAX      LgpPwrMeasurementPointEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the measurements to be populated in the
+             various columns of the 'lgpPwrMeasurementPointTable'."
+        INDEX       { lgpPwrMeasurementPointIndex }
+        ::= { lgpPwrMeasurementPointTable 1 }
+
+    LgpPwrMeasurementPointEntry ::= SEQUENCE 
+    {
+        lgpPwrMeasurementPointIndex             Unsigned32,
+        lgpPwrMeasurementPointId                OBJECT IDENTIFIER,
+        lgpPwrMeasurementPointNumLines          Integer32,
+        lgpPwrMeasurementPointNomVolts          Integer32,
+        lgpPwrMeasurementPointNomFrequency      Integer32,
+        lgpPwrMeasurementPointFrequency         Integer32,
+        lgpPwrMeasurementPointApparentPower     Integer32,
+        lgpPwrMeasurementPointTruePower         Integer32,
+        lgpPwrMeasurementPointPowerFactor       Integer32,
+        lgpPwrMeasurementPointWattHours         Integer32,
+        lgpPwrMeasurementPointVAPercent         Integer32,
+        lgpPwrMeasurementPointNeutralCurrent    Integer32,
+        lgpPwrMeasurementPointGroundCurrent     Integer32,
+        lgpPwrMeasurementPointNomCurrent        Integer32,
+        lgpPwrMeasurementPointNomPowerFactor    Integer32,
+        lgpPwrMeasurementPointNomVA             Integer32,
+        lgpPwrMeasurementPointNomW              Integer32,
+        lgpPwrMeasurementPointPowerFactorTag    INTEGER
+    }
+
+    lgpPwrMeasurementPointIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index that indicates the row of the
+            'lgpPwrMeasurementPointTable' for a power measurement point."
+        ::= { lgpPwrMeasurementPointEntry 1 }
+
+    lgpPwrMeasurementPointId OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An OID representing a well known measurement point.
+            These object identifiers indicate a point or location of power
+            measurement in a power system.  The OID's name usually
+            implies a location of the measurement point such as
+            'input', 'output', 'bypass' etc."
+        REFERENCE
+            "The object identifiers  in this column can be found in the sub-tree
+            'lgpPwrWellKnownMeasurementPoints'."
+        ::= { lgpPwrMeasurementPointEntry 2 }
+
+    lgpPwrMeasurementPointNumLines OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Count"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The number of lines on the indicated power measurement point.
+             (i.e. the number of phases on the power source being measured.)"
+        ::= { lgpPwrMeasurementPointEntry 3 }
+
+    lgpPwrMeasurementPointNomVolts OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The magnitude of the nominal voltage on the power source being
+            measured."
+        ::= { lgpPwrMeasurementPointEntry 4 }
+
+    lgpPwrMeasurementPointNomFrequency OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Hertz"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The nominal or configured/expected frequency for the power
+             source indicated by 'lgpPwrMeasurementPointId' in the
+             corresponding row in the lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 5 }
+
+    lgpPwrMeasurementPointFrequency OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Hertz"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present (actual) frequency for the power source indicated
+             by 'lgpPwrMeasurementPointId' in the corresponding row in the
+             lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 6 }
+
+    lgpPwrMeasurementPointApparentPower OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt-Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present apparent AC power for the power source
+             indicated by 'lgpPwrMeasurementPointId' in the corresponding row
+             in the lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 7 }
+
+    lgpPwrMeasurementPointTruePower OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Watt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present AC power for the power source indicated by
+            'lgpPwrMeasurementPointId' in the corresponding row in the
+             lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 8 }
+
+    lgpPwrMeasurementPointPowerFactor OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       ".01 Power Factor"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present Power Factor for the power source indicated by
+            'lgpPwrMeasurementPointId' in the corresponding row in the
+             lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 9 }
+
+    lgpPwrMeasurementPointWattHours OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Watt-Hour"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present number of Watt Hours for the power source indicated by
+            'lgpPwrMeasurementPointId' in the corresponding row in the
+             lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 10 }
+
+    lgpPwrMeasurementPointVAPercent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 Percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The percentage of the rated apparent AC power of the power
+            source indicated by 'lgpPwrMeasurementPointId' in the corresponding
+            row in the lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 11 }
+
+    lgpPwrMeasurementPointNeutralCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present neutral current of the power point indicated by
+            'lgpPwrMeasurementPointId' in the corresponding row in the
+            lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 12 }
+
+    lgpPwrMeasurementPointGroundCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present ground current of the power point indicated by
+            'lgpPwrMeasurementPointId' in the corresponding row in the
+            lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 13 }
+
+    lgpPwrMeasurementPointNomCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The nominal or configured/expected current of the power point
+            indicated by 'lgpPwrMeasurementPointId' in the corresponding row
+            in the lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 14 }
+
+    lgpPwrMeasurementPointNomPowerFactor OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       ".01 Power Factor"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The nominal or configured/expected power factor of the power point
+            indicated by 'lgpPwrMeasurementPointId' in the corresponding row
+            in the lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 15 }
+
+    lgpPwrMeasurementPointNomVA OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt-Amp"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The nominal or configured/expected apparent AC power for the power
+            source indicated by 'lgpPwrMeasurementPointId' in the corresponding
+            row in the lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 16 }
+
+    lgpPwrMeasurementPointNomW OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Watt"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The nominal or configured/expected true AC power for the power
+            source indicated by 'lgpPwrMeasurementPointId' in the corresponding
+            row in the lgpPwrMeasurementPointTable."
+        ::= { lgpPwrMeasurementPointEntry 17 }
+
+    lgpPwrMeasurementPointPowerFactorTag OBJECT-TYPE
+        SYNTAX      INTEGER 
+        {
+            leading(1), 
+            lagging(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present description of the Power Factor for the power source
+            indicated by 'lgpPwrMeasurementPointId' in the corresponding row
+            in the lgpPwrMeasurementPointTable.  If Leading, the load is said
+            to be capacitive and the phase of the current leads the voltage.
+            If Lagging, the load is said to be inductive and the phase of the
+            current lags the voltage."
+        ::= { lgpPwrMeasurementPointEntry 19 }
+
+-- -----------------------------------------------------------------------------
+-- Source Measurement Line/Phase Table
+-- -----------------------------------------------------------------------------
+
+lgpPwrLineMeasurementTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpPwrLineMeasurementEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of power measurements for each phase/line for a given
+         power measurement point/location in the 'lgpPwrMeasurementPointTable'.
+         The lgpPwrMeasurementPointIndex in this table corresponds to the
+         index in the lgpPwrMeasurementPointTable.
+
+         This table contains zero, one, or
+         many rows, depending upon the number of power line source objects
+         available.  The NMS cannot create or delete rows from the table.
+         The rows are created by the agent based upon the capabilities of
+         the managed device."
+    ::= { lgpPwrMeasurements 3 }
+
+    lgpPwrLineMeasurementEntry OBJECT-TYPE
+        SYNTAX      LgpPwrLineMeasurementEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the contents of the columns for the table
+            'lgpPwrLineMeasurementTable'."
+        REFERENCE
+            "The lgpPwrMeasurementPointIndex can be found in the
+            lgpPwrMeasurementPointTable.  This index identifies the measurement
+            point for which the line detail measurement in the table applies."
+        INDEX       { lgpPwrMeasurementPtIndex, lgpPwrLineMeasurementIndex }
+        ::= { lgpPwrLineMeasurementTable 1 }
+
+    LgpPwrLineMeasurementEntry ::= SEQUENCE 
+    {
+        lgpPwrMeasurementPtIndex                Unsigned32,
+        lgpPwrLineMeasurementIndex              Unsigned32,
+        lgpPwrMeasurementPoint                  OBJECT IDENTIFIER,
+        lgpPwrLineMeasurementVoltsLL            Integer32,
+        lgpPwrLineMeasurementVoltsLN            Integer32,
+        lgpPwrLineMeasurementCurrent            Integer32,
+        lgpPwrLineMeasurementCapacity           Integer32,
+        lgpPwrLineMeasurementVA                 Integer32,
+        lgpPwrLineMeasurementTruePower          Integer32,
+        lgpPwrLineMeasurementVoltageTHD         Integer32,
+        lgpPwrLineMeasurementCurrentTHD         Integer32,
+        lgpPwrLineMeasurementKFactorCurrent     Integer32,
+        lgpPwrLineMeasurementCrestFactorCurrent Integer32,
+        lgpPwrLineMeasurementPowerFactor        Integer32,
+        lgpPwrLineMeasurementPowerFactorTag     INTEGER,
+        lgpPwrLineMeasurementMaxVolts           Integer32,
+        lgpPwrLineMeasurementMinVolts           Integer32,
+        lgpPwrLineMeasurementVAR                Integer32,
+        lgpPwrLineMeasurementPercentLoad        Integer32,
+        lgpPwrLineMeasurementVolts              Integer32,
+        lgpPwrLineMeasurementVACapacity         Integer32
+    }
+
+    lgpPwrMeasurementPtIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the row of the table
+             'lgpPwrMeasurementPointTable' for a power measurement point."
+        ::= { lgpPwrLineMeasurementEntry 1 }
+
+    lgpPwrLineMeasurementIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the row of the table
+             'lgpPwrLineMeasurementTable' for a power measurement point."
+        ::= { lgpPwrLineMeasurementEntry 2 }
+
+    lgpPwrMeasurementPoint OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An OID representing a well known measurement point.
+            These object identifiers indicate a point or location of power
+            measurement in a power system.  The OID name usually
+            implies a location of the measurement point such as
+            'input', 'output', 'bypass', etc."
+        REFERENCE
+            "The object identifiers  in this column can be found in the sub-tree
+            'lgpPwrWellKnownMeasurementPoints' and correspond to the entry in
+            the table lgpPwrMeasurementPointTable."
+        ::= { lgpPwrLineMeasurementEntry 3 }
+
+    lgpPwrLineMeasurementVoltsLL OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present Line-to-Line voltage measurement for the indicated
+             source. The line being measured is given by the
+             lgpPwrLineMeasurementIndex [1 = AB, 2 = BC, 3 = CA]."
+        ::= { lgpPwrLineMeasurementEntry 4 }
+
+    lgpPwrLineMeasurementVoltsLN OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present Line-to-neutral voltage measurement for the indicated
+             source. The line being measured is given by the
+             lgpPwrLineMeasurementIndex where [1 = A, 2 = B, 3 = C]."
+        ::= { lgpPwrLineMeasurementEntry 5 }
+
+    lgpPwrLineMeasurementCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present current measurement for the indicated source. The line
+             being measured is given by the 'lgpPwrLineMeasurementIndex' where
+             [1 = A, 2 = B, 3 = C]."
+        ::= { lgpPwrLineMeasurementEntry 6 }
+
+    lgpPwrLineMeasurementCapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The percentage of the power capacity presently being used on this
+             line."
+        ::= { lgpPwrLineMeasurementEntry 7 }
+
+    lgpPwrLineMeasurementVA OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt-Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present apparent AC line power."
+        ::= { lgpPwrLineMeasurementEntry 8 }
+
+    lgpPwrLineMeasurementTruePower OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Watt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present AC line power measured in watts."
+        ::= { lgpPwrLineMeasurementEntry 9 }
+
+    lgpPwrLineMeasurementVoltageTHD OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 Percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present total harmonic distortion on the AC line voltage."
+        ::= { lgpPwrLineMeasurementEntry 10 }
+
+    lgpPwrLineMeasurementCurrentTHD OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 Percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present total harmonic distortion on the AC line current."
+        ::= { lgpPwrLineMeasurementEntry 11 }
+
+    lgpPwrLineMeasurementKFactorCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 K Factor"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present line K Factor."
+        ::= { lgpPwrLineMeasurementEntry 12 }
+
+    lgpPwrLineMeasurementCrestFactorCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.1 Crest Factor"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present crest factor of the line current."
+        ::= { lgpPwrLineMeasurementEntry 13 }
+
+    lgpPwrLineMeasurementPowerFactor OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "0.01 Power Factor"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present Power Factor for the line."
+        ::= { lgpPwrLineMeasurementEntry 14 }
+
+    lgpPwrLineMeasurementPowerFactorTag OBJECT-TYPE
+        SYNTAX      INTEGER 
+        {
+            leading(1), 
+            lagging(2)
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present description of the Power Factor for the line.  If
+            Leading, the load is said to be capacitive and the phase of the
+            current leads the voltage.  If Lagging, the load is said to be
+            inductive and the phase of the current lags the voltage."
+        ::= { lgpPwrLineMeasurementEntry 15 }
+
+    lgpPwrLineMeasurementMaxVolts   OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum voltage measurement recorded for the indicated source
+            since the command 'lgpPwrStatisticsReset' was executed."
+        ::= { lgpPwrLineMeasurementEntry 16 }
+
+    lgpPwrLineMeasurementMinVolts OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The minimum voltage measurement recorded for the
+            indicated source since the command 'lgpPwrStatisticsReset' was
+            executed."
+        ::= { lgpPwrLineMeasurementEntry 17 }
+
+    lgpPwrLineMeasurementVAR OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt-Amp-Reactive"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present reactive AC line power of the power source indicated by
+            'lgpPwrMeasurementPoint'."
+        ::= { lgpPwrLineMeasurementEntry 18 }
+
+    lgpPwrLineMeasurementPercentLoad OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present percent load of the AC line power."
+        ::= { lgpPwrLineMeasurementEntry 19 }
+
+    lgpPwrLineMeasurementVolts OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present voltage measurement for the indicated source."
+        ::= { lgpPwrLineMeasurementEntry 20 }
+
+    lgpPwrLineMeasurementVACapacity OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "percent"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The percentage of the apparent power capacity presently being
+            used on this line."
+        ::= { lgpPwrLineMeasurementEntry 21 }
+
+-- -----------------------------------------------------------------------------
+-- DC Power Measurement Point Table
+-- -----------------------------------------------------------------------------
+
+lgpPwrDcMeasurementPointTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpPwrDcMeasurementPointEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains a list of DC power measurement point entries.
+         The table contains zero, one, or many rows, depending upon the number
+         of power related measurement points available.  The NMS cannot
+         create or delete rows from the table. The rows are created by the
+         agent based upon the capabilities of the managed device.  Each row
+         in the table represents a series of measurements on a given point
+         or location within the system.  Measurement points/locations are
+         identified by the object identifier 'lgpPwrDcMeasurementPointId' in the
+         'LgpPwrDcMeasurementPointEntry' object.  The actual measurement being
+         taken at that identified point is identified by the other
+         corresponding columns in the LgpPwrDcMeasurementPointEntry for the
+         particular row of the table."
+    REFERENCE
+        "The measurement points represented by 'lgpPwrDcMeasurementPointId'
+        can be found in the sub-tree lgpPwrWellKnownMeasurementPoints.
+        Additional measurement detail on a 'per line' basis is available in
+        the lgpPwrLineMeasurementTable"
+    ::= { lgpPwrMeasurements 4 }
+
+    lgpPwrDcMeasurementPointEntry OBJECT-TYPE
+        SYNTAX      LgpPwrDcMeasurementPointEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the measurements to be populated in the
+             various columns of the 'lgpPwrDcMeasurementPointTable'."
+        INDEX       { lgpPwrDcMeasurementPointIndex }
+        ::= { lgpPwrDcMeasurementPointTable 1 }
+
+    LgpPwrDcMeasurementPointEntry ::= SEQUENCE 
+    {
+        lgpPwrDcMeasurementPointIndex       Unsigned32,
+        lgpPwrDcMeasurementPointId          OBJECT IDENTIFIER,
+        lgpPwrDcMeasurementPointSubID       Integer32,
+        lgpPwrDcMeasurementPointVolts       Integer32,
+        lgpPwrDcMeasurementPointCurrent     Integer32,
+        lgpPwrDcMeasurementPointNomVolts    Integer32,
+        lgpPwrDcMeasurementPointTruePower   Integer32
+    }
+
+    lgpPwrDcMeasurementPointIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index that indicates the row of the
+            'lgpPwrMeasurementPointTable' for a power measurement point."
+        ::= { lgpPwrDcMeasurementPointEntry 1 }
+
+    lgpPwrDcMeasurementPointId OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An OID representing a well known measurement point.
+            These object identifiers indicate a point or location of power
+            measurement in a power system.  The OID's name usually
+            implies a location of the measurement point such as
+            'input', 'output', 'bypass' etc."
+        REFERENCE
+            "The object identifiers  in this column can be found in the sub-tree
+            'lgpPwrWellKnownMeasurementPoints'."
+        ::= { lgpPwrDcMeasurementPointEntry 2 }
+
+    lgpPwrDcMeasurementPointSubID OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Count"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The identifier used to differentiate between identical thresholds
+            for a given point index and point ID in the DC measurements table."
+        ::= { lgpPwrDcMeasurementPointEntry 3 }
+
+    lgpPwrDcMeasurementPointVolts OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present DC voltage for the power source indicated by
+            'lgpPwrDcMeasurementPointId' in the corresponding row in the
+            lgpPwrDcMeasurementPointTable."
+        ::= { lgpPwrDcMeasurementPointEntry 4 }
+
+    lgpPwrDcMeasurementPointCurrent OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Amp"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present DC current for the power source indicated by
+            'lgpPwrDcMeasurementPointId' in the corresponding row in the
+            lgpPwrDcMeasurementPointTable."
+        ::= { lgpPwrDcMeasurementPointEntry 5 }
+
+    lgpPwrDcMeasurementPointNomVolts OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Volt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The nominal(configured/expected) DC voltage for the power source
+            indicated by 'lgpPwrDcMeasurementPointId' in the
+            corresponding row in the lgpPwrDcMeasurementPointTable."
+        ::= { lgpPwrDcMeasurementPointEntry 6 }
+
+    lgpPwrDcMeasurementPointTruePower OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Watt"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The present DC power for the power source indicated by
+            'lgpPwrDcMeasurementPointId' in the corresponding row in the
+             lgpPwrDcMeasurementPointTable."
+        ::= { lgpPwrDcMeasurementPointEntry 7 }
+
+-- -----------------------------------------------------------------------------
+-- Well Known Power Measurement Types
+-- -----------------------------------------------------------------------------
+
+lgpPwrWellKnownMeasurementTypes OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree registers well known Liebert Power Measurement
+         Types.  The object identifier names usually encompass units of
+         measure, lines of reference, and device location.  The OID's
+         name usually implies a measurement type such as 'voltsAC',
+         'current', 'voltsDc', 'VoltsLL', etc."
+        ::= { lgpPwrMeasurements 5  }
+
+    lgpPwrVoltsAc      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents an AC voltage."
+        ::= { lgpPwrWellKnownMeasurementTypes 1 }
+
+    lgpPwrVoltsDc      OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a DC voltage."
+        ::= { lgpPwrWellKnownMeasurementTypes 2 }
+
+    lgpPwrAmpsNeutral   OBJECT-IDENTITY
+        STATUS      current
+        DESCRIPTION
+            "This identifier represents a current measurement in Amps on the
+            neutral line."
+        ::= { lgpPwrWellKnownMeasurementTypes 3 }
+
+-- -----------------------------------------------------------------------------
+-- lgpPwrControl - Liebert Control Group
+-- -----------------------------------------------------------------------------
+
+lgpPwrWellKnownControlPoints OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This sub-tree registers well known Liebert Power Control
+         Points.  The object identifier names usually imply locations
+         where control of a device is available -- such 'output' or
+         'load circuits'."
+    REFERENCE
+        "These well known control identifiers are referenced in the
+         'lgpPwrLoadCircuitId' column in the
+         'lgpPwrLoadCircuitTable'."
+        ::= { lgpPwrControl 1  }
+
+    lgpPwrLoadCircuit      OBJECT-IDENTITY
+            STATUS      current
+            DESCRIPTION
+                "The managed device's controllable load circuit.
+                 Many power systems contain more than one load circuit.
+                 This identifier represents one load circuit for the
+                 system but does not necessarily represent the 'first' one.
+                 The load circuits' numbering with respect to
+                 'lgpPwrLoadCircuit1' etc. may depend on the physical wiring
+                 of the system when it was installed."
+            ::= { lgpPwrWellKnownControlPoints 1 }
+
+-- -----------------------------------------------------------------------------
+-- Load Circuit Table
+-- -----------------------------------------------------------------------------
+lgpPwrLoadCircuitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpPwrLoadCircuitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of load circuits that can be controlled(opened or closed).
+        The NMS cannot create or delete rows from the table.
+        The rows are created by the agent based upon the capabilities of
+        the managed device."
+    ::= { lgpPwrControl 2 }
+
+    lgpPwrLoadCircuitEntry OBJECT-TYPE
+        SYNTAX      LgpPwrLoadCircuitEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the contents of the columns for the table
+            'lgpPwrLoadCircuitTable'."
+        INDEX       { lgpPwrLoadCircuitIndex }
+        ::= { lgpPwrLoadCircuitTable 1 }
+
+    LgpPwrLoadCircuitEntry ::= SEQUENCE 
+    {
+        lgpPwrLoadCircuitIndex              Unsigned32,
+        lgpPwrLoadCircuitId                 OBJECT IDENTIFIER,
+        lgpPwrLoadCircuitSubID              Unsigned32,
+        lgpPwrLoadCircuitState              INTEGER,
+        lgpPwrLoadCircuitStateAndControl    INTEGER
+
+    }
+
+    lgpPwrLoadCircuitIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the row of the table
+            'lgpPwrLoadCircuitTable'."
+        ::= { lgpPwrLoadCircuitEntry 1 }
+
+    lgpPwrLoadCircuitId OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An OID representing a well known load circuit identifier.
+            These load circuit identifiers indicate the name or type of load
+            circuit reference in the table."
+        REFERENCE
+            "The object identifiers  in this column can be found in the sub-tree
+            'lgpPwrWellKnownMeasurementPoints'."
+        ::= { lgpPwrLoadCircuitEntry 2 }
+
+    lgpPwrLoadCircuitSubID OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is a sub identifier for the 'lgpPwrLoadCircuitId'.
+            It indicates the hardware identifier of the load control circuit."
+        ::= { lgpPwrLoadCircuitEntry 3 }
+
+    lgpPwrLoadCircuitState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        {
+            on(1), 
+            off(2), 
+            default(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This identifier indicates the state of the load circuit.
+            When read, only a closed or open response will be returned.
+            When written to, the state of the circuit will transition to
+            desired state."
+        ::= { lgpPwrLoadCircuitEntry 4 }
+
+    lgpPwrLoadCircuitStateAndControl OBJECT-TYPE
+        SYNTAX      INTEGER 
+        {
+            off(0), 
+            on(1), 
+            reboot(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This identifier indicates the state of the load circuit.
+            When read, only a closed or open response will be returned.
+            When written to, the state of the circuit will transition to
+            desired state."
+        ::= { lgpPwrLoadCircuitEntry 5 }
+
+lgpPwrAlarmSilence OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Audible Alarm Silence Command.  This command turns off the device's
+        audible alarm.  It will not affect the status of the alarm(s) that
+        caused the audible alarm.  This command should be sent with a
+        parameter of 1.  This variable doesn't return a value when read."
+    ::= { lgpPwrControl 3 }
+
+lgpPwrBatteryTest OBJECT-TYPE
+    SYNTAX      INTEGER  
+    {
+        start(1), 
+        abort(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Battery Test Command.  This command will initiate a battery test if
+        one is not already in progress, or abort the current test if it is in
+        progress."
+    ::= { lgpPwrControl 4 }
+
+lgpPwrUpsAbortCommand OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "UPS Abort command.  This command will abort the pending command on the
+        device.  There is no guarantee a client using the abort command will
+        cancel a command sent moments before from the same client.
+        Another client could initiate a command and change what command is
+        actually pending on the device.  This command should be sent with a
+        parameter of 1.  This variable doesn't return a value when read."
+    ::= { lgpPwrControl 5 }
+
+lgpPwrTransferToBypass OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Transfer to Bypass Command. This command will initiate a transfer of
+        the load to the bypass of the system.  This command should be sent with a
+        parameter of 1.  This variable doesn't return a value when read."
+    ::= { lgpPwrControl 6 }
+
+lgpPwrTransferToInverter OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Transfer to Inverter Command. This command will initiate a transfer
+        of the load to the inverter of the system.  This command should be sent
+        with a parameter of 1.  This variable doesn't return a value when read."
+    ::= { lgpPwrControl 7 }
+
+lgpPwrOutputOnDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Output On Delay Command.  This command will turn on the output of the
+        device after a user specified delay.  The number of seconds to delay
+        is subject to the precision of the device and should be kept to 10
+        second intervals."
+    ::= { lgpPwrControl 8 }
+
+lgpPwrOutputOffDelayWithRestart OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Output Off Delay with Restart Command.  This command will turn off the
+        output of the device after a user specified delay.  The number
+        of seconds to delay is subject to the precision of the device and
+        should be kept to 10 second intervals.  The device will then
+        turn the output on again after a specified amount of time.  "
+    ::= { lgpPwrControl 9 }
+
+lgpPwrOutputOffDelayWithoutRestart OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Output Off Delay without Restart Command.  This command will turn off
+        the output of the device after a specified delay.  The number of seconds
+        to delay is subject to the precision of the device and should be kept
+        to 10 second intervals.  The device will NOT automatically turn the
+        output on following this command."
+    ::= { lgpPwrControl 10 }
+
+-- =============================================================================
+-- lgpPwrStatus - Liebert Power Status Group
+-- =============================================================================
+
+lgpPwrTransferCount OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of times that the output load has been transferred between the
+        available input sources."
+    ::= { lgpPwrStatus 1 }
+
+lgpPwrAutoTransferTimer OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The required wait time between output load auto transfer attempts
+         between available input sources."
+    ::= { lgpPwrStatus 2 }
+
+lgpPwrAutoReTransferEnabled OBJECT-TYPE
+    SYNTAX      INTEGER 
+    {
+        no (0),
+        yes (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ability to retransfer the output load automatically to the well
+        known measurement source from the 'lgpPwrWellKnownMeasurements'
+        sub-tree that is the preferred input source of the system"
+    ::= { lgpPwrStatus 3 }
+
+lgpPwrSyncPhaseAngle OBJECT-TYPE
+    SYNTAX      Integer32(-3600..3600)
+    UNITS       "0.1 Degrees"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The phase angle difference of source 1 in relation to source 2."
+    ::= { lgpPwrStatus 4 }
+
+lgpPwrParallelSystemOutputToLoadSource OBJECT-TYPE
+    SYNTAX      INTEGER 
+    {
+        unknown (0),
+        utility (1), 
+        battery (2), 
+        bypass (3), 
+        none (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The source supporting the parallel system's load."
+    ::= { lgpPwrStatus 5 }
+
+lgpPwrDcToDcConverter OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the DC to DC converter."
+    ::= { lgpPwrStatus 6 }
+
+lgpPwrOutputToLoadOnInverter OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present source of output power is the Inverter."
+    ::= { lgpPwrStatus 7 }
+
+lgpPwrBatteryChargeCompensating OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system is adjusting the battery charging algorithm to accommodate
+        for the battery temperature."
+    ::= { lgpPwrStatus 8 }
+
+lgpPwrInverterReady OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1),
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ability of the inverter to support the output load of the system."
+    ::= { lgpPwrStatus 9 }
+
+lgpPwrOutputToLoadOnBypass OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present source of output power is the Bypass."
+    ::= { lgpPwrStatus 10 }
+
+lgpPwrBoost OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the boost circuitry"
+    ::= { lgpPwrStatus 11 }
+
+lgpPwrBuck OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of the buck circuitry"
+    ::= { lgpPwrStatus 12 }
+
+lgpPwrShutdownOverTemperature OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to an over temperature
+        condition."
+    ::= { lgpPwrStatus 13 }
+
+lgpPwrShutdownOverload OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to an over load condition."
+    ::= { lgpPwrStatus 14 }
+
+lgpPwrShutdownDcBusOverload OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to a DC bus over load
+        condition."
+    ::= { lgpPwrStatus 15 }
+
+lgpPwrShutdownOutputShort OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to an output short condition."
+    ::= { lgpPwrStatus 16 }
+
+lgpPwrShutdownLineSwap OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to a condition where the line
+        and neutral were reversed."
+    ::= { lgpPwrStatus 17 }
+
+lgpPwrShutdownLowBattery OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to a low battery condition."
+    ::= { lgpPwrStatus 18 }
+
+lgpPwrShutdownRemote OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to a remote shutdown command."
+    ::= { lgpPwrStatus 19 }
+
+lgpPwrShutdownInputUnderVoltage OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to an under voltage condition
+        during startup."
+    ::= { lgpPwrStatus 20 }
+
+lgpPwrShutdownPowerFactorCorrectionFailure OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due to a power factor correction
+        startup failure."
+    ::= { lgpPwrStatus 21 }
+
+lgpPwrShutdownHardware OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has previously shutdown due external shutdown signal."
+    ::= { lgpPwrStatus 22 }
+
+lgpPwrRedundantSubModule OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has a redundant battery module installed."
+    ::= { lgpPwrStatus 23 }
+
+lgpPwrBypassReady OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ability of the bypass to support the output load of the system.
+        If Yes, the bypass is available to transfer to."
+    ::= { lgpPwrStatus 24 }
+
+lgpPwrGeneratorStatus OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        connected(1), 
+        disconnected(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the system generator."
+    ::= { lgpPwrStatus 25 }
+
+lgpPwrRotaryBreakerStatus OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        unknown(1), 
+        closed(2), 
+        test(3), 
+        normal(4),
+        bypass(5), 
+        maintenance(6)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the system rotary breaker."
+    ::= { lgpPwrStatus 26 }
+
+lgpPwrPowerFactorCorrection OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the power factor correction circuitry of the system."
+    ::= { lgpPwrStatus 27 }
+
+lgpPwrBypassSyncDiff OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Degrees"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The phase angle difference between the inverter output and bypass
+        source. A positive value means the inverter leads the bypass source.
+        A negative value means the inverter lags the bypass source."
+    ::= { lgpPwrStatus 28 }
+
+lgpPwrBypassOverloadShutdownTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The calculated time remaining before bypass static switch shutdown due
+        to the present overload condition. If the bypass is not in an overload
+        condition, this object returns -1."
+    ::= { lgpPwrStatus 29 }
+
+lgpPwrInverterOverloadShutdownTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The calculated time remaining before inverter shutdown. The calculated
+        time of inverter operation remaining for the present overload event.
+
+        Note: If the inverter is not experiencing an overload event this point
+        will return 65535 indicating this value is unavailable."
+    ::= { lgpPwrStatus 30 }
+
+lgpPwrStateOutputSource OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        none(1), 
+        inverter(2), 
+        bypass(3),
+        maintenanceBypass(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UPS's output power source (inverter, bypass, or none).
+        NOTE: It is possible that the load still has power from the 
+        Maintenance Bypass."
+    ::= { lgpPwrStatus 31 }
+
+lgpPwrStateInputSource OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        none(1), 
+        utility(2), 
+        generator(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system input power source (none, utility, generator)."
+    ::= { lgpPwrStatus 32 }
+
+lgpPwrStateInputQualification OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        fail(1), 
+        marginalLow(2), 
+        normal(3),
+        marginalHigh(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the system input. The unit may or may not operate
+        normally under 'marginalLow' and 'marginalHigh' states."
+    ::= { lgpPwrStatus 33 }
+
+lgpPwrStateBypassStaticSwitchState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the bypass static switch."
+    ::= { lgpPwrStatus 34 }
+
+lgpPwrStateBypassQualification OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        fail(1), 
+        marginalLow(2), 
+        normal(3),
+        marginalHigh(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state of the bypass static switch. The unit may 
+        or may not operate normally under 'marginalLow' and 'marginalHigh'
+        states."
+    ::= { lgpPwrStatus 35 }
+
+lgpPwrStateDCBusQualification OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        fail(1), 
+        marginalLow(2), 
+        normal(3),
+        marginalHigh(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state of the DC bus. The unit may or may not 
+        operate normally under 'marginalLow' and 'marginalHigh' states."
+    ::= { lgpPwrStatus 36 }
+
+lgpPwrStateOutQualification OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        fail(1), 
+        marginalLow(2), 
+        normal(3),
+        marginalHigh(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state of the output. The unit may or may not 
+        operate normally under 'marginalLow' and 'marginalHigh' states."
+    ::= { lgpPwrStatus 37 }
+
+lgpPwrStateInverterQualification OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        fail(1), 
+        marginalLow(2), 
+        normal(3),
+        marginalHigh(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current operational state of the inverter. The unit may or may not 
+        operate normally under 'marginalLow' and 'marginalHigh' states."
+    ::= { lgpPwrStatus 38 }
+
+lgpPwrStateInverterState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the inverter."
+    ::= { lgpPwrStatus 39 }
+
+lgpPwrStateRectifierState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current state of the rectifier."
+    ::= { lgpPwrStatus 40 }
+
+lgpPwrStateModuleGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains UPS module information."
+    ::= { lgpPwrStatus 41 }
+
+    lgpPwrStateUpsModuleCount OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Count"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Number of UPS modules in the system. In a single module system, this
+            value is one."
+        ::= { lgpPwrStateModuleGroup 1 }
+
+    lgpPwrStateUpsModuleRedundantCount OBJECT-TYPE
+        SYNTAX      Integer32
+        UNITS       "Count"
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Number of redundant UPS modules in the system. In a single module
+            system, the value is zero. This value is dependent upon the present
+            load and the number of modules (i.e. the value may change during normal
+            operation based upon a load change). This value represents the number
+            of extra modules above the minimum needed to support the load."
+        ::= { lgpPwrStateModuleGroup 2 }
+
+lgpPwrStateBackfeedBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Static Bypass Switch Line Disconnect Breaker."
+    ::= { lgpPwrStatus 42 }
+
+lgpPwrStateLoadDisconnectState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Static Bypass Switch Load Disconnect Breaker."
+    ::= { lgpPwrStatus 43 }
+
+lgpPwrStateInputBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Input Disconnect Breaker."
+    ::= { lgpPwrStatus 44 }
+
+lgpPwrStateTrapFilterBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Trap Filter Disconnect Breaker."
+    ::= { lgpPwrStatus 45 }
+
+lgpPwrStateInvOutputBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Inverter Output Disconnect Breaker."
+    ::= { lgpPwrStatus 46 }
+
+lgpPwrStateIntBypassBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Internal Bypass Breaker."
+    ::= { lgpPwrStatus 47 }
+
+lgpPwrStateBypassIsolBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Bypass Isolation Breaker."
+    ::= { lgpPwrStatus 48 }
+
+lgpPwrStateRectifierIsolBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Rectifier Isolation Breaker."
+    ::= { lgpPwrStatus 49 }
+
+lgpPwrStateMaintBypassBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Maintenance Bypass Breaker."
+    ::= { lgpPwrStatus 50 }
+
+lgpPwrStateMaintIsolBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Maintenance Isolation Breaker."
+    ::= { lgpPwrStatus 51 }
+
+lgpPwrStateOutStaticSwState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        off(1), 
+        on(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Output Series Static Switch."
+    ::= { lgpPwrStatus 52 }
+
+lgpPwrStateModuleOutBrkrState OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        open(1), 
+        closed(2),
+        notInstalled(3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state of the Module Output Breaker."
+    ::= { lgpPwrStatus 53 }
+
+lgpPwrBypassReXfrRemainTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time remaining before an inverter overload or inverter fault can 
+        be cleared and auto retransfer from the bypass to the inverter can take 
+        place. 
+
+        Note: If an inverter overload or fault is not taking place, this point
+        will return 65535."
+    ::= { lgpPwrStatus 54 }
+
+lgpPwrStateUpsOutputSource OBJECT-TYPE
+    SYNTAX     INTEGER 
+    {
+        other(1),
+        none(2),
+        normal(3),
+        bypass(4),
+        battery(5),
+        booster(6),
+        reducer(7)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The present source of output power.  The enumeration
+        none(2) indicates that there is no source of output
+        power (and therefore no output power), for example,
+        the system has opened the output breaker.
+
+        NOTE: In a single-module system, this point is intended to have the same 
+        behavior as the RFC1628 point upsOutputSource."
+    ::= { lgpPwrStatus 55 }
+
+lgpPwrStateLoadBusSynchronization OBJECT-TYPE
+    SYNTAX     INTEGER 
+    {
+        unknown(0),
+        active(1),
+        abnormal(2)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The state of the Load Bus Synchronizer (LBS)."
+    ::= { lgpPwrStatus 56 }
+
+lgpPwrStateCircuitBrkrStateGroup OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "This group contains Static Switch circuit breaker state information."
+    ::= { lgpPwrStatus 57 }
+
+    lgpPwrStateSource1InputBrkrState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+	    open(1), 
+	    closed(2),
+	    notInstalled(3)
+        }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The states of Source 1 Input Breaker."
+        ::= { lgpPwrStateCircuitBrkrStateGroup 1 }
+
+    lgpPwrStateSource2InputBrkrState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+	    open(1), 
+	    closed(2),
+	    notInstalled(3)
+        }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The states of Source 2 Input Breaker."
+        ::= { lgpPwrStateCircuitBrkrStateGroup 2 }
+
+    lgpPwrStateSource1BypassBrkrState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+	    open(1), 
+	    closed(2),
+	    notInstalled(3)
+        }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The states of Source 1 Bypass Breaker."
+        ::= { lgpPwrStateCircuitBrkrStateGroup 3 }
+
+    lgpPwrStateSource2BypassBrkrState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+	    open(1), 
+	    closed(2),
+	    notInstalled(3)
+        }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The states of Source 2 Bypass Breaker."
+        ::= { lgpPwrStateCircuitBrkrStateGroup 4 }
+
+    lgpPwrStateOutputBrkrState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+	    open(1), 
+	    closed(2),
+	    notInstalled(3)
+        }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The states of Output Breaker."
+        ::= { lgpPwrStateCircuitBrkrStateGroup 5 }
+
+    lgpPwrStateAuxOutputBrkrState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+	    open(1), 
+	    closed(2),
+	    notInstalled(3)
+        }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The states of Auxiliary Output Breaker."
+        ::= { lgpPwrStateCircuitBrkrStateGroup 6 }
+
+    lgpPwrStateSource1PduInputBrkrState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+	    open(1), 
+	    closed(2),
+	    notInstalled(3)
+        }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The states of Source 1 PDU Input Breaker."
+        ::= { lgpPwrStateCircuitBrkrStateGroup 7 }
+
+    lgpPwrStateSource2PduInputBrkrState OBJECT-TYPE
+        SYNTAX      INTEGER 
+        { 
+	    open(1), 
+	    closed(2),
+	    notInstalled(3)
+        }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+	    "The states of Source 2 PDU Input Breaker."
+        ::= { lgpPwrStateCircuitBrkrStateGroup 8 }
+
+lgpPwrEconomicOperation OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        off(0),
+        on(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The present state of ECO mode operation,
+        on(1) if system is on bypass due to ECO mode operation,
+        off(0) any other time."
+    ::= { lgpPwrStatus 58 }
+
+-- =============================================================================
+-- lgpPwrSettings - Liebert Power Settings Group
+-- =============================================================================
+
+lgpPwrPreferredSource OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The well known measurement source from the
+        'lgpPwrWellKnownMeasurements' sub-tree that is the preferred
+         input source of the system."
+    ::= { lgpPwrSettings 1 }
+
+lgpPwrLoadOnSource OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The well known measurement source from the
+         'lgpPwrWellKnownMeasurements' sub-tree that is currently
+          powering the output (load)."
+    ::= { lgpPwrSettings 2 }
+
+lgpPwrNominalVoltageDeviation OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Volt"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The nominal voltage deviation between the well known
+        measurement source lgpPwrSource1Input and lgpPwrSource2Input."
+    ::= { lgpPwrSettings 3 }
+
+lgpPwrNominalVoltageDeviationPercent OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The percentage of the nominal voltage deviation between the well known
+        measurement source lgpPwrSource1Input and lgpPwrSource2Input."
+    ::= { lgpPwrSettings 4 }
+
+lgpPwrPhaseDifferenceLimit OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Degrees"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum phase difference (between the well known
+         input sources ) in which a transfer to an available input source is
+         permitted."
+    ::= { lgpPwrSettings 5 }
+
+lgpPwrFrequencyDeviationLimit OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "0.1 Hertz"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum frequency deviation (between the well known
+         input sources ) in which a transfer to an available input source is
+         permitted."
+    ::= { lgpPwrSettings 6 }
+
+-- -----------------------------------------------------------------------------
+-- Thresholds Table
+-- -----------------------------------------------------------------------------
+
+lgpPwrThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LgpPwrThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of power thresholds for a given power measurement at a
+        point/location in the system.
+        The lgpPwrThresholdType in this table corresponds to the
+        type of measurement the high and low thresholds applies to.
+
+        This table contains zero, one, or many rows, depending upon the number
+        of 'lgpPwrThresholdPoint' and 'lgpPwrThresholdSubID' available in the
+        table.
+        The NMS cannot create or delete rows from the table.
+        The rows are created by the agent based upon the capabilities of
+        the managed device."
+    ::= { lgpPwrSettings 7 }
+
+    lgpPwrThresholdEntry OBJECT-TYPE
+        SYNTAX      LgpPwrThresholdEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This entry defines the contents of the columns for the table
+            'lgpPwrThresholdTable'."
+        REFERENCE
+            "The lgpPwrThresholdType in this table corresponds to the
+            type of measurement the high and low thresholds applies to."
+        INDEX       { lgpPwrThresholdIndex }
+        ::= { lgpPwrThresholdTable 1 }
+
+    LgpPwrThresholdEntry ::= SEQUENCE 
+    {
+        lgpPwrThresholdIndex            Unsigned32,
+        lgpPwrThresholdPoint            OBJECT IDENTIFIER,
+        lgpPwrThresholdSubID            Unsigned32,
+        lgpPwrThresholdType             OBJECT IDENTIFIER,
+        lgpPwrThresholdHighWarning      Integer32,
+        lgpPwrThresholdHighFailure      Integer32,
+        lgpPwrThresholdLowWarning       Integer32,
+        lgpPwrThresholdLowFailure       Integer32
+    }
+
+    lgpPwrThresholdIndex OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "This is the index indicating the row of the table
+             'lgpPwrLineMeasurementTable' for a power measurement point."
+        ::= { lgpPwrThresholdEntry 1 }
+
+    lgpPwrThresholdPoint OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An OID representing a well known measurement point.
+            These object identifiers indicate a point or location of power
+            measurement in a power system.  The OID's name usually
+            implies a location of the measurement point such as
+            'input', 'output', 'bypass' etc."
+        REFERENCE
+            "The object identifiers  in this column can be found in the sub-tree
+            'lgpPwrWellKnownMeasurementPoints' and correspond to the
+            entry in the table 'lgpPwrThresholdTable'."
+        ::= { lgpPwrThresholdEntry 2 }
+
+    lgpPwrThresholdSubID OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This is a sub identifier for the 'lgpPwrThresholdPoint'.
+            It indicates the instance number of the well known threshold point."
+        ::= { lgpPwrThresholdEntry 3 }
+
+    lgpPwrThresholdType OBJECT-TYPE
+        SYNTAX      OBJECT IDENTIFIER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "An OID representing a well known measurement type.
+            These object identifiers indicate the type of measurement referenced
+            by the row of the table.  These object identifiers can encompass
+            units of measure, lines of reference, and device location.
+            The OID's name usually implies a measurement type such as
+            'voltsAc', 'current', 'voltsDc', 'VoltsLL', etc."
+        REFERENCE
+            "The object identifiers  in this column can be found in the sub-tree
+            'lgpPwrWellKnownThresholdTypes' and correspond to the
+            entry in the table lgpPwrThresholdTable."
+        ::= { lgpPwrThresholdEntry 4 }
+
+    lgpPwrThresholdHighWarning OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high warning threshold of a type of measurement designated by
+            the 'lgpPwrThresholdType' at a location designated by the
+            'lgpPwrThresholdPoint'.  If multiple thresholds are available at a
+            single 'lgpPwrThresholdPoint', of the same 'lgpPwrThresholdType',
+            then the 'lgpPwrThresholdSubID' will differentiate between them.
+            When this threshold is met, the agent will send a notification."
+        ::= { lgpPwrThresholdEntry 5 }
+
+    lgpPwrThresholdHighFailure OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The high failure threshold of a type of measurement designated by
+            the 'lgpPwrThresholdType' at a location designated by the
+            'lgpPwrThresholdPoint'.  If multiple thresholds are available at a
+            single 'lgpPwrThresholdPoint', of the same 'lgpPwrThresholdType',
+            then the 'lgpPwrThresholdSubID' will differentiate between them.
+            When this threshold is met, the agent will send a notification."
+        ::= { lgpPwrThresholdEntry 6 }
+
+    lgpPwrThresholdLowWarning OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low warning threshold of a type of measurement designated by
+            the 'lgpPwrThresholdType' at a location designated by the
+            'lgpPwrThresholdPoint'.  If multiple thresholds are available at a
+            single 'lgpPwrThresholdPoint', of the same 'lgpPwrThresholdType',
+            then the 'lgpPwrThresholdSubID' will differentiate between them.
+            When this threshold is met, the agent will send a notification."
+        ::= { lgpPwrThresholdEntry 7 }
+
+    lgpPwrThresholdLowFailure OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The low failure threshold of a type of measurement designated by
+            the 'lgpPwrThresholdType' at a location designated by the
+            'lgpPwrThresholdPoint'.  If multiple thresholds are available at a
+            single 'lgpPwrThresholdPoint', of the same 'lgpPwrThresholdType',
+            then the 'lgpPwrThresholdSubID' will differentiate between them.
+            When this threshold is met, the agent will send a notification."
+        ::= { lgpPwrThresholdEntry 8 }
+
+lgpPwrUpsAutoRestart OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The device will automatically restart when utility power is restored
+        following a battery discharge."
+    ::= { lgpPwrSettings 8 }
+
+lgpPwrUpsAutoRestartDelay OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The device will automatically delay a certain number of seconds and
+        then  restart after utility power is restored following a battery
+        discharge.  The number of seconds to delay is subject to the precision
+        of the device and should be kept to 10 second intervals."
+    ::= { lgpPwrSettings 9 }
+
+lgpPwrAutoRestartBatteryChargeThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The battery charge percentage required before the device can
+        automatically restart."
+    ::= { lgpPwrSettings 10 }
+
+lgpPwrParallelModuleCount OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of modules in the parallel system."
+    ::= { lgpPwrSettings 11 }
+
+lgpPwrParallelRedundancyCount OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The number of redundant modules in the parallel system."
+    ::= { lgpPwrSettings 12 }
+
+lgpPwrLoadBusSyncMode OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        master(1), 
+        slave(2), 
+        none(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configuration of Load Bus Synchronization (LBS) between
+        independent systems."
+    ::= { lgpPwrSettings 13 }
+
+lgpPwrEconomicOperationMode OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configuration of the economic operation mode of the system."
+    ::= { lgpPwrSettings 14 }
+
+lgpPwrAutomaticBatteryTest OBJECT-TYPE
+    SYNTAX      INTEGER { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Automatic battery test option.  If enabled, the battery will be tested
+        on a fixed interval.  If disabled, the battery test must be initiated
+        by a battery test command.  The interval at which a battery test is
+        performed is defined by 'lgpPwrAutomaticBatteryTestInterval'."
+    ::= { lgpPwrSettings 15 }
+
+lgpPwrMinimumRedundantPowerModule OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum number of redundant power modules that must be present
+        before sending a loss of power redundancy alarm.  If 0, there is no
+        redundant power functionality."
+    ::= { lgpPwrSettings 16 }
+
+lgpPwrMinimumRedundantBatteryModule OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum number of redundant battery modules that must be present
+        before sending an alarm. If 0, the redundant battery module alarm is 
+        disabled."
+    ::= { lgpPwrSettings 17 }
+
+lgpPwrOutputToLoadUserOverloadLimit OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Volt-Amp"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This is the user specified maximum load the device can support
+        without sending an alarm."
+    ::= { lgpPwrSettings 18 }
+
+lgpPwrNoLoadWarningLimit OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Amp"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The minimum current draw on the output in which the device considers
+         there to be a load present on the output.  The condition
+         lgpConditionWarningNoLoadDetected will be triggered if the output
+         current falls below this value.  If this value is '-1' then the
+         lgpConditionNoLoadDetectedWarning condition is 'disabled'."
+    ::= { lgpPwrSettings 19 }
+
+lgpPwrNoLoadWarningDelay OBJECT-TYPE
+    SYNTAX      Integer32(0..10000)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The amount of time to delay before annunciation of the condition
+         lgpConditionNoLoadDetectedWarning after the output current load
+         falls below the threshold lgpPwrOutputNoLoadWarningLimit."
+    ::= { lgpPwrSettings 20 }
+
+lgpPwrEconomicOperationModeControl OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        disabled(0),
+        mode1(1), 
+        mode2(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The configuration of the economic operation mode of the system.
+         Note that this supersedes lgpPwrEconomicOperationMode in newer devices."
+    ::= { lgpPwrSettings 21 }
+
+-- =============================================================================
+-- lgpPwrStatistic - Liebert Power Statistic Group
+-- =============================================================================
+lgpPwrBrownOutCount OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of occurrences where the input line voltage has fallen below
+        a pre-determined threshold for a specified amount of time.  This number
+        resets when the command 'lgpPwrStatisticsReset' is executed."
+    ::= { lgpPwrStatistic 1 }
+
+lgpPwrBlackOutCount OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of occurrences where there is a total loss of electric power.
+        This number resets when the command 'lgpPwrStatisticsReset' is
+        executed."
+    ::= { lgpPwrStatistic 2 }
+
+lgpPwrTransientCount OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of occurrences where the input line voltage spikes above a
+        pre-determined threshold for a specified amount of time.  This number
+        resets when the command 'lgpPwrStatisticsReset' is executed."
+    ::= { lgpPwrStatistic 3 }
+
+lgpPwrBatteryDischargeCount OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of battery discharges since the last reset."
+    ::= { lgpPwrStatistic 4 }
+
+lgpPwrBatteryDischargeTime OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "minutes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total accumulated time spent on battery since the last reset."
+    ::= { lgpPwrStatistic 5 }
+
+lgpPwrBatteryAmpHours OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Amp-hour"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total accumulated Amp-hours removed from the battery since last
+        reset."
+    ::= { lgpPwrStatistic 6 }
+
+lgpPwrBatteryWattHours OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Watt-Hour"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total accumulated Watt-Hours removed from the battery since last
+        reset.  This command should be sent with a parameter of 1.  This
+        variable doesn't return a value when read."
+    ::= { lgpPwrStatistic 7 }
+
+lgpPwrBatteryStatisticsReset OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Battery statistics clear command.  The command to reset all battery
+        statistics stored by the device.  This command should be sent with a
+        parameter of 1.  This variable doesn't return a value when read."
+    ::= { lgpPwrStatistic 8 }
+
+lgpPwrStatisticsReset OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Reset Power Statistics Command.  This command will reset the power
+        statistics stored in the system.  This command should be sent with a
+        parameter of 1.  This variable doesn't return a value when read."
+    ::= { lgpPwrStatistic 9 }
+
+-- =============================================================================
+-- lgpPwrConversion - Liebert Power Conversion Group
+-- =============================================================================
+
+lgpPwrNumberInstalledPowerModules OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of power modules installed in the device."
+    ::= { lgpPwrConversion 1 }
+
+lgpPwrNumberFailedPowerModules OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of power modules in the device that have failed."
+    ::= { lgpPwrConversion 2 }
+
+lgpPwrNumberRedundantPowerModules OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of redundant power modules installed in the device."
+    ::= { lgpPwrConversion 3 }
+
+lgpPwrNumberActivePowerModules OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active power modules in the device."
+    ::= { lgpPwrConversion 4 }
+
+lgpPwrNumberPowerModuleWarnings OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Count"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of power modules in the device that have a warning."
+    ::= { lgpPwrConversion 6 }
+
+lgpPwrUpsInverterStandby OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        on(1), 
+        off(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The output to the load is supported by the bypass and the inverter is
+        on standby."
+    ::= { lgpPwrConversion 7 }
+
+-- =============================================================================
+-- lgpPwrTopology - Liebert Power Topology Group
+-- =============================================================================
+
+lgpPwrUpsTopOffline OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UPS has an offline topology.  Under normal operating conditions,
+        AC power from the utility passes straight through the UPS
+        to the critical load.  The inverter is used to convert the DC power
+        from the battery to create AC power to support the load when the
+        utility fails. Normally the inverter is operating in the stand-by mode,
+        keeping the batteries charged. Should the utility power go out of
+        specification, the inverter will power the load by drawing energy from
+        the battery."
+    ::= { lgpPwrTopology 1 }
+
+lgpPwrUpsTopLineInteractive OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The UPS has a line-interactive topology.  This topology
+        resembles the offline product, but inserts a transformer or inductor
+        in series between the utility power source and the load. This inline
+        inductor enables the UPS inverter to interact with incoming power
+        and provide a measure of power conditioning to the load. This
+        buck-and-boost circuitry helps with high and low input voltage
+        conditions."
+    ::= { lgpPwrTopology 2 }
+
+lgpPwrUPSTopDualInput OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has separate input sources for the bypass and inverter."
+    ::= { lgpPwrTopology 3 }
+
+lgpPwrTopFrequencyConverter OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has a frequency converter."
+    ::= { lgpPwrTopology 4 }
+
+lgpPwrTopVoltageConverter OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The system has a voltage converter."
+    ::= { lgpPwrTopology 5 }
+
+lgpPwrTopMaximumFrameCapacity OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Volt-Amp"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The maximum device system capacity."
+    ::= { lgpPwrTopology 6 }
+
+lgpPwrTopRedundantControlModules     OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        yes(1), 
+        no(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The device has a redundant control module installed."
+    ::= { lgpPwrTopology 7 }
+
+lgpPwrInputIsolationTransformerInstalled     OBJECT-TYPE
+    SYNTAX      INTEGER 
+    {  
+        notInstalled(1), 
+        installed(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the input isolation transformer is installed."
+    ::= { lgpPwrTopology 8 }
+
+lgpPwrStateStaticSwitchType OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        notApplicable(1), 
+        continuousDuty(2), 
+        momentaryDuty(3) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Static switch type (N/A, continous duty, or momentary duty)."
+    ::= { lgpPwrTopology 9 }
+
+lgpPwrStateModuleType OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        singleModuleSystem(1), 
+        module1plus1(2), 
+        module1plusN(3), 
+        moduleNplus1(4), 
+        systemControlCabinet(5), 
+        mainStaticSwitch(6) 
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "UPS module type. 
+            SMS   -- Single Module System
+            1 + 1 -- Redundant system for capacity 
+            1 + N -- Distributed multi-module system 
+            N + 1 -- A multi-module system with one bypass for the system
+            SCC   -- System Control Cabinet used in an N+1 system to
+                     provide a single bypass for the system. 
+            MSS   -- Main Static Switch"
+    ::= { lgpPwrTopology 10 }
+
+lgpPwrStateBypassInputConfig OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        singlePhase2WireL1WithReturn(1),
+        twoPhase2WireL1L2(2),
+        twoPhase3WireL1L2WithNeutral(3),
+        threePhase3WireL1L2L3(4),
+        threePhase4WireL1L2L3WithNeutral(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Bypass input wire physical wiring configuration.
+            singlePhase2WireL1WithReturn
+                Single phase input with 2 wires (Line 1, and Return).
+            twoPhase2WireL1L2
+                Two phase input with 2 wires (Line 1, and Line 2).
+            twoPhase3WireL1L2WithNeutral
+                Two phase input with 3 wires (Line 1, Line 2, and Neutral)
+            threePhase3WireL1L2L3
+                Three phase input with 3 wires (Line 1, Line 2, and Line 3)
+            threePhase4WireL1L2L3WithNeutral
+                Three phase input with 4 wires (Line 1, Line 2, Line 3, and 
+                Neutral)."
+    ::= { lgpPwrTopology 11 }
+
+lgpPwrStateOutputConfig OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        singlePhase2WireL1WithReturn(1),
+        twoPhase2WireL1L2(2),
+        twoPhase3WireL1L2WithNeutral(3),
+        threePhase3WireL1L2L3(4),
+        threePhase4WireL1L2L3WithNeutral(5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Output wire physical wiring configuration.
+            singlePhase2WireL1WithReturn
+                Single phase output with 2 wires (Line 1, and Return).
+            twoPhase2WireL1L2
+                Two phase output with 2 wires (Line 1, and Line 2).
+            twoPhase3WireL1L2WithNeutral
+                Two phase output with 3 wires (Line 1, Line 2, and Neutral)
+            threePhase3WireL1L2L3
+                Three phase output with 3 wires (Line 1, Line 2, and Line 3)
+            threePhase4WireL1L2L3WithNeutral
+                Three phase output with 4 wires (Line 1, Line 2, Line 3, and 
+                Neutral)."
+    ::= { lgpPwrTopology 12 }
+
+lgpPwrRectifierPassiveFilterInstalled     OBJECT-TYPE
+    SYNTAX      INTEGER 
+    {  
+        notInstalled(1), 
+        installed(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the rectifier passive filter is installed."
+    ::= { lgpPwrTopology 13 }
+
+lgpPwrRectifierTrapInstalled     OBJECT-TYPE
+    SYNTAX      INTEGER 
+    {  
+        notInstalled(1), 
+        installed(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the rectifier input passive filter is installed."
+    ::= { lgpPwrTopology 14 }
+
+lgpPwrRectifierActiveFilterInstalled     OBJECT-TYPE
+    SYNTAX      INTEGER 
+    {  
+        notInstalled(1), 
+        installed(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the rectifier active filter is installed."
+    ::= { lgpPwrTopology 15 }
+
+-- =============================================================================
+-- lgpPwrConfig - Liebert Power Config Group
+-- =============================================================================
+
+lgpPwrSysCapacity OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Volt-Amp"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The current device system capacity."
+    ::= { lgpPwrConfig 1 }
+
+lgpPwrUPSModuleMode OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        single(1), 
+        parallel(2), 
+        hotmaster(3), 
+        hotslave(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The module mode of the UPS."
+    ::= { lgpPwrConfig 2 }
+
+lgpPwrMaxRatedCurrent OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Amp"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "System output maximum amperage rating. The maximum rated amperage for 
+        the system. This value is based upon the model type and is typically 
+        limited by the wiring, breakers, power devices, etc."
+    ::= { lgpPwrConfig 3 }
+
+lgpPwrRectifierPulseCount OBJECT-TYPE
+    SYNTAX      INTEGER 
+    { 
+        sixPulse(1), 
+        twelvePulse(2), 
+        eighteenPulse(3), 
+        twentyFourPulse(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rectifier pulse count per waveform cycle (6-, 12-, 18-, or 24-pulse)."
+    ::= { lgpPwrConfig 4 }
+END

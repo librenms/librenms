@@ -1,0 +1,34 @@
+os: dpi
+text: 'IBM DPI'
+type: power
+icon: ibmos
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+poller_modules:
+    hr-mib: false
+    ucd-mib: false
+    bgp-peers: false
+    ucd-diskio: false
+    wireless: false
+    ospf: false
+    entity-physical: false
+    applications: false
+    stp: false
+    ntp: false
+discovery_modules:
+    entity-physical: false
+    cisco-vrf-lite: false
+    ipv6-address: false
+    storage: false
+    hr-device: false
+    discovery-protocols: false
+    arp-table: false
+    bgp-peers: false
+    ucd-diskio: false
+    services: false
+    stp: false
+    ntp: false
+    wireless: false
+discovery:
+    -
+      sysDescr: IBM DPI

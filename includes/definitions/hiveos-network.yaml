@@ -1,0 +1,15 @@
+os: hiveos-network
+text: 'Aerohive HiveOS'
+type: network
+icon: aerohive
+mib_dir:
+    - aerohive
+over:
+    - { graph: device_bits, text: Traffic }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.26928.1
+            - .1.3.6.1.4.1.4413
+        sysDescr_regex:
+            - '/^(Aerohive )*SR[\d\w]+/'

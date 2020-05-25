@@ -8,7 +8,7 @@ if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=
 foreach ($vrfs_lite_cisco as $vrf) {
     $device['context_name']=$vrf['context_name'];
 
-    $oids = snmp_walk($device, 'ipAddressIfIndex.ipv6', '-Ln -Osq', 'IP-MIB');
+    $oids = snmp_walk($device, 'ipAddressIfIndex.ipv6', ['-Osq', '-Ln'], 'IP-MIB');
     $oids = str_replace('ipAddressIfIndex.ipv6.', '', $oids);
     $oids = str_replace('"', '', $oids);
     $oids = str_replace('IP-MIB::', '', $oids);
@@ -48,7 +48,7 @@ foreach ($vrfs_lite_cisco as $vrf) {
     } //end foreach
 
     if (!$oids) {
-        $oids = snmp_walk($device, 'ipv6AddrPfxLength', '-Ln -Osq -OnU', 'IPV6-MIB');
+        $oids = snmp_walk($device, 'ipv6AddrPfxLength', ['-OsqnU', '-Ln'], 'IPV6-MIB');
         $oids = str_replace('.1.3.6.1.2.1.55.1.8.1.2.', '', $oids);
         $oids = str_replace('"', '', $oids);
         $oids = trim($oids);
@@ -65,9 +65,10 @@ foreach ($vrfs_lite_cisco as $vrf) {
         } //end foreach
     } //end if
 
-    $sql = "SELECT * FROM ipv6_addresses AS A, ports AS I WHERE I.device_id = '".$device['device_id']."' AND  A.port_id = I.port_id'";
-
-    foreach (dbFetchRows($sql) as $row) {
+    $sql = 'SELECT `ipv6_addresses`.*, `ports`.`device_id`, `ports`.`ifIndex` FROM `ipv6_addresses`';
+    $sql .= ' LEFT JOIN `ports` ON `ipv6_addresses`.`port_id` = `ports`.`port_id`';
+    $sql .= ' WHERE `ports`.device_id = ? OR `ports`.`device_id` IS NULL';
+    foreach (dbFetchRows($sql, array($device['device_id'])) as $row) {
         $full_address  = $row['ipv6_address'].'/'.$row['ipv6_prefixlen'];
         $port_id       = $row['port_id'];
         $valid_address = $full_address.'-'.$port_id;

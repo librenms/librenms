@@ -1,6 +1,0 @@
-os: hikvision
-text: Hikvision
-type: network
-icon: hikvision
-over:
-    - { graph: device_uptime, text: 'Device Uptime' }

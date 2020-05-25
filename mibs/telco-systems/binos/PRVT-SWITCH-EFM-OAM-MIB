@@ -1,0 +1,841 @@
+-- *********************************************************************
+-- *********************************************************************
+-- ** Filename: PRVT-SWITCH-EFM-OAM-MIB
+-- ** Project: T - Ethernet and Fast Ethernet IP Switches.
+-- ** Purpose: Private MIB
+-- *********************************************************************
+-- (c) Copyright, 2001, BATM Advanced Communications. All rights reserved.
+-- WARNING:
+--
+-- BY UTILIZING THIS FILE, YOU AGREE TO THE FOLLOWING:
+--
+-- This file is the property of BATM Advanced Communications.
+-- BATM Advanced Communications retains all title and
+-- ownership in the Specification, including any revisions.
+
+-- BATM Advanced Communications grants all interested parties a non-exclusive
+-- license to use and distribute an unmodified copy of this
+-- Specification in connection with management of BATM Advanced Communications 
+-- and Telco Systems products, and without fee, provided that the following
+-- conditions are met:
+-- 1. Redistributions of this specification must retain the above copyright
+-- notice, this list of conditions and the following disclaimer.
+-- 2. Redistributions in binary form must reproduce the above copyright
+-- notice, this list of conditions and the following disclaimer in the
+-- documentation and/or other materials provided with the distribution.
+-- 3. The name of the BATM Advanced Communications MAY NOT be used to endorse
+-- or promote products derived from this specification without specific prior written
+-- permission.
+--
+-- EXCEPT AS RESTRICTED BY LAW, OR AS PROVIDED IN BATM'S LIMITED
+-- WARRANTY, THE SPECIFICATIONS CONTAINED IN THIS FILE ARE
+-- PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED
+-- OR IMPLIED, INCLUDING BUT NOT LIMITED TO, ANY IMPLIED WARRANTIES
+-- OF MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE.
+-- IN NO EVENT SHALL BATM BE LIABLE FOR ANY DAMAGES WHATSOEVER
+-- INCLUDING, WITHOUT LIMITATION, DAMAGES FOR LOSS OF BUSINESS
+-- PROFITS, BUSINESS INTERRUPTION, LOSS OF BUSINESS INFORMATION OR
+-- OTHER CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE, OR INABILITY
+-- TO USE, THE SPECIFICATION CONTAINED IN THIS FILE.
+PRVT-SWITCH-EFM-OAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY,
+OBJECT-TYPE,
+NOTIFICATION-TYPE,
+Integer32,
+Counter32,
+Unsigned32
+FROM SNMPv2-SMI
+
+TruthValue,
+RowStatus,
+DisplayString
+FROM SNMPv2-TC
+
+dot3OamAdminState,
+dot3OamMode,
+dot3OamLoopbackStatus
+FROM DOT3-OAM-MIB
+
+ifIndex
+FROM IF-MIB
+
+PortList
+FROM Q-BRIDGE-MIB
+
+switch
+FROM PRVT-SWITCH-MIB;
+
+prvtSwitchEfmOamMIB MODULE-IDENTITY
+LAST-UPDATED "201002110000Z"
+ORGANIZATION "BATM Advanced Communication"
+CONTACT-INFO
+"BATM/Telco Systems Support team
+Email:
+For North America: techsupport@telco.com
+For North Europe: support@batm.de, info@batm.de
+For the rest of the world: techsupport@telco.com"
+
+DESCRIPTION
+"This MIB should provide general configuration and
+reports of this protocol that are not available in
+the standard DOT3-OAM-MIB, such as Enabling and Timers,
+as well as the ability to control private
+extensions added to the EFM OAM."
+
+-- revision history
+REVISION "201002110000Z"
+DESCRIPTION
+"Change oids for backward compatibility."
+
+REVISION "200912010000Z"
+DESCRIPTION
+"Added dying-gasp notification"
+
+REVISION "200906010000Z"
+DESCRIPTION
+"Changed limits for prvtEfmOamPingTable leafs"
+
+
+REVISION "200904290000Z"
+DESCRIPTION
+"Changed type for prvtEfmOamEventForwardStatus and
+prvtEfmOamEventForwardShutdown to PortList"
+
+
+REVISION "200903180000Z"
+DESCRIPTION
+"Fixed range and measurment unit for prvtEfmOamKeepAlive scalar"
+
+
+REVISION "200903060000Z"
+DESCRIPTION
+"Removed incorrect scalars
+Removed certain leafs in prvtEfmOamPingTable and prvtEfmOamLoopbackTable
+Modified prvtEfmOamPingResultTable and prvtEfmOamLoopbackResultTable"
+
+::= { switch 133 }
+
+-- ***********************************************
+-- ************ Top level structure of the MIB****
+-- ***********************************************
+prvtEfmOamNotifications OBJECT IDENTIFIER ::= { prvtSwitchEfmOamMIB 0 }
+prvtEfmOamObjects OBJECT IDENTIFIER ::= { prvtSwitchEfmOamMIB 1 }
+prvtEfmOamConformance OBJECT IDENTIFIER ::= { prvtSwitchEfmOamMIB 2 }
+
+-- ***********************************************
+-- ************* global scalar objects ***********
+-- ***********************************************
+prvtEfmOamEnable OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enable/disable the EFM OAM on the device"
+::= { prvtEfmOamObjects 1 }
+
+prvtEfmOamMultiPduCount OBJECT-TYPE
+SYNTAX Unsigned32 (1..10)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Number of OAM PDUs that will be sent when
+protocol ask to send multiple subsequent
+messages."
+DEFVAL { 5 }
+::= { prvtEfmOamObjects 2 }
+
+prvtEfmOamRemoteEvent OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Enable or disable sending the local
+event notifications to the remote device."
+DEFVAL { true }
+::= { prvtEfmOamObjects 3 }
+
+prvtEfmOamLocalSysLog OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Disable/enable sending of Event Notification
+OAM PDU to the local Syslog daemon."
+DEFVAL { true }
+::= { prvtEfmOamObjects 4 }
+
+prvtEfmOamPriority OBJECT-TYPE
+SYNTAX Unsigned32 (0..8)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Priority of the sent OAM PDUs.
+Please note that value 8 represents no-priority."
+DEFVAL { 8 }
+::= { prvtEfmOamObjects 5 }
+
+prvtEfmOamKeepAlive OBJECT-TYPE
+SYNTAX Unsigned32 (100..15000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Aging interval (in miliseconds)of the last heard
+neighbouring device."
+DEFVAL { 5000 }
+::= { prvtEfmOamObjects 6 }
+
+prvtEfmOamHelloInterval OBJECT-TYPE
+SYNTAX Unsigned32 (100..5000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Maximal interval between a pair of PDUs in milliseconds."
+DEFVAL { 1000 }
+::= { prvtEfmOamObjects 7 }
+
+prvtEfmOamPktsSent OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Sent packets."
+::= { prvtEfmOamObjects 8 }
+
+prvtEfmOamPktsReceived OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Received packets."
+::= { prvtEfmOamObjects 9 }
+
+prvtEfmOamHistorySize OBJECT-TYPE
+SYNTAX Unsigned32 (1000..10000)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Number of entries in EFM_OAM history."
+DEFVAL { 5000 }
+::= { prvtEfmOamObjects 14 }
+
+-- ***********************************************
+-- ************* prvtEfmOamTable *****************
+-- ***********************************************
+
+
+prvtEfmOamTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtEfmOamEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table shall containg an entry per
+physical interface, indexed by the corresponding
+ifIndex from IF-MIB and each row in the
+table shall contain a single column."
+::= { prvtEfmOamObjects 10 }
+
+prvtEfmOamEntry OBJECT-TYPE
+SYNTAX PrvtEfmOamEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"EFM Entry"
+INDEX { ifIndex }
+::= { prvtEfmOamTable 1 }
+
+PrvtEfmOamEntry ::= SEQUENCE {
+prvtEfmOamEnhanceMode INTEGER,
+prvtEfmOamEventReturn Integer32,
+prvtEfmOamForceLoopbackLocal TruthValue,
+prvtEfmOamForceLoopbackRemote TruthValue,
+prvtEfmOamEventForwardStatus PortList,
+prvtEfmOamEventForwardShutdown PortList
+}
+
+prvtEfmOamEnhanceMode OBJECT-TYPE
+SYNTAX INTEGER {
+basic ( 1 ),
+enhance ( 2 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Used to be used to enable or disable EFM-OAM
+Vendor specific extensions on the
+specific interface. Values are :
+- basic(1) - no Vendor specific OAM
+extensions are used.
+- enhance(2) - when the remote device is detected
+as Vendor device, enhanced mode is used."
+DEFVAL { basic }
+::= { prvtEfmOamEntry 1 }
+
+prvtEfmOamEventReturn OBJECT-TYPE
+SYNTAX Integer32 (0 | 1..10)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"0 - feature is disabled (default value)
+1-10 - feature is enabled. The number
+specifies how many handshaking attempts
+will be done before shutting down the port."
+DEFVAL { 0 }
+::= { prvtEfmOamEntry 2 }
+
+prvtEfmOamForceLoopbackLocal OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"
+Used to force permanent loopback configuration
+on the local side.
+This is used for loopback traffic
+analysis for long term (for example,
+24 hours length infrastructure testing).
+"
+DEFVAL { false }
+::= { prvtEfmOamEntry 3 }
+
+prvtEfmOamForceLoopbackRemote OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"
+Used to force permanent loopback configuration
+on the remote side.
+This is used for loopback traffic
+analysis for long term (for example,
+24 hours length infrastructure testing).
+"
+DEFVAL { false }
+::= { prvtEfmOamEntry 4 }
+
+prvtEfmOamEventForwardStatus OBJECT-TYPE
+SYNTAX PortList
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"
+Forward a Link EventNotification on the specified target
+interface. Note that the interface which will
+forward the EventNotification must have efm-oam mode enabled.
+"
+::= { prvtEfmOamEntry 5 }
+
+prvtEfmOamEventForwardShutdown OBJECT-TYPE
+SYNTAX PortList
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"
+Shutdown a specified target interface as a
+result of the current interface status change.
+"
+::= { prvtEfmOamEntry 6 }
+
+-- ***********************************************
+-- ************ prvtEfmOamPingTable **************
+-- ***********************************************
+prvtEfmOamPing OBJECT IDENTIFIER ::= { prvtEfmOamObjects 11 }
+
+prvtEfmOamPingTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtEfmOamPingEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table let the EFM-OAM non-intrusive monitoring
+on the specific interface by querying a number
+of time aFramesTransmittedOK parameter, ping requests,
+using the variable retrieval EFM OAM PDU."
+::= { prvtEfmOamPing 1 }
+
+prvtEfmOamPingEntry OBJECT-TYPE
+SYNTAX PrvtEfmOamPingEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+INDEX { ifIndex }
+::= { prvtEfmOamPingTable 1 }
+
+PrvtEfmOamPingEntry ::= SEQUENCE {
+prvtEfmOamPingEchoNumber Unsigned32,
+prvtEfmOamPingDelayTime Unsigned32,
+prvtEfmOamPingTimeOut Unsigned32,
+prvtEfmOamPingCounterBranch INTEGER,
+prvtEfmOamPingCounterLeaf INTEGER,
+prvtEfmOamPingRowStatus RowStatus
+}
+
+prvtEfmOamPingEchoNumber OBJECT-TYPE
+SYNTAX Unsigned32 (1..10)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The number of echo packets to send."
+DEFVAL { 5 }
+::= { prvtEfmOamPingEntry 1 }
+
+prvtEfmOamPingDelayTime OBJECT-TYPE
+SYNTAX Unsigned32 (0..600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The delay in seconds between packets."
+DEFVAL { 0 }
+::= { prvtEfmOamPingEntry 2 }
+
+prvtEfmOamPingTimeOut OBJECT-TYPE
+SYNTAX Unsigned32 (1..600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"The time in seconds which the ping
+should wait for the response."
+DEFVAL { 2 }
+::= { prvtEfmOamPingEntry 3 }
+
+prvtEfmOamPingCounterBranch OBJECT-TYPE
+SYNTAX INTEGER
+{
+branch ( 7 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Set/get the counter of ping-like operation."
+::= { prvtEfmOamPingEntry 4 }
+
+prvtEfmOamPingCounterLeaf OBJECT-TYPE
+SYNTAX INTEGER
+{
+framesTransmittedOK ( 2 ),
+framesReceivedOK ( 5 ),
+octetsTransmittedOK ( 8 ),
+octetsReceivedOK ( 14 ),
+multicastFramesReceivedOK ( 21 ),
+broadcastFramesReceivedOK ( 22 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Set/get the counter of ping-like operation."
+::= { prvtEfmOamPingEntry 5 }
+
+prvtEfmOamPingRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+"Creation/delete/edit of the ping test."
+::= { prvtEfmOamPingEntry 6 }
+
+-- ***********************************************
+-- ******** prvtEfmOamPingResultTable ************
+-- ***********************************************
+prvtEfmOamPingResultTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtEfmOamPingResultEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Ping results."
+::= { prvtEfmOamPing 2 }
+
+prvtEfmOamPingResultEntry OBJECT-TYPE
+SYNTAX PrvtEfmOamPingResultEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+INDEX { ifIndex }
+::= { prvtEfmOamPingResultTable 1 }
+
+PrvtEfmOamPingResultEntry ::= SEQUENCE {
+prvtEfmOamPingResultStatus INTEGER,
+prvtEfmOamPingResultSentPackets Counter32,
+prvtEfmOamPingResultReceivedPackets Counter32,
+prvtEfmOamPingResultRcvRateInteger Unsigned32,
+prvtEfmOamPingResultRcvRateFractional Unsigned32,
+prvtEfmOamPingResultTimeMin Unsigned32,
+prvtEfmOamPingResultTimeMax Unsigned32,
+prvtEfmOamPingResultAverageTimeInteger Unsigned32,
+prvtEfmOamPingResultAverageTimeFractional Unsigned32,
+prvtEfmOamPingResultClear INTEGER
+}
+
+prvtEfmOamPingResultStatus OBJECT-TYPE
+SYNTAX INTEGER
+{
+noPing ( 1 ),
+running ( 2 ),
+terminated ( 3 )
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Current ping operation status."
+::= { prvtEfmOamPingResultEntry 1 }
+
+prvtEfmOamPingResultSentPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Sent packets"
+::= { prvtEfmOamPingResultEntry 2 }
+
+prvtEfmOamPingResultReceivedPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Received packets"
+::= { prvtEfmOamPingResultEntry 3 }
+
+prvtEfmOamPingResultRcvRateInteger OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Ping receive rate - Integer part"
+::= { prvtEfmOamPingResultEntry 4 }
+
+prvtEfmOamPingResultRcvRateFractional OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Ping receive rate - Fractional part"
+::= { prvtEfmOamPingResultEntry 5 }
+
+prvtEfmOamPingResultTimeMin OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Ping minimum time."
+::= { prvtEfmOamPingResultEntry 6 }
+
+prvtEfmOamPingResultTimeMax OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Ping maximum time."
+::= { prvtEfmOamPingResultEntry 7 }
+
+prvtEfmOamPingResultAverageTimeInteger OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Ping average time - Integer part."
+::= { prvtEfmOamPingResultEntry 8 }
+
+prvtEfmOamPingResultAverageTimeFractional OBJECT-TYPE
+SYNTAX Unsigned32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Ping average time - Fractional part."
+::= { prvtEfmOamPingResultEntry 9 }
+
+prvtEfmOamPingResultClear OBJECT-TYPE
+SYNTAX INTEGER {
+none ( 0 ),
+clear ( 1 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Deleteper interface entries in prvtEfmOamPingResultTable."
+::= { prvtEfmOamPingResultEntry 10 }
+
+-- ***********************************************
+-- ************ prvtEfmOamLoopbackTable **********
+-- ***********************************************
+
+prvtEfmOamLoopback OBJECT IDENTIFIER ::= { prvtEfmOamObjects 12 }
+
+prvtEfmOamLoopbackTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtEfmOamLoopbackEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table should permit to perform EFM-OAM
+intrusive monitoring on the specific interface
+by setting the remote device into loopback state
+and generating test traffic.
+It should support:
+Storm operation, an operation that sets
+remote loopback, stops local data flow to the
+remote box and generates a packet burst by CPU.
+When the burst is received back it is validated
+and statistics are displayed. Burst operation,
+an operation that sets remote loopback, stops
+local data flow to the remote box and generates
+a packet test burst by the hardware (when available).
+It means a single packet generated by CPU is
+repetitively sent by the hardware. When the
+burst is received back it is ignored and only
+counters are displayed."
+::= { prvtEfmOamLoopback 1 }
+
+prvtEfmOamLoopbackEntry OBJECT-TYPE
+SYNTAX PrvtEfmOamLoopbackEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+INDEX { ifIndex }
+::= { prvtEfmOamLoopbackTable 1 }
+
+PrvtEfmOamLoopbackEntry ::= SEQUENCE {
+prvtEfmOamLoopbackOperation INTEGER,
+prvtEfmOamLoopbackDuration Unsigned32,
+prvtEfmOamLoopbackCount Unsigned32,
+prvtEfmOamLoopbackPacketSize Unsigned32,
+prvtEfmOamLoopbackDelay Unsigned32,
+prvtEfmOamLoopbackTimeout Unsigned32,
+prvtEfmOamLoopbackNoRemote TruthValue,
+prvtEfmOamLoopbackRowStatus RowStatus
+}
+
+prvtEfmOamLoopbackOperation OBJECT-TYPE
+SYNTAX INTEGER {
+storm ( 1 ),
+burst ( 2 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Represent the operation that the
+should be performed on the interface."
+::= { prvtEfmOamLoopbackEntry 1 }
+
+prvtEfmOamLoopbackDuration OBJECT-TYPE
+SYNTAX Unsigned32 (1..600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Represent the amount of time burst test should run in seconds."
+DEFVAL { 10 }
+::= { prvtEfmOamLoopbackEntry 2 }
+
+prvtEfmOamLoopbackCount OBJECT-TYPE
+SYNTAX Unsigned32 (1..2147483646)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Represent the count of packets to send in storm operation."
+DEFVAL { 100 }
+::= { prvtEfmOamLoopbackEntry 3 }
+
+prvtEfmOamLoopbackPacketSize OBJECT-TYPE
+SYNTAX Unsigned32 (64..1512)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Represent the size of the test packet to use."
+DEFVAL { 64 }
+::= { prvtEfmOamLoopbackEntry 4 }
+
+prvtEfmOamLoopbackDelay OBJECT-TYPE
+SYNTAX Unsigned32 (0..600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Represent the delay between packets in seconds.
+The default value is 0 and represents no delay."
+DEFVAL { 0 }
+::= { prvtEfmOamLoopbackEntry 5 }
+
+prvtEfmOamLoopbackTimeout OBJECT-TYPE
+SYNTAX Unsigned32 (1..600)
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Represent the wait for response in seconds."
+DEFVAL { 2 }
+::= { prvtEfmOamLoopbackEntry 6 }
+
+prvtEfmOamLoopbackNoRemote OBJECT-TYPE
+SYNTAX TruthValue
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Add or not remote to loopback."
+DEFVAL { false }
+::= { prvtEfmOamLoopbackEntry 7 }
+
+prvtEfmOamLoopbackRowStatus OBJECT-TYPE
+SYNTAX RowStatus
+MAX-ACCESS read-create
+STATUS current
+DESCRIPTION
+""
+::= { prvtEfmOamLoopbackEntry 8 }
+
+-- ***********************************************
+-- ******** prvtEfmOamLoopbackResultTable ********
+-- ***********************************************
+prvtEfmOamLoopbackResultTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtEfmOamLoopbackResultEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"Loopback results."
+::= { prvtEfmOamLoopback 2 }
+
+prvtEfmOamLoopbackResultEntry OBJECT-TYPE
+SYNTAX PrvtEfmOamLoopbackResultEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+INDEX { ifIndex }
+::= { prvtEfmOamLoopbackResultTable 1 }
+
+PrvtEfmOamLoopbackResultEntry ::= SEQUENCE {
+prvtEfmOamLoopbackResultStatus INTEGER,
+prvtEfmOamLoopbackResultFlood INTEGER,
+prvtEfmOamLoopbackResultSentPackets Counter32,
+prvtEfmOamLoopbackResultReceivedPackets Counter32,
+prvtEfmOamLoopbackResultClear INTEGER
+}
+
+prvtEfmOamLoopbackResultStatus OBJECT-TYPE
+SYNTAX INTEGER
+{
+noLoopback ( 1 ),
+startCmdSent ( 2 ),
+startFail ( 3 ),
+dataStarted ( 4 ),
+stopCmdSent ( 5 ),
+terminated ( 6 ),
+remoteFailure ( 7 )
+}
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Loopback result status"
+::= { prvtEfmOamLoopbackResultEntry 1 }
+
+prvtEfmOamLoopbackResultFlood OBJECT-TYPE
+SYNTAX INTEGER
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Flood value"
+::= { prvtEfmOamLoopbackResultEntry 2 }
+
+prvtEfmOamLoopbackResultSentPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Sent packets"
+::= { prvtEfmOamLoopbackResultEntry 3 }
+
+prvtEfmOamLoopbackResultReceivedPackets OBJECT-TYPE
+SYNTAX Counter32
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Received packets"
+::= { prvtEfmOamLoopbackResultEntry 4 }
+
+prvtEfmOamLoopbackResultClear OBJECT-TYPE
+SYNTAX INTEGER {
+none ( 0 ),
+clear ( 1 )
+}
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"Delete per interface entries in prvtEfmOamLoopbackResultTable."
+::= { prvtEfmOamLoopbackResultEntry 5 }
+
+
+-- ***********************************************
+-- ************ prvtEfmOamPeerTable **************
+-- ***********************************************
+
+prvtEfmOamPeerTable OBJECT-TYPE
+SYNTAX SEQUENCE OF PrvtEfmOamPeerEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"This table holds the peer extended information
+available only when local interface is set in
+enhanced mode (see prvtOamEnhanceMode) and the
+remote is detected as enhanced-mode device. This table
+shall containg an entry per physical interface,
+indexed by the corresponding ifIndex from IF-MIB."
+::= { prvtEfmOamObjects 13 }
+
+prvtEfmOamPeerEntry OBJECT-TYPE
+SYNTAX PrvtEfmOamPeerEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+""
+INDEX { ifIndex }
+::= { prvtEfmOamPeerTable 1 }
+
+PrvtEfmOamPeerEntry ::= SEQUENCE {
+prvtEfmOamPeerPort DisplayString,
+prvtEfmOamPeerName DisplayString
+}
+
+prvtEfmOamPeerPort OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Holds the peer port name as string
+as it is sent by the peer (eg: 1/2/1)."
+::= { prvtEfmOamPeerEntry 1 }
+
+prvtEfmOamPeerName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Holds the peer hostname s string
+as it is sent by the peer."
+::= { prvtEfmOamPeerEntry 2 }
+
+-- ***********************************************
+-- **************** Notification *****************
+-- ***********************************************
+prvtOamLoopBackState NOTIFICATION-TYPE
+OBJECTS {
+ifIndex,
+dot3OamAdminState,
+dot3OamMode,
+dot3OamLoopbackStatus
+}
+STATUS current
+DESCRIPTION
+"This trap should be sent whenever the loopback
+state has been change from Remote, when dot3OamMode
+is passive or dot3OamAdminState is disable the
+interface cannot be on remoteLoopback state
+and should send this trap."
+::= { prvtEfmOamNotifications 1 }
+
+
+prvtOamDyingGasp NOTIFICATION-TYPE
+       STATUS  current
+       DESCRIPTION
+               "The notification alarms for a failure due to loss of local power
+                ('Dying Gasp')"
+       ::= { prvtEfmOamNotifications 2 }
+
+
+END

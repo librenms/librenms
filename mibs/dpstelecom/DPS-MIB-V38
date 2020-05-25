@@ -1,0 +1,773 @@
+--  Title:    DPS_V41.MIB
+--  Version:  v4.1
+--
+--  Copyright @ 1997-2004 DPS Inc. All Rights Reserved
+--
+--  This MIB defines objects for the DPS products.
+--
+--
+
+DPS-MIB-V38 DEFINITIONS ::= BEGIN
+
+IMPORTS
+	DisplayString,
+	sysDescr,
+	sysLocation
+		FROM RFC1213-MIB
+	OBJECT-TYPE
+		FROM RFC1212-MIB
+	enterprises
+		FROM RFC1155-SMI
+	TRAP-TYPE
+		FROM RFC-1215;
+
+dpsInc OBJECT IDENTIFIER ::= {enterprises  2682}
+
+dpsAlarmControl OBJECT IDENTIFIER ::= {dpsInc 1}
+
+tmonXM OBJECT IDENTIFIER ::= {dpsAlarmControl 1}
+
+tmonIdent OBJECT IDENTIFIER ::= {tmonXM 1}
+
+tmonIdentManufacturer OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The TMON/XM Unit manufacturer."
+	::= {tmonIdent  1}
+
+tmonIdentModel OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The TMON/XM model designation."
+	::= {tmonIdent  2}
+
+tmonIdentSoftwareVersion OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The TMON/XM SNMP Agent software version."
+	::= {tmonIdent  3}
+
+tmonAlarmTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TMonAlarmEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION "A table of TMon Alarm-specific information."
+	::= {tmonXM 2}
+
+tmonAlarmEntry OBJECT-TYPE
+	SYNTAX  TMonAlarmEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION "Information about a particular TMon alarm."
+	INDEX   {tmonAIndex}
+	::= {tmonAlarmTable 1}
+
+TMonAlarmEntry ::= SEQUENCE	{	tmonAIndex		INTEGER,
+					tmonASite		DisplayString,
+					tmonADesc		DisplayString,
+					tmonAState		DisplayString,
+					tmonASeverity		DisplayString,
+					tmonAChgDate		DisplayString,
+					tmonAChgTime		DisplayString,
+					tmonAAuxDesc 		DisplayString,
+					tmonADispDesc		DisplayString,
+					tmonAPntType		INTEGER,
+					tmonAPort		INTEGER,
+					tmonAAddress		INTEGER,
+					tmonADisplay		INTEGER,
+					tmonAPoint		INTEGER,
+               tmonAIPAddr 		DisplayString,
+					tmonADevDesc		DisplayString
+				}
+
+tmonAIndex OBJECT-TYPE
+	SYNTAX  INTEGER (0..2147483647)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Tmon alarm table index (1..NumberOfAlarms)."
+	::={tmonAlarmEntry 1}
+
+tmonASite OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The site of the alarm (i.e. Atlanta Hub, Sub-Station H32)."
+	::= {tmonAlarmEntry 2}
+
+tmonADesc OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "A user-defined text string associated with the alarm 
+					 (i.e. South Door, Generator, Power Grid 1)."
+	::= {tmonAlarmEntry 3}
+
+tmonAState OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The current alarm state."
+	::= {tmonAlarmEntry 4}
+
+tmonASeverity OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The severity of the last alarm event."
+	::= {tmonAlarmEntry 5}
+
+tmonAChgDate OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The date (mm/dd/yy) of the last alarm event."
+	::= {tmonAlarmEntry 6}
+
+tmonAChgTime OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The time (hh:mm:ss) of the last alarm event."
+	::= {tmonAlarmEntry 7}
+
+tmonAAuxDesc OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "An auxiliary user-defined text string associated with the
+					 alarm (i.e. This remote needs servicing)."
+	::= {tmonAlarmEntry 8}
+
+tmonADispDesc OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "A description of the display on which this point appears."
+	::= {tmonAlarmEntry 9}
+
+tmonAPntType OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Type of this point."
+	::={tmonAlarmEntry 10}
+
+tmonAPort OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Port on which this point is reported."
+	::={tmonAlarmEntry 11}
+
+tmonAAddress OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Address of unit reporting this point."
+	::={tmonAlarmEntry 12}
+
+tmonADisplay OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Display on which this point appears."
+	::={tmonAlarmEntry 13}
+
+tmonAPoint OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Index into display of this point."
+	::={tmonAlarmEntry 14}
+
+tmonAIPAddr OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The IP Address of the device on which this point appears."
+	::= {tmonAlarmEntry 16}
+   
+tmonADevDesc OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "A description of the device on which this point appears."
+	::= {tmonAlarmEntry 17}
+
+-- structure used to issue a command to tmonXM element
+
+tmonCommandGrid OBJECT IDENTIFIER ::= {tmonXM 3}
+
+tmonCPType OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Tmon point type."
+	::= {tmonCommandGrid 1}
+
+tmonCPort OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Tmon port number."
+	::= {tmonCommandGrid 2}
+
+tmonCAddress OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Tmon_port address number."
+	::= {tmonCommandGrid 3}
+
+tmonCDisplay OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Tmon_port_address display number."
+	::= {tmonCommandGrid 4}
+
+tmonCPoint OBJECT-TYPE
+	SYNTAX  INTEGER (1..64)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Tmon_port_display point number (1-64)."
+	::= {tmonCommandGrid 5}
+
+tmonCEvent OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Tmon event ID."
+	::= {tmonCommandGrid 6}
+
+tmonCAction OBJECT-TYPE
+	SYNTAX  INTEGER {	latch(1),
+				release(2),
+				momentary(3),
+				ack(17),
+				tag(18),
+				untag(19)
+			}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Requested command action (tmonXM will ignore if invalid)."
+	::= {tmonCommandGrid 7}
+
+tmonCAuxText OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "An auxiliary user-defined text string associated with the
+					 command (i.e. User_initials)."
+	::= {tmonCommandGrid 8}
+
+tmonCResult OBJECT-TYPE
+	SYNTAX  INTEGER {	success(1),
+				failure(2),
+				pending(3)
+			}
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Command result."
+	::= {tmonCommandGrid 9}
+
+
+
+dpsRTU OBJECT IDENTIFIER ::= {dpsAlarmControl 2}
+
+dpsRTUIdent OBJECT IDENTIFIER ::= {dpsRTU 1}
+
+dpsRTUManufacturer OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The Remote Telemetry Unit manufacturer."
+	::= {dpsRTUIdent  1}
+
+dpsRTUModel OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The RTU model designation."
+	::= {dpsRTUIdent  2}
+
+dpsRTUFirmwareVersion OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The RTU firmware version."
+	::= {dpsRTUIdent  3}
+
+dpsRTUDateTime OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "The RTU system date and time."
+	::= {dpsRTUIdent  4}
+
+dpsRTUSyncReq OBJECT-TYPE
+	SYNTAX  INTEGER {	sync(1)
+			}
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Caution: SETting this object initiates traps for all
+					 standing alarms."
+	::= {dpsRTUIdent  5}
+
+
+-- structure used to access displays managed by this RTU
+
+dpsRTUDisplayGrid OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DPSrtuDispEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION "Holds information on displays managed by the RTU."
+	::= {dpsRTU 2}
+
+dpsRTUDisplayEntry OBJECT-TYPE
+	SYNTAX  DPSrtuDispEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION "Information about a particular RTU display."
+	INDEX   {dpsRTUPort, dpsRTUAddress, dpsRTUDisplay}
+	::= {dpsRTUDisplayGrid 1}
+
+DPSrtuDispEntry ::= SEQUENCE {	dpsRTUPort		INTEGER,
+					dpsRTUAddress		INTEGER,
+					dpsRTUDisplay		INTEGER,
+					dpsRTUDispDesc		DisplayString,
+					dpsRTUPntMap		DisplayString
+				}
+
+dpsRTUPort OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "RTU port number."
+	::= {dpsRTUDisplayEntry 1}
+
+dpsRTUAddress OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "RTU_port address number."
+	::= {dpsRTUDisplayEntry 2}
+
+dpsRTUDisplay OBJECT-TYPE 
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "RTU_port_address display number."
+	::= {dpsRTUDisplayEntry 3}
+
+dpsRTUDispDesc OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "A description of the associated display."
+	::= {dpsRTUDisplayEntry 4}
+
+dpsRTUPntMap OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "A map of the points appearing in this display."
+	::= {dpsRTUDisplayEntry 5}
+
+
+-- structure used to issue a control to a managed point
+
+dpsRTUControlGrid OBJECT IDENTIFIER ::= {dpsRTU 3}
+
+dpsRTUCPort OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "RTU port number."
+	::= {dpsRTUControlGrid 1}
+
+dpsRTUCAddress OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "RTU_port address number."
+	::= {dpsRTUControlGrid 2}
+
+dpsRTUCDisplay OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "RTU_port_address display number."
+	::= {dpsRTUControlGrid 3}
+
+dpsRTUCPoint OBJECT-TYPE
+	SYNTAX  INTEGER (1..64)
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "RTU_port_display point number (1-64)."
+	::= {dpsRTUControlGrid 4}
+
+dpsRTUCAction OBJECT-TYPE
+	SYNTAX  INTEGER {	latch(1),
+				release(2),
+				momentary(3)
+			 }
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "Requested action on point (RTU will ignore if invalid)."
+	::= {dpsRTUControlGrid 5}
+
+dpsRTUAlarmGrid OBJECT-TYPE
+	SYNTAX  SEQUENCE OF DPSrtuAlarmEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION "Holds individual alarm point information."
+	::= {dpsRTU 5}
+
+dpsRTUAlarmEntry OBJECT-TYPE
+	SYNTAX  DPSrtuAlarmEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION "Detailed information about a particular RTU display."
+	INDEX   {dpsRTUAPort, dpsRTUAAddress, dpsRTUADisplay, dpsRTUAPoint}
+	::= {dpsRTUAlarmGrid 1}
+
+DPSrtuAlarmEntry ::= SEQUENCE	 {	dpsRTUAPort		INTEGER,
+					dpsRTUAAddress		INTEGER,
+					dpsRTUADisplay		INTEGER,
+					dpsRTUAPoint		INTEGER,
+					dpsRTUAPntDesc		DisplayString,
+					dpsRTUAState		DisplayString
+				}
+
+dpsRTUAPort OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "RTU port number."
+	::= {dpsRTUAlarmEntry 1}
+
+dpsRTUAAddress OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "RTU_port address number."
+	::= {dpsRTUAlarmEntry 2}
+
+dpsRTUADisplay OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "RTU_port_address display number."
+	::= {dpsRTUAlarmEntry 3}
+
+dpsRTUAPoint OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "RTU_port_address_display point number."
+	::= {dpsRTUAlarmEntry 4}
+
+dpsRTUAPntDesc OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-write
+	STATUS  mandatory
+	DESCRIPTION "A description of this point."
+	::= {dpsRTUAlarmEntry 5}
+
+dpsRTUAState OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The current state of this point."
+	::= {dpsRTUAlarmEntry 6}
+
+--Table for accessing analog channel value
+
+analogChannels OBJECT-TYPE
+	SYNTAX  SEQUENCE OF ChannelEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION "Holds information on analog channels"
+	::= {dpsRTU 6}
+
+channelEntry OBJECT-TYPE
+	SYNTAX  ChannelEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION "Information about a particular channel"
+	INDEX   {channelNumber}
+	::= {analogChannels 1}
+
+ChannelEntry ::= SEQUENCE 	{	channelNumber		INTEGER,
+					enabled			INTEGER,
+					description		DisplayString,
+					value			DisplayString,
+					thresholds		INTEGER
+				}
+
+channelNumber OBJECT-TYPE
+	SYNTAX  INTEGER (0..999)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Input channel number"
+	::= {channelEntry 1}
+
+enabled OBJECT-TYPE
+	SYNTAX  INTEGER { 	disabled	(0),
+				enabled		(1)
+			}		
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Enable status of channel"
+	::= {channelEntry 2}
+
+description OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The user defined description of the channel"
+	::= {channelEntry 3}		
+										
+value OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "The current value of the channel"
+	::= {channelEntry 4}		
+
+thresholds OBJECT-TYPE
+	SYNTAX  INTEGER { 	noAlarms	(0),
+				minorUnder	(1),
+				minorOver	(2),
+				majorUnder	(3),
+				majorOver	(4),
+				notDetected (5)
+			}		
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Highest threshold level crossed, if MJ, MN is assumed"
+	::= {channelEntry 5}
+	
+-- TRAP definitions
+
+tmonCRalarmSet TRAP-TYPE
+	ENTERPRISE	tmonXM
+	VARIABLES {	tmonASite, tmonADesc, tmonAState, tmonASeverity, tmonAChgDate,
+					tmonAChgTime, tmonAAuxDesc, tmonADispDesc, tmonAPntType,
+					tmonAPort, tmonAAddress, tmonADisplay, tmonAPoint, tmonCEvent,
+               tmonAIPAddr, tmonADevDesc }
+	DESCRIPTION "Generated when a critical alarm is set."
+	::= 10
+
+tmonCRalarmClr TRAP-TYPE
+	ENTERPRISE  tmonXM
+	VARIABLES {	tmonASite, tmonADesc, tmonAState, tmonASeverity, tmonAChgDate,
+					tmonAChgTime, tmonAAuxDesc, tmonADispDesc, tmonAPntType,
+					tmonAPort, tmonAAddress, tmonADisplay, tmonAPoint, tmonCEvent,
+               tmonAIPAddr, tmonADevDesc } 
+	DESCRIPTION "Generated when a critical alarm clears."
+	::= 11
+
+tmonMJalarmSet TRAP-TYPE
+	ENTERPRISE  tmonXM
+	VARIABLES {	tmonASite, tmonADesc, tmonAState, tmonASeverity, tmonAChgDate,
+					tmonAChgTime, tmonAAuxDesc, tmonADispDesc, tmonAPntType,
+					tmonAPort, tmonAAddress, tmonADisplay, tmonAPoint, tmonCEvent,
+               tmonAIPAddr, tmonADevDesc }
+	DESCRIPTION "Generated when a major alarm is set."
+	::= 12
+
+tmonMJalarmClr TRAP-TYPE
+	ENTERPRISE	tmonXM
+	VARIABLES {	tmonASite, tmonADesc, tmonAState, tmonASeverity, tmonAChgDate,
+					tmonAChgTime, tmonAAuxDesc, tmonADispDesc, tmonAPntType,
+					tmonAPort, tmonAAddress, tmonADisplay, tmonAPoint, tmonCEvent,
+               tmonAIPAddr, tmonADevDesc }
+	DESCRIPTION "Generated when a major alarm clears."
+	::= 13
+
+tmonMNalarmSet TRAP-TYPE
+	ENTERPRISE  tmonXM
+	VARIABLES {	tmonASite, tmonADesc, tmonAState, tmonASeverity, tmonAChgDate,
+					tmonAChgTime, tmonAAuxDesc, tmonADispDesc, tmonAPntType,
+					tmonAPort, tmonAAddress, tmonADisplay, tmonAPoint, tmonCEvent,
+               tmonAIPAddr, tmonADevDesc }
+	DESCRIPTION "Generated when a minor alarm is set."
+	::= 14
+
+tmonMNalarmClr TRAP-TYPE
+	ENTERPRISE  tmonXM
+	VARIABLES {	tmonASite, tmonADesc, tmonAState, tmonASeverity, tmonAChgDate,
+					tmonAChgTime, tmonAAuxDesc, tmonADispDesc, tmonAPntType,
+					tmonAPort, tmonAAddress, tmonADisplay, tmonAPoint, tmonCEvent,
+               tmonAIPAddr, tmonADevDesc }
+	DESCRIPTION "Generated when a minor alarm clears."
+	::= 15
+
+tmonSTalarmSet TRAP-TYPE
+	ENTERPRISE  tmonXM
+	VARIABLES {	tmonASite, tmonADesc, tmonAState, tmonASeverity, tmonAChgDate,
+					tmonAChgTime, tmonAAuxDesc, tmonADispDesc, tmonAPntType,
+					tmonAPort, tmonAAddress, tmonADisplay, tmonAPoint, tmonCEvent,
+               tmonAIPAddr, tmonADevDesc }
+	DESCRIPTION "Generated when a status alarm is set."
+	::= 16
+
+tmonSTalarmClr TRAP-TYPE
+	ENTERPRISE  tmonXM
+	VARIABLES {	tmonASite, tmonADesc, tmonAState, tmonASeverity, tmonAChgDate,
+					tmonAChgTime, tmonAAuxDesc, tmonADispDesc, tmonAPntType,
+					tmonAPort, tmonAAddress, tmonADisplay, tmonAPoint, tmonCEvent,
+               tmonAIPAddr, tmonADevDesc }
+	DESCRIPTION "Generated when a status alarm clears."
+	::= 17
+
+dpsRTUPointSet TRAP-TYPE
+	ENTERPRISE  dpsRTU
+	VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime,
+					dpsRTUAPort, dpsRTUAAddress, dpsRTUADisplay, dpsRTUAPoint,
+					dpsRTUAPntDesc, dpsRTUAState }
+	DESCRIPTION "Generated when a point is set."
+	::= 20
+
+dpsRTUPointClr TRAP-TYPE
+	ENTERPRISE  dpsRTU
+	VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime,
+					dpsRTUAPort, dpsRTUCAddress, dpsRTUADisplay, dpsRTUAPoint,
+					dpsRTUAPntDesc, dpsRTUAState }
+	DESCRIPTION "Generated when a point clears."
+	::= 21
+
+dpsRTUsumPSet TRAP-TYPE
+	ENTERPRISE  dpsRTU
+	VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime }
+	DESCRIPTION "Generated when any point is set."
+	::= 101
+
+dpsRTUsumPClr TRAP-TYPE
+	ENTERPRISE  dpsRTU
+	VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime }
+	DESCRIPTION "Generated when all points clear."
+	::= 102
+
+dpsRTUcomFailed TRAP-TYPE
+	ENTERPRISE  dpsRTU
+	VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime }
+	DESCRIPTION "Generated when polled unit fails to respond."
+	::= 103
+
+dpsRTUcomRestored TRAP-TYPE
+	ENTERPRISE  dpsRTU
+	VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime }
+	DESCRIPTION "Generated when failed unit resumes responding."
+	::= 104
+
+-- **************************************************************************
+-- Granular TRAP definitions
+--
+--    The following section supports granular trapping available on selected
+-- DPS remote telemetry units.  This software selectable facility changes the
+-- trap sent by a remote so equipped.  The standard trap identifies a SET or
+-- CLR event in the trap ID and binds variables identifying the specific
+-- remote point associated with the event.  A granular trap identifies a SET
+-- or CLR event and the specific point associated with the event all in the
+-- trap ID.  This is accomplished by mapping all SET event/points into the
+-- trap ID range 10001-19999 and all CLR event/points into the trap ID range
+-- 20001-29999.
+--    If the unit manages multiple displays, the displays are mapped
+-- sequentially with each display occupying a 64 point range.  For example, a
+-- standalone standard or timestamp KDA which manages two displays, reports
+-- SET event/points in the first display (discrete alarm points) in the range
+-- 10001-10064.  The CLR event/points for the same display would be reported
+-- in the range 20001-20064.  The second display (controls & housekeeping
+-- alarm points) would have its SET event/points reported in the range 10065-
+-- 10128 and its CLR event/points reported in the range 20065-20128.
+--    SET and CLR definitions for the first 64 points have been included and
+-- can be used as is for driving most SNMP manager mechanisms designed to key
+-- on the trap ID for distinguishing and managing events.  Additional events
+-- can be added simply by editing the following trap definitions prior to
+-- compiling this file into your SNMP manager.  We recommend managing the SET
+-- and CLR event definitions for a specific point as a single unit and using
+-- the following simple rules:
+--  + Adjust the numeric portion of the label preceeding TRAP-TYPE.
+--  + Adjust the numeric reference in the DESCRIPTION text.
+--  + Adjust the number on the last line of the definition.
+--
+--    Using these rules a definition for the 65th point would be:
+-- 
+-- dpsRTUp0065Set TRAP-TYPE
+-- 	ENTERPRISE  dpsRTU
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime,
+--						dpsRTUAPort, dpsRTUCAddress, dpsRTUADisplay, dpsRTUAPoint,
+--						dpsRTUAPntDesc, dpsRTUAState }
+--    DESCRIPTION "Generated when granular point 65 is set."
+--    ::= 10065
+--
+-- dpsRTUp0065Clr TRAP-TYPE
+--    ENTERPRISE  dpsRTU
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime,
+--						dpsRTUAPort, dpsRTUCAddress, dpsRTUADisplay, dpsRTUAPoint,
+--						dpsRTUAPntDesc, dpsRTUAState }
+--    DESCRIPTION "Generated when granular point 65 clears."
+--    ::= 20065
+--
+--    This editing can can be accomplished quite easily using a plain ASCII
+-- file editor.  The repetitive structure of the definitions also makes for
+-- rapid scripted or programmed generation if any such tools are available.
+-- A compressed file containing event/point definitions for 144 displays is
+-- available (DPS_G36.zip 150K) which uncompressed (DPS_G36.mib 6.2M) can be
+-- used for cut-and-paste editing if desired.
+--    The definitions can be further customized if desired by similar editing
+-- prior to compiling carefully observing the following conventions:
+--  + The label preceeding the TRAP-TYPE designator can be edited with some
+--    freedom but the label must be utterly unique among all trap definitions.
+--  + The ENTERPRISE and VARIABLES sections must not be changed.
+--  + The DESCRIPTION can be edited with complete freedom and is typically
+--    ignored within the context of standard SNMP manager trap handling.  The
+--    quote mark before and after the text of the description are required.
+--  + The number on the last line of the definition is the actual trap ID
+--    defined and must also be utterly unique.
+--
+--    For example:
+-- 
+-- dpsRTUp0001Set TRAP-TYPE
+-- 	ENTERPRISE  dpsRTU
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime,
+--						dpsRTUAPort, dpsRTUCAddress, dpsRTUADisplay, dpsRTUAPoint,
+--						dpsRTUAPntDesc, dpsRTUAState }
+--    DESCRIPTION "Generated when granular point 1 is set."
+--    ::= 10001
+--
+-- dpsRTUp0001Clr TRAP-TYPE
+--    ENTERPRISE  dpsRTU
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime,
+--						dpsRTUAPort, dpsRTUCAddress, dpsRTUADisplay, dpsRTUAPoint,
+--						dpsRTUAPntDesc, dpsRTUAState }
+--    DESCRIPTION "Generated when granular point 1 clears."
+--    ::= 20001
+--
+--    Could be customized as:
+--
+-- dpsRTUFireAlarm TRAP-TYPE
+--    ENTERPRISE  dpsRTU
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime,
+--						dpsRTUAPort, dpsRTUCAddress, dpsRTUADisplay, dpsRTUAPoint,
+--						dpsRTUAPntDesc, dpsRTUAState }
+--    DESCRIPTION "Generated when smoke detector activates."
+--    ::= 10001
+--
+-- dpsRTUFireOut TRAP-TYPE
+--    ENTERPRISE  dpsRTU
+--		VARIABLES {	sysDescr, sysLocation, dpsRTUDateTime,
+--						dpsRTUAPort, dpsRTUCAddress, dpsRTUADisplay, dpsRTUAPoint,
+--						dpsRTUAPntDesc, dpsRTUAState }
+--    DESCRIPTION "Generated when smoke detector deactivates."
+--    ::= 20001
+-- **************************************************************************
+
+
+END

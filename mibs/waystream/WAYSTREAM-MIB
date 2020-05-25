@@ -1,0 +1,2117 @@
+WAYSTREAM-MIB DEFINITIONS ::= BEGIN
+--
+-- This is the Waystream Management Information Base definition for iBOS, to be
+-- to be used with Waystream products which use the operating system.
+--
+-- Copyright (c) 2017 Waystream AB, All rights reserved
+--
+
+IMPORTS
+        MODULE-IDENTITY,
+        OBJECT-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Unsigned32,
+        Counter64,
+        Gauge32,
+        TimeTicks
+	FROM SNMPv2-SMI
+	
+	DisplayString
+	FROM SNMPv2-TC
+	
+        wsMgmt,
+        wsExperiment
+        FROM WAYSTREAM-SMI;
+
+
+--
+-- Waystream IBOS
+--
+ibos    MODULE-IDENTITY
+    LAST-UPDATED "201702101100Z"	-- February 10, 2017
+    ORGANIZATION "Waystream AB"
+    CONTACT-INFO
+        "Waystream AB
+         Customer Service
+
+         Mail : Farogatan 33
+                SE-164 51 Kista
+                Sweden
+
+         Tel  : +46 8 5626 9450
+
+         E-mail: info@waystream.com
+         Web   : http://www.waystream.com"
+    DESCRIPTION
+        "The Waystream MIB describing iBOS functionality of ASRs"
+
+    REVISION "201710231100Z"	-- October 23, 2017
+    DESCRIPTION
+        "Added SFP all unit values, SFP part and serial numbers."
+    REVISION "201709181100Z"	-- September 18, 2017
+    DESCRIPTION
+        "Added SFP RX/TX power dBm values."
+    REVISION "201702101100Z"	-- February 10, 2017
+    DESCRIPTION
+        "Company name change:
+	 In October 2015 PacketFront Network Products was renamed Waystream.
+	 In this update all PacketFront were changed to Waystream and all
+	 pf* to ws*."
+    REVISION "201207051930Z"
+    DESCRIPTION
+        "Added sBasePX (BASE-PX) and sBaseBX10 (BASE-BX10) bits
+	to pfSFPTransceiver (see SFF-8472 standard)."
+    REVISION "201112200908Z"
+    DESCRIPTION
+        "Add 100M and 10G SFP information from SFF-8472 specification.
+	The column pfSFPTransceiver has new bits s100BaseFX and s100BaseLX, 
+	a new column pfSFPTransceiverExt which is a combination of the 
+	10G Ethernet Compliance Codes SFP+ Cable Technology information."
+    REVISION "201112060934Z"
+    DESCRIPTION
+        "Added new table pfXFPTable that mirrors the pfSFPTable but with minor
+         differencies in parameter set and interpretation."
+    REVISION "201101111755Z"	-- January 11, 2011
+    DESCRIPTION
+        "Updated company name"
+    REVISION "200904171529Z"
+    DESCRIPTION
+        "Moved pfCopy to PACKETFRONT-COPY-MIB and added environment notifications
+         to the MIB at pfIbosEnvironmentNotifications."
+    REVISION "200903231102Z"
+    DESCRIPTION
+        "Updated telephone information in contact-info. Reordered revision
+         information. Fixed enumerated types not starting from zero"
+    REVISION "200804301426Z"
+    DESCRIPTION
+        "Moved pfRpm to PACKETFRONT-RPM-MIB
+         Moved pfIgmp to PACKETFRONT-IGMP-CACHE-MIB
+         Moved pfProduct to PACKETFRONT-PRODUCTS-MIB
+         Moved boilerplate to PACKETFRONT-SMI and PACKETFRONT-TC"
+    REVISION "200710031835Z"
+    DESCRIPTION
+        "Added pfRpm"
+    REVISION "200706131437Z"
+    DESCRIPTION
+        "Added pfIgmp"
+    REVISION "200610181341Z"
+    DESCRIPTION
+        "Corrected pfAccounting member types"
+    REVISION "200608231100Z"
+    DESCRIPTION
+        "Added pfVersionString OID"
+    REVISION "200601251330Z"
+    DESCRIPTION
+        "Changed name of pfNeighbourPlatform to pfNeighbourModel.  Added OID for ASR10K."
+    REVISION "200505101124Z"
+    DESCRIPTION
+        "Added missing connector type SC."
+    REVISION "200502010911Z"
+    DESCRIPTION
+        "Corrected pfPolicyTable entry types. Added description for pfPolicyUseCnt."
+    REVISION "200501141500Z"
+    DESCRIPTION
+        "Added pfAccounting extensions to the MIB."
+    REVISION "200410201434Z"
+    DESCRIPTION
+        "Added the ipdConfig object"
+    REVISION "200405141155Z"
+    DESCRIPTION
+        "Updated to reflect PacketFronts new corporate address"
+
+
+        ::= { wsMgmt 1 }
+
+
+--
+-- System management objects
+wsSystem      	OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                        "System management objects"
+               ::= { ibos 1 }
+
+-- Test object
+wsWritedummy	OBJECT-TYPE
+                SYNTAX Integer32 (0..2147483647)
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "This object is a read-write object that accept an
+                         integer. The value written has no effect on the
+                         system, but a successful write indicate that 
+                         SNMP write operations are possible on the target
+                         router. The last written value can be read back"
+                ::= { wsSystem 1 }
+
+-- Restart the system
+wsReload      	OBJECT-TYPE
+                SYNTAX Integer32 (0..2147483647)
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                        "This object is used to restart the target router
+                         by setting the number of seconds until system
+                         reload. A value of 0 cancels any pending reload.
+                         The value returned when reading the object is the
+                         number of seconds remaining until reload"
+                ::= { wsSystem 2 }
+
+-- System iBOS version
+wsVersion  	OBJECT-TYPE
+                SYNTAX Integer32 (0..2147483647)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The iBOS version indicator"
+                ::= { wsSystem 3 }
+
+-- System iBOS version
+wsAsrRevision  	OBJECT-TYPE
+                SYNTAX Integer32 (0..2147483647)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        "The ASR hardware revision"
+                ::= { wsSystem 4 }
+
+-- System iBOS version string
+wsVersionString OBJECT-TYPE
+                SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		    "A textual representation of the iBOS version.
+		     For iBOS versions after 3.2, this field should be
+		     used to identify the iBOS version instead of the
+		     old wsVersion OID"
+	        ::= { wsSystem 5 }
+
+--
+-- Environment data
+wsEnvironment 	OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"Environtment data"
+		::= { ibos 2 }
+
+-- Temperature table
+wsTempTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsTempEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of values from temperature sensors."
+		::= { wsEnvironment 1 }
+
+wsTempEntry	OBJECT-TYPE
+		SYNTAX WsTempEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for a temperature sensor."
+		INDEX { wsTempSensor }
+		::= { wsTempTable 1 }
+
+WsTempEntry ::=
+	SEQUENCE {
+		wsTempSensor 		Unsigned32,
+		wsTempMeasured		Integer32,
+		wsTempTOS 		Integer32,
+		wsTempTHYST 		Integer32,
+		wsTempThresholdLow 	Integer32,
+		wsTempThresholdHigh 	Integer32,
+		wsTempStatus 		INTEGER
+	}
+
+wsTempSensor	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Sensor number."
+		::= { wsTempEntry 1 }
+
+wsTempMeasured	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured temperature in 100ths of degrees centigrade."
+		::= { wsTempEntry 2 }
+
+wsTempTOS	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TOS in 100ths of degrees centigrade."
+		::= { wsTempEntry 3 }
+
+wsTempTHYST	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"THYST in 100ths of degrees centigrade."
+		::= { wsTempEntry 4 }
+
+wsTempThresholdLow	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Threshold (low) in 100ths of degrees centigrade."
+		::= { wsTempEntry 5 }
+
+wsTempThresholdHigh	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Threshold (high) in 100ths of degrees centigrade."
+		::= { wsTempEntry 6 }
+	    
+wsTempStatus	OBJECT-TYPE
+                SYNTAX INTEGER {
+                          failed(-1),
+                          ok(0),
+                          high(1),
+                          low(2),
+                          disabled(4)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Status (measurement compared to threshold)."
+		::= { wsTempEntry 7 }
+
+-- Voltage table
+wsVoltTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsVoltEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of measured board voltages."
+		::= { wsEnvironment 2 }
+
+wsVoltEntry	OBJECT-TYPE
+		SYNTAX WsVoltEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for a board voltage."
+		INDEX { wsVoltChannel }
+		::= { wsVoltTable 1 }
+
+WsVoltEntry ::=
+	SEQUENCE {
+		wsVoltChannel 		Unsigned32,
+		wsVoltNominal 		Integer32,
+		wsVoltMeasured		Integer32,
+		wsVoltThresholdLow 	Integer32,
+		wsVoltThresholdHigh 	Integer32,
+		wsVoltStatus 		INTEGER
+	}
+
+wsVoltChannel	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Voltage channel number."
+		::= { wsVoltEntry 1 }
+
+wsVoltNominal	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Nominal voltage in mV for channel."
+		::= { wsVoltEntry 2 }
+
+wsVoltMeasured	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured voltage in mV for channel."
+		::= { wsVoltEntry 3 }
+
+wsVoltThresholdLow	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Threshold (low) voltage in mV for channel."
+		::= { wsVoltEntry 4 }
+
+wsVoltThresholdHigh	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Threshold (high) voltage in mV for channel."
+		::= { wsVoltEntry 5 }
+	    
+wsVoltStatus	OBJECT-TYPE
+                SYNTAX INTEGER {
+			na(-3),
+			failed(-1),
+			ok(0),
+			high(1),
+			low(2),
+			notPresent(3),
+			disabled(4)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Status (measurement compared to threshold)."
+		::= { wsVoltEntry 6 }
+
+
+-- Fan speed table
+wsFanTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsFanEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of measured rotation speeds for external fans."
+		::= { wsEnvironment 3 }
+
+wsFanEntry	OBJECT-TYPE
+		SYNTAX WsFanEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for a fan."
+		INDEX { wsFanNumber }
+		::= { wsFanTable 1 }
+
+WsFanEntry ::=
+	SEQUENCE {
+		wsFanNumber 		Unsigned32,
+		wsFanRPM 		Integer32
+	}
+
+wsFanNumber	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Fan number."
+		::= { wsFanEntry 1 }
+
+wsFanRPM	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Fan speed in revolutions per minute."
+		::= { wsFanEntry 2 }
+
+-- Fan driving voltage
+wsFanVoltage	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Fan driving voltage (in mV)."
+		::= { wsEnvironment 4 }
+
+-- Provides control over if send ibos environment related traps
+wsIbosEnvironmentTrapEnable OBJECT-TYPE
+		SYNTAX INTEGER {
+			enabled(1),
+			disabled(2)
+		}
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Provides control over iBOS environment related traps."
+		::= { wsEnvironment 5 }
+
+
+--
+-- PFDP data
+wsPFDP	 	OBJECT-IDENTITY
+		STATUS current
+		DESCRIPTION
+			"PFDP data"
+		::= { ibos 3 }
+
+
+-- PFDP Neighbours Table
+wsNeighboursTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsNeighboursEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of discovered PFDB Neighbours."
+		::= { wsPFDP 1 }
+
+wsNeighboursEntry	OBJECT-TYPE
+		SYNTAX WsNeighboursEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for a neighbour."
+		INDEX { wsNeighbourIfIndex, wsNeighbourNIndex }
+		::= { wsNeighboursTable 1 }
+
+WsNeighboursEntry ::=
+	SEQUENCE {
+		wsNeighbourIfIndex	Unsigned32,
+		wsNeighbourNIndex	Unsigned32,
+		wsNeighbourHostname	DisplayString,
+		wsNeighbourLocalIf	DisplayString,
+		wsNeighbourRemoteIf	DisplayString,
+		wsNeighbourModel	DisplayString,
+		wsNeighbourLastAct	Integer32,
+		wsNeighbourOSVersion	DisplayString,
+		wsNeighbourSNPA		OCTET STRING,
+		wsNeighbourUptime	Unsigned32,
+		wsNeighbourState	INTEGER,
+		wsNeighbourDBCount	Unsigned32,
+		wsNeighbourCreated	TimeTicks,
+		wsNeighbourPacketsIn	Unsigned32,
+		wsNeighbourPacketErrorsrIn	Unsigned32
+	}
+
+wsNeighbourIfIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour interface index."
+		::= { wsNeighboursEntry 1 }
+
+wsNeighbourNIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour index."
+		::= { wsNeighboursEntry 2 }
+
+wsNeighbourHostname	OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour hostname."
+		::= { wsNeighboursEntry 3 }
+
+wsNeighbourLocalIf	OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Local interface that neighbour is on."
+		::= { wsNeighboursEntry 4 }
+
+wsNeighbourRemoteIf	OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Remote interface of neighbour."
+		::= { wsNeighboursEntry 5 }
+
+wsNeighbourModel	OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour model."
+		::= { wsNeighboursEntry 6 }
+
+wsNeighbourLastAct	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Time in seconds since last neighbour advertisment."
+		::= { wsNeighboursEntry 7 }
+
+wsNeighbourOSVersion	OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour OS version."
+		::= { wsNeighboursEntry 8 }
+
+wsNeighbourSNPA		OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SNPA of neighbour interface."
+		::= { wsNeighboursEntry 9 }
+
+wsNeighbourUptime	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Uptime in seconds for neighbour."
+		::= { wsNeighboursEntry 10 }
+
+wsNeighbourState	OBJECT-TYPE
+		SYNTAX INTEGER {
+				bidirectional(1),
+				unidirectional(2)
+		       }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"State of neighbour."
+		::= { wsNeighboursEntry 11 }
+
+wsNeighbourDBCount	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Database entries for neighbour."
+		::= { wsNeighboursEntry 12 }
+
+wsNeighbourCreated	OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The value of sysUpTime at the time the neighbour
+			 first appeared on the interface."
+		::= { wsNeighboursEntry 13 }
+
+wsNeighbourPacketsIn	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of PFDP packets received from neighbour."
+		::= { wsNeighboursEntry 14 }
+
+wsNeighbourPacketErrorsrIn	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of erroneous PFDP packets received from 
+			 neighbour."
+		::= { wsNeighboursEntry 15 }
+
+-- PFDP Neighbour Ports Table
+wsNeighbourPortsTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsNeighbourPortsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of ports of discovered PFDB Neighbours."
+		::= { wsPFDP 2 }
+
+wsNeighbourPortsEntry	OBJECT-TYPE
+		SYNTAX WsNeighbourPortsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for a port of a neighbour."
+		INDEX { wsNeighbourPortIfIndex, wsNeighbourPortNIndex, wsNeighbourPortPIndex }
+		::= { wsNeighbourPortsTable 1 }
+
+WsNeighbourPortsEntry ::=
+	SEQUENCE {
+		wsNeighbourPortIfIndex			Unsigned32,
+		wsNeighbourPortNIndex			Unsigned32,
+		wsNeighbourPortPIndex			Unsigned32,
+		wsNeighbourPortName			DisplayString,
+		wsNeighbourPortState			BITS,
+		wsNeighbourPortTxOctets			Counter64,
+		wsNeighbourPortTxDropPkts		Unsigned32,
+		wsNeighbourPortTxBroadcastPkts		Unsigned32,
+		wsNeighbourPortTxMulticastPkts		Unsigned32,
+		wsNeighbourPortTxUnicastPkts		Unsigned32,
+		wsNeighbourPortTxCollisions		Unsigned32,
+		wsNeighbourPortTxDeferredTransmit	Unsigned32,
+		wsNeighbourPortTxFrameInDisc		Unsigned32,
+		wsNeighbourPortRxOctets			Counter64,
+		wsNeighbourPortRxUndersizePkts		Unsigned32,
+		wsNeighbourPortPkts64Octets		Unsigned32,
+		wsNeighbourPortPkts65to127Octets	Unsigned32,
+		wsNeighbourPortPkts128to255Octets	Unsigned32,
+		wsNeighbourPortPkts256to511Octets	Unsigned32,
+		wsNeighbourPortPkts512to1023Octets	Unsigned32,
+		wsNeighbourPortPkts1024to1522Octets	Unsigned32,
+		wsNeighbourPortRxOversizePkts		Unsigned32,
+		wsNeighbourPortRxJabbers		Unsigned32,
+		wsNeighbourPortRxAlignmentErrors	Unsigned32,
+		wsNeighbourPortRxFCSErrors		Unsigned32,
+		wsNeighbourPortRxGoodOctets		Counter64,
+		wsNeighbourPortRxDropPkts		Unsigned32,
+		wsNeighbourPortRxUnicastPkts		Unsigned32,
+		wsNeighbourPortRxMulticastPkts		Unsigned32,
+		wsNeighbourPortRxBroadcastPkts		Unsigned32,
+		wsNeighbourPortRxFragments		Unsigned32,
+		wsNeighbourPortRxExcessSizeDisc		Unsigned32,
+		wsNeighbourPortRxSymbolError		Unsigned32
+	}
+
+wsNeighbourPortIfIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour interface index."
+		::= { wsNeighbourPortsEntry 1 }
+
+wsNeighbourPortNIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour index."
+		::= { wsNeighbourPortsEntry 2 }
+
+wsNeighbourPortPIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour port index."
+		::= { wsNeighbourPortsEntry 3 }
+
+wsNeighbourPortName	OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of neighbour port."
+		::= { wsNeighbourPortsEntry 4 }
+
+wsNeighbourPortState	OBJECT-TYPE
+		SYNTAX BITS {
+			reserved0(0),
+			reserved1(1),
+			reserved2(2),
+			reserved3(3),
+			vlaninfo(4),
+			s100mbit(5),
+			fullduplex(6),
+			up(7)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"State of neighbour port."
+		::= { wsNeighbourPortsEntry 5 }
+		
+wsNeighbourPortTxOctets	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of good bytes of data transmitted by 
+			 a port (excluding preamble but including FCS)."
+		::= { wsNeighbourPortsEntry 6 }
+
+wsNeighbourPortTxDropPkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"This counter is incremented every time a transmit 
+			 packet is dropped due to lack of resources (e.g., 
+			 transmit FIFO underflow), or an internal MAC sublayer 
+			 transmit error not counted by.in either the 
+			 TxLateCollision or the TxExcessiveCollision counters."
+		::= { wsNeighbourPortsEntry 7 }
+
+wsNeighbourPortTxBroadcastPkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets transmitted by a port that
+			 are directed to a broadcast address. This counter does
+			 not include errored broadcast packets or valid 
+			 multicast packets."
+		::= { wsNeighbourPortsEntry 8 }
+
+wsNeighbourPortTxMulticastPkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets transmitted by a port that 
+			 are directed to a multicast address. This counter does
+			 not include errored multicast packets or valid 
+			 broadcast packets."
+		::= { wsNeighbourPortsEntry 9 }
+
+wsNeighbourPortTxUnicastPkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets transmitted by a port that 
+			 are addressed to a unicast address."
+		::= { wsNeighbourPortsEntry 10 }
+
+wsNeighbourPortTxCollisions	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of collisions experienced by a port during
+			 packet transmissions."
+		::= { wsNeighbourPortsEntry 11 }
+
+wsNeighbourPortTxDeferredTransmit	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets transmitted by a port for which 
+			 the first transmission attempt is delayed because the 
+			 medium is busy."
+		::= { wsNeighbourPortsEntry 12 }
+
+wsNeighbourPortTxFrameInDisc	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of valid packets received which are 
+			 discarded by the forwarding process due to lack of 
+			 space on an output queue."
+		::= { wsNeighbourPortsEntry 13 }
+
+wsNeighbourPortRxOctets	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of bytes of data received by a port 
+			 (excluding preamble but including FCS), including 
+			 bad packets."
+		::= { wsNeighbourPortsEntry 14 }
+
+wsNeighbourPortRxUndersizePkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets received by a port that are
+			 less than 64 bytes long (excluding framing bits but 
+			 including the FCS)."
+		::= { wsNeighbourPortsEntry 15 }
+
+wsNeighbourPortPkts64Octets	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets (including error packets) that 
+			 are 64 bytes long."
+		::= { wsNeighbourPortsEntry 16 }
+
+wsNeighbourPortPkts65to127Octets	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets (including error packets) that 
+			 are between 65 and 127 bytes long."
+		::= { wsNeighbourPortsEntry 17 }
+
+wsNeighbourPortPkts128to255Octets	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets (including error packets) that 
+			 are between 128 and 255 bytes long."
+		::= { wsNeighbourPortsEntry 18 }
+
+wsNeighbourPortPkts256to511Octets	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets (including error packets) that 
+			 are between 256 and 511 bytes long."
+		::= { wsNeighbourPortsEntry 19 }
+
+wsNeighbourPortPkts512to1023Octets	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets (including error packets) that 
+			 are between 512 and 1023 bytes long."
+		::= { wsNeighbourPortsEntry 20 }
+
+wsNeighbourPortPkts1024to1522Octets	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets (including error packets) that 
+			 are between 1024 and 1522 bytes long."
+		::= { wsNeighbourPortsEntry 21 }
+
+wsNeighbourPortRxOversizePkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets received by a port that are
+			 greater than 1522 bytes inclusive (excluding framing 
+			 bits but including the FCS). Note that this counter 
+			 alone will be incremented for packets in the range
+			 1523-1536 bytes inclusive, whereas both this counter
+			 and the RxExcessSizeDisc counter will be incremented
+			 for packets of 1537 bytes and higher."
+		::= { wsNeighbourPortsEntry 22 }
+
+wsNeighbourPortRxJabbers	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets received by a port that are 
+			longer than 1522 bytes and have either an FCS error or 
+			an alignment error."
+		::= { wsNeighbourPortsEntry 23 }
+
+wsNeighbourPortRxAlignmentErrors	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets received by a port that have a 
+			 length (excluding framing bits but including FCS) 
+			 between 64 and 1522 bytes, inclusive, and have a bad 
+			 FCS with a nonintegral number of bytes."
+		::= { wsNeighbourPortsEntry 24 }
+
+wsNeighbourPortRxFCSErrors	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets received by a port that have a 
+			 length (excluding framing bits but including FCS) 
+			 between 64 and 1522 bytes inclusive, and have a bad 
+			 FCS with an integral number of bytes."
+		::= { wsNeighbourPortsEntry 25 }
+
+wsNeighbourPortRxGoodOctets	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of bytes in all good packets received
+			 by a port (excluding framing bits but including FCS)."
+		::= { wsNeighbourPortsEntry 26 }
+
+wsNeighbourPortRxDropPkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets received by a port that were
+			 dropped due to lack of resources (e.g., lack of input
+			 buffers) or were dropped due to lack of resources 
+			 before a determination of the validity of the packet
+			 was able to be made (e.g., receive FIFO overflow). The
+			 counter is only incremented if the receive error was 
+			 not counted by.either the RxExcessSizeDisc, the 
+			 RxAlignmentErrors or the RxFCSErrors counters."
+		::= { wsNeighbourPortsEntry 27 }
+
+wsNeighbourPortRxUnicastPkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets received by a port that are
+			 addressed to a unicast address."
+		::= { wsNeighbourPortsEntry 28 }
+
+wsNeighbourPortRxMulticastPkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets received by a port that are
+			 directed to a multicast address. This counter does not
+			 include errored multicast packets or valid broadcast
+			 packets."
+		::= { wsNeighbourPortsEntry 29 }
+
+wsNeighbourPortRxBroadcastPkts	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets received by a port that are
+			 directed to the broadcast address. This counter does 
+			 not include errored broadcast packets or valid 
+			 multicast packets."
+		::= { wsNeighbourPortsEntry 30 }
+
+wsNeighbourPortRxFragments	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of packets received by a port that are less
+			 than 64 bytes (excluding framing bits) and have either
+			 an FCS error or an alignment error."
+		::= { wsNeighbourPortsEntry 31 }
+
+wsNeighbourPortRxExcessSizeDisc	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of good packets received by a port that are
+			 greater than 1536 bytes (excluding framing bits but
+			 including the FCS) and were discarded due to excessive
+			 length. Note that the RxOversizePkts counter alone is
+			 incremented for packets in the range 1523-1536 bytes
+			 inclusive, whereas both this counter and the 
+			 RxOversizePkts counter are incremented for packets of
+			 1537 bytes and higher."
+		::= { wsNeighbourPortsEntry 32 }
+
+wsNeighbourPortRxSymbolError	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The total number of times a valid length packet was
+			 received at a port and at least one invalid data 
+			 symbol was detected. Counter only increment once per
+			 carrier event and does not increment on detection of
+			 collision during the carrier event."
+		::= { wsNeighbourPortsEntry 33 }
+
+
+
+-- PFDP Neighbour Ports SNPA Table
+wsNeighbourPortSNPATable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsNeighbourPortSNPAEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of known SNPA on ports of discovered PFDB Neighbours."
+		::= { wsPFDP 3 }
+
+wsNeighbourPortSNPAEntry	OBJECT-TYPE
+		SYNTAX WsNeighbourPortSNPAEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for a known SNPA on a port of a neighbour."
+		INDEX { wsNeighbourPortSNPAIfIndex, wsNeighbourPortSNPANIndex, 
+			wsNeighbourPortSNPAPIndex, wsNeighbourPortSNPASIndex }
+		::= { wsNeighbourPortSNPATable 1 }
+
+WsNeighbourPortSNPAEntry ::=
+	SEQUENCE {
+		wsNeighbourPortSNPAIfIndex		Unsigned32,
+		wsNeighbourPortSNPANIndex		Unsigned32,
+		wsNeighbourPortSNPAPIndex		Unsigned32,
+		wsNeighbourPortSNPASIndex		Unsigned32,
+		wsNeighbourPortSNPASMCast		Integer32,
+		wsNeighbourPortSNPA			OCTET STRING
+	}
+
+wsNeighbourPortSNPAIfIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour interface index."
+		::= { wsNeighbourPortSNPAEntry 1 }
+
+wsNeighbourPortSNPANIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour index."
+		::= { wsNeighbourPortSNPAEntry 2 }
+
+wsNeighbourPortSNPAPIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour port index."
+		::= { wsNeighbourPortSNPAEntry 3 }
+
+wsNeighbourPortSNPASIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Neighbour port SNPA index."
+		::= { wsNeighbourPortSNPAEntry 4 }
+
+wsNeighbourPortSNPASMCast	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Set to 1 if SNPA is a multicast address, 0 otherwise."
+		::= { wsNeighbourPortSNPAEntry 5 }
+
+wsNeighbourPortSNPA		OBJECT-TYPE
+		SYNTAX OCTET STRING
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Known SNPA on neighbour port."
+		::= { wsNeighbourPortSNPAEntry 6 }
+
+--
+-- SFP Table
+wsSFPTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsSFPEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table with information on SFPs."
+		::= { ibos 4 }
+
+wsSFPEntry	OBJECT-TYPE
+		SYNTAX WsSFPEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for an SFP."
+		INDEX { wsSFPIndex }
+		::= { wsSFPTable 1 }
+
+WsSFPEntry ::=
+	SEQUENCE {
+		wsSFPIndex 		Unsigned32,
+		wsSFPStatus 		INTEGER,
+		wsSFPConnector 		INTEGER,
+		wsSFPTransceiver 	BITS,
+		wsSFPEncoding 		INTEGER,
+		wsSFPBitrate 		Unsigned32,
+		wsSFPSingleModeLen 	Unsigned32,
+		wsSFPMultiMode50Len 	Unsigned32,
+		wsSFPMultiMode625Len 	Unsigned32,
+		wsSFPCopperLen 		Unsigned32,
+		wsSFPTempStatus 	INTEGER,
+		wsSFPTemp 		Integer32,
+		wsSFPVoltStatus 	INTEGER,
+		wsSFPVolt 		Integer32,
+		wsSFPTXCurrentStatus 	INTEGER,
+		wsSFPTXCurrent 		Integer32,
+		wsSFPTXPowerStatus 	INTEGER,
+		wsSFPTXPower		Integer32,
+		wsSFPRXPowerStatus 	INTEGER,
+		wsSFPRXPower 		Integer32,
+		wsSFPTransceiverExt 	BITS,
+		wsSFPTXdBmPower		Integer32,
+		wsSFPRXdBmPower		Integer32,
+		wsSFPTempNormalLow	Integer32,
+		wsSFPTempNormalHigh	Integer32,
+		wsSFPTempWarningLow	Integer32,
+		wsSFPTempWarningHigh	Integer32,
+		wsSFPVoltNormalLow	Integer32,
+		wsSFPVoltNormalHigh	Integer32,
+		wsSFPVoltWarningLow	Integer32,
+		wsSFPVoltWarningHigh	Integer32,
+		wsSFPTXCurrentNormalLow		Integer32,
+		wsSFPTXCurrentNormalHigh	Integer32,
+		wsSFPTXCurrentWarningLow	Integer32,
+		wsSFPTXCurrentWarningHigh	Integer32,
+		wsSFPTXOutputPowNormalLowuW	Integer32,
+		wsSFPTXOutputPowNormalHighuW	Integer32,
+		wsSFPTXOutputPowWarningLowuW	Integer32,
+		wsSFPTXOutputPowWarningHighuW	Integer32,
+		wsSFPTXOutputPowNormalLowdBm	Integer32,
+		wsSFPTXOutputPowNormalHighdBm	Integer32,
+		wsSFPTXOutputPowWarningLowdBm	Integer32,
+		wsSFPTXOutputPowWarningHighdBm	Integer32,
+		wsSFPRXInputPowNormalLowuW	Integer32,
+		wsSFPRXInputPowNormalHighuW	Integer32,
+		wsSFPRXInputPowWarningLowuW	Integer32,
+		wsSFPRXInputPowWarningHighuW	Integer32,
+		wsSFPRXInputPowNormalLowdBm	Integer32,
+		wsSFPRXInputPowNormalHighdBm	Integer32,
+		wsSFPRXInputPowWarningLowdBm	Integer32,
+		wsSFPRXInputPowWarningHighdBm	Integer32,
+		wsSFPPartNumber		DisplayString,
+		wsSFPSerialNumber	DisplayString
+	}
+
+wsSFPIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SFP number."
+		::= { wsSFPEntry 1 }
+
+wsSFPStatus	OBJECT-TYPE
+		SYNTAX INTEGER {
+			ok(0),
+			missing(1),
+			invalid(2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SFP status."
+		::= { wsSFPEntry 2 }
+
+wsSFPConnector 	OBJECT-TYPE
+		SYNTAX INTEGER {
+			sc(1),
+			fiberJack(6),
+			lc(7),
+			mtrj(8),
+			mu(9),
+			sg(10),
+			opticalPigtail(11),
+			hssdcii(32),
+			copperPigtail(33)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Connector type."
+		::= { wsSFPEntry 3 }
+
+wsSFPTransceiver	OBJECT-TYPE
+		SYNTAX BITS {
+			sBasePX(0),
+			sBaseBX10(1),
+			s100BaseFX(2),
+			s100BaseLX(3),
+			s1000BaseT(4),
+			s1000BaseCX(5),
+			s1000BaseLX(6),
+			s1000BaseSX(7)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver capablities."
+		::= { wsSFPEntry 4 }
+
+wsSFPEncoding 	OBJECT-TYPE
+		SYNTAX INTEGER {
+			e8B10B(1),
+			e4B5B(2),
+			eNRZ(3),
+			eManchester(4)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Encoding type."
+		::= { wsSFPEntry 5 }
+
+wsSFPBitrate	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SFP Bitrate (Mbps)."
+		::= { wsSFPEntry 6 }
+
+wsSFPSingleModeLen	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported single mode fiber link length (m).
+			A value of 255000 means > 254000 m."
+		::= { wsSFPEntry 7 }
+
+wsSFPMultiMode50Len	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported 50um multi-mode fiber link length (m).
+			A value of 2550 means > 2540 m."
+		::= { wsSFPEntry 8 }
+
+wsSFPMultiMode625Len	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported 62.5um multi-mode fiber link length (m).
+			A value of 2550 means > 2540 m."
+		::= { wsSFPEntry 9 }
+
+wsSFPCopperLen	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported copper link length (m).
+			A value of 255 means > 254 m."
+		::= { wsSFPEntry 10 }
+
+wsSFPTempStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Temperature status."
+		::= { wsSFPEntry 11 }
+
+
+wsSFPTemp	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured temperature in degrees centigrade."
+		::= { wsSFPEntry 12 }
+
+wsSFPVoltStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Voltage status."
+		::= { wsSFPEntry 13 }
+
+
+wsSFPVolt	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured voltage (mV)."
+		::= { wsSFPEntry 14 }
+
+wsSFPTXCurrentStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX Current status."
+		::= { wsSFPEntry 15 }
+
+
+wsSFPTXCurrent	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured TX current (mA)."
+		::= { wsSFPEntry 16 }
+
+wsSFPTXPowerStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX power status."
+		::= { wsSFPEntry 17 }
+
+
+wsSFPTXPower	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured TX power (uW)."
+		::= { wsSFPEntry 18 }
+
+wsSFPRXPowerStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX power status."
+		::= { wsSFPEntry 19 }
+
+
+wsSFPRXPower	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured RX power (uW)."
+		::= { wsSFPEntry 20 }
+
+wsSFPTransceiverExt	OBJECT-TYPE
+		SYNTAX BITS {
+			s10000BaseER(0),
+			s10000BaseLRM(1),
+			s10000BaseLR(2),
+			s10000BaseSR(3),
+			sActiveCable(4),
+			sPassiveCable(5),
+			reserved6(6),
+			reserved7(7)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"10G Ethernet Compliance Codes."
+		::= { wsSFPEntry 21 }
+
+wsSFPTXdBmPower	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured TX power (dBm x 1000)."
+		::= { wsSFPEntry 22 }
+
+wsSFPRXdBmPower	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured RX power (dBm x 1000)."
+		::= { wsSFPEntry 23 }
+
+wsSFPTempNormalLow OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Operating temparature normal range low (C)."
+		::= { wsSFPEntry 24 }
+
+wsSFPTempNormalHigh OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Operating temparature normal range high (C)."
+		::= { wsSFPEntry 25 }
+
+wsSFPTempWarningLow OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Operating temparature warning range low (C)."
+		::= { wsSFPEntry 26 }
+
+wsSFPTempWarningHigh OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Operating temparature warning range high (C)."
+		::= { wsSFPEntry 27 }
+
+wsSFPVoltNormalLow OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supply voltage normal range low (mV)."
+		::= { wsSFPEntry 28 }
+
+wsSFPVoltNormalHigh OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supply voltage normal range high (mV)."
+		::= { wsSFPEntry 29 }
+
+wsSFPVoltWarningLow OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supply voltage warning range low (mV)."
+		::= { wsSFPEntry 30 }
+
+wsSFPVoltWarningHigh OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supply voltage warning range high (mV)."
+		::= { wsSFPEntry 31 }
+
+wsSFPTXCurrentNormalLow OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX Current normal range low (mA)."
+		::= { wsSFPEntry 32 }
+
+wsSFPTXCurrentNormalHigh OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX Current normal range high (mA)."
+		::= { wsSFPEntry 33 }
+
+wsSFPTXCurrentWarningLow OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX Current warning range low (mA)."
+		::= { wsSFPEntry 34 }
+
+wsSFPTXCurrentWarningHigh OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX Current warning range high (mA)."
+		::= { wsSFPEntry 35 }
+
+wsSFPTXOutputPowNormalLowuW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX output power normal range low (uW)."
+		::= { wsSFPEntry 36 }
+
+wsSFPTXOutputPowNormalHighuW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX output power normal range high (uW)."
+		::= { wsSFPEntry 37 }
+
+wsSFPTXOutputPowWarningLowuW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX output power warning range low (uW)."
+		::= { wsSFPEntry 38 }
+
+wsSFPTXOutputPowWarningHighuW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX output power warning range high (uW)."
+		::= { wsSFPEntry 39 }
+
+wsSFPTXOutputPowNormalLowdBm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX output power normal range low (dBm x 1000)."
+		::= { wsSFPEntry 40 }
+
+wsSFPTXOutputPowNormalHighdBm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX output power normal range high (dBm x 1000)."
+		::= { wsSFPEntry 41 }
+
+wsSFPTXOutputPowWarningLowdBm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX output power warning range low (dBm x 1000)."
+		::= { wsSFPEntry 42 }
+
+wsSFPTXOutputPowWarningHighdBm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX output power warning range high (dBm x 1000)."
+		::= { wsSFPEntry 43 }
+
+wsSFPRXInputPowNormalLowuW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX input power normal range low (uW)."
+		::= { wsSFPEntry 44 }
+
+wsSFPRXInputPowNormalHighuW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX input power normal range high (uW)."
+		::= { wsSFPEntry 45 }
+
+wsSFPRXInputPowWarningLowuW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX input power warning range low (uW)."
+		::= { wsSFPEntry 46 }
+
+wsSFPRXInputPowWarningHighuW OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX input power warning range high (uW)."
+		::= { wsSFPEntry 47 }
+
+wsSFPRXInputPowNormalLowdBm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX input power normal range low (dBm x 1000)."
+		::= { wsSFPEntry 48 }
+
+wsSFPRXInputPowNormalHighdBm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX input power normal range high (dBm x 1000)."
+		::= { wsSFPEntry 49 }
+
+wsSFPRXInputPowWarningLowdBm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX input power warning range low (dBm x 1000)."
+		::= { wsSFPEntry 50 }
+
+wsSFPRXInputPowWarningHighdBm OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX input power warning range high (dBm x 1000)."
+		::= { wsSFPEntry 51 }
+
+wsSFPPartNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SFP part number."
+		::= { wsSFPEntry 52 }
+
+wsSFPSerialNumber OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (0..32))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SFP serial number."
+		::= { wsSFPEntry 53 }
+
+--
+-- Accounting objects
+wsAccounting   	OBJECT-IDENTITY
+                STATUS current
+                DESCRIPTION
+                        "Accounting objects"
+               ::= { ibos 5 }
+
+wsPolicyTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsPolicyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table of policy accounting information."
+		::= { wsAccounting 1 }
+
+wsPolicyEntry	OBJECT-TYPE
+		SYNTAX WsPolicyEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for a policy."
+		INDEX { wsPolicyIfIndex, wsPolicyName }
+		::= { wsPolicyTable 1 }
+
+WsPolicyEntry ::=
+	SEQUENCE {
+		wsPolicyIfIndex		Unsigned32,
+		wsPolicyIfName		DisplayString,
+		wsPolicyName 		DisplayString,
+		wsPolicyCookie		DisplayString,
+		wsPolicyInPkts		Counter64,
+		wsPolicyInBytes		Counter64,
+		wsPolicyInDrops		Counter64,
+		wsPolicyOutPkts		Counter64,
+		wsPolicyOutBytes	Counter64,
+		wsPolicyOutDrops	Counter64,
+		wsPolicyUsedCnt		Gauge32
+	}
+
+wsPolicyIfIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Interface index of policy accounting entry."
+		::= { wsPolicyEntry 1 }
+
+wsPolicyIfName  OBJECT-TYPE
+                SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		        "Interface name of policy accountin entry"
+	        ::= { wsPolicyEntry 2 }
+
+wsPolicyName	OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of policy."
+		::= { wsPolicyEntry 3 }
+
+wsPolicyCookie	OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Name of policy cookie."
+		::= { wsPolicyEntry 4 }
+
+wsPolicyInPkts	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Input packets counter."
+		::= { wsPolicyEntry 5 }
+
+wsPolicyInBytes	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Input bytes counter."
+		::= { wsPolicyEntry 6 }
+
+wsPolicyInDrops	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number input packets dropped."
+		::= { wsPolicyEntry 7 }
+
+wsPolicyOutPkts	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Output packets counter."
+		::= { wsPolicyEntry 8 }
+
+wsPolicyOutBytes	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Output bytes counter."
+		::= { wsPolicyEntry 9 }
+
+wsPolicyOutDrops	OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number input packets dropped."
+		::= { wsPolicyEntry 10 }
+
+wsPolicyUsedCnt	OBJECT-TYPE
+		SYNTAX Gauge32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number policy maps set to use this policy."
+		::= { wsPolicyEntry 11 }
+
+--
+-- XFP Table
+wsXFPTable 	OBJECT-TYPE
+		SYNTAX SEQUENCE OF WsXFPEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Table with information on XFPs."
+		::= { ibos 6 }
+
+wsXFPEntry	OBJECT-TYPE
+		SYNTAX WsXFPEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry for an XFP."
+		INDEX { wsXFPIndex }
+		::= { wsXFPTable 1 }
+
+WsXFPEntry ::=
+	SEQUENCE {
+		wsXFPIndex 		Unsigned32,
+		wsXFPStatus 		INTEGER,
+		wsXFPConnector 		INTEGER,
+		wsXFPTransceiver 	BITS,
+		wsXFPEncoding 		BITS,
+		wsXFPBitrateMin		Unsigned32,
+		wsXFPBitrateMax		Unsigned32,
+		wsXFPSingleModeLen 	Unsigned32,
+		wsXFPMultiMode50Len 	Unsigned32,
+		wsXFPMultiMode625Len 	Unsigned32,
+		wsXFPCopperLen 		Unsigned32,
+		wsXFPTempStatus 	INTEGER,
+		wsXFPTemp 		Integer32,
+		wsXFPTXCurrentStatus 	INTEGER,
+		wsXFPTXCurrent 		Integer32,
+		wsXFPTXPowerStatus 	INTEGER,
+		wsXFPTXPower		Integer32,
+		wsXFPRXPowerStatus 	INTEGER,
+		wsXFPRXPower 		Integer32
+	}
+
+wsXFPIndex	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP number."
+		::= { wsXFPEntry 1 }
+
+wsXFPStatus	OBJECT-TYPE
+		SYNTAX INTEGER {
+			ok(0),
+			missing(1),
+			invalid(2)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP status."
+		::= { wsXFPEntry 2 }
+
+wsXFPConnector 	OBJECT-TYPE
+		SYNTAX INTEGER {
+			sc(1),
+			fiberJack(6),
+			lc(7),
+			mtrj(8),
+			mu(9),
+			sg(10),
+			opticalPigtail(11),
+			hssdcii(32),
+			copperPigtail(33)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Connector type."
+		::= { wsXFPEntry 3 }
+
+wsXFPTransceiver	OBJECT-TYPE
+		SYNTAX BITS {
+			reserved0(0),
+			s10GBaseEW(1),
+			s10GBaseLW(2),
+			s10GBaseSW(3),
+			s10GBaseLRM(4),
+			s10GBaseER(5),
+			s10GBaseLR(6),
+			s10GBaseSR(7)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Transceiver capablities."
+		::= { wsXFPEntry 4 }
+
+wsXFPEncoding 	OBJECT-TYPE
+		SYNTAX BITS {
+			reserved0(0),
+			reserved1(1),
+			reserved2(2),
+			eRZ(3),
+			eNRZ(4),
+			eSonetScrambl(5),
+			e8B10B(6),
+			e64B66B(7)
+		}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Encoding type."
+		::= { wsXFPEntry 5 }
+
+wsXFPBitrateMin	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP Min Bitrate (Mbps)."
+		::= { wsXFPEntry 6 }
+
+wsXFPBitrateMax	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"XFP Max Bitrate (Mbps)."
+		::= { wsXFPEntry 7 }
+
+wsXFPSingleModeLen	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported single mode fiber link length (m).
+			A value of 255000 means > 254000 m."
+		::= { wsXFPEntry 8 }
+
+wsXFPMultiMode50Len	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported 50um multi-mode fiber link length (m).
+			A value of 510 means > 508 m."
+		::= { wsXFPEntry 9 }
+
+wsXFPMultiMode625Len	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported 62.5um multi-mode fiber link length (m).
+			A value of 255 means > 254 m."
+		::= { wsXFPEntry 10 }
+
+wsXFPCopperLen	OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Supported copper link length (m).
+			A value of 255 means > 254 m."
+		::= { wsXFPEntry 11 }
+
+wsXFPTempStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Temperature status."
+		::= { wsXFPEntry 12 }
+
+
+wsXFPTemp	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured temperature in degrees centigrade."
+		::= { wsXFPEntry 13 }
+
+wsXFPTXCurrentStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX Current status."
+		::= { wsXFPEntry 14 }
+
+
+wsXFPTXCurrent	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured TX current (mA)."
+		::= { wsXFPEntry 15 }
+
+wsXFPTXPowerStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"TX power status."
+		::= { wsXFPEntry 16 }
+
+wsXFPTXPower	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured TX power (uW)."
+		::= { wsXFPEntry 17 }
+
+wsXFPRXPowerStatus 	OBJECT-TYPE
+		SYNTAX INTEGER {
+                       unknown(0),
+                       alarmLow(1),
+                       warnLow(2),
+                       ok(3),
+                       warnHigh(4),
+                       alarmHigh(5)
+                }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"RX power status."
+		::= { wsXFPEntry 18 }
+
+wsXFPRXPower	OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Measured RX power (uW)."
+		::= { wsXFPEntry 19 }
+
+--
+-- Waystream ibos environment related notifications
+wsIbosEnvironmentNotifications      OBJECT IDENTIFIER ::={ wsEnvironment 0 }
+
+wsIbosTempLow   NOTIFICATION-TYPE
+                OBJECTS { wsTempSensor, wsTempMeasured, wsTempThresholdLow, wsTempStatus }
+                STATUS current
+                DESCRIPTION
+                        "A wsIbosTempLow trap signifies that the SNMP entity,
+			 acting in an agent role, has detected that one of its
+                        temperature sensors is outside of the predefined low
+                        threshold."
+                ::= { wsIbosEnvironmentNotifications 1 }
+
+wsIbosTempHigh  NOTIFICATION-TYPE
+                OBJECTS { wsTempSensor, wsTempMeasured, wsTempThresholdHigh, wsTempStatus }
+                STATUS current
+                DESCRIPTION
+                        "A wsIbosTempHigh trap signifies that the SNMP entity,
+                        acting in an agent role, has detected that one of its
+                        temperature sensors is outside of the predefined high
+                        threshold."
+                ::= { wsIbosEnvironmentNotifications 2 }
+
+wsIbosVoltLow   NOTIFICATION-TYPE
+                OBJECTS { wsVoltChannel, wsVoltMeasured, wsVoltThresholdLow, wsVoltStatus }
+                STATUS current
+                DESCRIPTION
+			"A wsIbosVoltLow trap signifies that the SNMP entity,
+			acting in an agent role, has detected that one of its
+			voltage channels is outside of the predefined low
+			threshold."
+                ::= { wsIbosEnvironmentNotifications 3 }
+
+wsIbosVoltHigh  NOTIFICATION-TYPE
+                OBJECTS { wsVoltChannel, wsVoltMeasured, wsVoltThresholdHigh, wsVoltStatus }
+                STATUS current
+                DESCRIPTION
+                        "A wsIbosVoltHigh trap signifies that the SNMP entity,
+                        acting in an agent role, has detected that one of its
+                        voltage channels is outside of the predefined high
+                        threshold."
+                ::= { wsIbosEnvironmentNotifications 4 }
+
+wsIbosFanRPMLow NOTIFICATION-TYPE
+                OBJECTS { wsFanNumber, wsFanRPM }
+                STATUS current
+                DESCRIPTION
+                        "A wsIbosFanRPMLow trap signifies that the SNMP entity,
+                        acting in an agent role, has detected that one of its
+                        fans's RPM is lower than the system defined threshold."
+                ::= { wsIbosEnvironmentNotifications 5 }
+
+wsIbosFanOutVoltLow NOTIFICATION-TYPE
+                OBJECTS { wsFanVoltage }
+                STATUS current
+                DESCRIPTION
+			"A wsIbosFanOutVoltLow trap signifies that the SNMP
+			entity, acting in an agent role, has detected that its
+			fan output voltage is lower than the system defined
+			threshold."
+                ::= { wsIbosEnvironmentNotifications 6 }
+
+END

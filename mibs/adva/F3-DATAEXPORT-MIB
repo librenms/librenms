@@ -1,0 +1,287 @@
+F3-DATAEXPORT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, IpAddress
+             FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, RowStatus, StorageType,
+    VariablePointer
+             FROM SNMPv2-TC
+    IpVersion, PerfCounter64
+             FROM CM-COMMON-MIB
+    Ipv6Address
+             FROM  IPV6-TC
+    fsp150cm
+             FROM  ADVA-MIB;
+
+f3DataExportMIB MODULE-IDENTITY
+    LAST-UPDATED        "201310310000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Marek Romaniuk
+                     ADVA Optical Networking, Inc.
+                Tel: +48 58 7716 414
+             E-mail: mromaniuk@advaoptical.com
+             Postal: ul. Slaska 35/37
+                     81-310 Gdynia, Poland"
+    DESCRIPTION
+            "This module defines the Data Export MIB definitions 
+             used by the F3 (FSP150CM/CC) product lines.
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201310310000Z"
+    DESCRIPTION
+        "
+         Notes from release 201312090000Z,
+         (1) Added new object: f3DataExportClearStatsAction
+         Notes from release 201310310000Z,
+         (1) MIB version ready for release FSP150CC 6.1.CC." 
+
+    ::= {fsp150cm 30}
+
+-- 
+-- OID definitions
+-- 
+
+f3DataExportConfigObjects            OBJECT IDENTIFIER ::= {f3DataExportMIB 1}
+f3DataExportCounterObjects           OBJECT IDENTIFIER ::= {f3DataExportMIB 2}
+f3DataExportActionObjects            OBJECT IDENTIFIER ::= {f3DataExportMIB 3}
+f3DataExportConformance              OBJECT IDENTIFIER ::= {f3DataExportMIB 4}
+
+--
+-- Textual Conventions 
+-- 
+
+DataExportType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Data Export Types."
+    SYNTAX     BITS {
+                 esal3pm(1),
+                 twamppm(2),
+                 flowbyteratepm(3)
+               }
+
+--
+--  Data Export Configure Scalars
+--
+
+f3DataExportTypes OBJECT-TYPE
+    SYNTAX     DataExportType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This object provides ability to set data export types."
+    ::= { f3DataExportConfigObjects 1 }
+
+f3DataExportReportInterval OBJECT-TYPE
+    SYNTAX     Integer32 (1..60)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This object provides ability to set interval value (in seconds)."
+    ::= { f3DataExportConfigObjects 2 }
+
+f3DataExportIpVersion OBJECT-TYPE
+    SYNTAX     IpVersion
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This object provides ability to set version of IP protocol."
+    ::= { f3DataExportConfigObjects 3 }
+
+f3DataExportServerIpv4Addr OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This object provides ability to set IPv4 FTP server address."
+    ::= { f3DataExportConfigObjects 4 }
+
+f3DataExportServerIpv6Addr OBJECT-TYPE
+    SYNTAX     Ipv6Address
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This object provides ability to set IPv6 FTP server address."
+    ::= { f3DataExportConfigObjects 5 }
+
+f3DataExportUserName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This object provides ability to set transfer protocol user login."
+    ::= { f3DataExportConfigObjects 6 }
+
+f3DataExportPassword OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This object provides ability to set transfer protocol user password. 
+           Reading this object will return an empty string if the password 
+           has not been set or ***** if the password has been set."
+    ::= { f3DataExportConfigObjects 7 }
+
+f3DataExportPath OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         " This object provides ability to set remote path to place file."
+    ::= { f3DataExportConfigObjects 8 }
+
+
+f3DataExportConfigObjectTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3DataExportConfigObjectEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "This table allows configuration of the object which need export data."
+    ::= { f3DataExportConfigObjects 9 }
+
+f3DataExportConfigObjectEntry OBJECT-TYPE
+    SYNTAX     F3DataExportConfigObjectEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A conceptual row in the f3DataExportConfigObjectTable."
+    INDEX { f3DataExportConfigObjectEntity }
+    ::= { f3DataExportConfigObjectTable 1 }
+
+F3DataExportConfigObjectEntry ::= SEQUENCE {
+    f3DataExportConfigObjectEntity             VariablePointer,
+    f3DataExportConfigObjectStorageType        StorageType,
+    f3DataExportConfigObjectRowStatus          RowStatus
+    }
+
+f3DataExportConfigObjectEntity OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object value need export data."
+    ::= { f3DataExportConfigObjectEntry 1 }
+
+f3DataExportConfigObjectStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The type of storage configured for this entry."
+    ::= { f3DataExportConfigObjectEntry 2 }
+
+f3DataExportConfigObjectRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.
+          	An entry MUST NOT exist in the active state unless all
+          	objects in the entry have an appropriate value, as described
+          	in the description clause for each writable object.
+ 	
+          	The values of f3DataExportConfigObjectRowStatus supported are
+          	createAndGo(4) and destroy(6).  All mandatory attributes
+          	must be specified in a single SNMP SET request with
+          	f3DataExportConfigObjectRowStatus value as createAndGo(4).
+          	Upon successful row creation, this object has a
+          	value of active(1).
+ 	
+          	The f3DataExportConfigObjectRowStatus object may be modified if
+          	the associated instance of this object is equal to active(1)."
+    ::= { f3DataExportConfigObjectEntry 3 }
+
+--
+--  Data Export Counter Scalars
+--
+
+f3DataExportServerXferPass OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         " Counter for successful PM export"
+    ::= { f3DataExportCounterObjects 1 }
+
+f3DataExportServerXferFail OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         " Counter for failure PM export."
+    ::= { f3DataExportCounterObjects 2 }
+
+
+--
+--  Data Export Action Objects
+--
+
+f3DataExportClearStatsAction OBJECT-TYPE
+    SYNTAX     INTEGER {
+                 not-applicable(0),
+                 clear(1)
+               }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Initiates a data export action. 
+             This object is write only.
+             Supported actions are:
+             clear(1) - Clear Data Export Stats."
+    ::= { f3DataExportActionObjects 1 }
+
+--
+-- Conformance
+--
+
+f3DataExportCompliances OBJECT IDENTIFIER ::= {f3DataExportConformance 1}
+f3DataExportGroups    OBJECT IDENTIFIER ::= {f3DataExportConformance 2}
+
+f3DataExportCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3-DATAEXPORT-MIB compilance."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3DataExportConfigGroup, f3DataExportCounterGroup, f3DataExportActionGroup
+        }
+    ::= { f3DataExportCompliances 1 }
+
+f3DataExportConfigGroup OBJECT-GROUP
+    OBJECTS {
+       f3DataExportTypes,
+       f3DataExportReportInterval,
+       f3DataExportIpVersion,
+       f3DataExportServerIpv4Addr,
+       f3DataExportServerIpv6Addr,
+       f3DataExportUserName,
+       f3DataExportPassword,
+       f3DataExportPath
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of objects used to manage the Data Export."
+    ::= { f3DataExportGroups 1 }
+
+f3DataExportCounterGroup OBJECT-GROUP
+    OBJECTS {
+       f3DataExportServerXferPass,
+       f3DataExportServerXferFail
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of Data Export counter objects."
+    ::= { f3DataExportGroups 2 }
+
+f3DataExportActionGroup OBJECT-GROUP
+    OBJECTS {
+       f3DataExportClearStatsAction
+    }
+    STATUS  current
+    DESCRIPTION
+             "A collection of Data Export action objects."
+    ::= { f3DataExportGroups 3 }
+
+END

@@ -19,29 +19,10 @@
  */
 
 /**
- * Filter all elements with keys that start with 'rrd_'
- *
- * @param array $arr input array
- * @return array Copy of $arr with all keys beginning with 'rrd_' removed.
- */
-function rrd_array_filter($arr)
-{
-    $result = array();
-    foreach ($arr as $k => $v) {
-        if (strpos($k, 'rrd_') === 0) {
-            continue;
-        }
-        $result[$k] = $v;
-    }
-    return $result;
-} // rrd_array_filter
-
-
-/**
  * Datastore-independent function which should be used for all polled metrics.
  *
  * RRD Tags:
- *   rrd_def     array|string: (required) an array of rrd field definitions example: "DS:dataName:COUNTER:600:U:100000000000"
+ *   rrd_def     RrdDefinition
  *   rrd_name    array|string: the rrd filename, will be processed with rrd_name()
  *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
  *   rrd_step             int: rrd step, defaults to 300
@@ -54,17 +35,6 @@ function rrd_array_filter($arr)
  */
 function data_update($device, $measurement, $tags, $fields)
 {
-    // convenience conversion to allow calling with a single value, so, e.g., these are equivalent:
-    // data_update($device, 'mymeasurement', $tags, 1234);
-    //     AND
-    // data_update($device, 'mymeasurement', $tags, array('mymeasurement' => 1234));
-    if (!is_array($fields)) {
-        $fields = array($measurement => $fields);
-    }
-
-    // rrdtool_data_update() will only use the tags it deems relevant, so we pass all of them.
-    // However, influxdb saves all tags, so we filter out the ones beginning with 'rrd_'.
-
-    rrdtool_data_update($device, $measurement, $tags, $fields);
-    influx_update($device, $measurement, rrd_array_filter($tags), $fields);
-} // data_update
+    $datastore = app('Datastore');
+    $datastore->put($device, $measurement, $tags, $fields);
+}

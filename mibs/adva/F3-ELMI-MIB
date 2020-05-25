@@ -1,0 +1,704 @@
+F3-ELMI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, TimeTicks
+             FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP 
+             FROM SNMPv2-CONF
+    DisplayString, TruthValue, TEXTUAL-CONVENTION
+             FROM SNMPv2-TC
+    neIndex, shelfIndex, slotIndex
+             FROM  CM-ENTITY-MIB
+    cmEthernetAccPortIndex, cmEthernetNetPortIndex, cmFlowIndex
+             FROM  CM-FACILITY-MIB
+    fsp150cm
+             FROM  ADVA-MIB
+    PerfCounter64, OperationalState
+             FROM  CM-COMMON-MIB;
+
+f3ElmiMIB MODULE-IDENTITY
+    LAST-UPDATED    "201205180000Z"
+    ORGANIZATION    "ADVA Optical Networking"
+    CONTACT-INFO
+            "        Raghav Trivedi
+                     ADVA Optical Networking, Inc.
+                Tel: +1 972 759-1239
+             E-mail: rtrivedi@advaoptical.com
+             Postal: 2301 N. Greenville Ave. #300
+                     Richardson, TX USA 75082"
+    DESCRIPTION
+            "This module defines the ELMI MIB definitions used by 
+             the F3 (FSP150CM/CC) product lines.  
+             Copyright (C) ADVA Optical Networking."
+    REVISION        "201205180000Z"
+    DESCRIPTION
+         "
+          Notes from release 201205180000Z
+            (i)Initial Version." 
+    ::= {fsp150cm 20}    
+
+-- 
+-- OID definitions
+-- 
+f3ElmiConfigObjects        OBJECT IDENTIFIER ::= {f3ElmiMIB 1}
+f3ElmiStatsObjects         OBJECT IDENTIFIER ::= {f3ElmiMIB 2}
+f3ElmiConformance          OBJECT IDENTIFIER ::= {f3ElmiMIB 3}
+
+--
+-- Textual Conventions
+--
+ELMIEvcStatus ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the E-LMI EVC status sent in Status messages"
+    SYNTAX       INTEGER {
+                   active(1),
+                   inactive(2),
+                   partiallyActive(3)
+                 }
+
+ELMIEvcType ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "Describes the E-LMI EVC type sent in Status messages"
+    SYNTAX       INTEGER {
+                   pointToPoint(1),
+                   pointToMultipoint(2)
+                 }
+
+--
+-- CONFIGURATION 
+--
+--
+-- Ethernet Access Port - ELMI Config Table 
+--
+f3AccPortElmiConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3AccPortElmiConfigEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the Access Port related
+        ELMI Configuration."
+    ::= { f3ElmiConfigObjects 1 }
+
+f3AccPortElmiConfigEntry OBJECT-TYPE
+    SYNTAX     F3AccPortElmiConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Access Port ELMI Configuration Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex, 
+            f3AccPortElmiConfigIndex }
+    ::= { f3AccPortElmiConfigTable 1 }
+
+F3AccPortElmiConfigEntry ::= SEQUENCE {
+    f3AccPortElmiConfigIndex                         Integer32,
+    f3AccPortElmiConfigEnabled                       TruthValue,
+    f3AccPortElmiConfigOperationalState              OperationalState,
+    f3AccPortElmiConfigN393StatusCounter             Integer32, 
+    f3AccPortElmiConfigT392PollVerificationTimer     Integer32, 
+    f3AccPortElmiConfigAsyncStatusEnabled            TruthValue, 
+    f3AccPortElmiConfigMinAsyncMessageInterval       Integer32 
+}
+
+f3AccPortElmiConfigIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Access Port ELMI Configuration."
+     ::= { f3AccPortElmiConfigEntry 1 }
+
+f3AccPortElmiConfigEnabled OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to enable/disable ELMI 
+          on the Access Port."
+     ::= { f3AccPortElmiConfigEntry 2 }
+
+f3AccPortElmiConfigOperationalState   OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the ELMI state machine 
+             on the Access Port."
+     ::= { f3AccPortElmiConfigEntry 3 }
+
+f3AccPortElmiConfigN393StatusCounter     OBJECT-TYPE
+    SYNTAX      Integer32 (2..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of maximum number of consecutive errors,
+            after which ELMI is declared as not operational."
+    DEFVAL { 4 }
+     ::= { f3AccPortElmiConfigEntry 4 }
+
+f3AccPortElmiConfigT392PollVerificationTimer OBJECT-TYPE
+    SYNTAX      Integer32 (0|5..30) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object provides the Poll Verification Timer in seconds.  Value of
+             0 will be used to disable the timer." 
+    DEFVAL { 15 }
+    ::= { f3AccPortElmiConfigEntry 5 }
+
+f3AccPortElmiConfigAsyncStatusEnabled OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows configuration of the capability to generate and
+             send Asynchronous Status." 
+    ::= { f3AccPortElmiConfigEntry 6 }
+
+f3AccPortElmiConfigMinAsyncMessageInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows configuration of the minimum time interval between
+             asynchronouos status messages, in seconds."
+    DEFVAL { 1 }
+    ::= { f3AccPortElmiConfigEntry 7 }
+
+--
+-- Ethernet Network Port - ELMI Config Table 
+--
+f3NetPortElmiConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3NetPortElmiConfigEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the Access Port related
+        ELMI Configuration."
+    ::= { f3ElmiConfigObjects 2 }
+
+f3NetPortElmiConfigEntry OBJECT-TYPE
+    SYNTAX     F3NetPortElmiConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Access Port ELMI Configuration Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetNetPortIndex, 
+            f3NetPortElmiConfigIndex }
+    ::= { f3NetPortElmiConfigTable 1 }
+
+F3NetPortElmiConfigEntry ::= SEQUENCE {
+    f3NetPortElmiConfigIndex                         Integer32,
+    f3NetPortElmiConfigEnabled                       TruthValue,
+    f3NetPortElmiConfigOperationalState              OperationalState,
+    f3NetPortElmiConfigN393StatusCounter             Integer32, 
+    f3NetPortElmiConfigT392PollVerificationTimer     Integer32, 
+    f3NetPortElmiConfigAsyncStatusEnabled            TruthValue, 
+    f3NetPortElmiConfigMinAsyncMessageInterval       Integer32 
+}
+
+f3NetPortElmiConfigIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Network Port ELMI Configuration."
+     ::= { f3NetPortElmiConfigEntry 1 }
+
+f3NetPortElmiConfigEnabled OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to enable/disable ELMI 
+          on the Network Port."
+     ::= { f3NetPortElmiConfigEntry 2 }
+
+f3NetPortElmiConfigOperationalState   OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the ELMI state machine 
+             on the Network Port."
+     ::= { f3NetPortElmiConfigEntry 3 }
+
+f3NetPortElmiConfigN393StatusCounter     OBJECT-TYPE
+    SYNTAX      Integer32 (2..10)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object allows specification of maximum number of consecutive errors,
+            after which ELMI is declared as not operational."
+    DEFVAL { 4 }
+     ::= { f3NetPortElmiConfigEntry 4 }
+
+f3NetPortElmiConfigT392PollVerificationTimer OBJECT-TYPE
+    SYNTAX      Integer32 (0|5..30) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object provides the Poll Verification Timer in seconds.  Value of
+             0 will be used to disable the timer." 
+    DEFVAL { 15 }
+    ::= { f3NetPortElmiConfigEntry 5 }
+
+f3NetPortElmiConfigAsyncStatusEnabled OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows configuration of the capability to generate and
+             send Asynchronous Status." 
+    ::= { f3NetPortElmiConfigEntry 6 }
+
+f3NetPortElmiConfigMinAsyncMessageInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows configuration of the minimum time interval between
+             asynchronouos status messages, in seconds."
+    DEFVAL { 1 }
+    ::= { f3NetPortElmiConfigEntry 7 }
+
+--
+-- Ethernet Access Port - ELMI Statistics Table 
+--
+f3AccPortElmiStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3AccPortElmiStatsEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the Access Port related
+        ELMI Statistics."
+    ::= { f3ElmiStatsObjects 1 }
+
+f3AccPortElmiStatsEntry OBJECT-TYPE
+    SYNTAX     F3AccPortElmiStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Access Port ELMI Statistics Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex, 
+            f3AccPortElmiConfigIndex, f3AccPortElmiStatsIndex }
+    ::= { f3AccPortElmiStatsTable 1 }
+
+
+F3AccPortElmiStatsEntry ::= SEQUENCE {
+    f3AccPortElmiStatsIndex                          Integer32,
+    f3AccPortElmiStatsLastFullStatusSent             TimeTicks,
+    f3AccPortElmiStatsLastStatusCheckSent            TimeTicks,
+    f3AccPortElmiStatsLastFullStatusReceived         TimeTicks,
+    f3AccPortElmiStatsLastStatusCheckReceived        TimeTicks,
+    f3AccPortElmiStatsInvalidProtocolVersionFrames   PerfCounter64,
+    f3AccPortElmiStatsInvalidMessageTypeFrames       PerfCounter64,
+    f3AccPortElmiStatsOutOfSequenceIEFrames          PerfCounter64,
+    f3AccPortElmiStatsDuplicateIEFrames              PerfCounter64,
+    f3AccPortElmiStatsMissingMandatoryIEFrames       PerfCounter64,
+    f3AccPortElmiStatsErroredMandatoryIEFrames       PerfCounter64,
+    f3AccPortElmiStatsUnexpectedIEFrames             PerfCounter64,
+    f3AccPortElmiStatsPVTExpirations                 PerfCounter64
+}
+
+f3AccPortElmiStatsIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Access Port ELMI Statistics."
+     ::= { f3AccPortElmiStatsEntry 1 }
+
+f3AccPortElmiStatsLastFullStatusSent OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides number of hours, minutes, seconds since last full
+          status report was sent." 
+     ::= { f3AccPortElmiStatsEntry 2 }
+
+f3AccPortElmiStatsLastStatusCheckSent OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides number of hours, minutes, seconds since last 
+          status check was sent." 
+     ::= { f3AccPortElmiStatsEntry 3 }
+
+f3AccPortElmiStatsLastFullStatusReceived OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides number of hours, minutes, seconds since last 
+          status check was received." 
+     ::= { f3AccPortElmiStatsEntry 4 }
+
+f3AccPortElmiStatsLastStatusCheckReceived OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides number of hours, minutes, seconds since last 
+          status check was received." 
+     ::= { f3AccPortElmiStatsEntry 5 }
+
+f3AccPortElmiStatsInvalidProtocolVersionFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of invalid protocol version frames." 
+     ::= { f3AccPortElmiStatsEntry 6 }
+
+f3AccPortElmiStatsInvalidMessageTypeFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of invalid message type frames." 
+     ::= { f3AccPortElmiStatsEntry 7 }
+
+f3AccPortElmiStatsOutOfSequenceIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more Information Elements out of sequence."
+     ::= { f3AccPortElmiStatsEntry 8 }
+
+f3AccPortElmiStatsDuplicateIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more duplicate Information Elements."
+     ::= { f3AccPortElmiStatsEntry 9 }
+
+f3AccPortElmiStatsMissingMandatoryIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more missing mandatory Information Elements."
+     ::= { f3AccPortElmiStatsEntry 10 }
+
+f3AccPortElmiStatsErroredMandatoryIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more errors in mandatory Information Elements."
+     ::= { f3AccPortElmiStatsEntry 11 }
+
+f3AccPortElmiStatsUnexpectedIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more unexpected Information Elements."
+     ::= { f3AccPortElmiStatsEntry 12 }
+
+f3AccPortElmiStatsPVTExpirations OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of times the Protocol Verification Timer(t392)
+          has expired."
+     ::= { f3AccPortElmiStatsEntry 13 }
+
+--
+-- Ethernet Access Port - ELMI Statistics Table 
+--
+f3NetPortElmiStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3NetPortElmiStatsEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the Access Port related
+        ELMI Statistics."
+    ::= { f3ElmiStatsObjects 2 }
+
+f3NetPortElmiStatsEntry OBJECT-TYPE
+    SYNTAX     F3NetPortElmiStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           Access Port ELMI Statistics Entity."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetNetPortIndex, 
+            f3NetPortElmiConfigIndex, f3NetPortElmiStatsIndex }
+    ::= { f3NetPortElmiStatsTable 1 }
+
+
+F3NetPortElmiStatsEntry ::= SEQUENCE {
+    f3NetPortElmiStatsIndex                          Integer32,
+    f3NetPortElmiStatsLastFullStatusSent             TimeTicks,
+    f3NetPortElmiStatsLastStatusCheckSent            TimeTicks,
+    f3NetPortElmiStatsLastFullStatusReceived         TimeTicks,
+    f3NetPortElmiStatsLastStatusCheckReceived        TimeTicks,
+    f3NetPortElmiStatsInvalidProtocolVersionFrames   PerfCounter64,
+    f3NetPortElmiStatsInvalidMessageTypeFrames       PerfCounter64,
+    f3NetPortElmiStatsOutOfSequenceIEFrames          PerfCounter64,
+    f3NetPortElmiStatsDuplicateIEFrames              PerfCounter64,
+    f3NetPortElmiStatsMissingMandatoryIEFrames       PerfCounter64,
+    f3NetPortElmiStatsErroredMandatoryIEFrames       PerfCounter64,
+    f3NetPortElmiStatsUnexpectedIEFrames             PerfCounter64,
+    f3NetPortElmiStatsPVTExpirations                 PerfCounter64
+}
+
+f3NetPortElmiStatsIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the Access Port ELMI Statistics."
+     ::= { f3NetPortElmiStatsEntry 1 }
+
+f3NetPortElmiStatsLastFullStatusSent OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides number of hours, minutes, seconds since last full
+          status report was sent." 
+     ::= { f3NetPortElmiStatsEntry 2 }
+
+f3NetPortElmiStatsLastStatusCheckSent OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides number of hours, minutes, seconds since last 
+          status check was sent." 
+     ::= { f3NetPortElmiStatsEntry 3 }
+
+f3NetPortElmiStatsLastFullStatusReceived OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides number of hours, minutes, seconds since last 
+          status check was received." 
+     ::= { f3NetPortElmiStatsEntry 4 }
+
+f3NetPortElmiStatsLastStatusCheckReceived OBJECT-TYPE
+    SYNTAX      TimeTicks 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides number of hours, minutes, seconds since last 
+          status check was received." 
+     ::= { f3NetPortElmiStatsEntry 5 }
+
+f3NetPortElmiStatsInvalidProtocolVersionFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of invalid protocol version frames." 
+     ::= { f3NetPortElmiStatsEntry 6 }
+
+f3NetPortElmiStatsInvalidMessageTypeFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of invalid message type frames." 
+     ::= { f3NetPortElmiStatsEntry 7 }
+
+f3NetPortElmiStatsOutOfSequenceIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more Information Elements out of sequence."
+     ::= { f3NetPortElmiStatsEntry 8 }
+
+f3NetPortElmiStatsDuplicateIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more duplicate Information Elements."
+     ::= { f3NetPortElmiStatsEntry 9 }
+
+f3NetPortElmiStatsMissingMandatoryIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more missing mandatory Information Elements."
+     ::= { f3NetPortElmiStatsEntry 10 }
+
+f3NetPortElmiStatsErroredMandatoryIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more errors in mandatory Information Elements."
+     ::= { f3NetPortElmiStatsEntry 11 }
+
+f3NetPortElmiStatsUnexpectedIEFrames OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of ELMI frames received with one or
+          more unexpected Information Elements."
+     ::= { f3NetPortElmiStatsEntry 12 }
+
+f3NetPortElmiStatsPVTExpirations OBJECT-TYPE
+    SYNTAX      PerfCounter64 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "This object provides the number of times the Protocol Verification Timer(t392)
+          has expired."
+     ::= { f3NetPortElmiStatsEntry 13 }
+
+
+--
+-- ELMI EVC Status Information Table 
+--
+f3ElmiEvcStatusInfoTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3ElmiEvcStatusInfoEntry 
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to ELMI EVC Status."
+    ::= { f3ElmiConfigObjects 3 }
+
+f3ElmiEvcStatusInfoEntry OBJECT-TYPE
+    SYNTAX    F3ElmiEvcStatusInfoEntry  
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information about EVC Status information
+           transmitted in the last E-LMI STATUS Message."
+    INDEX { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex, 
+            cmFlowIndex }
+    ::= { f3ElmiEvcStatusInfoTable 1 }
+
+
+F3ElmiEvcStatusInfoEntry ::= SEQUENCE {
+    f3ElmiEvcStatusInfoEvcID                             Integer32,
+    f3ElmiEvcStatusInfoEvcFlowID                         DisplayString,
+    f3ElmiEvcStatusInfoEvcStatus                         ELMIEvcStatus,
+    f3ElmiEvcStatusInfoEvcType                           ELMIEvcType
+}
+
+f3ElmiEvcStatusInfoEvcID OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents unique EVC Identifier within the System. 
+          This value is sent in the E-LMI Status Message as EVC Reference ID."
+     ::= { f3ElmiEvcStatusInfoEntry 1 }
+
+f3ElmiEvcStatusInfoEvcFlowID OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents EVC Identifier derived from 
+          cmFlowCircuitName of the Flow. 
+          This value is sent in the E-LMI Status Message as EVC ID."
+     ::= { f3ElmiEvcStatusInfoEntry 2 }
+
+f3ElmiEvcStatusInfoEvcStatus OBJECT-TYPE
+    SYNTAX     ELMIEvcStatus
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents E-LMI EVC Status"
+     ::= { f3ElmiEvcStatusInfoEntry 3 }
+
+f3ElmiEvcStatusInfoEvcType OBJECT-TYPE
+    SYNTAX     ELMIEvcType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object represents E-LMI EVC Type"
+     ::= { f3ElmiEvcStatusInfoEntry 4 }
+
+--
+-- CONFORMANCE
+--
+f3ElmiCompliances OBJECT IDENTIFIER ::= {f3ElmiConformance 1}
+f3ElmiGroups      OBJECT IDENTIFIER ::= {f3ElmiConformance 2}
+
+f3ElmiCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "Describes the requirements for conformance to the F3 ELMI 
+             group."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+              f3ElmiConfigGroup, f3ElmiStatsGroup
+        }
+    ::= { f3ElmiCompliances 1 }
+
+f3ElmiConfigGroup OBJECT-GROUP
+    OBJECTS {
+        f3AccPortElmiConfigEnabled,
+        f3AccPortElmiConfigOperationalState, f3AccPortElmiConfigN393StatusCounter, 
+        f3AccPortElmiConfigT392PollVerificationTimer, f3AccPortElmiConfigAsyncStatusEnabled,
+        f3AccPortElmiConfigMinAsyncMessageInterval, f3NetPortElmiConfigEnabled,
+        f3NetPortElmiConfigOperationalState, f3NetPortElmiConfigN393StatusCounter, 
+        f3NetPortElmiConfigT392PollVerificationTimer, f3NetPortElmiConfigAsyncStatusEnabled,
+        f3NetPortElmiConfigMinAsyncMessageInterval,
+
+        f3ElmiEvcStatusInfoEvcID, f3ElmiEvcStatusInfoEvcFlowID,
+        f3ElmiEvcStatusInfoEvcStatus, f3ElmiEvcStatusInfoEvcType
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the F3 ELMI Configuration data."
+    ::= { f3ElmiGroups 1 }
+
+f3ElmiStatsGroup OBJECT-GROUP
+    OBJECTS {
+        f3AccPortElmiStatsLastFullStatusSent,
+        f3AccPortElmiStatsLastStatusCheckSent, f3AccPortElmiStatsLastFullStatusReceived,
+        f3AccPortElmiStatsLastStatusCheckReceived,
+        f3AccPortElmiStatsInvalidProtocolVersionFrames,
+        f3AccPortElmiStatsInvalidMessageTypeFrames,
+        f3AccPortElmiStatsOutOfSequenceIEFrames, f3AccPortElmiStatsDuplicateIEFrames,
+        f3AccPortElmiStatsMissingMandatoryIEFrames,
+        f3AccPortElmiStatsErroredMandatoryIEFrames,
+        f3AccPortElmiStatsUnexpectedIEFrames, f3AccPortElmiStatsPVTExpirations,
+
+        f3NetPortElmiStatsLastFullStatusSent,
+        f3NetPortElmiStatsLastStatusCheckSent, f3NetPortElmiStatsLastFullStatusReceived,
+        f3NetPortElmiStatsLastStatusCheckReceived,
+        f3NetPortElmiStatsInvalidProtocolVersionFrames,
+        f3NetPortElmiStatsInvalidMessageTypeFrames,
+        f3NetPortElmiStatsOutOfSequenceIEFrames, f3NetPortElmiStatsDuplicateIEFrames,
+        f3NetPortElmiStatsMissingMandatoryIEFrames,
+        f3NetPortElmiStatsErroredMandatoryIEFrames,
+        f3NetPortElmiStatsUnexpectedIEFrames, f3NetPortElmiStatsPVTExpirations
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the F3 ELMI Configuration data."
+    ::= { f3ElmiGroups 2 }
+
+END

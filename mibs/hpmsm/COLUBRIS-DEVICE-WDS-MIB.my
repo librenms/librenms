@@ -1,0 +1,1200 @@
+-- ****************************************************************************
+--  COLUBRIS-DEVICE-WDS-MIB definitions
+--
+--  Copyright (c) 2006, Colubris Networks, Inc.
+--  All Rights Reserved.
+--
+--  Colubris Device WDS MIB file.
+--
+-- ****************************************************************************
+
+
+COLUBRIS-DEVICE-WDS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter32
+        FROM    SNMPv2-SMI
+    DisplayString, MacAddress, TruthValue
+        FROM    SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM    SNMPv2-CONF
+    colubrisMgmtV2
+        FROM    COLUBRIS-SMI
+    coDevDisIndex
+        FROM    COLUBRIS-DEVICE-MIB
+;
+
+
+colubrisDeviceWdsMIB MODULE-IDENTITY
+    LAST-UPDATED    "200801040000Z"
+    ORGANIZATION    "Colubris Networks, Inc."
+    CONTACT-INFO    "Colubris Networks
+                     Postal: 200 West Street Ste 300
+                             Waltham, Massachusetts 02451-1121
+                             UNITED STATES
+                     Phone:  +1 781 684 0001
+                     Fax:    +1 781 684 0009
+
+                     E-mail: cn-snmp@colubris.com"
+    DESCRIPTION     "Colubris Device WDS MIB."
+
+    ::= { colubrisMgmtV2 34 }
+
+
+-- colubrisDeviceWdsMIB definition
+colubrisDeviceWdsMIBObjects OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIB 1 }
+
+-- colubris Device WDS groups
+coDeviceWDSInfoGroup        OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIBObjects 2 }
+coDeviceWDSRadioGroup       OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIBObjects 3 }
+coDeviceWDSGroupGroup       OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIBObjects 4 }
+coDeviceWDSLinkGroup        OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIBObjects 5 }
+coDeviceWDSNetworkScanGroup OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIBObjects 6 }
+
+-- The Device WDS Information Group
+coDeviceWdsInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceWdsInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Device WDS information attributes."
+    ::= { coDeviceWDSInfoGroup 1 }
+
+coDeviceWdsInfoEntry OBJECT-TYPE
+    SYNTAX      CoDeviceWdsInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the coDeviceWdsInfoTable.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller."
+    INDEX       { coDevDisIndex }
+    ::= { coDeviceWdsInfoTable 1 }
+
+CoDeviceWdsInfoEntry ::= SEQUENCE
+{
+    coDevWDSInfoMaxNumberOfGroup      Unsigned32
+}
+
+coDevWDSInfoMaxNumberOfGroup OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..6)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum number of WDS groups supported by the device."
+    ::= { coDeviceWdsInfoEntry 1 }
+
+-- The Device WDS Radio Group
+coDeviceWDSRadioTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceWDSRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the WDS radio parameters."
+    ::= { coDeviceWDSRadioGroup 1 }
+
+coDeviceWDSRadioEntry OBJECT-TYPE
+    SYNTAX      CoDeviceWDSRadioEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS radio Table.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller
+                 coDevWDSRadioIndex - Radio number where the WDS radio
+                                      parameters are applied."
+    INDEX       { coDevDisIndex, coDevWDSRadioIndex }
+    ::= { coDeviceWDSRadioTable 1 }
+
+CoDeviceWDSRadioEntry ::= SEQUENCE
+{
+    coDevWDSRadioIndex         Integer32,
+    coDevWDSRadioAckDistance   Unsigned32,
+    coDevWDSRadioQoS           INTEGER
+}
+
+coDevWDSRadioIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Radio number."
+    ::= { coDeviceWDSRadioEntry 1 }
+
+coDevWDSRadioAckDistance OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "km"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Maximum distance between the device and the remote peers."
+    ::= { coDeviceWDSRadioEntry 2 }
+
+coDevWDSRadioQoS OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    disabled(1),
+                    vlan(2),
+                    veryHigh(3),
+                    high(4),
+                    normal(5),
+                    low(6),
+                    diffSrv(7),
+                    tos(8),
+                    ipQos(9)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "QoS priority mechanism used to maps the traffic to
+                 one of the four WMM traffic queues."
+    ::= { coDeviceWDSRadioEntry 3 }
+
+-- The Device WDS Group Group
+coDeviceWDSGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceWDSGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the WDS Groups. This table contains
+                 the six WDS Groups configuration information."
+    ::= { coDeviceWDSGroupGroup 1 }
+
+coDeviceWDSGroupEntry OBJECT-TYPE
+    SYNTAX      CoDeviceWDSGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS Group Table.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller
+                 coDevWDSGroupIndex - Uniquely identify a WDS group
+                                      inside the Device WDS group table."
+    INDEX       { coDevDisIndex, coDevWDSGroupIndex }
+    ::= { coDeviceWDSGroupTable 1 }
+
+CoDeviceWDSGroupEntry ::= SEQUENCE
+{
+    coDevWDSGroupIndex            Integer32,
+    coDevWDSGroupName             DisplayString,
+    coDevWDSGroupState            INTEGER,
+    coDevWDSGroupSecurity         INTEGER,
+    coDevWDSGroupDynamicMode      INTEGER,
+    coDevWDSGroupDynamicGroupId   Unsigned32
+}
+
+coDevWDSGroupIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..6)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The auxiliary variable used to identify instances of WDS
+                 groups."
+    ::= { coDeviceWDSGroupEntry 1 }
+
+coDevWDSGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Friendly name of the WDS group."
+    ::= { coDeviceWDSGroupEntry 2 }
+
+coDevWDSGroupState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    discovery(1),
+                    negotiation(2),
+                    acquisition(3),
+                    locked(4),
+                    shutdown(5)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies if the WDS group is active in the radios."
+    ::= { coDeviceWDSGroupEntry 3 }
+
+coDevWDSGroupSecurity OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(1),
+                    wep(2),
+                    tkip(3),
+                    aes(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the encryption used by the WDS group."
+    ::= { coDeviceWDSGroupEntry 4 }
+
+coDevWDSGroupDynamicMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    master(1),
+                    slave(2),
+                    alternateMaster(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the mode of the dynamic WDS group."
+    ::= { coDeviceWDSGroupEntry 5 }
+
+coDevWDSGroupDynamicGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the group identifier of the dynamic WDS group."
+    ::= { coDeviceWDSGroupEntry 6 }
+
+-- The Device WDS Link Group
+coDeviceWDSLinkStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceWDSLinkStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the status of WDS links."
+    ::= { coDeviceWDSLinkGroup 1 }
+
+coDeviceWDSLinkStatusEntry OBJECT-TYPE
+    SYNTAX      CoDeviceWDSLinkStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS Link status Table.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller
+                 coDevWDSGroupIndex - Uniquely identify a WDS group
+                                      inside the Device WDS group table.
+                 coDevWDSLinkStaIndex - Uniquely identify a WDS link
+                                     inside a Device WDS group."
+    INDEX       { coDevDisIndex, coDevWDSGroupIndex, coDevWDSLinkStaIndex }
+    ::= { coDeviceWDSLinkStatusTable 1 }
+
+CoDeviceWDSLinkStatusEntry ::= SEQUENCE
+{
+    coDevWDSLinkStaIndex          Integer32,
+    coDevWDSLinkStaState          INTEGER,
+    coDevWDSLinkStaRadio          Integer32,
+    coDevWDSLinkStaPeerMacAddress MacAddress,
+    coDevWDSLinkStaMaster         TruthValue,
+    coDevWDSLinkStaAuthorized     TruthValue,
+    coDevWDSLinkStaEncryption     INTEGER,
+    coDevWDSLinkStaIdleTime       Unsigned32,
+    coDevWDSLinkStaSNR            Integer32,
+    coDevWDSLinkStaTxRate         Unsigned32,
+    coDevWDSLinkStaRxRate         Unsigned32,
+    coDevWDSLinkStaIfIndex        Integer32,
+    coDevWDSLinkStaHT             TruthValue,
+    coDevWDSLinkStaTxMCS          Unsigned32,
+    coDevWDSLinkStaRxMCS          Unsigned32,
+    coDevWDSLinkStaSignal         Integer32,
+    coDevWDSLinkStaNoise          Integer32
+}
+
+coDevWDSLinkStaIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "The auxiliary variable used to identify instances of WDS
+                 links."
+    ::= { coDeviceWDSLinkStatusEntry 1 }
+
+coDevWDSLinkStaState OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    down(1),
+                    acquiring(2),
+                    inactive(3),
+                    active(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the state of the WDS link."
+    ::= { coDeviceWDSLinkStatusEntry 2 }
+
+coDevWDSLinkStaRadio OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Radio number where the WDS peer was detected."
+    ::= { coDeviceWDSLinkStatusEntry 3 }
+
+coDevWDSLinkStaPeerMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the WDS peer."
+    ::= { coDeviceWDSLinkStatusEntry 4 }
+
+coDevWDSLinkStaMaster OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Determine if this link is a link to a master.
+                 Providing upstream network access."
+    ::= { coDeviceWDSLinkStatusEntry 5 }
+
+coDevWDSLinkStaAuthorized OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Encryption, if any, can proceed."
+    ::= { coDeviceWDSLinkStatusEntry 6 }
+
+coDevWDSLinkStaEncryption OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(1),
+                    wep(2),
+                    tkip(3),
+                    aes(4)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Specifies the encryption used by the WDS link."
+    ::= { coDeviceWDSLinkStatusEntry 7 }
+
+coDevWDSLinkStaIdleTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Inactivity time."
+    ::= { coDeviceWDSLinkStatusEntry 8 }
+
+coDevWDSLinkStaSNR OBJECT-TYPE
+    SYNTAX      Integer32 (0..92)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Signal noise ratio of the WDS peer."
+    ::= { coDeviceWDSLinkStatusEntry 9 }
+
+coDevWDSLinkStaTxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "500Kb/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transmit rate of the WDS peer."
+    ::= { coDeviceWDSLinkStatusEntry 10 }
+
+coDevWDSLinkStaRxRate OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "500Kb/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current receive rate of the WDS peer."
+    ::= { coDeviceWDSLinkStatusEntry 11 }
+
+coDevWDSLinkStaIfIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "coDevIfStaIfIndex of the associated interface in the
+                 device coDeviceIfStatusTable."
+    ::= { coDeviceWDSLinkStatusEntry 12 }
+
+coDevWDSLinkStaHT OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Determine if this link is using HT rates."
+    ::= { coDeviceWDSLinkStatusEntry 13 }
+
+coDevWDSLinkStaTxMCS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current transmit MCS of the WDS peer."
+    ::= { coDeviceWDSLinkStatusEntry 14 }
+
+coDevWDSLinkStaRxMCS OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current receive MCS of the WDS peer."
+    ::= { coDeviceWDSLinkStatusEntry 15 }
+
+coDevWDSLinkStaSignal OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Strength of the wireless signal."
+    ::= { coDeviceWDSLinkStatusEntry 16 }
+
+coDevWDSLinkStaNoise OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Level of local background noise."
+    ::= { coDeviceWDSLinkStatusEntry 17 }
+
+coDeviceWDSLinkStatsRatesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceWDSLinkStatsRatesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the statistics of WDS links."
+    ::= { coDeviceWDSLinkGroup 2 }
+
+coDeviceWDSLinkStatsRatesEntry OBJECT-TYPE
+    SYNTAX      CoDeviceWDSLinkStatsRatesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS Link Statistics
+                 Table.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller
+                 coDevWDSGroupIndex - Uniquely identify a WDS group
+                                      inside the Device WDS group table.
+                 coDevWDSLinkIndex - Uniquely identify a WDS link
+                                     inside a Device WDS group."
+    AUGMENTS    { coDeviceWDSLinkStatusEntry }
+    ::= { coDeviceWDSLinkStatsRatesTable 1 }
+
+CoDeviceWDSLinkStatsRatesEntry ::= SEQUENCE
+{
+    coDevWDSLinkStsPktsTxRate1       Counter32,
+    coDevWDSLinkStsPktsTxRate2       Counter32,
+    coDevWDSLinkStsPktsTxRate5dot5   Counter32,
+    coDevWDSLinkStsPktsTxRate11      Counter32,
+    coDevWDSLinkStsPktsTxRate6       Counter32,
+    coDevWDSLinkStsPktsTxRate9       Counter32,
+    coDevWDSLinkStsPktsTxRate12      Counter32,
+    coDevWDSLinkStsPktsTxRate18      Counter32,
+    coDevWDSLinkStsPktsTxRate24      Counter32,
+    coDevWDSLinkStsPktsTxRate36      Counter32,
+    coDevWDSLinkStsPktsTxRate48      Counter32,
+    coDevWDSLinkStsPktsTxRate54      Counter32,
+    coDevWDSLinkStsPktsRxRate1       Counter32,
+    coDevWDSLinkStsPktsRxRate2       Counter32,
+    coDevWDSLinkStsPktsRxRate5dot5   Counter32,
+    coDevWDSLinkStsPktsRxRate11      Counter32,
+    coDevWDSLinkStsPktsRxRate6       Counter32,
+    coDevWDSLinkStsPktsRxRate9       Counter32,
+    coDevWDSLinkStsPktsRxRate12      Counter32,
+    coDevWDSLinkStsPktsRxRate18      Counter32,
+    coDevWDSLinkStsPktsRxRate24      Counter32,
+    coDevWDSLinkStsPktsRxRate36      Counter32,
+    coDevWDSLinkStsPktsRxRate48      Counter32,
+    coDevWDSLinkStsPktsRxRate54      Counter32
+}
+
+coDevWDSLinkStsPktsTxRate1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 1 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 1 }
+
+coDevWDSLinkStsPktsTxRate2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 2 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 2 }
+
+coDevWDSLinkStsPktsTxRate5dot5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 5.5 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 3 }
+
+coDevWDSLinkStsPktsTxRate11 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 11 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 4 }
+
+coDevWDSLinkStsPktsTxRate6 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 6 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 5 }
+
+coDevWDSLinkStsPktsTxRate9 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 9 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 6 }
+
+coDevWDSLinkStsPktsTxRate12 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 12 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 7 }
+
+coDevWDSLinkStsPktsTxRate18 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 18 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 8 }
+
+coDevWDSLinkStsPktsTxRate24 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 24 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 9 }
+
+coDevWDSLinkStsPktsTxRate36 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 36 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 10 }
+
+coDevWDSLinkStsPktsTxRate48 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 48 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 11 }
+
+coDevWDSLinkStsPktsTxRate54 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at 54 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 12 }
+
+coDevWDSLinkStsPktsRxRate1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 1 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 13 }
+
+coDevWDSLinkStsPktsRxRate2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 2 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 14 }
+
+coDevWDSLinkStsPktsRxRate5dot5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 5.5 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 15 }
+
+coDevWDSLinkStsPktsRxRate11 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 11 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 16 }
+
+coDevWDSLinkStsPktsRxRate6 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 6 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 17 }
+
+coDevWDSLinkStsPktsRxRate9 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 9 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 18 }
+
+coDevWDSLinkStsPktsRxRate12 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 12 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 19 }
+
+coDevWDSLinkStsPktsRxRate18 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 18 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 20 }
+
+coDevWDSLinkStsPktsRxRate24 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 24 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 21 }
+
+coDevWDSLinkStsPktsRxRate36 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 36 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 22 }
+
+coDevWDSLinkStsPktsRxRate48 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 48 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 23 }
+
+coDevWDSLinkStsPktsRxRate54 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at 54 Mbit/s."
+    ::= { coDeviceWDSLinkStatsRatesEntry 24 }
+
+coDeviceWDSLinkStatsHTRatesTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceWDSLinkStatsHTRatesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the statistics of WDS HT links."
+    ::= { coDeviceWDSLinkGroup 3 }
+
+coDeviceWDSLinkStatsHTRatesEntry OBJECT-TYPE
+    SYNTAX      CoDeviceWDSLinkStatsHTRatesEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS HT Link Statistics
+                 Table.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller
+                 coDevWDSGroupIndex - Uniquely identify a WDS group
+                                      inside the Device WDS group table.
+                 coDevWDSLinkIndex - Uniquely identify a WDS link
+                                     inside a Device WDS group."
+    AUGMENTS    { coDeviceWDSLinkStatusEntry }
+    ::= { coDeviceWDSLinkStatsHTRatesTable 1 }
+
+CoDeviceWDSLinkStatsHTRatesEntry ::= SEQUENCE
+{
+    coDevWDSLinkStsPktsTxMCS0       Counter32,
+    coDevWDSLinkStsPktsTxMCS1       Counter32,
+    coDevWDSLinkStsPktsTxMCS2       Counter32,
+    coDevWDSLinkStsPktsTxMCS3       Counter32,
+    coDevWDSLinkStsPktsTxMCS4       Counter32,
+    coDevWDSLinkStsPktsTxMCS5       Counter32,
+    coDevWDSLinkStsPktsTxMCS6       Counter32,
+    coDevWDSLinkStsPktsTxMCS7       Counter32,
+    coDevWDSLinkStsPktsTxMCS8       Counter32,
+    coDevWDSLinkStsPktsTxMCS9       Counter32,
+    coDevWDSLinkStsPktsTxMCS10      Counter32,
+    coDevWDSLinkStsPktsTxMCS11      Counter32,
+    coDevWDSLinkStsPktsTxMCS12      Counter32,
+    coDevWDSLinkStsPktsTxMCS13      Counter32,
+    coDevWDSLinkStsPktsTxMCS14      Counter32,
+    coDevWDSLinkStsPktsTxMCS15      Counter32,
+    coDevWDSLinkStsPktsRxMCS0       Counter32,
+    coDevWDSLinkStsPktsRxMCS1       Counter32,
+    coDevWDSLinkStsPktsRxMCS2       Counter32,
+    coDevWDSLinkStsPktsRxMCS3       Counter32,
+    coDevWDSLinkStsPktsRxMCS4       Counter32,
+    coDevWDSLinkStsPktsRxMCS5       Counter32,
+    coDevWDSLinkStsPktsRxMCS6       Counter32,
+    coDevWDSLinkStsPktsRxMCS7       Counter32,
+    coDevWDSLinkStsPktsRxMCS8       Counter32,
+    coDevWDSLinkStsPktsRxMCS9       Counter32,
+    coDevWDSLinkStsPktsRxMCS10      Counter32,
+    coDevWDSLinkStsPktsRxMCS11      Counter32,
+    coDevWDSLinkStsPktsRxMCS12      Counter32,
+    coDevWDSLinkStsPktsRxMCS13      Counter32,
+    coDevWDSLinkStsPktsRxMCS14      Counter32,
+    coDevWDSLinkStsPktsRxMCS15      Counter32
+}
+
+coDevWDSLinkStsPktsTxMCS0 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS0 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 1 }
+
+coDevWDSLinkStsPktsTxMCS1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS1 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 2 }
+
+coDevWDSLinkStsPktsTxMCS2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS2 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 3 }
+
+coDevWDSLinkStsPktsTxMCS3 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS3 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 4 }
+
+coDevWDSLinkStsPktsTxMCS4 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS4 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 5 }
+
+coDevWDSLinkStsPktsTxMCS5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS5 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 6 }
+
+coDevWDSLinkStsPktsTxMCS6 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS6 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 7 }
+
+coDevWDSLinkStsPktsTxMCS7 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS7 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 8 }
+
+coDevWDSLinkStsPktsTxMCS8 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS8 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 9 }
+
+coDevWDSLinkStsPktsTxMCS9 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS9 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 10 }
+
+coDevWDSLinkStsPktsTxMCS10 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS10 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 11 }
+
+coDevWDSLinkStsPktsTxMCS11 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS11 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 12 }
+
+coDevWDSLinkStsPktsTxMCS12 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS12 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 13 }
+
+coDevWDSLinkStsPktsTxMCS13 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS13 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 14 }
+
+coDevWDSLinkStsPktsTxMCS14 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS14 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 15 }
+
+coDevWDSLinkStsPktsTxMCS15 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames transmitted at MCS15 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 16 }
+
+coDevWDSLinkStsPktsRxMCS0 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS0 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 17 }
+
+coDevWDSLinkStsPktsRxMCS1 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS1 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 18 }
+
+coDevWDSLinkStsPktsRxMCS2 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS2 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 19 }
+
+coDevWDSLinkStsPktsRxMCS3 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS3 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 20 }
+
+coDevWDSLinkStsPktsRxMCS4 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS4 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 21 }
+
+coDevWDSLinkStsPktsRxMCS5 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS5 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 22 }
+
+coDevWDSLinkStsPktsRxMCS6 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS6 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 23 }
+
+coDevWDSLinkStsPktsRxMCS7 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS7 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 24 }
+
+coDevWDSLinkStsPktsRxMCS8 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS8 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 25 }
+
+coDevWDSLinkStsPktsRxMCS9 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS9 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 26 }
+
+coDevWDSLinkStsPktsRxMCS10 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS10 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 27 }
+
+coDevWDSLinkStsPktsRxMCS11 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS11 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 28 }
+
+coDevWDSLinkStsPktsRxMCS12 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS12 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 29 }
+
+coDevWDSLinkStsPktsRxMCS13 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS13 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 30 }
+
+coDevWDSLinkStsPktsRxMCS14 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS14 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 31 }
+
+coDevWDSLinkStsPktsRxMCS15 OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of frames received at MCS15 since the
+                 link was established."
+    ::= { coDeviceWDSLinkStatsHTRatesEntry 32 }
+
+-- The Device WDS Network Scan Group
+coDeviceWDSNetworkScanTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CoDeviceWDSNetworkScanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Conceptual table for the WDS network scans."
+    ::= { coDeviceWDSNetworkScanGroup 1 }
+
+coDeviceWDSNetworkScanEntry OBJECT-TYPE
+    SYNTAX      CoDeviceWDSNetworkScanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An Entry (conceptual row) in the WDS Network Scan
+                 Table.
+                 coDevDisIndex - Uniquely identifies a device on the
+                                 MultiService Controller
+                 coDevWDSScanRadioIndex - Radio number where the WDS peer
+                                       was detected.
+                 coDevWDSScanPeerIndex - Uniquely identify a WDS peer
+                                      on a radio inside the WDS
+                                      network scan table."
+    INDEX       { coDevDisIndex, coDevWDSScanRadioIndex, coDevWDSScanPeerIndex }
+    ::= { coDeviceWDSNetworkScanTable 1 }
+
+CoDeviceWDSNetworkScanEntry ::= SEQUENCE
+{
+    coDevWDSScanRadioIndex     Integer32,
+    coDevWDSScanPeerIndex      Integer32,
+    coDevWDSScanGroupId        Unsigned32,
+    coDevWDSScanPeerMacAddress MacAddress,
+    coDevWDSScanChannel        Unsigned32,
+    coDevWDSScanSNR            Integer32,
+    coDevWDSScanMode           INTEGER,
+    coDevWDSScanAvailable      TruthValue
+}
+
+coDevWDSScanRadioIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..3)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Radio number where the WDS peer was detected."
+    ::= { coDeviceWDSNetworkScanEntry 1 }
+
+coDevWDSScanPeerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Uniquely identify a WDS peer on a radio."
+    ::= { coDeviceWDSNetworkScanEntry 2 }
+
+coDevWDSScanGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Group id used by the WDS peer."
+    ::= { coDeviceWDSNetworkScanEntry 3 }
+
+coDevWDSScanPeerMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "MAC address of the WDS peer."
+    ::= { coDeviceWDSNetworkScanEntry 4 }
+
+coDevWDSScanChannel OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..199)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Channel on which the peer is transmitting."
+    ::= { coDeviceWDSNetworkScanEntry 5 }
+
+coDevWDSScanSNR OBJECT-TYPE
+    SYNTAX      Integer32 (0..92)
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Signal noise ratio of the WDS peer."
+    ::= { coDeviceWDSNetworkScanEntry 6 }
+
+coDevWDSScanMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    master(1),
+                    slave(2),
+                    alternateMaster(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Current mode of the WDS peer."
+    ::= { coDeviceWDSNetworkScanEntry 7 }
+
+coDevWDSScanAvailable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Peer is accepting connections."
+    ::= { coDeviceWDSNetworkScanEntry 8 }
+
+-- Device WDS notifications
+colubrisDeviceWdsMIBNotificationPrefix OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIB 2 }
+colubrisDeviceWdsMIBNotifications OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIBNotificationPrefix 0 }
+
+-- conformance information
+colubrisDeviceWdsMIBConformance OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIB 3 }
+colubrisDeviceWdsMIBCompliances OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIBConformance 1 }
+colubrisDeviceWdsMIBGroups      OBJECT IDENTIFIER ::= { colubrisDeviceWdsMIBConformance 2 }
+
+-- compliance statements
+colubrisDeviceWdsMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION "The compliance statement for the device WDS MIB."
+    MODULE      MANDATORY-GROUPS
+                    {
+                        colubrisDeviceWdsInfoMIBGroup,
+                        colubrisDeviceWdsRadioMIBGroup,
+                        colubrisDeviceWdsGroupMIBGroup,
+                        colubrisDeviceWdsLinkMIBGroup,
+                        colubrisDeviceWdsNetworkScanMIBGroup
+                    }
+    ::= { colubrisDeviceWdsMIBCompliances 1 }
+
+-- units of conformance
+colubrisDeviceWdsInfoMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevWDSInfoMaxNumberOfGroup
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the device WDS
+                 information group."
+    ::= { colubrisDeviceWdsMIBGroups 1 }
+
+colubrisDeviceWdsRadioMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevWDSRadioAckDistance,
+                    coDevWDSRadioQoS
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the device WDS
+                 radio group."
+    ::= { colubrisDeviceWdsMIBGroups 2 }
+
+colubrisDeviceWdsGroupMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevWDSGroupName,
+                    coDevWDSGroupState,
+                    coDevWDSGroupSecurity,
+                    coDevWDSGroupDynamicMode,
+                    coDevWDSGroupDynamicGroupId
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the device WDS
+                 group group."
+    ::= { colubrisDeviceWdsMIBGroups 3 }
+
+colubrisDeviceWdsLinkMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevWDSLinkStaState,
+                    coDevWDSLinkStaRadio,
+                    coDevWDSLinkStaPeerMacAddress,
+                    coDevWDSLinkStaMaster,
+                    coDevWDSLinkStaAuthorized,
+                    coDevWDSLinkStaEncryption,
+                    coDevWDSLinkStaIdleTime,
+                    coDevWDSLinkStaSNR,
+                    coDevWDSLinkStaTxRate,
+                    coDevWDSLinkStaRxRate,
+                    coDevWDSLinkStaIfIndex,
+                    coDevWDSLinkStaHT,
+                    coDevWDSLinkStaTxMCS,
+                    coDevWDSLinkStaRxMCS,
+                    coDevWDSLinkStaSignal,
+                    coDevWDSLinkStaNoise,
+                    coDevWDSLinkStsPktsTxRate1,
+                    coDevWDSLinkStsPktsTxRate2,
+                    coDevWDSLinkStsPktsTxRate5dot5,
+                    coDevWDSLinkStsPktsTxRate11,
+                    coDevWDSLinkStsPktsTxRate6,
+                    coDevWDSLinkStsPktsTxRate9,
+                    coDevWDSLinkStsPktsTxRate12,
+                    coDevWDSLinkStsPktsTxRate18,
+                    coDevWDSLinkStsPktsTxRate24,
+                    coDevWDSLinkStsPktsTxRate36,
+                    coDevWDSLinkStsPktsTxRate48,
+                    coDevWDSLinkStsPktsTxRate54,
+                    coDevWDSLinkStsPktsRxRate1,
+                    coDevWDSLinkStsPktsRxRate2,
+                    coDevWDSLinkStsPktsRxRate5dot5,
+                    coDevWDSLinkStsPktsRxRate11,
+                    coDevWDSLinkStsPktsRxRate6,
+                    coDevWDSLinkStsPktsRxRate9,
+                    coDevWDSLinkStsPktsRxRate12,
+                    coDevWDSLinkStsPktsRxRate18,
+                    coDevWDSLinkStsPktsRxRate24,
+                    coDevWDSLinkStsPktsRxRate36,
+                    coDevWDSLinkStsPktsRxRate48,
+                    coDevWDSLinkStsPktsRxRate54,
+                    coDevWDSLinkStsPktsTxMCS0,
+                    coDevWDSLinkStsPktsTxMCS1,
+                    coDevWDSLinkStsPktsTxMCS2,
+                    coDevWDSLinkStsPktsTxMCS3,
+                    coDevWDSLinkStsPktsTxMCS4,
+                    coDevWDSLinkStsPktsTxMCS5,
+                    coDevWDSLinkStsPktsTxMCS6,
+                    coDevWDSLinkStsPktsTxMCS7,
+                    coDevWDSLinkStsPktsTxMCS8,
+                    coDevWDSLinkStsPktsTxMCS9,
+                    coDevWDSLinkStsPktsTxMCS10,
+                    coDevWDSLinkStsPktsTxMCS11,
+                    coDevWDSLinkStsPktsTxMCS12,
+                    coDevWDSLinkStsPktsTxMCS13,
+                    coDevWDSLinkStsPktsTxMCS14,
+                    coDevWDSLinkStsPktsTxMCS15,
+                    coDevWDSLinkStsPktsRxMCS0,
+                    coDevWDSLinkStsPktsRxMCS1,
+                    coDevWDSLinkStsPktsRxMCS2,
+                    coDevWDSLinkStsPktsRxMCS3,
+                    coDevWDSLinkStsPktsRxMCS4,
+                    coDevWDSLinkStsPktsRxMCS5,
+                    coDevWDSLinkStsPktsRxMCS6,
+                    coDevWDSLinkStsPktsRxMCS7,
+                    coDevWDSLinkStsPktsRxMCS8,
+                    coDevWDSLinkStsPktsRxMCS9,
+                    coDevWDSLinkStsPktsRxMCS10,
+                    coDevWDSLinkStsPktsRxMCS11,
+                    coDevWDSLinkStsPktsRxMCS12,
+                    coDevWDSLinkStsPktsRxMCS13,
+                    coDevWDSLinkStsPktsRxMCS14,
+                    coDevWDSLinkStsPktsRxMCS15
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the device WDS
+                 link group."
+    ::= { colubrisDeviceWdsMIBGroups 4 }
+
+colubrisDeviceWdsNetworkScanMIBGroup OBJECT-GROUP
+    OBJECTS     {
+                    coDevWDSScanGroupId,
+                    coDevWDSScanPeerMacAddress,
+                    coDevWDSScanChannel,
+                    coDevWDSScanSNR,
+                    coDevWDSScanMode,
+                    coDevWDSScanAvailable
+                }
+    STATUS      current
+    DESCRIPTION "A collection of objects for the device WDS
+                 network scan group."
+    ::= { colubrisDeviceWdsMIBGroups 5 }
+
+END

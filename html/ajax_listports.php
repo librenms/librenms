@@ -13,17 +13,16 @@
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-set_debug($_REQUEST['debug']);
-
-if (!$_SESSION['authenticated']) {
-    echo 'unauthenticated';
-    exit;
+if (!Auth::check()) {
+    die('Unauthorized');
 }
+
+set_debug($_REQUEST['debug']);
 
 if (is_numeric($_GET['device_id'])) {
     foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', array($_GET['device_id'])) as $interface) {
-        $interface  = ifNameDescr($interface);
-        $string = display($interface['label'].' - '.$interface['ifAlias']);
+        $interface  = cleanPort($interface);
+        $string = addslashes(html_entity_decode($interface['label'].' - '.$interface['ifAlias']));
         echo "obj.options[obj.options.length] = new Option('".$string."','".$interface['port_id']."');\n";
     }
 }

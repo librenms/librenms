@@ -1,0 +1,1643 @@
+-- RPS S.p.A enterprise MIB definition
+
+-- Copyright (c) RPS S.p.A.
+-- Version: 1.0.3 by Michele Marcon
+-- Date: 29.05.2017
+
+-- Title: RIELLOUPS-MIB
+
+-- RielloUPS-MIB { iso org(3) dod(6) internet(1) private(4)
+-- enterprises(1) riello(5491) }
+
+-- ************************************************************************
+-- ************************************************************************
+
+RIELLOUPS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+       MODULE-IDENTITY, NOTIFICATION-TYPE,
+       OBJECT-IDENTITY, Counter32, Gauge32, Integer32
+           FROM SNMPv2-SMI
+       DisplayString, TimeStamp, TimeInterval, TestAndIncr,
+         AutonomousType, TEXTUAL-CONVENTION
+           FROM SNMPv2-TC
+       MODULE-COMPLIANCE, OBJECT-GROUP
+           FROM SNMPv2-CONF
+        Gauge, Counter
+         FROM RFC1155-SMI
+       OBJECT-TYPE
+           FROM RFC-1212
+       TRAP-TYPE
+         FROM RFC-1215
+     rielloMIB
+             FROM RIELLO-MIB;
+
+rupsMIB              OBJECT IDENTIFIER ::= { rielloMIB 10 }
+
+   PositiveInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This data type is a non-zero and non-negative value."
+       SYNTAX       INTEGER (1..2147483647)
+
+   NonNegativeInteger ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "d"
+       STATUS       current
+       DESCRIPTION
+               "This data type is a non-negative value."
+       SYNTAX       INTEGER (0..2147483647)
+
+
+rupsObjects OBJECT IDENTIFIER ::= { rupsMIB  1 }
+
+rupsIdent OBJECT IDENTIFIER ::= { rupsObjects  1 }
+
+rupsIdentManufacturer OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The name of the UPS manufacturer."
+    ::= { rupsIdent  1 }
+
+rupsIdentModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS Model designation."
+    ::= { rupsIdent  2 }
+
+rupsIdentUPSSoftwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS firmware/software version(s).  This variable
+               may or may not have the same value as
+               upsIdentAgentSoftwareVersion in some implementations."
+    ::= { rupsIdent  3 }
+
+rupsIdentAgentSoftwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS agent software version.  This variable may or
+               may not have the same value as
+               upsIdentUPSSoftwareVersion in some implementations."
+    ::= { rupsIdent  4 }
+
+rupsIdentName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "A string identifying the UPS.  This object should be
+               set by the administrator."
+    ::= { rupsIdent  5 }
+
+rupsIdentAttachedDevices OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "A string identifying the devices attached to the
+               output(s) of the UPS.  This object should be set by
+               the administrator."
+    ::= { rupsIdent  6 }
+        
+rupsIdentIOConfiguration OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS IO configuration."
+    ::= { rupsIdent  7 }
+
+rupsIdentUpsType OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS type."
+    ::= { rupsIdent  8 }
+
+rupsIdentNominalPowerVA OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS nominal power VA."
+    ::= { rupsIdent  9 }
+
+rupsIdentNominalPowerW OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS nominal power W."
+    ::= { rupsIdent  10 }
+
+rupsIdentBatteryVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS nominal battery voltage."
+    ::= { rupsIdent  11 }
+
+rupsIdentBatteryCapacity OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS nominal battery capacity."
+    ::= { rupsIdent  12 }
+
+rupsIdentOutputVoltage OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS nominal output voltage."
+    ::= { rupsIdent  13 }
+
+rupsIdentOutputFrequency OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS nominal output frequency."
+    ::= { rupsIdent  14 }
+
+
+rupsBattery OBJECT IDENTIFIER ::= { rupsObjects  2 }
+
+rupsBatteryStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+    unknown(1),
+    batteryNormal(2),
+    batteryLow(3),
+    batteryDepleted(4)
+}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The indication of the capacity remaining in the UPS
+               system's batteries.   A value of batteryNormal
+               indicates that the remaining run-time is greater than
+               rupsConfigLowBattTime.  A value of batteryLow indicates
+               that the remaining battery run-time is less than or
+               equal to rupsConfigLowBattTime.  A value of
+               batteryDepleted indicates that the UPS will be unable
+               to sustain the present load when and if the utility
+               power is lost (including the possibility that the
+               utility power is currently absent and the UPS is
+               unable to sustain the output)."
+    ::= { rupsBattery  1 }
+
+rupsSecondsOnBattery OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS seconds
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "If the unit is on battery power, the elapsed time
+               since the UPS last switched to battery power, or the
+               time since the network management subsystem was last
+               restarted, whichever is less.  Zero shall be returned
+               if the unit is not on battery power."
+    ::= { rupsBattery  2 }
+
+rupsEstimatedMinutesRemaining OBJECT-TYPE
+    SYNTAX  PositiveInteger     -- UNITS minutes
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "An estimate of the time to battery charge depletion
+               under the present load conditions if the utility power
+               is off and remains off, or if it were to be lost and
+               remain off."
+    ::= { rupsBattery  3 }
+
+rupsEstimatedChargeRemaining OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS percent
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "An estimate of the battery charge remaining expressed
+               as a percent of full charge."
+    ::= { rupsBattery  4 }
+
+rupsBatteryVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Volt DC
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the present battery voltage."
+    ::= { rupsBattery  5 }
+
+rupsBatteryCurrent OBJECT-TYPE
+    SYNTAX  INTEGER (-2147483648..2147483647)   -- UNITS 0.1 Amp DC
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present battery current."
+    ::= { rupsBattery  6 }
+
+rupsBatteryTemperature OBJECT-TYPE
+    SYNTAX  INTEGER (-2147483648..2147483647)   -- UNITS degrees Centigrade
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The ambient temperature at or near the UPS Battery
+               casing."
+    ::= { rupsBattery  7 }
+
+rupsBatteryPositiveVoltage OBJECT-TYPE
+    SYNTAX  INTEGER (-2147483648..2147483647)   -- UNITS V
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS Battery positive voltage."
+    ::= { rupsBattery  8 }
+
+rupsBatteryNegativeVoltage OBJECT-TYPE
+    SYNTAX  INTEGER (-2147483648..2147483647)   -- UNITS V
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS Battery negative voltage."
+    ::= { rupsBattery  9 }
+
+rupsBatteryPositiveCurrent OBJECT-TYPE
+    SYNTAX  INTEGER (-2147483648..2147483647)   -- UNITS 0.1 A
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS Battery positive current."
+    ::= { rupsBattery  10 }
+
+rupsBatteryNegativeCurrent OBJECT-TYPE
+    SYNTAX  INTEGER (-2147483648..2147483647)   -- UNITS 0.1 A
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The UPS Battery positive current."
+    ::= { rupsBattery  11 }
+
+rupsIsCharging OBJECT-TYPE
+    SYNTAX  INTEGER {
+    discharging(0),
+    charging(1)
+}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The charging/discharging status of the battery"
+    ::= { rupsBattery  12 }
+
+rupsInput OBJECT IDENTIFIER ::= { rupsObjects  3 }
+
+rupsInputLineBads OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "A count of the number of times the input entered an
+               out-of-tolerance condition as defined by the
+               manufacturer.  This count is incremented by one each
+               time the input transitions from zero out-of-tolerance
+               lines to one or more input lines out-of-tolerance."
+    ::= { rupsInput  1 }
+
+rupsInputNumLines OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The number of input lines utilized in this device.
+               This variable indicates the number of rows in the
+               input table."
+    ::= { rupsInput  2 }
+
+rupsInputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RUpsInputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of input table entries.  The number of entries
+               is given by the value of upsInputNumLines."
+    ::= { rupsInput  3 }
+
+rupsInputEntry OBJECT-TYPE
+    SYNTAX  RUpsInputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+               particular input line."
+    INDEX   { rupsInputLineIndex }
+    ::= { rupsInputTable  1 }
+
+RUpsInputEntry ::=
+    SEQUENCE {
+        rupsInputLineIndex
+            PositiveInteger,
+
+        rupsInputFrequency
+            NonNegativeInteger,
+
+        rupsInputVoltage
+            NonNegativeInteger,
+
+        rupsInputCurrent
+            NonNegativeInteger,
+
+        rupsInputTruePower
+            NonNegativeInteger
+    }
+
+rupsInputLineIndex OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "The input line identifier."
+    ::= { rupsInputEntry  1 }
+
+rupsInputFrequency OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Hertz
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present input frequency."
+    ::= { rupsInputEntry  2 }
+
+rupsInputVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS RMS Volts
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the present input voltage."
+    ::= { rupsInputEntry  3 }
+
+rupsInputCurrent OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Amp
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the present input current."
+    ::= { rupsInputEntry  4 }
+
+rupsInputTruePower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS Watts
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The magnitude of the present input true power."
+    ::= { rupsInputEntry  5 }
+
+rupsOutput OBJECT IDENTIFIER ::= { rupsObjects  4 }
+
+rupsOutputSource OBJECT-TYPE
+    SYNTAX  INTEGER {
+    other(1),
+    none(2),
+    normal(3),
+    bypass(4),
+    battery(5),
+    booster(6),
+    reducer(7)
+}
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present source of output power.  The enumeration
+               none(2) indicates that there is no source of output
+               power (and therefore no output power), for example,
+               the system has opened the output breaker."
+    ::= { rupsOutput  1 }
+
+rupsOutputFrequency OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Hertz
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output frequency."
+    ::= { rupsOutput  2 }
+
+rupsOutputNumLines OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The number of output lines utilized in this device.
+               This variable indicates the number of rows in the
+               output table."
+    ::= { rupsOutput  3 }
+
+rupsOutputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RUpsOutputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of output table entries.  The number of
+               entries is given by the value of rupsOutputNumLines."
+    ::= { rupsOutput  4 }
+
+rupsOutputEntry OBJECT-TYPE
+    SYNTAX  RUpsOutputEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+               particular output line."
+    INDEX   { rupsOutputLineIndex }
+    ::= { rupsOutputTable  1 }
+
+RUpsOutputEntry ::=
+    SEQUENCE {
+        rupsOutputLineIndex
+            PositiveInteger,
+
+        rupsOutputVoltage
+            NonNegativeInteger,
+
+        rupsOutputCurrent
+            NonNegativeInteger,
+
+        rupsOutputPower
+            NonNegativeInteger,
+
+        rupsOutputPercentLoad
+            INTEGER,
+                        
+        rupsOutputPeakCurrent
+            NonNegativeInteger
+    }
+
+rupsOutputLineIndex OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "The output line identifier."
+    ::= { rupsOutputEntry  1 }
+
+rupsOutputVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS RMS Volts
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output voltage."
+    ::= { rupsOutputEntry  2 }
+
+rupsOutputCurrent OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Amp
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output current."
+    ::= { rupsOutputEntry  3 }
+
+rupsOutputPower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS Watts
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output true power."
+    ::= { rupsOutputEntry  4 }
+
+rupsOutputPercentLoad OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS percent
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The percentage of the UPS power capacity presently
+               being used on this output line, i.e., the greater of
+               the percent load of true power capacity and the
+               percent load of VA."
+    ::= { rupsOutputEntry  5 }
+        
+rupsOutputPeakCurrent OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Amp
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present output peak current."
+    ::= { rupsOutputEntry  6 }
+
+
+rupsBypass OBJECT IDENTIFIER ::= { rupsObjects  5 }
+
+rupsBypassFrequency OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 Hertz
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present bypass frequency."
+    ::= { rupsBypass  1 }
+
+rupsBypassNumLines OBJECT-TYPE
+    SYNTAX  NonNegativeInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The number of bypass lines utilized in this device.
+               This entry indicates the number of rows in the bypass
+               table."
+    ::= { rupsBypass  2 }
+
+rupsBypassTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RUpsBypassEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of bypass table entries.  The number of
+               entries is given by the value of rupsBypassNumLines."
+    ::= { rupsBypass  3 }
+
+rupsBypassEntry OBJECT-TYPE
+    SYNTAX  RUpsBypassEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+               particular bypass input."
+    INDEX   { rupsBypassLineIndex }
+    ::= { rupsBypassTable  1 }
+
+RUpsBypassEntry ::=
+    SEQUENCE {
+        rupsBypassLineIndex
+            PositiveInteger,
+
+        rupsBypassVoltage
+            NonNegativeInteger,
+
+        rupsBypassCurrent
+            NonNegativeInteger,
+
+        rupsBypassPower
+            NonNegativeInteger
+    }
+
+rupsBypassLineIndex OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "The bypass line identifier."
+    ::= { rupsBypassEntry  1 }
+
+rupsBypassVoltage OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS RMS Volts
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present bypass voltage."
+    ::= { rupsBypassEntry  2 }
+
+rupsBypassCurrent OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS 0.1 RMS Amp
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present bypass current."
+    ::= { rupsBypassEntry  3 }
+
+rupsBypassPower OBJECT-TYPE
+    SYNTAX  NonNegativeInteger  -- UNITS Watts
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present true power conveyed by the bypass."
+    ::= { rupsBypassEntry  4 }
+
+rupsAlarm OBJECT IDENTIFIER ::= { rupsObjects  6 }
+
+rupsAlarmsPresent OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present number of active alarm conditions."
+    ::= { rupsAlarm  1 }
+
+rupsAlarmTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RUpsAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A list of alarm table entries.  The table contains
+               zero, one, or many rows at any moment, depending upon
+               the number of alarm conditions in effect.  The table
+               is initially empty at agent startup.  The agent
+               creates a row in the table each time a condition is
+               detected and deletes that row when that condition no
+               longer pertains.  The agent creates the first row with
+               rupsAlarmId equal to 1, and increments the value of
+               rupsAlarmId each time a new row is created, wrapping to
+               the first free value greater than or equal to 1 when
+               the maximum value of rupsAlarmId would otherwise be
+               exceeded.  Consequently, after multiple operations,
+               the table may become sparse, e.g., containing entries
+               for rows 95, 100, 101, and 203 and the entries should
+               not be assumed to be in chronological order because
+               rupsAlarmId might have wrapped.
+
+               Alarms are named by an AutonomousType (OBJECT
+               IDENTIFIER), rupsAlarmDescr, to allow a single table to
+               reflect well known alarms plus alarms defined by a
+               particular implementation, i.e., as documented in the
+               private enterprise MIB definition for the device.  No
+               two rows will have the same value of rupsAlarmDescr,
+               since alarms define conditions.  In order to meet this
+               requirement, care should be taken in the definition of
+               alarm conditions to insure that a system cannot enter
+               the same condition multiple times simultaneously.
+
+               The number of rows in the table at any given time is
+               reflected by the value of rupsAlarmsPresent."
+    ::= { rupsAlarm  2 }
+
+rupsAlarmEntry OBJECT-TYPE
+    SYNTAX  RUpsAlarmEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "An entry containing information applicable to a
+
+
+
+
+
+               particular alarm."
+    INDEX   { rupsAlarmId }
+    ::= { rupsAlarmTable  1 }
+
+RUpsAlarmEntry ::=
+    SEQUENCE {
+        rupsAlarmId
+            PositiveInteger,
+
+        rupsAlarmDescr
+            OBJECT IDENTIFIER,
+
+        rupsAlarmTime
+            PositiveInteger
+    }
+
+rupsAlarmId OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+           "A unique identifier for an alarm condition.  This
+               value must remain constant."
+    ::= { rupsAlarmEntry  1 }
+
+rupsAlarmDescr OBJECT-TYPE
+    SYNTAX  OBJECT IDENTIFIER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "A reference to an alarm description object.  The
+               object referenced should not be accessible, but rather
+               be used to provide a unique description of the alarm
+               condition."
+    ::= { rupsAlarmEntry  2 }
+
+rupsAlarmTime OBJECT-TYPE
+    SYNTAX  PositiveInteger
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The value of sysUpTime when the alarm condition was
+               detected.  If the alarm condition was detected at the
+               time of agent startup and presumably existed before
+               agent startup, the value of rupsAlarmTime shall equal
+               0."
+    ::= { rupsAlarmEntry  3 }
+
+rupsWellKnownAlarms OBJECT IDENTIFIER ::= { rupsAlarm  3 }
+
+rupsAlarmBatteryBad OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  1 }
+
+rupsAlarmOnBattery OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  2 }
+
+rupsAlarmLowBattery OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  3 }
+
+rupsAlarmShutdownImminent OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  4 }
+
+rupsAlarmTempBad OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  5 }
+
+rupsAlarmFault OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  6 }
+
+rupsAlarmInternal OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  7 }
+
+rupsAlarmOutputOverload OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  8 }
+
+rupsAlarmOnBypass OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  9 }
+
+rupsAlarmBypassBad OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  10 }
+
+rupsAlarmShutdownImminent OBJECT IDENTIFIER ::= { rupsWellKnownAlarms  11 }
+
+   --
+   -- The Test Group
+   --
+
+   rupsTest               OBJECT IDENTIFIER ::= { rupsObjects 7 }
+
+   rupsTestId OBJECT-TYPE
+       SYNTAX     OBJECT IDENTIFIER
+       ACCESS read-write
+       STATUS     optional
+       DESCRIPTION
+               "The test is named by an OBJECT IDENTIFIER which
+               allows a standard mechanism for the initiation of
+               tests, including the well known tests identified in
+               this document as well as those introduced by a
+               particular implementation, i.e., as documented in the
+               private enterprise MIB definition for the device.
+
+               Setting this variable initiates the named test. Sets
+               to this variable require the presence of
+               upsTestSpinLock in the same SNMP message.
+
+               The set request will be rejected with an appropriate
+               error message if the requested test cannot be
+               performed, including attempts to start a test when
+               another test is already in progress.  The status of
+               the current or last test is maintained in
+               upsTestResultsSummary. Tests in progress may be
+               aborted by setting the rupsTestId variable to
+               rupsTestAbortTestInProgress.
+
+               Read operations return the value of the name of the
+               test in progress if a test is in progress or the name
+               of the last test performed if no test is in progress,
+               unless no test has been run, in which case the well
+               known value upsTestNoTestsInitiated is returned."
+       ::= { rupsTest 1 }
+
+   -- see [6] for more information on the semantics of objects with
+   -- syntax of TestAndIncr
+
+   rupsTestSpinLock OBJECT-TYPE
+       SYNTAX     TestAndIncr
+       ACCESS read-write
+       STATUS     optional
+       DESCRIPTION
+               "A spin lock on the test subsystem.  The spinlock is
+               used as follows.
+
+               Before starting a test, a manager-station should make
+               sure that a test is not in progress as follows:
+
+                   try_again:
+                     get (upsTestSpinLock)
+                     while (upsTestResultsSummary == inProgress) {
+                       /* loop while a test is running for another
+               manager */
+                       short delay
+                       get (upsTestSpinLock)
+                     }
+                     lock_value = upsTestSpinLock
+                     /* no test in progress, start the test */
+                     set (upsTestSpinLock = lock_value, upsTestId =
+               requested_test)
+                     if (error_index == 1) { /* (upsTestSpinLock
+               failed) */
+                       /* if problem is not access control, then
+                           some other manager slipped in ahead of us
+               */
+                       goto try_again
+                     }
+                     if (error_index == 2) { /* (upsTestId) */
+                       /* cannot perform the test */
+                       give up
+                     }
+                     /* test started ok */
+                     /* wait for test completion by polling
+               upsTestResultsSummary */
+                     get (upsTestSpinLock, upsTestResultsSummary,
+               upsTestResultsDetail)
+                     while (upsTestResultsSummary == inProgress) {
+                       short delay
+                       get (upsTestSpinLock, upsTestResultsSummary,
+               upsTestResultsDetail)
+                     }
+                     /* when test completes, retrieve any additional
+               test results */
+                     /* if upsTestSpinLock == lock_value + 1, then
+               these are our test */
+                     /* results (as opposed to another manager's */
+                     The initial value of upsTestSpinLock at agent
+               initialization shall
+                     be 1."
+       ::= { rupsTest 2 }
+
+   rupsTestResultsSummary OBJECT-TYPE
+       SYNTAX     INTEGER {
+           donePass(1),
+           doneWarning(2),
+           doneError(3),
+           aborted(4),
+           inProgress(5),
+           noTestsInitiated(6)
+       }
+       ACCESS read-only
+       STATUS     optional
+       DESCRIPTION
+               "The results of the current or last UPS diagnostics
+               test performed.  The values for donePass(1),
+               doneWarning(2), and doneError(3) indicate that the
+               test completed either successfully, with a warning, or
+               with an error, respectively.  The value aborted(4) is
+               returned for tests which are aborted by setting the
+               value of upsTestId to upsTestAbortTestInProgress.
+               Tests which have not yet concluded are indicated by
+               inProgress(5).  The value noTestsInitiated(6)
+               indicates that no previous test results are available,
+               such as is the case when no tests have been run since
+               the last reinitialization of the network management
+               subsystem and the system has no provision for non-
+               volatile storage of test results."
+       ::= { rupsTest 3 }
+
+   rupsTestResultsDetail OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (0..255))
+       ACCESS read-only
+       STATUS     optional
+       DESCRIPTION
+               "Additional information about upsTestResultsSummary.
+               If no additional information available, a zero length
+               string is returned."
+       ::= { rupsTest 4 }
+
+   rupsTestStartTime OBJECT-TYPE
+       SYNTAX     TimeStamp
+       ACCESS read-only
+       STATUS     optional
+       DESCRIPTION
+               "The value of sysUpTime at the time the test in
+               progress was initiated, or, if no test is in progress,
+               the time the previous test was initiated.  If the
+               value of upsTestResultsSummary is noTestsInitiated(6),
+               upsTestStartTime has the value 0."
+       ::= { rupsTest 5 }
+
+   rupsTestElapsedTime OBJECT-TYPE
+       SYNTAX     TimeInterval
+       ACCESS read-only
+       STATUS     optional
+       DESCRIPTION
+               "The amount of time, in TimeTicks, since the test in
+               progress was initiated, or, if no test is in progress,
+               the previous test took to complete.  If the value of
+               upsTestResultsSummary is noTestsInitiated(6),
+               upsTestElapsedTime has the value 0."
+       ::= { rupsTest 6 }
+
+   --
+   -- Well known tests.
+   --
+
+   rupsWellKnownTests     OBJECT IDENTIFIER ::= { rupsTest 7 }
+
+
+   rupsTestNoTestsInitiated OBJECT IDENTIFIER
+   --            "No tests have been initiated and no test is in
+   --            progress."
+       ::= { rupsWellKnownTests  1 }
+
+   rupsTestAbortTestInProgress OBJECT IDENTIFIER
+   --            "The test in progress is to be aborted / the test in
+   --            progress was aborted."
+       ::= { rupsWellKnownTests  2 }
+
+   rupsTestGeneralSystemsTest OBJECT IDENTIFIER
+   --            "The manufacturer's standard test of UPS device
+   --            systems."
+       ::= { rupsWellKnownTests  3 }
+
+   rupsTestQuickBatteryTest OBJECT IDENTIFIER
+   --            "A test that is sufficient to determine if the battery
+   --            needs replacement."
+       ::= { rupsWellKnownTests  4 }
+
+   rupsTestDeepBatteryCalibration OBJECT IDENTIFIER
+   --            "The system is placed on battery to a discharge level,
+   --            set by the manufacturer, sufficient to determine
+   --            battery replacement and battery run-time with a high
+   --            degree of confidence.  WARNING:  this test will leave
+   --            the battery in a low charge state and will require
+   --            time for recharging to a level sufficient to provide
+   --            normal battery duration for the protected load."
+       ::= { rupsWellKnownTests  5 }
+
+rupsControl OBJECT IDENTIFIER ::= { rupsObjects  8 }
+
+rupsShutdownType OBJECT-TYPE
+    SYNTAX  INTEGER {
+    output(1),
+    system(2)
+}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "This object determines the nature of the action to be
+               taken at the time when the countdown of the
+
+
+
+
+
+               upsShutdownAfterDelay and upsRebootWithDuration
+               objects reaches zero.
+
+               Setting this object to output(1) indicates that
+               shutdown requests should cause only the output of the
+               UPS to turn off.  Setting this object to system(2)
+               indicates that shutdown requests will cause the entire
+               UPS system to turn off."
+    ::= { rupsControl  1 }
+
+rupsShutdownAfterDelay OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS seconds
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Setting this object will shutdown (i.e., turn off)
+               either the UPS output or the UPS system (as determined
+               by the value of upsShutdownType at the time of
+               shutdown) after the indicated number of seconds, or
+               less if the UPS batteries become depleted. Setting
+               this object to 0 will cause the shutdown to occur
+               immediately.  Setting this object to -1 will abort the
+               countdown.  If the system is already in the desired
+               state at the time the countdown reaches 0, then
+               nothing will happen.  That is, there is no additional
+               action at that time if upsShutdownType = system and
+               the system is already off.  Similarly, there is no
+               additional action at that time if upsShutdownType =
+               output and the output is already off.  When read,
+               upsShutdownAfterDelay will return the number of
+               seconds remaining until shutdown, or -1 if no shutdown
+               countdown is in effect.  On some systems, if the agent
+               is restarted while a shutdown countdown is in effect,
+               the countdown may be aborted.  Sets to this object
+               override any upsShutdownAfterDelay already in effect."
+    ::= { rupsControl  2 }
+
+rupsStartupAfterDelay OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS seconds
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Setting this object will start the output after the
+               indicated number of seconds, including starting the
+               UPS, if necessary.  Setting this object to 0 will
+               cause the startup to occur immediately.  Setting this
+
+
+
+
+
+               object to -1 will abort the countdown.  If the output
+               is already on at the time the countdown reaches 0,
+               then nothing will happen.  Sets to this object
+               override the effect of any upsStartupAfterDelay
+               countdown or upsRebootWithDuration countdown in
+               progress.  When read, upsStartupAfterDelay will return
+               the number of seconds until startup, or -1 if no
+               startup countdown is in effect.  If the countdown
+               expires during a utility failure, the startup shall
+               not occur until the utility power is restored.  On
+               some systems, if the agent is restarted while a
+               startup countdown is in effect, the countdown is
+               aborted."
+    ::= { rupsControl  3 }
+
+rupsRebootWithDuration OBJECT-TYPE
+    SYNTAX  INTEGER     -- UNITS seconds
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Setting this object will immediately shutdown (i.e.,
+               turn off) either the UPS output or the UPS system (as
+               determined by the value of upsShutdownType at the time
+               of shutdown) for a period equal to the indicated
+               number of seconds, after which time the output will be
+               started, including starting the UPS, if necessary.  If
+               the number of seconds required to perform the request
+               is greater than the requested duration, then the
+               requested shutdown and startup cycle shall be
+               performed in the minimum time possible, but in no case
+               shall this require more than the requested duration
+               plus 60 seconds.  When read, upsRebootWithDuration
+               shall return the number of seconds remaining in the
+               countdown, or -1 if no countdown is in progress.  If
+               the startup should occur during a utility failure, the
+               startup shall not occur until the utility power is
+               restored."
+    ::= { rupsControl  4 }
+
+rupsAutoRestart OBJECT-TYPE
+    SYNTAX  INTEGER {
+    on(1),
+    off(2)
+}
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Setting this object to 'on' will cause the UPS system
+               to restart after a shutdown if the shutdown occurred
+               during a power loss as a result of either a
+               upsShutdownAfterDelay or an internal battery depleted
+               condition.  Setting this object to 'off' will prevent
+               the UPS system from restarting after a shutdown until
+               an operator manually or remotely explicitly restarts
+               it.  If the UPS is in a startup or reboot countdown,
+               then the UPS will not restart until that delay has
+               been satisfied."
+    ::= { rupsControl  5 }
+
+rupsTemperature OBJECT IDENTIFIER ::= { rupsObjects  10 }
+        
+rupsSystemTemperature OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS degree Celsius
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present temperature."
+    ::= { rupsTemperature  1 }
+
+rupsPowerTemperature1 OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS degree Celsius
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present temperature."
+    ::= { rupsTemperature  2 }
+        
+rupsPowerTemperature2 OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS degree Celsius
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present temperature."
+    ::= { rupsTemperature  3 }
+        
+rupsPowerTemperature3 OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS degree Celsius
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present temperature."
+    ::= { rupsTemperature  4 }
+        
+rupsChargerTemperature OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS degree Celsius
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present temperature."
+    ::= { rupsTemperature  5 }
+        
+rupsBatteryPositiveTemperature OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS degree Celsius
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present temperature."
+    ::= { rupsTemperature  6 }
+        
+rupsBatteryNegativeTemperature OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS degree Celsius
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present temperature."
+    ::= { rupsTemperature  7 }
+        
+rupsBatteryExternalTemperature OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS degree Celsius
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The present temperature."
+    ::= { rupsTemperature  8 }
+
+rupsMPS OBJECT IDENTIFIER ::= { rupsObjects  20 }       
+
+mpsAlarmGroupS OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group s."
+    ::= { rupsMPS  1 }
+        
+mpsAlarmGroupC OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group c."
+    ::= { rupsMPS  2 }
+        
+mpsAlarmGroupB OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group b."
+    ::= { rupsMPS  3 }
+        
+mpsAlarmGroupR OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group r."
+    ::= { rupsMPS  4 }
+        
+mpsAlarmGroupRI OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group RI."
+    ::= { rupsMPS  5 }
+        
+mpsAlarmGroupI OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group I."
+    ::= { rupsMPS  6 }
+        
+mpsAlarmGroupA0 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group A0."
+    ::= { rupsMPS  7 }
+        
+mpsAlarmGroupA1 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group A1."
+    ::= { rupsMPS  8 }
+        
+mpsAlarmGroupA2 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group A2."
+    ::= { rupsMPS  9 }
+        
+mpsAlarmGroupA3 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group A3."
+    ::= { rupsMPS  10 }
+        
+mpsAlarmGroupA4 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group A4."
+    ::= { rupsMPS  11 }
+        
+mpsAlarmGroupA5 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The alarm group A5."
+    ::= { rupsMPS  12 }
+
+rupsMST OBJECT IDENTIFIER ::= { rupsObjects  21 }       
+
+mstWarningGroupW0W1 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The anomaly group W0W1."
+    ::= { rupsMST  1 }
+        
+mstAnomalyGroupA0A1 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The anomaly group A0A1."
+    ::= { rupsMST  2 }
+        
+mstAnomalyGroupA2A3 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The anomaly group A2A3."
+    ::= { rupsMST  3 }
+        
+mstAnomalyGroupA4A5 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The anomaly group A4A5."
+    ::= { rupsMST  4 }
+        
+mstFaultGroupF0F1 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The fault group F0F1."
+    ::= { rupsMST  5 }
+        
+mstFaultGroupF2F3 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The fault group F2F3."
+    ::= { rupsMST  6 }
+        
+mstFaultGroupF4F5 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The fault group F4F5."
+    ::= { rupsMST  7 }
+        
+mstLockGroupL0L1 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The lock group L0L1."
+    ::= { rupsMST  8 }
+        
+mstLockGroupL2L3 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The lock group L2L3."
+    ::= { rupsMST  9 }
+        
+mstLockGroupL4L5 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The lock group L4L5."
+    ::= { rupsMST  10 }
+        
+mstEventGroupE0E1 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The event group E0E1."
+    ::= { rupsMST  11 }
+        
+rupsMPW OBJECT IDENTIFIER ::= { rupsObjects  22 }       
+
+mpwSystemStatusGroup1 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The system status group 1."
+    ::= { rupsMPW  1 }
+        
+mpwSystemStatusGroup2 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The system status group 2."
+    ::= { rupsMPW  2 }
+        
+mpwSystemStatusGroup3 OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The system status group 3."
+    ::= { rupsMPW  3 }
+        
+mpwBypassModuleAlarmGroup OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The bypass module alarm group."
+    ::= { rupsMPW  4 }
+        
+mpwPowerModule1AlarmGroup OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The power module 1 alarm group."
+    ::= { rupsMPW  5 }
+        
+mpwPowerModule2AlarmGroup OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The power module 2 alarm group."
+    ::= { rupsMPW  6 }
+        
+mpwPowerModule3AlarmGroup OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The power module 3 alarm group."
+    ::= { rupsMPW  7 }
+        
+mpwPowerModule4AlarmGroup OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The power module 4 alarm group."
+    ::= { rupsMPW  8 }
+        
+mpwPowerModule5AlarmGroup OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The power module 5 alarm group."
+    ::= { rupsMPW  9 }
+        
+mpwPowerModule6AlarmGroup OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The power module 6 alarm group."
+    ::= { rupsMPW  10 }
+        
+mpwPowerModule7AlarmGroup OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The power module 7 alarm group."
+    ::= { rupsMPW  11 }
+        
+mpwBypassModuleStatus OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The bypass module status."
+    ::= { rupsMPW  12 }
+        
+mpwPowerModule1Status OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The status of power module 1."
+    ::= { rupsMPW  13 }
+        
+mpwPowerModule2Status OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The status of power module 2."
+    ::= { rupsMPW  14 }
+        
+mpwPowerModule3Status OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The status of power module 3."
+    ::= { rupsMPW  15 }
+        
+mpwPowerModule4Status OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The status of power module 4."
+    ::= { rupsMPW  16 }
+        
+mpwPowerModule5Status OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The status of power module 5."
+    ::= { rupsMPW  17 }
+        
+mpwPowerModule6Status OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The status of power module 6."
+    ::= { rupsMPW  18 }
+        
+mpwPowerModule7Status OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "The status of power module 7."
+    ::= { rupsMPW  19 }
+        
+mpwControl OBJECT IDENTIFIER ::= { rupsMPW  20 }
+
+mpwCommandCode OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Command code."
+    ::= { mpwControl  1 }
+
+mpwShutdownDelay OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Shutdown delay."
+    ::= { mpwControl  2 }
+
+mpwRestoreDelay OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Restore delay."
+    ::= { mpwControl  3 }
+
+mpwModuleApplyCommand OBJECT-TYPE
+    SYNTAX  INTEGER
+
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+           "Module apply command"
+    ::= { mpwControl  4 }
+
+mpwCommandResult OBJECT-TYPE
+    SYNTAX  INTEGER  -- UNITS RMS Volts
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+           "Result of command."
+    ::= { mpwControl  5 }
+
+        
+rupsTraps OBJECT IDENTIFIER ::= { rupsMIB  2 }
+
+rupsTrapOnBattery TRAP-TYPE
+    ENTERPRISE  rupsTraps
+    VARIABLES   { rupsEstimatedMinutesRemaining,  rupsSecondsOnBattery,
+rupsConfigLowBattTime }
+    DESCRIPTION
+           "The UPS is operating on battery power.  This trap is
+               persistent and is resent at one minute intervals until
+               the UPS either turns off or is no longer running on
+               battery."
+    ::= 1
+
+rupsTrapTestCompleted TRAP-TYPE
+    ENTERPRISE  rupsTraps
+    DESCRIPTION
+           "This trap is sent upon completion of a UPS diagnostic
+               test."
+    ::= 2
+
+rupsTrapAlarmEntryAdded TRAP-TYPE
+    ENTERPRISE  rupsTraps
+    DESCRIPTION
+           "This trap is sent each time an alarm is inserted into
+               to the alarm table.  It is sent on the insertion of
+
+               all alarms except for rupsAlarmOnBattery and
+               rupsAlarmTestInProgress."
+    ::= 3
+
+rupsTrapAlarmEntryRemoved TRAP-TYPE
+    ENTERPRISE  rupsTraps
+    DESCRIPTION
+           "This trap is sent each time an alarm is removed from
+               the alarm table.  It is sent on the removal of all
+               alarms except for rupsAlarmTestInProgress."
+    ::= 4
+
+
+END
+

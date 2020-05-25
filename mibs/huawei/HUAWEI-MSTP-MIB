@@ -1,0 +1,3156 @@
+-- ==================================================================
+-- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- 
+-- Description: HUAWEI MSTP MIB
+-- Reference:
+-- Version:     V2.11
+-- History:     2008-06-14  MSTP Process
+-- History:     2008-10-08  MSTP Process- v3     
+-- History:     2009-3-01  MSTP Process- v4
+
+-- ==================================================================
+-- ==================================================================
+-- 
+-- Variables and types be imported
+--
+-- ==================================================================
+
+        HUAWEI-MSTP-MIB DEFINITIONS ::= BEGIN
+
+                IMPORTS 
+                        BridgeId                        
+                                FROM BRIDGE-MIB                 
+                        hwDatacomm                      
+                                FROM HUAWEI-MIB                 
+                        OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP                     
+                                FROM SNMPv2-CONF                        
+                        Integer32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, 
+                        NOTIFICATION-TYPE                       
+                                FROM SNMPv2-SMI                 
+                        RowStatus, TEXTUAL-CONVENTION                   
+                                FROM SNMPv2-TC
+                        InterfaceIndex, ifIndex, ifName 
+                                FROM IF-MIB         
+                        EnabledStatus
+                                FROM P-BRIDGE-MIB;
+                                
+        
+        
+                hwMstp MODULE-IDENTITY
+                        LAST-UPDATED "201708171000Z"
+                        ORGANIZATION
+                                "Huawei Technologies Co.,Ltd."
+                        CONTACT-INFO
+                                "Huawei Industrial Base
+                                  Bantian, Longgang
+                                   Shenzhen 518129
+                                   People's Republic of China
+                                   Website: http://www.huawei.com
+                                   Email: support@huawei.com
+                                 "
+                        DESCRIPTION
+                                "This module include the information about MSTP protocol in the bridge.
+                                The information can be read and some of them can be set."
+
+                        REVISION    "201708171000Z"
+                        DESCRIPTION "modified description"
+						
+						REVISION    "201703041000Z"
+                        DESCRIPTION "modified for:hwMstpiPortIndex."
+
+                        REVISION    "201511261000Z"
+                        DESCRIPTION "modified for:hwMstpDiameter 
+                                                                            hwMstpProDiameter 
+                                                                            hwMstpiStpTransLimit
+                                                                            hwMstpTransmitLimitDefault
+                                                                            hwMstpProNewPortStpTransLimit."
+                       
+                        REVISION    "201505291000Z"
+                        DESCRIPTION "Add for: hwMstpProFlushCapability."
+
+                        REVISION     "201408140000Z"
+                        DESCRIPTION  "Add table node for port count trap. 
+	                                Add for : hwMstpPortCountUpperThreshold
+                                                                   hwMstpPortCountLowerThreshold
+                                                                   hwMstpPortCountExceedThreshold
+                                                                   hwMstpPortCountExceedThresholdResume"
+
+                        REVISION     "201405280000Z"
+                        DESCRIPTION  "Add table node for tc-snooping notify trill. 
+                                                    Add for : hwMstpPortTcSnoopingTable"
+
+                        REVISION     "201402130000Z"
+                        DESCRIPTION  "Add leaf node for pw name. 
+	                                Add for : hwMstpiEdgePortChanged
+			       hwMstpProNewEdgePortChanged"
+
+                        REVISION     "201401270000Z"
+                        DESCRIPTION  "Add leaf node for pw name. 
+	                                Add for : hwMstpiPortStateForwarding
+			        hwMstpiPortStateDiscarding
+			        hwMstpiPortRootGuarded
+			        hwMstpiPortLoopGuarded
+			        hwMstpProNewPortStateForwarding
+			        hwMstpProNewPortStateDiscarding
+			        hwMstpProNewPortRootGuarded
+			        hwMstpProNewPortLoopGuarded
+			        hwMstpProLoopbackDetected"
+	     REVISION     "201309070000Z"
+                        DESCRIPTION  "Fix the errors checked by a tool."
+                        REVISION    "201303191000Z"
+                        DESCRIPTION "Modify bpdu encapsulation enum value."
+                        REVISION    "201706300000Z"
+                        DESCRIPTION "Modify description : 
+                                     hwMstpiRowStatus, hwMstpPortVlanListLow,
+                                     hwMstpPortVlanListHigh, hwMstpProNewPortType."
+
+                        ::= { hwL2Mgmt 4 }
+                      
+--
+-- Textual conventions
+--
+        
+                HwMSTPEnabledStatus ::= TEXTUAL-CONVENTION
+                        STATUS current
+                        DESCRIPTION
+                                "A simple status value for the object."
+                        SYNTAX INTEGER
+                                {
+                                enabled(1),
+                                disabled(2)
+                                }
+                        
+        
+--
+-- Node definitions
+--
+        
+                hwL2Mgmt OBJECT IDENTIFIER ::= { hwDatacomm 42 }
+                
+                hwMstpObjects OBJECT IDENTIFIER ::= { hwMstp 1 }
+                
+                hwMstpStatus OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Whether the Bridge MSTP is enabled.
+                                Enable indicate that MSTP enable in the bridge;
+                                Disabled indicate that MSTP disable in the bridge.
+                                By default, the Bridge MSTP is disabled."                        
+                        ::= { hwMstpObjects 1 }
+                
+                hwMstpForceVersion OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                stp(0),
+                                rstp(2),
+                                mstp(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                " The value of this object identifies the protocol mode of the STP. 
+                                 0: STP
+                                 2: RSTP
+                                 3: MSTP
+                                 Default value: MSTP (3)."                        
+                        ::= { hwMstpObjects 2 }
+                
+                hwMstpDiameter OBJECT-TYPE
+                        SYNTAX Integer32 (2..7 | 65535)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the network diameter of the STP.
+								It affects the time that include hello time, forward delay time and maxage. 
+								Every bridge can set the diameter of Bridge, and it is effective when the bridge is the root bridge. 
+								Effective in the CIST. The value ranges from 2 to 7. The default value is 7."                        
+                        ::= { hwMstpObjects 3 }
+                
+                hwMstpBridgeMaxHops OBJECT-TYPE
+                        SYNTAX Integer32 (1..40)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the maximum hops of a spanning tree in an MST region. 
+								The maximum hops of a spanning tree in an MST region can limit the network scale of the spanning tree. 
+								The object takes effect when the bridge is the root bridge. 
+								If the TTL of the BPDU received by the device is 0, the device discards the BPDU."                        
+                        ::= { hwMstpObjects 4 }
+                
+                hwMstpMasterBridgeID OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the current Master Bridge.
+                                It is the root Bridge Identifier of the instance 0 in the region."
+                        ::= { hwMstpObjects 5 }
+                
+                hwMstpMasterPathCost OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The CIST path cost from the transmitting Bridge to the Master Bridge.
+                                By default, the value is 0."                        
+                        ::= { hwMstpObjects 6 }
+                
+                hwMstpBpduGuard OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies whether the BPDU protection is enabled on the bridge.
+                                 1: enable
+                                 2: disable
+                                 Default value: disabled."                        
+                        ::= { hwMstpObjects 7 }
+                
+                hwMstpAdminFormatSelector OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The administrative Configuration Identifier Format Selector in use 
+                                by the Bridge. This has a value of 0 indicate the format specified 
+                                in the Standard of IEEE 802.1s. By default, the value is 0"                        
+                        ::= { hwMstpObjects 8 }
+                
+                hwMstpAdminRegionName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (1..32))
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the MST administrative region name. 
+								It changes to hwMstpOperRegionName when user uses the activing command to active the configuration of the region. 
+								By default, the MST region name is the first hexadecimal MAC address of a switching device."
+                        ::= { hwMstpObjects 9 }
+                
+                hwMstpAdminRevisionLevel OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the administrative revision level of the MST region. 
+								It changes to hwMstpOperRevisionLevel when users use the activing command to active the configuration of the region. 
+								The revision level and region name of MSTP, and the VLAN mapping table determine the MST region that the switch belongs to.
+								The value ranges from 0 to 65535. The default value is 0."                        
+                        ::= { hwMstpObjects 10 }
+                
+                hwMstpOperFormatSelector OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The operative Configuration Identifier Format Selector in use by the 
+                                Bridge. This has a value of 0 indicate the format specified in the 
+                                Standard of IEEE 802.1s. By default, the value is 0."                      
+                        ::= { hwMstpObjects 11 }
+                
+                hwMstpOperRegionName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..32))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This MSTP operative region name.
+                                It can be used to determine whether
+                                the region is the same region with
+                                the mapping between VLAN and instance
+                                and hwMstpOperRevisionLevel."
+                        ::= { hwMstpObjects 12 }                       
+                
+                
+                hwMstpOperRevisionLevel OBJECT-TYPE
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the effective revision level of the MST region. 
+								Two routers belong to the same MST region only if they have the same MST region name,
+								Mapping between VLANs and MSTIs, and the MST region revision level."                        
+                        ::= { hwMstpObjects 13 }
+                
+                hwMstpRegionConfActive OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Active the region configuration.
+                                Generally, the value of the hwMstpRegionConfActive is disable,
+                                but the value will be set as enable if Net Manager want to 
+                                active the configure of the region in the bridge. And then 
+                                all manager configuration will change to operable configuration.
+                                The value of hwMstpRegionConfActive is only disable when it is read.
+                                It is only enable when it is set. "                        
+                        ::= { hwMstpObjects 14 }
+                
+                hwMstpDefaultVlanAllo OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object identifies the default mapping relationship between the VLANs and the MSTIs in the MST region.
+                                 1: enable When you set this object, the value can be enable only.
+                                 65535: ununsed When you access the value of this object, it is unused.
+                                 In addition to the VLANs added to the MSTIs, the rest are added to the default MSTI 0."
+                        ::= { hwMstpObjects 15 }
+                
+                hwMstpDefaultRegionName OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                reset(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The object indicates the MSTP path cost.
+                                 1: indicates dot1d-1998, which is the IEEE 802.1d standard proposed in 1998.2.
+                                 2: indicates dot1t, which is the IEEE 802.1t standard.
+                                 3: indicates legacy, which is the calculation standard developed by Huawei."
+                        ::= { hwMstpObjects 16 }
+                
+                hwMstpPathCostStandard OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                dot1d1998(1),
+                                dot1t(2),
+                                legacy(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the path cost standard.
+                                 1: 1: dot1d-1988 is the IEEE 802.1d standard method in 1998.
+                                 2: dot1t is the standard method of the IEEE 802.1t.
+                                 3: legacy is the private algorithm of Huawei."
+                        ::= { hwMstpObjects 17 }
+                
+                hwMstpVIDAllocationTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpVIDAllocationEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table includes the information of the VLAN with relation to the instance of MSTP."
+                        ::= { hwMstpObjects 18 }
+                
+                hwMstpVIDAllocationEntry OBJECT-TYPE
+                        SYNTAX HwMstpVIDAllocationEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table includes the information of the VLAN with relation to the instance of MSTP.
+                                The index of the table is vlanid. Default, the VLAN is in the CIST."
+                        INDEX { hwMstpVID }
+                        ::= { hwMstpVIDAllocationTable 1 }
+                
+                HwMstpVIDAllocationEntry ::=
+                        SEQUENCE { 
+                                hwMstpVID
+                                        Integer32,
+                                hwMstpAdminMstID
+                                        Integer32,
+                                hwMstpOperMstID
+                                        Integer32
+                         }
+
+                hwMstpVID OBJECT-TYPE
+                        SYNTAX Integer32 (1..4094)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "VLAN Identifier."
+                        ::= { hwMstpVIDAllocationEntry 1 }
+                
+                hwMstpAdminMstID OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies which MSTI the VLAN belongs to. By default, all the VLANs belong to CIST 0."
+                        ::= { hwMstpVIDAllocationEntry 2 }
+                
+                hwMstpOperMstID OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                               "The value of this object identifies the MSTI that the effective VLAN belongs to."
+                        ::= { hwMstpVIDAllocationEntry 3 }
+                
+                hwMstpInstanceTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpInstanceEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This table describes the attribute value, description, and operation restriction of configurable attributes of the MSTI."
+                        ::= { hwMstpObjects 19 }
+                
+                hwMstpInstanceEntry OBJECT-TYPE
+                        SYNTAX HwMstpInstanceEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table includes the information of  the instance.
+                                The index of the table is Multiple spanning-tree instance Identifier."
+                        INDEX { hwMstpInstanceID }
+                        ::= { hwMstpInstanceTable 1 }
+                
+                HwMstpInstanceEntry ::=
+                        SEQUENCE { 
+                                hwMstpInstanceID
+                                        Integer32,
+                                hwMstpiBridgeID
+                                        BridgeId,
+                                hwMstpiBridgePriority
+                                        Integer32,
+                                hwMstpiDesignedRoot
+                                        BridgeId,
+                                hwMstpiRootPathCost
+                                        Integer32,
+                                hwMstpiRootPort
+                                        Integer32,
+                                hwMstpiRootType
+                                        INTEGER,
+                                hwMstpiRemainingHops
+                                        Integer32,
+                                hwMstpiAdminMappedVlanListLow
+                                        OCTET STRING,
+                                hwMstpiAdminMappedVlanListHigh
+                                        OCTET STRING,
+                                hwMstpiOperMappedVlanListLow
+                                        OCTET STRING,
+                                hwMstpiOperMappedVlanListHigh
+                                        OCTET STRING,
+                                hwMstpiRowStatus
+                                        RowStatus
+                         }
+
+                hwMstpInstanceID OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                                "Multiple spanning-tree instance Identifier.
+                                 The scope of instance identifier is different, 
+                                 some versions are 0 to 48."
+                        ::= { hwMstpInstanceEntry 1 }
+                
+                hwMstpiBridgeID OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier for the spanning tree instance 
+                                identified by MSTID."
+                        ::= { hwMstpInstanceEntry 2 }
+                
+                hwMstpiBridgePriority OBJECT-TYPE
+                        SYNTAX Integer32 (0..61440)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                               "This object indicates the bridge priority of the MSTI. 
+							   The step is 4096. For example, the values can be set to be 0, 4096, 8192... The default value is 32768."
+                        DEFVAL { 32768 }
+                        ::= { hwMstpInstanceEntry 3 }
+                
+                hwMstpiDesignedRoot OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the Root Bridge for the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpInstanceEntry 4 }
+                
+                hwMstpiRootPathCost OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The path cost from the transmitting Bridge to the Root Bridge 
+                                for the spanning tree instance identified by MSTID."
+                        ::= { hwMstpInstanceEntry 5 }
+                
+                hwMstpiRootPort OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The root port for the spanning tree instance identified by the MSTID."
+                        ::= { hwMstpInstanceEntry 6 }
+                
+                hwMstpiRootType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                normal(0),
+                                secondary(1),
+                                primary(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the type of the root bridge of the MSTI:
+                                0: normal
+                                1: secondary
+                                2: primary
+                               Default value: normal (0)."
+                        DEFVAL { normal }
+                        ::= { hwMstpInstanceEntry 7 }
+                
+                hwMstpiRemainingHops OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The remaining hops of the spanning tree instance identified by MSTID."
+                        ::= { hwMstpInstanceEntry 8 }
+                
+                hwMstpiAdminMappedVlanListLow OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                " The lower part of administrative VLAN list mapped to the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpInstanceEntry 9 }
+                
+                hwMstpiAdminMappedVlanListHigh OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                " The higher part of administrative VLAN list mapped to the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpInstanceEntry 10 }
+                
+                hwMstpiOperMappedVlanListLow OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                " The lower part of operative VLAN list mapped to the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpInstanceEntry 11 }
+                
+                hwMstpiOperMappedVlanListHigh OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                " The higher part of operative VLAN list mapped to the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpInstanceEntry 12 }
+                
+                hwMstpiRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                               "This object indicates the row status of the MSTI table.
+                               The value can be: 
+                               1: active
+                               3: not ready
+                               4: createAndGo
+                               5: createAndGo
+                               6: destroy"
+
+                        ::= { hwMstpInstanceEntry 13 }
+                
+                hwMstpPortTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpPortEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This table describes the attribute value, description, and operation restriction conditions of the port in each MSTI."
+                        ::= { hwMstpObjects 20 }
+                
+                hwMstpPortEntry OBJECT-TYPE
+                        SYNTAX HwMstpPortEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table includes the information of the port 
+                                of the multiple spanning tree instance. The index
+                                of the table is the aggregation of multiple spanning
+                                tree instance identifier and port index. "
+                        INDEX { hwMstpInstanceID, hwMstpiPortIndex }
+                        ::= { hwMstpPortTable 1 }
+                
+                HwMstpPortEntry ::=
+                        SEQUENCE { 
+                                hwMstpiPortIndex
+                                        Integer32,
+                                hwMstpiState
+                                        INTEGER,
+                                hwMstpiPortPriority
+                                        Integer32,
+                                hwMstpiPathCost
+                                        Integer32,
+                                hwMstpiDesignatedRoot
+                                        BridgeId,
+                                hwMstpiDesignatedCost
+                                        Integer32,
+                                hwMstpiDesignatedBridge
+                                        BridgeId,
+                                hwMstpiDesignatedPort
+                                        OCTET STRING,
+                                hwMstpiStpPortEdgeport
+                                        INTEGER,
+                                hwMstpiStpPortPointToPoint
+                                        INTEGER,
+                                hwMstpiStpMcheck
+                                        INTEGER,
+                                hwMstpiStpTransLimit
+                                        Integer32,
+                                hwMstpiStpRXStpBPDU
+                                        Counter32,
+                                hwMstpiStpTXStpBPDU
+                                        Counter32,
+                                hwMstpiStpRXTCNBPDU
+                                        Counter32,
+                                hwMstpiStpTXTCNBPDU
+                                        Counter32,
+                                hwMstpiStpRXRSTPBPDU
+                                        Counter32,
+                                hwMstpiStpTXRSTPBPDU
+                                        Counter32,
+                                hwMstpiStpRXMSTPBPDU
+                                        Counter32,
+                                hwMstpiStpTXMSTPBPDU
+                                        Counter32,
+                                hwMstpiStpClearStatistics
+                                        INTEGER,
+                                hwMstpiStpDefaultPortCost
+                                        INTEGER,
+                                hwMstpiStpStatus
+                                        HwMSTPEnabledStatus,
+                                hwMstpiPortRootGuard
+                                        HwMSTPEnabledStatus,
+                                hwMstpiPortLoopGuard
+                                        HwMSTPEnabledStatus,
+                                hwMstpPortCompliance
+                                        INTEGER,
+                                hwMstpConfigDigestSnooping
+                                        HwMSTPEnabledStatus,
+                                hwMstpNoAgreementCheck
+                                        HwMSTPEnabledStatus,
+                                hwMstpPortTCNotify
+                                        HwMSTPEnabledStatus,
+                                hwMstpiStpPortBpduFilter
+                                        INTEGER,
+                                hwMstpiPortRole
+                                        INTEGER
+                         }
+
+                hwMstpiPortIndex OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the bridge port."
+                        ::= { hwMstpPortEntry 1 }
+                
+                hwMstpiState OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disabled(1),
+                                discarding(2),
+                                learning(4),
+                                forwarding(5)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The current state of the port. It must be disabled, discarding, learning or forwarding. "
+                        ::= { hwMstpPortEntry 2 }
+                
+                hwMstpiPortPriority OBJECT-TYPE
+                        SYNTAX Integer32 (0..240)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of the priority field which is contained in the 
+                                first (in network byte order) four bits of the (2 octet long) Port ID.  
+                                The other octet of the Port ID is given by the value of mstiPortIndex. 
+                                And step of 16. It is the priority of the port in the multiple spanning tree instance,
+                                and it can be used to determine the role of the port in the multiple spanning tree."
+                        DEFVAL { 128 }
+                        ::= { hwMstpPortEntry 3 }
+                
+                hwMstpiPathCost OBJECT-TYPE
+                        SYNTAX Integer32 (1..200000000)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the path cost of the port."
+                        ::= { hwMstpPortEntry 4 }
+                
+                hwMstpiDesignatedRoot OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the Root Bridge for the port of the Spanning
+                                Tree instance identified by the MSTID"
+                        ::= { hwMstpPortEntry 5 }
+                
+                hwMstpiDesignatedCost OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the path cost of the designated port."
+                        ::= { hwMstpPortEntry 6 }
+                
+                hwMstpiDesignatedBridge OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the bridge which this port considers to 
+                                be the Designated Bridge for this port's segment."
+                        ::= { hwMstpPortEntry 7 }
+                
+                hwMstpiDesignatedPort OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (2))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The port Identifier of the port on the Designated Bridge 
+                                for this port's segment."
+                        ::= { hwMstpPortEntry 8 }
+                
+                hwMstpiStpPortEdgeport OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disable(1),
+                                enable(2),
+                                undo(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                               "This object indicates whether the port is an edge port. 
+							   By default, a port is a non-edge port. The value can be changed through configuration. 
+							   disable: indicates an edge port in the disabled state. 
+							   enable: indicates an edge port in the enabled state."
+                        ::= { hwMstpPortEntry 9 }
+                
+                hwMstpiStpPortPointToPoint OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                forceTrue(1),
+                                forceFalse(2),
+                                auto(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies whether the port is a Point-to-Point port.
+                                 1: forceTrue
+                                 2: forceFalse
+                                 3: auto
+                                 The default value is auto."
+
+                        DEFVAL { auto }
+                        ::= { hwMstpPortEntry 10 }
+                
+                hwMstpiStpMcheck OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                               "The value of this object identifies the operation of MCHECK on the port.
+                                1: enable When you set this object, the value can be enable only.
+                                2: ununsed When you access the value of this object, it is unused."
+
+                        ::= { hwMstpPortEntry 11 }
+                
+                hwMstpiStpTransLimit OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the transmission times of the BPDUs on the port."
+                        ::= { hwMstpPortEntry 12 }
+                
+                hwMstpiStpRXStpBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received Config BPDU. Effective in CIST."
+                        ::= { hwMstpPortEntry 13 }
+                
+                hwMstpiStpTXStpBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted Config BPDU. Effective in CIST."
+                        ::= { hwMstpPortEntry 14 }
+                
+                hwMstpiStpRXTCNBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received TCN BPDU. Effective in CIST."
+                        ::= { hwMstpPortEntry 15 }
+                
+                hwMstpiStpTXTCNBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted TCN BPDU. Effective in CIST."
+                        ::= { hwMstpPortEntry 16 }
+                
+                hwMstpiStpRXRSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received RST BPDU. Effective in CIST."
+                        ::= { hwMstpPortEntry 17 }
+                
+                hwMstpiStpTXRSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted RST BPDU. Effective in CIST."
+                        ::= { hwMstpPortEntry 18 }
+                
+                hwMstpiStpRXMSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received MST BPDU. Effective in CIST."
+                        ::= { hwMstpPortEntry 19 }
+                
+                hwMstpiStpTXMSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted MST BPDU. Effective in CIST."
+                        ::= { hwMstpPortEntry 20 }
+                
+                hwMstpiStpClearStatistics OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                clear(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                               "The value of this object identifies the status of clearing statistics on the port.
+                               1: clear When you perform SET operation to this object, the value can be clear only.
+                               2: ununsed When you perform GET operation to this object, the value of this object is unused."
+
+                        ::= { hwMstpPortEntry 21 }
+                
+                hwMstpiStpDefaultPortCost OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                reset(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the default cost of the port.
+                                1: reset When you perform SET operation to this object, the value can be reset only.
+                                2: ununsed When you perform GET operation to this object, the value of this object is unused.
+                                By default, the path cost value of the port on each MSTI is the path cost corresponding to the port rate."
+                        ::= { hwMstpPortEntry 22 }
+                
+                hwMstpiStpStatus OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the spanning tree status on the port.
+                                1: enbale
+                                2: disable
+                                The default value is enable."
+                        DEFVAL { enabled }
+                        ::= { hwMstpPortEntry 23 }
+                
+                hwMstpiPortRootGuard OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies whether the root protection is enabled on the port.
+                                1: enbale
+                                2: disable
+                                By default, the root protection is disabled."
+                        DEFVAL { disabled }
+                        ::= { hwMstpPortEntry 24 }
+                
+                hwMstpiPortLoopGuard OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies whether the loopback protection is enabled on the port.
+                                1: enbale
+                                2: disable
+                               By default, the loopback protection is disabled."
+
+                        DEFVAL { disabled }
+                        ::= { hwMstpPortEntry 25 }
+                
+                hwMstpPortCompliance OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                auto(1),
+                                dotls(2),
+                                legacy(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the protocol format of the MSTP packet sent and received on the port. 
+                                The protocol format can be one of the following:
+                                1: auto (the self-adaptive protocol format) 
+                                2: dotls (the standard IEEE 802.1s format)
+                                3: legacy (the private protocol format)
+                                By default, the protocol format of the MSTP packet is self-adaptive, that is, auto(1)."
+                        DEFVAL { auto }
+                        ::= { hwMstpPortEntry 26 }
+                
+                hwMstpConfigDigestSnooping OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the digest snooping function is enabled on the port:
+                                1: enabled
+                                2: disabled
+                                By default, the function is not enabled. In other words, the default value is disabled(2)."
+                        DEFVAL { disabled }
+                        ::= { hwMstpPortEntry 27 }
+                
+                hwMstpNoAgreementCheck OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Whether enhance agreement is enabled. 
+                                When Huawei datacomm devices running the VRP are internetworking 
+                                with non-Huawei devices, you need to enable this on Huawei devices 
+                                to configure the mode of the fast transition mechanism the same as 
+                                that on non-Huawei devices."
+                        DEFVAL { enabled }
+                        ::= { hwMstpPortEntry 30 }
+                
+                hwMstpPortTCNotify OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The main interface notifies its sub-interfaces to update 
+                                MAC entries and ARP entries after receiving a TC message. 
+                                This prevents services from being interrupted."
+                        DEFVAL { disabled }
+                        ::= { hwMstpPortEntry 31 }
+                        
+                hwMstpiStpPortBpduFilter OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disable(1),
+                                enable(2),
+                                undo(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the port is enabled to send or receive BPDUs.
+                             disable(1): indicates that the function of sending or receiving BPDUs is in the disabled state on the port.
+                             enable(2): indicates that the function of sending or receiving BPDUs is in the enabled state on the port.
+                             undo(3): indicates that the port is not configured with the function of sending or receiving BPDUs.
+                             By default, a port is not configured with the function of sending or receiving BPDUs."
+                        DEFVAL { undo }
+                        ::= { hwMstpPortEntry 32 }
+                hwMstpiPortRole OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disabled(1),
+                                alternate(2),
+                                backup(3),
+                                root(4),
+                                designated(5),
+                                master(6)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Indicates the port role on a particular instance."
+                        ::= { hwMstpPortEntry 33 }
+               
+                hwMstpSnooping OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "when the device's interface receive TCN, the servers is normal in device where MSTP is disable.
+                                By default, the value is disabled."                        
+                        ::= { hwMstpObjects 21 }
+                
+                hwMstpAccessoryTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpAccessoryEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table of MSTP Accessory Information."
+                        ::= { hwMstpObjects 22 }
+                
+                hwMstpAccessoryEntry OBJECT-TYPE
+                        SYNTAX HwMstpAccessoryEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table entry of MSTP Accessory Information."
+                        INDEX { hwMstpAccessoryIndex }
+                        ::= { hwMstpAccessoryTable 1 }
+                
+                HwMstpAccessoryEntry ::=
+                        SEQUENCE { 
+                                hwMstpAccessoryIndex
+                                        Integer32,
+                                hwMstpBackupReplyAgreement
+                                        INTEGER,
+                                hwMstpStpNoAgreementCheck
+                                        INTEGER
+                         }
+
+                hwMstpAccessoryIndex OBJECT-TYPE
+                        SYNTAX Integer32 (1..512)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The index of the Accessory Commands of MSTP."
+                        ::= { hwMstpAccessoryEntry 1 }
+                
+                hwMstpBackupReplyAgreement OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "When the port of device, which played the backup or alternate role, receives the BPDU message with 
+                                high priority, and the proposal flag of this message was set.
+                                The BPDU message can be send from this port immediately, the agreement flag was set of this BPDU message."
+                        DEFVAL { disable }
+                        ::= { hwMstpAccessoryEntry 2 }
+                
+                hwMstpStpNoAgreementCheck OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                disable(2)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "when the port is root, calculating allsyned without check syned flag of root."
+                        DEFVAL { disable }
+                        ::= { hwMstpAccessoryEntry 3 }
+                
+                hwMstpProTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpProEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This table describes the attribute value, attribute description, and access restrictions of each MSTP process."
+                        ::= { hwMstpObjects 23 }
+                
+                hwMstpProEntry OBJECT-TYPE
+                        SYNTAX HwMstpProEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "Entry of the MSTP process information table."
+                        INDEX { hwMstpProID }
+                        ::= { hwMstpProTable 1 }
+                
+                HwMstpProEntry ::=
+                        SEQUENCE { 
+                                hwMstpProID
+                                        Integer32,
+                                hwMstpProStpState
+                                        HwMSTPEnabledStatus,
+                                hwMstpProPriority
+                                        Integer32,
+                                hwMstpProRootType
+                                        INTEGER,
+                                hwMstpProForceVersion
+                                        INTEGER,
+                                hwMstpProBpduGuard
+                                        HwMSTPEnabledStatus,
+                                hwMstpProDiameter
+                                        Integer32,
+                                hwMstpProConvergeMode
+                                        INTEGER,
+                                hwMstpProMaxHops
+                                        Integer32,
+                                hwMstpProMCheck
+                                        INTEGER,
+                                hwMstpProPathCostStandard
+                                        INTEGER,
+                                hwMstpProHelloTime
+                                        Integer32,
+                                hwMstpProFwdDelay
+                                        Integer32,
+                                hwMstpProMaxAge
+                                        Integer32,
+                                hwMstpProTimerFactor
+                                        Integer32,
+                                hwMstpProTCNotify
+                                        OCTET STRING,
+                                hwMstpProNoLinkSharePortList
+                                        OCTET STRING,
+                                hwMstpProLinkSharePortList
+                                        OCTET STRING,
+                                hwMstpProTcGuard
+                                        HwMSTPEnabledStatus,
+                                hwMstpProTcGuardThreshold
+                                        Integer32,
+                                hwMstpProTcNotifyProcess
+                                        EnabledStatus,
+                                hwMstpProRegionConfActive
+                                        EnabledStatus,
+                                hwMstpProLinkShareGuard
+                                        EnabledStatus,
+                                hwMstpConfigDegist
+                                        OCTET STRING,
+                                hwMstpProRegionConfShare
+                                        EnabledStatus,
+                                hwMstpProRowStatus
+                                        RowStatus,
+                                hwMstpProTcGuardInterval
+                                        Integer32,
+                               hwMstpProFlushCapability
+                                        HwMSTPEnabledStatus
+                                
+                         }
+
+                hwMstpProID OBJECT-TYPE
+            SYNTAX Integer32 (0..288)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "MSTP process identifier."
+                        ::= { hwMstpProEntry 1 }
+                
+                hwMstpProStpState OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the spanning tree function is enabled for this MSTP process.
+                                 The value can be:
+                                 1: enabled
+                                 2: disabled
+                                 By default, the spanning tree function of an MSTP process is disabled."
+                        ::= { hwMstpProEntry 4 }
+                
+                hwMstpProPriority OBJECT-TYPE
+                        SYNTAX Integer32 (0..61440)
+                        UNITS "4096"
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The priority for the MSTP process spanning tree, step of 4096.
+                                For example, we can set the Priority of the bridge such as 0, 4096, 8192 etc.
+                                It can be used to determined whether the process is the root of
+                                the whole spanning tree. The default value is 32768."
+                        DEFVAL { 32768 }
+                        ::= { hwMstpProEntry 5 }
+                
+                hwMstpProRootType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                normal(0),
+                                secondary(1),
+                                primary(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                             "The value of this object identifies the type of the root bridge taken by the MSTP process.
+                              The value can be:
+                              0: normal
+                              1: secondary
+                              2: primary
+                             By default, an MSTP process does not function as a root bridge. "
+                        DEFVAL { normal }
+                        ::= { hwMstpProEntry 6 }
+                
+                hwMstpProForceVersion OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                stp(0),
+                                rstp(2),
+                                mstp(3)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the STP type of the MSTP process.
+                                 The value can be:
+                                 0: stp
+                                 1: rstp
+                                 2: mstp
+                                 By default, the protocol of an MSTP process is RSTP."
+                        ::= { hwMstpProEntry 7 }
+                
+                hwMstpProBpduGuard OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies whether the BPDU guard function is enabled for the MSTP process.
+                                  The value can be: 1: enabled
+                                  2: disabled
+                                  By default, the BPDU guard function of an MSTP process is disabled."
+
+                        DEFVAL { disabled }
+                        ::= { hwMstpProEntry 8 }
+                
+                hwMstpProDiameter OBJECT-TYPE
+                        SYNTAX Integer32 (2..7 | 65535)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the network diameter of the MSTP process. 
+								The network diameter determines timer parameters such as parameters of the Forwarding timer.
+								By default, the network diameter of an MSTP process is 7."
+                        DEFVAL { 7 }
+                        ::= { hwMstpProEntry 9 }
+                
+                hwMstpProConvergeMode OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                fast(1),
+                                normal(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the convergence mode of the MSTP process.
+                                 The value can be:
+                                1: fast
+                                2: normal
+                                By default, the convergence mode of an MSTP process is fast."
+
+                        ::= { hwMstpProEntry 10 }
+                
+                hwMstpProMaxHops OBJECT-TYPE
+                        SYNTAX Integer32 (1..40)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Maxhops of a MSTP process, the default value is 20."
+
+                        DEFVAL { 20 }
+                        ::= { hwMstpProEntry 11 }
+                
+                hwMstpProMCheck OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enabled(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies whether the MCheck mark is used.
+                                  The value can be:
+                                  1: enabled
+                                  65535: unused
+                                  By default, the MCheck mark of an MSTP process is unused."
+                        DEFVAL { 65535 }
+                        ::= { hwMstpProEntry 12 }
+                
+                hwMstpProPathCostStandard OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                dot1d1998(1),
+                                dot1t(2),
+                                legacy(3)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the path calculation standard of the MSTP process.
+                               The value can be:
+                              1: indicates dot1d-1998, which is the IEEE 802.1d standard proposed in 1998
+                              2: indicates dot1t, which is the IEEE 802.1t standard
+                              3: indicates legacy, which is the calculation standard developed by Huawei
+                              By default, the path calculation standard of an MSTP process is dot1t."
+                        DEFVAL { 2 }
+                        ::= { hwMstpProEntry 13 }
+                
+                hwMstpProHelloTime OBJECT-TYPE
+                        SYNTAX Integer32 (100..1000)
+                        UNITS "100"
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the Hello time of the MSTP process. 
+								The step is 100 centiseconds. By default, the Hello time of an MSTP process is 200 centiseconds."
+                        DEFVAL { 200 }
+                        ::= { hwMstpProEntry 14 }
+                
+                hwMstpProFwdDelay OBJECT-TYPE
+                        SYNTAX Integer32 (400..3000)
+                        UNITS "100"
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the Hello time of the MSTP process.
+								The step is 100 centiseconds. 
+								By default, the Hello time of an MSTP process is 1500 centiseconds."
+                        DEFVAL { 1500 }
+                        ::= { hwMstpProEntry 15 }
+                
+                hwMstpProMaxAge OBJECT-TYPE
+                        SYNTAX Integer32 (600..4000)
+                        UNITS "100"
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the maxage of the MSTP process.
+								The step is 100. By default, the maxage of an MSTP process is 2000."
+                        DEFVAL { 2000 }
+                        ::= { hwMstpProEntry 16 }
+                
+                hwMstpProTimerFactor OBJECT-TYPE
+                        SYNTAX Integer32 (1..10)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Timer factor, which is used in loop protection, the default value is 3."
+                        DEFVAL { 3 }
+                        ::= { hwMstpProEntry 17 }
+                
+                hwMstpProTCNotify OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..7))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The current MSTP process notifies the specified STP instance 
+                                in MSTP process 0 to update MAC entries and ARP entries after 
+                                receiving a TC message. This prevents services from being interrupted."
+                        ::= { hwMstpProEntry 18 }
+                
+                hwMstpProNoLinkSharePortList OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..64))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The port list participates in the status calculation of 
+                                a specified MSTP process witch no-link-share method."
+                        ::= { hwMstpProEntry 19 }
+                
+                hwMstpProLinkSharePortList OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..64))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The port list participates in the status calculation of 
+                                a specified MSTP process witch link-share method."
+                        ::= { hwMstpProEntry 20 }
+                
+                hwMstpProTcGuard OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the TC guard function is enabled for the MSTP process. 
+								After the TC guard function is enabled for the MSTP process and the number of TC BPDUs received by an MSTI in a unit time exceeds the threshold,
+								the subsequent TC BPDUs are not processed until the TC guard time expires.
+                                 The value can be:
+                                  1: enabled
+                                  2: disabled
+                               By default, this function is disabled."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProEntry 21 }
+                
+                hwMstpProTcGuardThreshold OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                               "The value of this object identifies the maximum number of TC messages that can be processed within the TC guard time. The default value is 3."
+                        ::= { hwMstpProEntry 22 }
+                
+                hwMstpProTcNotifyProcess OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether the current MSTP process notifies MSTP process 0 to update 
+                                MAC entries and ARP entries after receiving a TC message."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProEntry 23 }
+                
+                hwMstpProRegionConfActive OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Active the region configuration.
+                                Generally, the value of the hwMstpProRegionConfActive is disable,
+                                but the value will be set as enable if Net Manager want to 
+                                active the configure of the region in the bridge. And then 
+                                all manager configuration will change to operable configuration.
+                                The value of hwMstpRegionConfActive is only disable when it is read.
+                                It is only enable when it is set."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProEntry 24 }
+                
+        hwMstpProLinkShareGuard OBJECT-TYPE
+            SYNTAX EnabledStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "Whether the Link-share Guard function is enabled on the MSTP process. 
+                                                If the function is enabled, the root Guard function will also 
+                                                work on port in all instance besides instance 0, when the link 
+                                                between the ports either of which is in Link_share mode broken down."
+            DEFVAL { disabled }
+            ::= { hwMstpProEntry 25 }
+            
+            hwMstpConfigDegist OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "This MSTP region-configuration digest.
+                                It can be used to determine whether
+                                the region is the same region with
+                                another one."
+                        ::= { hwMstpProEntry 26 }
+                        
+            hwMstpProRegionConfShare OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Suggesting that whether all the process will share the same Region-config with process 0.
+                                If the function is enable, all the existing process will share the same Region-config with process 0.
+                                "
+                        ::= { hwMstpProEntry 27 }
+            
+            
+                hwMstpProRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the row status of hwMstpProTable.
+                                 The value can be:
+                                  1: active
+                                  2: notInService
+                                  3: notReady
+                                  4: createAndGo
+                                  5: createAndWait
+                                  6: destroy"
+
+                        ::= { hwMstpProEntry 30 }
+                
+                hwMstpProTcGuardInterval OBJECT-TYPE                        
+                        SYNTAX Integer32 (0..600)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                              "The value of this object indicates time the MSTP takes to handle a given number of TC packets and immediately refresh forwarding entries."
+                        ::= { hwMstpProEntry 31 }
+
+                hwMstpProFlushCapability OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "Whether FLUSH capability is enabled or not on a MSTP process."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProEntry 32 }
+                
+                
+                hwMstpPortBindTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpPortBindEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The port bind table."
+                        ::= { hwMstpObjects 24 }
+                
+                hwMstpPortBindEntry OBJECT-TYPE
+                        SYNTAX HwMstpPortBindEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The port bind entry."
+                        INDEX { hwMstpProID, hwMstpPortId1, hwMstpPortId2, hwMstpPortId3, hwMstpPortId4, 
+                                hwMstpPortIdFlag }
+                        ::= { hwMstpPortBindTable 1 }
+                
+                HwMstpPortBindEntry ::=
+                        SEQUENCE { 
+                                hwMstpPortId1
+                                        Integer32,
+                                hwMstpPortId2
+                                        Integer32,
+                                hwMstpPortId3
+                                        Integer32,
+                                hwMstpPortId4
+                                        Integer32,
+                                hwMstpPortIdFlag
+                                        Integer32,
+                                hwMstpPortVlanListLow
+                                        OCTET STRING,
+                                hwMstpPortVlanListHigh
+                                        OCTET STRING,
+                                hwMstpProNewPortType
+                                        INTEGER,
+                                hwMstpProNewPortBpduVlan
+                                    Integer32,
+                                hwMstpPortBindRowStatus
+                                        RowStatus
+                         }
+
+                hwMstpPortId1 OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "The value of this object identifies the port ID field 1 allocated by MSTP."
+                        ::= { hwMstpPortBindEntry 1 }
+                
+                hwMstpPortId2 OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                               "The value of this object identifies the port ID field 2 allocated by MSTP."
+                        ::= { hwMstpPortBindEntry 2 }
+                
+                hwMstpPortId3 OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                 "The value of this object identifies the port ID field 3 allocated by MSTP."
+                        ::= { hwMstpPortBindEntry 3 }
+                
+                hwMstpPortId4 OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the port ID field 4 allocated by MSTP."
+                        ::= { hwMstpPortBindEntry 4 }
+                
+                hwMstpPortIdFlag OBJECT-TYPE
+                        SYNTAX Integer32 (0..2147483647)
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the port ID tag allocated by MSTP."
+                        ::= { hwMstpPortBindEntry 5 }
+                
+                hwMstpPortVlanListLow OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates 2048 least significant bits (0-2047) of the VLAN to which the port joining the process belongs."
+                        ::= { hwMstpPortBindEntry 6 }
+                
+                hwMstpPortVlanListHigh OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates 2048 most significant bits (2048-4095) of the VLAN to which the port joining the process belongs."
+                        ::= { hwMstpPortBindEntry 7 }
+                
+                hwMstpProNewPortType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                normal(1),
+                                nolinkshare(2),
+                                linkshare(3),
+                                nolinksharewithvlan(4)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the mode in which the port joins the MSTP process:
+                                   The value can be:
+                                   1: normal
+                                   2: nolinkshare
+                                   3: linkshare
+                                   4: nolinksharewithvlan"
+
+                        ::= { hwMstpPortBindEntry 8 }
+                        
+                hwMstpProNewPortBpduVlan OBJECT-TYPE
+                        SYNTAX Integer32 (0..4094)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the BPDU-VLAN-based communication with non-Huawei devices.
+								On non-Huawei devices, protocol packets are in the format of VBSTand a VLAN is a spanning tree.
+								Therefore, to communicate with non-Huawei devices, the format of BPDU packets on Huawei devices need to be set to VBST, 
+								and Huawei devices need to belong to the same VLAN with non-Huawei devices."
+                        ::= { hwMstpPortBindEntry 9 }                        
+                
+                hwMstpPortBindRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "MSTP port binding table rowstatus."
+                        ::= { hwMstpPortBindEntry 100 }
+                
+                hwMstpProPortTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpProPortEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The table includes the information of the port 
+                                of the MSTP process. "
+                        ::= { hwMstpObjects 25 }
+                
+                hwMstpProPortEntry OBJECT-TYPE
+                        SYNTAX HwMstpProPortEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of the MSTP process port information table. "
+                        INDEX { hwMstpProID, hwMstpInstanceID, hwMstpiPortIndex }
+                        ::= { hwMstpProPortTable 1 }
+                
+                HwMstpProPortEntry ::=
+                        SEQUENCE { 
+                                hwMstpProPortState
+                                        INTEGER,
+                                hwMstpProPortPriority
+                                        Integer32,
+                                hwMstpProPortPathCost
+                                        Integer32,
+                                hwMstpProPortDesignatedRoot
+                                        BridgeId,
+                                hwMstpProPortDesignatedCost
+                                        Integer32,
+                                hwMstpProPortDesignatedBridge
+                                        BridgeId,
+                                hwMstpProPortDesignatedPort
+                                        OCTET STRING,
+                                hwMstpProPortStpEdgeport
+                                        HwMSTPEnabledStatus,
+                                hwMstpProPortStpPointToPoint
+                                        INTEGER,
+                                hwMstpProPortStpMcheck
+                                        INTEGER,
+                                hwMstpProPortStpTransLimit
+                                        Integer32,
+                                hwMstpProPortStpRXStpBPDU
+                                        Counter32,
+                                hwMstpProPortStpTXStpBPDU
+                                        Counter32,
+                                hwMstpProPortStpRXTCNBPDU
+                                        Counter32,
+                                hwMstpProPortStpTXTCNBPDU
+                                        Counter32,
+                                hwMstpProPortStpRXRSTPBPDU
+                                        Counter32,
+                                hwMstpProPortStpTXRSTPBPDU
+                                        Counter32,
+                                hwMstpProPortStpRXMSTPBPDU
+                                        Counter32,
+                                hwMstpProPortStpTXMSTPBPDU
+                                        Counter32,
+                                hwMstpProPortStpClearStatistics
+                                        INTEGER,
+                                hwMstpProPortStpDefaultPortCost
+                                        INTEGER,
+                                hwMstpProPortStpStatus
+                                        HwMSTPEnabledStatus,
+                                hwMstpProPortRootGuard
+                                        HwMSTPEnabledStatus,
+                                hwMstpProPortLoopGuard
+                                        HwMSTPEnabledStatus,
+                                hwMstpProPortCompliance
+                                        INTEGER,
+                                hwMstpProPortConfigDigestSnooping
+                                        HwMSTPEnabledStatus,
+                                hwMstpProPortNoAgreementCheck
+                                        HwMSTPEnabledStatus,
+                                hwMstpProPortTCNotify
+                                        HwMSTPEnabledStatus,
+                                hwMstpProPortType
+                                        INTEGER
+                         }
+
+                hwMstpProPortState OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disabled(1),
+                                discarding(2),
+                                learning(4),
+                                forwarding(5)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The current state of the port in MSTP process. 
+                                It must be disabled, discarding, learning or forwarding. "
+                        ::= { hwMstpProPortEntry 2 }
+                
+                hwMstpProPortPriority OBJECT-TYPE
+                        SYNTAX Integer32 (0..240)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of the priority field which is contained in the 
+                                first (in network byte order) four bits of the (2 octet long) Port ID.  
+                                The other octet of the Port ID is given by the value of hwMstpiPortIndex. 
+                                And step of 16. It is the priority of the port in the MSTP process,
+                                and it can be used to determine the role of the port in the MSTP process Spanning Tree. "
+                        DEFVAL { 128 }
+                        ::= { hwMstpProPortEntry 3 }
+                
+                hwMstpProPortPathCost OBJECT-TYPE
+                        SYNTAX Integer32 (1..200000000)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The path cost of paths with which the package passes the port.
+                                The range of path cost is 1..65535 for 802.1d standard,
+                                is 1..200000000 for 802.1t standard, and is 1..200000  
+                                for the legacy standard. "
+                        ::= { hwMstpProPortEntry 4 }
+                
+                hwMstpProPortDesignatedRoot OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the Root Bridge for the port of the 
+                                MSTP process Spanning Tree."
+                        ::= { hwMstpProPortEntry 5 }
+                
+                hwMstpProPortDesignatedCost OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The path cost of the designated port of the segment connected to 
+                                this port. This value is compared to the Root Path Cost field 
+                                in received bridge BPDUs."
+                        ::= { hwMstpProPortEntry 6 }
+                
+                hwMstpProPortDesignatedBridge OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the bridge which this port considers to 
+                                be the Designated Bridge for this port's segment."
+                        ::= { hwMstpProPortEntry 7 }
+                
+                hwMstpProPortDesignatedPort OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (2))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Port Identifier of the port on the Designated Bridge 
+                                for this port's segment."
+                        ::= { hwMstpProPortEntry 8 }
+                
+                hwMstpProPortStpEdgeport OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                " Whether the port fast is enabled in the MSTP process. When the 
+                                port is the edge port, it can change to forwarding state immediately. "
+                        DEFVAL { disabled }
+                        ::= { hwMstpProPortEntry 9 }
+                
+                hwMstpProPortStpPointToPoint OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                forceTrue(1),
+                                forceFalse(2),
+                                auto(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                " Whether the port connects the point to point link.
+                                If user set the port as a point to point port,
+                                the port is a point to point port in the MSTP process.
+                                If user set the port as a point to point port but the port isn't,
+                                the mstp may import temporary loop. So user can use the default. "
+                        DEFVAL { auto }
+                        ::= { hwMstpProPortEntry 10 }
+                
+                hwMstpProPortStpMcheck OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                " When root interface is changed from STP mode to RSTP or MSTP mode, the 
+                                appointed interface can not switch to RSTP or MSTP mode automatically. 
+                                At the time, you need switch back with hand by set Mcheck value to enable(1). 
+                                The value unused(65535) when it is read. "
+                        ::= { hwMstpProPortEntry 11 }
+                
+                hwMstpProPortStpTransLimit OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value used by the port transmit state machine to limit 
+                                the maximum transmission rate. "
+                        DEFVAL { 3 }
+                        ::= { hwMstpProPortEntry 12 }
+                
+                hwMstpProPortStpRXStpBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received Config BPDUs. "
+                        ::= { hwMstpProPortEntry 13 }
+                
+                hwMstpProPortStpTXStpBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted Config BPDUs. "
+                        ::= { hwMstpProPortEntry 14 }
+                
+                hwMstpProPortStpRXTCNBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received TCN BPDUs. "
+                        ::= { hwMstpProPortEntry 15 }
+                
+                hwMstpProPortStpTXTCNBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted TCN BPDUs. "
+                        ::= { hwMstpProPortEntry 16 }
+                
+                hwMstpProPortStpRXRSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received RST BPDUs. "
+                        ::= { hwMstpProPortEntry 17 }
+                
+                hwMstpProPortStpTXRSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted RST BPDUs. "
+                        ::= { hwMstpProPortEntry 18 }
+                
+                hwMstpProPortStpRXMSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received MST BPDUs. "
+                        ::= { hwMstpProPortEntry 19 }
+                
+                hwMstpProPortStpTXMSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted MST BPDUs. "
+                        ::= { hwMstpProPortEntry 20 }
+                
+                hwMstpProPortStpClearStatistics OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                clear(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Clear the Spanning Tree statistics in specified MSTP process.
+                                The value is unused(65535) when it is read.
+                                The value must be clear(1) when it is set."
+                        ::= { hwMstpProPortEntry 21 }
+                
+                hwMstpProPortStpDefaultPortCost OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                reset(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Set default port path cost. "
+                        ::= { hwMstpProPortEntry 22 }
+                
+                hwMstpProPortStpStatus OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Whether the Spanning Tree Protocol is enabled on this port. "
+                        DEFVAL { enabled }
+                        ::= { hwMstpProPortEntry 23 }
+                
+                hwMstpProPortRootGuard OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Whether the root guard is enabled. The function is to prevent 
+                                the port from receiving the BPDUs, the priority of which is 
+                                above the priority of the port."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProPortEntry 24 }
+                
+                hwMstpProPortLoopGuard OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Whether the loop protection is enabled. "
+                        DEFVAL { disabled }
+                        ::= { hwMstpProPortEntry 25 }
+                
+                hwMstpProPortCompliance OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                auto(1),
+                                dotls(2),
+                                legacy(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the protocol format of the MSTP packet sent and received on the port. 
+                                The protocol format can be one of the following:
+                                1: auto (the self-adaptive protocol format) 
+                                2: dotls (the standard IEEE 802.1s format)
+                                3: legacy (the private protocol format)
+                                By default, the protocol format of the MSTP packet is self-adaptive, that is, auto(1)."
+                        DEFVAL { auto }
+                        ::= { hwMstpProPortEntry 26 }
+                
+                hwMstpProPortConfigDigestSnooping OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the digest snooping function is enabled on the port:
+                                1: enabled
+                                2: disabled
+                                By default, the function is not enabled. In other words, the default value is disabled(2)."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProPortEntry 27 }
+                
+                hwMstpProPortNoAgreementCheck OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Whether enhance agreement is enabled. 
+                                When Huawei datacomm devices running the VRP are internetworking 
+                                with non-Huawei devices, you need to enable this on Huawei devices 
+                                to configure the mode of the fast transition mechanism the same as 
+                                that on non-Huawei devices."
+                        DEFVAL { enabled }
+                        ::= { hwMstpProPortEntry 30 }
+                
+                hwMstpProPortTCNotify OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The main interface notifies its sub-interfaces to update 
+                                MAC entries and ARP entries after receiving a TC message. 
+                                This prevents services from being interrupted."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProPortEntry 31 }
+                
+                hwMstpProPortType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                none(0),
+                                nolinkshare(1),
+                                linkshare(2)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                " An interface to participate in the status calculation of 
+                                link-share or no-link-share Spanning Tree processes."
+                        ::= { hwMstpProPortEntry 32 }
+                
+                hwMstpTcGuard OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Whether the Bridge TC Guard function is enabled. 
+                                If the function is enabled, the TC message in each instance exceeded 
+                                threshold will be defered to deal with at the end of TC protection time.
+                                By default, the function is disabled."                        
+                        ::= { hwMstpObjects 26 }
+                
+                hwMstpTcGuardThreshold OBJECT-TYPE
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the maximum number of TC BPDUs that can be processed by an MSTI within the TC guard time. The default value is 3."                        
+                        ::= { hwMstpObjects 27 }
+                
+                hwMstpProInstanceTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpProInstanceEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION 
+                                "This table describes the attribute value, attribute description, and access restrictions of each MSTI in an MSTP process."
+                        ::= { hwMstpObjects 28 }
+                
+                hwMstpProInstanceEntry OBJECT-TYPE
+                        SYNTAX HwMstpProInstanceEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of the MSTP process instance information table."
+                        INDEX { hwMstpProID, hwMstpInstanceID }
+                        ::= { hwMstpProInstanceTable 1 }
+                
+                HwMstpProInstanceEntry ::=
+                        SEQUENCE { 
+                                hwMstpProInstanceBridgeID
+                                        BridgeId,
+                                hwMstpProInstanceBridgePriority
+                                        Integer32,
+                                hwMstpProInstanceDesignedRoot
+                                        BridgeId,
+                                hwMstpProInstanceRootPathCost
+                                        Integer32,
+                                hwMstpProInstanceRootPort
+                                        Integer32,
+                                hwMstpProInstanceRootType
+                                        INTEGER,
+                                hwMstpProInstanceRemainingHops
+                                        Integer32,
+                                hwMstpProInstanceAdminMappedVlanListLow
+                                        OCTET STRING,
+                                hwMstpProInstanceAdminMappedVlanListHigh
+                                        OCTET STRING,
+                                hwMstpProInstanceOperMappedVlanListLow
+                                        OCTET STRING,
+                                hwMstpProInstanceOperMappedVlanListHigh
+                                        OCTET STRING,
+                                hwMstpProInstanceRowStatus
+                                        RowStatus
+                         }
+
+                hwMstpProInstanceBridgeID OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier for the spanning tree instance 
+                                identified by MSTID."
+                        ::= { hwMstpProInstanceEntry 1 }
+                
+                hwMstpProInstanceBridgePriority OBJECT-TYPE
+                        SYNTAX Integer32 (0..61440)
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the bridge priority of the MSTI. 
+								The step is 4096. For example, the values can be set to be 0, 4096, 8192... The default value is 32768."
+                        DEFVAL { 32768 }
+                        ::= { hwMstpProInstanceEntry 2 }
+                
+                hwMstpProInstanceDesignedRoot OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the Root Bridge for the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpProInstanceEntry 3 }
+                
+                hwMstpProInstanceRootPathCost OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The path cost from the transmitting Bridge to the Root Bridge 
+                                for the spanning tree instance identified by MSTID."
+                        ::= { hwMstpProInstanceEntry 4 }
+                
+                hwMstpProInstanceRootPort OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The root port for the spanning tree instance identified by the MSTID."
+                        ::= { hwMstpProInstanceEntry 5 }
+                
+                hwMstpProInstanceRootType OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                normal(0),
+                                secondary(1),
+                                primary(2)
+                                }
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                              "The value of this object identifies the type of the root bridge of the MSTI:
+                                The value can be:
+                                0: normal
+                                1: secondary
+                                2: primary
+                                Default value: normal (0)."
+
+                        DEFVAL { normal }
+                        ::= { hwMstpProInstanceEntry 6 }
+                
+                hwMstpProInstanceRemainingHops OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The remaining hops of the spanning tree instance identified by MSTID."
+                        ::= { hwMstpProInstanceEntry 7 }
+                
+                hwMstpProInstanceAdminMappedVlanListLow OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                " The lower part of administrative VLAN list mapped to the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpProInstanceEntry 8 }
+                
+                hwMstpProInstanceAdminMappedVlanListHigh OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                " The higher part of administrative VLAN list mapped to the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpProInstanceEntry 9 }
+                
+                hwMstpProInstanceOperMappedVlanListLow OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                " The lower part of operative VLAN list mapped to the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpProInstanceEntry 10 }
+                
+                hwMstpProInstanceOperMappedVlanListHigh OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..256))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                " The higher part of operative VLAN list mapped to the spanning 
+                                tree instance identified by MSTID."
+                        ::= { hwMstpProInstanceEntry 11 }
+                
+                hwMstpProInstanceRowStatus OBJECT-TYPE
+                        SYNTAX RowStatus
+                        MAX-ACCESS read-create
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates the row status of creating or deleting hwMstpProInstanceTable."
+                        ::= { hwMstpProInstanceEntry 100 }
+                
+                hwMstpProNewPortTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpProNewPortEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This table describes the attribute value, attribute description, and access restrictions of ports in each MSTI in an MSTP process."
+                        ::= { hwMstpObjects 29 }
+                
+                hwMstpProNewPortEntry OBJECT-TYPE
+                        SYNTAX HwMstpProNewPortEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of the MSTP process port information table. "
+                        INDEX { hwMstpProID, hwMstpInstanceID, hwMstpPortId1, hwMstpPortId2, hwMstpPortId3, 
+                                hwMstpPortId4, hwMstpPortIdFlag }
+                        ::= { hwMstpProNewPortTable 1 }
+                
+                HwMstpProNewPortEntry ::=
+                        SEQUENCE { 
+                                hwMstpProNewPortState
+                                        INTEGER,
+                                hwMstpProNewPortPriority
+                                        Integer32,
+                                hwMstpProNewPortPathCost
+                                        Integer32,
+                                hwMstpProNewPortDesignatedRoot
+                                        BridgeId,
+                                hwMstpProNewPortDesignatedCost
+                                        Integer32,
+                                hwMstpProNewPortDesignatedBridge
+                                        BridgeId,
+                                hwMstpProNewPortDesignatedPort
+                                        OCTET STRING,
+                                hwMstpProNewPortStpEdgeport
+                                        INTEGER,
+                                hwMstpProNewPortStpPointToPoint
+                                        INTEGER,
+                                hwMstpProNewPortStpMcheck
+                                        INTEGER,
+                                hwMstpProNewPortStpTransLimit
+                                        Integer32,
+                                hwMstpProNewPortStpRXStpBPDU
+                                        Counter32,
+                                hwMstpProNewPortStpTXStpBPDU
+                                        Counter32,
+                                hwMstpProNewPortStpRXTCNBPDU
+                                        Counter32,
+                                hwMstpProNewPortStpTXTCNBPDU
+                                        Counter32,
+                                hwMstpProNewPortStpRXRSTPBPDU
+                                        Counter32,
+                                hwMstpProNewPortStpTXRSTPBPDU
+                                        Counter32,
+                                hwMstpProNewPortStpRXMSTPBPDU
+                                        Counter32,
+                                hwMstpProNewPortStpTXMSTPBPDU
+                                        Counter32,
+                                hwMstpProNewPortStpClearStatistics
+                                        INTEGER,
+                                hwMstpProNewPortStpDefaultPortCost
+                                        INTEGER,
+                                hwMstpProNewPortStpStatus
+                                        EnabledStatus,
+                                hwMstpProNewPortRootGuard
+                                        EnabledStatus,
+                                hwMstpProNewPortLoopGuard
+                                        EnabledStatus,
+                                hwMstpProNewPortCompliance
+                                        INTEGER,
+                                hwMstpProNewPortConfigDigestSnooping
+                                        EnabledStatus,
+                                hwMstpProNewPortNoAgreementCheck
+                                        EnabledStatus,
+                                hwMstpProNewPortVplsSubinterfaceEnable
+                                        EnabledStatus,
+                                hwMstpProNewPortBpduEncapsulation
+                                        INTEGER,
+                                hwMstpProNewPortBpduFilter
+                                        INTEGER,
+                                hwMstpProNewPortStpRXTC
+                                        Counter32,
+                                hwMstpProNewPortStpTXTC
+                                        Counter32,
+                                hwMstpProNewPortRole
+                                        INTEGER 
+                         }
+
+                hwMstpProNewPortState OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disabled(1),
+                                discarding(2),
+                                learning(4),
+                                forwarding(5)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the spanning tree status on the port where the MSTI is configured."
+                        ::= { hwMstpProNewPortEntry 1 }
+                
+                hwMstpProNewPortPriority OBJECT-TYPE
+                        SYNTAX Integer32 (0..240)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the priority of the port where the MSTI is configured."
+                        DEFVAL { 128 }
+                        ::= { hwMstpProNewPortEntry 2 }
+                
+                hwMstpProNewPortPathCost OBJECT-TYPE
+                        SYNTAX Integer32 (1..200000000)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the path cost of the port where the MSTI is configured. "
+                        ::= { hwMstpProNewPortEntry 3 }
+                
+                hwMstpProNewPortDesignatedRoot OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the Root Bridge for the port of the 
+                                MSTP process Spanning Tree."
+                        ::= { hwMstpProNewPortEntry 4 }
+                
+                hwMstpProNewPortDesignatedCost OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the specified cost of the port where the MSTI is configured."
+                        ::= { hwMstpProNewPortEntry 5 }
+                
+                hwMstpProNewPortDesignatedBridge OBJECT-TYPE
+                        SYNTAX BridgeId
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The Bridge Identifier of the bridge which this port considers to 
+                                be the Designated Bridge for this port's segment."
+                        ::= { hwMstpProNewPortEntry 6 }
+                
+                hwMstpProNewPortDesignatedPort OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (2))
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The port identifier of the port on the Designated Bridge 
+                                for this port's segment."
+                        ::= { hwMstpProNewPortEntry 7 }
+                
+                hwMstpProNewPortStpEdgeport OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disable(1),
+                                enable(2),
+                                undo(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                " Whether the port fast is enabled in the MSTP process. By default, there is no configuration on the port. When the 
+                                port is the edge port, it can change to forwarding state immediately. "
+                        ::= { hwMstpProNewPortEntry 8 }
+                
+                hwMstpProNewPortStpPointToPoint OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                forceTrue(1),
+                                forceFalse(2),
+                                auto(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies whether the port where the MSTI is configured is a P2P port.
+                                  The value can be:
+                                  1: forceTrue
+                                  2: forceFalse
+                                  3: auto
+                                 The default value is auto."
+
+                        DEFVAL { auto }
+                        ::= { hwMstpProNewPortEntry 9 }
+                
+                hwMstpProNewPortStpMcheck OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                enable(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                " When root interface is changed from STP mode to RSTP or MSTP mode, the 
+                                appointed interface can not switch to RSTP or MSTP mode automatically. 
+                                At the time, you need switch back with hand by set Mcheck value to enable(1). 
+                                The value unused(65535) when it is read. "
+                        ::= { hwMstpProNewPortEntry 10 }
+                
+                hwMstpProNewPortStpTransLimit OBJECT-TYPE
+                        SYNTAX Integer32 (0..255)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value is used to set BPDU maximum transmission rate of the port. 
+                                 If value is set 0, the transmit limit of the port is equal to the wMstpTransmitLimitDefault value "
+                        ::= { hwMstpProNewPortEntry 11 }
+                
+                hwMstpProNewPortStpRXStpBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received Config BPDUs. "
+                        ::= { hwMstpProNewPortEntry 12 }
+                
+                hwMstpProNewPortStpTXStpBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted Config BPDUs. "
+                        ::= { hwMstpProNewPortEntry 13 }
+                
+                hwMstpProNewPortStpRXTCNBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received TCN BPDUs. "
+                        ::= { hwMstpProNewPortEntry 14 }
+                
+                hwMstpProNewPortStpTXTCNBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted TCN BPDUs. "
+                        ::= { hwMstpProNewPortEntry 15 }
+                
+                hwMstpProNewPortStpRXRSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received RST BPDUs. "
+                        ::= { hwMstpProNewPortEntry 16 }
+                
+                hwMstpProNewPortStpTXRSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted RST BPDUs. "
+                        ::= { hwMstpProNewPortEntry 17 }
+                
+                hwMstpProNewPortStpRXMSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of received MST BPDUs. "
+                        ::= { hwMstpProNewPortEntry 18 }
+                
+                hwMstpProNewPortStpTXMSTPBPDU OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of transmitted MST BPDUs. "
+                        ::= { hwMstpProNewPortEntry 19 }
+                
+                hwMstpProNewPortStpClearStatistics OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                clear(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Clear the Spanning Tree statistics in specified MSTP process.
+                                The value is unused(65535) when it is read.
+                                The value must be clear(1) when it is set."
+                        ::= { hwMstpProNewPortEntry 20 }
+                
+                hwMstpProNewPortStpDefaultPortCost OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                reset(1),
+                                unused(65535)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                            "The value of this object identifies the default path cost of the port where the MSTI is configured:
+                            The value can be:
+                              1: reset When you perform SET operation to this object, the value can be reset only.
+                              65535: ununsed When you perform GET operation to this object, the value of this object is unused.
+                              By default, the path cost value of the port on each MSTI is calculated on the basis of the port speed."
+
+                        ::= { hwMstpProNewPortEntry 21 }
+                
+                hwMstpProNewPortStpStatus OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "Whether the Spanning Tree Protocol is enabled on this port. "
+                        DEFVAL { enabled }
+                        ::= { hwMstpProNewPortEntry 22 }
+                
+                hwMstpProNewPortRootGuard OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                               "The value of this object identifies whether the root guard function is enabled on the port where the MSTI is configured.
+                                The value can be: 1: enabled
+                                2: disabled
+                               By default, the root protection is disabled. The default value is disable(2)."
+
+                        DEFVAL { disabled }
+                        ::= { hwMstpProNewPortEntry 23 }
+                
+                hwMstpProNewPortLoopGuard OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                              "The value of this object identifies whether the loop guard function is enabled on the port where the MSTI is configured.
+                                  The value can be: 1: enabled
+                                 2: disabled
+                                 By default, the loop guard function is disabled. The default value is disable(2)."
+
+                        DEFVAL { disabled }
+                        ::= { hwMstpProNewPortEntry 24 }
+                
+                hwMstpProNewPortCompliance OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                auto(1),
+                                dotls(2),
+                                legacy(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the protocol format of the MSTP packet sent and received on the port. 
+                                The protocol format can be one of the following:
+                                1: auto (the self-adaptive protocol format) 
+                                2: dotls (the standard IEEE 802.1s format)
+                                3: legacy (the private protocol format)
+                                By default, the protocol format of the MSTP packet is self-adaptive, that is, auto(1)."
+                        DEFVAL { auto }
+                        ::= { hwMstpProNewPortEntry 25 }
+                
+                hwMstpProNewPortConfigDigestSnooping OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the digest snooping function is enabled on the port:
+                                1: enabled
+                                2: disabled
+                                By default, the function is not enabled. In other words, the default value is disabled(2)."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProNewPortEntry 26 }
+                
+                hwMstpProNewPortNoAgreementCheck OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                              "The value of this object identifies whether the fast convergence detection is enabled on the interface belonging to the MSTP process. 
+							  In the scenarios where Huawei devices are interconnected with non-Huawei devices, if the fast convergence detection is enabled,
+							  the Agree mark is checked during the fast convergence.
+                              The value can be:
+                              1: enabled
+                              2: disabled
+                             By default, this function is enabled."
+
+                        DEFVAL { enabled }
+                        ::= { hwMstpProNewPortEntry 27 }
+                
+                hwMstpProNewPortVplsSubinterfaceEnable OBJECT-TYPE
+                        SYNTAX EnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The main interface notifies its sub-interfaces to update 
+                                MAC entries and ARP entries after receiving a TC message. 
+                                This prevents services from being interrupted."
+                        DEFVAL { disabled }
+                        ::= { hwMstpProNewPortEntry 28 }
+                
+                hwMstpProNewPortBpduEncapsulation OBJECT-TYPE
+                        SYNTAX INTEGER
+                               {
+                               vbst(1),
+                               stp(2)
+                               }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the protocol format of the BPDU sent on the port. 
+                                The protocol format can be one of the following:
+                                1: vbst (the VBST format)
+                                2: stp (the STP format)
+                                By default, the BPDU format of the MSTP packet is stp(2)."
+                       DEFVAL { stp }
+                       ::= { hwMstpProNewPortEntry 29 }
+
+                hwMstpProNewPortBpduFilter OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disable(1),
+                                enable(2),
+                                undo(3)
+                                }
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether the port is enabled to send or receive BPDUs.
+                                disable(1): indicates that the function of sending or receiving BPDUs is in the disabled state on the port.
+                                enable(2): indicates that the function of sending or receiving BPDUs is in the enabled state on the port.
+                                undo(3): indicates that the port is not configured with the function of sending or receiving BPDUs.
+                                By default, a port is not configured with the function of sending or receiving BPDUs."
+
+                        DEFVAL { undo }
+                        ::= { hwMstpProNewPortEntry 30 }
+                
+                hwMstpProNewPortStpRXTC OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of TC BPDUs received by the port. "
+                        ::= { hwMstpProNewPortEntry 31 }
+                
+                hwMstpProNewPortStpTXTC OBJECT-TYPE
+                        SYNTAX Counter32
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "The number of TC BPDUs sent by the port. "
+                        ::= { hwMstpProNewPortEntry 32 }
+                hwMstpProNewPortRole  OBJECT-TYPE
+                        SYNTAX INTEGER
+                                {
+                                disabled(1),
+                                alternate(2),
+                                backup(3),
+                                root(4),
+                                designated(5),
+                                master(6)
+                                }
+                        MAX-ACCESS read-only
+                        STATUS current
+                        DESCRIPTION
+                                "Indicates the port role on a particular instance."
+                        ::= { hwMstpProNewPortEntry 33 }                       
+                        
+                hwMstpEdgedPortDefault OBJECT-TYPE                        
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object is used to configure a port as the default edge port."
+                        ::= { hwMstpObjects 30 }  
+                        
+                hwMstpBpduFilterPortDefault OBJECT-TYPE                        
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object is used to configure a port as the bpdu-filter port."
+                        ::= { hwMstpObjects 31 }  
+                        
+                hwMstpTransmitLimitDefault OBJECT-TYPE                        
+                        SYNTAX Integer32 (1..255)
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "The value is used to set BPDU maximum transmission rate of all port in the device."
+                        DEFVAL { 6 }
+                        ::= { hwMstpObjects 32 }           
+
+                hwMstpPwName OBJECT-TYPE
+                        SYNTAX OCTET STRING (SIZE (0..16))
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                                "Pw name"
+                        ::= { hwMstpObjects 33 }
+						
+                hwMstpPortTcSnoopingTable OBJECT-TYPE
+                        SYNTAX SEQUENCE OF HwMstpPortTcSnoopingEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "This table describes whether ports are enabled to transparently transmit STP packets over the TRILL network."
+                        ::= { hwMstpObjects 34 }
+
+                -- 1.3.6.1.4.1.2011.5.25.42.4.1.35
+                hwMstpPortCountUpperThreshold OBJECT-TYPE                        
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the upper threshold for the number of Up STP-capable interfaces."
+                        ::= { hwMstpObjects 35 } 
+                
+                -- 1.3.6.1.4.1.2011.5.25.42.4.1.36
+                hwMstpPortCountLowerThreshold OBJECT-TYPE                        
+                        SYNTAX Integer32 (0..65535)
+                        MAX-ACCESS accessible-for-notify
+                        STATUS current
+                        DESCRIPTION
+                                "The value of this object identifies the lower threshold for the number of Up STP-capable interfaces."
+                        ::= { hwMstpObjects 36 } 
+                
+                hwMstpPortTcSnoopingEntry OBJECT-TYPE
+                        SYNTAX HwMstpPortTcSnoopingEntry
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The entry of the MSTP TC snooping port information table. "
+                        INDEX { hwMstpPortIfIndex }
+                        ::= { hwMstpPortTcSnoopingTable 1 }
+                
+                HwMstpPortTcSnoopingEntry ::=
+                        SEQUENCE { 
+                                hwMstpPortIfIndex
+                                        Integer32,                                
+                                hwMstpPortTcSnoopingNotifyTrill
+                                        HwMSTPEnabledStatus
+                        }
+                
+                hwMstpPortIfIndex OBJECT-TYPE
+                        SYNTAX Integer32
+                        MAX-ACCESS not-accessible
+                        STATUS current
+                        DESCRIPTION
+                                "The ifIndex of the port."
+                        ::= { hwMstpPortTcSnoopingEntry 1 }
+                        
+                hwMstpPortTcSnoopingNotifyTrill OBJECT-TYPE
+                        SYNTAX HwMSTPEnabledStatus
+                        MAX-ACCESS read-write
+                        STATUS current
+                        DESCRIPTION
+                                "This object indicates whether an interface is enabled to transparently transmit STP packets over the TRILL network."
+                        ::= { hwMstpPortTcSnoopingEntry 2 }                             
+
+                hwMstpTraps OBJECT-IDENTITY
+                        STATUS current
+                        DESCRIPTION
+                                "Definition point for Mstp notifications."
+                        ::= { hwMstp 2 }
+                
+                hwMstpiPortStateForwarding NOTIFICATION-TYPE
+                        OBJECTS { hwMstpInstanceID, hwMstpiPortIndex, ifName, hwMstpPwName }
+                        STATUS current
+                        DESCRIPTION
+                               "When an interface enters the forwarding state, an alarm is triggered. 
+							   Reason: Changes occur on the link state and a new link joins the topology.
+							   Advice: Pay attention to the reason of change on the network topology and check if a fault occurs on the backup link."
+                        ::= { hwMstpTraps 1 }
+                
+                hwMstpiPortStateDiscarding NOTIFICATION-TYPE
+                        OBJECTS { hwMstpInstanceID, hwMstpiPortIndex, ifName, hwMstpPwName }
+                        STATUS current
+                        DESCRIPTION
+                               "When a port enters the congestion state, it generates alarms. 
+							   Reason: Changes occur on the link state and the link quits the topology. 
+							   Advice: Pay attention to the reason of change on the network topology and check if a fault occurs on the link."
+                        ::= { hwMstpTraps 2 }
+                
+                hwMstpiBridgeLostRootPrimary NOTIFICATION-TYPE
+                        OBJECTS { hwMstpInstanceID }
+                        STATUS current
+                        DESCRIPTION
+                                "When a switch loses the role of the root bridge, an alarm message is generated. 
+								Reason: The status of root bridge cannot be kept because a switch with a higher priority on the network becomes the root bridge. 
+								Advice: Reduce the priority of the newly joined switch on the specified MSTI.
+								If you want the new switch to serve as the root bridge, remove the root setting of the specified MSTI on the original root bridge."
+                        ::= { hwMstpTraps 3 }
+                
+                hwMstpiPortRootGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpInstanceID, hwMstpiPortIndex, ifName, hwMstpPwName }
+                        STATUS current
+                        DESCRIPTION
+                                "When the port of root bridge protection receives packets with higher priority, it triggers alarm.
+								Reason: A switch with higher priority and out of the root bridge protection circle attempts to preempt the status of the root bridge.
+								Advice: Reduce in the specified MSTI the priority of switches that are directly or indirectly connected to the port.
+								Re-configure the root bridge protection of the port."
+                        ::= { hwMstpTraps 4 }
+                
+                hwMstpiPortBpduGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpiPortIndex, ifName  }
+                        STATUS current
+                        DESCRIPTION
+                               "When the BPDU guard port receives the BPDU packets, it generates alarms.
+							   Reason: An edge port enabled with the BPDU guard function receives BPDUs. 
+							   Advice: The port receives BPDU packets that are likely to be hostile attack ones.
+							   The port is shut down at this time and needs to be manually restored by NMS administrators."
+                        ::= { hwMstpTraps 5 }
+                
+                hwMstpiPortLoopGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpInstanceID, hwMstpiPortIndex, ifName, hwMstpPwName }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when an Alternate-Port 
+                                or Root-Port is aged out."
+                        ::= { hwMstpTraps 6 }
+                
+                hwMstpiEdgePortChanged NOTIFICATION-TYPE
+                        OBJECTS { hwMstpiStpPortEdgeport, ifName, hwMstpPwName}
+                        STATUS current
+                        DESCRIPTION
+                                "When the edged-port receives a BPDU packet, the edged-port attribute will be disabled.
+                                Then the SNMP trap is generated. "
+                        ::= { hwMstpTraps 7 }
+                
+                hwMstpProPortStateForwarding NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProPortState }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when a port turns into 
+                                forwarding state from other state in the MSTP process."
+                        ::= { hwMstpTraps 8 }
+                
+                hwMstpProPortStateDiscarding NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProPortState }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when a port turns into 
+                                discarding state from forwarding state in the MSTP process."
+                        ::= { hwMstpTraps 9 }
+                
+                hwMstpProBridgeLostRootPrimary NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProPortState }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when the bridge is no longer 
+                                the root bridge of the MSTP process Spanning Tree. Another 
+                                switch with higher priority has already been the root bridge."
+                        ::= { hwMstpTraps 10 }
+                
+                hwMstpProPortRootGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProPortState }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when a root-guard port 
+                                receives a superior message in the MSTP process."
+                        ::= { hwMstpTraps 11 }
+                
+                hwMstpProPortBpduGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProPortState }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when an edged port of 
+                                the BPDU-guard MSTP process receives BPDU packets."
+                        ::= { hwMstpTraps 12 }
+                
+                hwMstpProPortLoopGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProPortState }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when an Alternate-Port 
+                                or Root-Port is aged out in the MSTP process."
+                        ::= { hwMstpTraps 13 }
+                
+                hwMstpProEdgePortChanged NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProPortStpEdgeport }
+                        STATUS current
+                        DESCRIPTION
+                                "When the edged-port receives a BPDU packet, the edged-port attribute will be disabled.
+                                Then the SNMP trap is generated. "
+                        ::= { hwMstpTraps 14 }
+                
+                hwMstpiTcGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpiBridgePriority }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when an MSTP instance receive TC BPDUs' number 
+                                exceeds the threshold."
+                        ::= { hwMstpTraps 15 }
+                
+                hwMstpProTcGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProTcGuard, hwMstpProInstanceBridgePriority }
+                        STATUS current
+                        DESCRIPTION
+                                "The SNMP trap that is generated when an MSTP process receive TC BPDUs' number 
+                                exceeds the threshold."
+                        ::= { hwMstpTraps 16 }
+                
+                hwMstpProRootChanged NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProInstanceRootPort }
+                        STATUS current
+                        DESCRIPTION
+                                "When the root bridge status of a MSTI in a specified MSTP process changes, an alarm message is generated. 
+								The changes include:
+								1 indicates the the local bridge becomes a root bridge.
+                                2 indicates the local bridge stops functioning as the root bridge."
+                        ::= { hwMstpTraps 17 }
+                
+                hwMstpProNewPortStateForwarding NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName, hwMstpPwName  }
+                        STATUS current
+                        DESCRIPTION
+                              "When a port belonging to the MSTP process enters the forwarding state, an alarm message is generated.
+							  Reason: The link status of an MSTP process changes and a new link is added to the network.
+							  Advice: Pay attention to the reason of change on the network topology and check if a fault occurs on the backup link."
+                        ::= { hwMstpTraps 18 }
+                
+                hwMstpProNewPortStateDiscarding NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName, hwMstpPwName  }
+                        STATUS current
+                        DESCRIPTION
+                                "When a port belonging to the MSTP process enters the block state, an alarm message is generated. 
+								Reason: Changes occur on the link state and a link is removed from the network. 
+								Advice: Pay attention to the reason of change on the network topology and check if a fault occurs on the link."
+                        ::= { hwMstpTraps 19 }
+                
+                hwMstpProNewBridgeLostRootPrimary NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProInstanceRootType }
+                        STATUS current
+                        DESCRIPTION
+                                "When the MSTP process stop functioning as a root bridge, an alarm message is generated. 
+								Cause: The MSTP process can no longer play the role of the root bridge because another MSTP process with a higher priority becomes the root bridge. 
+								Solution: Reduce the priority of the new root bridge on the specified MSTI if you do not want another MSTP process to function as the root bridge. 
+								On the contrary, delete the setting of the original root bridge on the specified MSTI if you want the new MSTP process to function as the root bridge."
+                        ::= { hwMstpTraps 20 }
+                
+                hwMstpProNewPortRootGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName, hwMstpPwName  }
+                        STATUS current
+                        DESCRIPTION
+                               "When a port enabled with the root guard function on the root bridge receives a packet of a higher priority, an alarm message is generated. 
+							   Cause: An MSTP process attempts to compete for the role of the root bridge. 
+							   Solution: Reduce the priorities on the specified MSTI of all MSTP processes on the device.
+							   Alternatively, reconfigure the root guard function for the port."
+                        ::= { hwMstpTraps 21 }
+                
+                hwMstpProNewPortBpduGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName  }
+                        STATUS current
+                        DESCRIPTION
+                                "When a port enabled with the BPDU guard function of the MSTP process receives BPDUs, an alarm message is generated. 
+								Cause: An edge port enabled with the BPDU guard function receives BPDUs. 
+								Solution: Manually restart the port because the port is shut down under the attack of BPDUs."
+                        ::= { hwMstpTraps 22 }
+                
+                hwMstpProNewPortLoopGuarded NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName, hwMstpPwName  }
+                        STATUS current
+                        DESCRIPTION
+                                "Specify that the root port has not received any BPDU packets for a long time when loop protection is enabled in MSTP process."
+                        ::= { hwMstpTraps 23 }
+                
+                hwMstpProNewEdgePortChanged NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName, hwMstpPwName  }
+                        STATUS current
+                        DESCRIPTION
+                                "Specify that the edge port is invalid because of receiving a BPDU packet."
+                        ::= { hwMstpTraps 24 }
+                        
+                hwMstpProLoopbackDetected NOTIFICATION-TYPE
+                        OBJECTS { hwMstpProNewPortState, ifName, hwMstpPwName  }
+                        STATUS current
+                        DESCRIPTION
+                                "When port detected loopback, block the port and arise trap."
+                        ::= { hwMstpTraps 25 }                
+                 
+               -- 1.3.6.1.4.1.2011.5.25.42.4.2.26
+                hwMstpPortCountExceedThreshold NOTIFICATION-TYPE
+                        OBJECTS { hwMstpPortCountUpperThreshold   }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the number of Up STP-capable interfaces exceeded the upper threshold."
+                        ::= { hwMstpTraps 26 }   
+                
+                -- 1.3.6.1.4.1.2011.5.25.42.4.2.27
+                hwMstpPortCountExceedThresholdResume NOTIFICATION-TYPE
+                        OBJECTS { hwMstpPortCountLowerThreshold  }
+                        STATUS current
+                        DESCRIPTION
+                                "This notification indicates that the number of Up STP-capable interfaces fell below the lower threshold."
+                        ::= { hwMstpTraps 27 } 
+
+                hwMstpConformance OBJECT IDENTIFIER ::= { hwMstp 3 }
+                
+                hwMstpGroups OBJECT IDENTIFIER ::= { hwMstpConformance 1 }
+                
+                hwMstpBridgeInfoGroup OBJECT-GROUP
+                        OBJECTS { hwMstpStatus, hwMstpForceVersion, hwMstpDiameter, hwMstpBridgeMaxHops, hwMstpMasterBridgeID, 
+                                hwMstpMasterPathCost, hwMstpBpduGuard, hwMstpAdminFormatSelector, hwMstpAdminRegionName, hwMstpAdminRevisionLevel, 
+                                hwMstpOperFormatSelector, hwMstpOperRegionName, hwMstpOperRevisionLevel, hwMstpRegionConfActive, hwMstpDefaultVlanAllo, 
+                                hwMstpDefaultRegionName, hwMstpPathCostStandard, hwMstpSnooping, hwMstpTcGuard, hwMstpTcGuardThreshold, hwMstpEdgedPortDefault, 
+                                hwMstpBpduFilterPortDefault, hwMstpTransmitLimitDefault, hwMstpPortCountUpperThreshold, hwMstpPortCountLowerThreshold }
+                        STATUS current
+                        DESCRIPTION
+                                "A collection of objects indicating the necessary
+                                capabilites of the bridge device which is running the multi spanning tree protocol."
+                        ::= { hwMstpGroups 1 }
+                
+                hwMstpVlanInfoGroup OBJECT-GROUP
+                        OBJECTS { hwMstpAdminMstID, hwMstpOperMstID }
+                        STATUS current
+                        DESCRIPTION
+                                "A collection of objects describes 
+                                the attribute of the VLAN in the multi spanning tree protocol.
+                                They are necessary to find the relation 
+                                between VLAN and instance by the VLAN identifier."
+                        ::= { hwMstpGroups 2 }
+                
+                hwMstpInstanceInfoGroup OBJECT-GROUP
+                        OBJECTS { hwMstpiBridgeID, hwMstpiBridgePriority, hwMstpiDesignedRoot, hwMstpiRootPathCost, hwMstpiRootPort, 
+                                hwMstpiRootType, hwMstpiRemainingHops, hwMstpiAdminMappedVlanListLow, hwMstpiAdminMappedVlanListHigh, hwMstpiOperMappedVlanListLow, 
+                                hwMstpiOperMappedVlanListHigh, hwMstpiRowStatus }
+                        STATUS current
+                        DESCRIPTION
+                                "A collection of objects describes 
+                                the attribute of the instance in the multi spanning tree protocol."
+                        ::= { hwMstpGroups 3 }
+                
+                hwMstpPortInfoGroup OBJECT-GROUP
+                        OBJECTS { hwMstpiState, hwMstpiPortPriority, hwMstpiPathCost, hwMstpiDesignatedRoot, hwMstpiDesignatedCost, 
+                                hwMstpiDesignatedBridge, hwMstpiDesignatedPort, hwMstpiStpPortEdgeport, hwMstpiStpPortPointToPoint, hwMstpiStpMcheck, 
+                                hwMstpiStpTransLimit, hwMstpiStpRXStpBPDU, hwMstpiStpTXStpBPDU, hwMstpiStpRXTCNBPDU, hwMstpiStpTXTCNBPDU, 
+                                hwMstpiStpRXRSTPBPDU, hwMstpiStpTXRSTPBPDU, hwMstpiStpRXMSTPBPDU, hwMstpiStpTXMSTPBPDU, hwMstpiStpClearStatistics, 
+                                hwMstpiStpDefaultPortCost, hwMstpiStpStatus, hwMstpiPortRootGuard, hwMstpiPortLoopGuard, hwMstpPortCompliance, 
+                                hwMstpConfigDigestSnooping, hwMstpNoAgreementCheck, hwMstpPortTCNotify, hwMstpiStpPortBpduFilter }
+                        STATUS current
+                        DESCRIPTION
+                                "A collection of objects is necessary to show the 
+                                information of the port in the bridge in the multi 
+                                spanning tree protocol."
+                        ::= { hwMstpGroups 4 }
+                
+                hwMstpAccessoryGroup OBJECT-GROUP
+                        OBJECTS { hwMstpBackupReplyAgreement, hwMstpStpNoAgreementCheck }
+                        STATUS current
+                        DESCRIPTION
+                                "MSTP accessory group."
+                        ::= { hwMstpGroups 5 }
+                
+                hwMstpNotificationGroup NOTIFICATION-GROUP
+                        NOTIFICATIONS { hwMstpiPortStateForwarding, hwMstpiPortStateDiscarding, hwMstpiBridgeLostRootPrimary, hwMstpiPortRootGuarded, hwMstpiPortBpduGuarded, 
+                                hwMstpiPortLoopGuarded, hwMstpiEdgePortChanged, hwMstpiTcGuarded, hwMstpProPortLoopGuarded, hwMstpProPortRootGuarded, hwMstpProBridgeLostRootPrimary,
+                                hwMstpProPortStateDiscarding, hwMstpProPortStateForwarding, hwMstpProLoopbackDetected, hwMstpProEdgePortChanged, hwMstpProPortBpduGuarded, 
+                                hwMstpPortCountExceedThreshold, hwMstpPortCountExceedThresholdResume }
+                        STATUS current
+                        DESCRIPTION
+                                "Notification."
+                        ::= { hwMstpGroups 6 }
+                
+                hwMstpProGroup OBJECT-GROUP
+                        OBJECTS { hwMstpProStpState, hwMstpProPriority, hwMstpProRootType, hwMstpProForceVersion, hwMstpProBpduGuard, 
+                                hwMstpProDiameter, hwMstpProConvergeMode, hwMstpProMaxHops, hwMstpProMCheck, hwMstpProPathCostStandard, 
+                                hwMstpProHelloTime, hwMstpProFwdDelay, hwMstpProMaxAge, hwMstpProTimerFactor, hwMstpProTcGuard, 
+                                hwMstpProTcGuardThreshold, hwMstpProTcNotifyProcess, hwMstpProRegionConfActive, hwMstpProRowStatus, 
+                                hwMstpProLinkShareGuard,hwMstpConfigDegist,hwMstpProTcGuardInterval}
+                        STATUS current
+                        DESCRIPTION
+                                "MSTP process group."
+                        ::= { hwMstpGroups 7 }
+                
+                hwMstpProPortInfoGroup OBJECT-GROUP
+                        OBJECTS { hwMstpPortVlanListLow, hwMstpPortVlanListHigh, hwMstpProNewPortType, hwMstpProNewPortBpduVlan,hwMstpPortBindRowStatus, hwMstpProNewPortState, 
+                                hwMstpProNewPortPriority, hwMstpProNewPortPathCost, hwMstpProNewPortDesignatedRoot, hwMstpProNewPortDesignatedCost, hwMstpProNewPortDesignatedBridge, 
+                                hwMstpProNewPortDesignatedPort, hwMstpProNewPortStpEdgeport, hwMstpProNewPortStpPointToPoint, hwMstpProNewPortStpMcheck, hwMstpProNewPortStpTransLimit, 
+                                hwMstpProNewPortStpRXStpBPDU, hwMstpProNewPortStpTXStpBPDU, hwMstpProNewPortStpRXTCNBPDU, hwMstpProNewPortStpTXTCNBPDU, hwMstpProNewPortStpRXRSTPBPDU, 
+                                hwMstpProNewPortStpTXRSTPBPDU, hwMstpProNewPortStpRXMSTPBPDU, hwMstpProNewPortStpTXMSTPBPDU, hwMstpProNewPortStpClearStatistics, hwMstpProNewPortStpDefaultPortCost, 
+                                hwMstpProNewPortStpStatus, hwMstpProNewPortRootGuard, hwMstpProNewPortLoopGuard, hwMstpProNewPortCompliance, hwMstpProNewPortConfigDigestSnooping, 
+                                hwMstpProNewPortNoAgreementCheck, hwMstpProNewPortVplsSubinterfaceEnable, hwMstpProNewPortBpduEncapsulation, hwMstpProNewPortBpduFilter, 
+                                hwMstpProNewPortStpRXTC, hwMstpProNewPortStpTXTC}
+                        STATUS current
+                        DESCRIPTION
+                                "A collection of objects is necessary to show the 
+                                information of the port in the bridge in the multi 
+                                spanning tree protocol."
+                        ::= { hwMstpGroups 8 }
+                
+                hwMstpProNotificationGroup NOTIFICATION-GROUP
+                        NOTIFICATIONS { hwMstpProTcGuarded, hwMstpProRootChanged, hwMstpProNewPortStateForwarding, hwMstpProNewPortStateDiscarding, hwMstpProNewBridgeLostRootPrimary, 
+                                hwMstpProNewPortRootGuarded, hwMstpProNewPortBpduGuarded, hwMstpProNewPortLoopGuarded, hwMstpProNewEdgePortChanged }
+                        STATUS current
+                        DESCRIPTION
+                                "MSTP process notification."
+                        ::= { hwMstpGroups 9 }
+                
+                hwMstpProInstanceInfoGroup OBJECT-GROUP
+                        OBJECTS { hwMstpProInstanceBridgeID, hwMstpProInstanceBridgePriority, hwMstpProInstanceDesignedRoot, hwMstpProInstanceRootPathCost, hwMstpProInstanceRootPort, 
+                                hwMstpProInstanceRootType, hwMstpProInstanceRemainingHops, hwMstpProInstanceAdminMappedVlanListLow, hwMstpProInstanceAdminMappedVlanListHigh, hwMstpProInstanceOperMappedVlanListLow, 
+                                hwMstpProInstanceOperMappedVlanListHigh, hwMstpProInstanceRowStatus }
+                        STATUS current
+                        DESCRIPTION
+                                "MSTP process instance group."
+                        ::= { hwMstpGroups 10 }
+
+                hwMstpPortTcSnoopingGroup OBJECT-GROUP
+                        OBJECTS { hwMstpPortTcSnoopingNotifyTrill }
+                        STATUS current
+                        DESCRIPTION
+                                "MSTP TC snooping group"
+                        ::= { hwMstpGroups 11 }   
+
+                hwMstpCompliances OBJECT IDENTIFIER ::= { hwMstpConformance 2 }
+                
+                hwMstpCompliance MODULE-COMPLIANCE
+                        STATUS current
+                        DESCRIPTION
+                                "The compliance statement for device support of Priority
+                                and Multicast Filtering extended bridging services."
+                        MODULE -- this module
+                                MANDATORY-GROUPS { hwMstpBridgeInfoGroup, hwMstpVlanInfoGroup, hwMstpInstanceInfoGroup, hwMstpPortInfoGroup, hwMstpAccessoryGroup, 
+                                        hwMstpProGroup, hwMstpProPortInfoGroup, hwMstpProNotificationGroup }
+                        ::= { hwMstpCompliances 1 }
+                
+        
+        END
+
+--
+-- HUAWEI-MSTP-MIB.my
+--

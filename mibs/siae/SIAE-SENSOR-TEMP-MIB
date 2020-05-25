@@ -1,0 +1,396 @@
+-- ----------------------------------------------------------------------------
+--
+--  SIAE MICROELETTRONICA s.p.a.
+--
+--  Via Michelangelo Buonarroti, 21
+--  20093 - Cologno Monzese
+--  Milano
+--  ITALY
+--
+-- ----------------------------------------------------------------------------
+-- ----------------------------------------------------------------------------
+
+SIAE-SENSOR-TEMP-MIB
+        DEFINITIONS ::= BEGIN
+
+        IMPORTS
+             MODULE-IDENTITY, OBJECT-TYPE,
+             Integer32
+        FROM SNMPv2-SMI
+             DisplayString
+        FROM SNMPv2-TC
+             siaeMib
+        FROM SIAE-TREE-MIB
+             AlarmStatus, AlarmSeverityCode
+        FROM SIAE-ALARM-MIB;
+
+     sensorTemp MODULE-IDENTITY
+        LAST-UPDATED "201605030000Z"
+        ORGANIZATION "SIAE MICROELETTRONICA spa"
+        CONTACT-INFO
+            "SIAE MICROELETTONICA s.p.a.
+             Via Michelangelo Buonarroti, 21
+             20093 - Cologno Monzese
+             Milano - ITALY
+             Phone :  +39-02-27325-1
+             E-mail: tbd@siaemic.com
+            "
+        DESCRIPTION
+            "Management information for equipment heat.
+            "
+        REVISION "201605030000Z"
+        DESCRIPTION
+            "MIB version 01.00.01
+             - Added sensorTempMonitorTable and sensorTempMonitorSystemControl
+             - Added DEFVAL clause to sensorTempAlarmThreshold1Severity and
+               sensorTempAlarmThreshold2Severity
+            "
+        REVISION "201403310000Z"
+        DESCRIPTION
+            "Initial version 01.00.00
+            "
+    ::= { siaeMib 77 }
+
+----------------------------------------------------------------------------------
+--  Temperature Sensors Management information
+----------------------------------------------------------------------------------
+--
+--  This MIB is used to describe the temperature devices available on the equipment.
+--  Each device represents a temperature sensor. It displays the current temperature.
+--  Each records has got 2 thresholds passing one of them an indication is generated.
+--  When at least one device has got a pass indication an alarm rises.
+--  The alarm drops when the temperature is 5°C under the threshold which generates the
+--  indication.
+--  
+----------------------------------------------------------------------------------
+
+------ Beginning --------------------------------------------------------------
+
+    sensorTempMibVersion  OBJECT-TYPE
+        SYNTAX      INTEGER
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Numerical version of this module.
+             The string version of this MIB have the following format:
+                XX.YY.ZZ
+             so, for example, the value 1 should be interpreted as 00.00.01
+             and the value 10001 should be interpreted as 01.00.01."
+    ::= {sensorTemp 1}
+
+-------  Begin of  sensorTempTable
+--
+
+    sensorTempTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  SensorTempEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with sensorTemp device entries"
+    ::= {sensorTemp 2}
+
+    sensorTempEntry OBJECT-TYPE
+        SYNTAX      SensorTempEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Temperature Sensor entry"
+        INDEX       {sensorTempIndex}
+    ::= {sensorTempTable 1}
+
+    SensorTempEntry  ::=
+        SEQUENCE  {
+             sensorTempIndex             Integer32,
+             sensorTempValue             Integer32,
+             sensorTempThreshold1        Integer32,
+             sensorTempThreshold2        Integer32,
+             sensorTempHysteresis1       Integer32,
+             sensorTempHysteresis2       Integer32,
+             sensorTempStatus1           INTEGER,
+             sensorTempStatus2           INTEGER,
+             sensorTempLabel             DisplayString
+         }
+
+    sensorTempIndex OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Temperature Sensor index.
+            "
+    ::= {sensorTempEntry 1}
+
+    sensorTempValue   OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "Value of the temperature (in Celsius).
+            "
+    ::= {sensorTempEntry 2}
+
+    sensorTempThreshold1 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object can not be modified. It reports the temperature threshold 1.
+             When sensorTempValue exceeds this value sensorTempStatus1 becomes Active.
+             When threshold has been exceed status returns stand-by only when sensorTempValue
+             goes under sensorTempHysteresis1.
+            "
+    ::= {sensorTempEntry 3}
+
+    sensorTempThreshold2 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object can not be modified. It reports the temperature threshold 2.
+             When sensorTempValue exceeds this value sensorTempStatus2 becomes Active.
+             When threshold has been exceed status returns stand-by only when sensorTempValue
+             goes under sensorTempHysteresis2.  
+            "
+    ::= {sensorTempEntry 4}
+
+    sensorTempHysteresis1 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object can not be modified. It reports the temperature hysteresis 1.
+             When sensorTempStatus1 is Active it represents the value under which returns
+             cleared.
+            "
+    ::= {sensorTempEntry 5}
+
+    sensorTempHysteresis2 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object can not be modified. It reports the temperature hysteresis 2.
+             When sensorTempStatus1 is Active it represents the value under which returns
+             cleared.  
+            "
+    ::= {sensorTempEntry 6}
+
+    sensorTempStatus1 OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               cleared    (1),
+                               alarmed    (2),
+                               hysteresis (3)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used to manage temperature related to sensorTempThreshold1.
+             Values mean:
+             cleared:    sensorTempValue is lower than threshold1
+             active:     sensorTempValue is greater than threshold1
+             hysteresis: sensorTempValue is between threshold1 and hysteresis1 but
+                         previuosly greater than thresold1.
+            "
+    ::= {sensorTempEntry 7}
+
+    sensorTempStatus2 OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               cleared    (1),
+                               alarmed    (2),
+                               hysteresis (3)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used to manage temperature related to sensorTempThreshold2.
+             Values mean:
+             cleared:    sensorTempValue is lower than threshold2
+             active:     sensorTempValue is greater than threshold2
+             hysteresis: sensorTempValue is between threshold2 and hysteresis2 but
+                         previuosly greater than thresold2.
+            "
+    ::= {sensorTempEntry 8}
+
+    sensorTempLabel OBJECT-TYPE
+        SYNTAX      DisplayString   (SIZE(0..32))
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "A textual string containing information on sensorTemp sensor.
+            "
+    ::= {sensorTempEntry 9}
+
+--
+-------  End of  sensorTempTable
+
+    sensorTempAlarmThreshold1  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used to notiy alarm if at least one entry in the
+             sensorTemp table has got sensorTempStatus1 alarmed."
+    ::= {sensorTemp 3}
+
+    sensorTempAlarmThreshold2  OBJECT-TYPE
+        SYNTAX      AlarmStatus
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "This object is used to notiy alarm if at least one entry in the
+             sensorTemp table has got sensorTempStatus2 alarmed."
+    ::= {sensorTemp 4}
+
+    sensorTempAlarmThreshold1Severity  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to change severity of sensorTempAlarmThreshold1."
+        DEFVAL { warningTrapEnable }
+    ::= {sensorTemp 5}
+
+    sensorTempAlarmThreshold2Severity  OBJECT-TYPE
+        SYNTAX      AlarmSeverityCode
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object is used to change severity of sensorTempAlarmThreshold2."
+        DEFVAL { criticalTrapEnable }
+    ::= {sensorTemp 6}
+
+----------------------------------------------------------------------------------
+--  TEMP-MONITOR feature
+----------------------------------------------------------------------------------
+--
+--  For each temperature sensor shown in sensorTempMonitorTable it is possible 
+--  to register a record every 15 min. Each record includes, along with some
+--  auxiliary information, the min, max and average temperature observed in
+--  the period of time. The registered data can be exported to the SNMP manager
+--  by using SIAE-PMFTP-MIB.
+--
+----------------------------------------------------------------------------------
+
+-------  Begin of  sensorTempMonitorTable
+--
+
+    sensorTempMonitorTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF  SensorTempMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Table with sensorTempMonitor entries"
+    ::= {sensorTemp 7}
+
+    sensorTempMonitorEntry OBJECT-TYPE
+        SYNTAX      SensorTempMonitorEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Temperature Sensor Monitor entry"
+        INDEX       {sensorTempIndex}
+    ::= {sensorTempMonitorTable 1}
+
+    SensorTempMonitorEntry  ::=
+        SEQUENCE  {
+             sensorTempMonitorAdminStatus INTEGER,
+             sensorTempMonitorOperStatus  INTEGER,
+             sensorTempMonitorMinTemp     Integer32,
+             sensorTempMonitorMaxTemp     Integer32,
+             sensorTempMonitorAverageTemp Integer32
+         }
+
+    sensorTempMonitorAdminStatus    OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               up   (1),
+                               down (2)
+                              }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The desired state of the temperatuure monitor.
+            
+             When a managed system initializes, all the temperature
+             monitors start with sensorTempMonitorAdminStatus in the
+             down(2) state, it's a default state also. As a result
+             of either explicit management action or per configuration
+             information retained by the managed system,
+             sensorTempMonitorAdminStatus is then changed to the up(1)
+             state (or remains in the down(2) state).
+            "
+         DEFVAL { down } 
+    ::= {sensorTempMonitorEntry 1}
+
+
+    sensorTempMonitorOperStatus    OBJECT-TYPE
+        SYNTAX      INTEGER   {
+                               up   (1),
+                               down (2)
+                              }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The current state of the temperatuure monitor. Usually
+             this object report the same value of sensorTempMonitorAdminStatus.
+             When there is some problem related to the temperature sensor,
+             this object shown the down(2) value even if sensorTempMonitorAdminStatus
+             is set to up(1).
+            "
+    ::= {sensorTempMonitorEntry 2}
+
+    sensorTempMonitorMinTemp    OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The minimum value of the temperature measured in the last actual
+             900 seconds. The value is expressed in degrees Celsius.
+            "
+    ::= {sensorTempMonitorEntry 3}
+
+    sensorTempMonitorMaxTemp    OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The maximum value of the temperature measured in the last actual
+             900 seconds. The value is expressed in degrees Celsius.
+            "
+    ::= {sensorTempMonitorEntry 4}
+
+    sensorTempMonitorAverageTemp    OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+            "The average value of the temperature measured in the last actual
+             900 seconds. The value is expressed in tenth of degrees Celsius.
+            "
+    ::= {sensorTempMonitorEntry 5}
+
+--
+-------  End of  sensorTempMonitorTable
+
+    sensorTempMonitorSystemControl OBJECT-TYPE
+        SYNTAX      INTEGER {
+                              start(1),
+                              shutdown(2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The administrative system control status requested by management
+             for the TEMP-MONITOR feature. The value 'start'(1) indicates that
+             TEMP-MONITOR should be supported in the device on all temperature
+             sensors that have this capability (Those shown in 
+             sensorTempMonitorTable). The value shutdown(2) indicates
+             that TEMP-MONITOR should be shutdown in the device on all
+             temperature sensors.
+            "
+        DEFVAL { shutdown }
+    ::= { sensorTemp 8 }
+
+------ End group -----------------------------------------------------------------
+
+END
+

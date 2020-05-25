@@ -1,0 +1,118 @@
+mib: ES4552BH2-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - portTransceiverThresholdInfoTable
+                    - portName
+        voltage:
+            data:
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoVcc
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.3.{{ $index }}'
+                    descr: '{{ $portName }}'
+                    index: 'portOpticalMonitoringInfoVcc.{{ $index }}'
+                    low_warn_limit: portTransceiverThresholdInfoVccLowWarn
+                    low_limit: portTransceiverThresholdInfoVccLowAlarm
+                    warn_limit: portTransceiverThresholdInfoVccHighWarn
+                    high_limit: portTransceiverThresholdInfoVccHighAlarm
+        current:
+            data:
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoTxBiasCurrent
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.4.{{ $index }}'
+                    descr: '{{ $portName }} - Tx'
+                    index: 'portOpticalMonitoringInfoTxBiasCurrent.{{ $index }}'
+                    low_warn_limit: portTransceiverThresholdInfoTxBiasCurrentLowWarn
+                    low_limit: portTransceiverThresholdInfoTxBiasCurrentLowAlarm
+                    warn_limit: portTransceiverThresholdInfoTxBiasCurrentHighWarn
+                    high_limit: portTransceiverThresholdInfoTxBiasCurrentHighAlarm
+                    divisor: 1000
+        dbm:
+            data:
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoTxPower
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.5.{{ $index }}'
+                    descr: '{{ $portName }} - Tx'
+                    index: 'portOpticalMonitoringInfoTxPower.{{ $index }}'
+                    low_warn_limit: portTransceiverThresholdInfoTxPowerLowWarn
+                    low_limit: portTransceiverThresholdInfoTxPowerLowAlarm
+                    warn_limit: portTransceiverThresholdInfoTxPowerHighWarn
+                    high_limit: portTransceiverThresholdInfoTxPowerHighAlarm
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoRxPower
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.6.{{ $index }}'
+                    descr: '{{ $portName }} - Rx'
+                    index: 'portOpticalMonitoringInfoRxPower.{{ $index }}'
+                    low_warn_limit: portTransceiverThresholdInfoRxPowerLowWarn
+                    low_limit: portTransceiverThresholdInfoRxPowerLowAlarm
+                    warn_limit: portTransceiverThresholdInfoRxPowerHighWarn
+                    high_limit: portTransceiverThresholdInfoRxPowerHighAlarm
+        temperature:
+            data:
+                -
+                    oid: portOpticalMonitoringInfoTable
+                    value: portOpticalMonitoringInfoTemperature
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.2.11.1.2.{{ $index }}'
+                    descr: '{{ $portName }}'
+                    index: 'portOpticalMonitoringInfoTemperature.{{ $index }}'
+                    low_warn_limit: portTransceiverThresholdInfoTemperatureLowWarn
+                    low_limit: portTransceiverThresholdInfoTemperatureLowAlarm
+                    warn_limit: portTransceiverThresholdInfoTemperatureHighWarn
+                    high_limit: portTransceiverThresholdInfoTemperatureHighAlarm
+                -
+                    oid: switchThermalTempTable
+                    value: switchThermalTempValue
+                    group: 'Unit {{ $subindex0 }}'
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.11.1.3.{{ $index }}'
+                    descr: 'Unit {{ $subindex0 }} Thermal {{ $subindex1 }}'
+                    index: 'switchThermalTempValue.{{ $index }}'
+        fanspeed:
+            data:
+                -
+                    oid: switchFanTable
+                    value: switchFanOperSpeed
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.9.1.6.{{ $index }}'
+                    group: 'Unit {{ $subindex0 }}'
+                    descr: 'Unit {{ $subindex0 }} Fan {{ $subindex1 }}'
+                    index: 'switchFanOperSpeed.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: switchFanTable
+                    value: switchFanStatus
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.9.1.3.{{ $index }}'
+                    group: 'Unit {{ $subindex0 }}'
+                    descr: 'Unit {{ $subindex0 }} Fan {{ $subindex1 }}'
+                    index: 'switchFanStatus.{{ $index }}'
+                    state_name: switchFanStatus
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: ok }
+                        - { value: 2, generic: 2, graph: 1, descr: failure }
+                -
+                    oid: switchInfoTable
+                    value: swPowerStatus
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.3.1.8.{{ $index }}'
+                    descr: Power state
+                    index: 'swPowerStatus.{{ $index }}'
+                    state_name: swPowerStatus
+                    states:
+                        - { value: 1, generic: 1, graph: 1, descr: internalPower }
+                        - { value: 2, generic: 0, graph: 1, descr: redundantPower }
+                        - { value: 3, generic: 0, graph: 1, descr: internalAndRedundantPower }
+                -
+                    oid: switchInfoTable
+                    value: swRoleInSystem
+                    num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.3.1.9.{{ $index }}'
+                    descr: Switch role
+                    index: 'swRoleInSystem.{{ $index }}'
+                    state_name: swRoleInSystem
+                    states:
+                        - { value: 1, generic: 0, graph: 1, descr: master }
+                        - { value: 2, generic: 0, graph: 1, descr: backupMaster }
+                        - { value: 3, generic: 0, graph: 1, descr: slave }

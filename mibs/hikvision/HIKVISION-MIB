@@ -1,0 +1,319 @@
+HIKVISION-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                enterprises,
+                Counter
+                        FROM RFC1155-SMI
+                OBJECT-TYPE
+                        FROM SNMPv2-SMI;
+                        
+	hikvision	OBJECT IDENTIFIER ::= { enterprises 50001 }
+
+
+	hikEntity		OBJECT IDENTIFIER ::= { hikvision 1 }
+
+-- hikvision persistent property
+
+hikIp   OBJECT-TYPE
+    SYNTAX  NetworkAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "hikvision device valid ip address"
+    ::= { hikEntity 1 }
+
+hikPort   OBJECT-TYPE
+    SYNTAX  INTEGER(1..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "hikvision device valid manager port,default is 8000"
+    ::= { hikEntity 2 }
+
+hikEntityIndex   OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..128))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "hikvision device unique index, for DVR this is serial NO."
+    ::= { hikEntity 3 }   
+    
+    hikEntityType OBJECT IDENTIFIER ::= { hikEntity 100 } 
+
+hikEntityType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                DVR(1),
+                NVR(2),
+                IPC(3),
+                Unknown(255)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "hikvision products type"
+    ::= { hikEntity 100 }
+
+
+-- these throw errors and prevent translation, spencerbutler 20190319
+-- hikEntitySubType OBJECT-TYPE
+--     SYNTAX  INTEGER {
+--                 DVR_70xx(1),
+--                 DVR_71xx(2),
+--                 DVR_80xx(20),
+--                 DVR_81xx(21),
+--                 DVR_90xx(40),
+--                 DVR_91xx(41),
+--                 NVR(200),
+--                 IPC(400),
+--                 Unknown(65535)
+--             }
+--     ACCESS  read-only
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "hikvision product sub type"
+--     ::= { hikEntity 101 }
+    
+hikOnline OBJECT-TYPE
+    SYNTAX  INTEGER {
+                Online(1),
+                Absent(2),
+                Unknown(255)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "display hikvision product online status"
+    ::= { hikEntity 102 }
+ 
+hikService OBJECT-TYPE
+    SYNTAX  INTEGER {
+                Unknown(255)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "display hikvision product service type, now dvr will return Unknown"
+    ::= { hikEntity 103 }
+
+hikCMSDefType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                Unknown(255)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "display hikvision product defined CMS type, now dvr will return Unknown"
+    ::= { hikEntity 104 }
+
+hikObjectID OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "display hikvision product object ID, now dvr do not need this will return 0"
+    ::= { hikEntity 105 }
+
+hikObjectName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..128))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "display hikvision product object Name, now dvr do not need this will return nothing"
+    ::= { hikEntity 106 }
+
+hikTrapHostIp1 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..128))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "display hikvision product 1st trap host ip address "
+    ::= { hikEntity 110}
+    
+    
+    
+    
+--hik cpu info
+hikCPUNum OBJECT-TYPE
+    SYNTAX  INTEGER(1..512)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "the number of hikvision product's cpu "
+    ::= { hikEntity 200}
+
+hikCPUFrequency OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "the frequency of hikvision product's cpu, format like ¡°2000MHZ¡± "
+    ::= { hikEntity 201}
+
+--hik memery info
+hikMemoryCapability OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "the size of Memory"
+    ::= { hikEntity 220}    
+    
+hikMemoryUsage OBJECT-TYPE
+    SYNTAX  INTEGER(0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "the Usage of hikvision product's Memory, value scope  is (0-100)"
+    ::= { hikEntity 221}       
+    
+hikDeviceStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+                    Online(1),
+                    Absent(2),
+                    Unknown(255)
+                }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "display hikvision product status"
+    ::= { hikEntity 230}
+
+-- malformed definitions
+-- hikDeviceLanguage OBJECT-TYPE
+--     SYNTAX  INTEGER {
+--                     English(1),
+--                     Simple Chinese(2),
+--                     Traditional Chinese(3),
+--                     Japanese(4),
+--                     Korea(5),
+--                     Unknown(255)
+--                 }
+--     ACCESS  read-only
+--     STATUS  mandatory
+--     DESCRIPTION
+--             "display hikvision product language"
+--     ::= { hikEntity 231}
+
+-- hikvision disk info --
+
+hikDiskNum OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "the number of hikvision device local disks"
+    ::= { hikEntity 240}
+-- the disk table
+
+hikDiskTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF hikDiskEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of disk entries.  The number of
+            entries is given by the value of hikDiskNum."
+    ::= { hikEntity 241 }
+    
+hikDiskEntry OBJECT-TYPE
+    SYNTAX  HikDiskEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A disk entry containing objects at local disk status."
+    INDEX   { hikDiskIndex }
+    ::= { hikDiskTable 1 }
+
+HikDiskEntry ::=
+    SEQUENCE {
+        hikDiskIndex
+            INTEGER,
+        hikDiskVolume
+            DisplayString,
+        hikDiskStatus
+            INTEGER,
+        hikDiskFreeSpace
+            INTEGER,
+        hikDiskCapability
+            INTEGER
+    }
+
+hikDiskIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "An unique value for each local disk entry.  Its value
+            ranges between 1 and the value of ifNumber."
+    ::= { hikDiskEntry 1 }
+
+hikDiskVolume OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE (0..32))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A textual string containing information about local
+            disk"
+    ::= { hikDiskEntry 2 }
+
+hikDiskStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+                Normal(0),
+                Unformatted(1),
+                Abnormal(2),
+                Smartfailed(3),
+                Mismatch(4),
+                Idle(5),
+                NotOnline(6),
+				Reparing(10),
+				Formatting(11)
+                }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "local disk status"
+    ::= { hikDiskEntry 3 }
+
+hikDiskFreeSpace OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "the size of local disk entry free space,
+             if we get 100, means free space is 100M"
+    ::= { hikDiskEntry 4 }
+
+hikDiskCapability OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "the size of local disk entry all space,
+             if we get 100, means all space is 100M"
+    ::= { hikDiskEntry 5 }
+
+
+-- hikvisoin trap define  
+    
+-- these throw errors
+	--power status trap
+-- 	Power_PowerOn TRAP-TYPE
+-- 		ENTERPRISE hikvision
+-- 		DESCRIPTION
+-- 			"hikvision device power on"
+-- 		::= 1
+--
+--	Power_PowerOff TRAP-TYPE
+--		ENTERPRISE hikvision
+--		DESCRIPTION
+--			"hikvision device shut down"
+--		::= 2
+--
+--	Power_ReBoot TRAP-TYPE
+--		ENTERPRISE hikvision
+--		DESCRIPTION
+--			"hikvision device reboot"
+--		::= 3		
+
+        
+END
+

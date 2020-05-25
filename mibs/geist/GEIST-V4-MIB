@@ -1,0 +1,1404 @@
+
+GEIST-V4-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+DisplayString FROM SNMPv2-TC
+MODULE-IDENTITY, OBJECT-TYPE, IpAddress, enterprises, Integer32, Gauge32, NOTIFICATION-TYPE FROM SNMPv2-SMI;
+
+geist MODULE-IDENTITY
+	LAST-UPDATED "201209110000Z"
+	ORGANIZATION "Geist"
+	CONTACT-INFO "support@geistglobal.com"
+	DESCRIPTION "The MIB for Geist Products"
+	REVISION "201209110000Z"
+	DESCRIPTION "Original version"
+	::= { enterprises 21239 }
+
+blackbird OBJECT IDENTIFIER
+	::= { geist 5 }
+watchdog100 OBJECT IDENTIFIER
+	::= { blackbird 1 }
+
+--###########################################################################################--
+--deviceInfo--
+--###########################################################################################--
+
+deviceInfo OBJECT IDENTIFIER
+	::= { watchdog100 1 }
+
+productTitle OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Product name"
+	::= { deviceInfo 1 }
+
+productVersion OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Product version"
+	::= { deviceInfo 2 }
+
+productFriendlyName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "User-assigned name"
+	::= { deviceInfo 3 }
+
+productMacAddress OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Product's unique MAC address"
+	::= { deviceInfo 4 }
+
+productUrl OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Product's main URL access point"
+	::= { deviceInfo 5 }
+
+deviceCount OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Total number of devices on unit"
+	::= { deviceInfo 6 }
+
+temperatureUnits OBJECT-TYPE
+	SYNTAX Integer32(0..1)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Current units for temperature values. 0 = Degrees Fahrenheit, 1 = Degrees Celsius"
+	::= { deviceInfo 7 }
+
+--###########################################################################################--
+--internalTable--
+--###########################################################################################--
+
+internalTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF InternalEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Internal sensors for units"
+	::= { watchdog100 2 }
+
+internalEntry OBJECT-TYPE
+	SYNTAX InternalEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the internalTable table: each entry contains an index and other sensor details"
+	INDEX { internalIndex }
+	::= { internalTable 1 }
+
+InternalEntry ::= SEQUENCE {
+	internalIndex				Integer32,
+	internalSerial				DisplayString,
+	internalName				DisplayString,
+	internalAvail				Gauge32,
+	internalTemp				Integer32,
+	internalHumidity				Integer32,
+	internalDewPoint				Integer32
+}
+
+internalIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { internalEntry 1 }
+
+internalSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { internalEntry 2 }
+
+internalName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { internalEntry 3 }
+
+internalAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { internalEntry 4 }
+
+internalTemp OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Temperature in tenths of degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { internalEntry 5 }
+
+internalHumidity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Humidity reading"
+	::= { internalEntry 6 }
+
+internalDewPoint OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Dew-point in tenths of degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { internalEntry 7 }
+
+--###########################################################################################--
+--tempSensorTable--
+--###########################################################################################--
+
+tempSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF TempSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Remote Temperature Sensor"
+	::= { watchdog100 4 }
+
+tempSensorEntry OBJECT-TYPE
+	SYNTAX TempSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the tempSensorTable table: each entry contains an index and other sensor details"
+	INDEX { tempSensorIndex }
+	::= { tempSensorTable 1 }
+
+TempSensorEntry ::= SEQUENCE {
+	tempSensorIndex				Integer32,
+	tempSensorSerial				DisplayString,
+	tempSensorName				DisplayString,
+	tempSensorAvail				Gauge32,
+	tempSensorTemp				Integer32
+}
+
+tempSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { tempSensorEntry 1 }
+
+tempSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { tempSensorEntry 2 }
+
+tempSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { tempSensorEntry 3 }
+
+tempSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { tempSensorEntry 4 }
+
+tempSensorTemp OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Temperature in tenths of degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { tempSensorEntry 5 }
+
+--###########################################################################################--
+--airFlowSensorTable--
+--###########################################################################################--
+
+airFlowSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AirFlowSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Remote Airflow, Humidity, Temperature and Dewpoint Sensor "
+	::= { watchdog100 5 }
+
+airFlowSensorEntry OBJECT-TYPE
+	SYNTAX AirFlowSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the airFlowSensorTable table: each entry contains an index and other sensor details"
+	INDEX { airFlowSensorIndex }
+	::= { airFlowSensorTable 1 }
+
+AirFlowSensorEntry ::= SEQUENCE {
+	airFlowSensorIndex				Integer32,
+	airFlowSensorSerial				DisplayString,
+	airFlowSensorName				DisplayString,
+	airFlowSensorAvail				Gauge32,
+	airFlowSensorTemp				Integer32,
+	airFlowSensorFlow				Integer32,
+	airFlowSensorHumidity				Integer32,
+	airFlowSensorDewPoint				Integer32
+}
+
+airFlowSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { airFlowSensorEntry 1 }
+
+airFlowSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { airFlowSensorEntry 2 }
+
+airFlowSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { airFlowSensorEntry 3 }
+
+airFlowSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { airFlowSensorEntry 4 }
+
+airFlowSensorTemp OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Temperature in tenths of degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { airFlowSensorEntry 5 }
+
+airFlowSensorFlow OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "AFHT3 Airflow reading"
+	::= { airFlowSensorEntry 6 }
+
+airFlowSensorHumidity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "AFHT3 Humidity reading"
+	::= { airFlowSensorEntry 7 }
+
+airFlowSensorDewPoint OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Dew Point in tenths of degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { airFlowSensorEntry 8 }
+
+--###########################################################################################--
+--dewPointSensorTable--
+--###########################################################################################--
+
+dewPointSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF DewPointSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Remote Dew Point sensor"
+	::= { watchdog100 6 }
+
+dewPointSensorEntry OBJECT-TYPE
+	SYNTAX DewPointSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the dewPointSensorTable table: each entry contains an index and other sensor details"
+	INDEX { dewPointSensorIndex }
+	::= { dewPointSensorTable 1 }
+
+DewPointSensorEntry ::= SEQUENCE {
+	dewPointSensorIndex				Integer32,
+	dewPointSensorSerial				DisplayString,
+	dewPointSensorName				DisplayString,
+	dewPointSensorAvail				Gauge32,
+	dewPointSensorTemp				Integer32,
+	dewPointSensorHumidity				Integer32,
+	dewPointSensorDewPoint				Integer32
+}
+
+dewPointSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { dewPointSensorEntry 1 }
+
+dewPointSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { dewPointSensorEntry 2 }
+
+dewPointSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { dewPointSensorEntry 3 }
+
+dewPointSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { dewPointSensorEntry 4 }
+
+dewPointSensorTemp OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Temperature in tenths of degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { dewPointSensorEntry 5 }
+
+dewPointSensorHumidity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Humidity reading"
+	::= { dewPointSensorEntry 6 }
+
+dewPointSensorDewPoint OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Dew-point in tenths of degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { dewPointSensorEntry 7 }
+
+--###########################################################################################--
+--ccatSensorTable--
+--###########################################################################################--
+
+ccatSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF CcatSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Remote CCAT sensor"
+	::= { watchdog100 7 }
+
+ccatSensorEntry OBJECT-TYPE
+	SYNTAX CcatSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the ccatSensorTable table: each entry contains an index and other sensor details"
+	INDEX { ccatSensorIndex }
+	::= { ccatSensorTable 1 }
+
+CcatSensorEntry ::= SEQUENCE {
+	ccatSensorIndex				Integer32,
+	ccatSensorSerial				DisplayString,
+	ccatSensorName				DisplayString,
+	ccatSensorAvail				Gauge32,
+	ccatSensorValue				Integer32,
+	ccatSensorType				DisplayString,
+	ccatSensorDescription				DisplayString
+}
+
+ccatSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { ccatSensorEntry 1 }
+
+ccatSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { ccatSensorEntry 2 }
+
+ccatSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { ccatSensorEntry 3 }
+
+ccatSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { ccatSensorEntry 4 }
+
+ccatSensorValue OBJECT-TYPE
+	SYNTAX Integer32(-100..5000)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "CCAT sensor reading"
+	::= { ccatSensorEntry 5 }
+
+ccatSensorType OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "CCAT sensor type"
+	::= { ccatSensorEntry 6 }
+
+ccatSensorDescription OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "CCAT sensor value description"
+	::= { ccatSensorEntry 7 }
+
+--###########################################################################################--
+--t3hdSensorTable--
+--###########################################################################################--
+
+t3hdSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF T3hdSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Remote Temperature x 3, Humidity and Dewpoint Sensor"
+	::= { watchdog100 8 }
+
+t3hdSensorEntry OBJECT-TYPE
+	SYNTAX T3hdSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the t3hdSensorTable table: each entry contains an index and other sensor details"
+	INDEX { t3hdSensorIndex }
+	::= { t3hdSensorTable 1 }
+
+T3hdSensorEntry ::= SEQUENCE {
+	t3hdSensorIndex				Integer32,
+	t3hdSensorSerial				DisplayString,
+	t3hdSensorName				DisplayString,
+	t3hdSensorAvail				Gauge32,
+	t3hdSensorIntName				DisplayString,
+	t3hdSensorIntTemp				Integer32,
+	t3hdSensorIntHumidity				Integer32,
+	t3hdSensorIntDewPoint				Integer32,
+	t3hdSensorExtAAvail				Gauge32,
+	t3hdSensorExtAName				DisplayString,
+	t3hdSensorExtATemp				Integer32,
+	t3hdSensorExtBAvail				Gauge32,
+	t3hdSensorExtBName				DisplayString,
+	t3hdSensorExtBTemp				Integer32
+}
+
+t3hdSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { t3hdSensorEntry 1 }
+
+t3hdSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { t3hdSensorEntry 2 }
+
+t3hdSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { t3hdSensorEntry 3 }
+
+t3hdSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { t3hdSensorEntry 4 }
+
+t3hdSensorIntName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "T3HD Sensor Internal Friendly Name"
+	::= { t3hdSensorEntry 5 }
+
+t3hdSensorIntTemp OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Internal Temperature in 0.1 degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { t3hdSensorEntry 6 }
+
+t3hdSensorIntHumidity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "T3HD Sensor Internal Humidity"
+	::= { t3hdSensorEntry 7 }
+
+t3hdSensorIntDewPoint OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Internal DewPoint in 0.1 degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { t3hdSensorEntry 8 }
+
+t3hdSensorExtAAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "T3HD External A status: 0 = Unavailable, 1 = Available"
+	::= { t3hdSensorEntry 9 }
+
+t3hdSensorExtAName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "T3HD External A Friendly Name"
+	::= { t3hdSensorEntry 10 }
+
+t3hdSensorExtATemp OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for External Temperature A in 0.1 degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { t3hdSensorEntry 11 }
+
+t3hdSensorExtBAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "T3HD External B status: 0 = Unavailable, 1 = Available"
+	::= { t3hdSensorEntry 12 }
+
+t3hdSensorExtBName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "T3HD External B Friendly Name"
+	::= { t3hdSensorEntry 13 }
+
+t3hdSensorExtBTemp OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for External Temperature B in 0.1 degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { t3hdSensorEntry 14 }
+
+--###########################################################################################--
+--thdSensorTable--
+--###########################################################################################--
+
+thdSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF ThdSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Remote Temperature, Humidity and Dewpoint Sensor"
+	::= { watchdog100 9 }
+
+thdSensorEntry OBJECT-TYPE
+	SYNTAX ThdSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the thdSensorTable table: each entry contains an index and other sensor details"
+	INDEX { thdSensorIndex }
+	::= { thdSensorTable 1 }
+
+ThdSensorEntry ::= SEQUENCE {
+	thdSensorIndex				Integer32,
+	thdSensorSerial				DisplayString,
+	thdSensorName				DisplayString,
+	thdSensorAvail				Gauge32,
+	thdSensorTemp				Integer32,
+	thdSensorHumidity				Integer32,
+	thdSensorDewPoint				Integer32
+}
+
+thdSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { thdSensorEntry 1 }
+
+thdSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { thdSensorEntry 2 }
+
+thdSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { thdSensorEntry 3 }
+
+thdSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { thdSensorEntry 4 }
+
+thdSensorTemp OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for Temperature in 0.1 degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { thdSensorEntry 5 }
+
+thdSensorHumidity OBJECT-TYPE
+	SYNTAX Integer32(0..100)
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "THD Sensor Humidity"
+	::= { thdSensorEntry 6 }
+
+thdSensorDewPoint OBJECT-TYPE
+	SYNTAX Integer32(-40..200)
+	UNITS "0.1 Degrees"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current reading for DewPoint in 0.1 degrees. Units are given by temperatureUnits field in deviceInfo"
+	::= { thdSensorEntry 7 }
+
+--###########################################################################################--
+--rpmSensorTable--
+--###########################################################################################--
+
+rpmSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF RpmSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Remote Power Manager Sensor"
+	::= { watchdog100 10 }
+
+rpmSensorEntry OBJECT-TYPE
+	SYNTAX RpmSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the rpmSensorTable table: each entry contains an index and other sensor details"
+	INDEX { rpmSensorIndex }
+	::= { rpmSensorTable 1 }
+
+RpmSensorEntry ::= SEQUENCE {
+	rpmSensorIndex				Integer32,
+	rpmSensorSerial				DisplayString,
+	rpmSensorName				DisplayString,
+	rpmSensorAvail				Gauge32,
+	rpmSensorEnergy				Gauge32,
+	rpmSensorVoltage				Gauge32,
+	rpmSensorVoltageMax				Gauge32,
+	rpmSensorVoltageMin				Gauge32,
+	rpmSensorVoltagePeak				Gauge32,
+	rpmSensorCurrent				Gauge32,
+	rpmSensorRealPower				Gauge32,
+	rpmSensorApparentPower				Gauge32,
+	rpmSensorPowerFactor				Gauge32,
+	rpmSensorOutlet1				Gauge32,
+	rpmSensorOutlet2				Gauge32
+}
+
+rpmSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { rpmSensorEntry 1 }
+
+rpmSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { rpmSensorEntry 2 }
+
+rpmSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { rpmSensorEntry 3 }
+
+rpmSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { rpmSensorEntry 4 }
+
+rpmSensorEnergy OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "kWh"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Accumulated Energy"
+	::= { rpmSensorEntry 5 }
+
+rpmSensorVoltage OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "Volts (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage"
+	::= { rpmSensorEntry 6 }
+
+rpmSensorVoltageMax OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "Volts (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Max)"
+	::= { rpmSensorEntry 7 }
+
+rpmSensorVoltageMin OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "Volts (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Min)"
+	::= { rpmSensorEntry 8 }
+
+rpmSensorVoltagePeak OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "Volts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Peak)"
+	::= { rpmSensorEntry 9 }
+
+rpmSensorCurrent OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "0.1 Amps (rms)"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Current reading in deciAmps"
+	::= { rpmSensorEntry 10 }
+
+rpmSensorRealPower OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "Watts"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Real Power"
+	::= { rpmSensorEntry 11 }
+
+rpmSensorApparentPower OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "Volt-Amps"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Apparent Power"
+	::= { rpmSensorEntry 12 }
+
+rpmSensorPowerFactor OBJECT-TYPE
+	SYNTAX Gauge32
+	UNITS "%"
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Power Factor"
+	::= { rpmSensorEntry 13 }
+
+rpmSensorOutlet1 OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Outlet 1 State: 0 = off, 1 = on"
+	::= { rpmSensorEntry 14 }
+
+rpmSensorOutlet2 OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "RPM Sensor Outlet 2 State: 0 = off, 1 = on"
+	::= { rpmSensorEntry 15 }
+
+--###########################################################################################--
+--a2dSensorTable--
+--###########################################################################################--
+
+a2dSensorTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF A2DSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Analog Measurement Sensor (Voltage, Current, or Dry Contact)"
+	::= { watchdog100 11 }
+
+a2DSensorEntry OBJECT-TYPE
+	SYNTAX A2DSensorEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION "Entry in the a2dSensorTable table: each entry contains an index and other sensor details"
+	INDEX { a2dSensorIndex }
+	::= { a2dSensorTable 1 }
+
+A2DSensorEntry ::= SEQUENCE {
+	a2dSensorIndex				Integer32,
+	a2dSensorSerial				DisplayString,
+	a2dSensorName				DisplayString,
+	a2dSensorAvail				Gauge32,
+	a2dSensorValue				Integer32
+}
+
+a2dSensorIndex OBJECT-TYPE
+	SYNTAX Integer32(1..100)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Table entry index value"
+	::= { a2DSensorEntry 1 }
+
+a2dSensorSerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial Number"
+	::= { a2DSensorEntry 2 }
+
+a2dSensorName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Friendly Name"
+	::= { a2DSensorEntry 3 }
+
+a2dSensorAvail OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable"
+	::= { a2DSensorEntry 4 }
+
+a2dSensorValue OBJECT-TYPE
+	SYNTAX Integer32(-1000000..1000000)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Current analog measurement reading within either a user defined or preset range depending on device mode."
+	::= { a2DSensorEntry 5 }
+
+--###########################################################################################--
+--Notifications--
+--###########################################################################################--
+
+trap OBJECT IDENTIFIER ::= { watchdog100 32767 }
+trapPrefix OBJECT IDENTIFIER ::= { trap 0 }
+
+internalTestNOTIFY NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION "Test SNMP Trap"
+	::= { trapPrefix 10101 }
+
+--#####deviceInfo#####--
+
+--#####internalTable#####--
+
+internalAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { internalAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10204 }
+
+internalAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { internalAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20204 }
+
+internalTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS { internalTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Internal Temperature Sensor Trap"
+	::= { trapPrefix 10205 }
+
+internalTempCLEAR NOTIFICATION-TYPE
+	OBJECTS { internalTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Internal Temperature Sensor Clear Trap"
+	::= { trapPrefix 20205 }
+
+internalHumidityNOTIFY NOTIFICATION-TYPE
+	OBJECTS { internalHumidity }
+	STATUS current
+	DESCRIPTION "Humidity reading Trap"
+	::= { trapPrefix 10206 }
+
+internalHumidityCLEAR NOTIFICATION-TYPE
+	OBJECTS { internalHumidity }
+	STATUS current
+	DESCRIPTION "Humidity reading Clear Trap"
+	::= { trapPrefix 20206 }
+
+internalDewPointNOTIFY NOTIFICATION-TYPE
+	OBJECTS { internalDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Internal Dew Point Sensor Trap"
+	::= { trapPrefix 10207 }
+
+internalDewPointCLEAR NOTIFICATION-TYPE
+	OBJECTS { internalDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Internal Dew Point Sensor Clear Trap"
+	::= { trapPrefix 20207 }
+
+--#####tempSensorTable#####--
+
+tempSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { tempSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10404 }
+
+tempSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { tempSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20404 }
+
+tempSensorTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS { tempSensorTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Remote Temperature Sensor Trap"
+	::= { trapPrefix 10405 }
+
+tempSensorTempCLEAR NOTIFICATION-TYPE
+	OBJECTS { tempSensorTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Remote Temperature Sensor Clear Trap"
+	::= { trapPrefix 20405 }
+
+--#####airFlowSensorTable#####--
+
+airFlowSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10504 }
+
+airFlowSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20504 }
+
+airFlowSensorTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "AFHT3 Sensor Temperature Trap"
+	::= { trapPrefix 10505 }
+
+airFlowSensorTempCLEAR NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "AFHT3 Sensor Temperature Clear Trap"
+	::= { trapPrefix 20505 }
+
+airFlowSensorFlowNOTIFY NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorFlow }
+	STATUS current
+	DESCRIPTION "AFHT3 Airflow reading Trap"
+	::= { trapPrefix 10506 }
+
+airFlowSensorFlowCLEAR NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorFlow }
+	STATUS current
+	DESCRIPTION "AFHT3 Airflow reading Clear Trap"
+	::= { trapPrefix 20506 }
+
+airFlowSensorHumidityNOTIFY NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorHumidity }
+	STATUS current
+	DESCRIPTION "AFHT3 Humidity reading Trap"
+	::= { trapPrefix 10507 }
+
+airFlowSensorHumidityCLEAR NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorHumidity }
+	STATUS current
+	DESCRIPTION "AFHT3 Humidity reading Clear Trap"
+	::= { trapPrefix 20507 }
+
+airFlowSensorDewPointNOTIFY NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "AFHT3 Sensor Dew Point Trap"
+	::= { trapPrefix 10508 }
+
+airFlowSensorDewPointCLEAR NOTIFICATION-TYPE
+	OBJECTS { airFlowSensorDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "AFHT3 Sensor Dew Point Clear Trap"
+	::= { trapPrefix 20508 }
+
+--#####dewPointSensorTable#####--
+
+dewPointSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10604 }
+
+dewPointSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20604 }
+
+dewPointSensorTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Remote Dew Point Sensor Temperature Trap"
+	::= { trapPrefix 10605 }
+
+dewPointSensorTempCLEAR NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Remote Dew Point Sensor Temperature Clear Trap"
+	::= { trapPrefix 20605 }
+
+dewPointSensorHumidityNOTIFY NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorHumidity }
+	STATUS current
+	DESCRIPTION "Humidity reading Trap"
+	::= { trapPrefix 10606 }
+
+dewPointSensorHumidityCLEAR NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorHumidity }
+	STATUS current
+	DESCRIPTION "Humidity reading Clear Trap"
+	::= { trapPrefix 20606 }
+
+dewPointSensorDewPointNOTIFY NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Remote Dew Point Sensor Dew Point Trap"
+	::= { trapPrefix 10607 }
+
+dewPointSensorDewPointCLEAR NOTIFICATION-TYPE
+	OBJECTS { dewPointSensorDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "Remote Dew Point Sensor Dew Point Clear Trap"
+	::= { trapPrefix 20607 }
+
+--#####ccatSensorTable#####--
+
+ccatSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { ccatSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10704 }
+
+ccatSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { ccatSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20704 }
+
+ccatSensorValueNOTIFY NOTIFICATION-TYPE
+	OBJECTS { ccatSensorValue, ccatSensorType }
+	STATUS current
+	DESCRIPTION "CCAT sensor reading Trap"
+	::= { trapPrefix 10705 }
+
+ccatSensorValueCLEAR NOTIFICATION-TYPE
+	OBJECTS { ccatSensorValue, ccatSensorType }
+	STATUS current
+	DESCRIPTION "CCAT sensor reading Clear Trap"
+	::= { trapPrefix 20705 }
+
+--#####t3hdSensorTable#####--
+
+t3hdSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10804 }
+
+t3hdSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20804 }
+
+t3hdSensorIntTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorIntTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "T3HD Sensor Temperature Trap"
+	::= { trapPrefix 10806 }
+
+t3hdSensorIntTempCLEAR NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorIntTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "T3HD Sensor Temperature Clear Trap"
+	::= { trapPrefix 20806 }
+
+t3hdSensorIntHumidityNOTIFY NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorIntHumidity }
+	STATUS current
+	DESCRIPTION "T3HD Sensor Internal Humidity Trap"
+	::= { trapPrefix 10807 }
+
+t3hdSensorIntHumidityCLEAR NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorIntHumidity }
+	STATUS current
+	DESCRIPTION "T3HD Sensor Internal Humidity Clear Trap"
+	::= { trapPrefix 20807 }
+
+t3hdSensorIntDewPointNOTIFY NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorIntDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "T3HD Sensor Dew Point Trap"
+	::= { trapPrefix 10808 }
+
+t3hdSensorIntDewPointCLEAR NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorIntDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "T3HD Sensor Dew Point Clear Trap"
+	::= { trapPrefix 20808 }
+
+t3hdSensorExtATempNOTIFY NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorExtATemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "T3HD Sensor External A Temperature Trap"
+	::= { trapPrefix 10811 }
+
+t3hdSensorExtATempCLEAR NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorExtATemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "T3HD Sensor External A Temperature Clear Trap"
+	::= { trapPrefix 20811 }
+
+t3hdSensorExtBTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorExtBTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "T3HD Sensor External B Temperature Trap"
+	::= { trapPrefix 10814 }
+
+t3hdSensorExtBTempCLEAR NOTIFICATION-TYPE
+	OBJECTS { t3hdSensorExtBTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "T3HD Sensor External B Temperature Clear Trap"
+	::= { trapPrefix 20814 }
+
+--#####thdSensorTable#####--
+
+thdSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { thdSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 10904 }
+
+thdSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { thdSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 20904 }
+
+thdSensorTempNOTIFY NOTIFICATION-TYPE
+	OBJECTS { thdSensorTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "THD Sensor Temperature Trap"
+	::= { trapPrefix 10905 }
+
+thdSensorTempCLEAR NOTIFICATION-TYPE
+	OBJECTS { thdSensorTemp, temperatureUnits }
+	STATUS current
+	DESCRIPTION "THD Sensor Temperature Clear Trap"
+	::= { trapPrefix 20905 }
+
+thdSensorHumidityNOTIFY NOTIFICATION-TYPE
+	OBJECTS { thdSensorHumidity }
+	STATUS current
+	DESCRIPTION "THD Sensor Humidity Trap"
+	::= { trapPrefix 10906 }
+
+thdSensorHumidityCLEAR NOTIFICATION-TYPE
+	OBJECTS { thdSensorHumidity }
+	STATUS current
+	DESCRIPTION "THD Sensor Humidity Clear Trap"
+	::= { trapPrefix 20906 }
+
+thdSensorDewPointNOTIFY NOTIFICATION-TYPE
+	OBJECTS { thdSensorDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "THD Sensor Dew Point Trap"
+	::= { trapPrefix 10907 }
+
+thdSensorDewPointCLEAR NOTIFICATION-TYPE
+	OBJECTS { thdSensorDewPoint, temperatureUnits }
+	STATUS current
+	DESCRIPTION "THD Sensor Dew Point Clear Trap"
+	::= { trapPrefix 20907 }
+
+--#####rpmSensorTable#####--
+
+rpmSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 11004 }
+
+rpmSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 21004 }
+
+rpmSensorEnergyNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorEnergy }
+	STATUS current
+	DESCRIPTION "RPM Sensor Accumulated Energy Trap"
+	::= { trapPrefix 11005 }
+
+rpmSensorEnergyCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorEnergy }
+	STATUS current
+	DESCRIPTION "RPM Sensor Accumulated Energy Clear Trap"
+	::= { trapPrefix 21005 }
+
+rpmSensorVoltageNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorVoltage }
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage Trap"
+	::= { trapPrefix 11006 }
+
+rpmSensorVoltageCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorVoltage }
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage Clear Trap"
+	::= { trapPrefix 21006 }
+
+rpmSensorVoltageMaxNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorVoltageMax }
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Max) Trap"
+	::= { trapPrefix 11007 }
+
+rpmSensorVoltageMaxCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorVoltageMax }
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Max) Clear Trap"
+	::= { trapPrefix 21007 }
+
+rpmSensorVoltageMinNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorVoltageMin }
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Min) Trap"
+	::= { trapPrefix 11008 }
+
+rpmSensorVoltageMinCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorVoltageMin }
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Min) Clear Trap"
+	::= { trapPrefix 21008 }
+
+rpmSensorVoltagePeakNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorVoltagePeak }
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Peak) Trap"
+	::= { trapPrefix 11009 }
+
+rpmSensorVoltagePeakCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorVoltagePeak }
+	STATUS current
+	DESCRIPTION "RPM Sensor Voltage (Peak) Clear Trap"
+	::= { trapPrefix 21009 }
+
+rpmSensorCurrentNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorCurrent }
+	STATUS current
+	DESCRIPTION "RPM Sensor Current Trap"
+	::= { trapPrefix 11010 }
+
+rpmSensorCurrentCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorCurrent }
+	STATUS current
+	DESCRIPTION "RPM Sensor Current Clear Trap"
+	::= { trapPrefix 21010 }
+
+rpmSensorRealPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorRealPower }
+	STATUS current
+	DESCRIPTION "RPM Sensor Real Power Trap"
+	::= { trapPrefix 11011 }
+
+rpmSensorRealPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorRealPower }
+	STATUS current
+	DESCRIPTION "RPM Sensor Real Power Clear Trap"
+	::= { trapPrefix 21011 }
+
+rpmSensorApparentPowerNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorApparentPower }
+	STATUS current
+	DESCRIPTION "RPM Sensor Apparent Power Trap"
+	::= { trapPrefix 11012 }
+
+rpmSensorApparentPowerCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorApparentPower }
+	STATUS current
+	DESCRIPTION "RPM Sensor Apparent Power Clear Trap"
+	::= { trapPrefix 21012 }
+
+rpmSensorPowerFactorNOTIFY NOTIFICATION-TYPE
+	OBJECTS { rpmSensorPowerFactor }
+	STATUS current
+	DESCRIPTION "RPM Sensor Power Factor Trap"
+	::= { trapPrefix 11013 }
+
+rpmSensorPowerFactorCLEAR NOTIFICATION-TYPE
+	OBJECTS { rpmSensorPowerFactor }
+	STATUS current
+	DESCRIPTION "RPM Sensor Power Factor Clear Trap"
+	::= { trapPrefix 21013 }
+
+--#####a2dSensorTable#####--
+
+a2dSensorAvailNOTIFY NOTIFICATION-TYPE
+	OBJECTS { a2dSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Trap"
+	::= { trapPrefix 11104 }
+
+a2dSensorAvailCLEAR NOTIFICATION-TYPE
+	OBJECTS { a2dSensorAvail }
+	STATUS current
+	DESCRIPTION "Device availability. 0 = Unavailable, 1 = Available, 2 = Partially Unavailable Clear Trap"
+	::= { trapPrefix 21104 }
+
+a2dSensorValueNOTIFY NOTIFICATION-TYPE
+	OBJECTS { a2dSensorValue }
+	STATUS current
+	DESCRIPTION "A2D Analog Sensor Measurement Trap"
+	::= { trapPrefix 11105 }
+
+a2dSensorValueCLEAR NOTIFICATION-TYPE
+	OBJECTS { a2dSensorValue }
+	STATUS current
+	DESCRIPTION "A2D Analog Sensor Measurement Clear Trap"
+	::= { trapPrefix 21105 }
+
+END

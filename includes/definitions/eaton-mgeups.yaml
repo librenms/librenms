@@ -1,0 +1,21 @@
+os: eaton-mgeups
+text: 'Eaton MGE UPS'
+group: ups
+type: power
+icon: eaton
+rfc1628_compat: true
+mib_dir:
+    - mge
+over:
+    - { graph: device_current, text: Current }
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_load, text: Load }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.705.1
+        sysDescr_regex_except:
+            - '/^Eaton ATS/'
+            - '/^Galaxy/'
+            - '/^GALAXY/'
+            - '/^MGE Galaxy/'

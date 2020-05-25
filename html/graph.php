@@ -1,5 +1,4 @@
 <?php
-
 /**
  * LibreNMS
  *
@@ -10,31 +9,25 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Data\Store\Datastore;
 
 $start = microtime(true);
 
-if (isset($_GET['debug'])) {
-    $debug = true;
-    ini_set('display_errors', 1);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('error_reporting', E_ALL);
-} else {
-    $debug = false;
-    ini_set('display_errors', 0);
-    ini_set('display_startup_errors', 0);
-    ini_set('log_errors', 0);
-    ini_set('error_reporting', 0);
-}
-
-$init_modules = array('web', 'graphs');
+$init_modules = array('web', 'graphs', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-rrdtool_initialize(false);
+$auth = Auth::check() || is_client_authorized($_SERVER['REMOTE_ADDR']);
 
-require $config['install_dir'] . '/html/includes/graphs/graph.inc.php';
+if (!$auth) {
+    die('Unauthorized');
+}
 
-rrdtool_close();
+set_debug(isset($_GET['debug']));
+
+require \LibreNMS\Config::get('install_dir') . '/includes/html/graphs/graph.inc.php';
+
+Datastore::terminate();
 
 if ($debug) {
     echo '<br />';

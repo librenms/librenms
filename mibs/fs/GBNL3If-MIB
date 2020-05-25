@@ -1,0 +1,469 @@
+    GBNL3If-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Gauge32,
+        Unsigned32, Integer32,
+        IpAddress                               FROM SNMPv2-SMI
+        
+        RowStatus, TruthValue, 
+        DisplayString, MacAddress               FROM SNMPv2-TC   
+
+        -- IpAddress                               FROM RFC1155-SMI
+        
+        VlanIndex                               FROM Q-BRIDGE-MIB
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        gbnL3                                   FROM ADMIN-MASTER-MIB;       
+
+    gbnL3If MODULE-IDENTITY
+        LAST-UPDATED    "0105102004Z"  -- May 10, 2004
+        ORGANIZATION    "Admin Systems, Inc."
+        CONTACT-INFO    "Admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "GBN Generic router id MIB definition."
+
+        REVISION        "0105102004Z"  -- May 10, 2004
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnL3 1 }
+
+
+
+------------------------------------------------------------------------------
+--  gbnL3Mib             OBJECT IDENTIFIER ::= { gbnL3If 1 }
+    gbnL3SuperVLAN       OBJECT IDENTIFIER ::= { gbnL3If 2 }
+    gbnL3Arp             OBJECT IDENTIFIER ::= { gbnL3If 3 }
+    gbnL3IP              OBJECT IDENTIFIER ::= { gbnL3If 4 }
+    gbnL3DHCP            OBJECT IDENTIFIER ::= { gbnL3If 5 }    
+    gbnL3URPF            OBJECT IDENTIFIER ::= { gbnL3If 6 } 		  
+------------------------------------------------------------------------------
+--
+--  gbnL3SuperVLAN:
+--      
+--
+------------------------------------------------------------------------------
+    arpProxy OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disable the ARP proxy."
+            ::= { gbnL3SuperVLAN 1 }
+
+    superVLANTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SuperVLANEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of superVLAN.When create a new entry,must set superVLANStatus to be active to create
+             a entry first,or set superVLANsw/superVLANsuper fisrt will return no suchinstanc error"
+        ::= { gbnL3SuperVLAN 2 }
+
+    superVLANEntry OBJECT-TYPE
+        SYNTAX SuperVLANEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for superVLAN."
+        INDEX { superVLANVID }
+        ::= { superVLANTable 1 }
+
+    SuperVLANEntry ::= SEQUENCE {
+    	 superVLANVID		INTEGER,
+        superVLANsw    		INTEGER,
+        superVLANsuper    	TruthValue,        
+        superVLANStatus          RowStatus
+       }
+
+    superVLANVID OBJECT-TYPE
+        SYNTAX INTEGER (1..4094)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "vlan id."
+        ::= { superVLANEntry 1 }
+
+    superVLANsw OBJECT-TYPE
+        SYNTAX INTEGER (0..12)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "sw,0 means not existting."
+        ::= { superVLANEntry 2 }
+
+   superVLANsuper OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The interface is superVLAN or not"
+        ::= { superVLANEntry 3 }
+
+  superVLANStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "the status of this entry"
+        ::= { superVLANEntry 4 }
+
+
+------------------------------------------------------------------------------
+--
+--  gbnL3Arp:
+--      
+--
+------------------------------------------------------------------------------
+    arpTable OBJECT-TYPE 
+	    SYNTAX      SEQUENCE OF ArpEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION "此表为系统ARP的高速缓存表，在rfc1213中已经定义了两个有关系统
+	                 ARP的表格：at组中的atTable和ip组中的ipNetToMediaTable，但此两
+	                 个表没有VLAN信息和交换机端口信息，故定义此扩展表。" 
+	    ::= { gbnL3Arp 1 }     
+	    
+	arpEntry OBJECT-TYPE 
+	    SYNTAX      ArpEntry
+	    MAX-ACCESS  not-accessible
+	    STATUS      current
+	    DESCRIPTION "系统ARP的高速缓存表。" 
+	    INDEX   { arpIpAddress }
+	    ::= { arpTable 1 } 
+	    
+    ArpEntry ::= 
+        SEQUENCE { 
+            arpIpAddress      IpAddress, 
+            arpMacAddress     MacAddress,
+            arpIfIndex        INTEGER,
+            arpVlan           INTEGER,
+            arpPort           INTEGER,
+            arpType           INTEGER, 
+            arpRowStatus      RowStatus 
+        } 
+        
+    arpIpAddress OBJECT-TYPE 
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "IP地址，作为索引。" 
+        ::= { arpEntry 1 }
+        
+    arpMacAddress OBJECT-TYPE 
+        SYNTAX       MacAddress
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION "IP地址对应的MAC地址。" 
+        ::= { arpEntry 2 }        
+    
+    arpIfIndex OBJECT-TYPE 
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "IP地址所在的接口索引。" 
+        ::= { arpEntry 3 }  
+        
+    arpVlan OBJECT-TYPE 
+        SYNTAX       INTEGER
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION "IP地址所在的VLAN。" 
+        ::= { arpEntry 4 }        
+ 
+    arpPort OBJECT-TYPE 
+        SYNTAX       INTEGER (1..26)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION "学习到IP地址的交换机端口号。" 
+        ::= { arpEntry 5 }
+    
+    arpType OBJECT-TYPE 
+        SYNTAX       INTEGER {
+                         other(1),
+                         invalid(2),--无效ARP表项
+                         dynamic(3),--学习到的ARP表项
+                         static(4)  --静态添加的ARP表项  
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION "此ARP表项的类型。" 
+        ::= { arpEntry 6 }   
+        
+     arpRowStatus OBJECT-TYPE 
+        SYNTAX       RowStatus
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION "此ARP表项的状态，用来添加/删除静态ARP表项，ative为添加，destroy为删除。创建表项时首先
+                    添加mac地址，只有添加了VLAN和端口后active才可以返回成功。" 
+        ::= { arpEntry 7 }  
+
+    arpAging OBJECT-TYPE 
+        SYNTAX       INTEGER(3..2880)
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION "The age time of dynamic arp entry.Unit is minute.Default is 20." 
+        --arp表的老化时间，单位为分钟，默认为20分钟。
+        ::= { gbnL3Arp 2 }   
+
+    arpNum OBJECT-TYPE 
+        SYNTAX       INTEGER(0..8192)
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION "Total arp entries." 
+        --arp条目的总个数。
+        ::= { gbnL3Arp 3 }  
+
+------------------------------------------------------------------------------
+--
+--  gbnL3IP:
+--      
+--
+------------------------------------------------------------------------------
+    ipRangeTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF IpRangeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of ipaddress range for VLAN/Supervlan interface."
+        --VLAN/SuperVLAN接口的IP地址范围限制表.
+        ::= { gbnL3IP 1 }
+
+    ipRangeEntry OBJECT-TYPE
+        SYNTAX IpRangeEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for ipRangeTable."
+        INDEX { ipRangeIndex }
+        ::= { ipRangeTable 1 }
+
+    IpRangeEntry ::= SEQUENCE {
+    	 ipRangeSW		        Integer32,
+         ipRangeIndex    		Integer32,
+         ipRangeStartIP    	    IpAddress,
+         ipRangeEndIP           IpAddress,
+         ipRangeStatus          RowStatus
+       }
+
+    ipRangeSW OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "sw,for 3526 1-32, for 3750 1-256"
+        --IP接口的ID,为gbnL3IpSubnetIfIndex的后2个字节的取值,对于3526范围为1-12,而对于3750为1-256
+        ::= { ipRangeEntry 1 }
+
+    ipRangeIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index number of range."
+        --每个IP接口可以最多配置2048/4096个子范围.
+        ::= { ipRangeEntry 2 }
+
+   ipRangeStartIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The start ipaddress of this range."
+        --开始IP地址.
+        ::= { ipRangeEntry 3 }
+
+   ipRangeEndIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The end ipaddress of this range."
+        --结束IP地址.
+        ::= { ipRangeEntry 4 }
+
+  ipRangeStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "the status of this entry"
+        ::= { ipRangeEntry 5 }        
+
+------------------------------------------------------------------------------
+--
+--  gbnL3DHCP:
+--      
+--
+------------------------------------------------------------------------------
+    Option82 OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "Enable/disable option82.Default is disalbe"
+        --DHCP中继option82开关.默认为关闭            
+            ::= { gbnL3DHCP 1 }
+
+    Option82Strategy OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        drop(1),
+                        keep(2),
+                        replace(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      obsolete
+        DESCRIPTION
+            "Actions when receive packets with option82."
+        --在option82开启后当DHCP中继接收到带option82选项内容的报文时采取的策略.
+        --drop为丢弃报文,keep为保留报文的option82选项内容,而replace为替换报文中的option82内容.
+        --默认为replace
+            ::= { gbnL3DHCP 2 }
+
+    option82Format OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        normal(1),
+                        verbose(2),
+                        henan(3)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "packet format of dhcp option 82.Default is normal(1)"
+            ::= { gbnL3DHCP 3 }
+
+    option82FormatVerboseNodeIdentifier OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..50))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "when format is verbose,can set value of node-identifier.Except special string listing below, others string means user-define string. 
+            default is 0 length of value, means use switch mac"
+            --"hostname" means switch hostname
+            ::= { gbnL3DHCP 4 }
+
+    option82PortTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Option82PortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A port table of dhcp option 82."
+        ::= { gbnL3DHCP 5 }
+
+    option82PortEntry OBJECT-TYPE
+        SYNTAX Option82PortEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for option82PortTable."
+        INDEX { option82PortIndex }
+        ::= { option82PortTable 1 }
+
+    Option82PortEntry ::= SEQUENCE {
+    	   option82PortIndex		        Integer32,
+         option82PortStrategy      		  INTEGER,
+         option82PortCircuitId     	         DisplayString,
+         option82PortRemoteId               DisplayString
+       }
+
+    option82PortIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "port index"
+        ::= { option82PortEntry 1 }
+
+    option82PortStrategy OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        drop(1),
+                        keep(2),
+                        replace(3),
+                        appendhostname(4),
+                        appendhostnameip(5)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Actions when receive packets with option82.drop(1) means drop packets, keep(2) means not change the packet
+            replace(3) means relace option82 value, appendhostname(4) means append option82 suboption 9 with hostname,
+            appendhostnameip(5) means append option82 suboption 9 with hostname and ip.default is replace(3)."
+        ::= { option82PortEntry 2 }  
+
+    option82PortCircuitId OBJECT-TYPE
+        SYNTAX     DisplayString(SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "circuit-id string of port.default is 0 length of value."
+        ::= { option82PortEntry 3 }  
+
+    option82PortRemoteId OBJECT-TYPE
+        SYNTAX     DisplayString(SIZE(0..64))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "circuit-id string of port.default is 0 length of value.Except special string listing below, others string means user-define string. "
+            --"hostname" means switch hostname
+        ::= { option82PortEntry 4 }  
+            
+------------------------------------------------------------------------------
+--
+--  gbnL3URPF:
+--      
+--
+------------------------------------------------------------------------------
+    UrpfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF UrpfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of URPF state of every interface.Each interface can be of URPF strict mode,
+            URPF loose mode,or be URPF turned off. "
+        ::= { gbnL3URPF 1 }
+
+    urpfEntry OBJECT-TYPE
+        SYNTAX UrpfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Table entry for UrpfTable."
+        INDEX { urpfIfIndex }
+        ::= { UrpfTable 1 }
+
+    UrpfEntry ::= SEQUENCE {
+        urpfIfIndex       INTEGER,
+        urpfState     INTEGER
+       }
+
+    urpfIfIndex OBJECT-TYPE
+        SYNTAX       INTEGER(1..512)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Interface index,for 3650 1-256, for 3750-48 1-512"
+        --接口索引    
+        ::= { urpfEntry 1 }     
+    
+    urpfState OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        off(1),
+                        strict(2),
+                        loose(3)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "URPF state."
+        --urpf 状态，默认为关闭    
+        ::= { urpfEntry 2 }  
+               
+END

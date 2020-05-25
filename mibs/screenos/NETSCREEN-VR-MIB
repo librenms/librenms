@@ -1,0 +1,157 @@
+-- These MIBs were created on 1/9/2003
+-- This module defines enterprise MIBs for virtual router
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-VR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   OBJECT-TYPE
+       FROM SNMPv2-SMI
+   netscreenVR
+       FROM NETSCREEN-SMI;
+
+netscreenVRMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor VR
+         info"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200109010000Z" -- September 1, 2003
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenVR 0 }
+
+
+vrTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF VrEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "VR table.  This table contains VR info."
+    ::= { netscreenVR 1 }
+
+vrEntry OBJECT-TYPE
+    SYNTAX     VrEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing information about the
+         BGP's Version, LocalAs and Identifier"
+    INDEX { vrId }
+    ::= { vrTable 1 }
+
+VrEntry ::= SEQUENCE {
+        vrName
+            OCTET STRING,
+        vrId
+            INTEGER,
+        vrVsysName
+            OCTET STRING,
+        vrRouteId
+            INTEGER,
+        vrMaxRoutes
+            INTEGER,
+        vrNumRoutes
+            INTEGER,
+        vrSharable
+            INTEGER,
+        vrOspfRipBgpEnabled
+            INTEGER,
+        vrTrapPrivate
+            INTEGER
+}
+
+vrName OBJECT-TYPE
+    SYNTAX     OCTET STRING 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Name of the VR."
+    ::= { vrEntry 1 }
+
+vrId OBJECT-TYPE
+    SYNTAX     INTEGER (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Id for the VR. It will be used in all other
+         private MIBs so that cross reference can be made."
+    ::= { vrEntry 2 }
+
+vrVsysName OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Id of the vsys which owns this VR."
+    ::= { vrEntry 3 }
+
+vrRouteId OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Router id, used by OSFP and BGP."
+    ::= { vrEntry 4 }
+
+vrMaxRoutes OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Maximum routes allowed for this VR."
+    ::= { vrEntry 5 }
+
+vrNumRoutes OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The number of routes currently the VR has."
+    ::= { vrEntry 6 }
+
+vrSharable OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The VR is sharable or not."
+    ::= { vrEntry 7 }
+
+vrOspfRipBgpEnabled OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Enable OSPF, RIP, BGP."
+    ::= { vrEntry 8 }
+
+vrTrapPrivate OBJECT-TYPE
+    SYNTAX     INTEGER 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "0 private, 1 public. This only applies to 
+         root system' default VR. If private trap is
+         enabled, a private trap is sent, otherwise,
+         the standard trap is sent. For other VRs, By
+         default, the public trap is supported."
+    ::= { vrEntry 9 }
+END
+

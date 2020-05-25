@@ -1,0 +1,715 @@
+-- *****************************************************************
+-- TN-LINK-OAM-MIB
+--
+-- Copyright (c) 2013, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+TN-LINK-OAM-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+   OBJECT-TYPE, Counter32, Unsigned32,
+    Integer32, Counter64
+    FROM SNMPv2-SMI
+    -- from [RFC2578]
+  TimeStamp, TruthValue, DisplayString
+    FROM SNMPv2-TC
+    -- from [RFC2579]
+  ifIndex
+    FROM IF-MIB
+    -- from [RFC2863]
+  dot3OamEntry, dot3OamStatsEntry, dot3OamPeerEntry,
+    dot3OamEventConfigEntry
+    FROM DOT3-OAM-MIB
+  tnProducts
+    FROM TRANSITION-SMI;
+
+  tnLinkOamMIB MODULE-IDENTITY
+  LAST-UPDATED "201305280000Z"
+  ORGANIZATION "Transition Networks, Inc."
+  CONTACT-INFO
+       "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+        E-mail: techsupport@transition.com
+       "
+  DESCRIPTION
+  "The mib module for managing Link OAM."
+::= { tnProducts 140 }
+
+--
+-- Sections of the Ethernet OAM MIB
+
+   tnLinkOamNotifications OBJECT IDENTIFIER ::= { tnLinkOamMIB 0 }
+   tnLinkOamObjects       OBJECT IDENTIFIER ::= { tnLinkOamMIB 1 }
+   tnLinkOamConformance   OBJECT IDENTIFIER ::= { tnLinkOamMIB 2 }
+
+-- ***************************************************************
+--
+-- Link OAM Port Configuration Group
+--
+
+tnLinkOamPortConfigTable                               OBJECT-TYPE
+  SYNTAX      SEQUENCE OF TnLinkOamPortConfigEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "This table allows the user to inspect the current Link
+     OAM port configurations, and change them as well.
+    "
+  ::= { tnLinkOamObjects 1 }
+
+tnLinkOamPortConfigEntry                               OBJECT-TYPE
+  SYNTAX     TnLinkOamPortConfigEntry
+  MAX-ACCESS not-accessible
+  STATUS     current
+  DESCRIPTION
+    "An entry in the table that contains information of
+     OAM port configurations.
+    "
+  AUGMENTS { dot3OamEntry }
+  ::= { tnLinkOamPortConfigTable 1 }
+
+TnLinkOamPortConfigEntry ::=
+  SEQUENCE {
+    tnLinkOamLoopbackSupport             INTEGER,
+    tnLinkOamLinkMonitorSupport          INTEGER,
+    tnLinkMIBRetrievalSupport            INTEGER,
+    tnLinkOamLoopbackOperation           INTEGER
+  }
+
+tnLinkOamLoopbackSupport                               OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Controls whether the loopback support is enabled for the
+     switch port. Link OAM remote loopback can be used for fault
+     localization and link performance testing. Enabling the
+     loopback support will allow the DTE to execute the remote
+     loopback command that helps in the fault detection.
+    "
+  ::= { tnLinkOamPortConfigEntry 1 }
+
+tnLinkOamLinkMonitorSupport                            OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Controls whether the Link Monitor support is enabled for the
+     switch port. On enabling the Link Monitor support, the DTE
+     supports event notification that permits the inclusion of
+     diagnostic information.
+    "
+  ::= { tnLinkOamPortConfigEntry 2 }
+
+tnLinkMIBRetrievalSupport                              OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "Controls whether the MIB Retrieval Support is enabled for
+     the switch port. On enabling the MIB retrieval support,
+     the DTE supports polling of various Link OAM based MIB
+     variables' contents.
+    "
+  ::= { tnLinkOamPortConfigEntry 3 }
+
+tnLinkOamLoopbackOperation                             OBJECT-TYPE
+  SYNTAX      INTEGER {
+                enable(1),
+                disable(2)
+              }
+  MAX-ACCESS  read-write
+  STATUS      current
+  DESCRIPTION
+    "If the Loopback support is enabled, enabling this field
+     will start a loopback operation for the port.
+    "
+  ::= { tnLinkOamPortConfigEntry 4 }
+
+-- **************************************************************
+--
+-- Ethernet OAM Monitor Groups
+--
+
+-- **************************************************************
+--
+-- Ethernet OAM Port Statistics Table
+--
+
+tnLinkOamStatisticsTable                               OBJECT-TYPE
+  SYNTAX       SEQUENCE OF TnLinkOamStatisticsEntry
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+    "This table contains statistics for the OAM function on a
+     particular Ethernet-like interface.  There is an entry in the
+     table for every entry in the tnLinkOamTable.
+
+     The displayed counters represent the total number of OAM
+     frames received and transmitted for the selected port.
+     Discontinuities of these counter can occur at re-initialization
+     of the management system.
+    "
+    ::= { tnLinkOamObjects 2 }
+
+tnLinkOamStatisticsEntry                               OBJECT-TYPE
+  SYNTAX      TnLinkOamStatisticsEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the table containing statistics information on
+     the Ethernet OAM function for a single Ethernet-like
+     interface.
+    "
+  AUGMENTS { dot3OamStatsEntry }
+  ::= { tnLinkOamStatisticsTable 1 }
+
+TnLinkOamStatisticsEntry ::=
+  SEQUENCE {
+      tnLinkOamLinkfaultPDUsRx                    Counter32,
+      tnLinkOamLinkfaultPDUsTx                    Counter32,
+      tnLinkOamDyingGaspRx                        Counter32,
+      tnLinkOamDyingGaspTx                        Counter32,
+      tnLinkOamCriticalEventPDUsRx                Counter32,
+      tnLinkOamCriticalEventPDUsTx                Counter32
+  }
+
+tnLinkOamLinkfaultPDUsRx                               OBJECT-TYPE
+  SYNTAX      Counter32
+  UNITS       "frames"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "A count of the number of Link fault PDU's received."
+  ::= { tnLinkOamStatisticsEntry 1 }
+
+tnLinkOamLinkfaultPDUsTx                               OBJECT-TYPE
+  SYNTAX      Counter32
+  UNITS       "frames"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "A count of the number of Link fault PDU's transmitted."
+  ::= { tnLinkOamStatisticsEntry 2 }
+
+tnLinkOamDyingGaspRx                                   OBJECT-TYPE
+  SYNTAX      Counter32
+  UNITS       "frames"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "A count of the number of Dying Gasp events received."
+  ::= { tnLinkOamStatisticsEntry 3 }
+
+tnLinkOamDyingGaspTx                                   OBJECT-TYPE
+  SYNTAX      Counter32
+  UNITS       "frames"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "A count of the number of Dying Gasp events transmitted."
+  ::= { tnLinkOamStatisticsEntry 4 }
+
+tnLinkOamCriticalEventPDUsRx                           OBJECT-TYPE
+  SYNTAX      Counter32
+  UNITS       "frames"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "A count of the number of Critical event PDU's received."
+  ::= { tnLinkOamStatisticsEntry 5 }
+
+tnLinkOamCriticalEventPDUsTx                           OBJECT-TYPE
+  SYNTAX      Counter32
+  UNITS       "frames"
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "A count of the number of Critical event PDU's transmitted."
+  ::= { tnLinkOamStatisticsEntry 6 }
+
+-- **************************************************************
+--
+-- Ethernet OAM Port Configuration Status Group
+--
+
+-- Ethernet OAM Local Port Configuration Status Table
+-- Included PDU Permission
+tnLinkOamLocalPortConfigStatusTable                    OBJECT-TYPE
+  SYNTAX       SEQUENCE OF TnLinkOamLocalPortConfigStatusEntry
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+    "This table provides Local Link OAM configuration operational
+     status."
+    ::= { tnLinkOamObjects 3 }
+
+tnLinkOamLocalPortConfigStatusEntry                    OBJECT-TYPE
+  SYNTAX      TnLinkOamLocalPortConfigStatusEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the table containing information of Peer Link
+     OAM configuration operational status."
+  AUGMENTS { dot3OamEntry }
+  ::= { tnLinkOamLocalPortConfigStatusTable 1 }
+
+TnLinkOamLocalPortConfigStatusEntry ::=
+  SEQUENCE {
+      tnLinkOamPDUPermission                          INTEGER,
+      tnLinkOamLocalMultiplexerState                  INTEGER,
+      tnLinkOamLocalParserState                       INTEGER,
+      tnLinkOamLocalOrganizationalUniqueIdentifi      DisplayString
+  }
+
+tnLinkOamPDUPermission                                 OBJECT-TYPE
+  SYNTAX      INTEGER {
+                  linkfault(1),
+                  receiveonly(2),
+                  informationexchangeonly(3),
+                  any(4)
+              }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This field is available only for the Local DTE. It
+     displays the current permission rules set for the
+     local DTE. Possible values are 'Link fault', 'Receive
+     only', 'Information exchange only', 'ANY'."
+  ::= { tnLinkOamLocalPortConfigStatusEntry 1 }
+
+tnLinkOamLocalMultiplexerState                         OBJECT-TYPE
+  SYNTAX      INTEGER {
+                  forwarding(1),
+                  discarding(2) 
+              }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "When in forwarding state, the Device is forwarding
+     non-OAMPDUs to the lower sublayer. Incase of
+     discarding, the device discards all the non-OAMPDU's."
+  ::= { tnLinkOamLocalPortConfigStatusEntry 2 }
+
+tnLinkOamLocalParserState                              OBJECT-TYPE
+  SYNTAX      INTEGER {
+                  forwarding(1),
+                  loopback(2),
+                  discarding(3) 
+              }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "When in forwarding state, Device is forwarding
+     non-OAMPDUs to higher sublayer. When in loopback,
+     Device is looping back non-OAMPDUs to the lower
+     sublayer. When in discarding state, Device is
+     discarding non-OAMPDUs."
+  ::= { tnLinkOamLocalPortConfigStatusEntry 3 }
+
+tnLinkOamLocalOrganizationalUniqueIdentifi             OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "24-bit Organizationally Unique Identifier of the
+     vendor."
+  ::= { tnLinkOamLocalPortConfigStatusEntry 4 }
+
+-- Ethernet OAM Peer Port Configuration Status Table
+
+tnLinkOamPeerPortConfigStatusTable                     OBJECT-TYPE
+  SYNTAX       SEQUENCE OF TnLinkOamPeerPortConfigStatusEntry
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+    "This table provides Peer Link OAM configuration operational
+     status."
+    ::= { tnLinkOamObjects 4 }
+
+tnLinkOamPeerPortConfigStatusEntry                     OBJECT-TYPE
+  SYNTAX      TnLinkOamPeerPortConfigStatusEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the table containing information of Peer Link
+     OAM configuration operational status."
+  AUGMENTS { dot3OamPeerEntry }
+  ::= { tnLinkOamPeerPortConfigStatusTable 1 }
+
+TnLinkOamPeerPortConfigStatusEntry ::=
+  SEQUENCE {
+      tnLinkOamPeerMultiplexerState                  INTEGER,
+      tnLinkOamPeerParserState                       INTEGER,
+      tnLinkOamPeerOrganizationalUniqueIdentifi      DisplayString
+}
+
+tnLinkOamPeerMultiplexerState                          OBJECT-TYPE
+  SYNTAX      INTEGER {
+                  forwarding(1),
+                  discarding(2) 
+              }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "When in forwarding state, the Device is forwarding
+     non-OAMPDUs to the lower sublayer. Incase of
+     discarding, the device discards all the non-OAMPDU's."
+  ::= { tnLinkOamPeerPortConfigStatusEntry 1 }
+
+tnLinkOamPeerParserState                               OBJECT-TYPE
+  SYNTAX      INTEGER {
+                  forwarding(1),
+                  loopback(2),
+                  discarding(3)
+              }
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "When in forwarding state, Device is forwarding
+     non-OAMPDUs to higher sublayer. When in loopback,
+     Device is looping back non-OAMPDUs to the lower
+     sublayer. When in discarding state, Device is
+     discarding non-OAMPDUs."
+  ::= { tnLinkOamPeerPortConfigStatusEntry 2 }
+
+tnLinkOamPeerOrganizationalUniqueIdentifi              OBJECT-TYPE
+  SYNTAX      DisplayString
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "24-bit Organizationally Unique Identifier of the
+     vendor."
+  ::= { tnLinkOamPeerPortConfigStatusEntry 3 }
+
+-- **************************************************************
+--
+-- Ethernet OAM Link Event Status Objects
+--
+
+--***************************************************************
+-- Frame Error Status Table
+
+tnLinkOamLinkEventStatusTable                          OBJECT-TYPE
+  SYNTAX       SEQUENCE OF TnLinkOamLinkEventStatusEntry
+  MAX-ACCESS   not-accessible
+  STATUS       current
+  DESCRIPTION
+    "This table shows frame error status."
+    ::= { tnLinkOamObjects 5 }
+
+tnLinkOamLinkEventStatusEntry                          OBJECT-TYPE
+  SYNTAX      TnLinkOamLinkEventStatusEntry
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "An entry in the table containing information of
+     frame error status."
+  INDEX       { ifIndex, tnLinkOamLocationIndex }
+  ::= { tnLinkOamLinkEventStatusTable 1 }
+
+TnLinkOamLinkEventStatusEntry ::=
+  SEQUENCE {
+      tnLinkOamLocationIndex                          Unsigned32,
+      tnLinkOamSequenceNumber                         Counter32,
+      tnLinkOamFrameErrorEventTimestamp               TimeStamp,
+      tnLinkOamFrameErrorEventWindow                  Counter32,
+      tnLinkOamFrameErrorEventThreshold               Counter32,
+      tnLinkOamFrameErrors                            Counter32,
+      tnLinkOamTotalFrameErrors                       Counter64,
+      tnLinkOamTotalFrameErrorEvents                  Counter32,
+      tnLinkOamFramePeriodErrorEventTimestamp         TimeStamp,
+      tnLinkOamFramePeriodErrorEventWindow            Counter32,
+      tnLinkOamFramePeriodErrorEventThreshold         Counter32,
+      tnLinkOamFramePeriodsErrors                     Counter32,
+      tnLinkOamTotalFramePeriodsErrors                Counter64,
+      tnLinkOamTotalFramePerioderrorEvents            Counter32,
+      tnLinkOamSymbolPeriodErrorEventTimestamp        TimeStamp,
+      tnLinkOamSymbolPeriodErrorEventWindow           Counter64,
+      tnLinkOamSymbolPeriodErrorEventThreshold        Counter64,
+      tnLinkOamSymbolPeriodsErrors                    Counter64,
+      tnLinkOamSymbolFramePeriodErrors                Counter64,
+      tnLinkOamTotalSymbolFramePerioderrorEvents      Counter32,
+      tnLinkOamEventSecondsSummaryTimestamp           TimeStamp,
+      tnLinkOamEventSecondsSummaryWindow              Counter32,
+      tnLinkOamEventSecondsSummaryThreshold           Counter32,
+      tnLinkOamEventSecondsSummarysEvents             Counter32,
+      tnLinkOamEventSecondsSummaryErrorTotal          Counter32,
+      tnLinkOamTotalEventSecondsSummaryEventTotal     Counter32
+  }
+
+tnLinkOamLocationIndex                            OBJECT-TYPE
+  SYNTAX      Unsigned32
+  MAX-ACCESS  not-accessible
+  STATUS      current
+  DESCRIPTION
+    "The index of the loacation of the OAM unit event status
+     accessed.
+     When the value of index is '1', the table will display
+     the Event status for the Local OAM unit. While the value
+     is '2', the table will display the status for the Peer
+     for the respective port."
+  ::= { tnLinkOamLinkEventStatusEntry 1 }
+
+tnLinkOamSequenceNumber                           OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the total number of
+     events occurred at the remote end." 
+  ::= { tnLinkOamLinkEventStatusEntry 2 }
+
+tnLinkOamFrameErrorEventTimestamp                 OBJECT-TYPE
+  SYNTAX      TimeStamp
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the time reference
+     when the event was generated, in terms of 100 ms
+     intervals." 
+  ::= { tnLinkOamLinkEventStatusEntry 3 }
+
+tnLinkOamFrameErrorEventWindow                    OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the duration of the
+     period in terms of 100 ms intervals.
+     1) The default value is one second.
+     2) The lower bound is one second.
+     3) The upper bound is one minute."
+  ::= { tnLinkOamLinkEventStatusEntry 4 }
+
+tnLinkOamFrameErrorEventThreshold                 OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the number of detected
+     errored frames in the period is required to be equal to
+     or greater than in order for the event to be generated.
+     1) The default value is one frame error.
+     2) The lower bound is zero frame errors.
+     3) The upper bound is unspecified."
+  ::= { tnLinkOamLinkEventStatusEntry 5 }
+
+tnLinkOamFrameErrors                              OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the number of detected
+     errored frames in the period."
+  ::= { tnLinkOamLinkEventStatusEntry 6 }
+
+tnLinkOamTotalFrameErrors                         OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This eight-octet field indicates the sum of errored
+     frames that have been detected since the OAM sublayer
+     was reset."
+  ::= { tnLinkOamLinkEventStatusEntry 7 }
+
+tnLinkOamTotalFrameErrorEvents                    OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the number of Errored
+     Frame Event TLVs that have been generated since the
+     OAM sublayer was reset." 
+  ::= { tnLinkOamLinkEventStatusEntry 8 }
+
+tnLinkOamFramePeriodErrorEventTimestamp           OBJECT-TYPE
+  SYNTAX      TimeStamp
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the time reference
+     when the event was generated, in terms of 100 ms
+     intervals."
+  ::= { tnLinkOamLinkEventStatusEntry 9 }
+
+tnLinkOamFramePeriodErrorEventWindow              OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the duration of period
+     in terms of frames."
+  ::= { tnLinkOamLinkEventStatusEntry 10 }
+
+tnLinkOamFramePeriodErrorEventThreshold           OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the number of errored
+     frames in the period is required to be equal to or
+     greater than in order for the event to be generated."
+  ::= { tnLinkOamLinkEventStatusEntry 11 }
+
+tnLinkOamFramePeriodsErrors                       OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the number of frame
+     errors in the period."
+  ::= { tnLinkOamLinkEventStatusEntry 12 }
+
+tnLinkOamTotalFramePeriodsErrors                  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This eight-octet field indicates the sum of frame
+     errors that have been detected since the OAM sublayer
+     was reset."
+  ::= { tnLinkOamLinkEventStatusEntry 13 }
+
+tnLinkOamTotalFramePerioderrorEvents              OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the number of Errored
+     Frame Period Event TLVs that have been generated since
+     the OAM sublayer was reset."
+  ::= { tnLinkOamLinkEventStatusEntry 14 }
+
+tnLinkOamSymbolPeriodErrorEventTimestamp          OBJECT-TYPE
+  SYNTAX      TimeStamp
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the time reference when
+     the event was generated, in terms of 100 ms intervals."
+  ::= { tnLinkOamLinkEventStatusEntry 15 }
+
+tnLinkOamSymbolPeriodErrorEventWindow             OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This eight-octet field indicates the number of symbols
+     in the period."
+  ::= { tnLinkOamLinkEventStatusEntry 16 }
+
+tnLinkOamSymbolPeriodErrorEventThreshold          OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This eight-octet field indicates the number of errored
+     symbols in the period is required to be equal to or
+     greater than in order for the event to be generated."
+  ::= { tnLinkOamLinkEventStatusEntry 17 }
+
+tnLinkOamSymbolPeriodsErrors                      OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This eight-octet field indicates the number of symbol
+     errors in the period."
+  ::= { tnLinkOamLinkEventStatusEntry 18 }
+
+tnLinkOamSymbolFramePeriodErrors                  OBJECT-TYPE
+  SYNTAX      Counter64
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This eight-octet field indicates the sum of symbol
+     errors since the OAM sublayer was reset."
+  ::= { tnLinkOamLinkEventStatusEntry 19 }
+
+tnLinkOamTotalSymbolFramePerioderrorEvents        OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the number of Errored
+     Symbol Period Event TLVs that have been generated since
+     the OAM sublayer was reset."
+  ::= { tnLinkOamLinkEventStatusEntry 20 }
+
+tnLinkOamEventSecondsSummaryTimestamp             OBJECT-TYPE
+  SYNTAX      TimeStamp
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the time reference when
+     the event was generated, in terms of 100 ms intervals,
+     encoded as a 16-bit unsigned integer."
+  ::= { tnLinkOamLinkEventStatusEntry 21 }
+
+tnLinkOamEventSecondsSummaryWindow                OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the duration of the
+     period in terms of 100 ms intervals, encoded as a
+     16-bit unsigned integer."
+  ::= { tnLinkOamLinkEventStatusEntry 22 }
+
+tnLinkOamEventSecondsSummaryThreshold             OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the number of errored
+     frame seconds in the period is required to be equal
+     to or greater than in order for the event to be
+     generated, encoded as a 16-bit unsigned integer."
+  ::= { tnLinkOamLinkEventStatusEntry 23 }
+
+tnLinkOamEventSecondsSummarysEvents               OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This two-octet field indicates the number of errored
+     frame seconds in the period, encoded as a 16-bit
+     unsigned integer."
+  ::= { tnLinkOamLinkEventStatusEntry 24 }
+
+tnLinkOamEventSecondsSummaryErrorTotal            OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the sum of errored
+     frame seconds that have been detected since the OAM
+     sublayer was reset."
+  ::= { tnLinkOamLinkEventStatusEntry 25 }
+
+tnLinkOamTotalEventSecondsSummaryEventTotal       OBJECT-TYPE
+  SYNTAX      Counter32
+  MAX-ACCESS  read-only
+  STATUS      current
+  DESCRIPTION
+    "This four-octet field indicates the number of Errored
+     Frame Seconds Summary Event TLVs that have been generated
+     since the OAM sublayer was reset, encoded as a 32bit
+     unsigned integer."
+  ::= { tnLinkOamLinkEventStatusEntry 26 }
+END

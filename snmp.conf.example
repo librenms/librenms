@@ -1,1 +1,2 @@
-mibdirs +/opt/librenms/mibs
+# This file is intentionally blank.
+# Do not add anything to it.

@@ -1,0 +1,198 @@
+NBS-CONNECTIVITY-MIB  DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+    OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE,
+    IpAddress
+        FROM SNMPv2-SMI
+
+    InterfaceIndex
+        FROM IF-MIB
+
+    nbs
+        FROM NBS-MIB
+
+    nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex
+        FROM NBS-CMMC-MIB
+
+    InetAddress, InetAddressType
+        FROM INET-ADDRESS-MIB;
+
+nbsConnectivityMib  MODULE-IDENTITY
+    LAST-UPDATED "201405280000Z"  -- May 28, 2014
+    ORGANIZATION "NBS"
+    CONTACT-INFO
+      "For technical support, please contact your service channel"
+
+    DESCRIPTION
+      "Read-only MIB which lists externally linked ports"
+    ::= { nbs 238 }
+
+-- *******************************************************************
+-- NBS-CONNECTIVITY-MIB local defines
+-- *******************************************************************
+
+nbsConnectivityGrp  OBJECT-IDENTITY
+    STATUS    current
+    DESCRIPTION
+      "Connectivity information"
+    ::= { nbsConnectivityMib 1 }
+
+nbsConnectivityTraps  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "SNMP Traps or Notifications"
+    ::= { nbsConnectivityMib 100 }
+
+nbsConnectivityEvent  OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+       "Event Notification Definitions"
+    ::= { nbsConnectivityTraps 0 }
+
+
+-- *******************************************************************
+--
+-- the nbsConnectivityTable
+--
+-- *******************************************************************
+
+nbsConnectivityTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF NbsConnectivityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "List of externally connected port pairs.
+
+                 The connectivity table entries come from discovery
+                 protocols."
+        ::= { nbsConnectivityGrp 1 }
+
+nbsConnectivityEntry      OBJECT-TYPE
+        SYNTAX      NbsConnectivityEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "Contains a description of a particular Port Connection."
+        INDEX { nbsConnectivitySourceIfIndex,
+                nbsConnectivityOrdinalIndex }
+        ::= { nbsConnectivityTable 1 }
+
+NbsConnectivityEntry ::= SEQUENCE {
+        nbsConnectivitySourceIfIndex   InterfaceIndex,
+        nbsConnectivityOrdinalIndex    INTEGER,
+        nbsConnectivityDestIfIndex     InterfaceIndex,
+        nbsConnectivityDestIPAddress   IpAddress,
+        nbsConnectivityDestAddrType    InetAddressType,
+        nbsConnectivityDestAddr        InetAddress,
+        nbsConnectivityStatus          INTEGER,
+        nbsConnectivityDestV6AddrType  InetAddressType,
+        nbsConnectivityDestV6Addr      InetAddress
+}
+
+nbsConnectivitySourceIfIndex    OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "MIB II Interface index."
+        ::= { nbsConnectivityEntry 10 }
+
+nbsConnectivityOrdinalIndex    OBJECT-TYPE
+        SYNTAX      INTEGER (1..2)
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "The ordinal index for this entry. A given source
+                 port may have one or more destination ports."
+        ::= { nbsConnectivityEntry 11 }
+
+nbsConnectivityDestIfIndex    OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "MIB II Interface index."
+        ::= { nbsConnectivityEntry 20 }
+
+nbsConnectivityDestIPAddress OBJECT-TYPE
+        SYNTAX      IpAddress
+        MAX-ACCESS  read-only
+        STATUS      deprecated
+        DESCRIPTION
+                "Deprecated. IPv4 information is in
+                 nbsConnectivityDestAddr instead."
+
+        ::= { nbsConnectivityEntry 30 }
+
+nbsConnectivityDestAddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The address type of nbsConnectivityDestAddr.
+                 Currently ipv4 and ipv6 are supported."
+
+        ::= { nbsConnectivityEntry 40 }
+
+nbsConnectivityDestAddr    OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "IP Address (Usually IPv4) of the remote port's SNMP agent"
+        ::= { nbsConnectivityEntry 50 }
+
+nbsConnectivityStatus    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                up           (1),    -- link status up
+                down         (2),    -- link status down
+                unknown      (3),    -- link status unknown
+                notSupported (4),    -- link status unsupported
+                sourceBlocked(5),    -- source (local) port is blocked
+                destBlocked  (6)     -- dest (remote) port is blocked
+        }
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "This object is used to indicate the link status."
+        DEFVAL { notSupported }
+        ::= { nbsConnectivityEntry 60 }
+
+nbsConnectivityDestV6AddrType OBJECT-TYPE
+        SYNTAX      InetAddressType
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "The address type of nbsConnectivityDestV6Addr."
+        ::= { nbsConnectivityEntry 70 }
+
+nbsConnectivityDestV6Addr    OBJECT-TYPE
+        SYNTAX      InetAddress
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "IP Address (Usually IPv6) of the remote port's SNMP agent"
+        ::= { nbsConnectivityEntry 80 }
+
+-- *******************************************************************
+--
+-- the nbsConnectivityEvent group
+--
+-- *******************************************************************
+
+nbsConnectivityChanged  NOTIFICATION-TYPE
+    OBJECTS  { nbsCmmcChassisIndex, nbsCmmcSlotIndex, nbsCmmcPortIndex,
+               nbsConnectivityDestAddrType,
+               nbsConnectivityDestAddr,
+               nbsConnectivityStatus  }
+    STATUS      current
+    DESCRIPTION
+       "Sent after the port goes up or down.
+
+        This Notification is of severity ERROR, which means it should
+        be emitted unless disabled or nbsCmmcSysTrapTblEntLevel is set
+        to a severity worse than error(3)."
+    ::= { nbsConnectivityEvent 10 }
+
+END

@@ -10,6 +10,6 @@
  * the source code distribution for details.
  */
 
-list($hardware,$version) = explode(',', $poll_device['sysDescr']);
+list($hardware,$version) = explode(',', $device['sysDescr']);
 preg_match('/(v[0-9\-\.]+)/', $version, $tmp_version);
 $version = rtrim($tmp_version[0], '.');

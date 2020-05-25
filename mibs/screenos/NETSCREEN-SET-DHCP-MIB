@@ -1,0 +1,134 @@
+-- This module defines enterprise MIBs for DHCP Configuration
+-- 
+-- Copyright (c) 1999-2004, Juniper Networks, Inc.
+-- All rights reserved.
+
+NETSCREEN-SET-DHCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    netscreenSetting, netscreenSettingMibModule
+        FROM NETSCREEN-SMI
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ;
+
+netscreenSetDhcpMibModule MODULE-IDENTITY
+    LAST-UPDATED  "200405032022Z" -- May 03, 2004
+    ORGANIZATION
+        "Juniper Networks, Inc."
+    CONTACT-INFO
+        "Customer Support
+
+         1194 North Mathilda Avenue 
+         Sunnyvale, California 94089-1206
+         USA
+
+         Tel: 1-800-638-8296
+         E-mail: customerservice@juniper.net
+         HTTP://www.juniper.net"
+    DESCRIPTION
+        "This module defines the object that are used to monitor all
+         the configuration info"
+    REVISION      "200405030000Z" -- May 03, 2004
+    DESCRIPTION
+        "Modified copyright and contact information"
+    REVISION      "200403030000Z" -- March 03, 2004
+    DESCRIPTION
+        "Converted to SMIv2 by Longview Software"
+    REVISION      "200311100000Z" -- November 10, 2003
+    DESCRIPTION
+        "Correct wrong title"
+    REVISION      "200112120000Z" -- December 12, 2001
+    DESCRIPTION
+        "change dhcp configuration per physical interface"
+    REVISION      "200109280000Z" -- September 28, 2001
+    DESCRIPTION
+        "No Comment"
+    REVISION      "200105270000Z" -- May 27, 2001
+    DESCRIPTION
+        "Creation Date"
+    ::= { netscreenSettingMibModule 5 }
+
+NsSetDhcpEntry ::= SEQUENCE
+{
+    nsSetDhcpIfIdx       Integer32,
+    nsSetDHCPService     INTEGER,
+    nsSetDHCPRelayServer DisplayString,
+    nsSetDHCPVpnEncryp   INTEGER,
+    nsSetDhcpIfInfo      Integer32
+}
+
+nsSetDHCP OBJECT IDENTIFIER ::= { netscreenSetting 5 }
+
+nsSetDhcpTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF NsSetDhcpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "NetScreen ScreenOS can allow dhcp service on each of NetScreen
+         device's physical interface. This table collects the dhcp
+         configuration on each physical interface."
+    ::= { nsSetDHCP 1 }
+
+nsSetDhcpEntry OBJECT-TYPE
+    SYNTAX        NsSetDhcpEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Hold the firewall setting attribute."
+    INDEX
+        { nsSetDhcpIfIdx }
+    ::= { nsSetDhcpTable 1 }
+
+nsSetDhcpIfIdx OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "unique interface id."
+    ::= { nsSetDhcpEntry 1 }
+
+nsSetDHCPService OBJECT-TYPE
+    SYNTAX        INTEGER {
+        none(0),
+        dhcp-relay-agent(1),
+        dhcp-server(2)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "DHCP service type for trusted network."
+    ::= { nsSetDhcpEntry 2 }
+
+nsSetDHCPRelayServer OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE(0..128))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "DHCP relay agent server name."
+    ::= { nsSetDhcpEntry 3 }
+
+nsSetDHCPVpnEncryp OBJECT-TYPE
+    SYNTAX        INTEGER {
+        disable(0),
+        enabled(1)
+    }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Secure DHCP relay agent traffic via VPN encryption."
+    ::= { nsSetDhcpEntry 4 }
+
+nsSetDhcpIfInfo OBJECT-TYPE
+    SYNTAX        Integer32 (0..2147483647)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Internal id assigned to this interface. Stays persistent across resets."
+    ::= { nsSetDhcpEntry 5 }
+
+END
+
+

@@ -1,0 +1,1330 @@
+-- *****************************************************************
+-- CISCO-VLAN-MEMBERSHIP-MIB
+--   
+-- November 1998, Chin-Chai Low
+--   
+-- Copyright (c) 1998-2004, 2007 by Cisco Systems Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-VLAN-MEMBERSHIP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    Integer32,
+    IpAddress
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    RowStatus,
+    TruthValue
+        FROM SNMPv2-TC
+    ifIndex
+        FROM IF-MIB
+    VlanIndex
+        FROM CISCO-VTP-MIB
+    CiscoPortList,
+    CiscoPortListRange
+        FROM CISCO-TC
+    ciscoMgmt
+        FROM CISCO-SMI;
+
+
+ciscoVlanMembershipMIB MODULE-IDENTITY
+    LAST-UPDATED    "200712140000Z"
+    ORGANIZATION    "Cisco Systems Inc."
+    CONTACT-INFO
+            "Cisco Systems
+            Customer Service
+
+            Postal: 170 W Tasman Drive
+            San Jose, CA  95134
+            USA
+
+            Tel: +1 800 553-NETS
+
+            E-mail: cs-vlans@cisco.com"
+    DESCRIPTION
+        "The MIB module for the management of the VLAN
+        Membership within the frame  work of Cisco
+        VLAN Architecture, v 2.0 by Keith McCloghrie. The MIB
+        provides information on VLAN Membership Policy Servers
+        used by a device and VLAN membership assignments of
+        non-trunk bridge ports of the device."
+    REVISION        "200712140000Z"
+    DESCRIPTION
+        "Add vmVlanCreationGroup."
+    REVISION        "200407160000Z"
+    DESCRIPTION
+        "Add vmMembershipSummaryExtTable."
+    REVISION        "200404070000Z"
+    DESCRIPTION
+        "Change the SYNTAX of vmMembershipSummaryMember2kPorts
+        from PortList to CiscoPortList."
+    REVISION        "200310100000Z"
+    DESCRIPTION
+        "Add vmVoiceVlanCdpVerifyEnable to support the feature
+        of voice VLANs' detection through CDP packets."
+    REVISION        "200306050000Z"
+    DESCRIPTION
+        "Deprecate vmMembershipSummaryMemberPorts and define
+        vmMembershipSummaryMember2kPorts to support up to 2k 
+        bridge ports."
+    REVISION        "200203280000Z"
+    DESCRIPTION
+        "Add vmVoiceVlanTable to support VVID feature"
+    REVISION        "200105010000Z"
+    DESCRIPTION
+        "Import VlanIndex from CISCO-VTP-MIB"
+    REVISION        "200101300000Z"
+    DESCRIPTION
+        "Corrected description of vmVmpsReconfirmResult"
+    REVISION        "200001060000Z"
+    DESCRIPTION
+        "Added 4k VLAN support"
+    REVISION        "9901180000Z"
+    DESCRIPTION
+        "Add vmNotificationsEnabled.
+        Add support for multi-vlan ports.
+                    Other minor edits."
+    REVISION        "9612060000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { ciscoMgmt 68 }
+
+
+ciscoVlanMembershipMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoVlanMembershipMIB 1 }
+
+-- Textual Conventions
+
+vmVmps  OBJECT IDENTIFIER
+    ::= { ciscoVlanMembershipMIBObjects 1 }
+
+vmMembership  OBJECT IDENTIFIER
+    ::= { ciscoVlanMembershipMIBObjects 2 }
+
+vmStatistics  OBJECT IDENTIFIER
+    ::= { ciscoVlanMembershipMIBObjects 3 }
+
+vmStatus  OBJECT IDENTIFIER
+    ::= { ciscoVlanMembershipMIBObjects 4 }
+
+vmVoiceVlan  OBJECT IDENTIFIER
+    ::= { ciscoVlanMembershipMIBObjects 5 }
+
+
+-- General Info
+
+vmVmpsVQPVersion OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The VLAN Query Protocol (VQP) version supported on
+        the device. VQP is the protocol used to query
+        VLAN Membership Policy Server (VMPS) for VLAN
+        membership assignments of dynamic VLAN ports.
+        A VMPS provides VLAN membership policy
+        assignments based on the content of the packets
+        received on a port." 
+    ::= { vmVmps 1 }
+
+vmVmpsRetries OBJECT-TYPE
+    SYNTAX          INTEGER (1..10)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The number of retries for VQP requests to a VMPS before
+        using the next available VMPS." 
+    ::= { vmVmps 2 }
+
+vmVmpsReconfirmInterval OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    UNITS           "Minutes"
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The switch will reconfirm membership of addresses on
+        each port with VMPS periodically. This object specifies
+        the interval to perform reconfirmation. If the value is
+        set to 0, the switch does not reconfirm membership with
+        VMPS."
+    DEFVAL          { 60 } 
+    ::= { vmVmps 3 }
+
+vmVmpsReconfirm OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        ready(1),
+                        execute(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Setting this object to execute(2) causes the switch
+        to reconfirm membership of every dynamic port.
+        Reading this object always return ready(1)." 
+    ::= { vmVmps 4 }
+
+vmVmpsReconfirmResult OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        other(1),
+                        inProgress(2),
+                        success(3),
+                        noResponse(4),
+                        noVmps(5),
+                        noDynamicPort(6),
+                        noHostConnected(7)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object returns the result of the last request
+        that sets vmVmpsReconfirm to execute(2). The
+        semantics of the possible results are as follows:
+
+             other(1)           - none of following
+             inProgress(2)      - reconfirm in progress
+             success(3)         - reconfirm completed successfully
+             noResponse(4)      - reconfirm failed because no
+                                  VMPS responded
+             noVmps(5)          - No VMPS configured
+             noDynamicPort(6)   - No dynamic ports configured
+             noHostConnected(7) - No hosts on dynamic ports" 
+    ::= { vmVmps 5 }
+
+vmVmpsCurrent OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This is the IpAddress of the current VMPS used." 
+    ::= { vmVmps 6 }
+
+vmVmpsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VmVmpsEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table of VMPS to use. The device will use
+        the the primary VMPS by default. If the
+        device is unable to reach the primary server
+        after vmVmpsRetries retries, it uses the first
+        secondary server in the table until it runs out
+        of secondary servers, in which case it will return
+        to using the primary server. Entries in this table
+        may be created and deleted via this MIB or
+        the management console on a device."
+    ::= { vmVmps 7 }
+
+vmVmpsEntry OBJECT-TYPE
+    SYNTAX          VmVmpsEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry (conceptual row) in the vmVmpsTable."
+    INDEX           { vmVmpsIpAddress } 
+    ::= { vmVmpsTable 1 }
+
+VmVmpsEntry ::= SEQUENCE {
+        vmVmpsIpAddress IpAddress,
+        vmVmpsPrimary   TruthValue,
+        vmVmpsRowStatus RowStatus
+}
+
+vmVmpsIpAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The Ip Address of the VMPS." 
+    ::= { vmVmpsEntry 1 }
+
+vmVmpsPrimary OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of the VMPS. Setting this value
+        to true will make this VMPS the primary server
+        and make the switch use this as the current server.
+        Setting this entry to true causes other rows
+        to transition to false. Attempting to write
+        a value of false after creation will result in
+        a return of bad value. Deleting an entry whose
+        value is true will result in the first entry
+        in the table being set to true." 
+    ::= { vmVmpsEntry 2 }
+
+vmVmpsRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "The status of this conceptual row." 
+    ::= { vmVmpsEntry 3 }
+ 
+
+-- VLAN Membership Info
+
+vmMembershipSummaryTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VmMembershipSummaryEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A summary of VLAN membership of non-trunk
+        bridge ports. This is a convenience table
+        for retrieving VLAN membership information.
+
+        A row is created for a VLAN if:
+        a) the VLAN exists, or
+        b) a port is assigned to a non-existent VLAN.
+
+        VLAN membership can only be modified via the
+        vmMembershipTable."
+    ::= { vmMembership 1 }
+
+vmMembershipSummaryEntry OBJECT-TYPE
+    SYNTAX          VmMembershipSummaryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry (conceptual row) in the
+        vmMembershipSummaryTable."
+    INDEX           { vmMembershipSummaryVlanIndex } 
+    ::= { vmMembershipSummaryTable 1 }
+
+VmMembershipSummaryEntry ::= SEQUENCE {
+        vmMembershipSummaryVlanIndex     VlanIndex,
+        vmMembershipSummaryMemberPorts   OCTET STRING,
+        vmMembershipSummaryMember2kPorts CiscoPortList
+}
+
+vmMembershipSummaryVlanIndex OBJECT-TYPE
+    SYNTAX          VlanIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The VLAN id of the VLAN." 
+    ::= { vmMembershipSummaryEntry 1 }
+
+vmMembershipSummaryMemberPorts OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (0..128))
+    MAX-ACCESS      read-only
+    STATUS          deprecated
+    DESCRIPTION
+        "The set of the device's member ports that belong
+        to the VLAN.
+
+        Each octet within the value of this object specifies a
+        set of eight ports, with the first octet specifying ports
+        1 through 8, the second octet specifying ports 9
+        through 16, etc.   Within each octet, the most
+        significant bit represents the lowest numbered
+        port, and the least significant bit represents the
+        highest numbered port.  Thus, each port of the
+        VLAN is represented by a single bit within the
+        value of this object.  If that bit has a value of
+        '1' then that port is included in the set of
+        ports; the port is not included if its bit has a
+        value of '0'.
+
+        A port number is the value of dot1dBasePort for
+        the port in the BRIDGE-MIB (RFC 1493)." 
+    ::= { vmMembershipSummaryEntry 2 }
+
+vmMembershipSummaryMember2kPorts OBJECT-TYPE
+    SYNTAX          CiscoPortList
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The set of the device's member ports that belong
+        to the VLAN. It has the VLAN membership information
+        of up to 2048 ports with the port number from 1 to 
+        2048.
+
+        Each octet within the value of this object specifies a
+        set of eight ports, with the first octet specifying 
+        ports 1 through 8, the second octet specifying ports 9
+        through 16, etc.   Within each octet, the most
+        significant bit represents the lowest numbered
+        port, and the least significant bit represents the
+        highest numbered port.  Thus, each port of the
+        VLAN is represented by a single bit within the
+        value of this object.  If that bit has a value of
+        '1' then that port is included in the set of
+        ports; the port is not included if its bit has a
+        value of '0'.
+
+        A port number is the value of dot1dBasePort for
+        the port in the BRIDGE-MIB (RFC 1493)." 
+    ::= { vmMembershipSummaryEntry 3 }
+ 
+
+
+vmMembershipTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VmMembershipEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table for configuring VLAN port membership.
+        There is one row for each bridge port that is
+        assigned to a static or dynamic access port. Trunk
+        ports are not  represented in this table.  An entry
+        may be created and deleted when ports are created or
+        deleted via SNMP or the management console on a 
+        device."
+    ::= { vmMembership 2 }
+
+vmMembershipEntry OBJECT-TYPE
+    SYNTAX          VmMembershipEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry (conceptual row) in the vmMembershipTable."
+    INDEX           { ifIndex } 
+    ::= { vmMembershipTable 1 }
+
+VmMembershipEntry ::= SEQUENCE {
+        vmVlanType   INTEGER ,
+        vmVlan       INTEGER,
+        vmPortStatus INTEGER ,
+        vmVlans      OCTET STRING,
+        vmVlans2k    OCTET STRING,
+        vmVlans3k    OCTET STRING,
+        vmVlans4k    OCTET STRING
+}
+
+vmVlanType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        static(1),
+                        dynamic(2),
+                        multiVlan(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The type of VLAN membership assigned to this port.
+        A port with static vlan membership is assigned to a
+        single VLAN directly. A port with dynamic membership
+        is assigned a single VLAN based on content of packets
+        received on the port and via VQP queries to VMPS.
+        A port with multiVlan membership may be assigned to
+        one or more VLANs directly.
+
+        A static or dynamic port membership is specified
+        by the value of vmVlan. A multiVlan port membership is
+        specified by the value of vmVlans." 
+    ::= { vmMembershipEntry 1 }
+
+vmVlan OBJECT-TYPE
+    SYNTAX          INTEGER (0..4095)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The VLAN id of the VLAN the port is assigned to
+        when vmVlanType is set to static or dynamic.
+        This object is not instantiated if not applicable.
+
+        The value may be 0 if the port is not assigned
+        to a VLAN.
+
+        If vmVlanType is static, the port is always
+        assigned to a VLAN and the object may not be
+        set to 0.
+
+        If vmVlanType is dynamic the object's value is
+        0 if the port is currently not assigned to a VLAN.
+        In addition, the object may be set to 0 only." 
+    ::= { vmMembershipEntry 2 }
+
+vmPortStatus OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        inactive(1),
+                        active(2),
+                        shutdown(3)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "An indication of the current VLAN status of the port.
+        A status of inactive(1) indicates that a dynamic port
+        does not yet have a VLAN assigned, or a port is 
+        assigned to a VLAN that is currently not active. A 
+        status of active(2) indicates that the currently 
+        assigned VLAN is active. A status of shutdown(3) 
+        indicates that the port has been disabled as a result
+        of VQP shutdown response." 
+    ::= { vmMembershipEntry 3 }
+
+vmVlans OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (0..128))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The VLAN(s) the port is assigned to when the
+        port's vmVlanType is set to multiVlan.
+        This object is not instantiated if not applicable.
+
+        The port is always assigned to one or more VLANs
+        and the object may not be set so that there are
+        no vlans assigned.
+
+        Each octet within the value of this object specifies a
+        set of eight VLANs, with the first octet specifying
+        VLAN id 1 through 8, the second octet specifying VLAN
+        ids 9 through 16, etc.   Within each octet, the most
+        significant bit represents the lowest numbered
+        VLAN id, and the least significant bit represents the
+        highest numbered VLAN id.  Thus, each VLAN of the
+        port is represented by a single bit within the
+        value of this object.  If that bit has a value of
+        '1' then that VLAN is included in the set of
+        VLANs; the VLAN is not included if its bit has a
+        value of '0'." 
+    ::= { vmMembershipEntry 4 }
+
+vmVlans2k OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (0..128))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The VLAN(s) the port is assigned to when the
+        port's vmVlanType is set to multiVlan.
+        This object is not instantiated if not applicable.
+
+        The port is always assigned to one or more VLANs
+        and the object may not be set so that there are
+        no vlans assigned.
+
+        Each octet within the value of this object specifies a
+        set of eight VLANs, with the first octet specifying
+        VLAN id 1024 through 1031, the second octet specifying 
+        VLAN ids 1032 through 1039, etc.  Within each octet, 
+        the most significant bit represents the lowest 
+        numbered VLAN id, and the least significant bit 
+        represents the highest numbered VLAN id.  Thus, each 
+        VLAN of the port is represented by a single bit within
+        the value of this object.  If that bit has a value of
+        '1' then that VLAN is included in the set of
+        VLANs; the VLAN is not included if its bit has a
+        value of '0'." 
+    ::= { vmMembershipEntry 5 }
+
+vmVlans3k OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (0..128))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The VLAN(s) the port is assigned to when the
+        port's vmVlanType is set to multiVlan.
+        This object is not instantiated if not applicable.
+
+        The port is always assigned to one or more VLANs
+        and the object may not be set so that there are
+        no vlans assigned.
+
+        Each octet within the value of this object specifies a
+        set of eight VLANs, with the first octet specifying
+        VLAN id 2048 through 2055, the second octet specifying 
+        VLAN ids 2056 through 2063, etc.   Within each octet, 
+        the most significant bit represents the lowest 
+        numbered VLAN id, and the least significant bit 
+        represents the highest numbered VLAN id.  Thus, each
+        VLAN of the port is represented by a single bit within
+        the value of this object.  If that bit has a value of
+        '1' then that VLAN is included in the set of
+        VLANs; the VLAN is not included if its bit has a
+        value of '0'." 
+    ::= { vmMembershipEntry 6 }
+
+vmVlans4k OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (0..128))
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The VLAN(s) the port is assigned to when the
+        port's vmVlanType is set to multiVlan.
+        This object is not instantiated if not applicable.
+
+        The port is always assigned to one or more VLANs
+        and the object may not be set so that there are
+        no vlans assigned.
+
+        Each octet within the value of this object specifies a
+        set of eight VLANs, with the first octet specifying
+        VLAN id 3072 through 3079, the second octet specifying 
+        VLAN ids 3040 through 3047, etc.   Within each octet, 
+        the most significant bit represents the lowest 
+        numbered VLAN id, and the least significant bit 
+        represents the highest numbered VLAN id.  Thus, each
+        VLAN of the port is represented by a single bit within
+        the value of this object.  If that bit has a value of
+        '1' then that VLAN is included in the set of
+        VLANs; the VLAN is not included if its bit has a
+        value of '0'." 
+    ::= { vmMembershipEntry 7 }
+ 
+
+
+vmMembershipSummaryExtTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VmMembershipSummaryExtEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A summary of VLAN membership of non-trunk
+        bridge ports. This table is used for 
+        retrieving VLAN membership information
+        for the device which supports dot1dBasePort 
+        with value greater than 2048.
+
+        A row is created for a VLAN and a particular
+        bridge port range, where at least one port 
+        in the range is assigned to this VLAN.
+
+        VLAN membership can only be modified via the
+        vmMembershipTable."
+    ::= { vmMembership 3 }
+
+vmMembershipSummaryExtEntry OBJECT-TYPE
+    SYNTAX          VmMembershipSummaryExtEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry (conceptual row) in the
+        vmMembershipSummaryExtTable."
+    INDEX           {
+                        vmMembershipSummaryVlanIndex,
+                        vmMembershipPortRangeIndex
+                    } 
+    ::= { vmMembershipSummaryExtTable 1 }
+
+VmMembershipSummaryExtEntry ::= SEQUENCE {
+        vmMembershipPortRangeIndex  CiscoPortListRange,
+        vmMembershipSummaryExtPorts CiscoPortList
+}
+
+vmMembershipPortRangeIndex OBJECT-TYPE
+    SYNTAX          CiscoPortListRange
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "The bridge port range index of this row." 
+    ::= { vmMembershipSummaryExtEntry 1 }
+
+vmMembershipSummaryExtPorts OBJECT-TYPE
+    SYNTAX          CiscoPortList
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The set of the device's member ports that belong
+        to the VLAN. It has the VLAN membership information
+        of up to 2k ports with the port number starting from
+        the information indicated in vmMembershipPortRangeIndex
+        object of the same row. For example, if the value
+        of vmMembershipPortRangeIndex is 'twoKto4K', the
+        port number indicated in this object starting from
+        2049 and ending to 4096. 
+
+        A port number is the value of dot1dBasePort for
+        the port in the BRIDGE-MIB (RFC 1493)." 
+    ::= { vmMembershipSummaryExtEntry 2 }
+ 
+
+
+vmVlanCreationMode OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        automatic(1),
+                        manual(2)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to determine whether or not
+        a non-existing VLAN will be created automatically
+        by the system after assigned to a port.
+
+        automatic(1):  a non-existing VLAN will be created
+                       automatically by the system after
+                       assigned to a port.
+
+        manual(2):     a non-existing VLAN will not be created
+                       automatically by the system and need to be
+                       manually created by the users after assigned
+                       to a port." 
+    ::= { vmMembership 4 }
+
+-- VQP Statistics
+
+vmVQPQueries OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The total number of VQP requests sent by this device
+        to all VMPS since last system re-initialization." 
+    ::= { vmStatistics 1 }
+
+vmVQPResponses OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of VQP responses received by this device
+        from all VMPS since last system re-initialization." 
+    ::= { vmStatistics 2 }
+
+vmVmpsChanges OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times, since last system
+        re-initialization, the current VMPS was changed. The
+        current VMPS is changed whenever the VMPS fails to 
+        response after vmVmpsRetries of a VQP request." 
+    ::= { vmStatistics 3 }
+
+vmVQPShutdown OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times, since last system
+        re-initialization, a VQP response indicates 
+        'shutdown'. A 'shutdown' response is a result of 
+        the membership policy configured at a VMPS
+        by the administrator." 
+    ::= { vmStatistics 4 }
+
+vmVQPDenied OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times, since last system
+        re-initialization, a VQP response indicates 
+        'denied'. A 'denied' response is a result of 
+        the membership policy configured at a VMPS
+        by the administrator." 
+    ::= { vmStatistics 5 }
+
+vmVQPWrongDomain OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times, since last system
+        re-initialization, a VQP response indicates wrong 
+        management domain. A wrong management domain 
+        response indicates that the VMPS used serves a 
+        management domain that is different
+        from the device's management domain." 
+    ::= { vmStatistics 6 }
+
+vmVQPWrongVersion OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times, since last system
+        re-initialization, a VQP response indicates wrong 
+        VQP version. A wrong VQP version response 
+        indicates that the VMPS used supports a VQP 
+        version that is different from the device's 
+        VQP version." 
+    ::= { vmStatistics 7 }
+
+vmInsufficientResources OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "The number of times, since last system
+        re-initialization, a VQP response indicates 
+        insufficient resources. An insufficient resources 
+        response indicates that the VMPS used does not 
+        have the required resources to verify the
+        membership assignment requested." 
+    ::= { vmStatistics 8 }
+
+-- Status
+
+vmNotificationsEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "An indication of whether the notifications/traps
+        defined in this MIB are enabled." 
+    ::= { vmStatus 1 }
+-- Voice Vlan Configuration
+
+vmVoiceVlanTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VmVoiceVlanEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "A table for configuring the Voice VLAN-ID
+        for the ports. An entry will exist for each
+        interface which supports Voice Vlan feature."
+    ::= { vmVoiceVlan 1 }
+
+vmVoiceVlanEntry OBJECT-TYPE
+    SYNTAX          VmVoiceVlanEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "An entry (conceptual row) in the vmVoiceVlanTable.
+        Only interfaces which support Voice Vlan feature
+        are shown."
+    INDEX           { ifIndex } 
+    ::= { vmVoiceVlanTable 1 }
+
+VmVoiceVlanEntry ::= SEQUENCE {
+        vmVoiceVlanId              INTEGER,
+        vmVoiceVlanCdpVerifyEnable TruthValue
+}
+
+vmVoiceVlanId OBJECT-TYPE
+    SYNTAX          INTEGER (0..4096)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The Voice Vlan ID (VVID) to which this
+        port belongs to.
+
+        0    -    The CDP packets transmitting 
+                  through this port would contain
+                  Appliance VLAN-ID TLV with value 
+                  of 0. VoIP and related packets 
+                  are expected to be sent and 
+                  received with VLAN-id=0 and an 
+                  802.1p priority. 
+
+        1..4094 - The CDP packets transmitting
+                  through this port would contain
+                  Appliance VLAN-ID TLV with N.
+                  VoIP and related packets are
+                  expected to be sent and received
+                  with VLAN-id=N and an 802.1p
+                  priority.
+
+        4095  -   The CDP packets transmitting
+                  through this port would contain
+                  Appliance VLAN-ID TLV with value
+                  of 4095. VoIP and related packets
+                  are expected to be sent and 
+                  received untagged without an 
+                  802.1p priority.
+
+        4096  -   The CDP packets transmitting 
+                  through this port would not 
+                  include Appliance VLAN-ID TLV; 
+                  or, if the VVID is not supported 
+                  on the port, this MIB object will
+                  not be configurable and will 
+                  return 4096." 
+    ::= { vmVoiceVlanEntry 1 }
+
+vmVoiceVlanCdpVerifyEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Enable or Disable the feature of CDP message
+        verification of voice VLANs.
+
+        true   - The voice VLAN vmVoiceVlan is enabled 
+                 only after CDP messages are received 
+                 from the IP phone.
+
+        false -  The voice VLAN vmVoiceVlan is enabled
+                 as soon as the IP phone interface is
+                 up. There is no verification needed 
+                 from CDP messages from the IP phone." 
+    ::= { vmVoiceVlanEntry 2 }
+ 
+
+-- Notifications
+
+vmNotifications  OBJECT IDENTIFIER
+    ::= { ciscoVlanMembershipMIB 2 }
+
+vmNotificationsPrefix  OBJECT IDENTIFIER
+    ::= { vmNotifications 0 }
+
+
+vmVmpsChange NOTIFICATION-TYPE
+    OBJECTS         { vmVmpsIpAddress }
+    STATUS          current
+    DESCRIPTION
+        "A VMPS change notification is generated whenever
+        vmVmpsChanges is incremented. The IP address
+        of the new VMPS is sent."
+   ::= { vmNotificationsPrefix 1 }
+-- Conformance
+
+vmMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoVlanMembershipMIB 3 }
+
+vmMIBCompliances  OBJECT IDENTIFIER
+    ::= { vmMIBConformance 1 }
+
+vmMIBGroups  OBJECT IDENTIFIER
+    ::= { vmMIBConformance 2 }
+
+
+vmMIBCompliance MODULE-COMPLIANCE
+    STATUS          obsolete
+    DESCRIPTION
+        "The   compliance   statement for   entities    which
+        implement the VLANs."
+    MODULE          -- this module
+    MANDATORY-GROUPS { vmMembershipGroup }
+
+    GROUP           vmVQPClientGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vmVQPNotificationsGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+    ::= { vmMIBCompliances 1 }
+
+vmMIBCompliance2 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The   compliance   statement for   entities    which
+        implement the VLANs."
+    MODULE          -- this module
+    MANDATORY-GROUPS { vmMembershipGroup2 }
+
+    GROUP           vmVQPClientGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vmVQPNotificationsGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+    ::= { vmMIBCompliances 2 }
+
+vmMIBCompliance3 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The   compliance   statement for   entities    which
+        implement the VLANs."
+    MODULE          -- this module
+    MANDATORY-GROUPS { vmMembershipGroup2 }
+
+    GROUP           vmVQPClientGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vmVQPNotificationsGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vm4kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the range of VlanIndex
+        between 1024 and 4095."
+    ::= { vmMIBCompliances 3 }
+
+vmMIBCompliance4 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The   compliance   statement for   entities    which
+        implement the VLANs."
+    MODULE          -- this module
+    MANDATORY-GROUPS { vmMembershipGroup3 }
+
+    GROUP           vmVQPClientGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vmVQPNotificationsGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vm1kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the multiVlan
+        membership."
+
+    GROUP           vm4kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the range of VlanIndex
+        between 1024 and 4095 and multiVlan
+        membership."
+
+    GROUP           vmStatusGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the 
+        traps/notifications defined in this
+        MIB."
+
+    GROUP           vmVoiceVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the Voice VLAN
+        feature."
+
+    OBJECT          vmVlanType
+    SYNTAX          INTEGER  {
+                        static(1)
+                    }
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required. Only static(1)
+        is required to be implemented."
+    ::= { vmMIBCompliances 4 }
+
+vmMIBCompliance5 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The   compliance   statement for   entities    which
+        implement the VLANs."
+    MODULE          -- this module
+    MANDATORY-GROUPS { vmMembershipGroup3 }
+
+    GROUP           vmVQPClientGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vmVQPNotificationsGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vm1kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the multiVlan
+        membership."
+
+    GROUP           vm4kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the range of VlanIndex
+        between 1024 and 4095 and multiVlan
+        membership."
+
+    GROUP           vmStatusGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the
+        traps/notifications defined in this
+        MIB."
+
+    GROUP           vmVoiceVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the Voice VLAN
+        feature."
+
+    GROUP           vmVoiceVlanExtGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the CDP only
+        verification of Voice VLAN feature."
+
+    OBJECT          vmVlanType
+    SYNTAX          INTEGER  {
+                        static(1)
+                    }
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required. Only static(1)
+        is required to be implemented."
+    ::= { vmMIBCompliances 5 }
+
+vmMIBCompliance6 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The   compliance   statement for   entities    which
+        implement the VLANs."
+    MODULE          -- this module
+    MANDATORY-GROUPS { vmMembershipGroup3 }
+
+    GROUP           vmVQPClientGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vmVQPNotificationsGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vm1kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the multiVlan
+        membership."
+
+    GROUP           vm4kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the range of VlanIndex
+        between 1024 and 4095 and multiVlan
+        membership."
+
+    GROUP           vmStatusGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the
+        traps/notifications defined in this
+        MIB."
+
+    GROUP           vmVoiceVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the Voice VLAN
+        feature."
+
+    GROUP           vmVoiceVlanExtGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the CDP only
+        verification of Voice VLAN feature."
+
+    GROUP           vmMembershipExtGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the VLAN 
+        membership feature with bridge port 
+        ID greater than 2048."
+
+    OBJECT          vmVlanType
+    SYNTAX          INTEGER  {
+                        static(1)
+                    }
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required. Only static(1)
+        is required to be implemented."
+    ::= { vmMIBCompliances 6 }
+
+vmMIBCompliance7 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The   compliance   statement for   entities    which
+        implement the VLANs."
+    MODULE          -- this module
+    MANDATORY-GROUPS { vmMembershipGroup3 }
+
+    GROUP           vmVQPClientGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vmVQPNotificationsGroup
+    DESCRIPTION
+        "A VQP client must implement this group."
+
+    GROUP           vm1kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the multiVlan
+        membership."
+
+    GROUP           vm4kVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the range of VlanIndex
+        between 1024 and 4095 and multiVlan
+        membership."
+
+    GROUP           vmStatusGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the
+        traps/notifications defined in this
+        MIB."
+
+    GROUP           vmVoiceVlanGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the Voice VLAN
+        feature."
+
+    GROUP           vmVoiceVlanExtGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the CDP only
+        verification of Voice VLAN feature."
+
+    GROUP           vmMembershipExtGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the VLAN
+        membership feature with bridge port
+        ID greater than 2048."
+
+    GROUP           vmVlanCreationGroup
+    DESCRIPTION
+        "This group must be implemented by the
+        entities which support the configuration
+        on the VLAN creation mode when assigning a
+        non-existing VLAN to a port."
+
+    OBJECT          vmVlanType
+    SYNTAX          INTEGER  {
+                        static(1)
+                    }
+    MIN-ACCESS      read-only
+    DESCRIPTION
+        "Write access is not required. Only static(1)
+        is required to be implemented."
+    ::= { vmMIBCompliances 7 }
+
+-- Units of Conformance
+
+vmMembershipGroup OBJECT-GROUP
+    OBJECTS         {
+                        vmMembershipSummaryMemberPorts,
+                        vmVlan,
+                        vmVlanType,
+                        vmPortStatus
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "A collection of objects for displaying and
+        configuring VLAN membership."
+    ::= { vmMIBGroups 1 }
+
+vmVQPClientGroup OBJECT-GROUP
+    OBJECTS         {
+                        vmVmpsVQPVersion,
+                        vmVmpsRetries,
+                        vmVmpsReconfirm,
+                        vmVmpsReconfirmInterval,
+                        vmVmpsReconfirmResult,
+                        vmVmpsCurrent,
+                        vmVmpsIpAddress,
+                        vmVmpsPrimary,
+                        vmVmpsRowStatus,
+                        vmVQPQueries,
+                        vmVQPResponses,
+                        vmVmpsChanges,
+                        vmVQPShutdown,
+                        vmVQPDenied,
+                        vmVQPWrongDomain,
+                        vmVQPWrongVersion,
+                        vmInsufficientResources
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for the managing a VQP
+        client."
+    ::= { vmMIBGroups 2 }
+
+vmVQPNotificationsGroup NOTIFICATION-GROUP
+   NOTIFICATIONS    { vmVmpsChange }
+    STATUS          current
+    DESCRIPTION
+        "The notification group for a VQP client."
+    ::= { vmMIBGroups 3 }
+
+vmStatusGroup OBJECT-GROUP
+    OBJECTS         { vmNotificationsEnabled }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for conveying general
+        status information."
+    ::= { vmMIBGroups 4 }
+
+vmMembershipGroup2 OBJECT-GROUP
+    OBJECTS         {
+                        vmMembershipSummaryMemberPorts,
+                        vmVlan,
+                        vmVlans,
+                        vmVlanType,
+                        vmPortStatus
+                    }
+    STATUS          deprecated
+    DESCRIPTION
+        "A collection of objects for displaying and
+        configuring VLAN membership."
+    ::= { vmMIBGroups 5 }
+
+vm4kVlanGroup OBJECT-GROUP
+    OBJECTS         {
+                        vmVlans2k,
+                        vmVlans3k,
+                        vmVlans4k
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing multiVlan
+        information for VLANS with VlanIndex from 
+        1024 to 4095 which are assigned to one port."
+    ::= { vmMIBGroups 6 }
+
+vmVoiceVlanGroup OBJECT-GROUP
+    OBJECTS         { vmVoiceVlanId }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing information
+        of Voice Vlan feature."
+    ::= { vmMIBGroups 7 }
+
+vm1kVlanGroup OBJECT-GROUP
+    OBJECTS         { vmVlans }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing multiVlan
+        information for VLANS with VlanIndex from 
+        0 to 1023 which are assigned to one port."
+    ::= { vmMIBGroups 8 }
+
+vmMembershipGroup3 OBJECT-GROUP
+    OBJECTS         {
+                        vmMembershipSummaryMember2kPorts,
+                        vmVlan,
+                        vmVlanType,
+                        vmPortStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for displaying and
+        configuring VLAN membership."
+    ::= { vmMIBGroups 9 }
+
+vmVoiceVlanExtGroup OBJECT-GROUP
+    OBJECTS         { vmVoiceVlanCdpVerifyEnable }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing the
+        information of CDP verification 
+        of Voice Vlan feature."
+    ::= { vmMIBGroups 10 }
+
+vmMembershipExtGroup OBJECT-GROUP
+    OBJECTS         { vmMembershipSummaryExtPorts }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects providing
+        information for VLAN membership with 
+        bridge port ID greater than 2048."
+    ::= { vmMIBGroups 11 }
+
+vmVlanCreationGroup OBJECT-GROUP
+    OBJECTS         { vmVlanCreationMode }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for the configuration
+        on VLAN creation mode when assigning a
+        non-existing VLAN to a port."
+    ::= { vmMIBGroups 12 }
+
+END
+
+
+

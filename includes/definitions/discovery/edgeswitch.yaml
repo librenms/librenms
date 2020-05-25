@@ -1,0 +1,66 @@
+mib: EdgeSwitch-BOXSERVICES-PRIVATE-MIB
+modules:
+    sensors:
+        state:
+            data:
+                -
+                    oid: boxServicesTempUnitEntry
+                    value: boxServicesTempUnitState
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.15.1.2.{{ $index }}'
+                    descr: 'Chassis state'
+                    index: 'boxServicesTempUnitState.{{ $index }}'
+                    states:
+                        - { value: 0, descr: low, graph: 1, generic: 1 }
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: critical, graph: 1, generic: 2 }
+                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
+                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notoperational, graph: 1, generic: 2 }
+                -
+                    oid: boxServicesTempSensorsEntry
+                    value: boxServicesTempSensorState
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.8.1.4.{{ $index }}'
+                    descr: 'Temp Sensor {{ $index }}'
+                    index: 'boxServicesTempSensorState.{{ $index }}'
+                    states:
+                        - { value: 0, descr: low, graph: 1, generic: 1 }
+                        - { value: 1, descr: normal, graph: 1, generic: 0 }
+                        - { value: 2, descr: warning, graph: 1, generic: 1 }
+                        - { value: 3, descr: critical, graph: 1, generic: 2 }
+                        - { value: 4, descr: shutdown, graph: 1, generic: 2 }
+                        - { value: 5, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 6, descr: notoperational, graph: 1, generic: 2 }
+ 
+                -
+                    oid: boxServicesFansEntry
+                    value: boxServicesFanItemState
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.6.1.3.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+                    index: 'boxServicesFanItemState.{{ $index }}'
+                    states:
+                        - { value: 1, descr: notpresent, graph: 1, generic: 3 }
+                        - { value: 2, descr: operational, graph: 1, generic: 0 }
+                        - { value: 3, descr: failed, graph: 1, generic: 2 }
+                        - { value: 4, descr: powering, graph: 1, generic: 0 }
+                        - { value: 5, descr: nopower, graph: 1, generic: 2 }
+                        - { value: 6, descr: notpowering, graph: 1, generic: 2 }
+                        - { value: 7, descr: incompatible, graph: 1, generic: 1 }
+
+        fanspeed:
+            data:
+                -
+                    oid: boxServicesFansEntry
+                    value: boxServicesFanSpeed
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.6.1.4.{{ $index }}'
+                    index: 'boxServicesFanSpeed.{{ $index }}'
+                    descr: 'Fan {{ $index }}'
+
+        temperature:
+            data:
+                -
+                    oid: boxServicesTempSensorsEntry
+                    value: boxServicesTempSensorTemperature
+                    num_oid: '.1.3.6.1.4.1.4413.1.1.43.1.8.1.5.{{ $index }}'
+                    index: 'boxServicesTempSensorTemperature.{{ $index }}'
+                    descr: 'Temperature {{ $index }}'

@@ -1,11 +1,15 @@
 source: Support/Poller Support.md
-### poller.php
+path: blob/master/doc/
 
-This document will explain how to use poller.php to debug issues or manually running to process data.
+# poller.php
 
-#### Command options
+This document will explain how to use poller.php to debug issues or
+manually running to process data.
+
+## Command options
+
 ```bash
-	LibreNMS 2014.master Poller
+    LibreNMS 2014.master Poller
 
 -h <device id> | <device hostname wildcard>  Poll single device
 -h odd                                       Poll odd numbered devices  (same as -i 2 -n 0)
@@ -20,77 +24,106 @@ Debugging and testing options:
 -f                                           Do not insert data into InfluxDB
 -d                                           Enable debugging output
 -v                                           Enable verbose debugging output
--m                                           Specify module(s) to be run
+-m                                           Specify module(s) to be run. Comma separate modules, submodules may be added with /
 ```
 
-`-h` Use this to specify a device via either id or hostname (including wildcard using *). You can also specify odd and
-even. all will run poller against all devices.
+`-h` Use this to specify a device via either id or hostname (including
+wildcard using *). You can also specify odd and even. all will run
+poller against all devices.
 
 `-i` This can be used to stagger the poller process.
 
 `-r` This option will suppress the creation or update of RRD files.
 
-`-d` Enables debugging output (verbose output but with most sensitive data masked) so that you can see what is happening during a poller run. This includes things like rrd updates, SQL queries and response from snmp.
+`-d` Enables debugging output (verbose output but with most sensitive
+data masked) so that you can see what is happening during a poller
+run. This includes things like rrd updates, SQL queries and response
+from snmp.
 
 `-v` Enables verbose debugging output with all data in tact.
 
 `-m` This enables you to specify the module you want to run for poller.
 
-#### Poller config
+# Poller Wrapper
 
-These are the default poller config items. You can globally disable a module by setting it to 0. If you just want to
-disable it for one device then you can do this within the WebUI -> Settings -> Modules.
+We have a `poller-wrapper.py` script by [Job
+Snijders](https://github.com/job). This script is currently the
+default.
+
+If you need to debug the output of poller-wrapper.py then you can add
+`-d` to the end of the command - it is NOT recommended to do this in
+cron.
+
+# Poller config
+
+These are the default poller config items. You can globally disable a
+module by setting it to 0. If you just want to
+disable it for one device then you can do this within the WebUI Device
+-> Edit -> Modules.
 
 ```php
-$config['poller_modules']['unix-agent']                   = 0;
-$config['poller_modules']['os']                           = 1;
-$config['poller_modules']['ipmi']                         = 1;
-$config['poller_modules']['sensors']                      = 1;
-$config['poller_modules']['processors']                   = 1;
-$config['poller_modules']['mempools']                     = 1;
-$config['poller_modules']['storage']                      = 1;
-$config['poller_modules']['netstats']                     = 1;
-$config['poller_modules']['hr-mib']                       = 1;
-$config['poller_modules']['ucd-mib']                      = 1;
-$config['poller_modules']['ipSystemStats']                = 1;
-$config['poller_modules']['ports']                        = 1;
-$config['poller_modules']['bgp-peers']                    = 1;
-$config['poller_modules']['junose-atm-vp']                = 1;
-$config['poller_modules']['toner']                        = 1;
-$config['poller_modules']['ucd-diskio']                   = 1;
-$config['poller_modules']['wifi']                         = 1;
-$config['poller_modules']['ospf']                         = 1;
-$config['poller_modules']['cisco-ipsec-flow-monitor']     = 1;
-$config['poller_modules']['cisco-remote-access-monitor']  = 1;
-$config['poller_modules']['cisco-cef']                    = 1;
-$config['poller_modules']['cisco-sla']                    = 1;
-$config['poller_modules']['cisco-mac-accounting']         = 1;
-$config['poller_modules']['cipsec-tunnels']               = 1;
-$config['poller_modules']['cisco-ace-loadbalancer']       = 1;
-$config['poller_modules']['cisco-ace-serverfarms']        = 1;
-$config['poller_modules']['netscaler-vsvr']               = 1;
-$config['poller_modules']['aruba-controller']             = 1;
-$config['poller_modules']['entity-physical']              = 1;
-$config['poller_modules']['applications']                 = 1;
-$config['poller_modules']['cisco-asa-firewall']           = 1;
-$config['poller_modules']['mib']                          = 0;
+$config['poller_modules']['unix-agent']                  = false;
+$config['poller_modules']['os']                          = true;
+$config['poller_modules']['ipmi']                        = true;
+$config['poller_modules']['sensors']                     = true;
+$config['poller_modules']['processors']                  = true;
+$config['poller_modules']['mempools']                    = true;
+$config['poller_modules']['storage']                     = true;
+$config['poller_modules']['netstats']                    = true;
+$config['poller_modules']['hr-mib']                      = true;
+$config['poller_modules']['ucd-mib']                     = true;
+$config['poller_modules']['ipSystemStats']               = true;
+$config['poller_modules']['ports']                       = true;
+$config['poller_modules']['nac']                         = false;
+$config['poller_modules']['bgp-peers']                   = true;
+$config['poller_modules']['junose-atm-vp']               = false;
+$config['poller_modules']['toner']                       = false;
+$config['poller_modules']['ucd-diskio']                  = true;
+$config['poller_modules']['wireless']                    = true;
+$config['poller_modules']['ospf']                        = true;
+$config['poller_modules']['cisco-ipsec-flow-monitor']    = false;
+$config['poller_modules']['cisco-remote-access-monitor'] = false;
+$config['poller_modules']['cisco-cef']                   = false;
+$config['poller_modules']['cisco-sla']                   = false;
+$config['poller_modules']['cisco-mac-accounting']        = false;
+$config['poller_modules']['cipsec-tunnels']              = false;
+$config['poller_modules']['cisco-ace-loadbalancer']      = false;
+$config['poller_modules']['cisco-ace-serverfarms']       = false;
+$config['poller_modules']['cisco-asa-firewall']          = false;
+$config['poller_modules']['cisco-voice']                 = false;
+$config['poller_modules']['cisco-cbqos']                 = false;
+$config['poller_modules']['cisco-otv']                   = false;
+$config['poller_modules']['cisco-vpdn']                  = false;
+$config['poller_modules']['netscaler-vsvr']              = false;
+$config['poller_modules']['aruba-controller']            = false;
+$config['poller_modules']['entity-physical']             = true;
+$config['poller_modules']['entity-state']                = false;
+$config['poller_modules']['applications']                = true;
+$config['poller_modules']['mib']                         = false;
+$config['poller_modules']['stp']                         = true;
+$config['poller_modules']['ntp']                         = true;
+$config['poller_modules']['services']                    = true;
+$config['poller_modules']['loadbalancers']               = false;
+$config['poller_modules']['mef']                         = false;
 ```
 
-#### OS based Poller config
+## OS based Poller config
 
-You can enable or disable modules for a specific OS by add corresponding line in `includes/definitions/$os.yaml`
-OS based settings have preference over global. Device based settings have preference over all others
+You can enable or disable modules for a specific OS by add
+corresponding line in `config.php` OS based settings have preference
+over global. Device based settings have preference over all others
 
-Poller performance improvement can be achieved by deactivating all modules that are not supported by specific OS.
+Poller performance improvement can be achieved by deactivating all
+modules that are not supported by specific OS.
 
 E.g. to deactivate spanning tree but activate unix-agent module for linux OS
 
 ```php
-$config['os']['linux']['poller_modules']['stp']  = 0;
-$config['os']['linux']['poller_modules']['unix-agent'] = 1;
+$config['os']['linux']['poller_modules']['stp']  = false;
+$config['os']['linux']['poller_modules']['unix-agent'] = true;
 ```
 
-#### Poller modules
+## Poller modules
 
 `unix-agent`: Enable the check_mk agent for external support for applications.
 
@@ -116,7 +149,10 @@ $config['os']['linux']['poller_modules']['unix-agent'] = 1;
 
 `ipSystemStats`: IP statistics for device.
 
-`ports`: This module will detect all ports on a device excluding ones configured to be ignored by config options.
+`ports`: This module will detect all ports on a device excluding ones
+configured to be ignored by config options.
+
+`nac`: Network Access Control (NAC) or 802.1X support.
 
 `bgp-peers`: BGP detection and support.
 
@@ -158,36 +194,44 @@ $config['os']['linux']['poller_modules']['unix-agent'] = 1;
 
 `mib`: Support for generic MIB parsing.
 
-#### Running
+# Running
 
 Here are some examples of running poller from within your install directory.
+
 ```bash
 ./poller.php -h localhost
 
 ./poller.php -h localhost -m ports
 ```
 
-#### Debugging
+# Debugging
 
-To provide debugging output you will need to run the poller process with the `-d` flag. You can do this either against
+To provide debugging output you will need to run the poller process
+with the `-d` flag. You can do this either against
 all modules, single or multiple modules:
 
 All Modules
+
 ```bash
 ./poller.php -h localhost -d
 ```
 
 Single Module
+
 ```bash
 ./poller.php -h localhost -m ports -d
 ```
 
 Multiple Modules
+
 ```bash
 ./poller.php -h localhost -m ports,entity-physical -d
 ```
 
-Using `-d` shouldn't output much sensitive information, `-v` will so it is then advisable to sanitise the output before pasting it somewhere as the debug output will contain snmp details amongst other items including port descriptions.
+Using `-d` shouldn't output much sensitive information, `-v` will so
+it is then advisable to sanitise the output before pasting it
+somewhere as the debug output will contain snmp details amongst other
+items including port descriptions.
 
 The output will contain:
 
