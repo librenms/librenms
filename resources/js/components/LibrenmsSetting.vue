@@ -1,7 +1,7 @@
 <!--
   - LibrenmsSetting.vue
   -
-  - Description-
+  -
   -
   - This program is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
             {{ getDescription() }}
             <span v-if="setting.units !== null">({{ setting.units }})</span>
         </label>
-        <div class="col-sm-5" v-tooltip="{ content: setting.disabled ? $t('settings.readonly') : false }">
+        <div class="col-sm-5" v-tooltip="{ content: setting.disabled ? $t(this.prefix + '.readonly') : false }">
             <component :is="getComponent()"
                        :value="value"
                        :name="setting.name"
@@ -53,7 +53,8 @@
     export default {
         name: "LibrenmsSetting",
         props: {
-            'setting': {type: Object, required: true}
+            'setting': {type: Object, required: true},
+            'prefix': {type: String, default: 'settings'}
         },
         data() {
             return {
@@ -63,7 +64,7 @@
         },
         methods: {
             persistValue(value) {
-                axios.put(route('settings.update', this.setting.name), {value: value})
+                axios.put(route(this.prefix + '.update', this.setting.name), {value: value})
                     .then((response) => {
                         this.value = response.data.value;
                         this.$emit('setting-updated', {name: this.setting.name, value: this.value});
@@ -100,23 +101,23 @@
                 this.value = value
             },
             getDescription() {
-                let key = 'settings.settings.' + this.setting.name + '.description';
+                let key = this.prefix + '.settings.' + this.setting.name + '.description';
                 return (this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)) ? this.$t(key) : this.setting.name;
             },
             getHelp() {
-                let help = this.$t('settings.settings.' + this.setting.name + '.help');
+                let help = this.$t(this.prefix + '.settings.' + this.setting.name + '.help');
                 if (this.setting.overridden) {
-                    help += "</p><p>" + this.$t('settings.readonly')
+                    help += "</p><p>" + this.$t(this.prefix + '.readonly')
                 }
 
                 return help
             },
             hasHelp() {
-                var key = 'settings.settings.' + this.setting.name + '.help';
+                var key = this.prefix + '.settings.' + this.setting.name + '.help';
                 return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)
             },
             resetToDefault() {
-                axios.delete(route('settings.destroy', this.setting.name))
+                axios.delete(route(this.prefix + '.destroy', this.setting.name))
                     .then((response) => {
                         this.value = response.data.value;
                         this.feedback = 'has-success';

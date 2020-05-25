@@ -12,6 +12,9 @@
         <li role="presentation" @if( $current_tab == 'groups' ) class="active" @endif>
           <a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i> @lang('Groups')</a>
         </li>
+        <li role="presentation" @if( $current_tab == 'settings' ) class="active" @endif>
+          <a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-lg icon-theme" aria-hidden="true"></i> @lang('Settings')</a>
+        </li>
         @endconfig
         <li role="presentation" @if( $current_tab == 'performance' ) class="active" @endif>
           <a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-lg icon-theme" aria-hidden="true"></i> @lang('Performance')</a>
@@ -20,6 +23,7 @@
           <a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-lg icon-theme" aria-hidden="true"></i> @lang('Log')</a>
         </li>
       </ul>
+      <br />
 @endsection
 
 @section('content_footer')

@@ -34,6 +34,18 @@ class PollerCluster extends Model
     protected $primaryKey = 'id';
     protected $fillable = ['poller_name'];
 
+    // ---- Accessors/Mutators ----
+
+    public function getPollerGroupsAttribute($groups)
+    {
+        return explode(',', $groups);
+    }
+
+    public function setPollerGroupsAttribute($groups)
+    {
+        $this->attributes['poller_groups'] = is_array($groups) ? implode(',', $groups) : $groups;
+    }
+
     public function stats()
     {
         return $this->hasMany(\App\Models\PollerClusterStat::class, 'parent_poller', 'id');

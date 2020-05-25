@@ -6,7 +6,6 @@
 
 @parent
 
-<br />
 @if( $pollers->isNotEmpty() )
 <div class="panel panel-default">
     <div class="panel-heading">

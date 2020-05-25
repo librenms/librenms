@@ -59,7 +59,7 @@ class ServiceConfig:
     services = PollerConfig(8, 300)
     discovery = PollerConfig(16, 21600)
     billing = PollerConfig(2, 300, 60)
-    ping = PollerConfig(1, 120)
+    ping = PollerConfig(1, 60)
     down_retry = 60
     update_enabled = True
     update_frequency = 86400
@@ -118,7 +118,7 @@ class ServiceConfig:
         self.alerting.enabled = config.get('service_alerting_enabled', True)
         self.alerting.frequency = config.get('service_alerting_frequency', ServiceConfig.alerting.frequency)
         self.ping.enabled = config.get('service_ping_enabled', False)
-        self.ping.frequency = config.get('ping_rrd_step', ServiceConfig.billing.calculate)
+        self.ping.frequency = config.get('ping_rrd_step', ServiceConfig.ping.frequency)
         self.down_retry = config.get('service_poller_down_retry', ServiceConfig.down_retry)
         self.log_level = config.get('service_loglevel', ServiceConfig.log_level)
         self.update_enabled = config.get('service_update_enabled', ServiceConfig.update_enabled)
