@@ -293,7 +293,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         }
 
         // Fix high/low thresholds (i.e. on negative numbers)
-        if ($low_limit > $high_limit) {
+        if (isset($high_limit) && $low_limit > $high_limit) {
             list($high_limit, $low_limit) = array($low_limit, $high_limit);
         }
 
