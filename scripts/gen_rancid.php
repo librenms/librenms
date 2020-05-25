@@ -29,6 +29,7 @@ $rancid_map['arista_eos'] = 'arista';
 $rancid_map['asa']        = 'cisco';
 $rancid_map['avocent']    = 'avocent';
 $rancid_map['edgeos']     = 'edgerouter';
+$rancid_map['edgeswitch'] = 'edgemax';
 $rancid_map['f5']         = 'f5';
 $rancid_map['fortigate']  = 'fortigate';
 $rancid_map['ftos']       = 'force10';
