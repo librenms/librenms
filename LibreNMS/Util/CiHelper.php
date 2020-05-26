@@ -415,8 +415,8 @@ class CiHelper
 
     private function parseChangedFiles()
     {
-        if ($this->flags['full']) {
-            // nothing to do
+        if ($this->flags['full'] || !empty($this->changed['full-checks'])) {
+            $this->flags['full'] = true; // make sure full is set and skip changed file parsing
             return;
         }
         $this->os = $this->os ?: $this->changed['os'];
@@ -429,11 +429,10 @@ class CiHelper
             'unit_docs' => !empty($this->changed['docs']) && empty($this->changed['php']),
             'unit_svg' => !empty($this->changed['svg']) && empty($this->changed['php']),
             'docs_changed' => !empty($this->changed['docs']),
-            'full' => !empty($this->changed['full-checks']),
         ]);
 
         $this->setFlags([
-            'unit_skip' => empty($this->changed['php']) && !array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
+            'unit_skip' => empty($this->changed['php']) && !array_sum(Arr::only($this->getFlags(), ['full', 'unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
             'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_python', 'lint_skip_bash'])) === 3,
             'style_skip' => empty($this->changed['php']),
             'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
