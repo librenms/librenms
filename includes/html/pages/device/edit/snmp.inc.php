@@ -5,18 +5,18 @@ use LibreNMS\Config;
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
         $force_save = ($_POST['force_save'] == 'on');
-        $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
+        $poller_group = isset($_POST['poller_group']) ? $_POST['poller_group'] : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
 
         if ($snmp_enabled) {
-            $max_repeaters = clean($_POST['max_repeaters']);
-            $max_oid = clean($_POST['max_oid']);
-            $port = $_POST['port'] ? clean($_POST['port']) : Config::get('snmp.port');
-            $port_assoc_mode = clean($_POST['port_assoc_mode']);
-            $retries = clean($_POST['retries']);
-            $snmpver = clean($_POST['snmpver']);
-            $transport = $_POST['transport'] ? clean($_POST['transport']) : $transport = 'udp';
-            $timeout = clean($_POST['timeout']);
+            $max_repeaters = $_POST['max_repeaters'];
+            $max_oid = $_POST['max_oid'];
+            $port = $_POST['port'] ? $_POST['port'] : Config::get('snmp.port');
+            $port_assoc_mode = $_POST['port_assoc_mode'];
+            $retries = $_POST['retries'];
+            $snmpver = $_POST['snmpver'];
+            $transport = $_POST['transport'] ? $_POST['transport'] : $transport = 'udp';
+            $timeout = $_POST['timeout'];
 
             $update = array(
                 'poller_group' => $poller_group,
@@ -34,7 +34,7 @@ if ($_POST['editing']) {
             }
 
             if ($snmpver != "v3") {
-                $community = clean($_POST['community']);
+                $community = $_POST['community'];
                 $update['community' ] = $community;
             }
 
@@ -48,24 +48,24 @@ if ($_POST['editing']) {
             if ($snmpver == "v3") {
                 $community = ''; // if v3 works, we don't need a community
 
-                $v3['authalgo'] = clean($_POST['authalgo']);
-                $v3['authlevel'] = clean($_POST['authlevel']);
-                $v3['authname'] = clean($_POST['authname']);
-                $v3['authpass'] = clean($_POST['authpass']);
-                $v3['cryptoalgo'] = clean($_POST['cryptoalgo']);
-                $v3['cryptopass'] = clean($_POST['cryptopass']);
+                $v3['authalgo'] = $_POST['authalgo'];
+                $v3['authlevel'] = $_POST['authlevel'];
+                $v3['authname'] = $_POST['authname'];
+                $v3['authpass'] = $_POST['authpass'];
+                $v3['cryptoalgo'] = $_POST['cryptoalgo'];
+                $v3['cryptopass'] = $_POST['cryptopass'];
 
                 $update = array_merge($update, $v3);
             }
         } else {
             // snmp is disabled
             $update['features'] = null;
-            $update['hardware'] = clean($_POST['hardware']);
+            $update['hardware'] = $_POST['hardware'];
             $update['icon'] = null;
-            $update['os'] = $_POST['os'] ? clean($_POST['os_id']) : "ping";
+            $update['os'] = $_POST['os'] ? $_POST['os_id'] : "ping";
             $update['poller_group'] = $poller_group;
             $update['snmp_disable'] = 1;
-            $update['sysName'] = $_POST['sysName'] ? clean($_POST['sysName']) : null;
+            $update['sysName'] = $_POST['sysName'] ? $_POST['sysName'] : null;
             $update['version'] = null;
         }
 
