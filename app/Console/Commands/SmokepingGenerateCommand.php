@@ -63,6 +63,8 @@ class SmokepingGenerateCommand extends LnmsCommand
         $this->addOption('targets', null, InputOption::VALUE_NONE);
         $this->addOption('no-header', null, InputOption::VALUE_NONE);
         $this->addOption('single-process', null, InputOption::VALUE_NONE);
+        $this->addOption('no-dns', null, InputOption::VALUE_NONE);
+        $this->addOption('compat', null, InputOption::VALUE_NONE);
     }
 
     /**
@@ -200,6 +202,13 @@ class SmokepingGenerateCommand extends LnmsCommand
     {
         $lines = [];
 
+        if ($this->option('compat') && $this->option('targets')) {
+            $lines[] = '' . PHP_EOL;
+            $lines[] = 'menu = Top' . PHP_EOL;
+            $lines[] = 'title = Network Latency Grapher' . PHP_EOL;
+            $lines[] = '' . PHP_EOL;
+        }
+
         if (!$noHeader) {
             $lines[] = sprintf('# %s', __('commands.smokeping:generate.header-first'));
             $lines[] = sprintf('# %s', __('commands.smokeping:generate.header-second'));
@@ -208,7 +217,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             return array_merge($lines, $this->warnings, ['']);
         }
 
-        return [];
+        return [$lines];
     }
 
 
@@ -259,6 +268,10 @@ class SmokepingGenerateCommand extends LnmsCommand
         if (Config::get('smokeping.probes') < 1) {
             $this->error(__('commands.smokeping:generate.no-probes'));
             return false;
+        }
+
+        if ($this->option('no-dns')) {
+            $this->disableDNSLookup();
         }
 
         return true;
