@@ -156,7 +156,7 @@ if ($_POST['editing']) {
         }
 
         if ($snmp_enabled && ($force_save !== true && !$device_issnmpable)) {
-            $update_failed_message[] = "Could not connect to " . $device['hostname'] . " with those SNMP settings.  To save anyway, turn on Force Save.";
+            $update_failed_message[] = "Could not connect to " . htmlspecialchars($device['hostname']) . " with those SNMP settings.  To save anyway, turn on Force Save.";
             $update_message[] = 'SNMP settings reverted';
         }
 
@@ -236,7 +236,7 @@ echo "
     <div class='form-group'>
     <label for='hardware' class='col-sm-2 control-label'>Hardware (optional)</label>
     <div class='col-sm-4'>
-    <input id='hardware' class='form-control' name='hardware' value='".$device['hardware']."'/>
+    <input id='hardware' class='form-control' name='hardware' value='".htmlspecialchars($device['hardware'])."'/>
     </div>
     </div>
     <div class='form-group'>
@@ -323,7 +323,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='".$device['community']."'/>
+    <input id='community' class='form-control' name='community' value='".htmlspecialchars($device['community'])."'/>
     </div>
     </div>
     </div>
@@ -344,13 +344,13 @@ echo "        </select>
     <div class='form-group'>
     <label for='authname' class='col-sm-2 control-label'>Auth User Name</label>
     <div class='col-sm-4'>
-    <input type='text' id='authname' name='authname' class='form-control' value='".$device['authname']."' autocomplete='off'>
+    <input type='text' id='authname' name='authname' class='form-control' value='".htmlspecialchars($device['authname'])."' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
     <label for='authpass' class='col-sm-2 control-label'>Auth Password</label>
     <div class='col-sm-4'>
-    <input type='password' id='authpass' name='authpass' class='form-control' value='".$device['authpass']."' autocomplete='off'>
+    <input type='password' id='authpass' name='authpass' class='form-control' value='".htmlspecialchars($device['authpass'])."' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
@@ -365,7 +365,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='cryptopass' class='col-sm-2 control-label'>Crypto Password</label>
     <div class='col-sm-4'>
-    <input type='password' id='cryptopass' name='cryptopass' class='form-control' value='".$device['cryptopass']."' autocomplete='off'>
+    <input type='password' id='cryptopass' name='cryptopass' class='form-control' value='".htmlspecialchars($device['cryptopass'])."' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
@@ -399,7 +399,7 @@ if (Config::get('distributed_poller') === true) {
             echo ' selected';
         }
 
-        echo '>'.$group['group_name'].'</option>';
+        echo '>'.htmlspecialchars($group['group_name']).'</option>';
     }
 
     echo '
