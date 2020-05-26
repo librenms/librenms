@@ -333,14 +333,14 @@ class SmokepingCliTest extends DBTestCase
     {
         $data = [];
 
-        // Generate some random devices for testing
-        foreach (range(1, 20) as $j) {
+        // Generate a ridiculous number of random devices for testing
+        foreach (range(1, 1000) as $i) {
             $device = factory(Device::class)->create();
             $data[$device->type][] = $device->hostname;
         }
 
         // Sort the data so the output matches the one from the database
-        ksort($data);
+        $data = Arr::sortRecursive($data);
 
         // Disable DNS lookups
         \Artisan::call('smokeping:generate --targets --no-header --no-dns --single-process --compat');
