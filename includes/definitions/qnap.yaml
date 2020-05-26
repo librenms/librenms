@@ -3,6 +3,9 @@ type: storage
 group: unix
 text: 'QNAP TurboNAS'
 ifXmcbc: true
+nobulk: true
+mib_dir:
+    - qnap
 over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
