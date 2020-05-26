@@ -41,7 +41,8 @@ return [
             'os' => 'Specific OS to run tests on. Implies unit, --db, --snmpsim',
             'quiet' => 'Hide output unless there is an error',
             'snmpsim' => 'Use snmpsim for unit tests',
-        ]
+        ],
+    ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
         'config-insufficient' => 'In order to generate a smokeping configuration, you must have set "smokeping.probes", "fping", and "fping6" set in your configuration',
@@ -56,7 +57,9 @@ return [
             'probes' => 'Generate probe list - used for splitting the smokeping configuration into multiple files. Conflicts with "--targets"',
             'targets' => 'Generate the target list - used for splitting the smokeping configuration into multiple files. Conflicts with "--probes"',
             'no-header' => 'Don\'t add the boilerplate comment to the start of the generated file',
+            'no-dns' => 'Skip DNS lookups',
             'single-process' => 'Only use a single process for smokeping',
+            'compat' => '[deprecated] Mimic the behaviour of gen_smokeping.php',
         ],
     ],
     'translation:generate' => [

@@ -28,11 +28,15 @@ namespace LibreNMS\Tests;
 use app\Console\Commands\SmokepingGenerateCommand;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Str;
+use Illuminate\Support\arr;
 use Illuminate\Translation\Translator;
 use LibreNMS\Config;
+use App\Models\Device;
 
-class SmokepingCliTest extends \LibreNMS\Tests\TestCase
+class SmokepingCliTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     protected $groups = [
         'Le23HKVMvN' => [
             'Cl09bZU4sn' => [
@@ -323,5 +327,66 @@ class SmokepingCliTest extends \LibreNMS\Tests\TestCase
         $output = $this->instance->buildTargets($this->groups, 4, true);
 
         $this->assertEquals(implode(PHP_EOL, $saved), implode(PHP_EOL, $output));
+    }
+
+    public function testCompareLegacy()
+    {
+        $data = [];
+
+        // Generate some random devices for testing
+        foreach (range(1, 20) as $j) {
+            $device = factory(Device::class)->create();
+            $data[$device->type][] = $device->hostname;
+        }
+
+        // Sort the data so the output matches the one from the database
+        ksort($data);
+
+        // Disable DNS lookups
+        \Artisan::call('smokeping:generate --targets --no-header --no-dns --single-process --compat');
+        $new = \Artisan::Output();
+        $old = $this->legacyAlgo($data);
+
+        $this->assertEquals($this->canonicalise($new), $this->canonicalise($old));
+    }
+
+    public function legacyAlgo($data)
+    {
+        // This is the code taken from the old gen_smokeping script, with echos and sql queries replaced
+        $lines = [];
+        $lines[] = '' . PHP_EOL;
+        $lines[] = 'menu = Top' . PHP_EOL;
+        $lines[] = 'title = Network Latency Grapher' . PHP_EOL;
+        $lines[] = '' . PHP_EOL;
+
+        foreach ($data as $groupName => $devices) {
+            //Dot and space need to be replaced, since smokeping doesn't accept it at this level
+            $lines[] = '+ ' . str_replace(['.', ' '], '_', $groupName) . PHP_EOL;
+            $lines[] = 'menu = ' . $groupName . PHP_EOL;
+            $lines[] = 'title = ' . $groupName . PHP_EOL;
+            foreach ($devices as $device) {
+                $lines[] = '++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
+                $lines[] = 'menu = ' . $device . PHP_EOL;
+                $lines[] = 'title = ' . $device . PHP_EOL;
+                $lines[] = 'host = ' . $device . PHP_EOL . PHP_EOL;
+            }
+        }
+
+        // Return a string as we need to evaluate the entire thing as a block
+        return implode('', $lines);
+    }
+
+    public function canonicalise($input) {
+        $input = explode(PHP_EOL, $input);
+
+        $output = [];
+
+        foreach ($input as $line) {
+            if (trim($line) !== '') {
+                $output[] = trim($line);
+            }
+        }
+
+        return implode(PHP_EOL, $output);
     }
 }
