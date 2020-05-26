@@ -1464,7 +1464,7 @@ extend proxmox /usr/bin/sudo /usr/local/bin/proxmox
 after, edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
+Debian-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 ```
 
 6: Restart snmpd on your host
