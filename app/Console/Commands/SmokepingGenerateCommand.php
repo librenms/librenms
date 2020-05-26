@@ -78,7 +78,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             return 1;
         }
 
-        $devices = Device::isNotDisabled()->orderBy('type')->get();
+        $devices = Device::isNotDisabled()->orderBy('type')->orderBy('hostname')->get();
 
         if ($this->option('probes')) {
             return $this->buildProbesConfiguration();
@@ -203,10 +203,10 @@ class SmokepingGenerateCommand extends LnmsCommand
         $lines = [];
 
         if ($this->option('compat') && $this->option('targets')) {
-            $lines[] = '' . PHP_EOL;
-            $lines[] = 'menu = Top' . PHP_EOL;
-            $lines[] = 'title = Network Latency Grapher' . PHP_EOL;
-            $lines[] = '' . PHP_EOL;
+            $lines[] = '';
+            $lines[] = 'menu = Top';
+            $lines[] = 'title = Network Latency Grapher';
+            $lines[] = '';
         }
 
         if (!$noHeader) {
