@@ -95,7 +95,7 @@ modules:
                     oid: systemPowerTable
                     value: systemPowerStatus
                     num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.5.{{ $index }}'
-                    descr: 'Enclosure {{ $systemFanEnclosureID }} PSU {{ $index }}'
+                    descr: 'Enclosure {{ $systemPowerEnclosureID }} PSU {{ $index }}'
                     index: 'systemPowerStatus-{{ $systemPowerEnclosureID }}.{{ $index }}'
                     group: 'System'
                     state_name: systemPowerStatus
