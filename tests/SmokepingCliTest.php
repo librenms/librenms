@@ -115,7 +115,7 @@ class SmokepingCliTest extends DBTestCase
         $this->instance->setWarning($warnings[1]);
         $this->instance->setWarning($warnings[2]);
 
-        $header = $this->instance->buildHeader(false);
+        $header = $this->instance->buildHeader(false, false);
 
         $this->assertEmpty(array_pop($header));
 
@@ -124,7 +124,7 @@ class SmokepingCliTest extends DBTestCase
             $this->assertTrue(Str::contains($line, array_merge($warnings, [__('commands.smokeping:generate.header-first'), __('commands.smokeping:generate.header-second'), __('commands.smokeping:generate.header-third')])), $line);
         }
 
-        $this->assertEmpty($this->instance->buildHeader(true));
+        $this->assertEquals($this->instance->buildHeader(true, false), []);
     }
 
     public function testAssembleProbes()

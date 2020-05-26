@@ -80,6 +80,11 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         $devices = Device::isNotDisabled()->orderBy('type')->orderBy('hostname')->get();
 
+        if (sizeof($devices) < 1) {
+            $this->error(__('commands.smokeping:generate.no-devices'));
+            return 3;
+        }
+
         if ($this->option('probes')) {
             return $this->buildProbesConfiguration();
         } elseif ($this->option('targets')) {
@@ -98,7 +103,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     {
         return $this->dnsLookup = false;
     }
-
+  
     /**
      * Build and output the probe configuration
      *
@@ -107,7 +112,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     public function buildProbesConfiguration()
     {
         $probes = $this->assembleProbes(Config::get('smokeping.probes'));
-        $header = $this->buildHeader($this->option('no-header'));
+        $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $probes);
     }
@@ -124,13 +129,8 @@ class SmokepingGenerateCommand extends LnmsCommand
             $smokelist[$device->type][$device->hostname] = ['transport' => $device->transport];
         }
 
-        if (sizeof($smokelist) < 1) {
-            $this->error(__('commands.smokeping:generate.no-devices'));
-            return 3;
-        }
-
         $targets = $this->buildTargets($smokelist, Config::get('smokeping.probes'), $this->option('single-process'));
-        $header = $this->buildHeader($this->option('no-header'));
+        $header = $this->buildHeader($this->option('no-header'), $this->option('compat'));
 
         return $this->render($header, $targets);
     }
@@ -198,11 +198,11 @@ class SmokepingGenerateCommand extends LnmsCommand
      *
      * @return array
      */
-    public function buildHeader($noHeader)
+    public function buildHeader($noHeader, $compat)
     {
         $lines = [];
 
-        if ($this->option('compat') && $this->option('targets')) {
+        if ($compat) {
             $lines[] = '';
             $lines[] = 'menu = Top';
             $lines[] = 'title = Network Latency Grapher';
@@ -217,7 +217,7 @@ class SmokepingGenerateCommand extends LnmsCommand
             return array_merge($lines, $this->warnings, ['']);
         }
 
-        return [$lines];
+        return $lines;
     }
 
 
@@ -267,6 +267,11 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         if (Config::get('smokeping.probes') < 1) {
             $this->error(__('commands.smokeping:generate.no-probes'));
+            return false;
+        }
+
+        if ($this->option('compat') && !$this->option('targets')) {
+            $this->error(__('commands.smokeping:generate.args-nonsense'));
             return false;
         }
 
