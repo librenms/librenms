@@ -17,9 +17,12 @@
     <link href="{{ asset(mix('/css/app.css')) }}" rel="stylesheet">
 @endpush
 
-@push('scripts')
-    @routes
+@section('javascript')
     <script src="{{ asset(mix('/js/manifest.js')) }}"></script>
     <script src="{{ asset(mix('/js/vendor.js')) }}"></script>
+@endsection
+
+@push('scripts')
+    @routes
     <script src="{{ asset(mix('/js/app.js')) }}"></script>
 @endpush

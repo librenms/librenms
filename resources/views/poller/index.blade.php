@@ -6,7 +6,7 @@
     <div class="col-md-12">
       <ul class="nav nav-tabs">
         <li role="presentation" @if( $current_tab == 'poller' ) class="active" @endif>
-          <a href="{{ route('poller') }}"><i class="fa fa-th-large fa-lg icon-theme" aria-hidden="true"></i> @lang('Poller')</a>
+          <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-lg icon-theme" aria-hidden="true"></i> @lang('Poller')</a>
         </li>
         @config('distributed_poller')
         <li role="presentation" @if( $current_tab == 'groups' ) class="active" @endif>

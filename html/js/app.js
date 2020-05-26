@@ -1279,22 +1279,29 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "SettingMultiple",
   mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]],
   computed: {
     multiOptions: function multiOptions() {
-      return Array.from(Object.entries(this.options).map(function (_ref, i) {
+      return Object.entries(this.options).map(function (_ref) {
         var _ref2 = _slicedToArray(_ref, 2),
             k = _ref2[0],
             v = _ref2[1];
 
-        return [{
+        return {
           label: v,
           value: k
-        }];
-      }));
+        };
+      });
+    }
+  },
+  methods: {
+    mutateInputEvent: function mutateInputEvent(options) {
+      console.log(options);
+      return options;
     }
   }
 });
@@ -2941,23 +2948,25 @@ var render = function() {
     _c(
       "div",
       { staticClass: "panel-body" },
-      _vm._l(_vm.settings, function(setting) {
-        return _c("div", [
-          !setting.advanced || _vm.advanced
-            ? _c(
-                "div",
-                { staticClass: "setting-container clearfix" },
-                [
-                  _c("librenms-setting", {
-                    attrs: { prefix: "poller", setting: setting }
-                  })
-                ],
-                1
-              )
-            : _vm._e()
-        ])
-      }),
-      0
+      [
+        _vm._l(_vm.settings, function(setting) {
+          return [
+            !setting.advanced || _vm.advanced
+              ? _c(
+                  "div",
+                  { staticClass: "setting-container clearfix" },
+                  [
+                    _c("librenms-setting", {
+                      attrs: { prefix: "poller.settings", setting: setting }
+                    })
+                  ],
+                  1
+                )
+              : _vm._e()
+          ]
+        })
+      ],
+      2
     )
   ])
 }
@@ -3508,33 +3517,25 @@ var render = function() {
     [
       _c("multiselect", {
         attrs: {
-          name: _vm.name,
+          value: [
+            {
+              label: _vm.options[_vm.value.toString()],
+              value: _vm.value.toString()
+            }
+          ],
           required: _vm.required,
           disabled: _vm.disabled,
+          name: _vm.name,
+          label: "label",
           "track-by": "value",
           options: _vm.multiOptions,
+          allowEmpty: false,
           multiple: true
         },
         on: {
           input: function($event) {
-            return _vm.$emit("input", $event.target.value)
+            _vm.$emit("input", _vm.mutateInputEvent($event))
           }
-        },
-        scopedSlots: _vm._u([
-          {
-            key: "singleLabel",
-            fn: function(ref) {
-              var option = ref.option
-              return [_c("strong", [_vm._v(_vm._s(option.label))])]
-            }
-          }
-        ]),
-        model: {
-          value: _vm.value,
-          callback: function($$v) {
-            _vm.value = $$v
-          },
-          expression: "value"
         }
       })
     ],

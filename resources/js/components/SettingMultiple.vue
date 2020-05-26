@@ -25,16 +25,17 @@
 <template>
     <div>
         <multiselect
-            v-model="value"
-            :name="name"
-            @input="$emit('input', $event.target.value)"
+            @input="$emit('input', mutateInputEvent($event))"
+            :value="[{label: options[value.toString()], value: value.toString()}]"
             :required="required"
             :disabled="disabled"
+            :name="name"
+            label="label"
             track-by="value"
             :options="multiOptions"
+            :allowEmpty="false"
             :multiple="true"
         >
-            <template slot="singleLabel" slot-scope="{ option }"><strong>{{ option.label }}</strong></template>
         </multiselect>
     </div>
 </template>
@@ -47,11 +48,13 @@
         mixins: [BaseSetting],
         computed: {
             multiOptions() {
-                return Array.from(
-                    Object.entries(this.options).map(
-                        ([k, v], i) => [{label: v, value: k}]
-                    )
-                )
+                return Object.entries(this.options).map(([k,v]) => ({label: v, value: k}))
+            }
+        },
+        methods: {
+            mutateInputEvent(options) {
+                console.log(options);
+                return options;
             }
         }
     }

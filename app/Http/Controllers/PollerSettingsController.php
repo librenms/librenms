@@ -25,7 +25,19 @@
 
 namespace App\Http\Controllers;
 
-class PollerSettingsController extends \Controller
-{
+use Illuminate\Http\Request;
 
+class PollerSettingsController extends Controller
+{
+    public function update(Request $request, $id)
+    {
+        // FIXME
+        return response()->json($request->all() + ['id' => $id]);
+    }
+
+    public function destroy($id)
+    {
+        // FIXME
+        return response()->json(['id' => $id]);
+    }
 }

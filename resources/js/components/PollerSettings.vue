@@ -29,14 +29,14 @@
                 <span class="pull-right">Advanced <toggle-button v-model="advanced"></toggle-button></span></h3>
         </div>
         <div class="panel-body">
-            <div v-for="setting in settings">
+            <template v-for="setting in settings">
                 <div class="setting-container clearfix" v-if="!setting.advanced || advanced">
                     <librenms-setting
-                        prefix="poller"
+                        prefix="poller.settings"
                         :setting='setting'
                     ></librenms-setting>
                 </div>
-            </div>
+            </template>
         </div>
     </div>
 </template>
