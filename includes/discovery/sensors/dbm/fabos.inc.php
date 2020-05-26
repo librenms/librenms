@@ -40,8 +40,8 @@ foreach (explode("\n", $fabosSfpTxPower) as $data) {
             $limit                     = -5;
             $entPhysicalIndex_measured = 'ports';
             $dbquery                   = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$entPhysicalIndex, $device['device_id']]);
-            foreach ($dbquery as $dbindex => $dbresult) {                                                                            
-                $descr = makeshortif($dbresult['ifDescr']) . ' Transmit Power';                     
+            foreach ($dbquery as $dbindex => $dbresult) {
+                $descr = makeshortif($dbresult['ifDescr']) . ' Transmit Power';
                 discover_sensor($valid['sensor'], 'dbm', $device, $oid, $index, 'brocade', $descr, $divisor, $multiplier, $limit_low, null, null, $limit, $entry, 'snmp', $entPhysicalIndex, $entPhysicalIndex_measured);
             }
         }
