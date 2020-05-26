@@ -10,3 +10,4 @@ over:
 discovery:
     - sysDescr:
         - pfSense
+        - netgate
