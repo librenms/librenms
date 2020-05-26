@@ -14,3 +14,4 @@ discovery:
       sysDescr_except:
       - FreeNAS
       - TrueNAS
+      - netgate
