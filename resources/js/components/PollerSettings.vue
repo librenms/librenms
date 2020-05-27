@@ -25,18 +25,25 @@
 <template>
     <div class="panel panel-default">
         <div class="panel-heading">
-            <h3 class="panel-title">{{ name }} <small>({{ node_id }})</small>
-                <span class="pull-right">Advanced <toggle-button v-model="advanced"></toggle-button></span></h3>
+            <h3 class="panel-title">
+                {{ $t('Poller Settings') }}
+                <span class="pull-right">Advanced <toggle-button v-model="advanced"></toggle-button></span>
+            </h3>
         </div>
         <div class="panel-body">
-            <template v-for="setting in settings">
-                <div class="setting-container clearfix" v-if="!setting.advanced || advanced">
-                    <librenms-setting
-                        prefix="poller.settings"
-                        :setting='setting'
-                    ></librenms-setting>
-                </div>
-            </template>
+            <vue-tabs direction="vertical" type="pills">
+                <v-tab :title="poller.poller_name" v-for="(poller, id) in pollers">
+                    <template v-for="setting in settings[id]">
+                        <div class="setting-container clearfix" v-show="!setting.advanced || advanced">
+                            <librenms-setting
+                                prefix="poller.settings"
+                                :setting='setting'
+                                :id="poller.id"
+                            ></librenms-setting>
+                        </div>
+                    </template>
+                </v-tab>
+            </vue-tabs>
         </div>
     </div>
 </template>
@@ -45,9 +52,8 @@
     export default {
         name: "PollerSettings",
         props: {
-            'settings': Array,
-            'name': String,
-            'node_id': String
+            'pollers': Object,
+            'settings': Object
         },
         data() {
             return {
@@ -57,8 +63,14 @@
     }
 </script>
 
+<style>
+    .tab-content {
+        width: 100%;
+    }
+</style>
+
 <style scoped>
-.setting-container {
-    margin-bottom: 10px;
-}
+    .setting-container {
+        margin-bottom: 10px;
+    }
 </style>

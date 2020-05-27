@@ -49,7 +49,7 @@ class PollerController extends Controller
 
     public function settingsTab()
     {
-        $pollerClusters = PollerCluster::all();
+        $pollerClusters = PollerCluster::all()->keyBy('id');
         return view('poller.settings', [
             'current_tab' => 'settings',
             'settings' => $this->pollerSettings($pollerClusters),

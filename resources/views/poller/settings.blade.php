@@ -5,12 +5,11 @@
 @section('content')
     @parent
     <div id="app">
-        @foreach($poller_cluster as $index => $poller)
-            <poller-settings :settings='@json($settings[$index])' name="{{ $poller->poller_name }}" node_id="{{ $poller->node_id }}">
-            </poller-settings>
-        @endforeach
+        <poller-settings
+            :pollers='@json($poller_cluster, JSON_FORCE_OBJECT)'
+            :settings='@json($settings, JSON_FORCE_OBJECT)'
+        ></poller-settings>
     </div>
-
 @endsection
 
 @push('styles')
@@ -20,9 +19,9 @@
 @section('javascript')
     <script src="{{ asset(mix('/js/manifest.js')) }}"></script>
     <script src="{{ asset(mix('/js/vendor.js')) }}"></script>
+    @routes
 @endsection
 
 @push('scripts')
-    @routes
     <script src="{{ asset(mix('/js/app.js')) }}"></script>
 @endpush

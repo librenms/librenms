@@ -25,7 +25,7 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
         Route::get('groups', 'PollerController@groupsTab')->name('poller.groups');
         Route::get('settings', 'PollerController@settingsTab')->name('poller.settings');
         Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
-        Route::resource('settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
+        Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
     });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);

@@ -1,7 +1,7 @@
 <!--
   - SettingMultiple.vue
   -
-  - Description-
+  - Setting for multiple select option.  Value is expected to be a comma delimited string
   -
   - This program is free software: you can redistribute it and/or modify
   - it under the terms of the GNU General Public License as published by
@@ -48,6 +48,10 @@
         mixins: [BaseSetting],
         computed: {
             formattedValue() {
+                if (this.value === undefined) {
+                    return []
+                }
+
                 let values = this.value.toString().split(',')
                 return this.formatOptions(_.pick(this.options, ...values))
             },

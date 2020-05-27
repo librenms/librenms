@@ -54,7 +54,8 @@
         name: "LibrenmsSetting",
         props: {
             'setting': {type: Object, required: true},
-            'prefix': {type: String, default: 'settings'}
+            'prefix': {type: String, default: 'settings'},
+            'id': {required: false}
         },
         data() {
             return {
@@ -64,7 +65,7 @@
         },
         methods: {
             persistValue(value) {
-                axios.put(route(this.prefix + '.update', this.setting.name), {value: value})
+                axios.put(route(this.prefix + '.update', this.getRouteParams()), {value: value})
                     .then((response) => {
                         this.value = response.data.value;
                         this.$emit('setting-updated', {name: this.setting.name, value: this.value});
@@ -92,7 +93,7 @@
                 this.persistValue(value)
             }, 500),
             changeValue(value) {
-                if (['select', 'boolean'].includes(this.setting.type)) {
+                if (['select', 'boolean', 'multiple'].includes(this.setting.type)) {
                     // no need to debounce
                     this.persistValue(value);
                 } else {
@@ -121,7 +122,7 @@
                 return this.$te(key) || this.$te(key, this.$i18n.fallbackLocale)
             },
             resetToDefault() {
-                axios.delete(route(this.prefix + '.destroy', this.setting.name))
+                axios.delete(route(this.prefix + '.destroy', this.getRouteParams()))
                     .then((response) => {
                         this.value = response.data.value;
                         this.feedback = 'has-success';
@@ -142,6 +143,13 @@
             },
             showUndo() {
                 return !_.isEqual(this.setting.value, this.value);
+            },
+            getRouteParams() {
+                let parameters = [this.setting.name];
+                if (this.id) {
+                    parameters.unshift(this.id);
+                }
+                return parameters;
             },
             getComponent() {
                 // snake to studly

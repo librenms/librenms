@@ -33,11 +33,14 @@ Vue.component('v-select', vSelect);
 import Multiselect from 'vue-multiselect'
 Vue.component('multiselect', Multiselect)
 
-Vue.mixin({
-    methods: {
-        route: route
-    }
-});
+import VueTabs from 'vue-nav-tabs'
+Vue.use(VueTabs)
+
+// Vue.mixin({
+//     methods: {
+//         route: route
+//     }
+// });
 
 Vue.filter('ucfirst', function (value) {
     if (!value) return '';

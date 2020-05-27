@@ -25,19 +25,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\PollerCluster;
 use Illuminate\Http\Request;
 
 class PollerSettingsController extends Controller
 {
-    public function update(Request $request, $id)
+    public function update(Request $request, $id, $setting)
     {
-        // FIXME
-        return response()->json($request->all() + ['id' => $id]);
+        $poller = PollerCluster::findOrFail($id);
+        $poller->$setting = $request->get('value');
+        $poller->save();
+        return response()->json(['value' => $poller->$setting]);
     }
 
-    public function destroy($id)
+    public function destroy($id, $setting)
     {
-        // FIXME
-        return response()->json(['id' => $id]);
+        $poller = PollerCluster::findOrFail($id);
+        $poller->$setting = null;
+        $poller->save();
+        return response()->json(['value' => $poller->$setting]); // TODO return default
     }
 }
