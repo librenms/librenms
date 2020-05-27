@@ -56,7 +56,7 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
      */
     public function render(\Illuminate\Http\Request $request)
     {
-        $title = __('Error connecting to database');
+        $title = trans('exceptions.database_connect.title');
 
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
