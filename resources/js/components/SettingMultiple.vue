@@ -26,14 +26,14 @@
     <div>
         <multiselect
             @input="$emit('input', mutateInputEvent($event))"
-            :value="[{label: options[value.toString()], value: value.toString()}]"
+            :value="formattedValue"
             :required="required"
             :disabled="disabled"
             :name="name"
             label="label"
             track-by="value"
-            :options="multiOptions"
-            :allowEmpty="false"
+            :options="formattedOptions"
+            :allow-empty="false"
             :multiple="true"
         >
         </multiselect>
@@ -47,20 +47,24 @@
         name: "SettingMultiple",
         mixins: [BaseSetting],
         computed: {
-            multiOptions() {
-                return Object.entries(this.options).map(([k,v]) => ({label: v, value: k}))
+            formattedValue() {
+                let values = this.value.toString().split(',')
+                return this.formatOptions(_.pick(this.options, ...values))
+            },
+            formattedOptions() {
+                return this.formatOptions(this.options)
             }
         },
         methods: {
+            formatOptions(options) {
+                return Object.entries(options).map(([k, v]) => ({label: v, value: k}))
+            },
             mutateInputEvent(options) {
-                console.log(options);
-                return options;
+                return options.map(option => option.value).join(',');
             }
         }
     }
 </script>
-
-<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
 
 <style scoped>
 

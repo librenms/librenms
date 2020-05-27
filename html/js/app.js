@@ -1238,6 +1238,14 @@ function _iterableToArrayLimit(arr, i) { if (!(Symbol.iterator in Object(arr) ||
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance"); }
+
+function _iterableToArray(iter) { if (Symbol.iterator in Object(iter) || Object.prototype.toString.call(iter) === "[object Arguments]") return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = new Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } }
+
 //
 //
 //
@@ -1285,23 +1293,33 @@ function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
   name: "SettingMultiple",
   mixins: [_BaseSetting__WEBPACK_IMPORTED_MODULE_0__["default"]],
   computed: {
-    multiOptions: function multiOptions() {
-      return Object.entries(this.options).map(function (_ref) {
-        var _ref2 = _slicedToArray(_ref, 2),
-            k = _ref2[0],
-            v = _ref2[1];
+    formattedValue: function formattedValue() {
+      var _ref;
+
+      var values = this.value.toString().split(',');
+      return this.formatOptions((_ref = _).pick.apply(_ref, [this.options].concat(_toConsumableArray(values))));
+    },
+    formattedOptions: function formattedOptions() {
+      return this.formatOptions(this.options);
+    }
+  },
+  methods: {
+    formatOptions: function formatOptions(options) {
+      return Object.entries(options).map(function (_ref2) {
+        var _ref3 = _slicedToArray(_ref2, 2),
+            k = _ref3[0],
+            v = _ref3[1];
 
         return {
           label: v,
           value: k
         };
       });
-    }
-  },
-  methods: {
+    },
     mutateInputEvent: function mutateInputEvent(options) {
-      console.log(options);
-      return options;
+      return options.map(function (option) {
+        return option.value;
+      }).join(',');
     }
   }
 });
@@ -3517,19 +3535,14 @@ var render = function() {
     [
       _c("multiselect", {
         attrs: {
-          value: [
-            {
-              label: _vm.options[_vm.value.toString()],
-              value: _vm.value.toString()
-            }
-          ],
+          value: _vm.formattedValue,
           required: _vm.required,
           disabled: _vm.disabled,
           name: _vm.name,
           label: "label",
           "track-by": "value",
-          options: _vm.multiOptions,
-          allowEmpty: false,
+          options: _vm.formattedOptions,
+          "allow-empty": false,
           multiple: true
         },
         on: {
@@ -5513,9 +5526,7 @@ __webpack_require__.r(__webpack_exports__);
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _SettingMultiple_vue_vue_type_template_id_5baa94e5_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./SettingMultiple.vue?vue&type=template&id=5baa94e5&scoped=true& */ "./resources/js/components/SettingMultiple.vue?vue&type=template&id=5baa94e5&scoped=true&");
 /* harmony import */ var _SettingMultiple_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./SettingMultiple.vue?vue&type=script&lang=js& */ "./resources/js/components/SettingMultiple.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var vue_multiselect_dist_vue_multiselect_min_css_vue_type_style_index_0_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue-multiselect/dist/vue-multiselect.min.css?vue&type=style&index=0&lang=css& */ "./node_modules/vue-multiselect/dist/vue-multiselect.min.css?vue&type=style&index=0&lang=css&");
-/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
-
+/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
 
@@ -5523,7 +5534,7 @@ __webpack_require__.r(__webpack_exports__);
 
 /* normalize component */
 
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
   _SettingMultiple_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
   _SettingMultiple_vue_vue_type_template_id_5baa94e5_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
   _SettingMultiple_vue_vue_type_template_id_5baa94e5_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
