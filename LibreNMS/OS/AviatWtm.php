@@ -54,7 +54,7 @@ class AviatWtm extends OS implements
 
         return array(
             new WirelessSensor('frequency', $this->getDeviceId(), $carrier1_oid, 'aviat-wtm-carrier1-tx-freq', 1, 'TX Frequency (Carrier1/1)', null, 1, 1000),
-            new WirelessSensor('frequency', $this->getDeviceId(), $carrier2_oid, 'aviat-wtm-carrier2-tx-freq', 1, 'TX Frequency (Carrier1/2)', null, 1, 1000), 
+            new WirelessSensor('frequency', $this->getDeviceId(), $carrier2_oid, 'aviat-wtm-carrier2-tx-freq', 1, 'TX Frequency (Carrier1/2)', null, 1, 1000) 
         );
     }
 
@@ -134,4 +134,3 @@ class AviatWtm extends OS implements
         );
     }
 }
-
