@@ -2,7 +2,7 @@
 /**
  * MaximumExecutionTimeExceeded.php
  *
- * Show nice explanation if the user hits their configured PHP max_execution_time 
+ * Show nice explanation if the user hits their configured PHP max_execution_time
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,5 +70,4 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
             'content' => $message,
         ]);
     }
-
 }
