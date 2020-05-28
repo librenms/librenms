@@ -14,7 +14,7 @@ path: blob/master/doc/
 apt install software-properties-common
 add-apt-repository universe
 apt update
-apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois unzip python3-pip
+apt install acl sed curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois unzip python3-pip
 ```
 
 # Add librenms user
@@ -27,8 +27,8 @@ usermod -a -G librenms www-data
 # Download LibreNMS
 
 ```bash
- cd /opt
- git clone https://github.com/librenms/librenms.git
+cd /opt
+git clone https://github.com/librenms/librenms.git
 ```
 
 # Set permissions
@@ -53,23 +53,20 @@ exit
 
 ## Configure MySQL
 
-```bash
-systemctl restart mysql
-mysql -uroot -p
-```
-
-> NOTE: Please change the 'password' below to something secure.
+> NOTE: Please change the `PASSWORD` below to something secure.
 
 ```sql
-CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
-CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
-FLUSH PRIVILEGES;
-exit
+mysql -u root <<EOF
+    CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+    CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'PASSWORD';
+    GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
+    FLUSH PRIVILEGES;
+    exit
+EOF
 ```
 
 ```bash
-vi /etc/mysql/mariadb.conf.d/50-server.cnf
+nano /etc/mysql/mariadb.conf.d/50-server.cnf
 ```
 
 Within the `[mysqld]` section please add:
@@ -85,75 +82,93 @@ systemctl restart mysql
 
 # Web Server
 
-## Configure and Start PHP-FPM
+## Configure and Restart PHP-FPM
 
-Ensure date.timezone is set in php.ini to your preferred time zone.
-See <http://php.net/manual/en/timezones.php> for a list of supported
-timezones.  Valid examples are: "America/New_York",
-"Australia/Brisbane", "Etc/UTC".
-Please remember to set the system timezone as well.
+Ensure `date.timezone` is set in `php.ini` to your preferred time zone.
+
+Valid examples are: `"America/New_York"`, `"Australia/Brisbane"`, `"Europe/Bratislava"`, `"Etc/UTC"`.
+
+>See <http://php.net/manual/en/timezones.php> for a list of supported timezones and change `Europe/Bratislava` in sed command to your timezone.
 
 ```bash
-vi /etc/php/7.2/fpm/php.ini
-vi /etc/php/7.2/cli/php.ini
+echo date.timezone = \"Europe/Bratislava\" >> /etc/php/7.2/fpm/php.ini
+echo date.timezone = \"Europe/Bratislava\" >> /etc/php/7.2/cli/php.ini
 ```
+
+Restart php-fpm
 
 ```bash
 systemctl restart php7.2-fpm
-´´´
-
 ```
-timedatectl set-timezone Etc/UTC
-´´´
 
 ## Configure NGINX
 
 ```bash
-vi /etc/nginx/conf.d/librenms.conf
+nano /etc/nginx/conf.d/librenms.conf
 ```
 
 Add the following config, edit `server_name` as required:
 
 ```nginx
 server {
- listen      80;
- server_name librenms.example.com;
- root        /opt/librenms/html;
- index       index.php;
+    listen      80;
+    server_name librenms.example.com;
+    root        /opt/librenms/html;
+    index       index.php;
 
- charset utf-8;
- gzip on;
- gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
- location / {
-  try_files $uri $uri/ /index.php?$query_string;
- }
- location /api/v0 {
-  try_files $uri $uri/ /api_v0.php?$query_string;
- }
- location ~ \.php {
-  include fastcgi.conf;
-  fastcgi_split_path_info ^(.+\.php)(/.+)$;
-  fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
- }
- location ~ /\.ht {
-  deny all;
- }
+    charset utf-8;
+    gzip on;
+    gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd  text/xsl text/xml image/x-icon;
+ 
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+ 
+    location /api/v0 {
+        try_files $uri $uri/ /api_v0.php?$query_string;
+    }
+ 
+    location ~ \.php {
+        include fastcgi.conf;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass unix:/var/run/php/php7.2-fpm.sock;
+    }
+ 
+    location ~ /\.ht {
+        deny all;
+    }
 }
 ```
+
+Delete default nginx site.
 
 ```bash
 rm /etc/nginx/sites-enabled/default
 systemctl restart nginx
 ```
 
+Check nginx configuration and restart nginx service.
+
+```bash
+nginx -t
+systemctl restart nginx
+```
+
 # Configure snmpd
+
+Copy example `snmpd.conf`.
 
 ```bash
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
-vi /etc/snmp/snmpd.conf
 ```
 
-Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community string.
+Edit the text which says `public` and set your own community string if you need it.
+
+```bash
+sed -e 's/RANDOMSTRINGGOESHERE/public/' -i /etc/snmp/snmpd.conf
+```
+
+Set up distro and restart `snmpd` service.
 
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
@@ -203,7 +218,7 @@ The web installer might prompt you to create a `config.php` file in
 your librenms install location manually, copying the content displayed
 on-screen to the file. If you have to do this, please remember to set
 the permissions on config.php after you copied the on-screen contents
-to the file. Run:
+to the file. 
 
 ```bash
 chown librenms:librenms /opt/librenms/config.php
