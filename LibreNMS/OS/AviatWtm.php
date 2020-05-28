@@ -54,7 +54,7 @@ class AviatWtm extends OS implements
 
         return array(
             new WirelessSensor('frequency', $this->getDeviceId(), $carrier1_oid, 'aviat-wtm-carrier1-tx-freq', 1, 'TX Frequency (Carrier1/1)', null, 1, 1000),
-            new WirelessSensor('frequency', $this->getDeviceId(), $carrier2_oid, 'aviat-wtm-carrier2-tx-freq', 1, 'TX Frequency (Carrier1/2)', null, 1, 1000) 
+            new WirelessSensor('frequency', $this->getDeviceId(), $carrier2_oid, 'aviat-wtm-carrier2-tx-freq', 1, 'TX Frequency (Carrier1/2)', null, 1, 1000)
         );
     }
 
@@ -89,7 +89,7 @@ class AviatWtm extends OS implements
 
     public function discoverWirelessRssi()
     {
-        $carrier1_rsl_oid = '.1.3.6.1.4.1.2509.9.15.2.2.1.4.59'; 
+        $carrier1_rsl_oid = '.1.3.6.1.4.1.2509.9.15.2.2.1.4.59';
         $carrier2_rsl_oid = '.1.3.6.1.4.1.2509.9.15.2.2.1.4.60';
 
         return array(
