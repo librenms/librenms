@@ -67,10 +67,22 @@
             <option value="severity" @if($sort == 0) selected @endif>@lang('severity, descending')</option>
         </select>
     </div>
+    <div class="form-group row">
+        <label for="hidenavigation-{{ $id }}" class="control-label">@lang('Hide Navigation'):</label>
+        <input type="checkbox" class="form-control" name="hidenavigation" id="hidenavigation-{{ $id }}" value="{{ $hidenavigation }}" data-size="normal" @if($hidenavigation) checked @endif>
+    </div>
+
 @endsection
 
 @section('javascript')
     <script type="text/javascript">
         init_select2('#device_group-{{ $id }}', 'device-group', {});
+
+        $('#hidenavigation-{{ $id }}')
+            .bootstrapSwitch('offColor','danger')
+            .on('switchChange.bootstrapSwitch', function (e, data) {
+                var hidenav = $(this).is(':checked') ? "1": "0";
+                $('#hidenavigation-{{ $id }}').val(hidenav);
+            });
     </script>
 @endsection

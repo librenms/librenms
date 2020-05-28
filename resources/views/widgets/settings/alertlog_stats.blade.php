@@ -18,4 +18,20 @@
         <label for="time_interval-{{ $id }}" class="control-label">@lang('Last days')</label>
         <input class="form-control" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
     </div>
+    <div class="form-group">
+        <label for="hidenavigation-{{ $id }}" class="control-label">@lang('Hide Navigation')</label>
+        <input type="checkbox" class="form-control" name="hidenavigation" id="hidenavigation-{{ $id }}" value="{{ $hidenavigation }}" data-size="normal" @if($hidenavigation) checked @endif>
+    </div>
 @endsection
+
+@section('javascript')
+    <script type="text/javascript">
+        $('#hidenavigation-{{ $id }}')
+            .bootstrapSwitch('offColor','danger')
+            .on('switchChange.bootstrapSwitch', function (e, data) {
+                var hidenav = $(this).is(':checked') ? "1": "0";
+                $('#hidenavigation-{{ $id }}').val(hidenav);
+            });
+    </script>
+@endsection
+
