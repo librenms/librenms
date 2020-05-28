@@ -51,9 +51,6 @@ class AviatWtm extends OS implements
   {
       $carrier1_oid = '.1.3.6.1.4.1.2509.9.5.2.1.1.1.59';
       $carrier2_oid = '.1.3.6.1.4.1.2509.9.5.2.1.1.1.60';
-      # The SNMP agent on WTM devices will choke on 15+ rapid requests.
-      # A "sleep" helps LibreNMS cope with this current issue
-      sleep(5);
 
       return array(
           new WirelessSensor('frequency', $this->getDeviceId(), $carrier1_oid, 'aviat-wtm-carrier1-tx-freq', 1, 'TX Frequency (Carrier1/1)', null, 1, 1000),
@@ -74,7 +71,6 @@ class AviatWtm extends OS implements
       $carrier1_rx_oid = '.1.3.6.1.4.1.2509.9.3.2.1.1.12.59';
       $carrier2_tx_oid = '.1.3.6.1.4.1.2509.9.3.2.1.1.11.60';
       $carrier2_rx_oid = '.1.3.6.1.4.1.2509.9.3.2.1.1.12.60';
-      sleep(5);
 
       return array(
         new WirelessSensor('rate', $this->getDeviceId(), $carrier1_tx_oid, 'aviat-wtm-carrier1-tx-rate', 1, 'TX Capacity (Carrier1/1)', null, 1, 1000000),
@@ -95,7 +91,6 @@ class AviatWtm extends OS implements
   {
       $carrier1_rsl_oid = '.1.3.6.1.4.1.2509.9.15.2.2.1.4.59'; 
       $carrier2_rsl_oid = '.1.3.6.1.4.1.2509.9.15.2.2.1.4.60';
-      sleep(5);
 
       return array(
           new WirelessSensor('rssi', $this->getDeviceId(), $carrier1_rsl_oid, 'aviat-wtm-carrier1-rsl', 1, 'RSL (Carrier1/1)', null, 1, 10),
@@ -114,7 +109,6 @@ class AviatWtm extends OS implements
   {
       $carrier1_snr_oid = '.1.3.6.1.4.1.2509.9.33.2.2.1.3.59';
       $carrier2_snr_oid = '.1.3.6.1.4.1.2509.9.33.2.2.1.3.60';
-      sleep(5);
 
       return array(
           new WirelessSensor('snr', $this->getDeviceId(), $carrier1_snr_oid, 'aviat-wtm-carrier1-snr', 1, 'SNR (Carrier1/1)', null, 1, 10),
@@ -133,7 +127,6 @@ class AviatWtm extends OS implements
   {
       $carrier1_txpower_oid = '.1.3.6.1.4.1.2509.9.33.2.2.1.7.59';
       $carrier2_txpower_oid = '.1.3.6.1.4.1.2509.9.33.2.2.1.7.60';
-      sleep(5);
 
       return array(
           new WirelessSensor('power', $this->getDeviceId(), $carrier1_txpower_oid, 'aviat-wtm-carrier1-txpower', 1, 'TX Power (Carrier1/1)', null, 1, 10),
