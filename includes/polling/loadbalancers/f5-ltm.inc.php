@@ -84,7 +84,7 @@ if (count($components > 0)) {
         $hash = $array['hash'];
         $rrd_name = array($type, $label, $hash);
 
-       if ($type == 'f5-ltm-bwc') {
+        if ($type == 'f5-ltm-bwc') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
                 ->addDataset('bytesin', 'COUNTER', 0)
@@ -102,8 +102,7 @@ if (count($components > 0)) {
             d_echo("\n\nComponent: ".$key."\n");
             d_echo("    Type: ".$type."\n");
             d_echo("    Label: ".$label."\n");
-
-        } elseif ($type == 'f5-ltm-vs') {
+       } elseif ($type == 'f5-ltm-vs') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
                 ->addDataset('pktsout', 'COUNTER', 0)

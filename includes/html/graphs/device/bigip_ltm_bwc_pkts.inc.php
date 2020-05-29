@@ -35,6 +35,5 @@ if (isset($components[$vars['id']])) {
         $rrd_options .= " GPRINT:DS:LAST:%6.2lf%s ";
         $rrd_options .= " GPRINT:DS:AVERAGE:%6.2lf%s ";
         $rrd_options .= " GPRINT:DS:MAX:%6.2lf%s\l ";
-
-   }
+    }
 }

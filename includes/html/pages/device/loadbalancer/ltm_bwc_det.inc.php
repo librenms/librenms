@@ -77,5 +77,5 @@ if ($components[$vars['bwcid']]['type'] == 'f5-ltm-bwc') {
                 </div>
             </div>
         </div>
-<?php
+    <?php
 }

@@ -195,9 +195,7 @@ if (!empty($ltmVirtualServEntry) || !empty($ltmPoolEntry) || !empty($ltmPoolMemb
                 $result['label'] = $value;
                 // The UID is far too long to have in a RRD filename, use a hash of it instead.
                 $result['hash'] = hash('crc32', $result['UID']);
-
             }
-
 
             // Do we have any results
             if (count($result) > 0) {

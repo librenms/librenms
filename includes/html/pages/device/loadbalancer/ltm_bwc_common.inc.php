@@ -24,7 +24,7 @@ if (!isset($vars['bwcid'])) {
         if ($array['type'] != 'f5-ltm-bwc') {
             continue;
         }
-       $vars['bwcid'] = $id;
+        $vars['bwcid'] = $id;
     }
 }
 
