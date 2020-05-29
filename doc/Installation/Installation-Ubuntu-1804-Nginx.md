@@ -13,8 +13,10 @@ path: blob/master/doc/
 ```bash
 apt install software-properties-common
 add-apt-repository universe
+sudo add-apt-repository ppa:ondrej/php
 apt update
-apt install acl sed curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois unzip python3-pip
+apt install php7.4
+apt install acl sed curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip python3-memcache python3-mysqldb rrdtool snmp snmpd whois unzip python3-pip
 ```
 
 # Add librenms user
@@ -43,7 +45,7 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 # Install PHP dependencies
 
 ```bash
-su - librenms
+cd /op  
 cd /opt/librenms
 ./scripts/composer_wrapper.php install --no-dev
 exit
@@ -91,14 +93,14 @@ Valid examples are: `"America/New_York"`, `"Australia/Brisbane"`, `"Europe/Brati
 >See <http://php.net/manual/en/timezones.php> for a list of supported timezones and change `Europe/Bratislava` in sed command to your timezone.
 
 ```bash
-echo date.timezone = \"Europe/Bratislava\" >> /etc/php/7.2/fpm/php.ini
-echo date.timezone = \"Europe/Bratislava\" >> /etc/php/7.2/cli/php.ini
+echo date.timezone = \"Europe/Bratislava\" >> /etc/php/7.4/fpm/php.ini
+echo date.timezone = \"Europe/Bratislava\" >> /etc/php/7.4/cli/php.ini
 ```
 
 Restart php-fpm
 
 ```bash
-systemctl restart php7.2-fpm
+systemctl restart php7.4-fpm
 ```
 
 ## Configure NGINX
