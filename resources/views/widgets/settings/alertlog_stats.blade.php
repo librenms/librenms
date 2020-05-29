@@ -1,11 +1,11 @@
 @extends('widgets.settings.base')
 
 @section('form')
-    <div class="form-group row">
+    <div class="form-group">
         <label for="title-{{ $id }}" class="control-label">@lang('Widget title')</label>
         <input type="text" class="form-control" name="title" id="title-{{ $id }}" placeholder="@lang('Custom title')" value="{{ $title }}">
     </div>
-    <div class="form-group row">
+    <div class="form-group">
         <label for="min_severity-{{ $id }}" class="control-label">@lang('Displayed severity'):</label>
         <select class="form-control" name="min_severity" id="min_severity-{{ $id }}">
             <option value="">@lang('any severity')</option>
