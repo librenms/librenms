@@ -25,6 +25,7 @@ the values we expect to see the data in:
 | frequency                       | Hz                          |
 | humidity                        | %                           |
 | load                            | %                           |
+| loss                            | %                           |
 | power                           | W                           |
 | power_consumed                  | kWh                         |
 | power_factor                    | ratio                       |
