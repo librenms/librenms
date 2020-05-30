@@ -71,7 +71,7 @@ if (!$auth) {
             if ($avail_type == $subtype) {
                 echo(" selected");
             }
-            $display_type = is_mib_graph($type, $avail_type) ? $avail_type : nicecase($avail_type);
+            $display_type = nicecase($avail_type);
             echo ">$display_type</option>";
         }
         echo '</select></form></div>';
