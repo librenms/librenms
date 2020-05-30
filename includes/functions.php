@@ -2247,6 +2247,10 @@ function dump_db_schema($connection = null)
                 $default = trim($data->COLUMN_DEFAULT, "'");
                 $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
             }
+            // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
+            if ($def['Type'] == 'timestamp') {
+                 $def['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $def['Extra']);
+            }
 
             $output[$table]['Columns'][] = $def;
         }
