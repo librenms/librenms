@@ -55,7 +55,6 @@ class AlertSchedule extends Model
                                 $query->where('end_recurring_dt', '>=', DB::raw("date_format(NOW(), '%Y-%m-%d')"))
                                     ->orWhereNull('end_recurring_dt')
                                     ->orWhere('end_recurring_dt', '0000-00-00');
-                                    //->orWhere('end_recurring_dt', '');
                             });
                     })
                     // Check the time is between the start and end hour/minutes/seconds
