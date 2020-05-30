@@ -32,16 +32,17 @@
         </div>
         <div class="panel-body">
             <vue-tabs direction="vertical" type="pills">
-                <v-tab :title="poller.poller_name" v-for="(poller, id) in pollers">
-                    <template v-for="setting in settings[id]">
-                        <div class="setting-container clearfix" v-show="!setting.advanced || advanced">
-                            <librenms-setting
-                                prefix="poller.settings"
-                                :setting='setting'
-                                :id="poller.id"
-                            ></librenms-setting>
-                        </div>
-                    </template>
+                <v-tab :title="poller.poller_name" v-for="(poller, id) in pollers" :key="id">0
+                    <div class="setting-container clearfix"
+                         v-for="setting in settings[id]"
+                         v-if="!setting.advanced || advanced"
+                         :key="setting.name">
+                        <librenms-setting
+                            prefix="poller.settings"
+                            :setting='setting'
+                            :id="poller.id"
+                        ></librenms-setting>
+                    </div>
                 </v-tab>
             </vue-tabs>
         </div>
@@ -57,7 +58,7 @@
         },
         data() {
             return {
-                advanced: false,
+                advanced: false
             }
         },
     }

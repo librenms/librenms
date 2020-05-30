@@ -751,6 +751,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 /* harmony default export */ __webpack_exports__["default"] = ({
   name: "PollerSettings",
   props: {
@@ -1865,17 +1866,17 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=script&lang=js&":
-/*!***********************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/TransitionCollapseHeight.vue?vue&type=script&lang=js& ***!
-  \***********************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapse.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/TransitionCollapse.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: 'TransitionExpand',
+  name: 'TransitionCollapse',
   functional: true,
   render: function render(createElement, context) {
     var data = {
@@ -1917,6 +1918,98 @@ __webpack_require__.r(__webpack_exports__);
       }
     };
     return createElement('transition', data, context.children);
+  }
+});
+
+/***/ }),
+
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/TransitionCollapseHeight.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************************************************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+/* harmony default export */ __webpack_exports__["default"] = ({
+  name: "TransitionCollapseHeight",
+  methods: {
+    beforeEnter: function beforeEnter(el) {
+      requestAnimationFrame(function () {
+        if (!el.style.height) {
+          el.style.height = '0px';
+        }
+
+        el.style.display = null;
+      });
+    },
+    enter: function enter(el) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          el.style.height = el.scrollHeight + 'px';
+        });
+      });
+    },
+    afterEnter: function afterEnter(el) {
+      el.style.height = null;
+    },
+    beforeLeave: function beforeLeave(el) {
+      requestAnimationFrame(function () {
+        if (!el.style.height) {
+          el.style.height = el.offsetHeight + 'px';
+        }
+      });
+    },
+    leave: function leave(el) {
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          el.style.height = '0px';
+        });
+      });
+    },
+    afterLeave: function afterLeave(el) {
+      el.style.height = null;
+    }
   }
 });
 
@@ -2106,6 +2199,25 @@ exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loa
 
 // module
 exports.push([module.i, "\n.panel.with-nav-tabs .panel-heading[data-v-6e9bbb69]{\n    padding: 5px 5px 0 5px;\n}\n.panel.with-nav-tabs .nav-tabs[data-v-6e9bbb69]{\n    border-bottom: none;\n}\n.panel.with-nav-tabs .nav-justified[data-v-6e9bbb69]{\n    margin-bottom: -1px;\n}\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69],\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69]:focus {\n    color: #777;\n}\n.with-nav-tabs.panel-default .nav-tabs > .open > a[data-v-6e9bbb69],\n.with-nav-tabs.panel-default .nav-tabs > .open > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > .open > a[data-v-6e9bbb69]:focus,\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li > a[data-v-6e9bbb69]:focus {\n    color: #777;\n    background-color: #ddd;\n    border-color: transparent;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.active > a[data-v-6e9bbb69],\n.with-nav-tabs.panel-default .nav-tabs > li.active > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li.active > a[data-v-6e9bbb69]:focus {\n    color: #555;\n    background-color: #fff;\n    border-color: #ddd;\n    border-bottom-color: transparent;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu[data-v-6e9bbb69] {\n    background-color: #f5f5f5;\n    border-color: #ddd;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a[data-v-6e9bbb69] {\n    color: #777;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > li > a[data-v-6e9bbb69]:focus {\n    background-color: #ddd;\n}\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a[data-v-6e9bbb69],\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a[data-v-6e9bbb69]:hover,\n.with-nav-tabs.panel-default .nav-tabs > li.dropdown .dropdown-menu > .active > a[data-v-6e9bbb69]:focus {\n    color: #fff;\n    background-color: #555;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css&":
+/*!******************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css& ***!
+  \******************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.enter-active[data-v-41d51ed4],\n.leave-active[data-v-41d51ed4] {\n    overflow: hidden;\n    transition: height 0.2s linear;\n}\n", ""]);
 
 // exports
 
@@ -2391,6 +2503,36 @@ if(false) {}
 
 
 var content = __webpack_require__(/*! !../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./Tabs.vue?vue&type=style&index=0&id=6e9bbb69&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/Tabs.vue?vue&type=style&index=0&id=6e9bbb69&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css&":
+/*!**********************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css& ***!
+  \**********************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css&");
 
 if(typeof content === 'string') content = [[module.i, content, '']];
 
@@ -2962,35 +3104,29 @@ var render = function() {
           _vm._l(_vm.pollers, function(poller, id) {
             return _c(
               "v-tab",
-              { attrs: { title: poller.poller_name } },
+              { key: id, attrs: { title: poller.poller_name } },
               [
+                _vm._v("0\n                "),
                 _vm._l(_vm.settings[id], function(setting) {
-                  return [
-                    _c(
-                      "div",
-                      {
-                        directives: [
-                          {
-                            name: "show",
-                            rawName: "v-show",
-                            value: !setting.advanced || _vm.advanced,
-                            expression: "!setting.advanced || advanced"
-                          }
+                  return !setting.advanced || _vm.advanced
+                    ? _c(
+                        "div",
+                        {
+                          key: setting.name,
+                          staticClass: "setting-container clearfix"
+                        },
+                        [
+                          _c("librenms-setting", {
+                            attrs: {
+                              prefix: "poller.settings",
+                              setting: setting,
+                              id: poller.id
+                            }
+                          })
                         ],
-                        staticClass: "setting-container clearfix"
-                      },
-                      [
-                        _c("librenms-setting", {
-                          attrs: {
-                            prefix: "poller.settings",
-                            setting: setting,
-                            id: poller.id
-                          }
-                        })
-                      ],
-                      1
-                    )
-                  ]
+                        1
+                      )
+                    : _vm._e()
                 })
               ],
               2
@@ -4317,6 +4453,48 @@ render._withStripped = true
 
 /***/ }),
 
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=template&id=41d51ed4&scoped=true&":
+/*!***************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/TransitionCollapseHeight.vue?vue&type=template&id=41d51ed4&scoped=true& ***!
+  \***************************************************************************************************************************************************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "render", function() { return render; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return staticRenderFns; });
+var render = function() {
+  var _vm = this
+  var _h = _vm.$createElement
+  var _c = _vm._self._c || _h
+  return _c(
+    "transition",
+    {
+      attrs: {
+        "enter-active-class": "enter-active",
+        "leave-active-class": "leave-active"
+      },
+      on: {
+        "before-enter": _vm.beforeEnter,
+        enter: _vm.enter,
+        "after-enter": _vm.afterEnter,
+        "before-leave": _vm.beforeLeave,
+        leave: _vm.leave,
+        "after-leave": _vm.afterLeave
+      }
+    },
+    [_vm._t("default")],
+    2
+  )
+}
+var staticRenderFns = []
+render._withStripped = true
+
+
+
+/***/ }),
+
 /***/ "./resources/js sync recursive \\.vue$/":
 /*!***********************************!*\
   !*** ./resources/js sync \.vue$/ ***!
@@ -4346,6 +4524,7 @@ var map = {
 	"./components/SettingText.vue": "./resources/js/components/SettingText.vue",
 	"./components/Tab.vue": "./resources/js/components/Tab.vue",
 	"./components/Tabs.vue": "./resources/js/components/Tabs.vue",
+	"./components/TransitionCollapse.vue": "./resources/js/components/TransitionCollapse.vue",
 	"./components/TransitionCollapseHeight.vue": "./resources/js/components/TransitionCollapseHeight.vue"
 };
 
@@ -6116,16 +6295,16 @@ __webpack_require__.r(__webpack_exports__);
 
 /***/ }),
 
-/***/ "./resources/js/components/TransitionCollapseHeight.vue":
-/*!**************************************************************!*\
-  !*** ./resources/js/components/TransitionCollapseHeight.vue ***!
-  \**************************************************************/
+/***/ "./resources/js/components/TransitionCollapse.vue":
+/*!********************************************************!*\
+  !*** ./resources/js/components/TransitionCollapse.vue ***!
+  \********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _TransitionCollapseHeight_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TransitionCollapseHeight.vue?vue&type=script&lang=js& */ "./resources/js/components/TransitionCollapseHeight.vue?vue&type=script&lang=js&");
+/* harmony import */ var _TransitionCollapse_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TransitionCollapse.vue?vue&type=script&lang=js& */ "./resources/js/components/TransitionCollapse.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 var render, staticRenderFns
 
@@ -6135,12 +6314,65 @@ var render, staticRenderFns
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_1__["default"])(
-  _TransitionCollapseHeight_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"],
+  _TransitionCollapse_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"],
   render,
   staticRenderFns,
   false,
   null,
   null,
+  null
+  
+)
+
+/* hot reload */
+if (false) { var api; }
+component.options.__file = "resources/js/components/TransitionCollapse.vue"
+/* harmony default export */ __webpack_exports__["default"] = (component.exports);
+
+/***/ }),
+
+/***/ "./resources/js/components/TransitionCollapse.vue?vue&type=script&lang=js&":
+/*!*********************************************************************************!*\
+  !*** ./resources/js/components/TransitionCollapse.vue?vue&type=script&lang=js& ***!
+  \*********************************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapse_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./TransitionCollapse.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapse.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapse_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/TransitionCollapseHeight.vue":
+/*!**************************************************************!*\
+  !*** ./resources/js/components/TransitionCollapseHeight.vue ***!
+  \**************************************************************/
+/*! exports provided: default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _TransitionCollapseHeight_vue_vue_type_template_id_41d51ed4_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./TransitionCollapseHeight.vue?vue&type=template&id=41d51ed4&scoped=true& */ "./resources/js/components/TransitionCollapseHeight.vue?vue&type=template&id=41d51ed4&scoped=true&");
+/* harmony import */ var _TransitionCollapseHeight_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./TransitionCollapseHeight.vue?vue&type=script&lang=js& */ "./resources/js/components/TransitionCollapseHeight.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _TransitionCollapseHeight_vue_vue_type_style_index_0_id_41d51ed4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css& */ "./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
+
+
+
+
+
+/* normalize component */
+
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _TransitionCollapseHeight_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _TransitionCollapseHeight_vue_vue_type_template_id_41d51ed4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _TransitionCollapseHeight_vue_vue_type_template_id_41d51ed4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  false,
+  null,
+  "41d51ed4",
   null
   
 )
@@ -6163,6 +6395,40 @@ component.options.__file = "resources/js/components/TransitionCollapseHeight.vue
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/babel-loader/lib??ref--4-0!../../../node_modules/vue-loader/lib??vue-loader-options!./TransitionCollapseHeight.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+
+/***/ }),
+
+/***/ "./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css&":
+/*!***********************************************************************************************************************!*\
+  !*** ./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css& ***!
+  \***********************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_style_index_0_id_41d51ed4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/style-loader!../../../node_modules/css-loader??ref--6-1!../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../node_modules/postcss-loader/src??ref--6-2!../../../node_modules/vue-loader/lib??vue-loader-options!./TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=style&index=0&id=41d51ed4&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_style_index_0_id_41d51ed4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_style_index_0_id_41d51ed4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_style_index_0_id_41d51ed4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(__WEBPACK_IMPORT_KEY__ !== 'default') (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_style_index_0_id_41d51ed4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_style_index_0_id_41d51ed4_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default.a); 
+
+/***/ }),
+
+/***/ "./resources/js/components/TransitionCollapseHeight.vue?vue&type=template&id=41d51ed4&scoped=true&":
+/*!*********************************************************************************************************!*\
+  !*** ./resources/js/components/TransitionCollapseHeight.vue?vue&type=template&id=41d51ed4&scoped=true& ***!
+  \*********************************************************************************************************/
+/*! exports provided: render, staticRenderFns */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_template_id_41d51ed4_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../node_modules/vue-loader/lib??vue-loader-options!./TransitionCollapseHeight.vue?vue&type=template&id=41d51ed4&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/TransitionCollapseHeight.vue?vue&type=template&id=41d51ed4&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_template_id_41d51ed4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_TransitionCollapseHeight_vue_vue_type_template_id_41d51ed4_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+
+
 
 /***/ }),
 
