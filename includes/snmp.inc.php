@@ -1109,64 +1109,18 @@ function oid_rrd_def($oid, $mibdef)
 } // oid_rrd_type
 
 
-/*
- * Construct a graph names for use in the database.
- * Tag each as in use on this device in &$graphs.
- * Update the database with graph definitions as needed.
- * We don't include the index in the graph name - that is handled at display time.
- */
-function tag_graphs($mibname, $oids, $mibdef, &$graphs)
-{
-    foreach ($oids as $index => $array) {
-        foreach ($array as $oid => $val) {
-            $graphname          = $mibname.'-'.$mibdef[$oid]['shortname'];
-            $graphs[$graphname] = true;
-        }
-    }
-} // tag_graphs
-
 
 /*
  * Ensure a graph_type definition exists in the database for the entities in this MIB
  */
-function update_mib_graph_types($mibname, $oids, $mibdef, $graphs)
-{
-    $seengraphs = array();
-
-    // Get the list of graphs currently in the database
-    // FIXME: there's probably a more efficient way to do this
-    foreach (dbFetch('SELECT DISTINCT `graph_subtype` FROM `graph_types` WHERE `graph_subtype` LIKE ?', array("$mibname-%")) as $graph) {
-        $seengraphs[$graph['graph_subtype']] = true;
-    }
-
-    foreach ($oids as $index => $array) {
-        $i = 1;
-        foreach ($array as $oid => $val) {
-            $graphname = "$mibname-".$mibdef[$oid]['shortname'];
-
-            // add the graph if it's not in the database already
-            if ($graphs[$graphname] && !$seengraphs[$graphname]) {
-                // construct a graph definition based on the MIB definition
-                $graphdef                  = array();
-                $graphdef['graph_type']    = 'device';
-                $graphdef['graph_subtype'] = $graphname;
-                $graphdef['graph_section'] = 'mib';
-                $graphdef['graph_descr']   = $mibdef[$oid]['description'];
-                $graphdef['graph_order']   = $i++;
-                // TODO: add colours, unit_text, and ds
-                // add graph to the database
-                dbInsert($graphdef, 'graph_types');
-            }
-        }
-    }
-} // update_mib_graph_types
+// update_mib_graph_types
 
 
 /*
  * Save all of the measurable oids for the device in their own RRDs.
  * Save the current value of all the oids in the database.
  */
-function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
+function save_mibs($device, $mibname, $oids, $mibdef, $os)
 {
     $usedoids = array();
     $deviceoids = array();
@@ -1205,8 +1159,40 @@ function save_mibs($device, $mibname, $oids, $mibdef, &$graphs)
         }
     }
 
-    tag_graphs($mibname, $usedoids, $mibdef, $graphs);
-    update_mib_graph_types($mibname, $usedoids, $mibdef, $graphs);
+    foreach ($usedoids as $index1 => $array1) {
+        foreach ($array1 as $oid => $val1) {
+            $graphname = $mibname . '-' . $mibdef[$oid]['shortname'];
+            $os->enableGraph($graphname);
+        }
+    }
+    $seengraphs = [];
+
+    // Get the list of graphs currently in the database
+    // FIXME: there's probably a more efficient way to do this
+    foreach (dbFetch('SELECT DISTINCT `graph_subtype` FROM `graph_types` WHERE `graph_subtype` LIKE ?', ["$mibname-%"]) as $graph) {
+        $seengraphs[$graph['graph_subtype']] = true;
+    }
+
+    foreach ($usedoids as $index2 => $array2) {
+        $i = 1;
+        foreach ($array2 as $oid1 => $val2) {
+            $graphname1 = "$mibname-" . $mibdef[$oid1]['shortname'];
+
+            // add the graph if it's not in the database already
+            if ($graphs[$graphname1] && !$seengraphs[$graphname1]) {
+                // construct a graph definition based on the MIB definition
+                $graphdef = [];
+                $graphdef['graph_type'] = 'device';
+                $graphdef['graph_subtype'] = $graphname1;
+                $graphdef['graph_section'] = 'mib';
+                $graphdef['graph_descr'] = $mibdef[$oid1]['description'];
+                $graphdef['graph_order'] = $i++;
+                // TODO: add colours, unit_text, and ds
+                // add graph to the database
+                dbInsert($graphdef, 'graph_types');
+            }
+        }
+    }
 
     // update database
     $columns = array('device_id', 'oid', 'module', 'mib', 'object_type', 'value', 'numvalue');
@@ -1259,7 +1245,7 @@ function load_device_mibs($device)
 /*
  * Run MIB-based polling for $device.  Update $graphs with the results.
  */
-function poll_mibs($device, &$graphs)
+function poll_mibs($device, $os)
 {
     if (!is_mib_poller_enabled($device)) {
         return;
@@ -1273,7 +1259,7 @@ function poll_mibs($device, &$graphs)
         d_echo("\n");
         $oids = snmpwalk_cache_oid($device, $name, array(), $module, null, "-OQUsb");
         d_echo($oids);
-        save_mibs($device, $name, $oids, load_mibdefs($module, $name), $graphs);
+        save_mibs($device, $name, $oids, load_mibdefs($module, $name), $os);
     }
     echo "\n";
 } // poll_mibs

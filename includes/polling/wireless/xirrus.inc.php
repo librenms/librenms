@@ -27,7 +27,7 @@ if (\LibreNMS\Config::get('xirrus_disable_stations') != true) {
         $tags = compact('radio', 'rrd_name', 'rrd_def');
         data_update($device, $measurement, $tags, $fields);
     }
-    $graphs['xirrus_stations'] = true;
+    $os->enableGraph('xirrus_stations');
 } else {
     $graphs['xirrus_stations'] = false;
 }

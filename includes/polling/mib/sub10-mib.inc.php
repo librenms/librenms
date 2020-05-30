@@ -52,4 +52,4 @@ $mib_graphs = array(
 
 unset($graph, $oids, $oid);
 
-poll_mib_def($device, 'SUB10SYSTEMS-MIB:sub10Systems', 'sub10', $mib_oids, $mib_graphs, $graphs);
+poll_mib_def($device, 'SUB10SYSTEMS-MIB:sub10Systems', $mib_oids, $mib_graphs, $os);

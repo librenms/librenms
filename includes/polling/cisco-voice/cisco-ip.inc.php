@@ -35,7 +35,7 @@ if ($device['os_group'] == "cisco") {
         $tags = compact('rrd_def');
         data_update($device, 'cisco-voice-ip', $tags, $fields);
 
-        $graphs['cisco-voice-ip'] = true;
+        $os->enableGraph('cisco-voice-ip');
         echo(" Cisco IOS Voice IP ");
         unset($rrd_def, $active, $fields, $tags);
     }

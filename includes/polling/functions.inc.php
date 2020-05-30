@@ -230,15 +230,15 @@ function record_sensor_data($device, $all_sensors)
  */
 function poll_device($device, $force_module = false)
 {
-    global $device, $graphs;
+    global $device;
 
     $device_start = microtime(true);
 
-    $graphs = [];
     $attribs = DeviceCache::getPrimary()->getAttribs();
     $device['attribs'] = $attribs;
 
     load_os($device);
+    $os = \LibreNMS\OS::make($device);
 
     unset($array);
 
@@ -351,16 +351,17 @@ function poll_device($device, $force_module = false)
                 echo "Module [ $module ] disabled globally.\n\n";
             }
         }
-        
-        if (!$force_module && !empty($graphs)) {
+
+        if (!$force_module) {
             echo "Enabling graphs: ";
-            $graphs = collect($graphs)->keys();
-            DeviceCache::getPrimary()->graphs->keyBy('graph')->collect()->except($graphs)->each->delete(); // delete extra graphs
-            DeviceCache::getPrimary()->graphs() // create missing graphs
-                ->saveMany($graphs->diff(DeviceCache::getPrimary()->graphs->pluck('graph'))->map(function ($graph) {
-                    echo '+';
-                    return new DeviceGraph(['graph' => $graph]);
-                }));
+            DeviceGraph::deleted(function ($graph) {
+                echo '-';
+            });
+            DeviceGraph::created(function ($graph) {
+                echo '+';
+            });
+
+            $os->persistGraphs();
             echo PHP_EOL;
         }
 
@@ -427,7 +428,7 @@ function poll_device($device, $force_module = false)
 /**
  * if no rrd_name parameter is passed, the MIB name is used as the rrd_file_name
  */
-function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs, $rrd_name = null)
+function poll_mib_def($device, $mib_name_table, $mib_oids, $mib_graphs, $os, $rrd_name = null)
 {
     echo "This is poll_mib_def Processing\n";
     $mib = null;
@@ -500,7 +501,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
     data_update($device, $rrd_name, $tags, $fields);
 
     foreach ($mib_graphs as $graphtoenable) {
-        $graphs[$graphtoenable] = true;
+        $os->enableGraph($graphtoenable);
     }
 
     return true;

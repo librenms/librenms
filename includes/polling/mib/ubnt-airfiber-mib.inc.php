@@ -208,4 +208,4 @@ $mib_graphs = array(
 
 unset($graph, $oids, $oid);
 
-poll_mib_def($device, 'UBNT-AirFIBER-MIB:UBNT', 'ubiquiti', $mib_oids, $mib_graphs, $graphs);
+poll_mib_def($device, 'UBNT-AirFIBER-MIB:UBNT', $mib_oids, $mib_graphs, $os);

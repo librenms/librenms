@@ -24,7 +24,7 @@ if (is_numeric($connections)) {
 
         $tags = compact('rrd_def');
         data_update($device, 'secureplatform_sessions', $tags, $fields);
-        $graphs['secureplatform_sessions'] = true;
+        $os->enableGraph('secureplatform_sessions');
 }
 
 unset($connections);

@@ -50,8 +50,8 @@ if (!Str::startsWith($device['os'], array('Snom', 'asa'))) {
         $tags = compact('rrd_def');
         data_update($device, 'netstats-icmp', $tags, $fields);
 
-        $graphs['netstat_icmp']      = true;
-        $graphs['netstat_icmp_info'] = true;
+        $os->enableGraph('netstat_icmp');
+        $os->enableGraph('netstat_icmp_info');
     }
 
     unset($oids, $data, $rrd_def, $fields, $tags);
