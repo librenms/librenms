@@ -332,6 +332,13 @@ $graphs['mailcow-postfix'] = array(
     'traffic',
     'domains',
 );
+$graphs['docker'] = [
+    'cpu_usage',
+    'pids',
+    'mem_limit',
+    'mem_used',
+    'mem_perc'
+];
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";
