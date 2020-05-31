@@ -70,7 +70,7 @@ class AviatWtm extends OS implements
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
-                "1.3.6.1.4.1.2509.9.5.2.1.1.1.$index",
+                ".1.3.6.1.4.1.2509.9.5.2.1.1.1.$index",
                 'aviat-wtm-carrier-tx-freq',
                 $index,
                 "TX Frequency ({$name[$index]})",
@@ -100,7 +100,7 @@ class AviatWtm extends OS implements
             $sensors[] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
-                "1.3.6.1.4.1.2509.9.3.2.1.1.11.$index",
+                ".1.3.6.1.4.1.2509.9.3.2.1.1.11.$index",
                 'aviat-wtm-carrier-tx-rate',
                 $index,
                 "TX Capacity ({$name[$index]})",
@@ -114,7 +114,7 @@ class AviatWtm extends OS implements
             $sensors[] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
-                "1.3.6.1.4.1.2509.9.3.2.1.1.12.$index",
+                ".1.3.6.1.4.1.2509.9.3.2.1.1.12.$index",
                 'aviat-wtm-carrier-rx-rate',
                 $index,
                 "TX Capacity ({$name[$index]})",
