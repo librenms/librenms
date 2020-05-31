@@ -106,7 +106,7 @@ class PollerController extends Controller
                 [
                     'name' => 'poller_groups',
                     'default' => Config::get('distributed_poller_group'),
-                    'value' => $poller->poller_group ?? Config::get('distributed_poller_group'),
+                    'value' => $poller->poller_groups ?? Config::get('distributed_poller_group'),
                     'type' => 'multiple',
                     'options' => $groups,
                 ],

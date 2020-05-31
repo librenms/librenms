@@ -36,15 +36,12 @@ class PollerCluster extends Model
 
     // ---- Accessors/Mutators ----
 
-    public function getPollerGroupsAttribute($groups)
-    {
-        return explode(',', $groups);
-    }
-
     public function setPollerGroupsAttribute($groups)
     {
         $this->attributes['poller_groups'] = is_array($groups) ? implode(',', $groups) : $groups;
     }
+
+    // ---- Relationships ----
 
     public function stats()
     {
