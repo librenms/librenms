@@ -1,14 +1,14 @@
 version: "2"
 plugins:
   markdownlint:
-    enabled: false
+    enabled: true
     checks:
       MD013:
         line_length: 120
   phan:
     enabled: false
   phpcodesniffer:
-    enabled: false
+    enabled: true
     config:
         standard: "PSR2"
     checks:
@@ -22,13 +22,13 @@ plugins:
       - python
       - php
   shellcheck:
-    enabled: false
+    enabled: true
   eslint:
-    enabled: false
+    enabled: true
   fixme:
-    enabled: false
+    enabled: true
   phpmd:
-    enabled: false
+    enabled: true
     checks:
       Controversial/CamelCaseVariableName:
         enabled: false
