@@ -26,6 +26,7 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
@@ -34,12 +35,25 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\OS;
 
 class AviatWtm extends OS implements
+    OSDiscovery,
     WirelessFrequencyDiscovery,
     WirelessRateDiscovery,
     WirelessRssiDiscovery,
     WirelessSnrDiscovery,
     WirelessPowerDiscovery
 {
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+
+        $oids = ['entPhysicalModelName.2', 'entPhysicalSerialNum.2', 'entPhysicalSoftwareRev.2'];
+        $data = snmp_get_multi($this->getDevice(), $oids, '-OQUs', 'ENTITY-MIB');
+
+        $device->hardware = $data[2]['entPhysicalModelName'] ?? null;
+        $device->serial = $data[2]['entPhysicalSerialNum'] ?? null;
+        $device->version = $data[2]['entPhysicalSoftwareRev'] ?? null;
+    }
+
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -59,7 +73,7 @@ class AviatWtm extends OS implements
     }
 
     /**
-     * Discover wireless tx or rx capacity. This is in dbps. Type is rate.
+     * Discover wireless tx or rx capacity. This is in bps. Type is rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array
@@ -67,35 +81,67 @@ class AviatWtm extends OS implements
 
     public function discoverWirelessRate()
     {
-        $carrier1_tx_oid = '.1.3.6.1.4.1.2509.9.3.2.1.1.11.59';
-        $carrier1_rx_oid = '.1.3.6.1.4.1.2509.9.3.2.1.1.12.59';
-        $carrier2_tx_oid = '.1.3.6.1.4.1.2509.9.3.2.1.1.11.60';
-        $carrier2_rx_oid = '.1.3.6.1.4.1.2509.9.3.2.1.1.12.60';
+        $sensors = [];
+        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
 
-        return array(
-            new WirelessSensor('rate', $this->getDeviceId(), $carrier1_tx_oid, 'aviat-wtm-carrier1-tx-rate', 1, 'TX Capacity (Carrier1/1)', null, 1, 1000000),
-            new WirelessSensor('rate', $this->getDeviceId(), $carrier1_rx_oid, 'aviat-wtm-carrier1-rx-rate', 1, 'RX Capacity (Carrier1/1)', null, 1, 1000000),
-            new WirelessSensor('rate', $this->getDeviceId(), $carrier2_tx_oid, 'aviat-wtm-carrier2-tx-rate', 1, 'TX Capacity (Carrier1/2)', null, 1, 1000000),
-            new WirelessSensor('rate', $this->getDeviceId(), $carrier1_rx_oid, 'aviat-wtm-carrier2-rx-rate', 1, 'RX Capacity (Carrier1/2)', null, 1, 1000000),
-        );
+        $tx = snmpwalk_cache_oid($this->getDevice(), 'aviatModemCurCapacityTx', [], 'AVIAT-MODEM-MIB');
+        foreach ($tx as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                "1.3.6.1.4.1.2509.9.3.2.1.1.11.$index",
+                'aviat-wtm-carrier-tx-rate',
+                $index,
+                "TX Capacity ({$name[$index]})",
+                $data['aviatModemCurCapacityTx'],
+                1000
+            );
+        }
+
+        $rx = snmpwalk_cache_oid($this->getDevice(), 'aviatModemCurCapacityRx', [], 'AVIAT-MODEM-MIB');
+        foreach ($rx as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'rate',
+                $this->getDeviceId(),
+                "1.3.6.1.4.1.2509.9.3.2.1.1.12.$index",
+                'aviat-wtm-carrier-rx-rate',
+                $index,
+                "TX Capacity ({$name[$index]})",
+                $data['aviatModemCurCapacityRx'],
+                1000
+            );
+        }
+
+        return $sensors;
     }
 
     /**
-     * Discover wireless tx or rx RSL. This is in dbps. Type is rssi.
+     * Discover wireless tx or rx RSL. This is in dbm. Type is rssi.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
      * @return array
      */
-
     public function discoverWirelessRssi()
     {
-        $carrier1_rsl_oid = '.1.3.6.1.4.1.2509.9.15.2.2.1.4.59';
-        $carrier2_rsl_oid = '.1.3.6.1.4.1.2509.9.15.2.2.1.4.60';
+        $sensors = [];
+        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $rsl = snmpwalk_cache_oid($this->getDevice(), 'aviatRxPerformRslReadingCurrent', [], 'AVIAT-RXPERFORMANCE-MIB');
 
-        return array(
-            new WirelessSensor('rssi', $this->getDeviceId(), $carrier1_rsl_oid, 'aviat-wtm-carrier1-rsl', 1, 'RSL (Carrier1/1)', null, 1, 10),
-            new WirelessSensor('rssi', $this->getDeviceId(), $carrier2_rsl_oid, 'aviat-wtm-carrier2-rsl', 1, 'RSL (Carrier1/2)', null, 1, 10),
-        );
+        foreach ($rsl as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'rssi',
+                $this->getDeviceId(),
+                ".1.3.6.1.4.1.2509.9.15.2.2.1.4.$index",
+                'aviat-wtm-carrier-rsl',
+                $index,
+                "RSL ({$name[$index]})",
+                $data['aviatRxPerformRslReadingCurrent'],
+                1,
+                10
+            );
+        }
+
+        return $sensors;
     }
 
     /**
@@ -104,16 +150,27 @@ class AviatWtm extends OS implements
      *
      * @return array
      */
-
     public function discoverWirelessSnr()
     {
-        $carrier1_snr_oid = '.1.3.6.1.4.1.2509.9.33.2.2.1.3.59';
-        $carrier2_snr_oid = '.1.3.6.1.4.1.2509.9.33.2.2.1.3.60';
+        $sensors = [];
+        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $snr = snmpwalk_cache_oid($this->getDevice(), 'aviatRxPerformCinrReadingCurrent', [], 'AVIAT-RXPERFORMANCE-EX-MIB');
 
-        return array(
-            new WirelessSensor('snr', $this->getDeviceId(), $carrier1_snr_oid, 'aviat-wtm-carrier1-snr', 1, 'SNR (Carrier1/1)', null, 1, 10),
-            new WirelessSensor('snr', $this->getDeviceId(), $carrier2_snr_oid, 'aviat-wtm-carrier2-snr', 1, 'SNR (Carrier1/2)', null, 1, 10),
-        );
+        foreach ($snr as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'snr',
+                $this->getDeviceId(),
+                ".1.3.6.1.4.1.2509.9.33.2.2.1.3.$index",
+                'aviat-wtm-carrier-snr',
+                $index,
+                "SNR ({$name[$index]})",
+                $data['aviatRxPerformCinrReadingCurrent'],
+                1,
+                10
+            );
+        }
+
+        return $sensors;
     }
 
     /**
@@ -122,15 +179,26 @@ class AviatWtm extends OS implements
      *
      * @return array
      */
-
     public function discoverWirelessPower()
     {
-        $carrier1_txpower_oid = '.1.3.6.1.4.1.2509.9.33.2.2.1.7.59';
-        $carrier2_txpower_oid = '.1.3.6.1.4.1.2509.9.33.2.2.1.7.60';
+        $sensors = [];
+        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $snr = snmpwalk_cache_oid($this->getDevice(), 'aviatRxPerformTxpowReadingCurrent', [], 'AVIAT-RXPERFORMANCE-EX-MIB');
 
-        return array(
-            new WirelessSensor('power', $this->getDeviceId(), $carrier1_txpower_oid, 'aviat-wtm-carrier1-txpower', 1, 'TX Power (Carrier1/1)', null, 1, 10),
-            new WirelessSensor('power', $this->getDeviceId(), $carrier2_txpower_oid, 'aviat-wtm-carrier2-txpower', 1, 'TX Power (Carrier1/2)', null, 1, 10),
-        );
+        foreach ($snr as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'power',
+                $this->getDeviceId(),
+                ".1.3.6.1.4.1.2509.9.33.2.2.1.7.$index",
+                'aviat-wtm-carrier-txpower',
+                $index,
+                "TX Power ({$name[$index]})",
+                $data['aviatRxPerformTxpowReadingCurrent'],
+                1,
+                10
+            );
+        }
+
+        return $sensors;
     }
 }
