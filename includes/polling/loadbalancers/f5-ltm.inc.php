@@ -133,8 +133,8 @@ if (count($components > 0)) {
                 // All is good.
                 $array['status'] = 0;
                 $array['error'] = '';
-            }
-        } elseif ($type == 'f5-ltm-pool') {
+             }
+       } elseif ($type == 'f5-ltm-pool') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('minup', 'GAUGE', 0)
                 ->addDataset('currup', 'GAUGE', 0);
