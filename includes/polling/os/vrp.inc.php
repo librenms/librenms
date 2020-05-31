@@ -21,6 +21,7 @@ $oidList = [
     'HUAWEI-DEVICE-EXT-MIB::hwProductName.0',
     'HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1',
     'HUAWEI-MIB::mlsr.20.1.1.1.3.0',
+    'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardName.9',
 ];
 
 foreach ($oidList as $oid) {
@@ -35,6 +36,19 @@ foreach ($oidList as $oid) {
 // Let's use sysDescr if nothing else is found in the OIDs. sysDescr is less detailled than OIDs most of the time
 if (empty($hardware_tmp) && !empty($matches[1])) {
     $hardware = "Huawei " . trim($matches[1]);
+}
+
+// Serial
+
+
+$oidList = [
+    'ENTITY-MIB::entPhysicalSerialNum.9',
+];
+foreach ($oidList as $oid) {
+    $serial = snmp_get($device, $oid, '-OQv');
+    if (!empty($serial)) {
+        break;
+    }
 }
 
 // Polling the Wireless data

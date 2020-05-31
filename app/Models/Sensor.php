@@ -21,6 +21,7 @@ class Sensor extends DeviceRelatedModel
         'frequency'            => 'line-chart',
         'humidity'             => 'tint',
         'load'                 => 'percent',
+        'loss'                 => 'percentage',
         'power'                => 'power-off',
         'power_consumed'       => 'plug',
         'power_factor'         => 'calculator',

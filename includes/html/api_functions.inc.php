@@ -355,7 +355,6 @@ function list_devices(\Illuminate\Http\Request $request)
     return api_success($devices, 'devices');
 }
 
-
 function add_device(\Illuminate\Http\Request $request)
 {
     // This will add a device using the data passed encoded with json
@@ -937,6 +936,25 @@ function get_port_info(\Illuminate\Http\Request $request)
     });
 }
 
+function search_ports(\Illuminate\Http\Request $request)
+{
+    $search = $request->route('search');
+    $value = "%$search%";
+    $ports = \App\Models\Port::hasAccess(Auth::user())
+        ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
+        ->where('ifAlias', 'like', $value)
+        ->orWhere('ifDescr', 'like', $value)
+        ->orWhere('ifName', 'like', $value)
+        ->orderBy('ifName')
+        ->get();
+
+    if ($ports->isEmpty()) {
+        return api_error(404, 'No ports found');
+    }
+
+    return api_success($ports, 'ports');
+}
+
 function get_all_ports(\Illuminate\Http\Request $request)
 {
     $columns = $request->get('columns', 'port_id, ifName');
@@ -1014,7 +1032,7 @@ function list_alerts(\Illuminate\Http\Request $request)
     }
 
     $order = 'timestamp desc';
-    
+
     $alert_rule = $request->get('alert_rule');
     if (isset($alert_rule)) {
         if (is_numeric($alert_rule)) {
@@ -1022,7 +1040,7 @@ function list_alerts(\Illuminate\Http\Request $request)
             $sql .= ' AND `R`.id=?';
         }
     }
-    
+
     if ($request->has('order')) {
         list($sort_column, $sort_order) = explode(' ', $request->get('order'), 2);
         if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
@@ -2333,7 +2351,7 @@ function validateDeviceIds($ids)
     }
     return true;
 }
-  
+
 function add_location(\Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);

@@ -55,7 +55,7 @@ class Graph
 
         if ($device != null) {
             // find the MIB subtypes
-            $graphs = $device->graphs();
+            $graphs = $device->graphs->pluck('graph');
 
             foreach (Config::get('graph_types') as $type => $type_data) {
                 foreach (array_keys($type_data) as $subtype) {

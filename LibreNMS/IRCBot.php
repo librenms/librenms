@@ -22,6 +22,7 @@ namespace LibreNMS;
 
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Enum\AlertState;
 
 class IRCBot
 {
@@ -237,10 +238,10 @@ class IRCBot
             }
 
             switch ($alert['state']) :
-                case 3:
+                case AlertState::WORSE:
                     $severity_extended = '+';
                     break;
-                case 4:
+                case AlertState::BETTER:
                     $severity_extended = '-';
                     break;
                 default:
@@ -248,7 +249,7 @@ class IRCBot
             endswitch;
 
             $severity = str_replace(array('warning', 'critical'), array($this->_color('Warning', 'yellow'), $this->_color('Critical', 'red')), $alert['severity']).$severity_extended.' ';
-            if ($alert['state'] == 0 and $this->config['irc_alert_utf8']) {
+            if ($alert['state'] == AlertState::RECOVERED and $this->config['irc_alert_utf8']) {
                 $severity = str_replace(array('Warning', 'Critical'), array('̶W̶a̶r̶n̶i̶n̶g', '̶C̶r̶i̶t̶i̶c̶a̶l'), $severity);
             }
 

@@ -67,10 +67,6 @@ class DevCheckCommand extends LnmsCommand
 
         $result = $this->helper->run();
 
-        if (getenv('EXECUTE_BUILD_DOCS') && $this->helper->getFlag('docs_changed')) {
-            exec('bash scripts/deploy-docs.sh');
-        }
-
         if ($result == 0 && $this->helper->allChecksComplete()) {
             $this->line("\033[32mTests ok, submit away :)\033[0m");
         }
@@ -105,7 +101,7 @@ class DevCheckCommand extends LnmsCommand
         }
 
         if ($check == 'ci') {
-            $this->helper->setFlags(['ci' => true]);
+            $this->helper->setFlags(['ci' => true, 'fail-fast' => true]);
             $this->helper->duskHeadless();
             $this->helper->enableSnmpsim();
             $this->helper->enableDb();
