@@ -70,7 +70,7 @@ class AviatWtm extends OS implements
             $sensors[] = new WirelessSensor(
                 'frequency',
                 $this->getDeviceId(),
-                "1.3.6.1.4.1.2509.9.3.2.1.1.11.$index",
+                "1.3.6.1.4.1.2509.9.5.2.1.1.1.$index",
                 'aviat-wtm-carrier-tx-freq',
                 $index,
                 "TX Frequency ({$name[$index]})",
