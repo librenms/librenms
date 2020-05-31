@@ -21,14 +21,14 @@
 * @author     Roman Tutkevich <race.fdm@gmail.com>
 */
 
-$inoctets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.30', array());
-$outoctets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.15', array());
-$inbpackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.20', array());
-$outbpackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.5', array());
-$inmpackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.21', array());
-$outmpackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.6', array());
-$inupackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.22', array());
-$outupackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.7', array());
+$inoctets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.15', array());    //  hwGponOltEthernetStatisticReceivedBytes
+$outoctets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.30', array());   //  hwGponOltEthernetStatisticSendBytes
+$inbpackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.5', array());   //  hwGponOltEthernetStatisticReceivedBroadcastPakts
+$outbpackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.20', array()); //  hwGponOltEthernetStatisticSendBroadcastPakts
+$inmpackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.6', array());   //  hwGponOltEthernetStatisticReceivedMulticastPakts
+$outmpackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.21', array()); //  hwGponOltEthernetStatisticSendMulticastPakts
+$inupackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.7', array());   //  hwGponOltEthernetStatisticReceivedUnicastPakts
+$outupackets = snmpwalk_cache_oid($device, '.1.3.6.1.4.1.2011.6.128.1.1.4.21.1.22', array()); //  hwGponOltEthernetStatisticSendUnicastPakts
 
 foreach ($inoctets as $index => $value) {
     $index=preg_replace("/^(.*?)\.([0-9]+)$/", "$2", $index);
