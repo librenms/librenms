@@ -50,6 +50,7 @@ return [
             'influxdb' => '資料存放區: InfluxDB',
             'opentsdb' => '資料存放區: OpenTSDB',
             'ping' => 'Ping',
+            'prometheus' => '資料存放區: Prometheus',
             'rrdtool' => 'RRDTool 設定',
             'snmp' => 'SNMP',
             'poller_modules' => '輪詢器模組',
