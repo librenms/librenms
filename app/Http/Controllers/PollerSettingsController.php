@@ -33,6 +33,11 @@ class PollerSettingsController extends Controller
     public function update(Request $request, $id, $setting)
     {
         $poller = PollerCluster::findOrFail($id);
+        $definition = collect($poller->configDefinition())->keyBy('name');
+        if (!$definition->has($setting)) {
+            return response()->json(['error' => 'Invalid setting'], 422);
+        }
+
         $poller->$setting = $request->get('value');
         $poller->save();
         return response()->json(['value' => $poller->$setting]);
@@ -41,8 +46,13 @@ class PollerSettingsController extends Controller
     public function destroy($id, $setting)
     {
         $poller = PollerCluster::findOrFail($id);
-        $poller->$setting = null;
+        $definition = collect($poller->configDefinition())->keyBy('name');
+        if (!$definition->has($setting)) {
+            return response()->json(['error' => 'Invalid setting'], 422);
+        }
+
+        $poller->$setting = $definition->get($setting)['default'];
         $poller->save();
-        return response()->json(['value' => $poller->$setting]); // TODO return default
+        return response()->json(['value' => $poller->$setting]);
     }
 }
