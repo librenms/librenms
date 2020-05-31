@@ -45,8 +45,7 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 # Install PHP dependencies
 
 ```bash
-cd /op  
-cd /opt/librenms
+su - librenms
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
@@ -146,7 +145,6 @@ Delete default nginx site.
 
 ```bash
 rm /etc/nginx/sites-enabled/default
-systemctl restart nginx
 ```
 
 Check nginx configuration and restart nginx service.
