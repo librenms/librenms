@@ -15,7 +15,7 @@ plugins:
       Generic Files LineLength TooLong:
         enabled: false
   duplication:
-    enabled: true
+    enabled: false
     config:
       languages:
       - javascript
