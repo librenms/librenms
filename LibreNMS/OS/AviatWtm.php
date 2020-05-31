@@ -63,13 +63,24 @@ class AviatWtm extends OS implements
 
     public function discoverWirelessFrequency()
     {
-        $carrier1_oid = '.1.3.6.1.4.1.2509.9.5.2.1.1.1.59';
-        $carrier2_oid = '.1.3.6.1.4.1.2509.9.5.2.1.1.1.60';
+        $sensors = [];
+        $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+        $frequency = snmpwalk_cache_oid($this->getDevice(), 'aviatRfFreqTx', [], 'AVIAT-RF-MIB:');
+        foreach ($frequency as $index => $data) {
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                "1.3.6.1.4.1.2509.9.3.2.1.1.11.$index",
+                'aviat-wtm-carrier-tx-freq',
+                $index,
+                "TX Frequency ({$name[$index]})",
+                $data['aviatRfFreqTx'],
+                1,
+                1000
+            );
+        }
 
-        return array(
-            new WirelessSensor('frequency', $this->getDeviceId(), $carrier1_oid, 'aviat-wtm-carrier1-tx-freq', 1, 'TX Frequency (Carrier1/1)', null, 1, 1000),
-            new WirelessSensor('frequency', $this->getDeviceId(), $carrier2_oid, 'aviat-wtm-carrier2-tx-freq', 1, 'TX Frequency (Carrier1/2)', null, 1, 1000)
-        );
+        return $sensors;
     }
 
     /**
@@ -183,9 +194,9 @@ class AviatWtm extends OS implements
     {
         $sensors = [];
         $name = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
-        $snr = snmpwalk_cache_oid($this->getDevice(), 'aviatRxPerformTxpowReadingCurrent', [], 'AVIAT-RXPERFORMANCE-EX-MIB');
+        $power = snmpwalk_cache_oid($this->getDevice(), 'aviatRxPerformTxpowReadingCurrent', [], 'AVIAT-RXPERFORMANCE-EX-MIB');
 
-        foreach ($snr as $index => $data) {
+        foreach ($power as $index => $data) {
             $sensors[] = new WirelessSensor(
                 'power',
                 $this->getDeviceId(),
