@@ -14,7 +14,7 @@ you select the same option when they are presented.
 # Install Required Packages
 
 === "Ubuntu 20.04"
-    === "Nginx"
+    === "NGINX"
         ```
         apt install software-properties-common
         add-apt-repository universe
@@ -31,7 +31,7 @@ you select the same option when they are presented.
         ```
 
 === "CentOS 8"
-    === "Nginx"
+    === "NGINX"
         ```
         yum install epel-release yum-utils
         yum localinstall http://rpms.remirepo.net/enterprise/remi-release-7.rpm
@@ -46,7 +46,7 @@ you select the same option when they are presented.
         ```
 
 === "Debian 10"
-    === "Nginx"
+    === "NGINX"
         ```
         apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.3-cli php7.3-curl php7.3-fpm php7.3-gd php7.3-json php7.3-mbstring php7.3-mysql php7.3-snmp php7.3-xml php7.3-zip python-memcache python-mysqldb rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools
         ```
@@ -183,7 +183,7 @@ listen = /run/php-fpm-librenms.sock;
 # Web Server
     
 === "Ubuntu 20.04"
-    === "Nginx"        
+    === "NGINX"        
         ```bash
         vi /etc/nginx/conf.d/librenms.conf
         ```
@@ -262,7 +262,7 @@ listen = /run/php-fpm-librenms.sock;
         ```
 
 === "Debian 10"
-    === "Nginx"
+    === "NGINX"
         ```bash
         vi /etc/nginx/sites-enabled/librenms.vhost
         ```
@@ -304,7 +304,7 @@ listen = /run/php-fpm-librenms.sock;
 
 
 === "CentOS 8"
-    === "Nginx"
+    === "NGINX"
         ```
         vi /etc/nginx/conf.d/librenms.conf
         ```
