@@ -33,10 +33,8 @@ you select the same option when they are presented.
 === "CentOS 8"
     === "NGINX"
         ```
-        yum install epel-release yum-utils
-        yum localinstall http://rpms.remirepo.net/enterprise/remi-release-7.rpm
-        yum-config-manager --enable remi-php73
-        yum install composer cronie fping git ImageMagick jwhois mariadb mariadb-server mtr MySQL-python net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-mbstring php-process php-snmp php-xml php-zip php-memcached php-mysqlnd python-memcached rrdtool python3 python3-pip
+        yum install epel-release
+        yum install cronie fping git ImageMagick mariadb mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3-PyMySQL python3-redis python3-memcached rrdtool
         ```
     
     === "Apache"
@@ -77,7 +75,7 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 
 ```
 su - librenms
-composer install --no-dev
+./scripts/composer_wrapper.php install --no-dev
 exit
 ```
 
@@ -92,7 +90,7 @@ exit
     
 === "CentOS 8"
     ```
-    vi /etc/my.cnf
+    vi /etc/my.cnf.d/mariadb-server.cnf
     ```
 
 Within the `[mysqld]` section add:
@@ -167,6 +165,10 @@ timedatectl set-timezone Etc/UTC
     ```
 
 === "CentOS 8"
+    ```bash
+    cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/librenms.conf
+    vi /etc/php-fpm.d/librenms.conf
+    ```
 
 ```
 # Change "www" to "librenms"
@@ -330,7 +332,7 @@ listen = /run/php-fpm-librenms.sock;
          location ~ \.php {
           include fastcgi.conf;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
-          fastcgi_pass unix:/run/php-fpm/php-fpm.sock;
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
          }
          location ~ /\.ht {
           deny all;
@@ -387,7 +389,7 @@ listen = /run/php-fpm-librenms.sock;
     Install the policy tool for SELinux:
     
     ```
-    yum install policycoreutils-python
+    yum install python3-policycoreutils
     ```
     
     ## Configure the contexts needed by LibreNMS:
