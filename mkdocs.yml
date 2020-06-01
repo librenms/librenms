@@ -14,6 +14,8 @@ site_url: http://docs.librenms.org
 markdown_extensions:
     - pymdownx.tasklist
     - pymdownx.tilde
+    - pymdownx.superfences
+    - pymdownx.tabbed
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
@@ -35,13 +37,9 @@ nav:
       - Features: Support/Features.md
       - Welcome to Observium users: General/Welcome-to-Observium-users.md
   - 2. Installing:
-      - Installing LibreNMS: Installation/index.md
+      - How to install LibreNMS: Installation/index.md
+      - Install LibreNMS: Installation/Install-LibreNMS.md
       - LibreNMS VMs: Installation/Images.md
-      - Ubuntu 18.04 (Nginx): Installation/Installation-Ubuntu-1804-Nginx.md
-      - Ubuntu 18.04 (Apache): Installation/Installation-Ubuntu-1804-Apache.md
-      - Debian 10 (Nginx): Installation/Installation-Debian-10-Nginx.md
-      - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
-      - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md
   - 3. Getting started:
       - Choosing a release: General/Releases.md
