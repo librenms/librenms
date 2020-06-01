@@ -27,15 +27,8 @@ you select the same option when they are presented.
         apt install software-properties-common
         add-apt-repository universe
         apt update
-        apt install acl curl apache2 composer fping git graphviz imagemagick libapache2-mod-php7.2 mariadb-client mariadb-server mtr-tiny nmap php7.2-cli php7.2-curl php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois python3-pip
+        apt install acl curl apache2 composer fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools
         ```
-        
-    # Add librenms user
-    
-    ```
-    useradd librenms -d /opt/librenms -M -r -s /usr/bin/bash
-    usermod -a -G librenms www-data
-    ```
 
 === "CentOS 8"
     === "Nginx"
@@ -52,27 +45,17 @@ you select the same option when they are presented.
         yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip python3 python3-pip
         ```
 
-    # Add librenms user
-    
-    ```
-    useradd librenms -d /opt/librenms -M -r -s /usr/bin/bash
-    usermod -a -G librenms nginx
-    ```
-
 === "Debian 10"
     === "Nginx"
         ```
         apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.3-cli php7.3-curl php7.3-fpm php7.3-gd php7.3-json php7.3-mbstring php7.3-mysql php7.3-snmp php7.3-xml php7.3-zip python-memcache python-mysqldb rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools
         ```
-    
-    # Add librenms user
-    
-    ```
-    useradd librenms -d /opt/librenms -M -r -s /usr/bin/bash
-    usermod -a -G librenms www-data
-    ```
+        
+# Add librenms user
 
-
+```
+useradd librenms -d /opt/librenms -M -r -s /usr/bin/bash
+```
 
 # Download LibreNMS
 
@@ -85,7 +68,7 @@ git clone https://github.com/librenms/librenms.git
 
 ```
 chown -R librenms:librenms /opt/librenms
-chmod 770 /opt/librenms
+chmod 771 /opt/librenms
 setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 ```
@@ -94,7 +77,7 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 
 ```
 su - librenms
-./scripts/composer_wrapper.php install --no-dev
+composer install --no-dev
 exit
 ```
 
@@ -102,8 +85,29 @@ exit
 
 ## Configure MySQL
 
+=== "Ubuntu 20.04 / Debian 10"
+    ```
+    vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    ```
+    
+=== "CentOS 8"
+    ```
+    vi /etc/my.cnf
+    ```
+
+Within the `[mysqld]` section add:
+
+```bash
+innodb_file_per_table=1
+lower_case_table_names=0
 ```
-systemctl start mariadb
+
+```
+systemctl enable mariadb
+systemctl restart mariadb
+```
+
+```
 mysql -u root
 ```
 
@@ -117,57 +121,69 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-=== "Ubuntu 20.04 / Debian 10"
-    ```
-    vi /etc/mysql/mariadb.conf.d/50-server.cnf
-    ```
-    
-=== "CentOS 8"
-    ```
-    vi /etc/my.cnf
-    ```
+# Configure PHP
 
-Within the `[mysqld]` section please add:
-
-```bash
-innodb_file_per_table=1
-lower_case_table_names=0
-```
-
-```
-systemctl enable mariadb
-systemctl restart mariadb
-```
-
-# Web Server
-
-## Configure PHP
-
-### Set timezone
+## Set timezone
 
 See <http://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
-Please remember to set the system timezone as well.
+Ensure date.timezone is set in php.ini to your preferred time zone.
+
+=== "Ubuntu 20.04"
+    ```bash
+    vi /etc/php/7.4/fpm/php.ini
+    vi /etc/php/7.4/cli/php.ini
+    ```
+        
+=== "Debian 10"
+    ```bash
+    vi /etc/php/7.3/fpm/php.ini
+    vi /etc/php/7.3/cli/php.ini
+    ```
+
+=== "CentOS 8"
+    ```
+    vi /etc/php.ini
+    ```
+
+Remember to set the system timezone as well.
 
 ```
 timedatectl set-timezone Etc/UTC
 ```
 
-Ensure date.timezone is set in php.ini to your preferred time zone.
-        
+## Configure PHP-FPM
+
 === "Ubuntu 20.04"
-    === "Nginx"
-        ```bash
-        vi /etc/php/7.4/fpm/php.ini
-        vi /etc/php/7.4/cli/php.ini
-        ```
-        
-        ```bash
-        systemctl restart php7.4-fpm
-        ```
-        
-        ## Configure NGINX
-        
+    ```bash
+    cp /etc/php/7.4/fpm/pool.d/www.conf /etc/php/7.4/fpm/pool.d/librenms.conf
+    vi /etc/php/7.4/fpm/pool.d/librenms.conf
+    ```
+
+=== "Debian 10"
+    ```bash
+    cp /etc/php/7.3/fpm/pool.d/www.conf /etc/php/7.3/fpm/pool.d/librenms.conf
+    vi /etc/php/7.3/fpm/pool.d/librenms.conf
+    ```
+
+=== "CentOS 8"
+
+```
+# Change "www" to "librenms"
+[librenms]
+
+# Change user and group to "librenms"
+user = librenms
+group = librenms
+
+# Change listen to a unique name
+listen = /run/php-fpm-librenms.sock;
+```
+
+# Web Server
+    
+=== "Ubuntu 20.04"
+    === "Nginx"        
         ```bash
         vi /etc/nginx/conf.d/librenms.conf
         ```
@@ -193,31 +209,21 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
          location ~ \.php {
           include fastcgi.conf;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
-          fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
          }
          location ~ /\.ht {
           deny all;
          }
         }
         ```
-        
+
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl restart nginx
+        systemctl restart php7.4-fpm
         ```
-        
+
     === "Apache"
-        ```bash
-        vi /etc/php/7.4/apache2/php.ini
-        vi /etc/php/7.4/cli/php.ini
-        
-        a2enmod php7.4
-        a2dismod mpm_event
-        a2enmod mpm_prefork
-        ```
-        
-        ## Configure Apache
-        
         ```bash
         vi /etc/apache2/sites-available/librenms.conf
         ```
@@ -235,34 +241,29 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
             AllowOverride All
             Options FollowSymLinks MultiViews
           </Directory>
-        </VirtualHost>
+
+          # Enable http authorization headers
+          <IfModule setenvif_module>
+            SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
+          </IfModule>
+    
+          <FilesMatch ".+\.php$">
+            SetHandler "proxy:unix:/run/php-fpm-librenms.sock|fcgi://localhost"
+          </FilesMatch>
+        </VirtualHost>     
         ```
-        
-        > NOTE: If this is the only site you are hosting on this server (it
-        > should be :)) then you will need to disable the default
-        > site. `a2dissite 000-default`
-        
+
         ```bash
+        a2dissite 000-default
+        a2enmod proxy_fcgi setenvif rewrite
         a2ensite librenms.conf
-        a2enmod rewrite
         systemctl restart apache2
+        systemctl restart php7.4-fpm
         ```
 
 === "Debian 10"
     === "Nginx"
         ```bash
-        vi /etc/php/7.3/fpm/php.ini
-        vi /etc/php/7.3/cli/php.ini
-        ```
-        
-        ```bash
-        systemctl restart php7.3-fpm
-        ```
-        
-        ## Configure NGINX
-        
-        ```bash
-        rm /etc/nginx/sites-available/default && rm /etc/nginx/sites-enabled/default
         vi /etc/nginx/sites-enabled/librenms.vhost
         ```
         
@@ -287,7 +288,7 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
          location ~ \.php {
           include fastcgi.conf;
           fastcgi_split_path_info ^(.+\.php)(/.+)$;
-          fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
          }
          location ~ /\.ht {
           deny all;
@@ -296,43 +297,14 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
         ```
         
         ```bash
+        rm /etc/nginx/sites-enabled/default
         systemctl reload nginx
+        systemctl restart php7.3-fpm
         ```
 
 
 === "CentOS 8"
     === "Nginx"
-        ```
-        vi /etc/php.ini
-        ```
-        
-        In `/etc/php-fpm.d/www.conf` make these changes:
-        
-        ```
-        vi /etc/php-fpm.d/www.conf
-        ```
-        
-        ```nginx
-        ;user = apache
-        user = nginx
-        
-        group = apache   ; keep group as apache
-        
-        ;listen = 127.0.0.1:9000
-        listen = /run/php-fpm/php-fpm.sock
-        
-        listen.owner = nginx
-        listen.group = nginx
-        listen.mode = 0660
-        ```
-        
-        ```
-        systemctl enable php-fpm
-        systemctl restart php-fpm
-        ```
-        
-        ## Configure NGINX
-        
         ```
         vi /etc/nginx/conf.d/librenms.conf
         ```
@@ -372,17 +344,11 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
         Delete the `server` section from `/etc/nginx/nginx.conf`
         
         ```
-        systemctl enable nginx
-        systemctl restart nginx
+        systemctl enable --now nginx
+        systemctl enable --now php-fpm
         ```
 
     === "Apache"
-        ```
-        vi  /etc/php.ini
-        ```
- 
-        ## Configure Apache
-        
         Create the librenms.conf:
         
         ```
