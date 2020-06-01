@@ -1,12 +1,13 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 import argparse, datetime, sys, subprocess
 from subprocess import call, Popen
 from os.path import dirname, abspath
 
 raw_input = getattr(__builtins__, 'raw_input', input)
 
+
 def confirm(question):
-    valid = {"yes":True, "y":True, "ye":True, "no":False, "n":False}
+    valid = {"yes": True, "y": True, "ye": True, "no": False, "n": False}
     while 1:
         sys.stdout.write(question + " [y/N] ")
         choice = raw_input().lower()
