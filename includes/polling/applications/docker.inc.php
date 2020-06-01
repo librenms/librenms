@@ -53,11 +53,11 @@ foreach ($docker_data as $data) {
     $rrd_name = ['app', $name, $app_id, $container];
 
     $fields = [
-        'cpu_usage' => (float)$data['cpu'],
+        'cpu_usage' => ((float)$data['cpu']) * 100,
         'pids' => $data['pids'],
         'mem_limit' => convertToBytes($data['memory']['limit']),
         'mem_used' => convertToBytes($data['memory']['used']),
-        'mem_perc' => (float)$data['memory']['perc'],
+        'mem_perc' => ((float)$data['memory']['perc']) * 100,
     ];
 
     $metrics[$container] = $fields;
