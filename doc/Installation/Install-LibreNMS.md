@@ -395,18 +395,9 @@ listen = /run/php-fpm-librenms.sock;
     ## Configure the contexts needed by LibreNMS:
     
     ```
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/logs(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/logs(/.*)?'
-    restorecon -RFvv /opt/librenms/logs/
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/rrd(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/rrd(/.*)?'
-    restorecon -RFvv /opt/librenms/rrd/
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/storage(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/storage(/.*)?'
-    restorecon -RFvv /opt/librenms/storage/
-    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/bootstrap/cache(/.*)?'
-    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/bootstrap/cache(/.*)?'
-    restorecon -RFvv /opt/librenms/bootstrap/cache/
+    semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/html(/.*)?'
+    semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/(logs|rrd|storage)(/.*)?'
+    restorecon -RFvv /opt/librenms
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_execmem 1
     ```
@@ -439,6 +430,12 @@ listen = /run/php-fpm-librenms.sock;
     semodule_package -o http_fping.pp -m http_fping.mod
     semodule -i http_fping.pp
     ```
+    
+    Additional SELinux problems may be found by executing the following command
+    
+    ```
+    audit2why < /var/log/audit/audit.log
+    ```
 
 # Allow access through firewall
 
@@ -447,10 +444,8 @@ listen = /run/php-fpm-librenms.sock;
 
 === "CentOS 8"
     ```
-    firewall-cmd --zone public --add-service http
-    firewall-cmd --permanent --zone public --add-service http
-    firewall-cmd --zone public --add-service https
-    firewall-cmd --permanent --zone public --add-service https
+    firewall-cmd --zone public --add-service http --add-service https
+    firewall-cmd --permanent --zone public --add-service http --add-service https
     ```
 
 # Configure snmpd
