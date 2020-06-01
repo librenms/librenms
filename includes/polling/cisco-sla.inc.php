@@ -18,6 +18,7 @@ if (count($slas) > 0) {
     foreach ($slas as $sla) {
         $sla_nr = $sla['sla_nr'];
         $rtt_type = $sla['rtt_type'];
+        $sla_tag = $sla['tag'];
 
         // Lets process each SLA
         $unixtime = intval(($rttMonLatestRttOperTable['1.3.6.1.4.1.9.9.42.1.2.10.1.5'][$sla_nr] / 100 + $time_offset));
@@ -42,12 +43,13 @@ if (count($slas) > 0) {
 
         $fields = array(
             'rtt' => $rtt,
+            'opstatus' => $opstatus,
         );
 
         // The base RRD
         $rrd_name = array('sla', $sla_nr);
         $rrd_def = RrdDefinition::make()->addDataset('rtt', 'GAUGE', 0, 300000);
-        $tags = compact('sla_nr', 'rrd_name', 'rrd_def');
+        $tags = compact('sla_tag', 'sla_nr', 'rrd_name', 'rrd_def');
         data_update($device, 'sla', $tags, $fields);
 
         // Let's gather some per-type fields.
