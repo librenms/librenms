@@ -116,6 +116,20 @@ class Checks
         }
     }
 
+    /**
+     * Check the script is running as the right user (works before config is available)
+     */
+    public static function runningUser()
+    {
+        if (function_exists('posix_getpwuid') && posix_getpwuid(posix_geteuid())['name'] !== get_current_user()) {
+            self::printMessage(
+                'Error: You must run lnms as the user ' . get_current_user(),
+                null,
+                true
+            );
+        }
+    }
+
     private static function printMessage($title, $content, $exit = false)
     {
         $content = (array)$content;

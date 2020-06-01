@@ -1,0 +1,621 @@
+-- ****************************************************************************
+-- aviatRf.mib: Aviat Networks RF Configuration Settings MIB
+--
+-- Copyright © 2014 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+AVIAT-RF-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Integer32
+            FROM SNMPv2-SMI
+        TruthValue
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        AviatPowerLevel, AviatDecibel, AviatModulationType, AviatRfuSideBandType
+            FROM AVIAT-TEXTCONVENTION-MIB
+        entPhysicalIndex
+            FROM ENTITY-MIB
+        aviatModules
+            FROM STXN-GLOBALREGISTER-MIB;
+
+    aviatRfModule MODULE-IDENTITY
+        LAST-UPDATED    "201511051430Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 5200 Great America Parkway
+                                 Santa Clara
+                                 California 95054
+                                 United States of America
+
+                         Tel: 408 567 7000
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This MIB module supports the RF Fault Management functions of
+                 the radio."
+        REVISION        "201511051430Z"
+        DESCRIPTION
+                "Added Tx power limit capability."
+        REVISION        "201507290845Z"
+        DESCRIPTION
+                "Added side band and Tx Rx spacing capability indications."
+        REVISION        "201502100948Z"
+        DESCRIPTION
+                "Added external RF switch indication."
+        REVISION        "201501270246Z"
+        DESCRIPTION
+                "Added 5.8GHz/ L6GHz selection support."
+        REVISION        "201411070247Z"
+        DESCRIPTION
+                "Added Semiconductor Technology."
+        REVISION        "201401210157Z"
+        DESCRIPTION
+                "Initial Version."
+            ::= { aviatModules 5 }
+
+
+-- ****************************************************************************
+-- Conformance area, containing groups and compliance specifications
+-- ****************************************************************************
+    aviatRfConformance          OBJECT IDENTIFIER ::= { aviatRfModule 1 }
+
+    aviatRfGroups               OBJECT IDENTIFIER ::= { aviatRfConformance 1 }
+
+    aviatRfCompliance           OBJECT IDENTIFIER ::= { aviatRfConformance 2 }
+
+
+-- ****************************************************************************
+-- Sub-tree for RF MIB objects
+-- ****************************************************************************
+    aviatRfMIBObjects           OBJECT IDENTIFIER ::= { aviatRfModule 2 }
+
+-- ****************************************************************************
+-- RF Config Types Table
+-- ****************************************************************************
+    aviatRfConfigTable          OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing the RF configuration objects for a
+                         particular entity of the system."
+            ::= { aviatRfMIBObjects 1 }
+
+    aviatRfConfigEntry          OBJECT-TYPE
+        SYNTAX          AviatRfConfigEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the RF configuration table."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatRfConfigTable 1 }
+
+    AviatRfConfigEntry ::=
+        SEQUENCE {
+            aviatRfFreqTx
+                Integer32,
+            aviatRfFreqRx
+                Integer32,
+            aviatRfPowerSet
+                AviatPowerLevel,
+            aviatRfTxMute
+                TruthValue,
+            aviatRfHighGain
+                TruthValue,
+            aviatRfBandSelection
+                INTEGER
+        }
+
+    aviatRfFreqTx               OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        UNITS           "kHz"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the transmit frequency of the unit."
+            ::= { aviatRfConfigEntry 1 }
+
+    aviatRfFreqRx               OBJECT-TYPE
+        SYNTAX          Integer32 ( 0..2147483647 )
+        UNITS           "kHz"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the receive frequency of the unit."
+            ::= { aviatRfConfigEntry 2 }
+
+    aviatRfPowerSet             OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        UNITS           "0.1 dBm"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the desired output power for the
+                         transmitter of the unit."
+            ::= { aviatRfConfigEntry 3 }
+
+    aviatRfTxMute               OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the status of the factory mute of the
+                         unit. If set to TRUE, the transmitter output will be
+                         muted. It should be set to FALSE otherwise.
+
+                         This setting is 'ORed' with other conditions
+                         (including diagnostic functions and configuration
+                         validation) to control the transmitter output status."
+        DEFVAL          { true }
+            ::= { aviatRfConfigEntry 4 }
+
+    aviatRfHighGain             OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies whether to assign a high power license
+                         to this RF interface. If set to TRUE a license has
+                         been assigned, FALSE otherwise."
+        DEFVAL          { false }
+            ::= { aviatRfConfigEntry 5 }
+
+    aviatRfBandSelection        OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    upper5g8   (1),
+                                    lower6g    (2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This is used to select a sub-band within the frequency
+                         range of the attached RFU. It is intended to limit the
+                         frequencies available for configuration of the RFU."
+            ::= { aviatRfConfigEntry 6 }
+
+
+-- ****************************************************************************
+-- RF ATPC MIB Types Table
+-- ****************************************************************************
+    aviatRfATPCTable            OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRfATPCEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing the RF ATPC configuration objects
+                         for a particular entity of the system."
+            ::= { aviatRfMIBObjects 2 }
+
+    aviatRfATPCEntry            OBJECT-TYPE
+        SYNTAX          AviatRfATPCEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the RF ATPC table."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatRfATPCTable 1 }
+
+    AviatRfATPCEntry ::=
+        SEQUENCE {
+            aviatRfATPCEnabled
+                TruthValue,
+            aviatRfATPCTargetFadeMargin
+                AviatDecibel,
+            aviatRfATPCMaximumPower
+                AviatPowerLevel,
+            aviatRfATPCMinimumPower
+                AviatPowerLevel,
+            aviatRfATPCFCCCompliant
+                TruthValue
+        }
+
+    aviatRfATPCEnabled          OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This is the control to enable or disable the Automatic
+                         Transmit Power Control (ATPC) function on the unit."
+            ::= { aviatRfATPCEntry 1 }
+
+    aviatRfATPCTargetFadeMargin OBJECT-TYPE
+        SYNTAX          AviatDecibel
+        UNITS           "0.1 dB"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the desired nominal fade margin that
+                         the Automatic Transmit Power Control function should
+                         attempt to maintain."
+        DEFVAL          { 100 }
+            ::= { aviatRfATPCEntry 2 }
+
+    aviatRfATPCMaximumPower     OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        UNITS           "0.1 dBm"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the maximum power level that the
+                         Automatic Transmit Power Control function may set."
+        DEFVAL          { 200 }
+            ::= { aviatRfATPCEntry 3 }
+
+    aviatRfATPCMinimumPower     OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        UNITS           "0.1 dBm"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the minimum power level that the
+                         Automatic Transmit Power Control function may set."
+        DEFVAL          { 0 }
+            ::= { aviatRfATPCEntry 4 }
+
+    aviatRfATPCFCCCompliant     OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This is the control to enable or disable the Federal
+                         Communications Commission (FCC) compliant Automatic
+                         Transmit Power Control function."
+        DEFVAL          { false }
+            ::= { aviatRfATPCEntry 5 }
+
+
+-- ****************************************************************************
+-- RFU CAPABILITIES MIB Types Table
+-- ****************************************************************************
+    aviatRfuCapabilityTable     OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRfuCapabilityEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing the capabilities of an attached
+                         RFU."
+            ::= { aviatRfMIBObjects 3 }
+
+    aviatRfuCapabilityEntry     OBJECT-TYPE
+        SYNTAX          AviatRfuCapabilityEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the RFU capabilities table."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatRfuCapabilityTable 1 }
+
+    AviatRfuCapabilityEntry ::=
+        SEQUENCE {
+            aviatRfuTxFreqMax
+                Integer32,
+            aviatRfuTxFreqMin
+                Integer32,
+            aviatRfuRxFreqMax
+                Integer32,
+            aviatRfuRxFreqMin
+                Integer32,
+            aviatRfuFreqStepMin
+                Integer32,
+            aviatRfuBandwidthMax
+                Integer32,
+            aviatRfuTxRxSpacingMax
+                Integer32,
+            aviatRfuTxRxSpacingMin
+                Integer32,
+            aviatRfuTxPowerMax
+                Integer32,
+            aviatRfuTxPowerMin
+                Integer32,
+            aviatRfuPowerStep
+                Integer32,
+            aviatRfuNoiseFigure
+                Integer32,
+            aviatRfuModulationMax
+                AviatModulationType,
+            aviatRfuTxRxSpacingPreset
+                TruthValue,
+            aviatRfuTxSideBand
+                AviatRfuSideBandType,
+            aviatRfuTxPowerLimit
+                Integer32
+        }
+
+    aviatRfuTxFreqMax           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU maximum transmit frequency capability."
+            ::= { aviatRfuCapabilityEntry 1 }
+
+    aviatRfuTxFreqMin           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU minimum Tx frequency capability."
+            ::= { aviatRfuCapabilityEntry 2 }
+
+    aviatRfuRxFreqMax           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU maximum Rx frequency capability."
+            ::= { aviatRfuCapabilityEntry 3 }
+
+    aviatRfuRxFreqMin           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU minimum Rx frequency capability."
+            ::= { aviatRfuCapabilityEntry 4 }
+
+    aviatRfuFreqStepMin         OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU minimum frequency step size capability."
+            ::= { aviatRfuCapabilityEntry 5 }
+
+    aviatRfuBandwidthMax        OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU maximum bandwidth capability."
+            ::= { aviatRfuCapabilityEntry 6 }
+
+    aviatRfuTxRxSpacingMax      OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU maximum Tx Rx spacing capability."
+            ::= { aviatRfuCapabilityEntry 7 }
+
+    aviatRfuTxRxSpacingMin      OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU minimum Tx Rx spacing capability."
+            ::= { aviatRfuCapabilityEntry 8 }
+
+    aviatRfuTxPowerMax          OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU maximum Tx power capability."
+            ::= { aviatRfuCapabilityEntry 9 }
+
+    aviatRfuTxPowerMin          OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU minimum Tx power capability."
+            ::= { aviatRfuCapabilityEntry 10 }
+
+    aviatRfuPowerStep           OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU power step capability."
+            ::= { aviatRfuCapabilityEntry 11 }
+
+    aviatRfuNoiseFigure         OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The RFU noise figure capability."
+            ::= { aviatRfuCapabilityEntry 12 }
+
+    aviatRfuModulationMax       OBJECT-TYPE
+        SYNTAX          AviatModulationType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This RFU maximum modulation capability."
+            ::= { aviatRfuCapabilityEntry 13 }
+
+    aviatRfuTxRxSpacingPreset   OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates if the valid RFU Tx Rx spacing range is limited
+                         to the preset values provided by aviatRfuTxSpacingTable."
+            ::= { aviatRfuCapabilityEntry 14 }
+
+    aviatRfuTxSideBand          OBJECT-TYPE
+        SYNTAX          AviatRfuSideBandType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates the RFU side band."
+            ::= { aviatRfuCapabilityEntry 15 }
+
+    aviatRfuTxPowerLimit        OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "RFU maximum Tx power limit for any modulation."
+            ::= { aviatRfuCapabilityEntry 16 }
+
+-- ****************************************************************************
+-- RFU CAPABILITIES MIB Spacing Table
+-- ****************************************************************************
+    aviatRfuTxSpacingTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRfuTxSpacingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing the allowed spacings for an
+                         attached RFU."
+            ::= { aviatRfMIBObjects 4 }
+
+    aviatRfuTxSpacingEntry      OBJECT-TYPE
+        SYNTAX          AviatRfuTxSpacingEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the RFU Tx spacing table."
+        INDEX           { entPhysicalIndex, aviatRfuTxSpacingIndex }
+            ::= { aviatRfuTxSpacingTable 1 }
+
+    AviatRfuTxSpacingEntry ::=
+        SEQUENCE {
+            aviatRfuTxSpacingIndex
+                Gauge32,
+            aviatRfuTxSpacingFreq
+                Integer32
+        }
+
+    aviatRfuTxSpacingIndex      OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An index representing a TxRx Spacing entry for an
+                         entity."
+            ::= { aviatRfuTxSpacingEntry 1 }
+
+    aviatRfuTxSpacingFreq       OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "A TxRx spacing entry valid for the system."
+            ::= { aviatRfuTxSpacingEntry 2 }
+
+
+-- ****************************************************************************
+-- RFU Details MIB Types Table
+-- ****************************************************************************
+    aviatRfuDetailsTable        OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRfuDetailsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing the details of an attached RFU."
+            ::= { aviatRfMIBObjects 5 }
+
+    aviatRfuDetailsEntry        OBJECT-TYPE
+        SYNTAX          AviatRfuDetailsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the RFU details table."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatRfuDetailsTable 1 }
+
+    AviatRfuDetailsEntry ::=
+        SEQUENCE {
+            aviatRfuType
+                Integer32,
+            aviatRfuFreqBand
+                Integer32,
+            aviatRfuPowerAmp
+                Integer32,
+            aviatRfuSemiconductorTech
+                INTEGER,
+            aviatRfuUnlicensed5G8Cap
+                TruthValue,
+            aviatRfuExternalCoaxPresent
+                TruthValue
+        }
+
+    aviatRfuType                OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The type indentification of the attached RFU."
+            ::= { aviatRfuDetailsEntry 1 }
+
+    aviatRfuFreqBand            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The frequency band indication of the attached RFU."
+            ::= { aviatRfuDetailsEntry 2 }
+
+    aviatRfuPowerAmp            OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The power amplifier type of the attached RFU."
+            ::= { aviatRfuDetailsEntry 3 }
+
+    aviatRfuSemiconductorTech   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    gaas (0),
+                                    gan  (1)
+                                 }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The semiconductor technology used in the power
+                         amplifier of the attached RFU. This is used to
+                         determine whether IDQ optimization is necessary
+                         for GaN type devices."
+            ::= { aviatRfuDetailsEntry 4 }
+
+    aviatRfuUnlicensed5G8Cap    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates that a 5.8GHz capable RFU is attached. This
+                         unit can operate across frequency ranges which are
+                         unlicensed in some markets."
+            ::= { aviatRfuDetailsEntry 5 }
+
+    aviatRfuExternalCoaxPresent OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates if an external RF switch is present."
+            ::= { aviatRfuDetailsEntry 6 }
+
+
+-- ****************************************************************************
+-- The Object and Event Groups
+-- ****************************************************************************
+    aviatRfObjectGroup          OBJECT-GROUP
+        OBJECTS {
+            aviatRfFreqTx,
+            aviatRfFreqRx,
+            aviatRfPowerSet,
+            aviatRfTxMute,
+            aviatRfHighGain,
+            aviatRfBandSelection,
+            aviatRfATPCEnabled,
+            aviatRfATPCTargetFadeMargin,
+            aviatRfATPCMaximumPower,
+            aviatRfATPCMinimumPower,
+            aviatRfATPCFCCCompliant,
+            aviatRfuTxFreqMax,
+            aviatRfuTxFreqMin,
+            aviatRfuRxFreqMax,
+            aviatRfuRxFreqMin,
+            aviatRfuFreqStepMin,
+            aviatRfuBandwidthMax,
+            aviatRfuTxRxSpacingMax,
+            aviatRfuTxRxSpacingMin,
+            aviatRfuTxPowerMax,
+            aviatRfuTxPowerMin,
+            aviatRfuPowerStep,
+            aviatRfuNoiseFigure,
+            aviatRfuModulationMax,
+            aviatRfuTxRxSpacingPreset,
+            aviatRfuTxSideBand,
+            aviatRfuTxPowerLimit,
+            aviatRfuTxSpacingFreq,
+            aviatRfuType,
+            aviatRfuFreqBand,
+            aviatRfuPowerAmp,
+            aviatRfuSemiconductorTech,
+            aviatRfuUnlicensed5G8Cap,
+            aviatRfuExternalCoaxPresent
+        }
+        STATUS          current
+        DESCRIPTION     "These objects specify the RF capabilities and settings
+                         of the unit."
+            ::= { aviatRfGroups 1 }
+
+
+-- ****************************************************************************
+-- The Compliance Specifications
+-- ****************************************************************************
+    aviatRfComplV1              MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION     "The implementation requirements for this MIB."
+        MODULE          -- This module
+            MANDATORY-GROUPS    {
+                                    aviatRfObjectGroup
+                                }
+            ::= { aviatRfCompliance 1 }
+
+END
