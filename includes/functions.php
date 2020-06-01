@@ -2238,7 +2238,7 @@ function dump_db_schema($connection = null)
         foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'")) as $data) {
             $def = [
                 'Field'   => $data->COLUMN_NAME,
-                'Type'    => $data->COLUMN_TYPE,
+                'Type'    => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),
                 'Null'    => $data->IS_NULLABLE === 'YES',
                 'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data->EXTRA),
             ];
@@ -2246,6 +2246,10 @@ function dump_db_schema($connection = null)
             if (isset($data->COLUMN_DEFAULT) && $data->COLUMN_DEFAULT != 'NULL') {
                 $default = trim($data->COLUMN_DEFAULT, "'");
                 $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
+            }
+            // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
+            if ($def['Type'] == 'timestamp') {
+                 $def['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $def['Extra']);
             }
 
             $output[$table]['Columns'][] = $def;

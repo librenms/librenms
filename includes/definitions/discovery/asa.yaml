@@ -20,7 +20,7 @@ modules:
                     value: crasL2LNumSessions
                     num_oid: '.1.3.6.1.4.1.9.9.392.1.3.29.{{ $index }}'
                     descr: 'Active LAN to LAN sessions'
-                    index: crasIPSecNumSessions.{{ $index }}
+                    index: crasL2LNumSessions.{{ $index }}
                 -
                     oid: .1.3.6.1.4.1.9.9.392.1.3
                     value: crasLBNumSessions
