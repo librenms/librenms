@@ -76,10 +76,16 @@ class Smokeping
 
     public function generateFileName($file = '')
     {
+        $fdir = preg_replace("/\.rrd/", "", $file);
+        $add="";
+        if(preg_match("/^([0-9]{1,3}_){3}[0-9]{1,3}$/", $fdir)) {
+            $t=explode("_", $d);
+            $add=$t[0] . "_" . $t[1] . "_" . $t[2] . "/";
+        }
         if (Config::get('smokeping.integration') === true) {
-            return Config::get('smokeping.dir') . '/' . $this->device->type . '/' . $file;
+            return Config::get('smokeping.dir') . '/' . $this->device->type . '/' . $add . $fdir . $file;
         } else {
-            return Config::get('smokeping.dir') . '/' . $file;
+            return Config::get('smokeping.dir') . '/' . $add . $fdir . $file;
         }
     }
 

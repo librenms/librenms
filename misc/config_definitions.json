@@ -5036,6 +5036,12 @@
             "section": "smokeping",
             "order": 3,
             "type": "text"
+        },
+        "smokeping.use_folders": {
+            "group": "external",
+            "section": "smokeping",
+            "order": 4,
+            "type": "boolean"
         }
     }
 }

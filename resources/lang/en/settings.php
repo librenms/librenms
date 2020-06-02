@@ -1288,6 +1288,10 @@ return [
         'smokeping.url' => [
             'description' => 'URL to smokeping',
             'help' => 'Full URL to the smokeping gui'
+        ],
+        'smokeping.use_folders' => [
+            'description' => 'Use hostname folders in smokeping datadir',
+            'help' => 'Use folders as datadir/hostname/hostname.rrd for more quickly smokeping gui'
         ]
 
     ],

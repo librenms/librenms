@@ -20,15 +20,35 @@ title = Network Latency Grapher
 
 <?php
 
+$menu=$data="";
 foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `disabled` = 0 AND `type` != '' GROUP BY `type`") as $groups) {
     //Dot and space need to be replaced, since smokeping doesn't accept it at this level
-    echo '+ ' . str_replace(['.', ' '], '_', $groups['type']) . PHP_EOL;
-    echo 'menu = ' . $groups['type'] . PHP_EOL;
-    echo 'title = ' . $groups['type'] . PHP_EOL;
-    foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `disabled` = 0", array($groups['type'])) as $devices) {
-        echo '++ ' . str_replace(['.', ' '], '_', $devices['hostname']) . PHP_EOL;
-        echo 'menu = ' . $devices['hostname'] . PHP_EOL;
-        echo 'title = ' . $devices['hostname'] . PHP_EOL;
-        echo 'host = ' . $devices['hostname'] . PHP_EOL . PHP_EOL;
+    $menu='+ ' . str_replace(['.', ' '], '_', $groups['type']) . PHP_EOL;
+    $menu.='menu = ' . $groups['type'] . PHP_EOL;
+    $menu.='title = ' . $groups['type'] . PHP_EOL;
+    $data="";
+
+    $arr=dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `ignore` = 0 AND `disabled` = 0 order by hostname", array($groups['type']));
+    $t_arr=array();
+    foreach($arr as $n => $v) {
+        $t_arr[$n]=$v['hostname'];
     }
+    natsort($t_arr);
+    foreach ($t_arr as $n => $device) {
+        $data.='++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
+        $data.='menu = ' . $device . PHP_EOL;
+        $data.='title = ' . $device . PHP_EOL . PHP_EOL;
+        if(preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $device)) {
+            $ip=explode(".", $device);
+            $folder=$ip[0] . '.' . $ip[1] . '.' . $ip[2];
+            $data.='+++ ' . str_replace(".","_",$folder) . PHP_EOL;
+            $data.='menu = ' . $folder . PHP_EOL;
+            $data.='title = ' . $folder . PHP_EOL . PHP_EOL;
+            $data.='++++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
+        }
+        $data.='menu = ' . $device . PHP_EOL;
+        $data.='title = ' . $device . PHP_EOL;
+        $data.='host = ' . $device . PHP_EOL . PHP_EOL;
+    }
+    if(!empty($data)) echo $menu.$data;
 }
