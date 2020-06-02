@@ -5,24 +5,22 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'backupninja';
 $app_id = $app['app_id'];
+$output = 'OK';
 
-if (!empty($agent_data['app'][$name])) {
-    $backupninja = $agent_data['app'][$name];
-} else {
-    $options = '-Oqv';
-    $oid     = '.1.3.6.1.4.1.2021.220.3.1.1.11.98.97.99.107.117.112.110.105.110.106.97';
-    $backupninja  = snmp_get($device, $oid, $options);
+try {
+    $backupninja_data = json_app_get($device, $name, 1)['data'];
+} catch (JsonAppMissingKeysException $e) {
+    $backupninja_data = $e->getParsedJson();
+} catch (JsonAppException $e) {
+    echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
+    update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+    return;
 }
 
-echo ' backupninja';
+$metrics = array();
 
-$datas = json_decode($backupninja);
-$last_actions = $datas->actions;
-$last_fatal = $datas->fatal;
-$last_error = $datas->error;
-$last_warning = $datas->warning;
-
-$rrd_name = array('app', $name, $app_id);
+$category = 'overview';
+$rrd_name = array('app', $name, $app_id, $category);
 $rrd_def = RrdDefinition::make()
     ->addDataset('last_actions', 'GAUGE', 0)
     ->addDataset('last_fatal', 'GAUGE', 0)
@@ -30,15 +28,17 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('last_warning', 'GAUGE', 0);
 
 $fields = array(
-                'last_actions'   => intval(trim($last_actions)),
-                'last_fatal'     => intval(trim($last_fatal)),
-                'last_error'     => intval(trim($last_error)),
-                'last_warning'   => intval(trim($last_warning)),
+    'last_actions'   => $backupninja_data['last_actions'],
+    'last_fatal'     => $backupninja_data['last_fatal'],
+    'last_error'     => $backupninja_data['last_error'],
+    'last_warning'   => $backupninja_data['last_warning'],
 );
+$metrics[$category] = $fields;
 
 // Debug
 d_echo("backupninja : $fields");
 
-$tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
+$tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
-update_application($app, $backupninja, $fields);
+
+update_application($app, $output, $metrics);
