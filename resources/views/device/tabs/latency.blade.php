@@ -55,10 +55,10 @@
     @endif
     <div class="panel panel-default">
         <div class="panel-heading">
-            @csrf
             <span class="panel-title" style="line-height: 34px">@lang('Performance')</span>
             <span class="pull-right">
             <form method="post" role="form" id="map" class="form-inline">
+                    @csrf
                     <div class="form-group">
                         <label for="dtpickerfrom">@lang('From')</label>
                         <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16"

@@ -240,6 +240,13 @@ class CiHelperTest extends TestCase
             'lint_skip_bash' => true,
             'unit_svg' => true,
         ]);
+
+        putenv('FILES=.travis.yml');
+        $helper = new CiHelper();
+        $helper->detectChangedFiles();
+        $this->assertFlagsSet($helper, [
+            'full' => true,
+        ]);
     }
 
     private function assertFlagsSet(CiHelper $helper, $flags = [])
