@@ -242,14 +242,14 @@ to `/etc/snmp/backupninja.py` on your backuped server.
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/backupninja.py -O /etc/snmp/backupninja.py`
 ```
-
-2: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+2: Make the script executable: `chmod +x /etc/snmp/backupninja.py`
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
 ```
-extend .1.3.6.1.4.1.2021.220 backupninja /usr/bin/python /etc/snmp/backupninja.py
+extend backupninja /etc/snmp/backupninja.py
 ```
 
-3: Restart snmpd on your host
+4: Restart snmpd on your host
 
 
 # BIND9 aka named
