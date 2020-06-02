@@ -80,15 +80,11 @@ class Smokeping
         if (Config::get('smokeping.use_folders') === true) {
             $add = preg_replace("/\.rrd/", "", $file);
             if (preg_match("/^([0-9]{1,3}_){3}[0-9]{1,3}$/", $add)) {
-                $t=explode("_", $add);
-                $add=$t[0] . "_" . $t[1] . "_" . $t[2] . "/" . $add . "/";
+                $tmp=explode("_", $add);
+                $add=$tmp[0] . "_" . $tmp[1] . "_" . $tmp[2] . "/" . $add . "/";
             }
         }
-        if (Config::get('smokeping.integration') === true) {
-            return Config::get('smokeping.dir') . '/' . $this->device->type . '/' . $add . $file;
-        } else {
-            return Config::get('smokeping.dir') . '/' . $add . $file;
-        }
+        return Config::get('smokeping.dir') . '/' . (Config::get('smokeping.integration') === true ? $this->device->type . '/' : '') . $add . $file;
     }
 
     public function otherGraphs($direction)
