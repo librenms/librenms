@@ -38,11 +38,11 @@ foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `disabled` = 0 AND `typ
     $prev_folder="";
     foreach ($t_arr as $n => $device) {
         if ($config['smokeping']['use_folders'] === true) {
-            if(preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $device)) {
+            if (preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $device)) {
                 $ip=explode(".", $device);
                 $folder=$ip[0] . '.' . $ip[1] . '.' . $ip[2];
                 if ($prev_folder != $folder) {
-                    $data.='++ ' . str_replace(".","_",$folder) . PHP_EOL;
+                    $data.='++ ' . str_replace(".", "_", $folder) . PHP_EOL;
                     $data.='menu = ' . $folder . PHP_EOL;
                     $data.='title = ' . $folder . PHP_EOL . PHP_EOL;
                 }
