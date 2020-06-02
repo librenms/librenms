@@ -4,7 +4,7 @@
     @if($data['smokeping']->hasGraphs())
         <div class="panel with-nav-tabs panel-default">
             <div class="panel-heading">
-                <a href="{{ \LibreNMS\Config::get('smokeping.url') }}?target={{ $device->type }}.@if(preg_match('/^([0-9]{1,3}.){3}[0-9]{1,3}$/',$device->hostname)){{ preg_replace('/_[^_]+$/','.',str_replace('.','_',$device->hostname)) }}@endif{{ str_replace('.','_',$device->hostname) }}.{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">@lang('Smokeping') <i class="glyphicon glyphicon-share-alt"></i></span></a>
+                <a href="{{ \LibreNMS\Config::get('smokeping.url') }}?target={{ $device->type }}.@if(\LibreNMS\Config::get('smokeping.use_folders') === true)@if(preg_match('/^([0-9]{1,3}.){3}[0-9]{1,3}$/',$device->hostname)){{ preg_replace('/_[^_]+$/','.',str_replace('.','_',$device->hostname)) }}@endif{{ str_replace('.','_',$device->hostname) }}.@endif{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">@lang('Smokeping') <i class="glyphicon glyphicon-share-alt"></i></span></a>
                 <ul class="nav nav-tabs" style="display: inline-block">
                     @foreach($data['smokeping_tabs'] as $tab)
                         <li @if($loop->first) class="active" @endif><a href="#{{ $tab }}" data-toggle="tab">@lang('smokeping.' . $tab)</a></li>
