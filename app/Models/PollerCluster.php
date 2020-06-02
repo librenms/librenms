@@ -188,6 +188,7 @@ class PollerCluster extends Model
                 'default' => \LibreNMS\Config::get('service_update_enabled'),
                 'value' => (bool)($poller->update_enabled ?? \LibreNMS\Config::get('service_update_enabled')),
                 'type' => 'boolean',
+                'advanced' => true,
             ],
             [
                 'name' => 'update_frequency',
