@@ -79,7 +79,7 @@ class Smokeping
         $add="";
         if (Config::get('smokeping.use_folders') === true) {
             $add = preg_replace("/\.rrd/", "", $file);
-            if(preg_match("/^([0-9]{1,3}_){3}[0-9]{1,3}$/", $add)) {
+            if (preg_match("/^([0-9]{1,3}_){3}[0-9]{1,3}$/", $add)) {
                 $t=explode("_", $add);
                 $add=$t[0] . "_" . $t[1] . "_" . $t[2] . "/" . $add . "/";
             }
