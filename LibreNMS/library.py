@@ -11,18 +11,17 @@ import time
 from logging.handlers import RotatingFileHandler
 
 try:
-    import pymysql
-    pymysql.install_as_MySQLdb()
-except ImportError:
-    pass
-
-try:
     import MySQLdb
-except ImportError as exc:
-    print('ERROR: missing the mysql python module please run:')
-    print('pip install -r requirements.txt')
-    print('ERROR: %s' % exc)
-    sys.exit(2)
+except ImportError:
+    try:
+        import pymysql
+        pymysql.install_as_MySQLdb()
+        import MySQLdb
+    except ImportError as exc:
+        print('ERROR: missing the mysql python module please run:')
+        print('pip install -r requirements.txt')
+        print('ERROR: %s' % exc)
+        sys.exit(2)
 
 logger = logging.getLogger(__name__)
 
