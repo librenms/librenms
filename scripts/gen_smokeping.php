@@ -13,6 +13,7 @@
 
 $init_modules = array();
 require realpath(__DIR__ . '/..') . '/includes/init.php';
+include '/opt/librenms/config.php';
 ?>
 
 menu = Top
@@ -38,16 +39,18 @@ foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `disabled` = 0 AND `typ
         $data.='++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
         $data.='menu = ' . $device . PHP_EOL;
         $data.='title = ' . $device . PHP_EOL . PHP_EOL;
-        if(preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $device)) {
-            $ip=explode(".", $device);
-            $folder=$ip[0] . '.' . $ip[1] . '.' . $ip[2];
-            $data.='+++ ' . str_replace(".","_",$folder) . PHP_EOL;
-            $data.='menu = ' . $folder . PHP_EOL;
-            $data.='title = ' . $folder . PHP_EOL . PHP_EOL;
-            $data.='++++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
+        if($config['smokeping']['use_folders'] === true) {
+            if(preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $device)) {
+                $ip=explode(".", $device);
+                $folder=$ip[0] . '.' . $ip[1] . '.' . $ip[2];
+                $data.='+++ ' . str_replace(".","_",$folder) . PHP_EOL;
+                $data.='menu = ' . $folder . PHP_EOL;
+                $data.='title = ' . $folder . PHP_EOL . PHP_EOL;
+                $data.='++++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
+            }
+            $data.='menu = ' . $device . PHP_EOL;
+            $data.='title = ' . $device . PHP_EOL;
         }
-        $data.='menu = ' . $device . PHP_EOL;
-        $data.='title = ' . $device . PHP_EOL;
         $data.='host = ' . $device . PHP_EOL . PHP_EOL;
     }
     if(!empty($data)) echo $menu.$data;
