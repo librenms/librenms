@@ -13,7 +13,7 @@
 
 $init_modules = array();
 require realpath(__DIR__ . '/..') . '/includes/init.php';
-include '/opt/librenms/config.php';
+include realpath(__DIR__ . '/..') . 'config.php';
 ?>
 
 menu = Top
