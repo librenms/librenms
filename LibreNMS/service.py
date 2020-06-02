@@ -159,6 +159,9 @@ class ServiceConfig:
         try:
             settings = {}
             cursor = db.query('SELECT * FROM `poller_cluster` WHERE `node_id`=%s', self.node_id)
+            if cursor.rowcount == 0:
+                return
+
             for index, setting in enumerate(cursor.fetchone()):
                 name = cursor.description[index][0]
                 settings[name] = setting
