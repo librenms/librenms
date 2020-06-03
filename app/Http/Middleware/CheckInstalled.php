@@ -38,11 +38,45 @@ class CheckInstalled
      */
     public function handle($request, Closure $next)
     {
-        if (!file_exists(storage_path('installed')) && !$request->is('install*')) {
-            // no .env so let's redirect to the install
-            return redirect(url('/install'));
+        if (!file_exists(storage_path('installed'))) {
+            // no .env so set app key
+            $this->checkEnvFile();
+
+            if (config('database.connections.mysql.password')) {
+                // assume if db password is set, app is installed
+                touch(storage_path('installed'));
+            } elseif (!$request->is('install*')) {
+                // redirect to install
+                return redirect(url('/install'));
+            }
         }
 
         return $next($request);
+    }
+
+    private function checkEnvFile()
+    {
+        $envFile = base_path('.env');
+        if (!file_exists($envFile)) {
+            $key = $this->generateRandomKey();
+            config(['app.key' => $key]);
+            $this->writeNewEnvironmentFileWith($key, $envFile);
+        }
+    }
+
+    private function generateRandomKey()
+    {
+        return 'base64:' . base64_encode(random_bytes(32));
+    }
+
+    private function writeNewEnvironmentFileWith($key, $environmentFilePath)
+    {
+        file_put_contents($environmentFilePath, preg_replace(
+            '/^APP_KEY=/m',
+            'APP_KEY=' . $key,
+            file_exists($environmentFilePath)
+                ? file_get_contents($environmentFilePath)
+                : file_get_contents(base_path('.env.example'))
+        ));
     }
 }
