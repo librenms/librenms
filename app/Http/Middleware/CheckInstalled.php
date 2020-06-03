@@ -38,7 +38,7 @@ class CheckInstalled
      */
     public function handle($request, Closure $next)
     {
-        if (!file_exists(storage_path('installed')) && !$request->is('install')) {
+        if (!file_exists(storage_path('installed')) && !$request->is('install*')) {
             // no .env so let's redirect to the install
             return redirect(url('/install'));
         }
