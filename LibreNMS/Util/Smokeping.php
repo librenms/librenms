@@ -81,7 +81,7 @@ class Smokeping
             $add = preg_replace("/\.rrd/", "", $file);
             if (preg_match("/^([0-9]{1,3}_){3}[0-9]{1,3}$/", $add)) {
                 $tmp=explode("_", $add);
-                $add=$tmp[0] . "_" . $tmp[1] . "_" . $tmp[2] . "/" . $add . "/";
+                $add=$tmp[0] . "_" . $tmp[1] . "/" .$tmp[0] . "_" . $tmp[1] . "_" . $tmp[2] . "/" . $add . "/";
             }
         }
         return Config::get('smokeping.dir') . '/' . (Config::get('smokeping.integration') === true ? $this->device->type . '/' : '') . $add . $file;
