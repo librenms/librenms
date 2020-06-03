@@ -43,25 +43,17 @@ foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `disabled` = 0 AND `typ
                 $folder=$ip[0] . '.' . $ip[1];
                 $folder2=$ip[0] . '.' . $ip[1] . '.' . $ip[2];
                 if ($prev_folder != $folder) {
-                    $data.='++ ' . str_replace(".", "_", $folder) . PHP_EOL;
-                    $data.='menu = ' . $folder . PHP_EOL;
-                    $data.='title = ' . $folder . PHP_EOL . PHP_EOL;
+                    $data.=menu_element(2,$folder);
                 }
                 $prev_folder=$folder;
                 if ($prev_folder2 != $folder2) {
-                    $data.='+++ ' . str_replace(".", "_", $folder2) . PHP_EOL;
-                    $data.='menu = ' . $folder2 . PHP_EOL;
-                    $data.='title = ' . $folder2 . PHP_EOL . PHP_EOL;
+                    $data.=menu_element(3,$folder2);
                 }
                 $prev_folder2=$folder2;
-                $data.='++++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
-                $data.='menu = ' . $device . PHP_EOL;
-                $data.='title = ' . $device . PHP_EOL . PHP_EOL;
+                $data.=menu_element(4,$device);
                 $data.='+++++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
             } else {
-                $data.='++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
-                $data.='menu = ' . $device . PHP_EOL;
-                $data.='title = ' . $device . PHP_EOL . PHP_EOL;
+                $data.=menu_element(2,$device);
                 $data.='+++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
             }
         } else {
@@ -74,4 +66,10 @@ foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `disabled` = 0 AND `typ
     if (!empty($data)) {
         echo $menu.$data;
     }
+}
+function menu_element($f_level, $f_name) {
+    $f_data.=str_repeat('+', $f_level) . ' ' . str_replace(".", "_", $f_name) . PHP_EOL;
+    $f_data.='menu = ' . $f_name . PHP_EOL;
+    $f_data.='title = ' . $f_name . PHP_EOL . PHP_EOL;
+    return $f_data;
 }
