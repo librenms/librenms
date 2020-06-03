@@ -81,13 +81,7 @@ class LegacyController extends Controller
         ]);
     }
 
-    public function dummyAuth()
-    {
-        $this->middleware('auth');
-        return $this->dummyUnauth();
-    }
-
-    public function dummyUnauth()
+    public function dummy()
     {
         return 'Dummy page';
     }
