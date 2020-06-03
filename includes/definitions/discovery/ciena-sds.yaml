@@ -36,7 +36,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.105.{{ $index }}'
                     descr: 'Rx Port {{ $index }} - Optic SN: {{ $wwpLeosPortXcvrSerialNum }}'
                     divisor: 10000
-                    index: wwpLeosPortXcvrRxDbmPower.{{ $index }}'
+                    index: wwpLeosPortXcvrRxDbmPower.{{ $index }}
                     group: 'Rx dBm'
                     low_limit: wwpLeosPortXcvrLowRxDbmPwAlarmThreshold
                     high_limit: wwpLeosPortXcvrHighRxDbmPwAlarmThreshold
@@ -51,7 +51,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.106.{{ $index }}'
                     descr: 'Tx Port {{ $index }} - Optic SN: {{ $wwpLeosPortXcvrSerialNum }}'
                     divisor: 10000
-                    index: wwpLeosPortXcvrTxDbmPower.{{ $index }}'
+                    index: wwpLeosPortXcvrTxDbmPower.{{ $index }}
                     group: 'Tx dBm'
                     low_limit: wwpLeosPortXcvrLowTxDbmPwAlarmThreshold
                     high_limit: wwpLeosPortXcvrHighTxDbmPwAlarmThreshold
@@ -112,7 +112,7 @@ modules:
                     value: wwpLeosPortXcvrTemperature
                     num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.16.{{ $index }}'
                     descr: 'Port {{ $subindex0 }} - Optic SN: {{ $wwpLeosPortXcvrSerialNum }}'
-                    index: wwpLeosPortXcvrTemperature.{{ $index }}'
+                    index: wwpLeosPortXcvrTemperature.{{ $index }}
                     group: 'Ports'
                     low_limit: wwpLeosPortXcvrLowTempAlarmThreshold
                     high_limit: wwpLeosPortXcvrHighTempAlarmThreshold
