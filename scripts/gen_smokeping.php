@@ -11,10 +11,6 @@
 * the source code distribution for details.
 */
 
-$init_modules = array();
-require realpath(__DIR__ . '/..') . '/includes/init.php';
-include realpath(__DIR__ . '/..') . 'config.php';
-
 function menu_element($f_level, $f_name)
 {
     $f_data.=str_repeat('+', $f_level) . ' ' . str_replace(".", "_", $f_name) . PHP_EOL;
@@ -22,6 +18,11 @@ function menu_element($f_level, $f_name)
     $f_data.='title = ' . $f_name . PHP_EOL . PHP_EOL;
     return $f_data;
 }
+
+$init_modules = array();
+require realpath(__DIR__ . '/..') . '/includes/init.php';
+include realpath(__DIR__ . '/..') . 'config.php';
+
 ?>
 
 menu = Top
