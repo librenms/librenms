@@ -21,6 +21,7 @@ pymdown-extensions==7.1
 PyYAML==5.3.1
 six==1.15.0
 tornado==6.0.4
+MarkupSafe==1.1.1
 EOF
 )
 
