@@ -39,7 +39,4 @@ These install docs are no longer updated and may result in an unsuccessful insta
 - [RHEL / CentOS 7 Nginx](Installation-CentOS-7-Nginx/)
 - [Ubuntu 16.04 Apache](Installation-Ubuntu-1604-Apache/)
 - [Ubuntu 16.04 Nginx](Installation-Ubuntu-1604-Nginx/)
-- [Debian/Ubuntu](Installation-Ubuntu-1404-Apache/)
-- [RHEL/CentOS](Installation-CentOS-6-Apache-Nginx/)
-- [Debian/Ubuntu Lighttpd](Installation-Ubuntu-1404-Lighttpd/)
-- [Debian/Ubuntu Nginx](Installation-Ubuntu-1404-Nginx/)
+- [RHEL / CentOS 6](Installation-CentOS-6-Apache-Nginx/)
