@@ -47,7 +47,12 @@ class Smokeping
     public function getFiles()
     {
         if (is_null($this->files) && Config::has('smokeping.dir')) {
-            $dir = $this->generateFileName();
+            $add="";
+            if (Config::get('smokeping.use_folders') === true) {
+                $tmp=explode(".", $this->device->hostname);
+                $add=$tmp[0] . "_" . $tmp[1] . "/" .$tmp[0] . "_" . $tmp[1] . "_" . $tmp[2] . "/" . str_replace(".", "_", $this->device->hostname) . "/";
+            }
+            $dir = $this->generateFileName($add);
             if (is_dir($dir)) {
                 foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
                     if (stripos($file, '.rrd') !== false) {
@@ -77,7 +82,7 @@ class Smokeping
     public function generateFileName($file = '')
     {
         $add="";
-        if (Config::get('smokeping.use_folders') === true) {
+        if (Config::get('smokeping.use_folders') === true && preg_match("/\.rrd$/", $file)) {
             $add = preg_replace("/\.rrd/", "", $file);
             if (preg_match("/^([0-9]{1,3}_){3}[0-9]{1,3}$/", $add)) {
                 $tmp=explode("_", $add);
