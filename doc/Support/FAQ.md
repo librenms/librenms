@@ -531,20 +531,11 @@ menu similarly to device types.
 
 If you've changed your database credentials then you will need to
 update LibreNMS with those new details.
-Please edit both `config.php` and `.env`
-
-config.php:
-
-```php
-$config['db_host'] = '';
-$config['db_user'] = '';
-$config['db_pass'] = '';
-$config['db_name'] = '';
-```
+Please edit `.env`
 
 [.env](../Support/Environment-Variables.md#database):
 
-```bash
+```dotenv
 DB_HOST=
 DB_DATABASE=
 DB_USERNAME=

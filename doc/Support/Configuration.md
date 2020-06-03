@@ -28,22 +28,25 @@ Log files created by LibreNMS will be stored within this directory.
 
 # Database config
 
-These are the configuration options you will need to use to specify to get started.
+Set these variables either in .env or in the environment.
 
-```php
-$config['db_host'] = '127.0.0.1';
-$config['db_port'] = 3306;
-$config['db_user'] = '';
-$config['db_pass'] = '';
-$config['db_name'] = '';
+```dotenv
+DB_HOST=127.0.0.1
+DB_DATABASE=librenms
+DB_USERNAME=DBUSER
+DB_PASSWORD="DBPASS"
 ```
 
-If you use a unix socket, you can specify it with these options:
+Use non-standard port:
 
-```php
-$config['db_host']   = NULL;
-$config['db_port']   = NULL;
-$config['db_socket'] = '/run/mysqld/mysqld.sock';
+```dotenv
+DB_PORT=3306
+```
+
+Use a unix socket:
+
+```dotenv
+DB_SOCKET=/run/mysqld/mysqld.sock
 ```
 
 # Core

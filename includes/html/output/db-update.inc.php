@@ -23,7 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-if (file_exists(\LibreNMS\Config::get('install_dir') . '/config.php')) {
+if (file_exists(\LibreNMS\Config::get('install_dir') . '/.env')) {
     echo("This should only be called during install");
     exit;
 }

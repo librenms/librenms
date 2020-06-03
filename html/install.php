@@ -7,7 +7,7 @@ $librenms_dir = realpath(__DIR__ . '/..');
 
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
-} elseif (!file_exists("{$librenms_dir}/config.php")) {
+} elseif (!file_exists("$librenms_dir/.env")) {
     $allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
     foreach ($allowed_vars as $allowed) {
         if (isset($_POST[$allowed])) {
@@ -18,15 +18,15 @@ if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
 
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
-// Before we do anything, if we see config.php, redirect back to the homepage.
-if (file_exists("{$librenms_dir}/config.php") && $stage != 6) {
+// Before we do anything, if we see .env, redirect back to the homepage.
+if (file_exists("$librenms_dir/.env") && $stage != 6) {
     unset($_SESSION['stage']);
     header("Location: /");
     exit;
 }
 
 // do not use the DB in init, we'll bring it up ourselves
-$init_modules = array('web', 'nodb');
+$init_modules = ['web', 'nodb'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 // List of php modules we expect to see
@@ -81,9 +81,9 @@ if ($stage == 4) {
     }
 } elseif ($stage == 6) {
     // If we get here then let's do some final checks.
-    if (!file_exists("{$librenms_dir}/config.php")) {
-        // config.php file doesn't exist. go back to that stage
-        $msg = "config.php still doesn't exist";
+    if (!file_exists("$librenms_dir/.env")) {
+        // .env file doesn't exist. go back to that stage
+        $msg = ".env still doesn't exist";
         $stage = 5;
     } else {
         // all done, remove all traces of the install session
@@ -106,12 +106,12 @@ $complete = 1;
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title><?php echo(Config::get('page_title_prefix')); ?></title>
+  <title><?php echo (Config::get('project_name') . ' ' . __('Install')); ?></title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link href="<?php echo(Config::get('stylesheet')); ?>" rel="stylesheet" type="text/css"/>
+  <link href="<?php echo Config::get('stylesheet');  ?>" rel="stylesheet" type="text/css" />
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -121,7 +121,7 @@ $complete = 1;
   <div class="container">
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-          <h2 class="text-center">Welcome to the <?php echo(Config::get('project_name')); ?> install</h2>
+        <h2 class="text-center">Welcome to the <?php echo Config::get('project_name'); ?> install</h2>
       </div>
     </div>
     <div class="row">
@@ -210,7 +210,7 @@ if ($stage == 0) {
         }
     }
     echo "</td></tr>";
-    
+
     if (is_writable(Config::get('temp_dir'))) {
         $status = 'yes';
         $row_class = 'success';
@@ -264,37 +264,37 @@ if ($stage == 0) {
             <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="2">
           <div class="form-group">
-            <label for="dbhost" class="col-sm-4" control-label">DB Host: </label>
+            <label for="dbhost" class="col-sm-4 control-label">DB Host: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbhost" id="dbhost" value="<?php echo $dbhost; ?>" placeholder="Leave empty if using Unix-Socket">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbport" class="col-sm-4" control-label">DB Port: </label>
+            <label for="dbport" class="col-sm-4 control-label">DB Port: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbport" id="dbport" value="<?php echo $dbport; ?>" placeholder="Leave empty if using Unix-Socket">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbsocket" class="col-sm-4" control-label">DB Unix-Socket: </label>
+            <label for="dbsocket" class="col-sm-4 control-label">DB Unix-Socket: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbsocket" id="dbsocket" value="<?php echo $dbsocket; ?>" placeholder="Leave empty if using Host">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbuser" class="col-sm-4" control-label">DB User: </label>
+            <label for="dbuser" class="col-sm-4 control-label">DB User: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbuser" id="dbuser" value="<?php echo $dbuser; ?>">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbpass" class="col-sm-4" control-label">DB Pass: </label>
+            <label for="dbpass" class="col-sm-4 control-label">DB Pass: </label>
             <div class="col-sm-8">
               <input type="password" class="form-control" name="dbpass" id="dbpass" value="<?php echo $dbpass; ?>">
             </div>
           </div>
           <div class="form-group">
-            <label for="dbname" class="col-sm-4" control-label">DB Name: </label>
+            <label for="dbname" class="col-sm-4 control-label">DB Name: </label>
             <div class="col-sm-8">
               <input type="text" class="form-control" name="dbname" id="dbname" value="<?php echo $dbname; ?>">
             </div>
@@ -377,64 +377,35 @@ if ($stage == 0) {
       <div class="col-md-6">
     <?php
 
-// Create the config file we will write or display
-    $config_file = <<<"EOD"
-## Have a look in defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
+    // Create the .env file we will write or display
+    Artisan::call('key:generate', ['--show' => true, '--no-ansi' => true, '--no-interaction' => true]);
+    $app_key = trim(Artisan::output());
+    $node_id = uniqid();
+    $dot_env = <<<"EOD"
+APP_KEY=$app_key
+NODE_ID=$node_id
+DB_HOST=$dbhost
+DB_DATABASE=$dbname
+DB_USERNAME=$dbuser
+DB_PASSWORD="$dbpass"
 
-### Database config
-\$config\['db_host'\] = '$dbhost';
-\$config\['db_port'\] = '$dbport';
-\$config\['db_user'\] = '$dbuser';
-\$config\['db_pass'\] = '$dbpass';
-\$config\['db_name'\] = '$dbname';
-\$config\['db_socket'\] = '$dbsocket';
-
-// This is the user LibreNMS will run as
-//Please ensure this user is created and has the correct permissions to your install
-\$config['user'] = 'librenms';
-
-### Locations - it is recommended to keep the default
-#\$config\['install_dir'\]  = "$install_dir";
-
-### This should *only* be set if you want to *force* a particular hostname/port
-### It will prevent the web interface being usable form any other hostname
-#\$config\['base_url'\]        = "http://librenms.company.com";
-
-### Enable this to use rrdcached. Be sure rrd_dir is within the rrdcached dir
-### and that your web server has permission to talk to rrdcached.
-#\$config\['rrdcached'\]    = "unix:/var/run/rrdcached.sock";
-
-### Default community
-\$config\['snmp'\]\['community'\] = array("public");
-
-### Authentication Model
-\$config\['auth_mechanism'\] = "mysql"; # default, other options: ldap, http-auth
-#\$config\['http_auth_guest'\] = "guest"; # remember to configure this user if you use http-auth
-
-### List of RFC1918 networks to allow scanning-based discovery
-#\$config\['nets'\]\[\] = "10.0.0.0/8";
-#\$config\['nets'\]\[\] = "172.16.0.0/12";
-#\$config\['nets'\]\[\] = "192.168.0.0/16";
-
-# Update configuration
-#\$config\['update_channel'\] = 'release';  # uncomment to follow the monthly release channel
-#\$config\['update'\] = 0;  # uncomment to completely disable updates
 EOD;
 
-    if (!file_exists("{$librenms_dir}/config.php")) {
-        $conf = fopen("config.php", 'w');
-        if ($conf != false) {
-            if (fwrite($conf, "<?php\n") === false) {
-                echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
-                echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
-            } else {
-                $config_file = stripslashes($config_file);
-                fwrite($conf, $config_file);
-                echo("<div class='alert alert-success'>The config file has been created</div>");
-            }
+    if ($dbport && $dbport != 3306) {
+        $dot_env .= "DB_PORT=$dbport\n";
+    }
+
+    if ($dbsocket) {
+        $dot_env .= "DB_SOCKET=$dbsocket\n";
+    }
+
+    if (!file_exists("$librenms_dir/.env")) {
+        $conf = fopen("$librenms_dir/.env", 'w');
+        if ($conf != false && fwrite($conf, $dot_env) !== false) {
+            echo "<div class='alert alert-success'>The environment (.env) file has been created</div>";
         } else {
-            echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
-            echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
+            echo "<div class='alert alert-danger'>We couldn't create the .env file, please create this manually before continuing by copying the below into a .env file in the root directory of your install (typically /opt/librenms/)</div>";
+            echo "<pre>$dot_env</pre>";
         }
     }
     ?>
