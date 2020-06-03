@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title'        => 'Установка Laravel',
+    'title'        => 'Установка LibreNMS',
     'next'         => 'Следующий шаг',
 
     /*
@@ -16,8 +16,8 @@ return [
      *
      */
     'welcome'      => [
-        'title'   => 'Установка Laravel',
-        'message' => 'Добро пожаловать в первоначальную настройку фреймворка Laravel.',
+        'title'   => 'Установка LibreNMS',
+        'message' => 'Добро пожаловать в первоначальную настройку фреймворка LibreNMS.',
         'next'    => 'Следующий шаг',
     ],
 

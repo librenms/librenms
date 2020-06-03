@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Laravel Installer',
+    'title' => 'LibreNMS Installer',
     'next' => 'Nächster Schritt',
     'finish' => 'Installieren',
 
@@ -18,7 +18,7 @@ return [
      */
     'welcome' => [
         'title'   => 'Willkommen zum Installer',
-        'message' => 'Willkommen zum Laravel Installationsassistent.',
+        'message' => 'Willkommen zum LibreNMS Installationsassistent.',
     ],
 
     /*

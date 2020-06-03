@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Laraveli installer',
+    'title' => 'LibreNMSi installer',
     'next' => 'Järgmine samm',
 
     /*
@@ -16,7 +16,7 @@ return [
      *
      */
     'welcome' => [
-        'title'   => 'Tere tulemast Laraveli installerisse',
+        'title'   => 'Tere tulemast LibreNMSi installerisse',
         'message' => 'Tere tulemast installatsiooniviisardisse.',
     ],
 
@@ -57,7 +57,7 @@ return [
      */
     'final' => [
         'title' => 'Lõpetatud',
-        'finished' => 'Laravel on edukalt installitud',
+        'finished' => 'LibreNMS on edukalt installitud',
         'exit' => 'Väljumiseks vajuta siia',
     ],
 ];

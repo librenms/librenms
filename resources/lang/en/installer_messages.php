@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Laravel Installer',
+    'title' => 'LibreNMS Installer',
     'next' => 'Next Step',
     'back' => 'Previous',
     'finish' => 'Install',
@@ -22,7 +22,7 @@ return [
      */
     'welcome' => [
         'templateTitle' => 'Welcome',
-        'title'   => 'Laravel Installer',
+        'title'   => 'LibreNMS Installer',
         'message' => 'Easy Installation and Setup Wizard.',
         'next'    => 'Check Requirements',
     ],
@@ -114,7 +114,7 @@ return [
 
                 'app_tabs' => [
                     'more_info' => 'More Info',
-                    'broadcasting_title' => 'Broadcasting, Caching, Session, &amp; Queue',
+                    'broadcasting_title' => 'Broadcasting, Caching, Session, & Queue',
                     'broadcasting_label' => 'Broadcast Driver',
                     'broadcasting_placeholder' => 'Broadcast Driver',
                     'cache_label' => 'Cache Driver',
@@ -176,7 +176,7 @@ return [
      *
      */
     'installed' => [
-        'success_log_message' => 'Laravel Installer successfully INSTALLED on ',
+        'success_log_message' => 'LibreNMS Installer successfully INSTALLED on ',
     ],
 
     /*
@@ -206,7 +206,7 @@ return [
          * Shared translations.
          *
          */
-        'title' => 'Laravel Updater',
+        'title' => 'LibreNMS Updater',
 
         /*
          *
@@ -241,7 +241,7 @@ return [
         ],
 
         'log' => [
-            'success_message' => 'Laravel Installer successfully UPDATED on ',
+            'success_message' => 'LibreNMS Installer successfully UPDATED on ',
         ],
     ],
 ];

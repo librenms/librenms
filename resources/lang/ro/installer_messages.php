@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Procesul de instalare Laravel',
+    'title' => 'Procesul de instalare LibreNMS',
     'next' => 'Pasul următor',
 
     /*

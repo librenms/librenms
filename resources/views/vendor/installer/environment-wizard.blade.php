@@ -12,26 +12,26 @@
 @section('container')
     <div class="tabs tabs-full">
 
-        <input id="tab1" type="radio" name="tabs" class="tab-input" checked />
-        <label for="tab1" class="tab-label">
-            <i class="fa fa-cog fa-2x fa-fw" aria-hidden="true"></i>
-            <br />
-            {{ trans('installer_messages.environment.wizard.tabs.environment') }}
-        </label>
+{{--        <input id="tab1" type="radio" name="tabs" class="tab-input" checked />--}}
+{{--        <label for="tab1" class="tab-label">--}}
+{{--            <i class="fa fa-cog fa-2x fa-fw" aria-hidden="true"></i>--}}
+{{--            <br />--}}
+{{--            {{ trans('installer_messages.environment.wizard.tabs.environment') }}--}}
+{{--        </label>--}}
 
-        <input id="tab2" type="radio" name="tabs" class="tab-input" />
+        <input id="tab2" type="radio" name="tabs" class="tab-input" checked />
         <label for="tab2" class="tab-label">
             <i class="fa fa-database fa-2x fa-fw" aria-hidden="true"></i>
             <br />
             {{ trans('installer_messages.environment.wizard.tabs.database') }}
         </label>
 
-        <input id="tab3" type="radio" name="tabs" class="tab-input" />
-        <label for="tab3" class="tab-label">
-            <i class="fa fa-cogs fa-2x fa-fw" aria-hidden="true"></i>
-            <br />
-            {{ trans('installer_messages.environment.wizard.tabs.application') }}
-        </label>
+{{--        <input id="tab3" type="radio" name="tabs" class="tab-input" />--}}
+{{--        <label for="tab3" class="tab-label">--}}
+{{--            <i class="fa fa-cogs fa-2x fa-fw" aria-hidden="true"></i>--}}
+{{--            <br />--}}
+{{--            {{ trans('installer_messages.environment.wizard.tabs.application') }}--}}
+{{--        </label>--}}
 
         <form method="post" action="{{ route('LaravelInstaller::environmentSaveWizard') }}" class="tabs-wrap">
             <div class="tab" id="tab1content">
@@ -41,7 +41,7 @@
                     <label for="app_name">
                         {{ trans('installer_messages.environment.wizard.form.app_name_label') }}
                     </label>
-                    <input type="text" name="app_name" id="app_name" value="" placeholder="{{ trans('installer_messages.environment.wizard.form.app_name_placeholder') }}" />
+                    <input type="text" name="app_name" id="app_name" value="{{ config('app.name') }}" placeholder="{{ trans('installer_messages.environment.wizard.form.app_name_placeholder') }}" />
                     @if ($errors->has('app_name'))
                         <span class="error-block">
                             <i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
@@ -136,7 +136,7 @@
             </div>
             <div class="tab" id="tab2content">
 
-                <div class="form-group {{ $errors->has('database_connection') ? ' has-error ' : '' }}">
+                <div class="form-group {{ $errors->has('database_connection') ? ' has-error ' : '' }}" style="display: none;">
                     <label for="database_connection">
                         {{ trans('installer_messages.environment.wizard.form.db_connection_label') }}
                     </label>
@@ -184,7 +184,7 @@
                     <label for="database_name">
                         {{ trans('installer_messages.environment.wizard.form.db_name_label') }}
                     </label>
-                    <input type="text" name="database_name" id="database_name" value="" placeholder="{{ trans('installer_messages.environment.wizard.form.db_name_placeholder') }}" />
+                    <input type="text" name="database_name" id="database_name" value="librenms" placeholder="{{ trans('installer_messages.environment.wizard.form.db_name_placeholder') }}" />
                     @if ($errors->has('database_name'))
                         <span class="error-block">
                             <i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
@@ -197,7 +197,7 @@
                     <label for="database_username">
                         {{ trans('installer_messages.environment.wizard.form.db_username_label') }}
                     </label>
-                    <input type="text" name="database_username" id="database_username" value="" placeholder="{{ trans('installer_messages.environment.wizard.form.db_username_placeholder') }}" />
+                    <input type="text" name="database_username" id="database_username" value="librenms" placeholder="{{ trans('installer_messages.environment.wizard.form.db_username_placeholder') }}" />
                     @if ($errors->has('database_username'))
                         <span class="error-block">
                             <i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"></i>

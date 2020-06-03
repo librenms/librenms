@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Laravel Installer',
+    'title' => 'LibreNMS Installer',
     'next' => 'Volgende stap',
 
     /*

@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Laravel Installer',
+    'title' => 'LibreNMS Installer',
     'next' => 'Selanjutnya',
     'back' => 'Kembali',
     'finish' => 'Pasang',
@@ -22,7 +22,7 @@ return [
      */
     'welcome' => [
         'templateTitle' => 'Selamat Datang',
-        'title'   => 'Laravel Installer',
+        'title'   => 'LibreNMS Installer',
         'message' => 'Instalasi Mudah dan Persiapan Aplikasi',
         'next'    => 'Cek Kebutuhan',
     ],
@@ -175,7 +175,7 @@ return [
      *
      */
     'installed' => [
-        'success_log_message' => 'Laravel Installer berhasil DIPASANG pada ',
+        'success_log_message' => 'LibreNMS Installer berhasil DIPASANG pada ',
     ],
 
     /*
@@ -205,7 +205,7 @@ return [
          * Shared translations.
          *
          */
-        'title' => 'Laravel Updater',
+        'title' => 'LibreNMS Updater',
 
         /*
          *
@@ -240,7 +240,7 @@ return [
         ],
 
         'log' => [
-            'success_message' => 'Laravel Installer berhasil DIPERBARUI pada ',
+            'success_message' => 'LibreNMS Installer berhasil DIPERBARUI pada ',
         ],
     ],
 ];

@@ -7,7 +7,7 @@ return [
      * Traducciones compartidas.
      *
      */
-    'title' => 'Instalador de Laravel',
+    'title' => 'Instalador de LibreNMS',
     'next' => 'Siguiente',
     'finish' => 'Instalar',
 

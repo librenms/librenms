@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Εγκατάσταση Laravel',
+    'title' => 'Εγκατάσταση LibreNMS',
     'next' => 'Επόμενο',
 
     /*

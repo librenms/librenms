@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'โปรแกรมติดตั้ง Laravel',
+    'title' => 'โปรแกรมติดตั้ง LibreNMS',
     'next' => 'ขั้นตอนต่อไป',
     'back' => 'ย้อนกลับ',
     'finish' => 'ติดตั้ง',
@@ -22,7 +22,7 @@ return [
      */
     'welcome' => [
         'templateTitle' => 'ยินดีต้อนรับ',
-        'title'   => 'โปรแกรมติดตั้ง Laravel',
+        'title'   => 'โปรแกรมติดตั้ง LibreNMS',
         'message' => 'วิซาร์ดการติดตั้งและติดตั้งง่าย',
         'next'    => 'ตรวจสอบข้อกำหนด',
     ],
@@ -175,7 +175,7 @@ return [
      *
      */
     'installed' => [
-        'success_log_message' => 'ติดตั้ง Laravel สำเร็จติดตั้งแล้ว',
+        'success_log_message' => 'ติดตั้ง LibreNMS สำเร็จติดตั้งแล้ว',
     ],
 
     /*
@@ -205,7 +205,7 @@ return [
          * Shared translations.
          *
          */
-        'title' => 'Laravel Updater',
+        'title' => 'LibreNMS Updater',
 
         /*
          *
@@ -240,7 +240,7 @@ return [
         ],
 
         'log' => [
-            'success_message' => 'ติดตั้ง Laravel สำเร็จแล้วอัปเดตเมื่อ',
+            'success_message' => 'ติดตั้ง LibreNMS สำเร็จแล้วอัปเดตเมื่อ',
         ],
     ],
 ];

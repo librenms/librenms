@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Laravel安装程序',
+    'title' => 'LibreNMS安装程序',
     'next' => '下一步',
     'finish' => '安装',
 
@@ -17,7 +17,7 @@ return [
      *
      */
     'welcome' => [
-        'title'   => '欢迎来到Laravel安装程序',
+        'title'   => '欢迎来到LibreNMS安装程序',
         'message' => '欢迎来到安装向导.',
     ],
 

@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'تنصيب Laravel',
+    'title' => 'تنصيب LibreNMS',
     'next' => 'متابعة',
 
     /*
@@ -16,8 +16,8 @@ return [
      *
      */
     'welcome' => [
-        'title'   => 'تنصيب Laravel',
-        'message' => 'أهلا بك في صفحة تنصيب Laravel',
+        'title'   => 'تنصيب LibreNMS',
+        'message' => 'أهلا بك في صفحة تنصيب LibreNMS',
     ],
 
     /*

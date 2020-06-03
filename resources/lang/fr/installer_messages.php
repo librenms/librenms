@@ -7,7 +7,7 @@ return [
      * Shared translations.
      *
      */
-    'title' => 'Installateur de Laravel',
+    'title' => 'Installateur de LibreNMS',
     'next' => 'Suivant',
     'back' => 'Précedent',
     'finish' => 'Installer',
@@ -195,7 +195,7 @@ return [
          * Shared translations.
          *
          */
-        'title' => 'Mise à jour de Laravel',
+        'title' => 'Mise à jour de LibreNMS',
 
         /*
          *
@@ -230,7 +230,7 @@ return [
         ],
 
         'log' => [
-            'success_message' => 'L\'installateur Laravel a été mis à jour avec succès le ',
+            'success_message' => 'L\'installateur LibreNMS a été mis à jour avec succès le ',
         ],
     ],
 ];
