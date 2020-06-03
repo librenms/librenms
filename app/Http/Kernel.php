@@ -34,11 +34,16 @@ class Kernel extends HttpKernel
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
-            \App\Http\Middleware\LoadUserPreferences::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
-            \App\Http\Middleware\LegacyExternalAuth::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        'auth' => [
+            \App\Http\Middleware\LegacyExternalAuth::class,
+            \App\Http\Middleware\Authenticate::class,
+            \App\Http\Middleware\VerifyTwoFactor::class,
+            \App\Http\Middleware\LoadUserPreferences::class,
         ],
 
         'minimal' => [
@@ -61,8 +66,6 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
-        'auth' => \App\Http\Middleware\Authenticate::class,
-        '2fa' => \App\Http\Middleware\VerifyTwoFactor::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,

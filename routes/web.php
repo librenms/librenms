@@ -15,7 +15,7 @@
 Auth::routes();
 
 // WebUI
-Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
+Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
