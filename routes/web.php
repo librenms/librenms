@@ -143,6 +143,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::permanentRedirect('demo', '/');
 
     // Legacy routes
+    Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummyAuth');
+    Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummyUnauth');
     Route::any('/{path?}', 'LegacyController@index')
         ->where('path', '^((?!_debugbar).)*');
 });

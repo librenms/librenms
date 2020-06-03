@@ -80,4 +80,15 @@ class LegacyController extends Controller
             'refresh' => $no_refresh ? 0 : Config::get('page_refresh'),
         ]);
     }
+
+    public function dummyAuth()
+    {
+        $this->middleware('auth');
+        return $this->dummyUnauth();
+    }
+
+    public function dummyUnauth()
+    {
+        return 'Dummy page';
+    }
 }

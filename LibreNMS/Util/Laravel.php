@@ -46,7 +46,7 @@ class Laravel
         $kernel->bootstrap();
     }
 
-    public static function bootWeb()
+    public static function bootWeb($auth = false)
     {
         // this is not a substitute for the normal Laravel boot, just a way to make auth work for external php
         if (self::isBooted()) {
@@ -59,8 +59,11 @@ class Laravel
         $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
 
         $request = \Illuminate\Http\Request::capture();
-        // strip .php to make the url helper in non-laravel pages
-        $request->server->set('REQUEST_URI', str_replace('.php', '', $_SERVER['REQUEST_URI']));
+        // add prefix and strip .php to make the url helper work in non-laravel php scripts
+        $new_uri = ($auth ? '/dummy_legacy_auth' : '/dummy_legacy_unauth');
+        $new_uri .= str_replace('.php', '', $_SERVER['REQUEST_URI']);
+        $request->server->set('REQUEST_URI', $new_uri);
+
         $response = $kernel->handle($request);
 
 //        $response->send(); // don't send response, legacy code will
