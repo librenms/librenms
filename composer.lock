@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "458c9a095abed15368b926e597c9facb",
+    "content-hash": "868074c569fa67b34a266e8807662b1f",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -2320,6 +2320,20 @@
                 }
             ],
             "description": "PHPMailer is a full-featured email creation and transfer class for PHP",
+            "funding": [
+                {
+                    "url": "https://marcus.bointon.com/donations/",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/Synchro",
+                    "type": "github"
+                },
+                {
+                    "url": "https://www.patreon.com/marcusbointon",
+                    "type": "patreon"
+                }
+            ],
             "time": "2020-03-14T14:23:48+00:00"
         },
         {
@@ -2748,6 +2762,66 @@
                 "shell"
             ],
             "time": "2020-05-03T19:32:03+00:00"
+        },
+        {
+            "name": "rachidlaasri/laravel-installer",
+            "version": "4.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/rashidlaasri/LaravelInstaller.git",
+                "reference": "b751b4c23dba893e9a4a12f881a6fd8fa921d228"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/rashidlaasri/LaravelInstaller/zipball/b751b4c23dba893e9a4a12f881a6fd8fa921d228",
+                "reference": "b751b4c23dba893e9a4a12f881a6fd8fa921d228",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.0.0"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "RachidLaasri\\LaravelInstaller\\Providers\\LaravelInstallerServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "RachidLaasri\\LaravelInstaller\\": "src/"
+                },
+                "files": [
+                    "src/Helpers/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Rachid Laasri",
+                    "email": "rashidlaasri@gmail.com"
+                },
+                {
+                    "name": "Jeremy Kenedy",
+                    "email": "jeremykenedy@gmail.com"
+                }
+            ],
+            "description": "Laravel web installer",
+            "funding": [
+                {
+                    "url": "https://rachidlaasri.com",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://twitter.com/rashidlaasri",
+                    "type": "custom"
+                }
+            ],
+            "time": "2020-05-19T13:19:45+00:00"
         },
         {
             "name": "ralouphie/getallheaders",
@@ -5154,7 +5228,7 @@
                 "password",
                 "security"
             ],
-            "time": "2014-07-16T15:38:21+00:00"
+            "time": "2012-08-31T00:00:00+00:00"
         }
     ],
     "packages-dev": [
