@@ -35,22 +35,29 @@ foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `disabled` = 0 AND `typ
         $t_arr[$n]=$v['hostname'];
     }
     natsort($t_arr);
-    $prev_folder="";
+    $prev_folder=$prev_folder2="";
     foreach ($t_arr as $n => $device) {
         if ($config['smokeping']['use_folders'] === true) {
             if (preg_match("/^([0-9]{1,3}\.){3}[0-9]{1,3}$/", $device)) {
                 $ip=explode(".", $device);
-                $folder=$ip[0] . '.' . $ip[1] . '.' . $ip[2];
+                $folder=$ip[0] . '.' . $ip[1];
+                $folder2=$ip[0] . '.' . $ip[1] . '.' . $ip[2];
                 if ($prev_folder != $folder) {
                     $data.='++ ' . str_replace(".", "_", $folder) . PHP_EOL;
                     $data.='menu = ' . $folder . PHP_EOL;
                     $data.='title = ' . $folder . PHP_EOL . PHP_EOL;
                 }
                 $prev_folder=$folder;
-                $data.='+++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
+                if ($prev_folder2 != $folder2) {
+                    $data.='+++ ' . str_replace(".", "_", $folder2) . PHP_EOL;
+                    $data.='menu = ' . $folder2 . PHP_EOL;
+                    $data.='title = ' . $folder2 . PHP_EOL . PHP_EOL;
+                }
+                $prev_folder2=$folder2;
+                $data.='++++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
                 $data.='menu = ' . $device . PHP_EOL;
                 $data.='title = ' . $device . PHP_EOL . PHP_EOL;
-                $data.='++++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
+                $data.='+++++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
             } else {
                 $data.='++ ' . str_replace(['.', ' '], '_', $device) . PHP_EOL;
                 $data.='menu = ' . $device . PHP_EOL;
