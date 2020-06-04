@@ -149,11 +149,11 @@ if (empty($name)) {
             }
         } else {
         $status = 'error';
-        $message = $message;
+        $message = 'Failed to update transport';
         }
     } else {
         $status = 'error';
-        $message = 'Failed to update transport';
+        $message = $message;
     }
 }
 
