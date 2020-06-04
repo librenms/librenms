@@ -272,10 +272,7 @@ class Device extends BaseModel
 
     public function formatDowntime($short = false)
     {
-        $ret = static::where('hostname', $this->hostname)->first(['hostname', 'last_polled']);
-        if (!empty($ret)) {
-            return Time::formatInterval(time() - strtotime($ret->last_polled), $short);
-        }
+        return Time::formatInterval(time() - strtotime($this->last_polled), $short);
     }
 
     /**
