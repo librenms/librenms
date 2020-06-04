@@ -15,11 +15,10 @@ class CreateAlertTransportSchedule extends Migration
     {
         Schema::create('alert_transport_schedule', function (Blueprint $table) {
             $table->increments('transport_schedule_id');
+            $table->unsignedInteger('transport_id')->index(transport_id);
             $table->time('start_hr')->default('00:00:00');
             $table->time('end_hr')->default('00:00:00');
             $table->string('day', 15)->nullable();
-            $table->string('title');
-            $table->text('notes', 65535);
         });
     }
 

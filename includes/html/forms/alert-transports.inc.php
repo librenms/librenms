@@ -45,6 +45,10 @@ $transport_id        = $vars['transport_id'];
 $name                = $vars['name'];
 $is_default          = (int)(isset($vars['is_default']) && $vars['is_default'] == 'on');
 $transport_type      = $vars['transport-type'];
+$timerange = mres($vars['timerange']);
+$start_hr = mres($vars['start_hr']);
+$end_hr = mres($vars['end_hr']);
+$timerange_day = mres($vars['timerange_day']);
 
 if (empty($name)) {
     $status = 'error';
@@ -57,6 +61,91 @@ if (empty($name)) {
         'transport_name' => $name,
         'is_default' => $is_default
     );
+
+    if (!in_array($timerange, array(0,1))) {
+        $message .= 'Missing timerange choice<br />';
+    }
+
+    // check values if timerange is set to yes
+    if ($timerange == 1) {
+        if (empty($start_hr)) {
+            $message .= 'Missing start timerange hour<br />';
+        }
+
+        if (empty($end_hr)) {
+            $message .= 'Missing end timerange hour<br />';
+        }
+
+        if (isset($vars['timerange_day']) && is_array($vars['timerange_day']) && !empty($vars['timerange_day'])) {
+            $timerange_day = implode(',', $vars['timerange_day']);
+        } else {
+            $timerange_day = null;
+        }
+
+        if (!is_array($vars['maps'])) {
+            $message .= 'Not mapped to any groups or devices<br />';
+        }
+    } else {
+        // timerange = 0 => empty no reccurency values to be sure.
+        $start_hr = '00:00:00';
+        $end_hr = '00:00:00';
+        $timerange_day = null;
+    }
+
+    if (empty($message)) {
+        if (empty($transport_id)) {
+            $transport_id = dbInsert(array('timerange' => $timerange, 'start_hr' => $start_hr, 'end_hr' => $end_hr, 'timerange_day' => $timerange_day, 'title' => $title, 'notes' => $notes), 'alert_schedule');
+        } else {
+            dbUpdate(array('timerange' => $timerange, 'start_hr' => $start_hr, 'end_hr' => $end_hr, 'timerange_day' => $timerange_day, 'title' => $title, 'notes' => $notes), 'alert_schedule', '`schedule_id`=?', array($transport_id));
+        }
+
+        if ($transport_id > 0) {
+            $items = array();
+            $fail  = 0;
+
+            if ($update == 1) {
+                dbDelete('alert_schedulables', '`schedule_id`=?', array($transport_id));
+            }
+
+            foreach ($_POST['maps'] as $target) {
+                $type = 'device';
+                if (Str::startsWith($target, 'l')) {
+                    $type = 'location';
+                    $target = substr($target, 1);
+                } elseif (Str::startsWith($target, 'g')) {
+                    $type = 'device_group';
+                    $target = substr($target, 1);
+                }
+
+                $item = dbInsert(['schedule_id' => $transport_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
+                if ($notes && $type = 'device' && get_user_pref('add_schedule_note_to_device', false)) {
+                    $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
+                    $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
+                    dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);
+                }
+                if ($item > 0) {
+                    array_push($items, $item);
+                } else {
+                    $fail = 1;
+                }
+            }
+
+            if ($fail == 1 && $update == 0) {
+                foreach ($items as $item) {
+                    dbDelete('alert_schedulables', '`item_id`=?', array($item));
+                }
+
+                dbDelete('alert_schedule', '`schedule_id`=?', array($transport_id));
+                $message = 'Issue scheduling maintenance';
+            } else {
+                $status  = 'ok';
+                $message = 'Scheduling maintenance ok';
+            }
+        } else {
+            $message = 'Issue scheduling maintenance';
+        }//end if
+    }//end if
+
 
     if (is_numeric($transport_id) && $transport_id > 0) {
         // Update the fields -- json config field will be updated later
