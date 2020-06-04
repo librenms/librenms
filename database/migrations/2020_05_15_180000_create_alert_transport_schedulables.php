@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateAlertTransportSchedulables extends Migration
+class CreateAlertTransportTimerangeMapto extends Migration
 {
 
     /**
@@ -13,12 +13,12 @@ class CreateAlertTransportSchedulables extends Migration
      */
     public function up()
     {
-        Schema::create('alert_transport_schedulables', function (Blueprint $table) {
+        Schema::create('alert_transport_timerange_map', function (Blueprint $table) {
             $table->increments('item_id');
-            $table->unsignedInteger('transport_schedule_id')->index('transport_schedule_id');
-            $table->unsignedInteger('transport_schedulable_id');
-            $table->string('transport_schedulable_type');
-            $table->index(['transport_schedulable_type', 'transport_schedulable_id'], 'schedulable_morph_index');
+            $table->unsignedInteger('transport_id')->index('transport_id');
+            $table->unsignedInteger('mapto_id');
+            $table->string('transport_mapto_type');
+            $table->index(['transport_mapto_type', 'mapto_id'], 'schedulable_morph_index');
         });
     }
 
@@ -29,6 +29,6 @@ class CreateAlertTransportSchedulables extends Migration
      */
     public function down()
     {
-        Schema::drop('alert_transport_schedulables');
+        Schema::drop('alert_transport_timerange_map');
     }
 }
