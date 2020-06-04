@@ -55,6 +55,7 @@ return [
             'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
+            'applications' => 'Applications'
         ],
         'system' => [
             'cleanup' => 'Cleanup',
@@ -1288,8 +1289,11 @@ return [
         'smokeping.url' => [
             'description' => 'URL to smokeping',
             'help' => 'Full URL to the smokeping gui'
+        ],
+        'applications.always_update' => [
+            'description' => 'Always update',
+            'help' => 'By default, value and value_prev only updates on change. With this enabled they will always update'
         ]
-
     ],
     'twofactor' => [
         'description' => 'Enable Two-Factor Auth',

@@ -5036,6 +5036,13 @@
             "section": "smokeping",
             "order": 3,
             "type": "text"
+        },
+        "applications.always_update": {
+            "default": false,
+            "group": "poller",
+            "section": "applications",
+            "order": 0,
+            "type": "boolean"
         }
     }
 }
