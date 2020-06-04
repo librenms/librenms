@@ -265,6 +265,15 @@ if (Auth::user()->hasGlobalAdmin()) {
             $("#timerange").bootstrapSwitch('state', transport.timerange);
             $("#start_timerange_hr").val(transport.start_timerange_hr);
             $("#end_timerange_hr").val(transport.end_timerange_hr);
+            var recdayupd = val(transport.days);
+            if (recdayupd){
+                var arrayrecdayupd = recdayupd.split(',');
+                $.each(arrayrecdayupd, function(indexcheckedday, checkedday){
+                    $("input[name='timerange_day[]'][value="+checkedday+"]").prop('checked', true);
+                });
+            }else{
+                $('#timerange_day').prop('checked', false);
+            }
             $(".transport").hide();
             transport_form.show().find("input:text").val("");
              
