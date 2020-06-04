@@ -29,7 +29,7 @@ to communicate with each other.
 These requirements are above the normal requirements for a full LibreNMS install.
 
 - rrdtool version 1.4 or above
-- python-memcached package
+- Python 3 python-memcached package
 - a memcached install
 - a rrdcached install
 
