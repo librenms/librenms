@@ -44,7 +44,12 @@ if (is_array($transport)) {
         'name' => $transport['transport_name'],
         'type' => $transport['transport_type'],
         'is_default' => $is_default,
-        'details' => $details
+        'details' => $details,
+        'timerange' => ($transport['timerange'] == true) ? true : false,
+        'end_timerange_hr' => ($transport['end_hr'] == NULL) ? '' : $transport['end_hr'],
+        'start_timerange_hr' => ($transport['start_hr'] == NULL) ? '' : $transport['start_hr'],
+        'invert_map' => ($transport['invert_map'] == true) ? true : false,
+        'days' => ($transport['days'] == NULL) ? '' : $transport['days'],
     ]));
 } else {
     die(json_encode([
