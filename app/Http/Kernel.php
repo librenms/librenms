@@ -39,9 +39,9 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
-        'auth' => [
+        'auth.web' => [
             \App\Http\Middleware\LegacyExternalAuth::class,
-            \App\Http\Middleware\Authenticate::class,
+            'auth',
             \App\Http\Middleware\VerifyTwoFactor::class,
             \App\Http\Middleware\LoadUserPreferences::class,
         ],
@@ -66,6 +66,7 @@ class Kernel extends HttpKernel
      * @var array
      */
     protected $routeMiddleware = [
+        'auth' => \App\Http\Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
