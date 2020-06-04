@@ -267,7 +267,7 @@ class Device extends BaseModel
 
     public function formatDownUptime($short = false)
     {
-        $time = ($device->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
+        $time = ($this->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
         return Time::formatInterval($time, $short);
     }
 
