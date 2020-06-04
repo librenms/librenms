@@ -33,14 +33,14 @@ you select the same option when they are presented.
 === "CentOS 8"
     === "NGINX"
         ```
-        yum install epel-release
-        yum install cronie fping git ImageMagick mariadb mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3-PyMySQL python3-redis python3-memcached rrdtool
+        dnf install epel-release
+        dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached rrdtool
         ```
     
     === "Apache"
         ```
-        yum install epel-release
-        yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip python3 python3-pip
+        dnf install epel-release
+        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached rrdtool unzip
         ```
 
 === "Debian 10"
@@ -53,6 +53,7 @@ you select the same option when they are presented.
 
 ```
 useradd librenms -d /opt/librenms -M -r -s /usr/bin/bash
+usermod -a -G apache librenms # FIXME needed for CentOS, remove session
 ```
 
 # Download LibreNMS
@@ -79,9 +80,37 @@ su - librenms
 exit
 ```
 
-# DB Server
+# Set timezone
 
-## Configure MySQL
+See <http://php.net/manual/en/timezones.php> for a list of supported
+timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
+Ensure date.timezone is set in php.ini to your preferred time zone.
+
+=== "Ubuntu 20.04"
+    ```bash
+    vi /etc/php/7.4/fpm/php.ini
+    vi /etc/php/7.4/cli/php.ini
+    ```
+        
+=== "Debian 10"
+    ```bash
+    vi /etc/php/7.3/fpm/php.ini
+    vi /etc/php/7.3/cli/php.ini
+    ```
+
+=== "CentOS 8"
+    ```
+    vi /etc/php.ini
+    ```
+
+Remember to set the system timezone as well.
+
+```
+timedatectl set-timezone Etc/UTC
+```
+
+
+# Configure MariaDB
 
 === "Ubuntu 20.04 / Debian 10"
     ```
@@ -119,38 +148,7 @@ FLUSH PRIVILEGES;
 exit
 ```
 
-# Configure PHP
-
-## Set timezone
-
-See <http://php.net/manual/en/timezones.php> for a list of supported
-timezones.  Valid examples are: "America/New_York", "Australia/Brisbane", "Etc/UTC".
-Ensure date.timezone is set in php.ini to your preferred time zone.
-
-=== "Ubuntu 20.04"
-    ```bash
-    vi /etc/php/7.4/fpm/php.ini
-    vi /etc/php/7.4/cli/php.ini
-    ```
-        
-=== "Debian 10"
-    ```bash
-    vi /etc/php/7.3/fpm/php.ini
-    vi /etc/php/7.3/cli/php.ini
-    ```
-
-=== "CentOS 8"
-    ```
-    vi /etc/php.ini
-    ```
-
-Remember to set the system timezone as well.
-
-```
-timedatectl set-timezone Etc/UTC
-```
-
-## Configure PHP-FPM
+# Configure PHP-FPM
 
 === "Ubuntu 20.04"
     ```bash
@@ -182,7 +180,7 @@ group = librenms
 listen = /run/php-fpm-librenms.sock;
 ```
 
-# Web Server
+# Configure Web Server
     
 === "Ubuntu 20.04"
     === "NGINX"        
@@ -370,7 +368,16 @@ listen = /run/php-fpm-librenms.sock;
             AllowOverride All
             Options FollowSymLinks MultiViews
           </Directory>
-        </VirtualHost>
+
+          # Enable http authorization headers
+          <IfModule setenvif_module>
+            SetEnvIfNoCase ^Authorization$ "(.+)" HTTP_AUTHORIZATION=$1
+          </IfModule>
+    
+          <FilesMatch ".+\.php$">
+            SetHandler "proxy:unix:/run/php-fpm-librenms.sock|fcgi://localhost"
+          </FilesMatch>
+        </VirtualHost>     
         ```
         
         > NOTE: If this is the only site you are hosting on this server (it
@@ -378,6 +385,7 @@ listen = /run/php-fpm-librenms.sock;
         
         ```
         systemctl enable --now httpd
+        systemctl enable --now php-fpm
         ```
 
 # SELinux
@@ -389,7 +397,7 @@ listen = /run/php-fpm-librenms.sock;
     Install the policy tool for SELinux:
     
     ```
-    yum install python3-policycoreutils
+    dnf install policycoreutils-python-utils
     ```
     
     ## Configure the contexts needed by LibreNMS:
@@ -443,10 +451,18 @@ listen = /run/php-fpm-librenms.sock;
     Firewall not enabled by default
 
 === "CentOS 8"
+
     ```
     firewall-cmd --zone public --add-service http --add-service https
     firewall-cmd --permanent --zone public --add-service http --add-service https
     ```
+
+# Enable lnms command completion
+
+```
+ln -s /opt/librenms/lnms /usr/local/bin/lnms
+cp /opt/librenms/misc/lnms-completion.bash /etc/bash_completion.d/
+```
 
 # Configure snmpd
 

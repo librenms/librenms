@@ -10,6 +10,7 @@ fi
 pip3 install --upgrade pip
 pip3 install --user --requirement <(cat <<EOF
 future==0.18.2
+Jinja2==2.11.2
 livereload==2.6.1
 lunr==0.5.8
 Markdown==3.2.2
@@ -17,7 +18,10 @@ mkdocs==1.1.2
 mkdocs-material==5.2.2
 nltk==3.5
 pymdown-extensions==7.1
+PyYAML==5.3.1
+six==1.15.0
 tornado==6.0.4
+MarkupSafe==1.1.1
 EOF
 )
 
