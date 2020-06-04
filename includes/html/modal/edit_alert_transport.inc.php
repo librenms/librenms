@@ -263,8 +263,8 @@ if (Auth::user()->hasGlobalAdmin()) {
             $("#transport-choice").val(form_id);
             $("#is_default").bootstrapSwitch('state', transport.is_default);
             $("#timerange").bootstrapSwitch('state', transport.timerange);
-            $("#start_hr").val(transport.start_hr);
-            $("#end_hr").val(transport.end_hr);
+            $("#start_timerange_hr").val(transport.start_timerange_hr);
+            $("#end_timerange_hr").val(transport.end_timerange_hr);
             $(".transport").hide();
             transport_form.show().find("input:text").val("");
              
