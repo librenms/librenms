@@ -14,7 +14,7 @@ class CreateAlertSchedulablesTable extends Migration
     public function up()
     {
         Schema::create('alert_schedulables', function (Blueprint $table) {
-            $table->increments('item_id');
+            $table->boolean('recurring')->default(0)->unsigned();
             $table->unsignedInteger('schedule_id')->index('schedule_id');
             $table->unsignedInteger('alert_schedulable_id');
             $table->string('alert_schedulable_type');
