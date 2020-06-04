@@ -49,7 +49,7 @@ if (is_array($transport)) {
         'end_timerange_hr' => ($transport['end_hr'] == NULL) ? '' : $transport['end_hr'],
         'start_timerange_hr' => ($transport['start_hr'] == NULL) ? '' : $transport['start_hr'],
         'invert_map' => ($transport['invert_map'] == true) ? true : false,
-        'days' => ($transport['days'] == NULL) ? '' : $transport['days'],
+        'day' => ($transport['day'] == NULL) ? '' : $transport['day'],
     ]));
 } else {
     die(json_encode([
