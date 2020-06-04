@@ -1,0 +1,3020 @@
+--/**************************************************************************
+--*          COPYRIGHT 2012, 2013, 2014 BY DELL INC.
+--*                    ALL RIGHTS RESERVED
+--*************************************************************************/
+
+DELL-STORAGE-SC-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY,
+        NOTIFICATION-TYPE,
+        OBJECT-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32,
+        enterprises
+                            FROM SNMPv2-SMI
+        NOTIFICATION-GROUP,
+        OBJECT-GROUP,
+        MODULE-COMPLIANCE
+                            FROM SNMPv2-CONF
+        sysName
+                            FROM SNMPv2-MIB
+        SnmpAdminString
+                            FROM SNMP-FRAMEWORK-MIB
+        TEXTUAL-CONVENTION,
+        TruthValue,
+        DateAndTime
+                            FROM SNMPv2-TC;
+
+    storageCenterModule MODULE-IDENTITY
+        LAST-UPDATED        "201401290000Z"        --29 January 2014 --
+        ORGANIZATION        "Dell-Compellent"
+        CONTACT-INFO        "Dell-Compellent Technologies
+                            7625 Smetana Lane
+                            Eden Prairie, MN 55344-3712
+                            Tel: 952-294-3300
+                            Fax: 952-294-3333
+                            E-mail: support@compellent.com
+                            Web: http://www.compellent.com/"
+        DESCRIPTION         "The MIB is for monitoring the status of Storage
+                            Center products from Dell Storage."
+
+            --Revision History --
+
+        REVISION            "201401290000Z"        --29 January 2014 --
+        DESCRIPTION         "Changed most product references from
+                            'Compellent' to 'Dell Storage' and added
+                            level for StorageCenter under compellentEnterprise."
+        REVISION            "201312180000Z"        --18 December 2013 --
+        DESCRIPTION         "Added scScMgmtIP var to each trap."
+        REVISION            "201312060000Z"        --6 December 2013 --
+        DESCRIPTION         "Added scCtlrLeader."
+        REVISION            "201311050000Z"        --5 November 2013 --
+        DESCRIPTION         "Changed voltage values from unsigned to string,
+                            and added scEnclApiIndex."
+        REVISION            "201309270000Z"        --27 September 2013 --
+        DESCRIPTION         "Deprecated UsedSpace and TotalSpace (where GBs are
+                            calculated as 1000*1000*1000) and replaced them with
+                            vars calculated with GB = 1024*1024*1024."
+        REVISION            "201307190000Z"        --19 July 2013 --
+        DESCRIPTION         "Changed from Compellent enterprise number to Dell's."
+        REVISION            "201307090000Z"        --9 July 2013 --
+        DESCRIPTION         "Added IPv6 objects to CtlrTable and ScTable."
+        REVISION            "201305200000Z"        --20 May 2013 --
+        DESCRIPTION         "Changed how productIDGlobalStatus is handled.
+                            Added model and asset tags to scCtlrTable and scEnclTable.
+                            Added new tables scDiskConfigTable and scAlertTable."
+        REVISION            "201302080000Z"        --8 February 2013 --
+        DESCRIPTION         "Added traps organized by function rather than
+                            severity, and added new mib objects to support the new traps."
+        REVISION            "201107120000Z"
+        DESCRIPTION         "Cleaned things up to get rid of errors and warnings
+                            reported by MIB validators."
+        REVISION            "200905180000Z"
+        DESCRIPTION         "Applicable for Compellent Storage Center versions
+                            5.0 and higher."
+        ::= { storageCenter 1 }
+
+
+--=========== Textual Conventions ========================================--
+
+    ScHardwareType ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "Hardware component type.
+                            Used when refering to components on the
+                            controller or enclosure."
+        SYNTAX              INTEGER {
+                                fan( 1 ),
+                                powersupply( 2 ),
+                                tempsensor( 3 ),
+                                voltagesensor( 4 ),
+                                iomodule( 5 ),
+                                audiblealarm( 6 )
+                            }
+
+    ScStatus ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "Operational Status: Up, Down, or Degraded."
+        SYNTAX              INTEGER {
+                                up( 1 ),
+                                down( 2 ),
+                                degraded( 3 )
+                            }
+
+--=================================================================--
+    dellEnterprise OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "SNMP Enterprise number for Dell."
+        ::= { enterprises 674 }
+
+--=================================================================--
+    dellEnterpriseBranch OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Prefix for Dell Enterprise Branch."
+        ::= { dellEnterprise 11000 }
+
+--=================================================================--
+    dellStorageSubBranch OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Prefix for Dell Storage Sub-Branch."
+        ::= { dellEnterpriseBranch 2000 }
+
+--=================================================================--
+    compellentEnterprise OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Prefix for Dell-Compellent enterprise."
+        ::= { dellStorageSubBranch 500 }
+
+--=================================================================--
+    storageCenter OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Prefix for Storage Center product line."
+        ::= { compellentEnterprise 1 }
+
+--===========  Groups  =====================================--
+    storageCenterObjects OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Storage Center Objects."
+        ::= {  storageCenter 2 }
+
+--=========== Objects ========================================--
+--Product Identification Objects --
+    productIDDisplayName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Name of this product for display purposes."
+        ::= { storageCenterObjects 1 }
+
+    productIDDescription OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "A short description of this product."
+        ::= { storageCenterObjects 2 }
+
+    productIDVendor OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The name of the product manufacturer."
+        ::= { storageCenterObjects 3 }
+
+    productIDVersion OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The version of this product."
+        ::= { storageCenterObjects 4 }
+
+    productIDSerialNumber OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The Dell Service Tag."
+        ::= { storageCenterObjects 5 }
+
+    productIDGlobalStatus OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                other( 1 ),
+                                unknown( 2 ),
+                                ok( 3 ),
+                                noncritical( 4 ),
+                                critical( 5 ),
+                                nonrecoverable( 6 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Current status of the product. This is a rollup
+                            for the entire product including any monitored
+                            devices. The status is intended to give initiative
+                            to an SNMP monitor to get further data when this
+                            status is abnormal.  The value here maps from the
+                            System Status icon on the SC GUI: grey->unknown,
+                            green->ok, yellow->noncritical, red->critical.
+                            If the productIDGlobalStatus is not ok then
+                            scLastWorstAlert contains the scAlertNbr of
+                            the alert that is responsible for the
+                            negative status."
+        ::= { storageCenterObjects 6 }
+
+    productIDBuildNumber OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The software build number of the product populating
+                            the MIB."
+        ::= { storageCenterObjects 7 }
+
+    productIDURL OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "The URL of the web-based application to manage
+                            this device."
+        ::= { storageCenterObjects 8 }
+
+    --Misc Objects --
+    scAlertDef OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert Definition unique identifier"
+        ::= { storageCenterObjects 9 }
+
+    scIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center Index, typically the SC HSN (Hardware
+                            Serial Number.  Not a true hardware s/n,
+                            but a logical s/n on which to assign liensed-features)."
+        ::= { storageCenterObjects 10 }
+
+    scTestString OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Test String used by scTestTrap:
+                            'SNMP server subsystem is accessible'"
+        ::= { storageCenterObjects 11 }
+
+    scMiscAlertString OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "String used by last scMiscAlert"
+        ::= { storageCenterObjects 12 }
+
+--Controller Table --
+    scCtlrTable OBJECT-TYPE                             --table of controller entries
+        SYNTAX              SEQUENCE OF ScCtlrEntry     --points to def of ctlr entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Controller Table"
+        ::= { storageCenterObjects 13 }
+
+    scCtlrEntry OBJECT-TYPE                             --virtual object for controller entry
+        SYNTAX              ScCtlrEntry                 --is instance of controller entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scCtlrTable"
+        INDEX               {
+                                scCtlrIndex
+                            }
+        ::= { scCtlrTable 1 }
+
+    ScCtlrEntry ::= SEQUENCE {                          --definition of controller entry
+        scCtlrIndex         Unsigned32,                 --index is not-accessible
+        scCtlrNbr           Unsigned32,                 --same as index but is readable
+        scCtlrStatus        ScStatus,
+        scCtlrName          SnmpAdminString,
+        scCtlrIpAddr        SnmpAdminString,
+        scCtlrForceTrap     SnmpAdminString,
+        scCtlrModel         SnmpAdminString,
+        scCtlrServiceTag    SnmpAdminString,
+        scCtlrAssetTag      SnmpAdminString,
+        scCtlrIPv6Eth0IP    SnmpAdminString,
+        scCtlrIPv6Eth0IPPrefix Unsigned32,
+        scCtlrLeader        TruthValue
+    }
+
+--data object definitions for ScCtlrEntry
+    scCtlrIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..2)           --there are a max of 2 ctlrs in a SC
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scCtlrTable (same value as scCtlrNbr)"
+        ::= { scCtlrEntry 1 }
+
+    scCtlrNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..2)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "controller number (same value as scCtlrIndex)"
+        ::= { scCtlrEntry 2 }
+
+    scCtlrStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "controller status"
+        ::= { scCtlrEntry 3 }
+
+    scCtlrName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "controller name"
+        ::= { scCtlrEntry 4 }
+
+    scCtlrIpAddr OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "controller IP Address"
+        ::= { scCtlrEntry 5 }
+
+    scCtlrForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scCtlrStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scCtlrEntry 6 }
+
+    scCtlrModel OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "controller Model"
+        ::= { scCtlrEntry 7 }
+
+    scCtlrServiceTag OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "controller Dell Service Tag"
+        ::= { scCtlrEntry 8 }
+
+    scCtlrAssetTag OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "controller Asset Tag"
+        ::= { scCtlrEntry 9 }
+
+    scCtlrIPv6Eth0IP OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "controller IPv6 Eth0 IP Address"
+        ::= { scCtlrEntry 10 }
+
+    scCtlrIPv6Eth0IPPrefix OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "controller IPv6 Eth0 IP Addr Prefix Length"
+        ::= { scCtlrEntry 11 }
+
+    scCtlrLeader OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "bool that tells if this controller is the lead"
+        ::= { scCtlrEntry 12 }
+
+--Disk Table --
+    scDiskTable OBJECT-TYPE                             --table of disk entries
+        SYNTAX              SEQUENCE OF ScDiskEntry     --points to def of disk entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Disk Table"
+        ::= { storageCenterObjects 14 }
+
+    scDiskEntry OBJECT-TYPE                             --virtual object for disk entry
+        SYNTAX              ScDiskEntry                 --is instance of disk entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scDiskTable"
+        INDEX               {
+                                scDiskIndex
+                            }
+        ::= { scDiskTable 1 }
+
+    ScDiskEntry ::= SEQUENCE {                          --definition of disk entry
+        scDiskIndex         Unsigned32,                 --index is not-accessible
+        scDiskNbr           Unsigned32,                 --same as index but readable
+        scDiskStatus        ScStatus,
+        scDiskNamePosition  SnmpAdminString,
+        scDiskHealthy       TruthValue,
+        scDiskStatusMsg     SnmpAdminString,
+        scDiskApiIndex      Unsigned32,
+        scDiskForceTrap     SnmpAdminString,
+        scDiskSize          Unsigned32,                 --raw capacity, in GB
+        scDiskIoPortType    INTEGER,                    --disk bus type: fc, sas, etc.
+        scDiskEnclosure     Unsigned32
+    }
+
+--data object definitions for ScDiskEntry
+    scDiskIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scDiskTable (same value as scDiskNbr)"
+        ::= { scDiskEntry 1 }
+
+    scDiskNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "disk number (same value as scDiskIndex)"
+        ::= { scDiskEntry 2 }
+
+    scDiskStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "disk status"
+        ::= { scDiskEntry 3 }
+
+    scDiskNamePosition OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "disk name: format ee-dd
+                            where ee is the enclosure number,
+                            and dd is the disk number."
+        ::= { scDiskEntry 4 }
+
+    scDiskHealthy OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "true(1) indicates that the disk is healthy"
+        ::= { scDiskEntry 5 }
+
+    scDiskStatusMsg OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "disk status message: set to
+                            'no status message' when scDiskStatus=up"
+        ::= { scDiskEntry 6 }
+
+    scDiskApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "disk api index: used internal to the SC"
+        ::= { scDiskEntry 7 }
+
+    scDiskForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scDiskStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scDiskEntry 8 }
+
+    scDiskSize OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "disk size: raw capacity in GB"
+        ::= { scDiskEntry 9 }
+
+    scDiskIoPortType OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                fibrechannel( 1 ),
+                                iscsi( 2 ),
+                                fibrechanneloverethernet( 3 ),
+                                sas( 4 ),
+                                unknown( 5 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "disk I/O port type (bus type)"
+        ::= { scDiskEntry 10 }
+
+    scDiskEnclosure OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "disk enclosure index"
+        ::= { scDiskEntry 11 }
+
+--Enclosure Table --
+    scEnclTable OBJECT-TYPE                             --table of controller entries
+        SYNTAX              SEQUENCE OF ScEnclEntry     --points to def of enclosure entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Enclosure Table"
+        ::= { storageCenterObjects 15 }
+
+    scEnclEntry OBJECT-TYPE                             --virtual object for enclosure entry
+        SYNTAX              ScEnclEntry                 --is instance of enclosure entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scEnclTable"
+        INDEX               {
+                                scEnclIndex
+                            }
+        ::= { scEnclTable 1 }
+
+    ScEnclEntry ::= SEQUENCE {                          --definition of enclosure entry
+        scEnclIndex         Unsigned32,                 --index is not-accessible
+        scEnclNbr           Unsigned32,                 --same as index but is readable
+        scEnclStatus        ScStatus,
+        scEnclName          SnmpAdminString,
+        scEnclStatusDescr   SnmpAdminString,
+        scEnclType          SnmpAdminString,
+        scEnclModel         SnmpAdminString,
+        scEnclForceTrap     SnmpAdminString,
+        scEnclServiceTag    SnmpAdminString,
+        scEnclAssetTag      SnmpAdminString,
+        scEnclApiIndex      Unsigned32
+    }
+
+--data object definitions for ScEnclEntry
+    scEnclIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..100)         --there are a max of 100 enclosures
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scEnclTable (same value as scEnclNbr)"
+        ::= { scEnclEntry 1 }
+
+    scEnclNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..100)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "enclosure number (same value as scEnclIndex)"
+        ::= { scEnclEntry 2 }
+
+    scEnclStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure status"
+        ::= { scEnclEntry 3 }
+
+    scEnclName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure name"
+        ::= { scEnclEntry 4 }
+
+    scEnclStatusDescr OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure status description"
+        ::= { scEnclEntry 5 }
+
+    scEnclType OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure type"
+        ::= { scEnclEntry 6 }
+
+    scEnclModel OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure model"
+        ::= { scEnclEntry 7 }
+
+    scEnclForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scEnclStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scEnclEntry 8 }
+
+    scEnclServiceTag OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Dell Service Tag"
+        ::= { scEnclEntry 9 }
+
+    scEnclAssetTag OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Asset Tag"
+        ::= { scEnclEntry 10 }
+
+    scEnclApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure api index: used internal to the SC"
+        ::= { scEnclEntry 11 }
+
+--Controller Fan Sensor Table --
+    scCtlrFanTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScCtlrFanEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Controller Fan Sensor Table"
+        ::= { storageCenterObjects 16 }
+
+    scCtlrFanEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScCtlrFanEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scCtlrFanTable"
+        INDEX               {
+                                scCtlrIndex,
+                                scCtlrFanIndex
+                            }
+        ::= { scCtlrFanTable 1 }
+
+    ScCtlrFanEntry ::= SEQUENCE {                       --def of entry in table
+        scCtlrFanIndex          Unsigned32,             --index is not-accessible
+        scCtlrFanNbr            Unsigned32,             --same as index but is readable
+        scCtlrFanStatus         ScStatus,
+        scCtlrFanName           SnmpAdminString,
+        scCtlrFanCurrentRpm     Unsigned32,
+        scCtlrFanNormMaxRpm     Unsigned32,
+        scCtlrFanNormMinRpm     Unsigned32,
+        scCtlrFanWarnLwrRpm     Unsigned32,
+        scCtlrFanWarnUprRpm     Unsigned32,
+        scCtlrFanCritLwrRpm     Unsigned32,
+        scCtlrFanCritUprRpm     Unsigned32,
+        scCtlrFanForceTrap      SnmpAdminString,
+        scCtlrFanApiIndex       Unsigned32
+    }
+
+--data object definitions for ScCtlrFanEntry
+    scCtlrFanIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scCtlrFanTable (same value as scCtlrFanNbr)"
+        ::= { scCtlrFanEntry 1 }
+
+    scCtlrFanNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Fan number (same value as scCtlrFanIndex)"
+        ::= { scCtlrFanEntry 2 }
+
+    scCtlrFanStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan status"
+        ::= { scCtlrFanEntry 3 }
+
+    scCtlrFanName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan name"
+        ::= { scCtlrFanEntry 4 }
+
+    scCtlrFanCurrentRpm OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan current rpm"
+        ::= { scCtlrFanEntry 5 }
+
+    scCtlrFanNormMaxRpm OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan normal maximum rpm"
+        ::= { scCtlrFanEntry 6 }
+
+    scCtlrFanNormMinRpm OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan normal minimum rpm"
+        ::= { scCtlrFanEntry 7 }
+
+    scCtlrFanWarnLwrRpm OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan warning lower threshold rpm"
+        ::= { scCtlrFanEntry 8 }
+
+    scCtlrFanWarnUprRpm OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan warning-level upper threshold rpm"
+        ::= { scCtlrFanEntry 9 }
+
+    scCtlrFanCritLwrRpm OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan crtical-level lower threshold rpm"
+        ::= { scCtlrFanEntry 10 }
+
+    scCtlrFanCritUprRpm OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan crtical-level upper threshold rpm"
+        ::= { scCtlrFanEntry 11 }
+
+    scCtlrFanForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scCtlrCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scCtlrFanEntry 12 }
+
+    scCtlrFanApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "fan api index: used internal to the SC"
+        ::= { scCtlrFanEntry 13 }
+
+--Controller Power Supply Table --
+    scCtlrPowerTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScCtlrPowerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Controller Power Supply Table"
+        ::= { storageCenterObjects 17 }
+
+    scCtlrPowerEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScCtlrPowerEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scCtlrPowerTable"
+        INDEX               {
+                                scCtlrIndex,
+                                scCtlrPowerIndex
+                            }
+        ::= { scCtlrPowerTable 1 }
+
+    ScCtlrPowerEntry ::= SEQUENCE {                     --def of entry in table
+        scCtlrPowerIndex        Unsigned32,             --index is not-accessible
+        scCtlrPowerNbr          Unsigned32,             --same as index but is readable
+        scCtlrPowerStatus       ScStatus,
+        scCtlrPowerName         SnmpAdminString,
+        scCtlrPowerForceTrap    SnmpAdminString
+    }
+
+--data object definitions for ScCtlrPowerEntry
+    scCtlrPowerIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scCtlrPowerTable (same value as scCtlrPowerNbr)"
+        ::= { scCtlrPowerEntry 1 }
+
+    scCtlrPowerNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Ctlr Power Supply  number (same value as scCtlrPowerIndex)"
+        ::= { scCtlrPowerEntry 2 }
+
+    scCtlrPowerStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Power Supply status"
+        ::= { scCtlrPowerEntry 3 }
+
+    scCtlrPowerName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Power Supply name"
+        ::= { scCtlrPowerEntry 4 }
+
+    scCtlrPowerForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scCtlrCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scCtlrPowerEntry 5 }
+
+--Controller Voltage Sensor Table --
+    scCtlrVoltageTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScCtlrVoltageEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Voltage Sensor Table"
+        ::= { storageCenterObjects 18 }
+
+    scCtlrVoltageEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScCtlrVoltageEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scCtlrVoltageTable"
+        INDEX               {
+                                scCtlrIndex,
+                                scCtlrVoltageIndex
+                            }
+        ::= { scCtlrVoltageTable 1 }
+
+    ScCtlrVoltageEntry ::= SEQUENCE {                       --def of entry in table
+        scCtlrVoltageIndex      Unsigned32,                 --index is not-accessible
+        scCtlrVoltageNbr        Unsigned32,                 --same as index but is readable
+        scCtlrVoltageStatus     ScStatus,
+        scCtlrVoltageName       SnmpAdminString,
+        scCtlrVoltageCurrentV   SnmpAdminString,
+        scCtlrVoltageNormMaxV   SnmpAdminString,
+        scCtlrVoltageNormMinV   SnmpAdminString,
+        scCtlrVoltageWarnLwrV   SnmpAdminString,
+        scCtlrVoltageWarnUprV   SnmpAdminString,
+        scCtlrVoltageCritLwrV   SnmpAdminString,
+        scCtlrVoltageCritUprV   SnmpAdminString,
+        scCtlrVoltageForceTrap  SnmpAdminString
+    }
+
+--data object definitions for ScCtlrVoltageEntry
+    scCtlrVoltageIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scCtlrVoltageTable (same value as scCtlrVoltageNbr)"
+        ::= { scCtlrVoltageEntry 1 }
+
+    scCtlrVoltageNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Ctlr Voltage Sensor number (same value as scCtlrVoltageIndex)"
+        ::= { scCtlrVoltageEntry 2 }
+
+    scCtlrVoltageStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Sensor status"
+        ::= { scCtlrVoltageEntry 3 }
+
+    scCtlrVoltageName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Sensor name"
+        ::= { scCtlrVoltageEntry 4 }
+
+    scCtlrVoltageCurrentV OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Current Voltage"
+        ::= { scCtlrVoltageEntry 5 }
+
+    scCtlrVoltageNormMaxV OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Normal Maximum"
+        ::= { scCtlrVoltageEntry 6 }
+
+    scCtlrVoltageNormMinV OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Normal Minimum"
+        ::= { scCtlrVoltageEntry 7 }
+
+    scCtlrVoltageWarnLwrV OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Warning-level Lower Threshold"
+        ::= { scCtlrVoltageEntry 8 }
+
+    scCtlrVoltageWarnUprV OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Warning-level Upper Threshold"
+        ::= { scCtlrVoltageEntry 9 }
+
+    scCtlrVoltageCritLwrV OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Critical-level Lower Threshold"
+        ::= { scCtlrVoltageEntry 10 }
+
+    scCtlrVoltageCritUprV OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Voltage Critical-level Upper Threshold"
+        ::= { scCtlrVoltageEntry 11 }
+
+    scCtlrVoltageForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scCtlrCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scCtlrVoltageEntry 12 }
+
+--Controller Temp Sensor Table --
+    scCtlrTempTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScCtlrTempEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Temperature Sensor Table"
+        ::= { storageCenterObjects 19 }
+
+    scCtlrTempEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScCtlrTempEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scCtlrTempTable"
+        INDEX               {
+                                scCtlrIndex,
+                                scCtlrTempIndex
+                            }
+        ::= { scCtlrTempTable 1 }
+
+    ScCtlrTempEntry ::= SEQUENCE {                       --def of entry in table
+        scCtlrTempIndex      Unsigned32,                 --index is not-accessible
+        scCtlrTempNbr        Unsigned32,                 --same as index but is readable
+        scCtlrTempStatus     ScStatus,
+        scCtlrTempName       SnmpAdminString,
+        scCtlrTempCurrentC   Unsigned32,
+        scCtlrTempNormMaxC   Unsigned32,
+        scCtlrTempNormMinC   Unsigned32,
+        scCtlrTempWarnLwrC   Unsigned32,
+        scCtlrTempWarnUprC   Unsigned32,
+        scCtlrTempCritLwrC   Unsigned32,
+        scCtlrTempCritUprC   Unsigned32,
+        scCtlrTempForceTrap  SnmpAdminString
+    }
+
+--data object definitions for ScCtlrTempEntry
+    scCtlrTempIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scCtlrTempTable (same value as scCtlrTempNbr)"
+        ::= { scCtlrTempEntry 1 }
+
+    scCtlrTempNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Ctlr Temp Sensor number (same value as scCtlrTempIndex)"
+        ::= { scCtlrTempEntry 2 }
+
+    scCtlrTempStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor status"
+        ::= { scCtlrTempEntry 3 }
+
+    scCtlrTempName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor name"
+        ::= { scCtlrTempEntry 4 }
+
+    scCtlrTempCurrentC OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor Current Temperature in Celcius"
+        ::= { scCtlrTempEntry 5 }
+
+    scCtlrTempNormMaxC OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor Normal Maximum Temp in Celcius"
+        ::= { scCtlrTempEntry 6 }
+
+    scCtlrTempNormMinC OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor Normal Minimum Temp in Celcius"
+        ::= { scCtlrTempEntry 7 }
+
+    scCtlrTempWarnLwrC OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor Warning-level Lower Threshold"
+        ::= { scCtlrTempEntry 8 }
+
+    scCtlrTempWarnUprC OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor Warning-level Upper Threshold"
+        ::= { scCtlrTempEntry 9 }
+
+    scCtlrTempCritLwrC OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor Critical-level Lower Threshold"
+        ::= { scCtlrTempEntry 10 }
+
+    scCtlrTempCritUprC OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Controller Temp Sensor Critical-level Upper Threshold"
+        ::= { scCtlrTempEntry 11 }
+
+    scCtlrTempForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scCtlrCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scCtlrTempEntry 12 }
+
+--enclosure Fan Sensor Table --
+    scEnclFanTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScEnclFanEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "enclosure Fan Sensor Table"
+        ::= { storageCenterObjects 20 }
+
+    scEnclFanEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScEnclFanEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scEnclFanTable"
+        INDEX               {
+                                scEnclIndex,
+                                scEnclFanIndex
+                            }
+        ::= { scEnclFanTable 1 }
+
+    ScEnclFanEntry ::= SEQUENCE {                       --def of entry in table
+        scEnclFanIndex      Unsigned32,                 --index is not-accessible
+        scEnclFanNbr        Unsigned32,                 --same as index but is readable
+        scEnclFanStatus     ScStatus,
+        scEnclFanLocation   SnmpAdminString,
+        scEnclFanCurrentS   SnmpAdminString,
+        scEnclFanForceTrap  SnmpAdminString
+    }
+
+--data object definitions for ScEnclFanEntry
+    scEnclFanIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scEnclFanTable (same value as scEnclFanNbr)"
+        ::= { scEnclFanEntry 1 }
+
+    scEnclFanNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Fan number (same value as scEnclFanIndex)"
+        ::= { scEnclFanEntry 2 }
+
+    scEnclFanStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan status"
+        ::= { scEnclFanEntry 3 }
+
+    scEnclFanLocation OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan location"
+        ::= { scEnclFanEntry 4 }
+
+    scEnclFanCurrentS OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Fan current speed: high, Low, Medium, Off, Unknown"
+        ::= { scEnclFanEntry 5 }
+
+    scEnclFanForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scEnclCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scEnclFanEntry 6 }
+
+--enclosure Power Supply Table --
+    scEnclPowerTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScEnclPowerEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "enclosure Power Supply Table"
+        ::= { storageCenterObjects 21 }
+
+    scEnclPowerEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScEnclPowerEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scEnclPowerTable"
+        INDEX               {
+                                scEnclIndex,
+                                scEnclPowerIndex
+                            }
+        ::= { scEnclPowerTable 1 }
+
+    ScEnclPowerEntry ::= SEQUENCE {                       --def of entry in table
+        scEnclPowerIndex      Unsigned32,                 --index is not-accessible
+        scEnclPowerNbr        Unsigned32,                 --same as index but is readable
+        scEnclPowerStatus     ScStatus,
+        scEnclPowerPosition   SnmpAdminString,
+        scEnclPowerForceTrap  SnmpAdminString
+    }
+
+--data object definitions for ScEnclPowerEntry
+    scEnclPowerIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scEnclPowerTable (same value as scEnclPowerNbr)"
+        ::= { scEnclPowerEntry 1 }
+
+    scEnclPowerNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Encl Power Supply  number (same value as scEnclPowerIndex)"
+        ::= { scEnclPowerEntry 2 }
+
+    scEnclPowerStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Power Supply status"
+        ::= { scEnclPowerEntry 3 }
+
+    scEnclPowerPosition OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Power Supply position"
+        ::= { scEnclPowerEntry 4 }
+
+    scEnclPowerForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scEnclCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scEnclPowerEntry 5 }
+
+--Enclosure IO Module Table --
+    scEnclIoModTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScEnclIoModEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "I/O Module Table"
+        ::= { storageCenterObjects 22 }
+
+    scEnclIoModEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScEnclIoModEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scEnclIoModTable"
+        INDEX               {
+                                scEnclIndex,
+                                scEnclIoModIndex
+                            }
+        ::= { scEnclIoModTable 1 }
+
+    ScEnclIoModEntry ::= SEQUENCE {                       --def of entry in table
+        scEnclIoModIndex      Unsigned32,                 --index is not-accessible
+        scEnclIoModNbr        Unsigned32,                 --same as index but is readable
+        scEnclIoModStatus     ScStatus,
+        scEnclIoModPosition   SnmpAdminString,
+        scEnclIoModForceTrap  SnmpAdminString
+    }
+
+--data object definitions for ScEnclIoModEntry
+    scEnclIoModIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scEnclIoModTable (same value as scEnclIoModNbr)"
+        ::= { scEnclIoModEntry 1 }
+
+    scEnclIoModNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Encl I/O Module number (same value as scEnclIoModIndex)"
+        ::= { scEnclIoModEntry 2 }
+
+    scEnclIoModStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure I/O Module status"
+        ::= { scEnclIoModEntry 3 }
+
+    scEnclIoModPosition OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure I/O Module position"
+        ::= { scEnclIoModEntry 4 }
+
+    scEnclIoModForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scEnclCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scEnclIoModEntry 5 }
+
+--enclosure Temp Sensor Table --
+    scEnclTempTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScEnclTempEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Temperature Sensor Table"
+        ::= { storageCenterObjects 23 }
+
+    scEnclTempEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScEnclTempEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scEnclTempTable"
+        INDEX               {
+                                scEnclIndex,
+                                scEnclTempIndex
+                            }
+        ::= { scEnclTempTable 1 }
+
+    ScEnclTempEntry ::= SEQUENCE {                       --def of entry in table
+        scEnclTempIndex      Unsigned32,                 --index is not-accessible
+        scEnclTempNbr        Unsigned32,                 --same as index but is readable
+        scEnclTempStatus     ScStatus,
+        scEnclTempLocation   SnmpAdminString,
+        scEnclTempCurrentC   Unsigned32,
+        scEnclTempForceTrap  SnmpAdminString
+    }
+
+--data object definitions for ScEnclTempEntry
+    scEnclTempIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scEnclTempTable (same value as scEnclTempNbr)"
+        ::= { scEnclTempEntry 1 }
+
+    scEnclTempNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Encl Temp Sensor number (same value as scEnclTempIndex)"
+        ::= { scEnclTempEntry 2 }
+
+    scEnclTempStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Temp Sensor status"
+        ::= { scEnclTempEntry 3 }
+
+    scEnclTempLocation OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Temp Sensor location"
+        ::= { scEnclTempEntry 4 }
+
+    scEnclTempCurrentC OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Temp Sensor current temperature in Celcius"
+        ::= { scEnclTempEntry 5 }
+
+    scEnclTempForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scEnclCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scEnclTempEntry 6 }
+
+--Enclosure Audible Alarm Table --
+    scEnclAlarmTable OBJECT-TYPE
+        SYNTAX              SEQUENCE OF ScEnclAlarmEntry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Audible Alarm Table"
+        ::= { storageCenterObjects 24 }
+
+    scEnclAlarmEntry OBJECT-TYPE                         --virtual object
+        SYNTAX              ScEnclAlarmEntry             --points to def of entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scEnclAlarmTable"
+        INDEX               {
+                                scEnclIndex,
+                                scEnclAlarmIndex
+                            }
+        ::= { scEnclAlarmTable 1 }
+
+    ScEnclAlarmEntry ::= SEQUENCE {                       --def of entry in table
+        scEnclAlarmIndex      Unsigned32,                 --index is not-accessible
+        scEnclAlarmNbr        Unsigned32,                 --same as index but is readable
+        scEnclAlarmStatus     ScStatus,
+        scEnclAlarmName       SnmpAdminString,
+        scEnclAlarmForceTrap  SnmpAdminString
+    }
+
+--data object definitions for ScEnclAlarmEntry
+    scEnclAlarmIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)          --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scEnclAlarmTable (same value as scEnclAlarmNbr)"
+        ::= { scEnclAlarmEntry 1 }
+
+    scEnclAlarmNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Encl Audible Alarm number (same value as scEnclTempIndex)"
+        ::= { scEnclAlarmEntry 2 }
+
+    scEnclAlarmStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Audible Alarm status"
+        ::= { scEnclAlarmEntry 3 }
+
+    scEnclAlarmName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "enclosure Audible Alarm name"
+        ::= { scEnclAlarmEntry 4 }
+
+    scEnclAlarmForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scEnclCompStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scEnclAlarmEntry 5 }
+
+--Disk Folder Table --
+    scDiskFolderTable OBJECT-TYPE                         --table of Disk Folder entries
+        SYNTAX              SEQUENCE OF ScDiskFolderEntry --points def Disk Folder entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Disk Folder Table"
+        ::= { storageCenterObjects 25 }
+
+    scDiskFolderEntry OBJECT-TYPE                       --virtual object for Disk Folder
+        SYNTAX              ScDiskFolderEntry           --is instance of Disk Folder
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scDiskFolderTable"
+        INDEX               {
+                                scDiskFolderIndex
+                            }
+        ::= { scDiskFolderTable 1 }
+
+    ScDiskFolderEntry ::= SEQUENCE {                    --definition of Disk Folder entry
+        scDiskFolderIndex       Unsigned32,             --index is not-accessible
+        scDiskFolderNbr         Unsigned32,             --same as index but is readable
+        scDiskFolderStatus      ScStatus,
+        scDiskFolderName        SnmpAdminString,
+        scDiskFolderCapcty      Unsigned32,             --deprecated
+        scDiskFolderAlrtThr     Unsigned32,             --disk folder alert threshold
+        scDiskFolderApiIndex    Unsigned32,
+        scDiskFolderForceTrap   SnmpAdminString,
+        scDiskFolderCapcty2     Unsigned32              --replaces scDiskFolderCapcty
+    }
+
+--data object definitions for ScDiskFolderEntry
+    scDiskFolderIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)       --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scDiskFolderTable (same value as scDiskFolderNbr)"
+        ::= { scDiskFolderEntry 1 }
+
+    scDiskFolderNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "disk folder number (same value as scDiskFolderIndex)"
+        ::= { scDiskFolderEntry 2 }
+
+    scDiskFolderStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder status"
+        ::= { scDiskFolderEntry 3 }
+
+    scDiskFolderName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder name"
+        ::= { scDiskFolderEntry 4 }
+
+    scDiskFolderCapcty OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              deprecated
+        DESCRIPTION         "deprecated: Disk Folder capacity calcualted as
+                            totalSpace - usedSpace"
+        ::= { scDiskFolderEntry 5 }
+
+    scDiskFolderAlrtThr OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder alert threshold"
+        ::= { scDiskFolderEntry 6 }
+
+    scDiskFolderApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder api index: used internal to the SC"
+        ::= { scDiskFolderEntry 7 }
+
+    scDiskFolderForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scDiskFolderStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scDiskFolderEntry 8 }
+
+    scDiskFolderCapcty2 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder capacity is same as scDiskFolderSUFreeSpace"
+        ::= { scDiskFolderEntry 9 }
+
+--Volume Table --
+    scVolumeTable OBJECT-TYPE                           --table of Volume entries
+        SYNTAX              SEQUENCE OF ScVolumeEntry   --points def Volume entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Volume Table"
+        ::= { storageCenterObjects 26 }
+
+    scVolumeEntry OBJECT-TYPE                           --virtual object for Volume
+        SYNTAX              ScVolumeEntry               --is instance of Volume
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scVolumeTable"
+        INDEX               {
+                                scVolumeIndex
+                            }
+        ::= { scVolumeTable 1 }
+
+    ScVolumeEntry ::= SEQUENCE {                        --definition of Volume entry
+        scVolumeIndex       Unsigned32,                 --index is not-accessible
+        scVolumeNbr         Unsigned32,                 --same as index but is readable
+        scVolumeStatus      ScStatus,
+        scVolumeName        SnmpAdminString,
+        scVolumeApiIndex    Unsigned32,
+        scVolumeForceTrap   SnmpAdminString
+    }
+
+--data object definitions for ScVolumeEntry
+    scVolumeIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..4000)        --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scVolumeTable (same value as scVolumeNbr)"
+        ::= { scVolumeEntry 1 }
+
+    scVolumeNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..4000)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Volume number (same value as scVolumeIndex)"
+        ::= { scVolumeEntry 2 }
+
+    scVolumeStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Volume status"
+        ::= { scVolumeEntry 3 }
+
+    scVolumeName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Volume name"
+        ::= { scVolumeEntry 4 }
+
+    scVolumeApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Volume api index: used internal to the SC"
+        ::= { scVolumeEntry 5 }
+
+    scVolumeForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scVolumeStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scVolumeEntry 6 }
+
+--Server Table --
+    scServerTable OBJECT-TYPE                          --table of Server entries
+        SYNTAX              SEQUENCE OF ScServerEntry  --points def Server entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Server Table"
+        ::= { storageCenterObjects 27 }
+
+    scServerEntry OBJECT-TYPE                          --virtual object for Managed Server
+        SYNTAX              ScServerEntry              --is instance of Managed Server
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scServerTable"
+        INDEX               {
+                                scServerIndex
+                            }
+        ::= { scServerTable 1 }
+
+    ScServerEntry ::= SEQUENCE {                       --definition of Managed Server entry
+        scServerIndex       Unsigned32,                --index is not-accessible
+        scServerNbr         Unsigned32,                --same as index but is readable
+        scServerStatus      ScStatus,
+        scServerName        SnmpAdminString,
+        scServerCnctvy      INTEGER,                   --Managed Server connectivity
+        scServerPathCount   Unsigned32,                --Managed Server path count
+        scServerApiIndex    Unsigned32,
+        scServerForceTrap   SnmpAdminString
+    }
+
+--data object definitions for ScServerEntry
+    scServerIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..2000)        --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scServerTable (same value as scServerNbr)"
+        ::= { scServerEntry 1 }
+
+    scServerNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..2000)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Managed Server number (same value as scServerIndex)"
+        ::= { scServerEntry 2 }
+
+    scServerStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Managed Server status"
+        ::= { scServerEntry 3 }
+
+    scServerName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Managed Server name"
+        ::= { scServerEntry 4 }
+
+    scServerCnctvy OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                up( 1 ),
+                                down( 2 ),
+                                partial( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Managed Server connectivity"
+        ::= { scServerEntry 5 }
+
+    scServerPathCount OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Managed Server path count:
+                            the number of primary paths
+                            from the server to the SC"
+        ::= { scServerEntry 6 }
+
+    scServerApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Server api index: used internal to the SC"
+        ::= { scServerEntry 7 }
+
+    scServerForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scServerStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scServerEntry 8 }
+
+--Controller Cache Table --
+    scCacheTable OBJECT-TYPE                            --table of Ctlr Cache entries
+        SYNTAX              SEQUENCE OF ScCacheEntry    --points def Ctlr Cache entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Ctlr Cache Table"
+        ::= { storageCenterObjects 28 }
+
+    scCacheEntry OBJECT-TYPE                            --virtual object for Ctlr Cache
+        SYNTAX              ScCacheEntry                --is instance of Ctlr Cache
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scCacheTable"
+        INDEX               {
+                                scCacheIndex
+                            }
+        ::= { scCacheTable 1 }
+
+    ScCacheEntry ::= SEQUENCE {                         --definition of Ctlr Cache entry
+        scCacheIndex        Unsigned32,                 --index is not-accessible
+        scCacheNbr          Unsigned32,                 --same as index but is readable
+        scCacheStatus       ScStatus,
+        scCacheName         SnmpAdminString,
+        scCacheBatStat      INTEGER,                    --Ctlr Cache Battery Status
+        scCacheBatExpr      DateAndTime,                --Cache Battery Expiration Date
+        scCacheForceTrap    SnmpAdminString
+    }
+
+--data object definitions for ScCacheEntry
+    scCacheIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scCacheTable (same value as scCacheNbr)"
+        ::= { scCacheEntry 1 }
+
+    scCacheNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Ctlr Cache number (same value as scCacheIndex)"
+        ::= { scCacheEntry 2 }
+
+    scCacheStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Ctlr Cache status"
+        ::= { scCacheEntry 3 }
+
+    scCacheName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Ctlr Cache name"
+        ::= { scCacheEntry 4 }
+
+    scCacheBatStat OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                noBattery( 0 ),
+                                normal( 1 ),
+                                expirationPending( 2 ),
+                                expired( 3 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Ctlr Cache Battery Status"
+        ::= { scCacheEntry 5 }
+
+    scCacheBatExpr OBJECT-TYPE
+        SYNTAX              DateAndTime
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Ctlr Cache Battery Expiration Date"
+        ::= { scCacheEntry 6 }
+
+    scCacheForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scCacheStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scCacheEntry 7 }
+
+--Storage Center Table --
+    scScTable OBJECT-TYPE                               --table of Interface entries
+        SYNTAX              SEQUENCE OF ScScEntry       --points def Interface entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Storage Center Table"
+        ::= { storageCenterObjects 29 }
+
+    scScEntry OBJECT-TYPE                               --virtual object for Interface
+        SYNTAX              ScScEntry                   --is instance of Interface
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scScTable"
+        INDEX               {
+                                scScIndex
+                            }
+        ::= { scScTable 1 }
+
+    ScScEntry ::= SEQUENCE {                            --definition of Interface entry
+        scScIndex           Unsigned32,                     --index is not-accessible
+        scScNbr             Unsigned32,                     --same as index but is readable
+        scScStatus          ScStatus,
+        scScName            SnmpAdminString,
+        scScContact         SnmpAdminString,
+        scScLocation        SnmpAdminString,
+        scScPortsBal        TruthValue,                     --Ports Balanced
+        scScMgmtIP          SnmpAdminString,
+        scScSerial          Unsigned32,
+        scScForceTrap       SnmpAdminString,
+        scScIPv6MgmtIP      SnmpAdminString,
+        scScIPv6MgmtIPPrefix Unsigned32
+    }
+
+--data object definitions for ScScEntry
+    scScIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..2)
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scScTable (same value as scScNbr)"
+        ::= { scScEntry 1 }
+
+    scScNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..2)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Storage Center number (same value as scScIndex)"
+        ::= { scScEntry 2 }
+
+    scScStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center status"
+        ::= { scScEntry 3 }
+
+    scScName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center name.
+                            Can be changed via sysName."
+        ::= { scScEntry 4 }
+
+    scScContact OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center contact.
+                            Can be changed via sysContact."
+        ::= { scScEntry 5 }
+
+    scScLocation OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center location.
+                            Can be changed via sysLocation."
+        ::= { scScEntry 6 }
+
+    scScPortsBal OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center ports balanced"
+        ::= { scScEntry 7 }
+
+    scScMgmtIP OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center management IP addr"
+        ::= { scScEntry 8 }
+
+    scScSerial OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center serial number"
+        ::= { scScEntry 9 }
+
+    scScForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scLocalPortsStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scScEntry 10 }
+
+    scScIPv6MgmtIP OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center IPv6 mgmt IP address"
+        ::= { scScEntry 11 }
+
+    scScIPv6MgmtIPPrefix OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Storage Center IPv6 mgmt IP addr prefix length"
+        ::= { scScEntry 12 }
+
+--Monitored UPS Table --
+    scUPSTable OBJECT-TYPE                               --table of UPS entries
+        SYNTAX              SEQUENCE OF ScUPSEntry       --points def UPS entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Monitored UPS Table"
+        ::= { storageCenterObjects 30 }
+
+    scUPSEntry OBJECT-TYPE                              --virtual object for UPS
+        SYNTAX              ScUPSEntry                  --is instance of UPS
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scUPSTable"
+        INDEX               {
+                                scUPSIndex
+                            }
+        ::= { scUPSTable 1 }
+
+    ScUPSEntry ::= SEQUENCE {                           --definition of UPS entry
+        scUPSIndex       Unsigned32,                    --index is not-accessible
+        scUPSNbr         Unsigned32,                    --same as index but is readable
+        scUPSStatus      ScStatus,
+        scUPSName        SnmpAdminString,
+        scUPSBatLife     SnmpAdminString,
+        scUPSStatusDescr SnmpAdminString,
+        scUPSApiIndex    Unsigned32,
+        scUPSForceTrap   SnmpAdminString
+    }
+
+--data object definitions for ScUPSEntry
+    scUPSIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scUPSTable (same value as scUPSNbr)"
+        ::= { scUPSEntry 1 }
+
+    scUPSNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Monitored UPS number (same value as scUPSIndex)"
+        ::= { scUPSEntry 2 }
+
+    scUPSStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Monitored UPS status"
+        ::= { scUPSEntry 3 }
+
+    scUPSName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Monitored UPS name"
+        ::= { scUPSEntry 4 }
+
+    scUPSBatLife OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Monitored UPS battery life"
+        ::= { scUPSEntry 5 }
+
+    scUPSStatusDescr OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Monitored UPS status description"
+        ::= { scUPSEntry 6 }
+
+    scUPSApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "UPS api index: used internal to the SC"
+        ::= { scUPSEntry 7 }
+
+    scUPSForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "SET to 'ForceTrap' forces a scMonitoredUPSStatusChange trap.
+                            GET always returns the string 'Empty'."
+        ::= { scUPSEntry 8 }
+
+--Object Count Table --
+    scObjCntTable OBJECT-TYPE                            --table of entries
+        SYNTAX              SEQUENCE OF ScObjCntEntry    --points def entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Object Count Table"
+        ::= { storageCenterObjects 31 }
+
+    scObjCntEntry OBJECT-TYPE                           --virtual object
+        SYNTAX              ScObjCntEntry               --is instance of table
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scObjCntTable"
+        INDEX               {
+                                scObjCntIndex
+                            }
+        ::= { scObjCntTable 1 }
+
+    ScObjCntEntry ::= SEQUENCE {                        --definition of entry
+        scObjCntIndex       Unsigned32,                 --index is not-accessible
+        scObjCntNbr         Unsigned32,                 --same as index but is readable
+        scObjCntDevsInUse   Unsigned32,
+        scObjCntReplays     Unsigned32,
+        scObjCntDisks       Unsigned32,
+        scObjCntServers     Unsigned32,
+        scObjCntVolumes     Unsigned32
+    }
+
+--data object definitions for ScObjCntEntry
+    scObjCntIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..2)
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scObjCntTable (same value as scObjCntNbr)"
+        ::= { scObjCntEntry 1 }
+
+    scObjCntNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..2)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "Object Count number (same value as scObjCntIndex)"
+        ::= { scObjCntEntry 2 }
+
+    scObjCntDevsInUse OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Number of Devices In Use"
+        ::= { scObjCntEntry 3 }
+
+    scObjCntReplays OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Numbers of Replays"
+        ::= { scObjCntEntry 4 }
+
+    scObjCntDisks OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Numbers of Disks"
+        ::= { scObjCntEntry 5 }
+
+    scObjCntServers OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Numbers of Servers"
+        ::= { scObjCntEntry 6 }
+
+    scObjCntVolumes OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Numbers of Volumes"
+        ::= { scObjCntEntry 7 }
+
+--Disk Folder Storage Usage Table --
+    scDiskFolderSUTable OBJECT-TYPE                         --table of Disk Folder entries
+        SYNTAX              SEQUENCE OF ScDiskFolderSUEntry --points def Disk Folder entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Disk Folder Storage Usage Table"
+        ::= { storageCenterObjects 32 }
+
+    scDiskFolderSUEntry OBJECT-TYPE                     --virtual object for Disk Folder
+        SYNTAX              ScDiskFolderSUEntry         --is instance of Disk Folder
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scDiskFolderSUTable"
+        INDEX               {
+                                scDiskFolderSUIndex
+                            }
+        ::= { scDiskFolderSUTable 1 }
+
+    ScDiskFolderSUEntry ::= SEQUENCE {                  --definition of entry
+        scDiskFolderSUIndex         Unsigned32,         --index is not-accessible
+        scDiskFolderSUNbr           Unsigned32,         --same as index but is readable
+        scDiskFolderSUTotalSpace    Unsigned32,         --deprecated
+        scDiskFolderSUUsedSpace     Unsigned32,         --deprecated
+        scDiskFolderSUTotalSpace2   Unsigned32,         --replaces scDiskFolderSUTotalSpace
+        scDiskFolderSUUsedSpace2    Unsigned32,         --replaces scDiskFolderSUUsedSpace
+        scDiskFolderSUAllocSpace    Unsigned32,
+        scDiskFolderSUFreeSpace     Unsigned32,
+        scDiskFolderSUSpareSpace    Unsigned32
+    }
+
+--data object definitions for ScDiskFolderSUEntry
+    scDiskFolderSUIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)       --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scDiskFolderSUTable (same value as scDiskFolderSUNbr)"
+        ::= { scDiskFolderSUEntry 1 }
+
+    scDiskFolderSUNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "disk folder storage usage number (same value as scDiskFolderSUIndex)"
+        ::= { scDiskFolderSUEntry 2 }
+
+    scDiskFolderSUTotalSpace OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              deprecated
+        DESCRIPTION         "Disk Folder Storage Usage total space, in GB (1,000,000,000).
+                            Replaced by scDiskFolderSUTotalSpace2."
+        ::= { scDiskFolderSUEntry 3 }
+
+    scDiskFolderSUUsedSpace OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              deprecated
+        DESCRIPTION         "Disk Folder Storage Usage used space, in GB (1,000,000,000).
+                            Replaced by scDiskFolderSUUsedSpace2"
+        ::= { scDiskFolderSUEntry 4 }
+
+    scDiskFolderSUTotalSpace2 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder Storage Usage total space, in GB (1,073,741,824).
+                            Matches 'Total disk space' on SC GUI."
+        ::= { scDiskFolderSUEntry 5 }
+
+    scDiskFolderSUUsedSpace2 OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder Storage Usage used space, in GB (1,073,741,824).
+                            Matches 'Allocated space used by volumes' on SC GUI."
+        ::= { scDiskFolderSUEntry 6 }
+
+    scDiskFolderSUAllocSpace OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder Storage Usage allocated space, in GB (1,073,741,824).
+                            Matches 'Total space allocated for volume use' minus
+                            'Unhealthy/Bad disk space' on SC GUI."
+        ::= { scDiskFolderSUEntry 7 }
+
+    scDiskFolderSUFreeSpace OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder Storage Usage free space, in GB (1,073,741,824).
+                             scDiskFolderSUFreeSpace = scDiskFolderSUTotalSpace2 -
+                             scDiskFolderSUAllocSpace - scDiskFolderSUUsedSpace2.
+                            Matches 'Unallocated disk space' on SC GUI."
+        ::= { scDiskFolderSUEntry 8 }
+
+    scDiskFolderSUSpareSpace OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Folder Storage Usage spare space, in GB (1,073,741,824).
+                            Matches 'spares available' on SC GUI."
+        ::= { scDiskFolderSUEntry 9 }
+
+--SCSI Initiator Device Type --
+    scSIDeviceType OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                disk( 1 ),
+                                unknown( 2 )
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "SCSI Initiator Device Type"
+        ::= { storageCenterObjects 33 }
+
+--SCSI Initiator Device Status --
+    scSIDeviceStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "SCSI Initiator Device Status"
+        ::= { storageCenterObjects 34 }
+
+--Hardware Component Status --
+    scHWCompStatus OBJECT-TYPE
+        SYNTAX              ScStatus
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Last Hardware Component Status sent with
+                            scCtlrCompStatusChange and scEnclCompStatusChange."
+        ::= { storageCenterObjects 35 }
+
+--Hardware Component Name --
+    scHWCompName OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Last Hardware Component Name sent with
+                            scCtlrCompStatusChange and scEnclCompStatusChange."
+        ::= { storageCenterObjects 36 }
+
+--Hardware Component Position --
+    scHWCompPosition OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Last Hardware Component Position sent with
+                            scCtlrCompStatusChange and scEnclCompStatusChange."
+        ::= { storageCenterObjects 37 }
+
+--Hardware Component Type --
+    scHWCompType OBJECT-TYPE
+        SYNTAX              ScHardwareType
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Last Hardware Component Type sent with
+                            scCtlrCompStatusChange and scEnclCompStatusChange."
+        ::= { storageCenterObjects 38 }
+
+--Hardware Component State --
+    scHWCompState OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Last Hardware Component State sent with
+                            scCtlrCompStatusChange and scEnclCompStatusChange.
+                            Has meaning only in case of ScHardwareType = tempsensor,
+                            voltagesensor, or fan."
+        ::= { storageCenterObjects 39 }
+
+--Trap Action --
+    scTrapAction OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Recommend action associated with the
+                            most recent trap."
+        ::= { storageCenterObjects 40 }
+
+--Alert Message --
+    scAlertMsg OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert message associated with the
+                            most recent trap."
+        ::= { storageCenterObjects 41 }
+
+--Force Trap --
+    scForceTrap OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-write
+        STATUS              current
+        DESCRIPTION         "For software development use."
+        ::= { storageCenterObjects 42 }
+
+--Trap-normalized Flag --
+    scTrapNormalized OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Trap-normalized boolean flag:
+                            true means that the associated alert
+                            condition is now normal, i.e., that alert
+                            has cleared."
+        ::= { storageCenterObjects 43 }
+
+--Last Worst Alert --
+    scLastWorstAlert OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "If the productIDGlobalStatus is not ok
+                            then scLastWorstAlert contains the
+                            scAlertNbr of the alert that is
+                            responsible for the negative status."
+        ::= { storageCenterObjects 44 }
+
+--Disk Configuration Table --
+    scDiskConfigTable OBJECT-TYPE                         --table of Disk Config entries
+        SYNTAX              SEQUENCE OF ScDiskConfigEntry --points def Disk Config entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Disk Configuration Table"
+        ::= { storageCenterObjects 45 }
+
+    scDiskConfigEntry OBJECT-TYPE                       --virtual object for Disk Config
+        SYNTAX              ScDiskConfigEntry           --is instance of Disk Config
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scDiskConfigTable"
+        INDEX               {
+                                scDiskConfigIndex
+                            }
+        ::= { scDiskConfigTable 1 }
+
+    ScDiskConfigEntry ::= SEQUENCE {                    --definition of Disk Config entry
+        scDiskConfigIndex       Unsigned32,             --index is not-accessible
+        scDiskConfigNbr         Unsigned32,             --same as index but is readable
+        scDiskConfigSerial      SnmpAdminString,        --disk serial number
+        scDiskConfigVendor      SnmpAdminString,        --disk vendor
+        scDiskConfigProduct     SnmpAdminString,        --disk product description
+        scDiskConfigModel       SnmpAdminString,        --disk vendor + product description
+        scDiskConfigRev         SnmpAdminString,        --disk revision
+        scDiskConfigApiIndex    Unsigned32
+    }
+
+--data object definitions for ScDiskConfigEntry
+    scDiskConfigIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)       --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scDiskConfigTable (same value as scDiskConfigNbr)"
+        ::= { scDiskConfigEntry 1 }
+
+    scDiskConfigNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "disk config number (same value as scDiskFolderIndex)"
+        ::= { scDiskConfigEntry 2 }
+
+    scDiskConfigSerial OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Config serial number"
+        ::= { scDiskConfigEntry 3 }
+
+    scDiskConfigVendor OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Config vendor name"
+        ::= { scDiskConfigEntry 4 }
+
+    scDiskConfigProduct OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Config product description"
+        ::= { scDiskConfigEntry 5 }
+
+    scDiskConfigModel OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk vendor + product description"
+        ::= { scDiskConfigEntry 6 }
+
+    scDiskConfigRev OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk revision"
+        ::= { scDiskConfigEntry 7 }
+
+    scDiskConfigApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Disk Config api index: used internal to the SC"
+        ::= { scDiskConfigEntry 8 }
+
+--Alert Table --
+    scAlertTable OBJECT-TYPE                            --table of Alert entries
+        SYNTAX              SEQUENCE OF ScAlertEntry    --points def Alert entry
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "Alert Table"
+        ::= { storageCenterObjects 46 }
+
+    scAlertEntry OBJECT-TYPE                            --virtual object for Alert
+        SYNTAX              ScAlertEntry                --is instance of Alert
+        MAX-ACCESS          not-accessible
+        STATUS              current
+        DESCRIPTION         "an entry in scAlertTable"
+        INDEX               {
+                                scCtlrIndex,
+                                scAlertIndex
+                            }
+        ::= { scAlertTable 1 }
+
+    ScAlertEntry ::= SEQUENCE {                         --definition of Alert entry
+        scAlertIndex            Unsigned32,             --index is not-accessible
+        scAlertNbr              Unsigned32,             --same as index but is readable
+        scAlertStatus           INTEGER,
+        scAlertApiIndex         Unsigned32,
+        scAlertDefinition       SnmpAdminString,
+        scAlertCategory         INTEGER,
+        scAlertCreateTime       SnmpAdminString,
+        scAlertMessage          SnmpAdminString,
+        scAlertType             INTEGER,
+        scAlertAcknowledged     TruthValue,
+        scAlertActive           TruthValue
+    }
+
+--data object definitions for ScAlertEntry
+    scAlertIndex OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)       --just picked a large number
+        MAX-ACCESS          not-accessible              --index is not-accessible
+        STATUS              current
+        DESCRIPTION         "index into scAlertTable (same value as scAlertNbr)"
+        ::= { scAlertEntry 1 }
+
+    scAlertNbr OBJECT-TYPE
+        SYNTAX              Unsigned32 (1..10000)
+        MAX-ACCESS          read-only                   --same as index but is readable
+        STATUS              current
+        DESCRIPTION         "alert number (same value as scalertIndex)"
+        ::= { scAlertEntry 2 }
+
+    scAlertStatus OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                complete( 0 ),          --object has completed an operation
+                                critical( 1 ),          --object is in a critical condition
+                                degraded( 2 ),          --object is degraded
+                                deleting( 3 ),          --object is being deleted
+                                down( 4 ),              --object is down
+                                emergency( 5 ),         --object is in emergency mode
+                                inform( 6 ),            --this is an informational alert
+                                okay( 7 ),              --alert is okay
+                                unavailable( 8 ),       --alert is in unknown state
+                                unknown( 9 )            --alert is in unknown state
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert status"
+        ::= { scAlertEntry 3 }
+
+    scAlertApiIndex OBJECT-TYPE
+        SYNTAX              Unsigned32
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert api index: used internal to the SC"
+        ::= { scAlertEntry 4 }
+
+    scAlertDefinition OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert definition"
+        ::= { scAlertEntry 5 }
+
+    scAlertCategory OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                connectivity( 0 ),      --connectivity alert
+                                disk( 1 ),              --disk alert
+                                hardware( 2 ),          --hardware alert
+                                storage( 3 ),           --storage alert
+                                system( 4 ),            --system alert
+                                unknown( 5 )            --unknown alert
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert status"
+        ::= { scAlertEntry 6 }
+
+    scAlertCreateTime OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert creation time"
+        ::= { scAlertEntry 7 }
+
+    scAlertMessage OBJECT-TYPE
+        SYNTAX              SnmpAdminString
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert message"
+        ::= { scAlertEntry 8 }
+
+    scAlertType OBJECT-TYPE
+        SYNTAX              INTEGER {
+                                alert( 0 ),             --type = alert
+                                indiction( 1 ),         --type = indication
+                                unknown( 3 )            --unknown type
+                            }
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert type"
+        ::= { scAlertEntry 9 }
+
+    scAlertAcknowledged OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert-acknowledged boolean flag tells whether
+                            alert has been acknowledged via the SC GUI"
+        ::= { scAlertEntry 10 }
+
+    scAlertActive OBJECT-TYPE
+        SYNTAX              TruthValue
+        MAX-ACCESS          read-only
+        STATUS              current
+        DESCRIPTION         "Alert-active boolean flag tells whether alert
+                            is active.  'false' = alert has been cleared."
+        ::= { scAlertEntry 11 }
+
+--Conformance and Compliance--
+    storageCenterConformance OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Storage Center Conformance."
+        ::= { storageCenter 3 }
+
+    --conformance information
+    storageCenterCompliances OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Storage Center Compliances."
+        ::= { storageCenterConformance 1 }
+
+    --compliance statements
+    storageCenterCompliance1 MODULE-COMPLIANCE
+        --deprecated
+        STATUS              deprecated
+        DESCRIPTION         "Deprectaed compliance statement."
+
+        MODULE  -- this module
+                MANDATORY-GROUPS  {
+                                storageCenterNotificationsGroup,
+                                storageCenterObjectsGroupDeprecated
+                }
+
+
+        ::= { storageCenterCompliances 1 }
+
+
+    storageCenterCompliance2 MODULE-COMPLIANCE
+        STATUS              current
+        DESCRIPTION         "The compliance statement for Storage Center SNMP entities."
+
+        MODULE  -- this module
+                MANDATORY-GROUPS  {
+                                storageCenterNotificationsGroup2,
+                                storageCenterObjectsGroup,
+                                productID
+                }
+
+
+        ::= { storageCenterCompliances 2 }
+
+
+    storageCenterGroups OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Storage Center Groups."
+        ::= { storageCenterConformance 2 }
+
+    storageCenterNotificationsGroup NOTIFICATION-GROUP
+        --deprecated
+        NOTIFICATIONS       {
+                                trapStatusOkay,
+                                trapStatusDegraded,
+                                trapStatusDown,
+                                trapStatusInform,
+                                trapStatusCritical,
+                                trapStatusComplete,
+                                trapStatusEmergency,
+                                trapStatusUnavailable,
+                                trapStatusTest,
+                                trapStatusTestSpecific
+                            }
+        --trapStatusUnknown,
+        STATUS              deprecated
+        DESCRIPTION         "Decrepated Traps. These traps, organized by 'severity',
+                            contain truncated alert-strings. These traps
+                            have been deprecated in favor of the traps in
+                            storageCenterNotificationsGroup2, organized by function."
+        ::= { storageCenterGroups 1 }
+
+    storageCenterNotificationsGroup2 NOTIFICATION-GROUP
+        NOTIFICATIONS       {
+                                scTestTrap,
+                                scMiscAlert,
+                                scDiskStatusChange,
+                                scCtlrStatusChange,
+                                scCtlrCompStatusChange,
+                                scEnclStatusChange,
+                                scEnclCompStatusChange,
+                                scDiskFolderStatusChange,
+                                scVolumeStatusChange,
+                                scServerStatusChange,
+                                scCacheStatusChange,
+                                scLocalPortCondStatusChange,
+                                scMonitoredUPSStatusChange,
+                                scSIDeviceStatusChange
+                            }
+        STATUS              current
+        DESCRIPTION         "Traps organized by function.
+                             Deprecates storageCenterNotificationsGroup."
+        ::= { storageCenterGroups 2 }
+
+--/**************************************************************************
+    storageCenterObjectsGroup OBJECT-GROUP
+        OBJECTS {
+                        scAlertDef, scIndex, scTestString, scMiscAlertString,
+                        scDiskNbr, scDiskStatus, scDiskNamePosition, scDiskHealthy,
+                            scDiskStatusMsg, scDiskApiIndex, scDiskForceTrap,
+                            scDiskSize, scDiskIoPortType, scDiskEnclosure,
+                        scCtlrNbr, scCtlrStatus, scCtlrName, scCtlrIpAddr,
+                            scCtlrForceTrap, scCtlrModel, scCtlrServiceTag,
+                            scCtlrAssetTag, scCtlrIPv6Eth0IP,
+                            scCtlrIPv6Eth0IPPrefix, scCtlrLeader,
+                        scCtlrFanNbr, scCtlrFanStatus, scCtlrFanName,
+                            scCtlrFanCurrentRpm, scCtlrFanNormMaxRpm,
+                            scCtlrFanNormMinRpm, scCtlrFanWarnLwrRpm,
+                            scCtlrFanWarnUprRpm, scCtlrFanCritLwrRpm,
+                            scCtlrFanCritUprRpm, scCtlrFanForceTrap,
+                            scCtlrFanApiIndex,
+                        scCtlrPowerNbr, scCtlrPowerStatus, scCtlrPowerName,
+                            scCtlrPowerForceTrap,
+                        scCtlrVoltageNbr, scCtlrVoltageStatus, scCtlrVoltageName,
+                            scCtlrVoltageCurrentV, scCtlrVoltageNormMaxV,
+                            scCtlrVoltageNormMinV, scCtlrVoltageWarnLwrV,
+                            scCtlrVoltageWarnUprV, scCtlrVoltageCritLwrV,
+                            scCtlrVoltageCritUprV, scCtlrVoltageForceTrap,
+                        scCtlrTempNbr, scCtlrTempStatus, scCtlrTempName,
+                            scCtlrTempCurrentC, scCtlrTempNormMaxC,
+                            scCtlrTempNormMinC, scCtlrTempWarnLwrC,
+                            scCtlrTempWarnUprC, scCtlrTempCritLwrC,
+                            scCtlrTempCritUprC, scCtlrTempForceTrap,
+                        scEnclNbr, scEnclStatus, scEnclName, scEnclStatusDescr,
+                            scEnclType, scEnclModel, scEnclForceTrap,
+                            scEnclServiceTag, scEnclAssetTag, scEnclApiIndex,
+                        scEnclFanNbr, scEnclFanStatus, scEnclFanLocation,
+                            scEnclFanCurrentS, scEnclFanForceTrap,
+                        scEnclPowerNbr, scEnclPowerStatus, scEnclPowerPosition,
+                            scEnclPowerForceTrap,
+                        scEnclIoModNbr, scEnclIoModStatus, scEnclIoModPosition,
+                            scEnclIoModForceTrap,
+                        scEnclTempNbr, scEnclTempStatus, scEnclTempLocation,
+                            scEnclTempCurrentC, scEnclTempForceTrap,
+                        scEnclAlarmNbr, scEnclAlarmStatus, scEnclAlarmName,
+                            scEnclAlarmForceTrap,
+                        scDiskFolderNbr, scDiskFolderStatus, scDiskFolderName,
+                            scDiskFolderAlrtThr,
+                            scDiskFolderApiIndex, scDiskFolderForceTrap,
+                            scDiskFolderCapcty2,
+                        scVolumeNbr, scVolumeStatus, scVolumeName,
+                            scVolumeApiIndex, scVolumeForceTrap,
+                        scServerNbr, scServerStatus, scServerName,
+                            scServerCnctvy, scServerPathCount,
+                            scServerApiIndex, scServerForceTrap,
+                        scCacheNbr, scCacheStatus, scCacheName,
+                            scCacheBatStat, scCacheBatExpr, scCacheForceTrap,
+                        scScNbr, scScStatus, scScName, scScContact, scScLocation,
+                            scScPortsBal, scScMgmtIP, scScSerial, scScForceTrap,
+                            scScIPv6MgmtIP, scScIPv6MgmtIPPrefix,
+                        scUPSNbr, scUPSStatus, scUPSName,
+                            scUPSBatLife, scUPSStatusDescr, scUPSApiIndex,
+                            scUPSForceTrap, scTrapNormalized, scLastWorstAlert,
+                        scObjCntNbr, scObjCntDevsInUse, scObjCntReplays,
+                            scObjCntDisks, scObjCntServers, scObjCntVolumes,
+                        scDiskFolderSUNbr,
+                            scDiskFolderSUTotalSpace2,
+                            scDiskFolderSUUsedSpace2, scDiskFolderSUAllocSpace,
+                            scDiskFolderSUFreeSpace, scDiskFolderSUSpareSpace,
+                        scSIDeviceType, scSIDeviceStatus,
+                        scHWCompStatus, scHWCompType, scHWCompName, scHWCompPosition,
+                            scHWCompState, scTrapAction, scAlertMsg, scForceTrap,
+                        scDiskConfigNbr, scDiskConfigSerial, scDiskConfigVendor,
+                            scDiskConfigProduct, scDiskConfigModel,
+                            scDiskConfigRev, scDiskConfigApiIndex,
+                        scAlertNbr, scAlertStatus, scAlertApiIndex,
+                            scAlertDefinition, scAlertCategory, scAlertCreateTime,
+                            scAlertMessage, scAlertType, scAlertAcknowledged,
+                            scAlertActive
+                }
+        STATUS              current
+        DESCRIPTION         "The objects."
+        ::= { storageCenterGroups 3 }
+
+    productID OBJECT-GROUP
+        OBJECTS {
+                        productIDDisplayName,
+                        productIDDescription,
+                        productIDVendor,
+                        productIDVersion,
+                        productIDSerialNumber,
+                        productIDGlobalStatus,
+                        productIDBuildNumber,
+                        productIDURL
+                }
+        STATUS              current
+        DESCRIPTION         "The product identification objects."
+        ::= { storageCenterGroups 4 }
+
+    storageCenterObjectsGroupDeprecated OBJECT-GROUP
+        OBJECTS {
+                        scDiskFolderCapcty,
+                        scDiskFolderSUTotalSpace,
+                        scDiskFolderSUUsedSpace
+                }
+        STATUS              deprecated
+        DESCRIPTION         "The deprecated objects."
+        ::= { storageCenterGroups 5 }
+
+    --Note: storageCenterTrapsNotif is put under the enterprise level,
+    --at 251, so that this mib is compatible with previous
+    storageCenterTrapsNotif OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "Storage Center Traps Notif."
+        ::= { storageCenter 251 }
+
+    --===========  Storage Center Traps  ==============--
+    trapSevPrefix OBJECT-IDENTITY
+        STATUS              current
+        DESCRIPTION         "trapSevPrefix."
+        ::= { storageCenterTrapsNotif 0 }
+
+    --trapStatusUnknown NOTIFICATION-TYPE
+    --OBJECTS     { sysName }
+    --STATUS      deprecated
+    --DESCRIPTION
+    --"Storage Center Trap in Unknown state."
+    --::= { trapSevPrefix 0 }
+    --note: started trapStatusUnknown at subidentifier 0 instead of 1 --
+    --in order to keep compatible with oids from previous mib definition  --
+
+    trapStatusOkay NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Okay state."
+        ::= { trapSevPrefix 1 }
+
+    trapStatusDegraded NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Degraded state."
+        ::= { trapSevPrefix 2 }
+
+    trapStatusDown NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Down state."
+        ::= { trapSevPrefix 3 }
+
+    trapStatusInform NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Inform state."
+        ::= { trapSevPrefix 4 }
+
+    trapStatusCritical NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Critical state."
+        ::= { trapSevPrefix 5 }
+
+    trapStatusComplete NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Complete state."
+        ::= { trapSevPrefix 6 }
+
+    trapStatusEmergency NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Emergency state."
+        ::= { trapSevPrefix 7 }
+
+    trapStatusUnavailable NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Unavailable state."
+        ::= { trapSevPrefix 8 }
+
+    trapStatusTest NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Test state."
+        ::= { trapSevPrefix 100 }
+
+    trapStatusTestSpecific NOTIFICATION-TYPE
+        --deprecated
+        OBJECTS {
+                        sysName
+                }
+        STATUS              deprecated
+        DESCRIPTION         "Deprecated: Storage Center Trap in Test Specific state."
+        ::= { trapSevPrefix 101 }
+
+    --trap definitions as of 8 Feb 2013 --
+    scTestTrap NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scTestString,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Test Trap."
+        ::= { trapSevPrefix 200 }
+
+    scMiscAlert NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scMiscAlertString,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "This trap is used for all alerts that have no
+                            other specific trap definition associated with them"
+        ::= { trapSevPrefix 201 }
+
+    scDiskStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scDiskNbr,
+                        scDiskStatus,
+                        scDiskNamePosition,
+                        scDiskHealthy,
+                        scDiskStatusMsg,
+                        scEnclName,
+                        scAlertMsg,
+                        scTrapAction,
+                        scDiskConfigNbr,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Disk status change."
+        ::= { trapSevPrefix 202 }
+
+    scCtlrStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scCtlrNbr,
+                        scCtlrStatus,
+                        scCtlrName,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Controller status change."
+        ::= { trapSevPrefix 203 }
+
+    scCtlrCompStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scCtlrNbr,
+                        scCtlrName,
+                        scHWCompType,
+                        scHWCompName,
+                        scHWCompStatus,
+                        scHWCompPosition,
+                        scHWCompState,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Controller Component status change.
+                            scHWCompState contains current component state
+                            when scHWCompType = tempsensor, voltagesensor,
+                            or fan."
+        ::= { trapSevPrefix 204 }
+
+    scEnclStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scEnclNbr,
+                        scEnclName,
+                        scEnclStatus,
+                        scEnclStatusDescr,
+                        scEnclType,
+                        scEnclModel,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Enclosure status change."
+        ::= { trapSevPrefix 205 }
+
+    scEnclCompStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scEnclNbr,
+                        scEnclName,
+                        scHWCompType,
+                        scHWCompName,
+                        scHWCompStatus,
+                        scHWCompPosition,
+                        scHWCompState,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Enclosure Component status change.
+                            scHWCompState contains current temperature
+                            when scHWCompType = tempsensor."
+        ::= { trapSevPrefix 206 }
+
+    scDiskFolderStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scDiskFolderNbr,
+                        scDiskFolderStatus,
+                        scDiskFolderName,
+                        scDiskFolderCapcty,     --deprecated
+                        scDiskFolderAlrtThr,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scDiskFolderCapcty2,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Disk Folder status change."
+        ::= { trapSevPrefix 207 }
+
+    scVolumeStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scVolumeNbr,
+                        scVolumeStatus,
+                        scVolumeName,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Volume status change."
+        ::= { trapSevPrefix 208 }
+
+    scServerStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scServerNbr,
+                        scServerStatus,
+                        scServerName,
+                        scServerCnctvy,
+                        scServerPathCount,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Managed Server status change."
+        ::= { trapSevPrefix 209 }
+
+    scCacheStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scCacheNbr,
+                        scCacheStatus,
+                        scCacheName,
+                        scCacheBatStat,
+                        scCacheBatExpr,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Cache status change."
+        ::= { trapSevPrefix 210 }
+
+    scLocalPortCondStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scScPortsBal,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Local Front-end Port Condition status change."
+        ::= { trapSevPrefix 211 }
+
+    scMonitoredUPSStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scUPSNbr,
+                        scUPSStatus,
+                        scUPSName,
+                        scUPSBatLife,
+                        scUPSStatusDescr,
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "Monitored UPS status change."
+        ::= { trapSevPrefix 212 }
+
+    scSIDeviceStatusChange NOTIFICATION-TYPE
+        OBJECTS {
+                        scIndex,
+                        scAlertDef,
+                        scSIDeviceType,
+                        scSIDeviceStatus,
+                        scDiskNbr,           --zero if unknown
+                        scDiskNamePosition,  --"Unknown" if unknown
+                        scEnclNbr,           --zero if unknown
+                        scEnclName,           --"Unknown" if unknown
+                        scAlertMsg,
+                        scTrapAction,
+                        scTrapNormalized,
+                        scScMgmtIP,
+                        scScIPv6MgmtIP,
+                        scScIPv6MgmtIPPrefix
+                }
+        STATUS              current
+        DESCRIPTION         "SCSI Initiator Device status change."
+        ::= { trapSevPrefix 213 }
+
+
+END

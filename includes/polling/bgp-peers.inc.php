@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
@@ -63,6 +64,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerInUpdatesElapsedTime', '.1.3.6.1.4.1.2636.5.1.1.2.4.1.1.2', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerLocalAddr', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.7', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerRemoteAddrType', '.1.3.6.1.4.1.2636.5.1.1.2.1.1.1.10', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+                            $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerLastErrorReceived', '.1.3.6.1.4.1.2636.5.1.1.2.2.1.1.1', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
+                            $peer_data_tmp = snmpwalk_cache_long_oid($device, 'jnxBgpM2PeerLastErrorReceivedText', '.1.3.6.1.4.1.2636.5.1.1.2.2.1.1.5', $peer_data_tmp, 'BGP4-V2-MIB-JUNIPER', 'junos');
                             d_echo($peer_data_tmp);
                         }
 
@@ -75,6 +78,11 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerInTotalMessages'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerInTotalMessages'];
                         $peer_data['bgpPeerOutTotalMessages'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerOutTotalMessages'];
                         $peer_data['bgpPeerFsmEstablishedTime'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerFsmEstablishedTime'];
+                        $peer_data['bgpPeerLastErrorText'] = $peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceivedText'];
+
+                        $error_data = explode(" ", $peer_data_tmp[$peer_hash]['jnxBgpM2PeerLastErrorReceived']);
+                        $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
+                        $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
 
                         try {
                             $peer_data['bgpLocalAddr'] = IP::fromHexString($peer_data_tmp[$peer_hash]['jnxBgpM2PeerLocalAddr'])->uncompressed();
@@ -85,8 +93,10 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     } elseif ($device['os'] == 'vrp') {
                         echo "\nCaching Oids VRP...";
                         if (!isset($bgpPeers)) {
+                            //if not available, we timeout each time, to be fixed when split
                             $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeerEntry', [], 'HUAWEI-BGP-VPN-MIB', 'huawei');
                             $bgpPeersStats = snmpwalk_cache_oid($device, 'hwBgpPeerStatisticTable', [], 'HUAWEI-BGP-VPN-MIB', 'huawei', '-OQUbs');
+                            $bgp4updates = snmpwalk_cache_oid($device, 'bgpPeerEntry', [], 'BGP4-MIB', 'huawei', '-OQUbs');
                             foreach ($bgpPeersCache as $key => $value) {
                                 $oid = explode(".", $key, 5);
                                 $vrfInstance = $oid[0];
@@ -129,9 +139,31 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             $peer_data['bgpPeerInTotalMessages'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerInTotalMsgs'];
                             $peer_data['bgpPeerOutTotalMessages'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerOutTotalMsgs'];
                             $peer_data['bgpPeerFsmEstablishedTime'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerFsmEstablishedTime'];
+                            $peer_data['bgpPeerLastError'] = $bgpPeers[$address][$vrfInstance]['hwBgpPeerLastError'];
                         }
-                        d_echo("VPN : $vrfInstance for $address :");
+                        d_echo("VPN : $vrfInstance for $address :\n");
                         d_echo($peer_data);
+                        if (empty($peer_data['bgpPeerInUpdates']) || empty($peer_data['bgpPeerOutUpdates'])) {
+                            $peer_data['bgpPeerInUpdates'] = $bgp4updates[$address]['bgpPeerInUpdates'];
+                            $peer_data['bgpPeerOutUpdates'] = $bgp4updates[$address]['bgpPeerOutUpdates'];
+                        }
+                        if (empty($peer_data['bgpPeerInTotalMessages']) || empty($peer_data['bgpPeerOutTotalMessages'])) {
+                            $peer_data['bgpPeerInTotalMessages'] = $bgp4updates[$address]['bgpPeerInTotalMessages'];
+                            $peer_data['bgpPeerOutTotalMessages'] = $bgp4updates[$address]['bgpPeerOutTotalMessages'];
+                        }
+                        if (empty($peer_data['bgpPeerState'])) {
+                            $peer_data['bgpPeerState'] = $bgp4updates[$address]['bgpPeerState'];
+                        }
+                        if (empty($peer_data['bgpPeerAdminStatus'])) {
+                            $peer_data['bgpPeerAdminStatus'] = $bgp4updates[$address]['bgpPeerAdminStatus'];
+                        }
+                        if (empty($peer_data['bgpPeerLastError'])) {
+                            $peer_data['bgpPeerLastError'] = $bgp4updates[$address]['bgpPeerLastError'];
+                        }
+                        $error_data = explode(" ", $peer_data['bgpPeerLastError']);
+                        $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
+                        $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
+                        unset($peer_data['bgpPeerLastError']);
                     } elseif ($device['os'] == 'timos') {
                         if (!isset($bgpPeers)) {
                             echo "\nCaching Oids...";
@@ -188,6 +220,10 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'aristaBgp4V2PeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
                                 'aristaBgp4V2PeerInUpdatesElapsedTime' => 'bgpPeerInUpdateElapsedTime',
                                 'aristaBgp4V2PeerLocalAddr' => 'bgpLocalAddr',
+                                'aristaBgp4V2PeerDescription' => 'bgpPeerDescr',
+                                'aristaBgp4V2PeerLastErrorCodeReceived' => 'bgpPeerLastErrorCode',
+                                'aristaBgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
+                                'aristaBgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
                              ];
                         } else {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
@@ -202,6 +238,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'cbgpPeer2FsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
                                 'cbgpPeer2InUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
                                 'cbgpPeer2LocalAddr' => 'bgpLocalAddr',
+                                'cbgpPeer2LastError' => 'bgpPeerLastErrorCode',
+                                'cbgpPeer2LastErrorTxt' => 'bgpPeerLastErrorText',
                             ];
                         }
                     }
@@ -218,6 +256,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
                         'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
                         'bgpPeerLocalAddr' => 'bgpLocalAddr', // silly db field name
+                        'bgpPeerLastError' => 'bgpPeerLastErrorCode',
                     ];
                 }
 
@@ -236,15 +275,23 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     foreach ($oid_map as $source => $target) {
                         $v = isset($peer_data_raw[$source]) ? $peer_data_raw[$source] : '';
 
-                        if (str_contains($source, 'LocalAddr')) {
+                        if (Str::contains($source, 'LocalAddr')) {
                             try {
                                 $v = IP::fromHexString($v)->uncompressed();
                             } catch (InvalidIpException $e) {
                                 // if parsing fails, leave the data as-is
                             }
                         }
-
                         $peer_data[$target] = $v;
+                    }
+
+                    if (strpos($peer_data['bgpPeerLastErrorCode'], " ")) {
+                        // Some device return both Code and SubCode in the same snmp field, we need to split it
+                        $splitted_codes = explode(" ", $peer_data['bgpPeerLastErrorCode']);
+                        $error_code = intval($splitted_codes[0]);
+                        $error_subcode = intval($splitted_codes[1]);
+                        $peer_data['bgpPeerLastErrorCode'] = $error_code;
+                        $peer_data['bgpPeerLastErrorSubCode'] = $error_subcode;
                     }
                 }
 
@@ -261,11 +308,11 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         || $peer_data['bgpPeerState'] != $peer['bgpPeerState'])
                 ) {
                     if ($peer['bgpPeerState'] == $peer_data['bgpPeerState']) {
-                        log_event('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ')', $device, 'bgpPeer', 4, $peer_ip);
+                        log_event('BGP Session Flap: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . '), last error: '. describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 4, $peer_ip);
                     } elseif ($peer_data['bgpPeerState'] == 'established') {
                         log_event('BGP Session Up: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ')', $device, 'bgpPeer', 1, $peer_ip);
                     } elseif ($peer['bgpPeerState'] == 'established') {
-                        log_event('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . ')', $device, 'bgpPeer', 5, $peer_ip);
+                        log_event('BGP Session Down: ' . $peer['bgpPeerIdentifier'] . ' (AS' . $peer['bgpPeerRemoteAs'] . '), last error: '. describe_bgp_error_code($peer['bgpPeerLastErrorCode'], $peer['bgpPeerLastErrorSubCode']), $device, 'bgpPeer', 5, $peer_ip);
                     }
                 }
             }

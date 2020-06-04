@@ -11,9 +11,6 @@ over:
 icon: alcatellucent
 discovery:
     - sysObjectID:
-        - .1.3.6.1.4.1.6486.801.
-        - .1.3.6.1.4.1.6486.800.1.1.2.1.
         - .1.3.6.1.4.1.6486.800.1.1.2.2.4. #OmniStack LS
 mib_dir:
     - radlan
-

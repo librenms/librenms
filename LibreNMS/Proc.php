@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use Exception;
+use Illuminate\Support\Str;
 
 class Proc
 {
@@ -299,7 +300,7 @@ class Proc
      */
     private function checkAddEOL($string)
     {
-        if (!ends_with($string, PHP_EOL)) {
+        if (!Str::endsWith($string, PHP_EOL)) {
             $string .= PHP_EOL;
         }
         return $string;

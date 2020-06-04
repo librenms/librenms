@@ -18,13 +18,15 @@ use App\Models\PortsFdb;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
-use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IP;
+use LibreNMS\Util\IPv4;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
@@ -160,7 +162,7 @@ function get_port_stats_by_port_hostname(\Illuminate\Http\Request $request)
     $ifName = $request->route('ifname');
 
     // handle %2f in paths and pass to get_graph_by_port_hostname if needed
-    if (str_contains($ifName, '/')) {
+    if (Str::contains($ifName, '/')) {
         $parts = explode('/', $request->path());
 
         if (isset($parts[5])) {
@@ -211,7 +213,7 @@ function get_graph_generic_by_hostname(\Illuminate\Http\Request $request)
     $vars['output'] = $request->get('output', 'display');
     if (isset($sensor_id)) {
         $vars['id']   = $sensor_id;
-        if (str_contains($vars['type'], '_wireless')) {
+        if (Str::contains($vars['type'], '_wireless')) {
             $vars['type'] = str_replace('device_', '', $vars['type']);
         } else {
             // If this isn't a wireless graph we need to fix the name.
@@ -353,7 +355,6 @@ function list_devices(\Illuminate\Http\Request $request)
     return api_success($devices, 'devices');
 }
 
-
 function add_device(\Illuminate\Http\Request $request)
 {
     // This will add a device using the data passed encoded with json
@@ -483,7 +484,7 @@ function show_endpoints(\Illuminate\Http\Request $request, Router $router)
     $base = str_replace('api/v0', '', $request->url());
     foreach ($router->getRoutes() as $route) {
         /** @var \Illuminate\Routing\Route $route */
-        if (starts_with($route->getPrefix(), 'api/v0') && $route->getName()) {
+        if (Str::startsWith($route->getPrefix(), 'api/v0') && $route->getName()) {
             $output[$route->getName()] = $base . $route->uri();
         }
     }
@@ -633,7 +634,7 @@ function get_graph_by_portgroup(\Illuminate\Http\Request $request)
 
     if (empty($id)) {
         $ports = get_ports_from_type(explode(',', $group));
-        $if_list = implode(',', array_pluck($ports, 'port_id'));
+        $if_list = implode(',', Arr::pluck($ports, 'port_id'));
     } else {
         $if_list = $id;
     }
@@ -935,6 +936,25 @@ function get_port_info(\Illuminate\Http\Request $request)
     });
 }
 
+function search_ports(\Illuminate\Http\Request $request)
+{
+    $search = $request->route('search');
+    $value = "%$search%";
+    $ports = \App\Models\Port::hasAccess(Auth::user())
+        ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
+        ->where('ifAlias', 'like', $value)
+        ->orWhere('ifDescr', 'like', $value)
+        ->orWhere('ifName', 'like', $value)
+        ->orderBy('ifName')
+        ->get();
+
+    if ($ports->isEmpty()) {
+        return api_error(404, 'No ports found');
+    }
+
+    return api_success($ports, 'ports');
+}
+
 function get_all_ports(\Illuminate\Http\Request $request)
 {
     $columns = $request->get('columns', 'port_id, ifName');
@@ -1012,7 +1032,7 @@ function list_alerts(\Illuminate\Http\Request $request)
     }
 
     $order = 'timestamp desc';
-    
+
     $alert_rule = $request->get('alert_rule');
     if (isset($alert_rule)) {
         if (is_numeric($alert_rule)) {
@@ -1020,7 +1040,7 @@ function list_alerts(\Illuminate\Http\Request $request)
             $sql .= ' AND `R`.id=?';
         }
     }
-    
+
     if ($request->has('order')) {
         list($sort_column, $sort_order) = explode(' ', $request->get('order'), 2);
         if (($res = validate_column_list($sort_column, 'alerts')) !== true) {
@@ -2331,7 +2351,7 @@ function validateDeviceIds($ids)
     }
     return true;
 }
-  
+
 function add_location(\Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);

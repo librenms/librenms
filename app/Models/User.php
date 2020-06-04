@@ -177,7 +177,7 @@ class User extends Authenticatable
 
     public function apiToken()
     {
-        return $this->hasOne('App\Models\ApiToken', 'user_id', 'user_id');
+        return $this->hasOne(\App\Models\ApiToken::class, 'user_id', 'user_id');
     }
 
     public function devices()
@@ -190,7 +190,7 @@ class User extends Authenticatable
 
     public function deviceGroups()
     {
-        return $this->belongsToMany('App\Models\DeviceGroup', 'devices_group_perms', 'user_id', 'device_group_id');
+        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
     public function ports()
@@ -199,22 +199,22 @@ class User extends Authenticatable
             return Port::query();
         } else {
             //FIXME we should return all ports for a device if the user has been given access to the whole device.
-            return $this->belongsToMany('App\Models\Port', 'ports_perms', 'user_id', 'port_id');
+            return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
         }
     }
 
     public function dashboards()
     {
-        return $this->hasMany('App\Models\Dashboard', 'user_id');
+        return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
     }
 
     public function preferences()
     {
-        return $this->hasMany('App\Models\UserPref', 'user_id');
+        return $this->hasMany(\App\Models\UserPref::class, 'user_id');
     }
 
     public function widgets()
     {
-        return $this->hasMany('App\Models\UserWidget', 'user_id');
+        return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
     }
 }

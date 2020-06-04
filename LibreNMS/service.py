@@ -530,7 +530,7 @@ class Service:
             exception("Unable to log performance statistics - is the database still online?")
 
     def logfile_watchdog(self):
-        
+
         try:
             # check that lofgile has been written to within last poll period
             logfile_mdiff = datetime.now().timestamp() - os.path.getmtime(self.config.watchdog_logfile)

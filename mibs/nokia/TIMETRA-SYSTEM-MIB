@@ -5712,6 +5712,44 @@ tmnxSysResEcmpProfNumGrps        OBJECT-TYPE
          tmnxSysResEcmpProfNumGrps be 2048."
     ::= { tmnxSysResEcmpProfEntry 5 }
 
+tmnxSysResItCam                  OBJECT IDENTIFIER ::= { tmnxSysResInfo 3 }
+
+tmnxSysResItCamBank              OBJECT IDENTIFIER ::= { tmnxSysResItCam 1 }
+
+tmnxSysResItCamBankV6Multicast   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..5)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysResItCamBankV6Multicast specifies the maximum
+         number of internal TCAM banks to support ipv6 multicast to scale"
+    DEFVAL      { 0 }
+    ::= { tmnxSysResItCamBank 1 }
+
+tmnxSysFpCam                     OBJECT IDENTIFIER ::= { tmnxSysResInfo 4 }
+
+tmnxSysFpCamAllocation           OBJECT IDENTIFIER ::= { tmnxSysFpCam 1 }
+
+tmnxSysFpCamAllocAdmnV6Multicast OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10240)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpCamAllocAdmnV6Multicast specifies the maximum
+         number of number of IPv6 multicast routes allowed to be installed  in
+         the system/FP"
+    DEFVAL      { 0 }
+    ::= { tmnxSysFpCamAllocation 1 }
+
+tmnxSysFpCamAllocOperV6Multicast OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10240)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpCamAllocOperV6Multicast specifies the total
+         number of IPv6 multicast routes installed in the system/FP"
+    ::= { tmnxSysFpCamAllocation 2 }
+
 tmnxSysDhcp                      OBJECT IDENTIFIER ::= { tmnxSysObjs 28 }
 
 tmnxSysDhcp6AdvNoaddrsGlobal     OBJECT-TYPE
@@ -7952,6 +7990,20 @@ tmnxSysMgmtIfMDCliCmdAccntLoad   OBJECT-TYPE
     DEFVAL      { true }
     ::= { tmnxSysMgmtInterfaceMDCli 18 }
 
+tmnxSysMgmtIfMDEnvTimeFormat     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        iso-8601 (1),
+        rfc-1123 (2),
+        rfc-3339 (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysMgmtIfMDEnvTimeFormat specifies the time format to
+         be used, when displaying timestamp in info command in MD CLI."
+    DEFVAL      { rfc-3339 }
+    ::= { tmnxSysMgmtInterfaceMDCli 19 }
+
 tmnxMGSysObjs                    OBJECT IDENTIFIER ::= { tmnxSysObjs 41 }
 
 tmnxSysMgmtInterfaceYangModules  OBJECT IDENTIFIER ::= { tmnxSysObjs 42 }
@@ -7975,7 +8027,6 @@ tmnxSysMgmtIfYangNokia           OBJECT-TYPE
         "The value of tmnxSysMgmtIfYangNokia specifies whether or not the Nokia
          YANG models are supported. When set to 'true', network managers can
          access Nokia YANG models."
-    DEFVAL      { true }
     ::= { tmnxSysMgmtInterfaceYangModules 2 }
 
 tmnxSysMgmtIfYangOpenConfig      OBJECT-TYPE
@@ -8000,7 +8051,6 @@ tmnxSysMgmtIfYangNokiaCombined   OBJECT-TYPE
 
          tmnxSysMgmtIfYangNokiaCombined and tmnxSysMgmtIfYangNokia are mutually
          exclusive and cannot be both set to true at the same time."
-    DEFVAL      { false }
     ::= { tmnxSysMgmtInterfaceYangModules 4 }
 
 tmnxSysMgmtInterfaces            OBJECT IDENTIFIER ::= { tmnxSysObjs 43 }
@@ -8835,6 +8885,82 @@ tmnxSysFpoVplsEvpnMplsOperState  OBJECT-TYPE
          state of the VPLS EVPN MPLS forwarding path option."
     ::= { tmnxSysFwdPathOptsObjs 8 }
 
+tmnxSysFpoQosFc4ProfAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoQosFc4ProfAdminState specifies the
+         administrative state of the four color mode forwarding path option."
+    DEFVAL      { outOfService }
+    ::= { tmnxSysFwdPathOptsObjs 9 }
+
+tmnxSysFpoQosFc4ProfOperState    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoQosFc4ProfOperState indicates the operational
+         state of the four color mode forwarding path option."
+    ::= { tmnxSysFwdPathOptsObjs 10 }
+
+tmnxSysFpoQosMacCritAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoQosMacCritAdminState specifies the
+         administrative state of the MAC criteria for forwarding path option."
+    DEFVAL      { outOfService }
+    ::= { tmnxSysFwdPathOptsObjs 15 }
+
+tmnxSysFpoQosMacCritOperState    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoQosMacCritOperState indicates the operational
+         state of the MAC criteria for forwarding path option."
+    ::= { tmnxSysFwdPathOptsObjs 16 }
+
+tmnxSysFpoQosIpv6CritAdminState  OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoQosIpv6CritAdminState specifies the
+         administrative state of the IPv6 criteria for forwarding path option."
+    DEFVAL      { outOfService }
+    ::= { tmnxSysFwdPathOptsObjs 17 }
+
+tmnxSysFpoQosIpv6CritOperState   OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoQosIpv6CritOperState indicates the operational
+         state of the IPv6 criteria for forwarding path option."
+    ::= { tmnxSysFwdPathOptsObjs 18 }
+
+tmnxSysFpoQosBumPolAdminState    OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoQosBumPolAdminState specifies the
+         administrative state of the BUM policers for forwarding path option."
+    DEFVAL      { outOfService }
+    ::= { tmnxSysFwdPathOptsObjs 19 }
+
+tmnxSysFpoQosBumPolOperState     OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoQosBumPolOperState indicates the operational
+         state of the BUM policers for forwarding path option."
+    ::= { tmnxSysFwdPathOptsObjs 20 }
+
 tmnxSysConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 1 }
 
 tmnxSysCompliances               OBJECT IDENTIFIER ::= { tmnxSysConformance 1 }
@@ -9288,9 +9414,22 @@ tmnxSysV19v0Compliance           MODULE-COMPLIANCE
             tmnxSysBootConfFmtNotifyObjsGrp,
             tmnxSysFwdPathOptsV19v0Group,
             tmnxSysBootConfFmtNotifyGrp,
-            tmnxSysMgmtIfMdCliCmdAccntGroup
+            tmnxSysMgmtIfMdCliCmdAccntGroup,
+            tmnxSysResItCamV19v0Group,
+            tmnxSysFpCamAllocV19v0Group
         }
     ::= { tmnxSysCompliances 19 }
+
+tmnxSysV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of general system capabilities
+         on Nokia SROS series systems in release 20."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSysNotificationV20v0Group
+        }
+    ::= { tmnxSysCompliances 20 }
 
 tmnxSysGroups                    OBJECT IDENTIFIER ::= { tmnxSysConformance 2 }
 
@@ -10778,7 +10917,8 @@ tmnxSysMgmtIfMdCliGroup          OBJECT-GROUP
         tmnxSysMgmtIfWriteMode,
         tmnxSysMgmtIfWriteOperMode,
         tmnxSysMgmtIfModeLastSwitchTime,
-        tmnxSysMgmtIfModeSwitchDuration
+        tmnxSysMgmtIfModeSwitchDuration,
+        tmnxSysMgmtIfMDEnvTimeFormat
     }
     STATUS      current
     DESCRIPTION
@@ -11116,7 +11256,15 @@ tmnxSysFwdPathOptsV19v0Group     OBJECT-GROUP
         tmnxSysFpoMacFltOutVlanPrioAdmSt,
         tmnxSysFpoMacFltOutVlanPrioOprSt,
         tmnxSysFpoVplsEvpnMplsAdminState,
-        tmnxSysFpoVplsEvpnMplsOperState
+        tmnxSysFpoVplsEvpnMplsOperState,
+        tmnxSysFpoQosFc4ProfAdminState,
+        tmnxSysFpoQosFc4ProfOperState,
+        tmnxSysFpoQosMacCritAdminState,
+        tmnxSysFpoQosMacCritOperState,
+        tmnxSysFpoQosIpv6CritAdminState,
+        tmnxSysFpoQosIpv6CritOperState,
+        tmnxSysFpoQosBumPolAdminState,
+        tmnxSysFpoQosBumPolOperState
     }
     STATUS      current
     DESCRIPTION
@@ -11134,6 +11282,39 @@ tmnxSysMgmtIfMdCliCmdAccntGroup  OBJECT-GROUP
          behavior during MD-CLI load and rollback operations on Nokia SROS
          series system added in SROS release 19.10."
     ::= { tmnxSysV19v0Groups 12 }
+
+tmnxSysResItCamV19v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysResItCamBankV6Multicast
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting system internal TCAM resource info on
+         Nokia SROS series system added in SROS release 19.10"
+    ::= { tmnxSysV19v0Groups 13 }
+
+tmnxSysFpCamAllocV19v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysFpCamAllocAdmnV6Multicast,
+        tmnxSysFpCamAllocOperV6Multicast
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting system internal TCAM resource info on
+         Nokia SROS series system added in SROS release 19.10"
+    ::= { tmnxSysV19v0Groups 14 }
+
+tmnxSysV20v0Groups               OBJECT IDENTIFIER ::= { tmnxSysGroups 80 }
+
+tmnxSysNotificationV20v0Group    NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxEqOperStateChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the general system capabilities
+         on Nokia SROS series systems added in SROS release 20."
+    ::= { tmnxSysV20v0Groups 1 }
 
 tmnxSysMGGroups                  OBJECT IDENTIFIER ::= { tmnxSysConformance 3 }
 
@@ -12403,6 +12584,26 @@ tmnxSysLicenseUpdateRequired     NOTIFICATION-TYPE
 
          [RECOVERY] Update and activate the updated license."
     ::= { tmnxSysNotifications 84 }
+
+tmnxEqOperStateChange            NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxNotifyRow,
+        tmnxNotifyRowOperState,
+        tmnxNotifyEntryOID,
+        tmnxNotifyObjectName
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxEqOperStateChange notification is generated when a
+         change occurred in the operational state on the piece of hardware.
+
+         [EFFECT] If the state has changed to out of service, then all ports
+         and services associated with the module change to out of service and
+         traffic is impacted.
+
+         [RECOVERY] Investigation is required to determine the cause of the
+         change."
+    ::= { tmnxSysNotifications 85 }
 
 tmnxSysMGNotifications           OBJECT IDENTIFIER ::= { tmnxSysMIBNotifyPrefix 1 }
 

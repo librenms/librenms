@@ -2,11 +2,14 @@
 
 $smos_data = snmp_get_multi_oid(
     $device,
-    ['softwareEquipmentReleaseBench1.0','unitPartNumber.1'],
-    '-OUQn',
+    ['softwareEquipmentReleaseBench1.0','unitPartNumber.1', 'unitLabel.1', 'unitParentSerialNumber.1'],
+    '-OUQs',
     'SIAE-SOFT-MIB:SIAE-UNIT-MIB'
 );
-$version  = $smos_data['.1.3.6.1.4.1.3373.1103.7.2.0'];
-$hardware = $smos_data['.1.3.6.1.4.1.3373.1103.6.2.1.11.1'];
+
+
+$version  = $smos_data['softwareEquipmentReleaseBench1.0'];
+$hardware = "{$smos_data['unitLabel.1']} ({$smos_data['unitPartNumber.1']})";
+$serial = $smos_data['unitParentSerialNumber.1'];
 
 unset($smos_data);

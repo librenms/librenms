@@ -1,0 +1,707 @@
+-- ********************************************************************
+        WLC DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, IpAddress,Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+
+-- The Enterprises Number
+                peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+                wlc MODULE-IDENTITY
+                        LAST-UPDATED "2011081900Z"              -- 08 19, 2011 at 12:00 GMT
+                        ORGANIZATION
+                                "PEPLINK"
+                        CONTACT-INFO
+                                ""
+                        DESCRIPTION
+                                "MIB module for WLC."
+                        ::= { peplink 4 }
+
+-- #####################################################################
+-- 
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+	wlcSystemInfo OBJECT IDENTIFIER ::= { wlc 1 }
+
+-- **********************************************************************
+-- *  WLC System Basic Info 
+-- **********************************************************************
+	wlcSystemBasicInfo OBJECT IDENTIFIER ::= { wlcSystemInfo 1 }
+
+		wlcApMgmtEnable OBJECT-TYPE
+			SYNTAX INTEGER{ disable(0), enable(1) }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Mangement Enable"
+			::= { wlcSystemBasicInfo 1 }
+
+		wlcRemoteApMgmtEnable OBJECT-TYPE
+			SYNTAX INTEGER{ disable(0), enable(1) }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Remote AP Management Enable"
+			::= { wlcSystemBasicInfo 2 }
+
+		wlcMaxNumAp OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Maximum Number of Supported AP Licensed"
+			::= { wlcSystemBasicInfo 3 }
+
+		wlcNumApProfile OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Number of AP Profile Created"
+			::= { wlcSystemBasicInfo 4 }
+
+		wlcNumWlanNetwork OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Number of WLAN Network Created"
+			::= { wlcSystemBasicInfo 5 }
+
+		wlcNumApReg OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Number of AP Registered"
+			::= { wlcSystemBasicInfo 6 }
+
+		wlcNumApOnline OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Current Number of Online AP"
+			::= { wlcSystemBasicInfo 7 }
+
+		wlcNumAssocSta OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Current Number of Associated WLAN Station"
+			::= { wlcSystemBasicInfo 8 }
+
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+	wlcApMgmtInfo OBJECT IDENTIFIER ::= { wlc 2 }
+
+-- **********************************************************************
+-- *  WLC AP Group Info Table 
+-- **********************************************************************
+		wlcApGroupInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlcApGroupInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group Information Table"
+			::= { wlcApMgmtInfo 1 }
+
+			wlcApGroupInfoEntry OBJECT-TYPE
+			SYNTAX WlcApGroupInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wlcApGroupInfoTable"
+			INDEX { wlcApGrpId }
+			::= { wlcApGroupInfoTable 1 }
+
+			WlcApGroupInfoEntry ::=
+			SEQUENCE {
+				wlcApGrpId
+					INTEGER,
+				wlcApGrpName
+					OCTET STRING,
+				wlcApGrpBand24WlanNetwork
+					INTEGER,
+				wlcApGrpBand50WlanNetwork
+					INTEGER,
+				wlcApGrpNumApReg
+					INTEGER,
+				wlcApGrpNumApOnline
+					INTEGER,
+				wlcApGrpNumAssocSta
+					INTEGER,
+				wlcApGrpMgmtVlan
+					INTEGER
+			}
+
+			wlcApGrpId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group ID"
+			::= { wlcApGroupInfoEntry 1 }
+
+			wlcApGrpName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group Name"
+			::= { wlcApGroupInfoEntry 2 }
+
+			wlcApGrpBand24WlanNetwork OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Current Number of 2.4GHz Band WLAN Network"
+			::= { wlcApGroupInfoEntry 3 }
+
+			wlcApGrpBand50WlanNetwork OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Current Number of 5GHz Band WLAN Network"
+			::= { wlcApGroupInfoEntry 4 }
+
+			wlcApGrpNumApReg OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Number of Registered AP in this AP Group"
+			::= { wlcApGroupInfoEntry 5 }
+
+			wlcApGrpNumApOnline OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Number of Online AP in this AP Group"
+			::= { wlcApGroupInfoEntry 6 }
+
+			wlcApGrpNumAssocSta OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Number of Associated WLAN Stations in this AP Group"
+			::= { wlcApGroupInfoEntry 7 }
+
+			wlcApGrpMgmtVlan OBJECT-TYPE
+			SYNTAX INTEGER(0..4095)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Managment VLAN ID of this AP Group"
+			::= { wlcApGroupInfoEntry 8 }
+
+-- **********************************************************************
+-- *  WLC AP Group Statistics Table 
+-- **********************************************************************
+		wlcApGroupStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlcApGroupStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WLAN AP Group Statistics Table"
+			::= { wlcApMgmtInfo 2 }
+
+			wlcApGroupStatEntry OBJECT-TYPE
+			SYNTAX WlcApGroupStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wlcApGroupStatTable"
+			INDEX { wlcApGrpId, wlcApGrpStatBand }
+			::= { wlcApGroupStatTable 1 }
+
+			WlcApGroupStatEntry ::=
+			SEQUENCE {
+				wlcApGrpStatName
+					OCTET STRING,
+				wlcApGrpStatBand
+					INTEGER,
+				wlcApGrpStatNumTxPkt
+					Counter64,
+				wlcApGrpStatNumTxByte
+					Counter64,
+				wlcApGrpStatNumRxPkt
+					Counter64,
+				wlcApGrpStatNumRxByte
+					Counter64
+			}
+
+			wlcApGrpStatName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group Name"
+			::= { wlcApGroupStatEntry 1 }
+
+			wlcApGrpStatBand OBJECT-TYPE
+			SYNTAX INTEGER{	band24(1), band50(2) }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group Statistics of Frequency Band"
+			::= { wlcApGroupStatEntry 2 }
+
+			wlcApGrpStatNumTxPkt OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group Number of Transmitted Packets"
+			::= { wlcApGroupStatEntry 3 }
+
+			wlcApGrpStatNumTxByte OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group Number of Transmitted Bytes"
+			::= { wlcApGroupStatEntry 4 }
+
+			wlcApGrpStatNumRxPkt OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group Number of Received Packets"
+			::= { wlcApGroupStatEntry 5 }
+
+			wlcApGrpStatNumRxByte OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Group Number of Received Bytes"
+			::= { wlcApGroupStatEntry 6 }
+
+-- **********************************************************************
+-- *  WLC Wlan Network Info Table 
+-- **********************************************************************
+		wlcWlanNetworkInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlcWlanNetworkInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network Information Table"
+			::= { wlcApMgmtInfo 3 }
+
+			wlcWlanNetworkInfoEntry OBJECT-TYPE
+			SYNTAX WlcWlanNetworkInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wlcWlanNetworkInfoTable"
+			INDEX { wlcWlanNetworkId }
+			::= { wlcWlanNetworkInfoTable 1 }
+
+			WlcWlanNetworkInfoEntry ::=
+			SEQUENCE {
+				wlcWlanNetworkId
+					INTEGER,
+				wlcWlanEssid
+					OCTET STRING,
+				wlcWlanSecMode
+					INTEGER,
+				wlcWlanNumApOnline
+					INTEGER,
+				wlcWlanNumAssocSta
+					INTEGER,
+				wlcWlanVlanPool
+					OCTET STRING
+			}
+
+			wlcWlanNetworkId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network ID"
+			::= { wlcWlanNetworkInfoEntry 1 }
+
+			wlcWlanEssid OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network ESSID"
+			::= { wlcWlanNetworkInfoEntry 2 }
+
+			wlcWlanSecMode OBJECT-TYPE
+			SYNTAX INTEGER{	none(0), wep(1), legacy8021x(2), wpaMix(3) }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network Security Mode"
+			::= { wlcWlanNetworkInfoEntry 3 }
+
+			wlcWlanNumApOnline OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Current Number of Online AP in this WLAN Network"
+			::= { wlcWlanNetworkInfoEntry 4 }
+
+			wlcWlanNumAssocSta OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Current Number of Associated Stations in this WLAN Network"
+			::= { wlcWlanNetworkInfoEntry 5 }
+
+			wlcWlanVlanPool OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC VLAN Pool Setting of this WLAN Network"
+			::= { wlcWlanNetworkInfoEntry 6 }
+
+-- **********************************************************************
+-- *  WLC Wlan Network Stat Table 
+-- **********************************************************************
+		wlcWlanNetworkStatTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlcWlanNetworkStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network Statistics Table"
+			::= { wlcApMgmtInfo 4 }
+
+			wlcWlanNetworkStatEntry OBJECT-TYPE
+			SYNTAX WlcWlanNetworkStatEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wlcWlanNetworkInfoTable"
+			INDEX { wlcWlanNetworkId, wlcWlanStatBand }
+			::= { wlcWlanNetworkStatTable 1 }
+
+			WlcWlanNetworkStatEntry ::=
+			SEQUENCE {
+				wlcWlanStatEssid
+					OCTET STRING,
+				wlcWlanStatBand
+					INTEGER,
+				wlcWlanStatNumTxPkt
+					Counter64,
+				wlcWlanStatNumTxByte
+					Counter64,
+				wlcWlanStatNumRxPkt
+					Counter64,
+				wlcWlanStatNumRxByte
+					Counter64
+			}
+
+			wlcWlanStatEssid OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network ESSID"
+			::= { wlcWlanNetworkStatEntry 1 }
+
+			wlcWlanStatBand OBJECT-TYPE
+			SYNTAX INTEGER{	band24(1), band50(2) }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Statistics of WLAN Network in Frequency Band"
+			::= { wlcWlanNetworkStatEntry 2 }
+
+			wlcWlanStatNumTxPkt OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network Number of Transmitted Packets"
+			::= { wlcWlanNetworkStatEntry 3 }
+
+			wlcWlanStatNumTxByte OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network Number of Transmitted Bytes"
+			::= { wlcWlanNetworkStatEntry 4 }
+
+			wlcWlanStatNumRxPkt OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network Number of Received Packets"
+			::= { wlcWlanNetworkStatEntry 5 }
+
+			wlcWlanStatNumRxByte OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC WLAN Network Number of Received Bytes"
+			::= { wlcWlanNetworkStatEntry 6 }
+
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+	wlcWlanNeighDeviceInfo OBJECT IDENTIFIER ::= { wlc 3 }
+
+-- **********************************************************************
+-- *  WLC Wlan Neighbor AP Table
+-- **********************************************************************
+		wlcWlanNeighApTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlcWlanNeighApEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WLC Neighbor AP Table"
+			::= { wlcWlanNeighDeviceInfo 1 }
+
+			wlcWlanNeighApEntry OBJECT-TYPE
+			SYNTAX WlcWlanNeighApEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wlcWlanNeighApTable"
+			INDEX { wlcNeighApBssid }
+			::= { wlcWlanNeighApTable 1 }
+
+			WlcWlanNeighApEntry ::=
+			SEQUENCE {
+				wlcNeighApBssid
+					MacAddress,
+				wlcNeighApEssid
+					OCTET STRING,
+				wlcNeighApChannel
+					INTEGER,
+				wlcNeighApEncytMode
+					INTEGER,
+				wlcNeighNumApSeen
+					INTEGER,
+				wlcNeighNearestAp
+					OCTET STRING,
+				wlcNeighNearestApRssi
+					INTEGER,
+				wlcNeighFurthestAp
+					OCTET STRING,
+				wlcNeighFurthestApRssi
+					INTEGER
+			}
+
+			wlcNeighApBssid OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Neighbor AP BSSID"
+			::= { wlcWlanNeighApEntry 1 }
+
+			wlcNeighApEssid OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Neighbor AP ESSID"
+			::= { wlcWlanNeighApEntry 2 }
+
+			wlcNeighApChannel OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Neighbor AP Channel"
+			::= { wlcWlanNeighApEntry 3 }
+
+			wlcNeighApEncytMode OBJECT-TYPE
+			SYNTAX INTEGER{ none(0), wep(1), wpa(2), wpa2(3) }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Neighbor AP Encryption Mode"
+			::= { wlcWlanNeighApEntry 4 }
+
+			wlcNeighNumApSeen OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Number of AP which can detect the Neighbor AP"
+			::= { wlcWlanNeighApEntry 5 }
+
+			wlcNeighNearestAp OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (12))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Nearest AP Serial Number"
+			::= { wlcWlanNeighApEntry 6 }
+
+			wlcNeighNearestApRssi OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Neighbor Signal Strength received by the Nearest AP"
+			::= { wlcWlanNeighApEntry 7 }
+
+			wlcNeighFurthestAp OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (12))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Furthest AP Serial Number"
+			::= { wlcWlanNeighApEntry 8 }
+
+			wlcNeighFurthestApRssi OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Neighbor Signal Strength received by the Furthest AP"
+			::= { wlcWlanNeighApEntry 9 }
+
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+	wlcApInfo OBJECT IDENTIFIER ::= { wlc 4 }
+
+-- **********************************************************************
+-- *  WLC AP Info Table
+-- **********************************************************************
+		wlcApInfoTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF WlcApInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"WLAN Managed AP Information Table"
+			::= { wlcApInfo 1 }
+
+			wlcApInfoEntry OBJECT-TYPE
+			SYNTAX WlcApInfoEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the wlcApInfoTable"
+			INDEX { wlcApInfoApId }
+			::= { wlcApInfoTable 1 }
+
+			WlcApInfoEntry ::=
+			SEQUENCE {
+				wlcApInfoApId
+					INTEGER,
+				wlcApInfoApSerialNumber
+					OCTET STRING,
+				wlcApInfoApName
+					OCTET STRING,
+				wlcApInfoApModelName
+					OCTET STRING,
+				wlcApInfoApFirmwareVer
+					OCTET STRING,
+				wlcApInfoApStatus
+					INTEGER,
+				wlcApInfoApIp
+					IpAddress,
+				wlcApInfoApGrpID
+					INTEGER,
+				wlcApInfoApGrpName
+					OCTET STRING
+			}
+
+			wlcApInfoApId OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP ID"
+			::= { wlcApInfoEntry 1 }
+
+			wlcApInfoApSerialNumber OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..14))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Serial Number"
+			::= { wlcApInfoEntry 2 }
+
+			wlcApInfoApName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Name"
+			::= { wlcApInfoEntry 3 }
+
+			wlcApInfoApModelName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Model Name"
+			::= { wlcApInfoEntry 4 }
+
+			wlcApInfoApFirmwareVer OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Firmare Version"
+			::= { wlcApInfoEntry 5 }
+
+			wlcApInfoApStatus OBJECT-TYPE
+			SYNTAX INTEGER{ offline(0), online(1) }
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Current AP Status"
+			::= { wlcApInfoEntry 6 }
+
+			wlcApInfoApIp OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC Current AP Ip Address"
+			::= { wlcApInfoEntry 7 }
+
+			wlcApInfoApGrpID OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Configured AP Group ID"
+			::= { wlcApInfoEntry 8 }
+
+			wlcApInfoApGrpName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..64))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"WLC AP Configured AP Group Name"
+			::= { wlcApInfoEntry 9 }
+END
+

@@ -1,6 +1,7 @@
 os: ciena-waveserver
 text: 'Ciena Waveserver'
 icon: ciena
+ifname: true
 over:
     - { graph: device_bits, text: Traffic }
 type: network

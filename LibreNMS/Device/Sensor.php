@@ -36,6 +36,7 @@ class Sensor implements DiscoveryModule, PollerModule
     protected static $name = 'Sensor';
     protected static $table = 'sensors';
     protected static $data_name = 'sensor';
+    protected static $translation_prefix = 'sensors';
 
     private $valid = true;
 
@@ -617,7 +618,7 @@ class Sensor implements DiscoveryModule, PollerModule
         foreach ($sensors as $sensor) {
             $sensor_value = $data[$sensor['sensor_id']];
 
-            echo "  {$sensor['sensor_descr']}: $sensor_value " . __('sensors.' . $sensor['sensor_class'] . '.unit') . PHP_EOL;
+            echo "  {$sensor['sensor_descr']}: $sensor_value " . __(static::$translation_prefix . '.' . $sensor['sensor_class'] . '.unit') . PHP_EOL;
 
             // update rrd and database
             $rrd_name = array(

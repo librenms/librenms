@@ -2,9 +2,8 @@
 
 namespace LibreNMS\Authentication;
 
-use App\Models\Notification;
-use App\Models\NotificationAttrib;
 use App\Models\User;
+use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\AuthenticationException;
 use Phpass\PasswordHash;
@@ -35,13 +34,13 @@ class MysqlAuthorizer extends AuthorizerBase
                 $this->changePassword($username, $password);
                 return true;
             }
-        } elseif (starts_with($hash, '$1$')) {
+        } elseif (Str::startsWith($hash, '$1$')) {
             // old md5 crypt
             if (crypt($password, $hash) == $hash) {
                 $this->changePassword($username, $password);
                 return true;
             }
-        } elseif (starts_with($hash, '$P$')) {
+        } elseif (Str::startsWith($hash, '$P$')) {
             // Phpass
             $hasher = new PasswordHash();
             if ($hasher->CheckPassword($password, $hash)) {

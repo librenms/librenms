@@ -33,6 +33,6 @@ class AlertTemplate extends BaseModel
 
     public function map()
     {
-        return $this->hasMany('App\Models\AlertTemplateMap', 'alert_templates_id', 'id');
+        return $this->hasMany(\App\Models\AlertTemplateMap::class, 'alert_templates_id', 'id');
     }
 }

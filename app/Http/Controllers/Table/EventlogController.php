@@ -29,6 +29,7 @@ use App\Models\Eventlog;
 use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
+use LibreNMS\Enum\Alert;
 
 class EventlogController extends TableController
 {
@@ -89,6 +90,13 @@ class EventlogController extends TableController
                     return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
                 }
             }
+        } elseif (in_array($eventlog->type, \App\Models\Sensor::getTypes())) {
+            if (is_numeric($eventlog->reference)) {
+                $sensor = $eventlog->related;
+                if (isset($sensor)) {
+                    return '<b>' . Url::sensorLink($sensor, $sensor->sensor_descr) . '</b>';
+                }
+            }
         }
 
         return $eventlog->type;
@@ -112,15 +120,15 @@ class EventlogController extends TableController
     private function severityLabel($eventlog_severity)
     {
         switch ($eventlog_severity) {
-            case 1:
+            case Alert::OK:
                 return "label-success"; //OK
-            case 2:
+            case Alert::INFO:
                 return "label-info"; //Informational
-            case 3:
+            case Alert::NOTICE:
                 return "label-primary"; //Notice
-            case 4:
+            case Alert::WARNING:
                 return "label-warning"; //Warning
-            case 5:
+            case Alert::ERROR:
                 return "label-danger"; //Critical
             default:
                 return "label-default"; //Unknown

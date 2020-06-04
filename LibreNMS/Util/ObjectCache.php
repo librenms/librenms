@@ -49,10 +49,10 @@ class ObjectCache
     {
         return Cache::remember('ObjectCache:applications_list:' . auth()->id(), self::$cache_time, function () {
             return Application::hasAccess(auth()->user())
-                ->select('app_type', 'app_instance')
-                ->groupBy('app_type', 'app_instance')
-                ->orderBy('app_type')
+                ->select('app_type', 'app_state', 'app_instance')
+                ->groupBy('app_type', 'app_state', 'app_instance')
                 ->get()
+                ->sortBy('show_name', SORT_NATURAL|SORT_FLAG_CASE)
                 ->groupBy('app_type');
         });
     }

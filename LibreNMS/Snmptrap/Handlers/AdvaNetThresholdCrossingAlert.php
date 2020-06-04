@@ -28,6 +28,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
@@ -55,7 +56,7 @@ class AdvaNetThresholdCrossingAlert implements SnmptrapHandler
     public function getThresholdMessage($thresholdOid)
     {
         foreach ($this->getThresholds() as $oid => $descr) {
-            if (str_contains($thresholdOid, $oid)) {
+            if (Str::contains($thresholdOid, $oid)) {
                 return $descr;
             }
         }

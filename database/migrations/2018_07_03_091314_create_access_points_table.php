@@ -20,7 +20,7 @@ class CreateAccessPointsTable extends Migration
             $table->tinyInteger('radio_number')->nullable();
             $table->string('type', 16);
             $table->string('mac_addr', 24);
-            $table->boolean('deleted')->default(0)->index('deleted');
+            $table->boolean('deleted')->default(0)->index();
             $table->tinyInteger('channel')->unsigned()->default(0);
             $table->tinyInteger('txpow')->default(0);
             $table->tinyInteger('radioutil')->default(0);

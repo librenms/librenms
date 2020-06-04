@@ -15,7 +15,7 @@ class CreateSlasTable extends Migration
     {
         Schema::create('slas', function (Blueprint $table) {
             $table->increments('sla_id');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->integer('sla_nr');
             $table->string('owner');
             $table->string('tag');
@@ -23,7 +23,7 @@ class CreateSlasTable extends Migration
             $table->boolean('status');
             $table->boolean('opstatus')->default(0);
             $table->boolean('deleted')->default(0);
-            $table->unique(['device_id','sla_nr'], 'unique_key');
+            $table->unique(['device_id','sla_nr']);
         });
     }
 

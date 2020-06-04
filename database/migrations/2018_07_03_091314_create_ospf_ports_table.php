@@ -39,7 +39,7 @@ class CreateOspfPortsTable extends Migration
             $table->string('ospfIfDemand', 32)->nullable();
             $table->string('ospfIfAuthType', 32)->nullable();
             $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id','ospf_port_id','context_name'], 'device_id');
+            $table->unique(['device_id','ospf_port_id','context_name']);
         });
     }
 

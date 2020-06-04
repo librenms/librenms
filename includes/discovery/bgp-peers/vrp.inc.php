@@ -166,6 +166,6 @@ if (Config::get('enable_bgp')) {
         if ($vrp_bgp_peer_count > 0) {
             return; //Finish BGP discovery here, cause we collected data
         }
-        // If not, we continue with standard BGP4 MIB
     }
+    // If not, we continue with standard BGP4 MIB
 }

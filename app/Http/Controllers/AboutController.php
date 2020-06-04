@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers;
 
+use App;
 use App\Models\Application;
 use App\Models\Callback;
 use App\Models\Device;
@@ -72,6 +73,8 @@ class AboutController extends Controller
             'version_local'     => $version->local(),
             'version_mysql'     => current(DB::selectOne('select version()')),
             'version_php'       => phpversion(),
+            'version_laravel'   => App::VERSION(),
+            'version_python'    => Version::python(),
             'version_webserver' => $request->server('SERVER_SOFTWARE'),
             'version_rrdtool'   => str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
                 Config::get('rrdtool', 'rrdtool') . ' --version | head -n1'

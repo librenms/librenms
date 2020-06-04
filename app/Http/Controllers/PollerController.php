@@ -32,7 +32,7 @@ class PollerController extends Controller
         return view('poller.groups', [
             'current_tab' => 'groups',
             'poller_groups' => PollerGroup::query()->withCount('devices')->get(),
-            'default_group_id' => Config::get('distributed_poller_group'),
+            'default_group_id' => Config::get('default_poller_group'),
             'ungrouped_count' => Device::where('poller_group', 0)->count(),
         ]);
     }

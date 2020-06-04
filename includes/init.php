@@ -134,11 +134,11 @@ try {
     exit();
 }
 
-if (module_selected('discovery', $init_modules) && !update_os_cache()) {
-    // load_all_os() is called by update_os_cache() if updated, no need to call twice
-    load_all_os();
+if (module_selected('discovery', $init_modules) && !\LibreNMS\Util\OS::updateCache(false)) {
+    // OS::loadAllDefinitions() is called by update_os_cache() if updated, no need to call twice
+    \LibreNMS\Util\OS::loadAllDefinitions(false, true);
 } elseif (module_selected('web', $init_modules)) {
-    load_all_os(!module_selected('nodb', $init_modules));
+    \LibreNMS\Util\OS::loadAllDefinitions(!module_selected('nodb', $init_modules), true);
 }
 
 if (module_selected('web', $init_modules)) {

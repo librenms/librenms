@@ -25,16 +25,19 @@
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
 class AuthSSOTest extends DBTestCase
 {
-    private $last_user = null;
+    use DatabaseTransactions;
+
     private $original_auth_mech = null;
     private $server;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -75,7 +78,7 @@ class AuthSSOTest extends DBTestCase
         $_SERVER['REMOTE_USER'] = 'test';
 
         $_SERVER['mail'] = 'test@example.org';
-        $_SERVER['displayName'] = bin2hex(openssl_random_pseudo_bytes(16));
+        $_SERVER['displayName'] = Str::random();
     }
 
 
@@ -87,34 +90,18 @@ class AuthSSOTest extends DBTestCase
         Config::set('sso.mode', 'header');
 
         $_SERVER['REMOTE_ADDR'] = '::1';
-        $_SERVER['REMOTE_USER'] = bin2hex(openssl_random_pseudo_bytes(16));
+        $_SERVER['REMOTE_USER'] = Str::random();
 
         $_SERVER['HTTP_MAIL'] = 'test@example.org';
         $_SERVER['HTTP_DISPLAYNAME'] = 'Test User';
     }
 
-    public function makeBreakUser()
+    public function makeUser()
     {
-        $this->breakUser();
+        $user = Str::random();
+        $_SERVER['REMOTE_USER'] = $user;
 
-        $u = bin2hex(openssl_random_pseudo_bytes(16));
-        $this->last_user = $u;
-        $_SERVER['REMOTE_USER'] = $u;
-
-        return $u;
-    }
-
-    public function breakUser()
-    {
-        $a = LegacyAuth::reset();
-
-        if ($this->last_user !== null) {
-            $r = $a->deleteUser($a->getUserid($this->last_user));
-            $this->last_user = null;
-            return $r;
-        }
-
-        return true;
+        return $user;
     }
 
     // Excercise general auth flow
@@ -128,7 +115,7 @@ class AuthSSOTest extends DBTestCase
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
-        $user = $this->makeBreakUser();
+        $user = $this->makeUser();
         $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Retrieve it and validate
@@ -147,7 +134,7 @@ class AuthSSOTest extends DBTestCase
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
-        $user = $this->makeBreakUser();
+        $user = $this->makeUser();
         $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Retrieve it and validate
@@ -177,7 +164,7 @@ class AuthSSOTest extends DBTestCase
 
         // Create a random username and store it with the defaults
         $this->basicEnvironmentEnv();
-        $user = $this->makeBreakUser();
+        $user = $this->makeUser();
         $this->assertTrue($a->authenticate(['username' => $user]));
 
         // Change a few things and reauth
@@ -222,13 +209,13 @@ class AuthSSOTest extends DBTestCase
         unset($_SERVER['displayName']);
         unset($_SERVER['mail']);
 
-        $this->assertTrue($a->authenticate(['username' => $this->makeBreakUser()]));
+        $this->assertTrue($a->authenticate(['username' => $this->makeUser()]));
 
         $this->basicEnvironmentHeader();
         unset($_SERVER['HTTP_DISPLAYNAME']);
         unset($_SERVER['HTTP_MAIL']);
 
-        $this->assertTrue($a->authenticate(['username' => $this->makeBreakUser()]));
+        $this->assertTrue($a->authenticate(['username' => $this->makeUser()]));
     }
 
     // Document the modules current behaviour, so that changes trigger test failures
@@ -468,11 +455,10 @@ class AuthSSOTest extends DBTestCase
         $this->assertTrue($a->authSSOParseGroups() === 10);
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Config::set('auth_mechanism', $this->original_auth_mech);
         Config::forget('sso');
-        $this->breakUser();
         $_SERVER = $this->server;
         parent::tearDown();
     }

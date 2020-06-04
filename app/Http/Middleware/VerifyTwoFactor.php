@@ -4,6 +4,7 @@ namespace App\Http\Middleware;
 
 use App\Models\UserPref;
 use Closure;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 class VerifyTwoFactor
@@ -20,7 +21,7 @@ class VerifyTwoFactor
         // check twofactor
         if (Config::get('twofactor') === true) {
             // don't apply on 2fa checking routes
-            if (starts_with($request->route()->getName(), '2fa.')) {
+            if (Str::startsWith($request->route()->getName(), '2fa.')) {
                 return $next($request);
             }
 

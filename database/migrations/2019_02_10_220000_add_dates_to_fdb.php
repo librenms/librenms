@@ -32,8 +32,7 @@ class AddDatesToFdb extends Migration
     public function down()
     {
         Schema::table('ports_fdb', function (Blueprint $table) {
-            $table->dropColumn('created_at');
-            $table->dropColumn('updated_at');
+            $table->dropColumn(['created_at', 'updated_at']);
         });
     }
 }

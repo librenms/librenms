@@ -53,9 +53,7 @@ class AlertSchedule extends Model
                         $query->where('start_recurring_dt', '<=', DB::raw("date_format(NOW(), '%Y-%m-%d')"))
                             ->where(function ($query) {
                                 $query->where('end_recurring_dt', '>=', DB::raw("date_format(NOW(), '%Y-%m-%d')"))
-                                    ->orWhereNull('end_recurring_dt')
-                                    ->orWhere('end_recurring_dt', '0000-00-00')
-                                    ->orWhere('end_recurring_dt', '');
+                                    ->orWhereNull('end_recurring_dt');
                             });
                     })
                     // Check the time is between the start and end hour/minutes/seconds
@@ -76,11 +74,11 @@ class AlertSchedule extends Model
 
     public function devices()
     {
-        return $this->morphedByMany('App\Models\Device', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphedByMany(\App\Models\Device::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
     }
 
     public function deviceGroups()
     {
-        return $this->morphedByMany('App\Models\DeviceGroup', 'alert_schedulable');
+        return $this->morphedByMany(\App\Models\DeviceGroup::class, 'alert_schedulable');
     }
 }

@@ -23,6 +23,8 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
+use Illuminate\Support\Str;
 use LibreNMS\Alert\Transport;
 
 class Smseagle extends Transport
@@ -44,7 +46,7 @@ class Smseagle extends Transport
             'to' => implode(',', $opts['to']),
             'message' => $obj['title'],
         ];
-        $url = starts_with($opts['url'], 'http') ? '' : 'http://';
+        $url = Str::startsWith($opts['url'], 'http') ? '' : 'http://';
         $url .= $opts['url'] . '/index.php/http_api/send_sms?' . http_build_query($params);
         $curl   = curl_init($url);
 

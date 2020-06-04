@@ -1,6 +1,6 @@
 <?php
 /**
- * e3meter.inc.php
+ * e3meterdc.inc.php
  *
  * LibreNMS os poller module for Zyxel devices
  *
@@ -29,5 +29,5 @@ $e3meter = snmp_get_multi_oid($device, $oids, '-OUQnt');
 $version = $e3meter['.1.3.6.1.4.1.21695.1.10.1.1'];
 
 unset(
-    $zyxel
+    $e3meter
 );

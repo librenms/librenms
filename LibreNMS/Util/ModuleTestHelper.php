@@ -25,9 +25,12 @@
 
 namespace LibreNMS\Util;
 
+use DeviceCache;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\OS;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -89,11 +92,11 @@ class ModuleTestHelper
         $this->json_file = $this->json_dir . $this->file_name . ".json";
 
         // never store time series data
-        Config::set('norrd', true);
+        Config::set('rrd.enable', false);
         Config::set('hide_rrd_disabled', true);
-        Config::set('noinfluxdb', true);
-        $influxdb = false;
-        Config::set('nographite', true);
+        Config::set('influxdb.enable', false);
+        Config::set('graphite.enable', false);
+        Config::set('prometheus.enable', false);
 
         if (is_null(self::$module_tables)) {
             // only load the yaml once, then keep it in memory
@@ -142,6 +145,7 @@ class ModuleTestHelper
         $snmp_oids = $this->collectOids($device_id);
 
         $device = device_by_id_cache($device_id, true);
+        DeviceCache::setPrimary($device_id);
 
         $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
@@ -171,6 +175,7 @@ class ModuleTestHelper
         global $debug, $vdebug, $device;
 
         $device = device_by_id_cache($device_id);
+        DeviceCache::setPrimary($device_id);
 
         // Run discovery
         ob_start();
@@ -285,7 +290,7 @@ class ModuleTestHelper
     {
         $full_name = basename($os_file, '.json');
 
-        if (!str_contains($full_name, '_')) {
+        if (!Str::contains($full_name, '_')) {
             return [$full_name, ''];
         } elseif (is_file(Config::get('install_dir') . "/includes/definitions/$full_name.yaml")) {
             return [$full_name, ''];
@@ -362,7 +367,7 @@ class ModuleTestHelper
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
                     list($raw_type, $data) = explode(':', $raw_data, 2);
-                    if (starts_with($raw_type, 'Wrong Type (should be ')) {
+                    if (Str::startsWith($raw_type, 'Wrong Type (should be ')) {
                         // device returned the wrong type, save the wrong type to emulate the device behavior
                         list($raw_type, $data) = explode(':', ltrim($data), 2);
                     }
@@ -484,7 +489,7 @@ class ModuleTestHelper
         foreach ($private_oid as $oid) {
             if (isset($data[$oid])) {
                 $parts = explode('|', $data[$oid], 3);
-                $parts[2] = '<private>';
+                $parts[2] = $parts[1] === '4' ? '<private>' : '3C707269766174653E';
                 $data[$oid] = implode('|', $parts);
             }
         }
@@ -502,6 +507,7 @@ class ModuleTestHelper
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
         global $device, $debug, $vdebug;
+        Config::set('rrd.enable', false); // disable rrd
 
         if (!is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
@@ -528,6 +534,7 @@ class ModuleTestHelper
 
         // Populate the device variable
         $device = device_by_id_cache($device_id, true);
+        DeviceCache::setPrimary($device_id);
 
         $data = [];  // array to hold dumped data
 

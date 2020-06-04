@@ -85,6 +85,10 @@ if (isset($_REQUEST['search'])) {
                                        OR `D`.`overwrite_ip` LIKE ?
                                        OR `D`.`ip` = ? ";
                     $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", inet_pton($search)]);
+            } elseif (ctype_xdigit($mac_search = str_replace([':', '-', '.'], '', $search))) {
+                    $query .= " LEFT JOIN `ports` as `M` on `M`.`device_id` = `D`.`device_id`";
+                    $query_filter .= " OR `M`.`ifPhysAddress` LIKE ? ";
+                    $query_args_list[] = "%$mac_search%";
             }
 
             // result limitation

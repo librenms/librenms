@@ -15,7 +15,7 @@ class CreateDeviceRelationshipsTable extends Migration
     {
         Schema::create('device_relationships', function (Blueprint $table) {
             $table->unsignedInteger('parent_device_id')->default(0);
-            $table->unsignedInteger('child_device_id')->index('device_relationship_child_device_id_fk');
+            $table->unsignedInteger('child_device_id')->index();
             $table->primary(['parent_device_id','child_device_id']);
         });
     }
