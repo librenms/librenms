@@ -237,7 +237,7 @@
                     "sensor_class": "state",
                     "poller_type": "snmp",
                     "sensor_oid": ".1.3.6.1.4.1.2185.1.3.11.2.1.3.32.0",
-                    "sensor_index": "imPM1Power1Running1.{{ index }}",
+                    "sensor_index": "imPM1Power1Running1.0",
                     "sensor_type": "imPM1Power1Running1",
                     "sensor_descr": "Power State",
                     "group": null,
