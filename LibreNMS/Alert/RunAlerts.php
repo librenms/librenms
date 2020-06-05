@@ -554,7 +554,7 @@ class RunAlerts
         $prefix[3] = &$prefix[0];
         $prefix[4] = &$prefix[0];
 
-        if ($obj['state'] == AlerState::RECOVERED) {
+        if ($obj['state'] == AlertState::RECOVERED) {
             $severity = Alert::OK;
         } elseif ($obj['state'] == AlertState::ACTIVE) {
             $severity = Alert::SEVERITIES[$obj['severity']] ??  Alert::UNKNOWN;
