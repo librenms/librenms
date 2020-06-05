@@ -149,9 +149,13 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 });
 
 // installation routes
-Route::group(['middleware' => ['check-not-installed']], function () {
-    Route::get('/install', 'Install\InstallationController');
-    Route::any('/ajax/db-update', 'Ajax\DatabaseUpdateController');
+Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
+    Route::get('/', 'InstallationController')->name('install');
+    Route::get('/checks', 'ChecksController')->name('install.checks');
+    Route::get('/database', 'DatabaseController')->name('install.database');
+    Route::get('/user', 'MakeUserController')->name('install.user');
+    Route::get('/finish', 'FinalizeController')->name('install.finish');
+    Route::any('/migrate-database', 'DatabaseMigrationController')->name('install.migrate-database');
 });
 
 // Legacy routes

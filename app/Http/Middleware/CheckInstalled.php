@@ -26,6 +26,7 @@
 namespace App\Http\Middleware;
 
 use Closure;
+use Illuminate\Auth\Access\AuthorizationException;
 
 class CheckInstalled
 {
@@ -38,9 +39,14 @@ class CheckInstalled
      */
     public function handle($request, Closure $next)
     {
-        if (!file_exists(base_path('config.php')) && !$request->is(['install', 'ajax/db-update'])) {
+        $installed = file_exists(base_path('config.php'));
+        $is_install_route = $request->is('install*');
+
+        if (!$installed && !$is_install_route) {
             // no config.php does so let's redirect to the install
-            return redirect(url('/install'));
+            return redirect(route('install'));
+        } elseif ($installed && $is_install_route) {
+            throw new AuthorizationException('This should only be called during install');
         }
 
         return $next($request);
