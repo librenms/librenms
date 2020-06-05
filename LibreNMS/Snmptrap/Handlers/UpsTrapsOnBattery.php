@@ -41,8 +41,22 @@ class UpsTrapsOnBattery implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $remaining = $trap->getOidData($trap->findOid('UPS-MIB::upsEstimatedMinutesRemaining.0'));
-        $time  = $trap->getOidData($trap->findOid('UPS-MIB::upsSecondsOnBattery.0'));
-        Log::event("UPS running on battery for $time seconds. Estimated $remaining minutes remaining", $device->device_id, 'trap', 5);
+        $min_remaining = $trap->getOidData($trap->findOid('UPS-MIB::upsEstimatedMinutesRemaining.0'));
+        $sec_time  = $trap->getOidData($trap->findOid('UPS-MIB::upsSecondsOnBattery.0'));
+        Log::event("UPS running on battery for $sec_time seconds. Estimated $min_remaining minutes remaining", $trap->getDevice(), 'trap', 5);
+        $sensor_remaining = $device->sensors()->where('sensor_index', '200')->where('sensor_type', 'rfc1628')->first();
+        if(!$sensor_remaining){
+            Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);
+            return;
+        }
+        $sensor_remaining->sensor_current = $min_remaining;
+        $sensor_remaining->save();
+        $sensor_time = $device->sensors()->where('sensor_index', '100')->where('sensor_type', 'rfc1628')->first();
+        if(!$sensor_time){
+            Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
+            return;
+        }
+        $sensor_time->sensor_current = $sec_time;
+        $sensor_time->save();
     }
 }
