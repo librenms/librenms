@@ -13,7 +13,7 @@
     <script src="{{ asset('js/bootstrap-hover-dropdown.min.js') }}"></script>
     <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
 </head>
-<body style="background-color: #1b6d85">
+<body style="background-color: #047396">
 <div class="container">
     <div class="panel panel-default col-md-6 col-md-offset-3" style="box-shadow: 0 0 20px black;">
         <div class="panel-body">
@@ -30,13 +30,6 @@
                     <h4 class="text-center">@lang('install.stage', ['stage' => $stage ?? 0, 'stages' => $stages ?? 6])</h4>
                 </div>
             </div>
-            @if(!empty($msg))
-                <div class="row">
-                    <div class="col-xs-12">
-                        <div class="alert alert-danger">{{ $msg }}</div>
-                    </div>
-                </div>
-            @endif
             <div class="row">
                 <div class="col-xs-12">
                     <div id="install-progress" class="progress progress-striped">
@@ -47,6 +40,13 @@
                     </div>
                 </div>
             </div>
+            @if(!empty($msg))
+                <div class="row">
+                    <div class="col-xs-12">
+                        <div class="alert alert-danger">{{ $msg }}</div>
+                    </div>
+                </div>
+            @endif
             @yield('content')
         </div>
     </div>
