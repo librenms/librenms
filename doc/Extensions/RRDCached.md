@@ -92,7 +92,7 @@ JOURNAL_PATH=/var/lib/rrdcached/journal/
 PIDFILE=/run/rrdcached.pid
 SOCKFILE=/run/rrdcached.sock
 SOCKGROUP=librenms
-BASE_OPTIONS="-B -F -R"
+BASE_OPTIONS="-F -R"
 ```
 
 2: Fix permissions
