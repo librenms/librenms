@@ -25,10 +25,49 @@
 
 namespace App\Http\Controllers\Install;
 
+use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use LibreNMS\DB\Eloquent;
+
 class DatabaseController extends \App\Http\Controllers\Controller
 {
-    public function __invoke()
+    const KEYS = ['host', 'username', 'password', 'database', 'port', 'unix_socket'];
+
+    public function __invoke(Request $request)
     {
-        // TODO: Implement __invoke() method.
+        $data = Arr::only(session()->get('db') ?: [], self::KEYS);
+        $data['stage'] = 2;
+
+        return view('install.database', $data);
+    }
+
+    public function test(Request $request)
+    {
+        Eloquent::setConnection(
+            'setup',
+            $request->get('host', 'localhost'),
+            $request->get('username', 'librenms'),
+            $request->get('password', ''),
+            $request->get('database', 'librenms'),
+            $request->get('port', 3306),
+            $request->get('unix_socket')
+        );
+
+        session()->put('db', Arr::only(config('database.connections.setup', []), self::KEYS));
+
+        $ok = false;
+        $message = '';
+        try {
+            $ok = Eloquent::isConnected('setup');
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+        }
+
+        session(['install.database' => $ok]);
+
+        return response()->json([
+            'result' => $ok ? 'ok' : 'fail',
+            'message' => $message,
+        ]);
     }
 }

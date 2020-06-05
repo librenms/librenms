@@ -2,7 +2,6 @@
 return [
     'title' => 'LibreNMS Install',
     'install' => 'Install',
-    'welcome' => 'Welcome to the LibreNMS installer',
     'stage' => 'Stage :stage of :stages complete',
     'checks' => [
         'title' => 'Pre-Install Checks',
@@ -10,5 +9,15 @@ return [
         'item' => 'Item',
         'status' => 'Status',
         'comment' => 'Comment',
+    ],
+    'database' => [
+        'host' => 'Host',
+        'port' => 'Port',
+        'socket' => 'Unix-Socket',
+        'user' => 'User',
+        'password' => 'Password',
+        'name' => 'Name',
+        'socket_empty' => 'Leave empty if using Unix-Socket',
+        'ip_empty' => 'Leave empty if using Host',
     ]
 ];

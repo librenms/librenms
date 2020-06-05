@@ -33,9 +33,9 @@
             <div class="row">
                 <div class="col-xs-12">
                     <div id="install-progress" class="progress progress-striped">
-                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ !empty($stage) ? (($stages ?? 6) / $stage) : 0 }}"
-                             aria-valuemin="0" aria-valuemax="100" style="width: {{ !empty($stage) ? (($stages ?? 6) / $stage) : 0 }}%">
-                            <span class="sr-only">{{ !empty($stage) ? (($stages ?? 6) / $stage) : 0 }}% Complete</span>
+                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ ($stage ?? 0) / ($stages ?? 6) * 100 }}"
+                             aria-valuemin="0" aria-valuemax="100" style="width: {{ ($stage ?? 0) / ($stages ?? 6) * 100 }}%">
+                            <span class="sr-only">{{ ($stage ?? 0) / ($stages ?? 6) * 100 }}% Complete</span>
                         </div>
                     </div>
                 </div>
@@ -51,5 +51,6 @@
         </div>
     </div>
 </div>
+@yield('scripts')
 </body>
 </html>

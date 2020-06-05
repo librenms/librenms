@@ -150,12 +150,13 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
 // installation routes
 Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
-    Route::get('/', 'InstallationController')->name('install');
+    Route::redirect('/', '/install/checks')->name('install');
     Route::get('/checks', 'ChecksController')->name('install.checks');
     Route::get('/database', 'DatabaseController')->name('install.database');
     Route::get('/user', 'MakeUserController')->name('install.user');
     Route::get('/finish', 'FinalizeController')->name('install.finish');
-    Route::any('/migrate-database', 'DatabaseMigrationController')->name('install.migrate-database');
+    Route::post('/database/test', 'DatabaseController@test')->name('install.test-database');
+    Route::any('/database/migrate', 'DatabaseMigrationController')->name('install.migrate-database');
 });
 
 // Legacy routes
