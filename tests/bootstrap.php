@@ -48,7 +48,7 @@ if (getenv('SNMPSIM')) {
 
     // make PHP hold on a reference to $snmpsim so it doesn't get destructed
     register_shutdown_function(function (Snmpsim $ss) {
-        $ss->stop();
+        $ss->stop(6);
     }, $snmpsim);
 }
 
