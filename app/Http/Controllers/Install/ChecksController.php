@@ -29,6 +29,25 @@ class ChecksController extends \App\Http\Controllers\Controller
 {
     public function __invoke()
     {
-        return view('install.checks');
+        $checks = [
+            ['item' => 'test', 'status' => false, 'comment' => 'comment'],
+            $this->checkExtension('pdo_mysql'),
+            $this->checkExtension('mysqlnd'),
+            $this->checkExtension('gd'),
+        ];
+
+        return view('install.checks', ['stage' => 1, 'checks' => $checks]);
+    }
+
+    private function checkExtension($extension)
+    {
+        if (extension_loaded("$extension")) {
+            return ['item' => $extension, 'status' => true];
+        }
+
+        return [
+            'item' => $extension,
+            'status' => false
+        ];
     }
 }
