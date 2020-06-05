@@ -132,6 +132,11 @@ if (Auth::user()->hasGlobalAdmin()) {
         // fetch info about the node and then a list of versions for that node
         $node_info = json_decode(file_get_contents(Config::get('oxidized.url') . '/node/show/' . $oxidized_hostname . '?format=json'), true);
 
+        if (Config::get('oxidized.datetime_format') != "")
+        {
+            $node_info['last']['start']=date(Config::get('oxidized.datetime_format'),strtotime($node_info['last']['start'] . ' UTC'));
+            $node_info['last']['end']=date(Config::get('oxidized.datetime_format'),strtotime($node_info['last']['end'] . ' UTC'));
+        }
         // Try other hostname format if Oxidized request failed
         if (! $node_info) {
             // Adjust hostname based on whether domain was already in it or not
