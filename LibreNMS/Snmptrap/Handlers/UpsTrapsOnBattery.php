@@ -49,14 +49,21 @@ class UpsTrapsOnBattery implements SnmptrapHandler
             Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);
             return;
         }
-        $sensor_remaining->sensor_current = $min_remaining;
+        $sensor_remaining->sensor_current = $min_remaining / $sensor_remaining->sensor_divisor;
         $sensor_remaining->save();
         $sensor_time = $device->sensors()->where('sensor_index', '100')->where('sensor_type', 'rfc1628')->first();
         if(!$sensor_time){
             Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
             return;
         }
-        $sensor_time->sensor_current = $sec_time;
+        $sensor_time->sensor_current = $sec_time / $sensor_time->sensor_divisor;
         $sensor_time->save();
+        $sensor_output = $device->sensors()->where('sensor_type', 'upsOutputSourceState')->first();
+        if(!$sensor_output){
+            Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'upsOutputSourceState\' for device: " . $device->hostname);
+            return;
+        }
+        $sensor_output->sensor_current = 5;
+        $sensor_output->save();
     }
 }
