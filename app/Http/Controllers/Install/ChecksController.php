@@ -31,23 +31,19 @@ class ChecksController extends \App\Http\Controllers\Controller
     {
         $checks = [
             ['item' => 'test', 'status' => false, 'comment' => 'comment'],
-            $this->checkExtension('pdo_mysql'),
-            $this->checkExtension('mysqlnd'),
-            $this->checkExtension('gd'),
+            $this->checkPhpModule('pdo_mysql'),
+            $this->checkPhpModule('mysqlnd'),
+            $this->checkPhpModule('gd'),
         ];
 
         return view('install.checks', ['stage' => 1, 'checks' => $checks]);
     }
 
-    private function checkExtension($extension)
+    private function checkPhpModule($module)
     {
-        if (extension_loaded("$extension")) {
-            return ['item' => $extension, 'status' => true];
-        }
-
         return [
-            'item' => $extension,
-            'status' => false
+            'item' => trans('install.checks.php_module', ['module' => $module]),
+            'status' => extension_loaded("$module"),
         ];
     }
 }

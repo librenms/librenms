@@ -11,12 +11,12 @@
             <table class="table table-condensed table-bordered">
                 <tr>
                     <th class="col-xs-3">@lang('install.checks.item')</th>
-                    <th class="col-xs-2">@lang('install.checks.status')</th>
-                    <th class="col-xs-7">@lang('install.checks.comment')</th>
+                    <th class="col-xs-1">@lang('install.checks.status')</th>
+                    <th class="col-xs-8">@lang('install.checks.comment')</th>
                 </tr>
                 @foreach($checks as $check)
                 <tr class="{{ $check['status'] ? 'success' : 'danger' }}">
-                    <td>{{ $check['item'] }}</td>
+                    <td style="white-space: nowrap">{{ $check['item'] }}</td>
                     <td>@if($check['status'])
                             <i class="fa fa-check-circle alert-success"></i>
                         @else

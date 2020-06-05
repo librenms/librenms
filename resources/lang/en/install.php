@@ -6,6 +6,7 @@ return [
     'stage' => 'Stage :stage of :stages complete',
     'checks' => [
         'title' => 'Pre-Install Checks',
+        'php_module' => 'PHP Module: :module',
         'item' => 'Item',
         'status' => 'Status',
         'comment' => 'Comment',
