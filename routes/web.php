@@ -148,6 +148,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::permanentRedirect('demo', '/');
 });
 
+// installation routes
+Route::group(['middleware' => ['check-not-installed']], function () {
+    Route::get('/install', 'Install\InstallationController');
+    Route::any('/ajax/db-update', 'Ajax\DatabaseUpdateController');
+});
+
 // Legacy routes
 Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth');
 Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummy');

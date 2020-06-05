@@ -23,39 +23,27 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+$init_modules = ['web', 'nodb'];
+require \LibreNMS\Config::get('install_dir') . '/includes/init.php';
+var_dump(session()->all()); exit;
+
 if (file_exists(\LibreNMS\Config::get('install_dir') . '/config.php')) {
     echo("This should only be called during install");
     exit;
 }
-$init_modules = ['nodb'];
-require \LibreNMS\Config::get('install_dir') . '/includes/init.php';
 
 header("Content-type: text/plain");
 header('X-Accel-Buffering: no');
 
-$db_vars = array(
-    'dbhost' => 'host',
-    'dbuser' => 'username',
-    'dbpass' => 'password',
-    'dbname' => 'database',
-    'dbport' => 'port',
-    'dbsocket' => 'unix_socket',
+
+\LibreNMS\DB\Eloquent::setConnection(
+    'setup',
+    session('dbhost'),
+    session('dbuser'),
+    session('dbpass'),
+    session('dbname'),
+    session('dbport')
 );
-
-\Config::set('database.connections.setup', [
-    "driver" => "mysql",
-    "host" => $_SESSION['dbhost'] ?: 'localhost',
-    "port" => $_SESSION['dbhost'] ?: 3306,
-    "database" => $_SESSION['dbname'] ?: 'librenms',
-    "username" => $_SESSION['dbuser'] ?: 'librenms',
-    "password" => $_SESSION['dbpass'] ?: '',
-    "charset" => "utf8",
-    "collation" => "utf8_unicode_ci",
-    "prefix" => "",
-    "strict" => true,
-    "engine" => null
-]);
-
 
 echo "Starting Update...\n";
 try {
@@ -74,6 +62,3 @@ try {
     http_response_code(500);
 }
 
-ob_end_flush();
-flush();
-session_write_close();

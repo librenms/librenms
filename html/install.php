@@ -2,60 +2,55 @@
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
 
-session_start();
 $librenms_dir = realpath(__DIR__ . '/..');
+$init_modules = array('web', 'nodb');
+require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
-    $_POST = $_SESSION;
-} elseif (!file_exists("{$librenms_dir}/config.php")) {
-    $allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
-    foreach ($allowed_vars as $allowed) {
-        if (isset($_POST[$allowed])) {
-            $_SESSION[$allowed] = $_POST[$allowed];
-        }
+$allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
+foreach ($allowed_vars as $allowed) {
+    if (isset($_POST[$allowed])) {
+        session([$allowed => $_POST[$allowed]]);
+//            $_SESSION[$allowed] = $_POST[$allowed];
     }
 }
 
-$stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
+$stage = session('stage', 0);
+
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
-if (file_exists("{$librenms_dir}/config.php") && $stage != 6) {
-    unset($_SESSION['stage']);
-    header("Location: /");
-    exit;
-}
+//if (file_exists("{$librenms_dir}/config.php") && $stage != 6) {
+//    unset($_SESSION['stage']);
+//    header("Location: /");
+//    exit;
+//}
 
 // do not use the DB in init, we'll bring it up ourselves
-$init_modules = array('web', 'nodb');
-require realpath(__DIR__ . '/..') . '/includes/init.php';
+
 
 // List of php modules we expect to see
 $modules = array('gd','mysqlnd', 'pdo_mysql');
 
-$dbhost = @$_POST['dbhost'] ?: 'localhost';
-$dbuser = @$_POST['dbuser'] ?: 'librenms';
-$dbpass = @$_POST['dbpass'] ?: '';
-$dbname = @$_POST['dbname'] ?: 'librenms';
-$dbport = @$_POST['dbport'] ?: 3306;
-if (empty($_POST['dbsocket'])) {
-    $dbsocket = null;
-} else {
+$dbhost = session('dbhost', 'localhost');
+$dbuser = session('dbuser', 'librenms');
+$dbpass = session('dbpass', '');
+$dbname = session('dbname', 'librenms');
+$dbport = session('dbport', 3306);
+if ($dbsocket = session('dbsocket')) {
     $dbhost = 'localhost';
-    $dbsocket = $_POST['dbsocket'];
     $dbport = null;
 }
 
-$add_user = @$_POST['add_user'] ?: '';
-$add_pass = @$_POST['add_pass'] ?: '';
-$add_email = @$_POST['add_email'] ?: '';
+$add_user = session('add_user', '');
+$add_pass = session('add_pass', '');
+$add_email = session('add_email', '');
 
 
 // Check we can connect to MySQL DB, if not, back to stage 1 :)
 if ($stage > 1) {
     try {
         if ($stage != 6) {
-            dbConnect($dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket);
-            if (dbIsConnected() === false) {
+            \LibreNMS\DB\Eloquent::setConnection('setup', $dbhost, $dbuser, $dbpass, $dbname, $dbport, $dbsocket);
+            if (\LibreNMS\DB\Eloquent::isConnected('setup') === false) {
                 $msg = "We could not connect to your database, please check the details and try again";
                 $stage = 1;
             }
@@ -68,10 +63,8 @@ if ($stage > 1) {
         $stage = 1;
         $msg = "Couldn't connect to the database, please check your details<br /> " . $e->getMessage();
     }
-    $_SESSION['stage'] = $stage;
+    session(['stage' => $stage]);
 }
-
-session_write_close();
 
 if ($stage == 4) {
     // Now check we have a username, password and email before adding new user
@@ -87,17 +80,15 @@ if ($stage == 4) {
         $stage = 5;
     } else {
         // all done, remove all traces of the install session
-        session_unset();
-        session_destroy();
-        setcookie(session_name(), '', 0, '/');
-        session_regenerate_id(true);
+        session()->flush();
     }
 }
+session()->save();
 
 if (empty($stage)) {
     $stage = 0;
 }
-
+var_dump(cookie());
 $total_stages = 6;
 $stage_perc = $stage / $total_stages * 100;
 $complete = 1;
@@ -210,7 +201,7 @@ if ($stage == 0) {
         }
     }
     echo "</td></tr>";
-    
+
     if (is_writable(Config::get('temp_dir'))) {
         $status = 'yes';
         $row_class = 'success';
@@ -343,7 +334,9 @@ if ($stage == 0) {
     <script type="text/javascript">
         var output = document.getElementById("db-update");
         xhr = new XMLHttpRequest();
-        xhr.open("GET", "ajax_output.php?id=db-update", true);
+        xhr.open("GET", "ajax/db-update", true);
+        xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
+        xhr.withCredentials = true;
         xhr.onprogress = function (e) {
             output.innerHTML = e.currentTarget.responseText;
             output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area

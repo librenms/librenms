@@ -1,8 +1,8 @@
 <?php
 /**
- * CheckInstalled.php
+ * StreamedOutput.php
  *
- * Check if LibreNMS install has been completed (config.php exists) and redirect to install.php as needed.
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,30 +19,26 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 Tony Murray
+ * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Middleware;
+namespace App;
 
-use Closure;
+use RuntimeException;
+use Symfony\Component\Console\Output\StreamOutput;
 
-class CheckInstalled
+class StreamedOutput extends StreamOutput
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
-     */
-    public function handle($request, Closure $next)
+    protected function doWrite($message, $newline)
     {
-        if (!file_exists(base_path('config.php')) && !$request->is(['install', 'ajax/db-update'])) {
-            // no config.php does so let's redirect to the install
-            return redirect(url('/install'));
+        if (false === @fwrite($this->getStream(), $message) || ($newline && (false === @fwrite($this->getStream(), PHP_EOL)))) {
+            throw new RuntimeException('Unable to write output.');
         }
 
-        return $next($request);
+        echo $message;
+
+        ob_flush();
+        flush();
     }
 }
