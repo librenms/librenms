@@ -12,7 +12,7 @@
 */
 
 // Auth
-Auth::routes();
+Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // WebUI
 Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
