@@ -154,6 +154,7 @@ foreach ($cooling_unit as $index => $data) {
     }
 }
 
+$cooling_unit_analog = snmpwalk_cache_oid($device, 'coolingUnitStatusAnalogEntry', [], 'PowerNet-MIB');
 foreach ($cooling_unit_analog as $index => $data) {
     $cur_oid = '.1.3.6.1.4.1.318.1.1.27.1.4.1.2.1.3.' . $index;
     $descr = $data['coolingUnitStatusAnalogDescription'];
