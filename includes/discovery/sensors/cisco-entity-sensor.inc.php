@@ -117,7 +117,11 @@ if ($device['os_group'] == 'cisco') {
                     $multiplier = '1000000000';
                 }
 
-                if (is_numeric($entry['entSensorPrecision']) && $entry['entSensorPrecision'] > '0') {
+                if (is_numeric($entry['entSensorPrecision'])
+                        && $entry['entSensorPrecision'] > '0'
+                        // Workaround for a Cisco SNMP bug
+                        && $entry['entSensorPrecision'] != '1615384784'
+                ) {
                     $divisor = $divisor.str_pad('', $entry['entSensorPrecision'], '0');
                 }
 
