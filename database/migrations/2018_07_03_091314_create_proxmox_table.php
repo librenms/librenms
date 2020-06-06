@@ -19,8 +19,8 @@ class CreateProxmoxTable extends Migration
             $table->integer('vmid');
             $table->string('cluster');
             $table->string('description')->nullable();
-            $table->timestamp('last_seen')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->unique(['cluster','vmid'], 'cluster_vm');
+            $table->timestamp('last_seen')->useCurrent();
+            $table->unique(['cluster','vmid']);
         });
     }
 

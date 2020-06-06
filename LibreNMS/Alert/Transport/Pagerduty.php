@@ -27,6 +27,7 @@ namespace LibreNMS\Alert\Transport;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 use Log;
 use Validator;
@@ -37,9 +38,9 @@ class Pagerduty extends Transport
 
     public function deliverAlert($obj, $opts)
     {
-        if ($obj['state'] == 0) {
+        if ($obj['state'] == AlertState::RECOVERED) {
             $obj['event_type'] = 'resolve';
-        } elseif ($obj['state'] == 2) {
+        } elseif ($obj['state'] == AlertState::ACKNOWLEDGED) {
             $obj['event_type'] = 'acknowledge';
         } else {
             $obj['event_type'] = 'trigger';
@@ -60,6 +61,7 @@ class Pagerduty extends Transport
             'dedup_key'    => (string)$obj['alert_id'],
             'payload'    => [
                 'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
+                'device_groups'   => \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
                 'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
@@ -103,6 +105,11 @@ class Pagerduty extends Transport
                     'title' => 'Service',
                     'type'  => 'hidden',
                     'name'  => 'service_name',
+                ],
+                [
+                    'title' => 'Integration Key',
+                    'type'  => 'text',
+                    'name'  => 'service_key',
                 ]
             ],
             'validation' => []

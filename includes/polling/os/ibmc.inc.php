@@ -6,7 +6,7 @@ $oids = array (
     'serial' => 'deviceSerialNo.0'
 );
 
-$data = snmp_get_multi_oid($device, $oids, '-OUQs', 'HUAWEI-SERVER-IBMC-MIB');
+$data = snmp_get_multi_oid($device, $oids, '-OUQbs', 'HUAWEI-SERVER-IBMC-MIB');
 
 foreach ($oids as $var => $oid) {
     $$var = $data[$oid];

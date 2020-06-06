@@ -1,0 +1,704 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-IP-INTERFACE-MIB.my
+ --
+ --
+
+ CIENA-CES-IP-INTERFACE-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS       
+   Integer32, IpAddress, Unsigned32, NOTIFICATION-TYPE, OBJECT-TYPE, MODULE-IDENTITY        
+       FROM SNMPv2-SMI        
+   DisplayString, TruthValue
+       FROM SNMPv2-TC 
+   InetAddress, InetAddressPrefixLength, InetAddressType  
+        FROM INET-ADDRESS-MIB 
+   cienaGlobalSeverity, cienaGlobalMacAddress 
+                FROM CIENA-GLOBAL-MIB                    
+   cienaCesNotifications, cienaCesConfig
+       FROM CIENA-SMI
+   CienaGlobalState
+       FROM CIENA-TC;
+   
+    
+ cienaCesIpInterfaceMIB MODULE-IDENTITY
+              LAST-UPDATED "201812110000Z"
+              ORGANIZATION "Ciena Corp."
+              CONTACT-INFO
+              "   Mib Meister
+                  7035 Ridge Road
+                  Hanover, Maryland 21076
+                  USA
+                  Phone:  +1 800 921 1144
+                  Email:  support@ciena.com"
+              DESCRIPTION
+                       "This module defines the IP interface related notifications."
+              REVISION   
+                       "201812110000Z"
+              DESCRIPTION 
+                       " Added new cienaCesIpInterfaceUpNotification and cienaCesIpInterfaceDownNotification Notifications for IP interface link up/down."
+                                                                       
+              REVISION 
+                       "201706070000Z"
+              DESCRIPTION
+                       "Updated contact info."
+              REVISION
+                       "201611170000Z"
+              DESCRIPTION
+                       "Added new objects cienaCesIpMgmtInterfaceType, cienaCesIpMgmtInterfaceParentInterfaceIndex 
+                        cienaCesIpMgmtInterfaceVirtualSwitchIndex to cienaCesIpMgmtInterfaceEntry."
+	      REVISION
+                       "201608050000Z"
+              DESCRIPTION
+                       "Added cienaCesIpDataInterfaceInetTable for Ip-interface ip addresses." 
+              REVISION
+                       "201507290000Z"
+              DESCRIPTION
+                       "Added new object cienaCesIpDataInterfaceRole in CienaCesIpDataInterfaceEntry."            
+              REVISION
+                       "201506290000Z"
+              DESCRIPTION
+                       "Added new object cienaCesIpDataInterfaceStaticArpDestinationIp and 
+                        cienaCesIpDataInterfaceStaticArpDestinationMac to cienaCesIpDataInterfaceEntry."
+              REVISION    
+                       "201506260000Z"			
+              DESCRIPTION
+                       "Added new object cienaCesIpDataInterfaceIfNum in CienaCesIpDataInterfaceEntry."            
+              REVISION
+                       "201506250000Z"
+              DESCRIPTION
+                       "Added a new object cienaCesIpInterfaceL3InterfaceBaseMac to display the
+                        base MAC address for L3 interfaces."
+              REVISION
+                       "201404030000Z"
+              DESCRIPTION
+                       "Added a new object cienaCesIpMgmtInterfaceOperState."
+              REVISION
+                       "201404160000Z"
+              DESCRIPTION
+                       "Added cienaCesIpDataInterfaceTable for Data Interfaces." 
+              REVISION
+                       "201210170000Z"
+              DESCRIPTION
+                       "Changed cienaCesIpGatewayAddr from accessible-for-notify to read-only."  
+              REVISION
+                       "201107010000Z"
+              DESCRIPTION
+                       "Added a new object cienaCesIpMgmtInterfaceAdminState."  
+              REVISION
+                       "201103010000Z"
+              DESCRIPTION
+                       "Initial creation."  
+       ::= { cienaCesConfig 8 }
+
+ --
+ -- Node definitions
+ --
+   
+ cienaCesIpInterfaceMIBObjects OBJECT IDENTIFIER ::= { cienaCesIpInterfaceMIB 1 }
+ 
+ 
+ --
+ -- IP INterface Node
+ --
+ cienaCesIpInterface OBJECT IDENTIFIER ::= { cienaCesIpInterfaceMIBObjects 1 }
+      
+
+ -- Notifications 
+  
+ cienaCesIpInterfaceMIBNotificationPrefix  OBJECT IDENTIFIER ::= { cienaCesNotifications 8 } 
+ cienaCesIpInterfaceMIBNotifications       OBJECT IDENTIFIER ::=  
+                       { cienaCesIpInterfaceMIBNotificationPrefix 0 }
+
+ -- Conformance information 
+ 
+ cienaCesIpInterfaceMIBConformance OBJECT IDENTIFIER ::= { cienaCesIpInterfaceMIB 3 } 
+ cienaCesIpInterfaceMIBCompliances OBJECT IDENTIFIER ::= { cienaCesIpInterfaceMIBConformance 1 }     
+ cienaCesIpInterfaceMIBGroups      OBJECT IDENTIFIER ::= { cienaCesIpInterfaceMIBConformance 2 }
+
+ --
+ -- Management Interface MIB definitions 
+ --      
+ cienaCesIpMgmtInterfaceTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesIpMgmtInterfaceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+        "Table of management IP addresses and their associated attributes."
+     ::= { cienaCesIpInterface 1 }
+      
+ cienaCesIpMgmtInterfaceEntry OBJECT-TYPE
+     SYNTAX     CienaCesIpMgmtInterfaceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+        "Each entry represents a management interface configuration parameter."
+     INDEX { cienaCesIpMgmtInterfaceIndex }
+       ::= { cienaCesIpMgmtInterfaceTable 1 }
+      
+ CienaCesIpMgmtInterfaceEntry ::=  SEQUENCE { 
+      cienaCesIpMgmtInterfaceIndex                 Integer32,
+      cienaCesIpMgmtInterfaceName                  DisplayString,
+      cienaCesIpMgmtInterfaceOperIpAddr            IpAddress,
+      cienaCesIpMgmtInterfaceOperSubnet            IpAddress,
+      cienaCesIpMgmtInterfaceAdminState            INTEGER,
+      cienaCesIpMgmtInterfaceOperState             INTEGER,
+      cienaCesIpMgmtInterfaceType                  INTEGER,
+      cienaCesIpMgmtInterfaceVirtualSwitchIndex    Integer32,
+      cienaCesIpMgmtInterfaceParentInterfaceIndex  Integer32
+ }
+
+ cienaCesIpMgmtInterfaceIndex OBJECT-TYPE
+    SYNTAX Integer32 (1..4096)
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION
+       "Unique identifier of this interface."
+    ::= { cienaCesIpMgmtInterfaceEntry 1 }
+             
+ cienaCesIpMgmtInterfaceName OBJECT-TYPE
+    SYNTAX       DisplayString (SIZE (0..15))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+       "The friendly and unique name for the IP interface."
+    ::= { cienaCesIpMgmtInterfaceEntry 2 }
+
+ cienaCesIpMgmtInterfaceOperIpAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+        "The operational IP address associated with this interface."
+     ::= { cienaCesIpMgmtInterfaceEntry 3 }
+       
+ cienaCesIpMgmtInterfaceOperSubnet OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+        "The operational subnet mask associated with this IP address/interface."
+     ::= { cienaCesIpMgmtInterfaceEntry 4 }
+ 
+  cienaCesIpMgmtInterfaceAdminState OBJECT-TYPE
+     SYNTAX       INTEGER{
+                                enabled(1),
+                                disabled(2),
+                                shutdown(3)
+                                }
+                                
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+        "The admin status of each interface. A value of: 
+        - enabled(1) indicates that this interface is administratively enabled 
+        - disabled(2) indicates that this interface is administratively disabled
+        - shutdown(3) indicates a shutdown state of DCN interface"
+     ::= { cienaCesIpMgmtInterfaceEntry 5 }
+
+  cienaCesIpMgmtInterfaceOperState OBJECT-TYPE
+     SYNTAX       INTEGER{
+                                enabled(1),
+                                disabled(2)
+                                }
+                                
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+        "The operational status of each interface. A value of: 
+        - enabled(1) indicates that this interface is operationally enabled 
+        - disabled(2) indicates that this interface is operationally disabled"
+     ::= { cienaCesIpMgmtInterfaceEntry 6 }
+
+  cienaCesIpMgmtInterfaceType OBJECT-TYPE
+     SYNTAX       INTEGER{
+                                unknown(1),
+                                ppp(2),
+                                loop(3),
+                                ether(4),
+                                cpuVsMember(5),
+                                remoteMgmt(6),
+                                direct(7),
+                                directPartner(8),
+                                active(9),
+                                directSecondary(10),
+                                directPartnerSecondary(11),
+                                es1(12),
+                                es2(13),
+                                unnumbered(14)
+                                }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+        "The type of management IP interface."
+     ::= { cienaCesIpMgmtInterfaceEntry 7 }
+
+  cienaCesIpMgmtInterfaceVirtualSwitchIndex OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The virtual switch index associated with this interface (zero if none)."
+     ::= { cienaCesIpMgmtInterfaceEntry 8 }
+
+  cienaCesIpMgmtInterfaceParentInterfaceIndex OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+         "The parent interface index associated with this interface (zero if none)."
+     ::= { cienaCesIpMgmtInterfaceEntry 9 }
+
+ --  
+ -- Gateway address
+ --
+       
+ cienaCesIpGatewayAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+        "The gateway address."
+     ::= { cienaCesIpInterface 2 }
+       
+--
+ cienaCesIpMgmtInterfaceAddrChgNotification NOTIFICATION-TYPE
+   OBJECTS  {  cienaGlobalSeverity, 
+                           cienaGlobalMacAddress,
+               cienaCesIpMgmtInterfaceName,
+               cienaCesIpMgmtInterfaceOperIpAddr,
+               cienaCesIpMgmtInterfaceOperSubnet
+               }
+   STATUS   current
+   DESCRIPTION
+      "A cienaCesIpMgmtInterfaceAddrChgNotification is sent when the 
+      IP address of an interface changes. To enable the device to send
+      this notification, cienaCesIPMgmtInterfaceAddrChangeTrapState 
+      needs to be set to enabled. The cienaCesIPMgmtInterfaceAddrChangeTrapState
+      is set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+      cienaGlobalMacAddress, cienaCesIpMgmtInterfaceName, 
+      cienaCesIpMgmtInterfaceOperIpAddr, and cienaCesIpMgmtInterfaceOperSubnet."
+   ::= { cienaCesIpInterfaceMIBNotifications 1 }
+ 
+ cienaCesIpMgmtInterfaceGatewayChgNotification NOTIFICATION-TYPE
+   OBJECTS  {  cienaGlobalSeverity, 
+                           cienaGlobalMacAddress,
+               cienaCesIpGatewayAddr
+               }
+   STATUS   current
+   DESCRIPTION
+      "A cienaCesIpMgmtInterfaceGatewayChgNotification is sent when the 
+      IP address of an interface gateway changes. To enable the device to send 
+      this notification, cienaCesIPMgmtInterfaceGatewayAddrChangeTrapState needs 
+      to be set to enabled. The cienaCesIPMgmtInterfaceGatewayAddrChangeTrapState
+      is set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+      cienaGlobalMacAddress, and cienaCesIpGatewayAddr."
+   ::= { cienaCesIpInterfaceMIBNotifications 2 }
+
+ --
+ -- Data Interface MIB definitions
+ --
+ cienaCesIpDataInterfaceTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesIpDataInterfaceEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Data Interface entry."
+     ::= { cienaCesIpInterface 3 }
+
+ cienaCesIpDataInterfaceEntry OBJECT-TYPE
+     SYNTAX     CienaCesIpDataInterfaceEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+             "Each entry represents a data interface configuration parameter."
+     INDEX { cienaCesIpDataInterfaceIndex }
+            ::= { cienaCesIpDataInterfaceTable 1 }
+
+ CienaCesIpDataInterfaceEntry ::=  SEQUENCE {
+      cienaCesIpDataInterfaceIndex                   Integer32,
+      cienaCesIpDataInterfaceName                    DisplayString,
+      cienaCesIpDataInterfaceIpAddr                  IpAddress,
+      cienaCesIpDataInterfaceMask                    IpAddress,
+      cienaCesIpDataInterfaceVsIndex                 Integer32,
+      cienaCesIpDataInterfaceType                    INTEGER,
+      cienaCesIpDataInterfaceIfIndex                 Integer32,
+      cienaCesIpDataInterfaceMac                     MacAddress,
+      cienaCesIpDataInterfaceIfMtu                   Integer32,
+      cienaCesIpDataInterfaceAdminState              CienaGlobalState,
+      cienaCesIpDataInterfaceOperState               CienaGlobalState,
+      cienaCesIpDataInterfaceIpForwarding            TruthValue,
+      cienaCesIpDataInterfaceLdpEnable               TruthValue,
+      cienaCesIpDataInterfaceRsvpEnable              TruthValue,
+      cienaCesIpDataInterfaceTunnelDependency        TruthValue,
+      cienaCesIpDataInterfaceL2VpnDependency         TruthValue,
+      cienaCesIpDataInterfaceOspfEnable              TruthValue,
+      cienaCesIpDataInterfaceIsisEnable              TruthValue,
+      cienaCesIpDataInterfaceStaticArpEnable         TruthValue,
+      cienaCesIpDataInterfaceVccvDependency          TruthValue,
+      cienaCesIpDataInterfacePtpEnable               TruthValue,
+      cienaCesIpDataInterfaceIfNum                   Unsigned32,
+      cienaCesIpDataInterfaceStaticArpDestinationIp  IpAddress,
+      cienaCesIpDataInterfaceStaticArpDestinationMac MacAddress,
+      cienaCesIpDataInterfaceRole 	             INTEGER
+ }
+ cienaCesIpDataInterfaceIndex OBJECT-TYPE
+      SYNTAX      Integer32 
+      MAX-ACCESS  not-accessible 
+      STATUS      current
+      DESCRIPTION
+              "Unique index into the table."
+      ::= { cienaCesIpDataInterfaceEntry 1 }
+
+ cienaCesIpDataInterfaceName OBJECT-TYPE
+     SYNTAX       DisplayString (SIZE (0..15))
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "The name for this Data IP interface."
+     ::= { cienaCesIpDataInterfaceEntry 2 }
+
+ cienaCesIpDataInterfaceIpAddr OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "IP address associated with this interface. 
+
+	      Deprecated in lieu of cienaCesIpDataInterfaceInetAddr."
+     ::= { cienaCesIpDataInterfaceEntry 3 }
+
+ cienaCesIpDataInterfaceMask OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       deprecated
+     DESCRIPTION
+             "The subnet mask associated with this ip address/interface.
+
+	      Deprecated in lieu of cienaCesIpDataInterfaceInetAddrPrefixLength."
+     ::= { cienaCesIpDataInterfaceEntry 4 }
+
+ cienaCesIpDataInterfaceVsIndex  OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The vIndex associated with this Data IP interface." 
+    ::= { cienaCesIpDataInterfaceEntry 5 }
+
+ cienaCesIpDataInterfaceType OBJECT-TYPE
+     SYNTAX        INTEGER {
+                        broadcast(1),
+                        pointToPoint(2),
+                        loopBack(3),
+                        cpuVsMember(4)
+                   }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The type of Data IP interface."
+     DEFVAL      { broadcast }
+     ::= { cienaCesIpDataInterfaceEntry 6 }
+
+ cienaCesIpDataInterfaceIfIndex OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   read-only 
+     STATUS       current
+     DESCRIPTION
+             "The unique interface index assigned by INET."
+     ::= { cienaCesIpDataInterfaceEntry 7 }
+
+ cienaCesIpDataInterfaceMac OBJECT-TYPE
+     SYNTAX       MacAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+             "MAC address assigned by the device to this Data interface."
+     ::= { cienaCesIpDataInterfaceEntry 8 }
+
+
+ cienaCesIpDataInterfaceIfMtu OBJECT-TYPE
+     SYNTAX      Integer32
+     MAX-ACCESS  read-only
+     STATUS      current
+     DESCRIPTION
+             "The size of the largest packet which can be
+             sent/received on the interface, specified in octets.
+             For interfaces that are used for transmitting network
+             datagrams, this is the size of the largest network
+             datagram that can be sent on the interface."
+     DEFVAL      { 1500 }
+       ::= { cienaCesIpDataInterfaceEntry 9 }
+
+ cienaCesIpDataInterfaceAdminState OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The Admin State of Data IP interface."
+     ::= { cienaCesIpDataInterfaceEntry 10 }
+
+cienaCesIpDataInterfaceOperState OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The Oper State of Data IP interface."
+     DEFVAL      { 1 }
+     ::= { cienaCesIpDataInterfaceEntry 11 }
+
+ cienaCesIpDataInterfaceIpForwarding OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The Ip Forwarding State of Data IP interface."
+     DEFVAL      { 1 }
+     ::= { cienaCesIpDataInterfaceEntry 12 }
+
+ cienaCesIpDataInterfaceLdpEnable OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "Determines if LDP is enabled on the  Data IP interface."
+     ::= { cienaCesIpDataInterfaceEntry 13 }
+
+ cienaCesIpDataInterfaceRsvpEnable OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "Determines if RSVP is enabled on the  Data IP interface."
+     ::= { cienaCesIpDataInterfaceEntry 14 }
+
+ cienaCesIpDataInterfaceTunnelDependency OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "Determines if Tunnel entities using the interface."
+     ::= { cienaCesIpDataInterfaceEntry 15 }
+
+cienaCesIpDataInterfaceL2VpnDependency OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The L2Vpn association of the interface."
+     ::= { cienaCesIpDataInterfaceEntry 16 }
+
+ cienaCesIpDataInterfaceOspfEnable OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The OSPF attachment to the Data interface."
+     ::= { cienaCesIpDataInterfaceEntry 17 }
+
+ cienaCesIpDataInterfaceIsisEnable OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The ISIS attachment to the Data interface."
+     ::= { cienaCesIpDataInterfaceEntry 18 }
+
+ cienaCesIpDataInterfaceStaticArpEnable OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The Static ARP attachment to the Data interface."
+     ::= { cienaCesIpDataInterfaceEntry 19 }
+
+ cienaCesIpDataInterfaceVccvDependency OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The VCCV Profile association to the Data interface."
+     ::= { cienaCesIpDataInterfaceEntry 20 }
+
+ cienaCesIpDataInterfacePtpEnable OBJECT-TYPE
+     SYNTAX       TruthValue
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The PTP attachment to the Data interface."
+     ::= { cienaCesIpDataInterfaceEntry 21 }
+     
+ cienaCesIpDataInterfaceIfNum OBJECT-TYPE
+     SYNTAX       Unsigned32
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "This represent interface number."
+     ::= { cienaCesIpDataInterfaceEntry 22 }     
+
+ cienaCesIpDataInterfaceStaticArpDestinationIp OBJECT-TYPE
+     SYNTAX       IpAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The static ARP attachment destination IP address to the data interface.
+                 IpAddress value returned is only valid if cienaCesIpDataInterfaceStaticArpEnable
+                 is true."
+     ::= { cienaCesIpDataInterfaceEntry 23 }
+
+ cienaCesIpDataInterfaceStaticArpDestinationMac OBJECT-TYPE
+     SYNTAX       MacAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The static ARP attachment destination MAC address to the data interface.
+                 MacAddress value returned is only valid if cienaCesIpDataInterfaceStaticArpEnable
+                 is true."
+     ::= { cienaCesIpDataInterfaceEntry 24 }
+
+ cienaCesIpDataInterfaceRole OBJECT-TYPE
+     SYNTAX       INTEGER {
+                        controlplane(1),
+                        connectivity(2),
+                        benchmark(3)
+                   }
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The Role State of the IP Interface. The default role is control-plane, which is the regular 
+		MPLS L3 interface. When role is specified as connectivity, it is used for EVC Ping feature.
+		When role is specified as benchmark it is used for RFC 2544 Benchmark feature."
+     ::= { cienaCesIpDataInterfaceEntry 25 } 
+
+--
+-- IP Interface Traps
+--           
+ cienaCesIpInterfaceUpNotification  NOTIFICATION-TYPE
+     OBJECTS    {  cienaGlobalSeverity,  
+                   cienaGlobalMacAddress,
+                   cienaCesIpDataInterfaceName,
+                   cienaCesIpDataInterfaceIfIndex,
+                   cienaCesIpDataInterfaceAdminState,
+                   cienaCesIpDataInterfaceOperState
+                }
+     STATUS     current
+     DESCRIPTION  
+                "A cienaCesIpInterfaceUpNotification trap signifies that the SNMP entity, acting in
+                 an agent role, has detected the interface's status has become operationally up.
+                 This object is set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+                 cienaGlobalMacAddress, cienaCesIpDataInterfaceName, cienaCesIpDataInterfaceIfIndex,
+                 cienaCesIpDataInterfaceAdminState, cienaCesIpDataInterfaceOperState."
+     ::= { cienaCesIpInterfaceMIBNotifications 3 } 
+
+ cienaCesIpInterfaceDownNotification  NOTIFICATION-TYPE
+     OBJECTS   {  cienaGlobalSeverity,  
+                  cienaGlobalMacAddress,
+                  cienaCesIpDataInterfaceName,
+                  cienaCesIpDataInterfaceIfIndex,
+                  cienaCesIpDataInterfaceAdminState,
+                  cienaCesIpDataInterfaceOperState
+               }
+     STATUS     current
+     DESCRIPTION  
+                "A cienaCesIpInterfaceDownNotification trap signifies that the SNMP entity, acting in
+                 an agent role, has detected the interface's status has become operationally up.
+                 This object is set to enabled by default. Variable bindings include: cienaGlobalSeverity, 
+                 cienaGlobalMacAddress, cienaCesIpDataInterfaceName, cienaCesIpDataInterfaceIfIndex,
+                 cienaCesIpDataInterfaceAdminState, cienaCesIpDataInterfaceOperState."
+     ::= { cienaCesIpInterfaceMIBNotifications 4} 
+
+--
+-- L3 Interface Base MAC
+--
+ cienaCesIpInterfaceL3InterfaceBaseMac OBJECT-TYPE
+     SYNTAX       MacAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "The base MAC address for L3 interfaces."
+     ::= { cienaCesIpInterface 4 }
+
+--
+-- Inet Ip-Interface MIB definitions 
+--      
+ cienaCesIpDataInterfaceInetTable OBJECT-TYPE
+     SYNTAX SEQUENCE OF CienaCesIpDataInterfaceInetEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+                "Table of ip-interface IP addresses and their associated attributes."
+     ::= { cienaCesIpInterface 5 }
+      
+ cienaCesIpDataInterfaceInetEntry OBJECT-TYPE
+     SYNTAX       CienaCesIpDataInterfaceInetEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+                "Each entry represents an ip-interface configuration parameter."
+     INDEX { cienaCesIpDataInterfaceIndex,
+             cienaCesIpDataInterfaceInetIndexAddrType,
+             cienaCesIpDataInterfaceInetIndexAddr }
+       ::= { cienaCesIpDataInterfaceInetTable 1 }
+      
+ CienaCesIpDataInterfaceInetEntry ::=  SEQUENCE { 
+      cienaCesIpDataInterfaceInetIndexAddrType       InetAddressType,
+      cienaCesIpDataInterfaceInetIndexAddr           InetAddress,    
+      cienaCesIpDataInterfaceInetAddrPrefixLength    InetAddressPrefixLength,
+      cienaCesIpDataInterfaceInetAddrType            InetAddressType,
+      cienaCesIpDataInterfaceInetAddr                InetAddress
+ }
+
+  cienaCesIpDataInterfaceInetIndexAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+                "This OID specifies the Inet address type of the OIDs cienaCesIpDataInterfaceInetIndexAddr.
+                When representing:
+                ipv4 : cienaCesIpDataInterfaceInetAddr should be compliant with InetAddressIPv4 from RFC 4001
+                ipv6 : cienaCesIpDataInterfaceInetAddr should be compliant with InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesIpDataInterfaceInetEntry 1 } 
+
+  cienaCesIpDataInterfaceInetIndexAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+                "Inet address associated with this interface. 
+                This OID should be used in conjuction with cienaCesIpDataInterfaceInetIndexAddrType. 
+                This value should be compliant with RFC 4001 InetAddressType."
+     ::= { cienaCesIpDataInterfaceInetEntry 2 }
+
+  cienaCesIpDataInterfaceInetAddrPrefixLength OBJECT-TYPE
+     SYNTAX       InetAddressPrefixLength
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "Specifies the address prefix length. This OID should be used in conjuction 
+                with cienaCesIpDataInterfaceInetAddrType. 
+                This OID should be compliant with RFC 4001 InetAddressPrefixLength."
+     ::= { cienaCesIpDataInterfaceInetEntry 3 }
+
+  cienaCesIpDataInterfaceInetAddrType OBJECT-TYPE
+     SYNTAX       InetAddressType
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "This OID specifies the Inet address type of the OIDs cienaCesIpDataInterfaceInetAddr and 
+                cienaCesIpDataInterfaceInetAddrPrefixLength.
+                When representing:
+                ipv4 : cienaCesIpDataInterfaceInetNotifAddr should be compliant with InetAddressIPv4 from RFC 4001
+                ipv6 : cienaCesIpDataInterfaceInetNotifAddr should be compliant with InetAddressIPv6 from RFC 4001"
+     ::= { cienaCesIpDataInterfaceInetEntry 4 } 
+
+  cienaCesIpDataInterfaceInetAddr OBJECT-TYPE
+     SYNTAX       InetAddress
+     MAX-ACCESS   read-only
+     STATUS       current
+     DESCRIPTION
+                "Inet address associated with this interface. 
+                This OID should be used in conjuction with cienaCesIpDataInterfaceInetAddrType. 
+                This value should be compliant with RFC 4001 InetAddressType."
+     ::= { cienaCesIpDataInterfaceInetEntry 5 }
+
+ END

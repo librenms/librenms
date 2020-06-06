@@ -16,7 +16,7 @@ yum install epel-release
 ```
 
 ```
-yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip
+yum install git cronie fping jwhois ImageMagick mtr MySQL-python net-snmp net-snmp-utils nmap python-memcached rrdtool policycoreutils-python httpd mariadb mariadb-server unzip python3 python3-pip
 ```
 
 ### Install PHP
@@ -39,17 +39,6 @@ Install the required packages
 ```
 yum install mod_php php-cli php-common php-curl php-gd php-mbstring php-process php-snmp php-xml php-zip php-memcached php-mysqlnd
 ```
-
-#### Running with Webtatic PHP
-
-```
-rpm -Uvh https://mirror.webtatic.com/yum/el7/webtatic-release.rpm
-```
-
-```
-yum install php72w php72w-cli php72w-common php72w-curl php72w-gd php72w-mbstring php72w-mysqlnd php72w-process php72w-snmp php72w-xml php72w-zip
-```
-
 
 #### Running with CentOS SCL php
 
@@ -104,7 +93,7 @@ exit
 ## Configure MySQL
 
 ```
-systemctl start mariadb
+systemctl enable --now mariadb
 mysql -u root
 ```
 
@@ -130,7 +119,6 @@ lower_case_table_names=0
 ```
 
 ```
-systemctl enable mariadb
 systemctl restart mariadb
 ```
 
@@ -189,8 +177,7 @@ Add the following config, edit `ServerName` as required:
 > should be :)) then you will need to disable the default site. `rm -f /etc/httpd/conf.d/welcome.conf`
 
 ```
-systemctl enable httpd
-systemctl restart httpd
+systemctl enable --now httpd
 ```
 
 # SELinux

@@ -14,7 +14,7 @@ path: blob/master/doc/
 apt install software-properties-common
 add-apt-repository universe
 apt update
-apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
+apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois unzip python3-pip
 ```
 
 # Add librenms user
@@ -44,6 +44,7 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 
 ```bash
 su - librenms
+cd /opt/librenms
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
@@ -90,6 +91,7 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
 See <http://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
+Please remember to set the system timezone as well.
 
 ```bash
 vi /etc/php/7.2/fpm/php.ini
@@ -98,7 +100,11 @@ vi /etc/php/7.2/cli/php.ini
 
 ```bash
 systemctl restart php7.2-fpm
+´´´
+
 ```
+timedatectl set-timezone Etc/UTC
+´´´
 
 ## Configure NGINX
 

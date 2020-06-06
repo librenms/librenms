@@ -23,6 +23,7 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Mattermost extends Transport

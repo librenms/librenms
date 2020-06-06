@@ -7,6 +7,7 @@
  | If there is something you need to change, but is not available as an environment setting,
  | request an environment variable to be created upstream or send a pull request.
  */
+
 return [
 
     /*
@@ -87,6 +88,7 @@ return [
     */
 
     'failed' => [
+        'driver' => env('QUEUE_FAILED_DRIVER', 'database'),
         'database' => env('DB_CONNECTION', 'mysql'),
         'table' => 'failed_jobs',
     ],

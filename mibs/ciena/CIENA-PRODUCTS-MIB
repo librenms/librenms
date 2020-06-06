@@ -1,0 +1,75 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-PRODUCTS-MIB.my
+ --
+ --
+
+ CIENA-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 
+   MODULE-IDENTITY			
+	FROM SNMPv2-SMI			
+   cienaProducts, cienaCommon			
+	FROM CIENA-SMI;
+	
+	
+ cienaProductsMIB MODULE-IDENTITY
+		LAST-UPDATED "201706070000Z"
+		ORGANIZATION "Ciena Corp."
+		CONTACT-INFO
+		"   Mib Meister
+		    7035 Ridge Road
+		    Hanover, Maryland 21076
+		    USA
+		    Phone:  +1 800 921 1144
+		    Email:  support@ciena.com"
+		DESCRIPTION
+		       "Initial creation. This module defines the object identifiers that are
+		       assigned to Ciena products and platforms.  It is these
+		       OID values that are returned in sysObjectID."
+
+		REVISION "201706070000Z"
+		DESCRIPTION
+		"Updated contact info."
+
+		REVISION "201401210000Z"
+		DESCRIPTION
+		"Added new Object Identifiers for the PN 8700 series product line."
+
+		REVISION "201303050000Z"
+		DESCRIPTION
+		"Added new Object Identifiers for the PN 8500 series product line."
+
+		REVISION "201003280000Z"
+		DESCRIPTION
+		"Initial creation."
+	      ::= { cienaCommon 1 }
+		
+	
+ --
+ -- Node definitions
+ --
+
+ cn5410 OBJECT IDENTIFIER     ::= { cienaProducts 1 }	
+
+ cn5430 OBJECT IDENTIFIER     ::= { cienaProducts 2 }
+
+ ome6500 OBJECT IDENTIFIER    ::= { cienaProducts 3 }
+
+ pn8500-10 OBJECT IDENTIFIER  ::= { cienaProducts 4 }
+
+ pn8500-30 OBJECT IDENTIFIER  ::= { cienaProducts 5 }
+
+ pn8700-2 OBJECT IDENTIFIER   ::= { cienaProducts 6 }
+
+ pn8700-4 OBJECT IDENTIFIER   ::= { cienaProducts 7 }
+
+ pn8700-10 OBJECT IDENTIFIER  ::= { cienaProducts 8 }
+
+ pn8700-20 OBJECT IDENTIFIER  ::= { cienaProducts 9 }
+
+END
+
+--
+-- CIENA-PRODUCTS-MIB.my
+--

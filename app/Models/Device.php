@@ -7,15 +7,14 @@ use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
-use LibreNMS\DB\Schema;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\Url;
+use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 use Permissions;
 
 class Device extends BaseModel
@@ -24,80 +23,11 @@ class Device extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
+    protected $fillable = ['hostname', 'ip', 'status', 'status_reason', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'version', 'features', 'serial', 'icon'];
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
     ];
-
-    /**
-     * Initialize this class
-     */
-    public static function boot()
-    {
-        parent::boot();
-        if (Schema::isCurrent()) {
-            self::loadAllOs(true);
-        }
-
-        static::deleting(function (Device $device) {
-            // delete related data
-            $device->ports()->delete();
-            $device->syslogs()->delete();
-            $device->eventlogs()->delete();
-            $device->applications()->delete();
-
-            // handle device dependency updates
-            $device->children->each->updateMaxDepth($device->device_id);
-        });
-
-        // handle device dependency updates
-        static::updated(function (Device $device) {
-            if ($device->isDirty('max_depth')) {
-                $device->children->each->updateMaxDepth();
-            }
-        });
-
-        static::pivotAttached(function (Device $device, $relationName, $pivotIds, $pivotIdsAttributes) {
-            if ($relationName == 'parents') {
-                // a parent attached to this device
-
-                // update the parent's max depth incase it used to be standalone
-                Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
-
-                // make sure this device's max depth is updated
-                $device->updateMaxDepth();
-            } elseif ($relationName == 'children') {
-                // a child device attached to this device
-
-                // if this device used to be standalone, we need to udpate max depth
-                $device->validateStandalone();
-
-                // make sure the child's max depth is updated
-                Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
-            }
-        });
-
-        static::pivotDetached(function (Device $device, $relationName, $pivotIds) {
-            if ($relationName == 'parents') {
-                // this device detached from a parent
-
-                // update this devices max depth
-                $device->updateMaxDepth();
-
-                // parent may now be standalone, update old parent
-                Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
-            } elseif ($relationName == 'children') {
-                // a child device detached from this device
-
-                // update the detached child's max_depth
-                Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
-
-                // this device may be standalone, update it
-                $device->validateStandalone();
-            }
-        });
-    }
 
     // ---- Helper Functions ----
 
@@ -115,7 +45,7 @@ class Device extends BaseModel
      */
     public static function pollerTarget($device)
     {
-        if (! is_array($device)) {
+        if (!is_array($device)) {
             $ret = static::where('hostname', $device)->first(['hostname', 'overwrite_ip']);
             if (empty($ret)) {
                 return $device;
@@ -229,56 +159,6 @@ class Device extends BaseModel
         return $query->exists();
     }
 
-    public function loadOs($force = false)
-    {
-        $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
-
-        if ((!\LibreNMS\Config::getOsSetting($this->os, 'definition_loaded') || $force) && file_exists($yaml_file)) {
-            $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
-
-            \LibreNMS\Config::set("os.$this->os", array_replace_recursive($os, \LibreNMS\Config::get("os.$this->os", [])));
-            \LibreNMS\Config::set("os.$this->os.definition_loaded", true);
-        }
-    }
-
-    /**
-     * Load all OS, optionally load just the OS used by existing devices
-     * Default cache time is 1 day. Controlled by os_def_cache_time.
-     *
-     * @param bool $existing Only load OS that have existing OS in the database
-     * @param bool $cached Load os definitions from the cache file
-     */
-    public static function loadAllOs($existing = false, $cached = true)
-    {
-        $install_dir = \LibreNMS\Config::get('install_dir');
-        $cache_file = $install_dir . '/cache/os_defs.cache';
-        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \LibreNMS\Config::get('os_def_cache_time'))) {
-            // Cached
-            $os_defs = unserialize(file_get_contents($cache_file));
-            if ($existing) {
-                // remove unneeded os
-                $os_defs = array_diff_key($os_defs, self::distinct('os')->get('os')->toArray());
-            }
-            \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
-        } else {
-            // load from yaml
-            if ($existing) {
-                $os_list = [];
-                foreach (self::distinct('os')->get('os')->toArray() as $os) {
-                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
-                }
-            } else {
-                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-            }
-            foreach ($os_list as $file) {
-                if (is_readable($file)) {
-                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-                    \LibreNMS\Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, \LibreNMS\Config::get("os.{$tmp['os']}", [])));
-                }
-            }
-        }
-    }
-
     /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
@@ -342,24 +222,12 @@ class Device extends BaseModel
         ];
 
         foreach ($options as $file) {
-            if (is_file(public_path()."/$file")) {
+            if (is_file(public_path() . "/$file")) {
                 return asset($file);
             }
         }
 
         return asset('images/os/generic.svg');
-    }
-
-    /**
-     * Get list of enabled graphs for this device.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function graphs()
-    {
-        return DB::table('device_graphs')
-            ->where('device_id', $this->device_id)
-            ->pluck('graph');
     }
 
     /**
@@ -401,9 +269,9 @@ class Device extends BaseModel
     public function validateStandalone()
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
-            $this->max_depth = 1;  // has children
+            $this->max_depth = 1; // has children
         } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
-            $this->max_depth = 0;  // no children or parents
+            $this->max_depth = 0; // no children or parents
         }
 
         $this->save();
@@ -426,7 +294,7 @@ class Device extends BaseModel
         }
 
         $attrib->attrib_value = $value;
-        return (bool)$this->attribs()->save($attrib);
+        return (bool) $this->attribs()->save($attrib);
     }
 
     public function forgetAttrib($name)
@@ -436,7 +304,7 @@ class Device extends BaseModel
         });
 
         if ($attrib_index !== false) {
-            $deleted=(bool)$this->attribs->get($attrib_index)->delete();
+            $deleted = (bool) $this->attribs->get($attrib_index)->delete();
             // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
             // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
             $this->attribs->forget($attrib_index);
@@ -451,11 +319,21 @@ class Device extends BaseModel
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
     }
 
+    public function setLocation($location_text)
+    {
+        $location_text = $location_text ? Rewrite::location($location_text) : null;
+
+        $this->location_id = null;
+        if ($location_text) {
+            $location = Location::firstOrCreate(['location' => $location_text]);
+            $this->location()->associate($location);
+        }
+    }
+
     // ---- Accessors/Mutators ----
 
     public function getIconAttribute($icon)
     {
-        $this->loadOs();
         return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
 
@@ -475,7 +353,7 @@ class Device extends BaseModel
 
     public function setStatusAttribute($status)
     {
-        $this->attributes['status'] = (int)$status;
+        $this->attributes['status'] = (int) $status;
     }
 
     // ---- Query scopes ----
@@ -486,7 +364,7 @@ class Device extends BaseModel
             ['status', '=', 1],
             ['ignore', '=', 0],
             ['disable_notify', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -494,7 +372,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['ignore', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -504,7 +382,7 @@ class Device extends BaseModel
             ['status', '=', 0],
             ['disable_notify', '=', 0],
             ['ignore', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -512,28 +390,28 @@ class Device extends BaseModel
     {
         return $query->where([
             ['ignore', '=', 1],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
     public function scopeNotIgnored($query)
     {
         return $query->where([
-            ['ignore', '=', 0]
+            ['ignore', '=', 0],
         ]);
     }
 
     public function scopeIsDisabled($query)
     {
         return $query->where([
-            ['disabled', '=', 1]
+            ['disabled', '=', 1],
         ]);
     }
 
     public function scopeIsDisableNotify($query)
     {
         return $query->where([
-            ['disable_notify', '=', 1]
+            ['disable_notify', '=', 1],
         ]);
     }
 
@@ -541,7 +419,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['disable_notify', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -549,7 +427,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['uptime', '>', 0],
-            ['uptime', $modifier, $uptime]
+            ['uptime', $modifier, $uptime],
         ]);
     }
 
@@ -581,6 +459,11 @@ class Device extends BaseModel
     }
 
     // ---- Define Relationships ----
+
+    public function accessPoints()
+    {
+        return $this->hasMany(AccessPoint::class, 'device_id');
+    }
 
     public function alerts()
     {
@@ -622,14 +505,34 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Component::class, 'device_id');
     }
 
+    public function hostResources()
+    {
+        return $this->hasMany(HrDevice::class, 'device_id');
+    }
+
+    public function entityPhysical()
+    {
+        return $this->hasMany(EntPhysical::class, 'device_id');
+    }
+
     public function eventlogs()
     {
         return $this->hasMany(\App\Models\Eventlog::class, 'device_id', 'device_id');
     }
 
+    public function graphs()
+    {
+        return $this->hasMany(\App\Models\DeviceGraph::class, 'device_id');
+    }
+
     public function groups()
     {
         return $this->belongsToMany(\App\Models\DeviceGroup::class, 'device_group_device', 'device_id', 'device_group_id');
+    }
+
+    public function ipsecTunnels()
+    {
+        return $this->hasMany(IpsecTunnel::class, 'device_id');
     }
 
     public function ipv4()
@@ -647,9 +550,33 @@ class Device extends BaseModel
         return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
     }
 
+    public function mefInfo()
+    {
+        return $this->hasMany(MefInfo::class, 'device_id');
+    }
+
+    public function muninPlugins()
+    {
+        return $this->hasMany('App\Models\MuninPlugin', 'device_id');
+    }
+
     public function ospfInstances()
     {
         return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
+    }
+    public function ospfNbrs()
+    {
+        return $this->hasMany(\App\Models\OspfNbr::class, 'device_id');
+    }
+
+    public function ospfPorts()
+    {
+        return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
+    }
+
+    public function netscalerVservers()
+    {
+        return $this->hasMany(NetscalerVserver::class, 'device_id');
     }
 
     public function packages()
@@ -687,6 +614,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Processor::class, 'device_id');
     }
 
+    public function routes()
+    {
+        return $this->hasMany(Route::class, 'device_id');
+    }
+
     public function rules()
     {
         return $this->belongsToMany(\App\Models\AlertRule::class, 'alert_device_map', 'device_id', 'rule_id');
@@ -705,6 +637,11 @@ class Device extends BaseModel
     public function storage()
     {
         return $this->hasMany(\App\Models\Storage::class, 'device_id');
+    }
+
+    public function stpInstances()
+    {
+        return $this->hasMany(Stp::class, 'device_id');
     }
 
     public function mempools()
@@ -752,6 +689,26 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
     }
 
+    public function printerSupplies()
+    {
+        return $this->hasMany(Toner::class, 'device_id');
+    }
+
+    public function pseudowires()
+    {
+        return $this->hasMany(Pseudowire::class, 'device_id');
+    }
+
+    public function rServers()
+    {
+        return $this->hasMany(LoadbalancerRserver::class, 'device_id');
+    }
+
+    public function slas()
+    {
+        return $this->hasMany(Sla::class, 'device_id');
+    }
+
     public function syslogs()
     {
         return $this->hasMany(\App\Models\Syslog::class, 'device_id', 'device_id');
@@ -768,6 +725,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Vminfo::class, 'device_id');
     }
 
+    public function vlans()
+    {
+        return $this->hasMany(\App\Models\Vlan::class, 'device_id');
+    }
+
     public function vrfLites()
     {
         return $this->hasMany(\App\Models\VrfLite::class, 'device_id');
@@ -776,6 +738,11 @@ class Device extends BaseModel
     public function vrfs()
     {
         return $this->hasMany(\App\Models\Vrf::class, 'device_id');
+    }
+
+    public function vServers()
+    {
+        return $this->hasMany(LoadbalancerVserver::class, 'device_id');
     }
 
     public function wirelessSensors()

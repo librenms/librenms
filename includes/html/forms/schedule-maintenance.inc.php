@@ -40,9 +40,14 @@ if ($sub_type == 'new-maintenance') {
     $start_recurring_hr = mres($_POST['start_recurring_hr']);
     $end_recurring_hr = mres($_POST['end_recurring_hr']);
     $recurring_day = mres($_POST['recurring_day']);
-    $start = mres($_POST['start']);
-    $end   = mres($_POST['end']);
-    $maps  = mres($_POST['maps']);
+    $start    = mres($_POST['start']);
+    $duration = mres($_POST['duration']);
+    $end      = mres($_POST['end']);
+    $maps     = mres($_POST['maps']);
+
+    if (!empty($duration)) {
+        $end = date('Y-m-d H:i:00', strtotime('+'.$duration.' hour', strtotime($start)));
+    }
 
     if (empty($title)) {
         $message = 'Missing title<br />';

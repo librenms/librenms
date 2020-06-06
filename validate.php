@@ -47,6 +47,7 @@ if (isset($options['h'])) {
           - php: check that various PHP modules and functions exist
           - poller: check that the poller and discovery are running properly
           - programs: check that external programs exist and are executable
+          - python: check that various Python modules and functions exist
           - updates: checks the status of git and updates
           - user: check that the LibreNMS user is set properly
 
@@ -159,6 +160,7 @@ Component | Version
 LibreNMS  | ${versions['local_ver']}
 DB Schema | ${versions['db_schema']}
 PHP       | ${versions['php_ver']}
+Python    | ${versions['python_ver']}
 MySQL     | ${versions['mysql_ver']}
 RRDTool   | ${versions['rrdtool_ver']}
 SNMP      | ${versions['netsnmp_ver']}

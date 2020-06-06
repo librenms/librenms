@@ -23,6 +23,7 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Gitlab extends Transport
@@ -40,7 +41,7 @@ class Gitlab extends Transport
     public function contactGitlab($obj, $opts)
     {
         // Don't create tickets for resolutions
-        if ($obj['state'] != 0) {
+        if ($obj['state'] != AlertState::CLEAR) {
             $device = device_by_id_cache($obj['device_id']); // for event logging
 
             $project_id  = $opts['project-id'];

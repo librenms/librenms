@@ -11,6 +11,7 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Msteams extends Transport
@@ -27,7 +28,6 @@ class Msteams extends Transport
     public function contactMsteams($obj, $opts)
     {
         $url   = $opts['url'];
-
         $data  = array(
             'title' => $obj['title'],
             'themeColor' => self::getColorForState($obj['state']),
@@ -42,9 +42,11 @@ class Msteams extends Transport
             'Expect:'
         ));
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        if ($this->config['use-json'] === 'on' && $obj['uid'] !== '000') {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $obj['msg']);
+        }
         $ret  = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
         if ($code != 200) {
             var_dump("Microsoft Teams returned Error, retry later");
             return false;
@@ -61,6 +63,13 @@ class Msteams extends Transport
                     'name' => 'msteam-url',
                     'descr' => 'Microsoft Teams Webhook URL',
                     'type' => 'text',
+                ],
+                [
+                    'title' => 'Use JSON?',
+                    'name' => 'use-json',
+                    'descr' => 'Compose MessageCard with JSON rather than Markdown',
+                    'type' => 'checkbox',
+                    'default' => false,
                 ]
             ],
             'validation' => [

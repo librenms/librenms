@@ -27,6 +27,18 @@ $graphs['memcached'] = array(
     'data',
     'items',
 );
+$graphs['redis'] = array(
+    'clients',
+    'objects',
+    'fragmentation',
+    'usage',
+    'defrag',
+    'keyspace',
+    'sync',
+    'commands',
+    'connections',
+    'net',
+);
 $graphs['nginx']     = array(
     'connections',
     'req',
@@ -329,12 +341,22 @@ $link_array = array(
     'device' => $device['device_id'],
     'tab'    => 'apps',
 );
-$apps = \LibreNMS\Util\ObjectCache::applications()->flatten()->sortBy('app_type');
+
+
+$apps = \LibreNMS\Util\ObjectCache::applications()->flatten();
 foreach ($apps as $app) {
+    $app_state = \LibreNMS\Util\Html::appStateIcon($app->app_state);
+    if (!empty($app_state['icon'])) {
+        $app_state_info = "<font color=\"".$app_state['color']."\"><i title=\"".$app_state['hover_text']."\" class=\"fa ".$app_state['icon']." fa-fw fa-lg\" aria-hidden=\"true\"></i></font>";
+    } else {
+        $app_state_info = '';
+    }
+
     echo $sep;
     if ($vars['app'] == $app->app_type) {
         echo "<span class='pagemenu-selected'>";
     }
+    echo $app_state_info;
     echo generate_link($app->displayName(), array('page' => 'apps', 'app' => $app->app_type));
     if ($vars['app'] == $app->app_type) {
         echo '</span>';

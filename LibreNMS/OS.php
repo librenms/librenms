@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use App\Models\Device;
+use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
@@ -44,7 +45,6 @@ class OS implements ProcessorDiscovery
     }
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
-    private $device_model;
     private $cache; // data cache
     private $pre_cache; // pre-fetch data cache
 
@@ -84,11 +84,7 @@ class OS implements ProcessorDiscovery
      */
     public function getDeviceModel()
     {
-        if (is_null($this->device_model)) {
-            $this->device_model = Device::find($this->getDeviceId());
-        }
-
-        return $this->device_model;
+        return DeviceCache::get($this->getDeviceId());
     }
 
     public function preCache()

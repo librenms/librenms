@@ -17,7 +17,7 @@ class CreateMplsTunnelArHopsTable extends Migration
             $table->increments('ar_hop_id');
             $table->unsignedInteger('mplsTunnelARHopListIndex');
             $table->unsignedInteger('mplsTunnelARHopIndex');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->unsignedInteger('lsp_path_id');
             $table->enum('mplsTunnelARHopAddrType', array('unknown','ipV4','ipV6','asNumber','lspid','unnum'))->nullable();
             $table->string('mplsTunnelARHopIpv4Addr', 15)->nullable();

@@ -27,6 +27,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use LibreNMS\Enum\AlertState;
 
 class Alert extends Model
 {
@@ -41,7 +42,7 @@ class Alert extends Model
      */
     public function scopeActive($query)
     {
-        return $query->where('state', '=', '1');
+        return $query->where('state', '=', AlertState::ACTIVE);
     }
 
     /**
@@ -51,7 +52,7 @@ class Alert extends Model
      */
     public function scopeAcknowledged($query)
     {
-        return $query->where('state', '=', '2');
+        return $query->where('state', '=', AlertState::ACKNOWLEDGED);
     }
 
     // ---- Define Relationships ----
