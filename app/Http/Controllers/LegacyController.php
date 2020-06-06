@@ -80,4 +80,9 @@ class LegacyController extends Controller
             'refresh' => $no_refresh ? 0 : Config::get('page_refresh'),
         ]);
     }
+
+    public function dummy()
+    {
+        return 'Dummy page';
+    }
 }

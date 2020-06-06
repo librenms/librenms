@@ -1068,6 +1068,9 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
+                            if (is_numeric($$limit) && isset($user_function) && is_callable($user_function)) {
+                                $$limit = $user_function($$limit);
+                            }
                         }
                     }
 

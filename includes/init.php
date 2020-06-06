@@ -86,8 +86,8 @@ if (module_selected('alerts', $init_modules)) {
 }
 
 // Boot Laravel
-if (module_selected('auth', $init_modules)) {
-    \LibreNMS\Util\Laravel::bootWeb();
+if (module_selected('web', $init_modules)) {
+    \LibreNMS\Util\Laravel::bootWeb(module_selected('auth', $init_modules));
 } else {
     \LibreNMS\Util\Laravel::bootCli();
 }
