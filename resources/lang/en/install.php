@@ -12,13 +12,21 @@ return [
     ],
     'database' => [
         'status' => 'Status',
+        'test' => 'Test',
         'host' => 'Host',
         'port' => 'Port',
         'socket' => 'Unix-Socket',
-        'user' => 'User',
+        'username' => 'User',
         'password' => 'Password',
-        'name' => 'Name',
+        'name' => 'Database Name',
         'socket_empty' => 'Leave empty if using Unix-Socket',
         'ip_empty' => 'Leave empty if using Host',
+    ],
+    'user' => [
+        'username' => 'Username',
+        'password' => 'Password',
+        'email' => 'Email',
+        'button' => 'Add User',
+        'created' => 'User Created',
     ]
 ];

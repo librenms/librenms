@@ -129,23 +129,20 @@ class Eloquent
 
     public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
     {
-        if (!is_null($db_host) || !empty($db_name)) {
-            // legacy connection override
-            \Config::set("database.connections.$name", [
-                "driver" => "mysql",
-                "host" => $db_host,
-                "port" => $db_port,
-                "database" => $db_name,
-                "username" => $db_user,
-                "password" => $db_pass,
-                "unix_socket" => $db_socket,
-                "charset" => "utf8",
-                "collation" => "utf8_unicode_ci",
-                "prefix" => "",
-                "strict" => true,
-                "engine" => null
-            ]);
-            \Config::set('database.default', $name);
-        }
+        \Config::set("database.connections.$name", [
+            "driver" => "mysql",
+            "host" => $db_host,
+            "port" => $db_port,
+            "database" => $db_name,
+            "username" => $db_user,
+            "password" => $db_pass,
+            "unix_socket" => $db_socket,
+            "charset" => "utf8",
+            "collation" => "utf8_unicode_ci",
+            "prefix" => "",
+            "strict" => true,
+            "engine" => null
+        ]);
+        \Config::set('database.default', $name);
     }
 }

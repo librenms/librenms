@@ -32,23 +32,22 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DatabaseMigrationController extends Controller
 {
-    public function __invoke(Request $request)
+    use UsesDatabase;
+
+    public function __invoke()
     {
-        \LibreNMS\DB\Eloquent::setConnection(
-            'setup',
-            session('dbhost', 'localhost'),
-            session('dbuser', 'librenms'),
-            session('dbpass', 'farts'),
-            session('dbname', 'phpunit_tests_librenms_234324'),
-            session('dbport', 3306)
-        );
-        var_dump(session()->all()); exit;
+        return view('install.migrate-database', ['stage' => 4]);
+    }
+
+    public function migrate(Request $request)
+    {
+        $this->setDB();
 
         $response = new StreamedResponse(function () {
             try {
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));
                 echo "Starting Update...\n";
-                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--database' => 'setup'], $output);
+                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--database' => $this->connection], $output);
                 if ($ret !== 0) {
                     throw new \RuntimeException('Migration failed');
                 }

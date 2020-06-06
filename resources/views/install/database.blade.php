@@ -41,20 +41,24 @@
                         <input type="text" class="form-control" name="database" id="database" value="{{ $database ?? 'librenms' }}">
                     </div>
                 </div>
-                <div>
-                    <span id="database-status">
-                    @lang('install.database.status'):
-                    @if($status)
-                        <i class="fa fa-2x fa-check-circle"></i>
-                    @else
-                        <i class="fa fa-2x fa-times-circle"></i>
-                    @endif
-                    </span>
-                    <button type="submit" class="btn btn-success pull-right">Test</button>
+                <div class="row">
+                    <div class="col-sm-4 col-sm-offset-1">
+                        <strong>@lang('install.database.status'):</strong>
+                        <span id="database-status" style="vertical-align: middle">
+                            @if($status === null)
+                                <i class="fa fa-2x fa-question-circle text-muted"></i>
+                            @elseif($status)
+                                <i class="fa fa-2x fa-check-circle text-success"></i>
+                            @else
+                                <i class="fa fa-2x fa-times-circle text-danger"></i>
+                            @endif
+                        </span>
+                    </div>
+                    <div class="col-sm-7">
+                        <button type="submit" class="btn btn-success pull-right">@lang('install.database.test')</button>
+                    </div>
                 </div>
             </form>
-        </div>
-        <div class="col-md-3">
         </div>
     </div>
 @endsection
@@ -63,18 +67,22 @@
     <script>
         $('#database-form').submit(function (event) {
             event.preventDefault();
+            $('#database-status>i').attr('class', 'fa fa-2x fa-spinner fa-spin');
+            $('.db-error').remove();
+
             $.ajax({
                 type: 'POST',
                 dataType: "json",
                 url: $('#database-form').attr('action'),
                 data: $('#database-form').serialize(),
                 success: function (response) {
-                    console.log(response.ok);
-                    if (response.status === 'ok') {
-                        $('#database-status.i').removeClass('fa-check-circle').addClass('fa-times-circle')
+                    if (response.result === 'ok') {
+                        $('#database-status>i').attr('class', 'fa fa-2x fa-check-circle text-success')
                     } else {
-                        $('#database-status.i').removeClass('fa-times-circle').addClass('fa-check-circle')
-                        alert(response.message)
+                        $('#database-status>i').attr('class', 'fa fa-2x fa-times-circle text-danger')
+                        if (response.message) {
+                            $('#error-box').append($('<div class="db-error alert alert-danger">' + response.message + '</div>'))
+                        }
                     }
                 },
             });

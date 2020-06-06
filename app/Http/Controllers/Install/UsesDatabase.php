@@ -1,8 +1,6 @@
 <?php
 /**
- * InstallationController.php
- *
- * -Description-
+ * UsesDatabase.php
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,12 +23,25 @@
 
 namespace App\Http\Controllers\Install;
 
-use App\Http\Controllers\Controller;
+use LibreNMS\DB\Eloquent;
 
-class InstallationController extends Controller
+trait UsesDatabase
 {
-    public function invalid()
+    protected $connection = 'setup';
+
+    protected function setDB()
     {
-        abort(404);
+        Eloquent::setConnection(
+            $this->connection,
+            session('db.host', 'localhost'),
+            session('db.username', 'librenms'),
+            session('db.password'),
+            session('db.database', 'librenms'),
+            session('db.port', 3306),
+            session('db.socket')
+        );
+        config(['database.default', $this->connection]);
+
+        return \DB::connection($this->connection);
     }
 }

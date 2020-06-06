@@ -10,19 +10,17 @@
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css"/>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap-hover-dropdown.min.js') }}"></script>
-    <script src="{{ asset('js/hogan-2.0.0.js') }}"></script>
 </head>
-<body style="background-color: #047396">
+<body style="background-color: #047396;">
 <div class="container">
-    <div class="panel panel-default col-md-6 col-md-offset-3" style="box-shadow: 0 0 20px black;">
+    <div class="panel panel-default col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-xs-12" style="box-shadow: 0 0 20px black;">
         <div class="panel-body">
             <div class="row" style="border-bottom: 1px solid #f6f6f6;">
                 <div class="col-xs-10 col-xs-offset-1">
                     <h2 class="text-center">
                         <img src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_" . \LibreNMS\Config::get('applied_site_style') . ".svg")) }}" alt="{{ \LibreNMS\Config::get('project_name', 'LibreNMS') }}">
                         @lang('install.install')
-                        </h2>
+                    </h2>
                 </div>
             </div>
             <div class="row">
@@ -40,13 +38,13 @@
                     </div>
                 </div>
             </div>
-            @if(!empty($msg))
                 <div class="row">
-                    <div class="col-xs-12">
+                    <div id="error-box" class="col-xs-12">
+                        @if(!empty($msg))
                         <div class="alert alert-danger">{{ $msg }}</div>
+                        @endif
                     </div>
                 </div>
-            @endif
             @yield('content')
         </div>
     </div>

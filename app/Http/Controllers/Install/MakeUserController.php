@@ -25,10 +25,52 @@
 
 namespace App\Http\Controllers\Install;
 
+use App\Models\User;
+use Doctrine\DBAL\Query\QueryException;
+use Illuminate\Http\Request;
+
 class MakeUserController extends \App\Http\Controllers\Controller
 {
-    public function __invoke()
+    use UsesDatabase;
+
+    public function __invoke(Request $request)
     {
-        // TODO: Implement __invoke() method.
+        if ($request->method() == 'POST') {
+            $this->create($request);
+        }
+
+        if (session('install.database')) {
+            $this->setDB();
+            $user = User::first();
+        }
+
+        if (isset($user)) {
+            return view('install.user-created', [
+                'user' => $user,
+            ]);
+        }
+
+        return view('install.make-user');
+    }
+
+    public function create(Request $request)
+    {
+        $this->validate($request, [
+            'username' => 'required',
+            'password' => 'required',
+        ]);
+
+
+        try {
+            $user = new User($request->only(['username', 'password', 'email']));
+            $user->setPassword($request->get('password'));
+            $user->setConnection($this->connection);
+            $res = $user->save();
+            $message = $res ? trans('install.user.success') : trans('install.user.failure');
+        } catch (\Exception $e) {
+            $message = $e->getMessage();
+        }
+
+//        return redirect()->back()->with('message', $message);
     }
 }

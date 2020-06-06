@@ -25,11 +25,12 @@
 
 namespace App\Http\Controllers\Install;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 
-class DatabaseController extends \App\Http\Controllers\Controller
+class DatabaseController extends Controller
 {
     const KEYS = ['host', 'username', 'password', 'database', 'port', 'unix_socket'];
 
@@ -59,7 +60,8 @@ class DatabaseController extends \App\Http\Controllers\Controller
         $ok = false;
         $message = '';
         try {
-            $ok = Eloquent::isConnected('setup');
+            $conn = Eloquent::DB('setup');
+            $ok = $conn && !is_null($conn->getPdo());
         } catch (\Exception $e) {
             $message = $e->getMessage();
         }
