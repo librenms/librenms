@@ -1767,6 +1767,38 @@
             },
             "type": "graph"
         },
+        "graph_types.device.availability_1day": {
+            "default": {
+                "section": "availability",
+                "order": 0,
+                "descr": "Availability 1 Day"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.availability_1week": {
+            "default": {
+                "section": "availability",
+                "order": 1,
+                "descr": "Availability 1 Week"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.availability_1month": {
+            "default": {
+                "section": "availability",
+                "order": 2,
+                "descr": "Availability 1 Month"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.availability_1year": {
+            "default": {
+                "section": "availability",
+                "order": 3,
+                "descr": "Availability 1 Year"
+            },
+            "type": "graph"
+        },
         "graph_types.device.barracuda_firewall_sessions": {
             "default": {
                 "section": "firewall",

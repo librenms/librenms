@@ -563,6 +563,13 @@ device_groups:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_groups_name_unique: { Name: device_groups_name_unique, Columns: [name], Unique: true, Type: BTREE }
+device_outages:
+  Columns:
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
+    - { Field: up_again, Type: biging, 'Null': true, Extra: '' }
+  Indexes:
+    device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
 device_group_device:
   Columns:
     - { Field: device_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }

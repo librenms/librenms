@@ -55,6 +55,41 @@ if ($uptime != 0 && Config::get("os.{$device['os']}.bad_uptime") !== true) {
 
     $update_array['uptime'] = $uptime;
     $device['uptime']       = $uptime;
+
+    $graphs['availability_1day'] = true;
+    $graphs['availability_1week'] = true;
+    $graphs['availability_1month'] = true;
+    $graphs['availability_1year'] = true;
+
+    echo 'Availability: ' . PHP_EOL;
+
+    $avail_1d = \LibreNMS\Device\Availability::day($device);
+    $tags = array(
+        'rrd_def' => RrdDefinition::make()->addDataset('availability_1day', 'GAUGE', 0),
+    );
+    data_update($device, 'availability_1day', $tags, $avail_1d);
+    echo '1 day  : ' . $avail_1d . '%'. PHP_EOL;
+
+    $avail_1w = \LibreNMS\Device\Availability::week($device);
+    $tags = array(
+        'rrd_def' => RrdDefinition::make()->addDataset('availability_1week', 'GAUGE', 0),
+    );
+    data_update($device, 'availability_1week', $tags, $avail_1w);
+    echo '1 week : ' . $avail_1w . '%'. PHP_EOL;
+
+    $avail_1m = \LibreNMS\Device\Availability::month($device);
+    $tags = array(
+        'rrd_def' => RrdDefinition::make()->addDataset('availability_1month', 'GAUGE', 0),
+    );
+    data_update($device, 'availability_1month', $tags, $avail_1m);
+    echo '1 month: ' . $avail_1m . '%'. PHP_EOL;
+
+    $avail_1y = \LibreNMS\Device\Availability::year($device);
+    $tags = array(
+        'rrd_def' => RrdDefinition::make()->addDataset('availability_1year', 'GAUGE', 0),
+    );
+    data_update($device, 'availability_1year', $tags, $avail_1y);
+    echo '1 year : ' . $avail_1y . '%'. PHP_EOL;
 }//end if
 
 $poll_device['sysContact'] = str_replace('"', '', $poll_device['sysContact']);
