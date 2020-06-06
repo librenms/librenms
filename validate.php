@@ -54,7 +54,7 @@ if (isset($options['h'])) {
     exit;
 }
 
-// Composer checks
+// Check autoload
 if (!file_exists('vendor/autoload.php')) {
     print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
     exit;
@@ -106,9 +106,7 @@ if (strpos(`tail config.php`, '?>') !== false) {
 }
 
 
-// init autoloading
-require_once 'vendor/autoload.php';
-
+// Composer check
 $validator = new Validator();
 $validator->validate(array('dependencies'));
 if ($validator->getGroupStatus('dependencies') == ValidationResult::FAILURE) {
