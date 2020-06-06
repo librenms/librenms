@@ -11,6 +11,7 @@ return [
         'comment' => 'Comment',
     ],
     'database' => [
+        'status' => 'Status',
         'host' => 'Host',
         'port' => 'Port',
         'socket' => 'Unix-Socket',

@@ -37,6 +37,7 @@ class DatabaseController extends \App\Http\Controllers\Controller
     {
         $data = Arr::only(session()->get('db') ?: [], self::KEYS);
         $data['stage'] = 2;
+        $data['status'] = session('install.database');
 
         return view('install.database', $data);
     }

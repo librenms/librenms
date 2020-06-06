@@ -20,7 +20,7 @@
                 <div class="form-group">
                     <label for="unix_socket" class="col-sm-4 control-label">@lang('install.database.socket')</label>
                     <div class="col-sm-8">
-                        <input type="text" class="form-control" name="unix_socket" id="unix_socket" value="{{ $unix_socket }}" placeholder="@lang('install.database.ip_empty')">
+                        <input type="text" class="form-control" name="unix_socket" id="unix_socket" value="{{ $unix_socket ?? '' }}" placeholder="@lang('install.database.ip_empty')">
                     </div>
                 </div>
                 <div class="form-group">
@@ -32,7 +32,7 @@
                 <div class="form-group">
                     <label for="password" class="col-sm-4 control-label">@lang('install.database.password')</label>
                     <div class="col-sm-8">
-                        <input type="password" class="form-control" name="password" id="password" value="{{ $password }}">
+                        <input type="password" class="form-control" name="password" id="password" value="{{ $password ?? '' }}">
                     </div>
                 </div>
                 <div class="form-group">
@@ -41,7 +41,17 @@
                         <input type="text" class="form-control" name="database" id="database" value="{{ $database ?? 'librenms' }}">
                     </div>
                 </div>
-                <button type="submit" class="btn btn-success pull-right">Test</button>
+                <div>
+                    <span id="database-status">
+                    @lang('install.database.status'):
+                    @if($status)
+                        <i class="fa fa-2x fa-check-circle"></i>
+                    @else
+                        <i class="fa fa-2x fa-times-circle"></i>
+                    @endif
+                    </span>
+                    <button type="submit" class="btn btn-success pull-right">Test</button>
+                </div>
             </form>
         </div>
         <div class="col-md-3">
@@ -55,10 +65,17 @@
             event.preventDefault();
             $.ajax({
                 type: 'POST',
+                dataType: "json",
                 url: $('#database-form').attr('action'),
                 data: $('#database-form').serialize(),
                 success: function (response) {
-                    alert(response.message)
+                    console.log(response.ok);
+                    if (response.status === 'ok') {
+                        $('#database-status.i').removeClass('fa-check-circle').addClass('fa-times-circle')
+                    } else {
+                        $('#database-status.i').removeClass('fa-times-circle').addClass('fa-check-circle')
+                        alert(response.message)
+                    }
                 },
             });
         });
