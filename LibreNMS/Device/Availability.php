@@ -36,25 +36,25 @@ class Availability
      * 1 year  365 * 24 * 60 * 60 = 31536000
      */
 
-    public static function day($device, $precision=2)
+    public static function day($device, $precision = 3)
     {
         $duration = 86400;
         return self::availability($device, $duration, $precision);
     }
 
-    public static function week($device, $precision=2)
+    public static function week($device, $precision = 3)
     {
         $duration = 604800;
         return self::availability($device, $duration, $precision);
     }
 
-    public static function month($device, $precision=3)
+    public static function month($device, $precision = 3)
     {
         $duration = 2592000;
         return self::availability($device, $duration, $precision);
     }
 
-    public static function year($device, $precision=4)
+    public static function year($device, $precision = 3)
     {
         $duration = 31536000;
         return self::availability($device, $duration, $precision);
@@ -67,7 +67,7 @@ class Availability
      * @param int $precision after comma precision
      * @return availability in %
      */
-    public static function availability($device, $duration, $precision=2)
+    public static function availability($device, $duration, $precision = 3)
     {
         if (!is_numeric($device['uptime'])) {
             return null;
