@@ -29,7 +29,7 @@ class FinalizeController extends \App\Http\Controllers\Controller
 {
     public function __invoke()
     {
-        // TODO: Implement __invoke() method.
+        return view('install.finish');
     }
 
     private function writeConfigFile($config_file)
