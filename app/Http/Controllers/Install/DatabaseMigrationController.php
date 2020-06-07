@@ -52,6 +52,7 @@ class DatabaseMigrationController extends Controller
                     throw new \RuntimeException('Migration failed');
                 }
                 echo "\n\nSuccess!";
+                session(['install.user' => true]);
             } catch (\Exception $e) {
                 echo $e->getMessage() . "\n\nError!";
             }

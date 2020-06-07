@@ -3,7 +3,7 @@
 @section('content')
     <div class="row">
         <div class="col-xs-12">
-            <form class="form-horizontal" role="form" method="post" action="{{ route('install.user-create') }}">
+            <form class="form-horizontal" role="form" method="post" action="{{ route('install.action.user') }}">
                 @csrf
                 <div class="form-group">
                     <label for="username" class="col-sm-4 control-label">@lang('install.user.username')</label>

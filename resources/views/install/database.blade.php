@@ -1,9 +1,11 @@
 @extends('layouts.install')
 
+@section('title', trans('install.database.title'))
+
 @section('content')
     <div class="row">
         <div class="col-xs-12">
-            <form id="database-form" class="form-horizontal" role="form" method="post" action="{{ route('install.test-database') }}">
+            <form id="database-form" class="form-horizontal" role="form" method="post" action="{{ route('install.acton.test-database') }}">
                 @csrf
                 <div class="form-group">
                     <label for="host" class="col-sm-4 control-label">@lang('install.database.host')</label>

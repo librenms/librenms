@@ -153,14 +153,14 @@ Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
     Route::redirect('/', '/install/checks')->name('install');
     Route::get('/checks', 'ChecksController')->name('install.checks');
     Route::get('/database', 'DatabaseController')->name('install.database');
-    Route::get('/database/migrate', 'DatabaseMigrationController')->name('install.migrate-database');
+    Route::get('/database/migrate', 'DatabaseMigrationController')->name('install.migrate');
     Route::get('/user', 'MakeUserController')->name('install.user');
     Route::get('/finish', 'FinalizeController')->name('install.finish');
 
-    Route::post('/user/create', 'MakeUserController@create')->name('install.user-create');
-    Route::post('/database/test', 'DatabaseController@test')->name('install.test-database');
-    Route::get('/database/ajax/migrate', 'DatabaseMigrationController@migrate')->name('install.migrate');
-    Route::any('{path?}', 'InstallationController@invalid')->where('path', '.*');
+    Route::post('/user/create', 'MakeUserController@create')->name('install.action.user');
+    Route::post('/database/test', 'DatabaseController@test')->name('install.acton.test-database');
+    Route::get('/database/ajax/migrate', 'DatabaseMigrationController@migrate')->name('install.action.migrate');
+    Route::any('{path?}', 'InstallationController@invalid')->where('path', '.*'); // 404
 });
 
 // Legacy routes

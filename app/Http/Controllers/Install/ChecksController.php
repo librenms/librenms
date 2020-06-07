@@ -25,25 +25,40 @@
 
 namespace App\Http\Controllers\Install;
 
+use LibreNMS\Validations\Php;
+
 class ChecksController extends \App\Http\Controllers\Controller
 {
     public function __invoke()
     {
-        $checks = [
-            ['item' => 'test', 'status' => false, 'comment' => 'comment'],
-            $this->checkPhpModule('pdo_mysql'),
-            $this->checkPhpModule('mysqlnd'),
-            $this->checkPhpModule('gd'),
-        ];
+        $results = [];
+        $php_ok = version_compare(PHP_VERSION, Php::PHP_MIN_VERSION, '>=');
 
-        return view('install.checks', ['stage' => 1, 'checks' => $checks]);
+        // bitwise and so all checks run
+        if ($php_ok
+            & $this->checkPhpModule($results, 'pdo_mysql')
+            & $this->checkPhpModule($results, 'mysqlnd')
+            & $this->checkPhpModule($results, 'gd')
+        ) {
+            session(['install.checks' => true]);
+        }
+
+        return view('install.checks', [
+            'php_version' => PHP_VERSION,
+            'php_required' => Php::PHP_MIN_VERSION,
+            'php_ok' => $php_ok,
+            'modules' => $results
+        ]);
     }
 
-    private function checkPhpModule($module)
+    private function checkPhpModule(&$results, $module)
     {
-        return [
-            'item' => trans('install.checks.php_module', ['module' => $module]),
-            'status' => extension_loaded("$module"),
+        $status = extension_loaded("$module");
+        $results[] = [
+            'name' => str_replace('install.checks.php_module.', '', trans('install.checks.php_module.' . $module)),
+            'status' => $status,
         ];
+
+        return $status;
     }
 }

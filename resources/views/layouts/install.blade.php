@@ -15,23 +15,29 @@
             box-shadow: 0 0 20px black;
         }
 
+        body {
+            background-color: #047396;
+        }
+
         .btn-circle {
-            width: 70px;
-            height: 70px;
-            padding: 10px 16px;
-            border-radius: 35px;
+            width: 60px;
+            height: 60px;
+            padding: 8px 14px;
+            border-radius: 30px;
             font-size: 24px;
-            line-height: 1.9;
-            box-shadow: 3px 3px 5px black;
+            line-height: 1.7;
+            box-shadow: 2px 2px 4px grey;
         }
 
         .content-divider {
             padding-top: 20px;
             border-bottom: 1px solid #f6f6f6;
+            margin-bottom: 20px;
         }
     </style>
+    @yield('style')
 </head>
-<body style="background-color: #047396;">
+<body>
 <div class="container">
     <div class="panel panel-default col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-xs-12 primary-panel">
         <div class="panel-body">
@@ -39,44 +45,52 @@
                 <div class="col-xs-10 col-xs-offset-1">
                     <h2 class="text-center">
                         <img src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_" . \LibreNMS\Config::get('applied_site_style') . ".svg")) }}" alt="{{ \LibreNMS\Config::get('project_name', 'LibreNMS') }}">
-                        @lang('install.install')
+                        @yield('title')
                     </h2>
                 </div>
             </div>
             <div class="row">
                 <div class="col-xs-2 col-xs-offset-1">
-                    <a href="{{ route('install.checks') }}" class="btn btn-primary btn-circle" title="@lang('install.steps.checks')"><i class="fa fa-lg fa-fw fa-clipboard"></i></a>
+                    <a href="{{ route('install.checks') }}"
+                       class="btn btn-primary btn-circle"
+                       title="@lang('install.checks.title')">
+                        <i class="fa fa-lg fa-list-ul fa-flip-horizontal"></i>
+                    </a>
                 </div>
                 <div class="col-xs-2">
-                    <a href="{{ route('install.database') }}" class="btn btn-primary btn-circle" title="@lang('install.steps.database')"><i class="fa fa-lg fa-fw fa-database"></i></a>
+                    <a href="{{ route('install.database') }}"
+                       class="btn btn-primary btn-circle @if(!session('install.checks')) disabled @endif"
+                       title="@lang('install.database.title')">
+                        <i class="fa fa-lg fa-database"></i>
+                    </a>
                 </div>
                 <div class="col-xs-2">
-                    <a href="{{ route('install.migrate-database') }}" class="btn btn-primary btn-circle" title="@lang('install.steps.migrate')"><i class="fa fa-lg fa-fw fa-mouse-pointer"></i></a>
+                    <a href="{{ route('install.migrate') }}"
+                       class="btn btn-primary btn-circle @if(!session('install.database')) disabled @endif"
+                       title="@lang('install.migrate.title')">
+                        <i class="fa fa-lg fa-repeat"></i>
+                    </a>
                 </div>
                 <div class="col-xs-2">
-                    <a href="{{ route('install.user') }}" class="btn btn-primary btn-circle" title="@lang('install.steps.user')"><i class="fa fa-lg fa-fw fa-user"></i></a>
+                    <a href="{{ route('install.user') }}"
+                       class="btn btn-primary btn-circle @if(!session('install.migrate')) disabled @endif"
+                       title="@lang('install.user.title')">
+                        <i class="fa fa-lg fa-key"></i>
+                    </a>
                 </div>
                 <div class="col-xs-2">
-                    <a href="{{ route('install.finish') }}" class="btn btn-primary btn-circle" title="@lang('install.steps.finish')"><i class="fa fa-lg fa-fw fa-check"></i></a>
+                    <a href="{{ route('install.finish') }}"
+                       class="btn btn-primary btn-circle @if(!session('install.user')) disabled @endif"
+                       title="@lang('install.finish.title')">
+                        <i class="fa fa-lg fa-check"></i>
+                    </a>
                 </div>
             </div>
-            <div class="row content-divider">
-
-            </div>
-            {{--            <div class="row">--}}
-            {{--                <div class="col-xs-12">--}}
-            {{--                    <div id="install-progress" class="progress progress-striped">--}}
-            {{--                        <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="{{ ($stage ?? 0) / ($stages ?? 6) * 100 }}"--}}
-            {{--                             aria-valuemin="0" aria-valuemax="100" style="width: {{ ($stage ?? 0) / ($stages ?? 6) * 100 }}%">--}}
-            {{--                            <span class="sr-only">{{ ($stage ?? 0) / ($stages ?? 6) * 100 }}% Complete</span>--}}
-            {{--                        </div>--}}
-            {{--                    </div>--}}
-            {{--                </div>--}}
-            {{--            </div>--}}
+            <div class="content-divider"></div>
             <div class="row">
                 <div id="error-box" class="col-xs-12">
-                    @if(!empty($msg))
-                        <div class="alert alert-danger">{{ $msg }}</div>
+                    @if(!empty($message))
+                        <div class="alert alert-danger">{{ $message }}</div>
                     @endif
                 </div>
             </div>

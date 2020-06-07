@@ -45,6 +45,7 @@ class MakeUserController extends \App\Http\Controllers\Controller
         }
 
         if (isset($user)) {
+            session(['install.user' => true]);
             return view('install.user-created', [
                 'user' => $user,
             ]);
