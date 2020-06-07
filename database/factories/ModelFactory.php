@@ -171,6 +171,6 @@ $factory->define(\App\Models\Sensor::class, function (Faker\Generator $faker) {
         'sensor_id' => $faker->randomDigit,
         'sensor_index' => $faker->randomDigit,
         'sensor_class' => $faker->randomElement($sensor_class),
-        'sensor_value' => $faker->randomDigit,
+        'sensor_current' => $faker->randomDigit,
     ];
 });
