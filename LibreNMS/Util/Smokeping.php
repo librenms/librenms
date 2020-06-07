@@ -48,11 +48,11 @@ class Smokeping
     {
         if (is_null($this->files) && Config::has('smokeping.dir')) {
             $dir = $this->generateFileName();
-            if (is_dir($dir)) {
+            if (is_dir($dir) && is_readable($dir)) {
                 foreach (array_diff(scandir($dir), ['.', '..']) as $file) {
                     if (stripos($file, '.rrd') !== false) {
                         if (strpos($file, '~') !== false) {
-                            list($target, $slave) = explode('~', $this->filenameToHostname($file));
+                            [$target, $slave] = explode('~', $this->filenameToHostname($file));
                             $this->files['in'][$target][$slave] = $file;
                             $this->files['out'][$slave][$target] = $file;
                         } else {
