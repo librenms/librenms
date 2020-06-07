@@ -5,14 +5,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css"/>
+    <link href="{{ asset('css/bootstrap4.min.css') }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset(\LibreNMS\Config::get('stylesheet')) }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css"/>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
-    <script src="{{ asset('js/bootstrap.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap4.min.js') }}"></script>
     <style type="text/css">
         .primary-panel {
-            box-shadow: 0 0 20px black;
+            box-shadow: 0 0 25px #333;
         }
 
         body {
@@ -39,18 +39,14 @@
 </head>
 <body>
 <div class="container">
-    <div class="panel panel-default col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-xs-12 primary-panel">
-        <div class="panel-body">
-            <div class="row">
-                <div class="col-xs-10 col-xs-offset-1">
-                    <h2 class="text-center">
-                        <img src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_" . \LibreNMS\Config::get('applied_site_style') . ".svg")) }}" alt="{{ \LibreNMS\Config::get('project_name', 'LibreNMS') }}">
-                        @yield('title')
-                    </h2>
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-xs-2 col-xs-offset-1">
+    <div class="card col-lg-8 offset-lg-2 col-md-10 offset-md-1 col-12 primary-panel">
+        <div class="card-header text-center">
+            <img class="card-img-top" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_" . \LibreNMS\Config::get('applied_site_style') . ".svg")) }}" alt="LibreNMS">
+            <span class="h2">@yield('title')</span>
+        </div>
+        <div class="card-body">
+            <div class="d-flex flex-row justify-content-around">
+                <div>
                     <a href="{{ route('install.checks') }}"
                        id="install-checks-button"
                        class="btn btn-primary btn-circle"
@@ -58,7 +54,7 @@
                         <i class="fa fa-lg fa-list-ul fa-flip-horizontal"></i>
                     </a>
                 </div>
-                <div class="col-xs-2">
+                <div>
                     <a href="{{ route('install.database') }}"
                        id="install-database-button"
                        class="btn btn-primary btn-circle @if(!session('install.checks')) disabled @endif"
@@ -66,7 +62,7 @@
                         <i class="fa fa-lg fa-database"></i>
                     </a>
                 </div>
-                <div class="col-xs-2">
+                <div>
                     <a href="{{ route('install.migrate') }}"
                        id="install-migrate-button"
                        class="btn btn-primary btn-circle @if(!session('install.database')) disabled @endif"
@@ -74,7 +70,7 @@
                         <i class="fa fa-lg fa-repeat"></i>
                     </a>
                 </div>
-                <div class="col-xs-2">
+                <div>
                     <a href="{{ route('install.user') }}"
                        id="install-user-button"
                        class="btn btn-primary btn-circle @if(!session('install.migrate')) disabled @endif"
@@ -82,7 +78,7 @@
                         <i class="fa fa-lg fa-key"></i>
                     </a>
                 </div>
-                <div class="col-xs-2">
+                <div>
                     <a href="{{ route('install.finish') }}"
                        id="install-finish-button"
                        class="btn btn-primary btn-circle @if(!session('install.user')) disabled @endif"
@@ -93,7 +89,7 @@
             </div>
             <div class="content-divider"></div>
             <div class="row">
-                <div id="error-box" class="col-xs-12">
+                <div id="error-box" class="col-12">
                     @if(!empty($message))
                         <div class="alert alert-danger">{{ $message }}</div>
                     @endif

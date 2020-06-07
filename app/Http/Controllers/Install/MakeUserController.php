@@ -61,17 +61,16 @@ class MakeUserController extends \App\Http\Controllers\Controller
             'password' => 'required',
         ]);
 
-
         try {
+            $this->setDB();
             $user = new User($request->only(['username', 'password', 'email']));
             $user->setPassword($request->get('password'));
-            $user->setConnection($this->connection);
             $res = $user->save();
             $message = $res ? trans('install.user.success') : trans('install.user.failure');
         } catch (\Exception $e) {
             $message = $e->getMessage();
         }
 
-//        return redirect()->back()->with('message', $message);
+        return redirect()->back()->with('message', $message);
     }
 }

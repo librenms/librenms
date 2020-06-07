@@ -39,6 +39,8 @@ return [
         'email' => 'Email',
         'button' => 'Add User',
         'created' => 'User Created',
+        'success' => 'Successfully created user',
+        'failure' => 'Failed to create user'
     ],
     'finish' => [
         'title' => 'Finish Install'

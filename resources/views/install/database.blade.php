@@ -4,47 +4,47 @@
 
 @section('content')
     <div class="row">
-        <div class="col-xs-12">
+        <div class="col-12">
             <form id="database-form" class="form-horizontal" role="form" method="post" action="{{ route('install.acton.test-database') }}">
                 @csrf
-                <div class="form-group">
-                    <label for="host" class="col-sm-4 control-label">@lang('install.database.host')</label>
-                    <div class="col-sm-8">
+                <div class="form-row pb-3">
+                    <label for="host" class="col-4 col-form-label text-right">@lang('install.database.host')</label>
+                    <div class="col-6">
                         <input type="text" class="form-control" name="host" id="host" value="{{ $host ?? 'localhost' }}" placeholder="@lang('install.database.socket_empty')">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="port" class="col-sm-4 control-label">@lang('install.database.port')</label>
-                    <div class="col-sm-8">
+                <div class="form-row pb-3">
+                    <label for="port" class="col-4 col-form-label text-right">@lang('install.database.port')</label>
+                    <div class="col-6">
                         <input type="text" class="form-control" name="port" id="port" value="{{ $port ?? 3306 }}" placeholder="@lang('install.database.socket_empty')">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="unix_socket" class="col-sm-4 control-label">@lang('install.database.socket')</label>
-                    <div class="col-sm-8">
+                <div class="form-row pb-3">
+                    <label for="unix_socket" class="col-4 col-form-label text-right">@lang('install.database.socket')</label>
+                    <div class="col-6">
                         <input type="text" class="form-control" name="unix_socket" id="unix_socket" value="{{ $unix_socket ?? '' }}" placeholder="@lang('install.database.ip_empty')">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="username" class="col-sm-4 control-label">@lang('install.database.username')</label>
-                    <div class="col-sm-8">
+                <div class="form-row pb-3">
+                    <label for="username" class="col-4 col-form-label text-right">@lang('install.database.username')</label>
+                    <div class="col-6">
                         <input type="text" class="form-control" name="username" id="username" value="{{ $username ?? 'librenms' }}">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="password" class="col-sm-4 control-label">@lang('install.database.password')</label>
-                    <div class="col-sm-8">
+                <div class="form-row pb-3">
+                    <label for="password" class="col-4 col-form-label text-right">@lang('install.database.password')</label>
+                    <div class="col-6">
                         <input type="password" class="form-control" name="password" id="password" value="{{ $password ?? '' }}">
                     </div>
                 </div>
-                <div class="form-group">
-                    <label for="database" class="col-sm-4 control-label">@lang('install.database.name')</label>
-                    <div class="col-sm-8">
+                <div class="form-row pb-3">
+                    <label for="database" class="col-4 col-form-label text-right">@lang('install.database.name')</label>
+                    <div class="col-6">
                         <input type="text" class="form-control" name="database" id="database" value="{{ $database ?? 'librenms' }}">
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-sm-4 col-sm-offset-1">
+                    <div class="col-4 offset-1">
                         <strong>@lang('install.database.status'):</strong>
                         <span id="database-status" style="vertical-align: middle">
                             @if($status === null)
@@ -56,8 +56,8 @@
                             @endif
                         </span>
                     </div>
-                    <div class="col-sm-7">
-                        <button type="submit" class="btn btn-success pull-right">@lang('install.database.test')</button>
+                    <div class="col-7">
+                        <button type="submit" class="btn btn-success float-right">@lang('install.database.test')</button>
                     </div>
                 </div>
             </form>
