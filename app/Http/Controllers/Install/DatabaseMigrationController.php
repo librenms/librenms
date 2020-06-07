@@ -36,14 +36,14 @@ class DatabaseMigrationController extends Controller
 
     public function __invoke()
     {
-        return view('install.migrate-database', ['stage' => 4]);
+        return view('install.migrate-database');
     }
 
     public function migrate(Request $request)
     {
         $this->setDB();
 
-        $response = new StreamedResponse(function () {
+        $response = new StreamedResponse(function () use ($request) {
             try {
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));
                 echo "Starting Update...\n";
@@ -52,7 +52,8 @@ class DatabaseMigrationController extends Controller
                     throw new \RuntimeException('Migration failed');
                 }
                 echo "\n\nSuccess!";
-                session(['install.user' => true]);
+                session(['install.migrate' => true]);
+                session()->save();
             } catch (\Exception $e) {
                 echo $e->getMessage() . "\n\nError!";
             }

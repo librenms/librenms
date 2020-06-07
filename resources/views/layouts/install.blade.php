@@ -52,6 +52,7 @@
             <div class="row">
                 <div class="col-xs-2 col-xs-offset-1">
                     <a href="{{ route('install.checks') }}"
+                       id="install-checks-button"
                        class="btn btn-primary btn-circle"
                        title="@lang('install.checks.title')">
                         <i class="fa fa-lg fa-list-ul fa-flip-horizontal"></i>
@@ -59,6 +60,7 @@
                 </div>
                 <div class="col-xs-2">
                     <a href="{{ route('install.database') }}"
+                       id="install-database-button"
                        class="btn btn-primary btn-circle @if(!session('install.checks')) disabled @endif"
                        title="@lang('install.database.title')">
                         <i class="fa fa-lg fa-database"></i>
@@ -66,6 +68,7 @@
                 </div>
                 <div class="col-xs-2">
                     <a href="{{ route('install.migrate') }}"
+                       id="install-migrate-button"
                        class="btn btn-primary btn-circle @if(!session('install.database')) disabled @endif"
                        title="@lang('install.migrate.title')">
                         <i class="fa fa-lg fa-repeat"></i>
@@ -73,6 +76,7 @@
                 </div>
                 <div class="col-xs-2">
                     <a href="{{ route('install.user') }}"
+                       id="install-user-button"
                        class="btn btn-primary btn-circle @if(!session('install.migrate')) disabled @endif"
                        title="@lang('install.user.title')">
                         <i class="fa fa-lg fa-key"></i>
@@ -80,6 +84,7 @@
                 </div>
                 <div class="col-xs-2">
                     <a href="{{ route('install.finish') }}"
+                       id="install-finish-button"
                        class="btn btn-primary btn-circle @if(!session('install.user')) disabled @endif"
                        title="@lang('install.finish.title')">
                         <i class="fa fa-lg fa-check"></i>

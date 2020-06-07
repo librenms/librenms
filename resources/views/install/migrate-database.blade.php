@@ -41,13 +41,10 @@
         xhr.onreadystatechange = function () {
             if (xhr.readyState === XMLHttpRequest.DONE) {
                 if (xhr.status === 200) {
-                    console.log("Complete");
-                    $('#add-user-btn').removeAttr('disabled');
+                    $('#install-user-button').removeClass('disabled');
                 }
-                $('#install-progress').removeClass('active')
             }
         };
         xhr.send();
-        $('#install-progress').addClass('active')
     </script>
 @endsection
