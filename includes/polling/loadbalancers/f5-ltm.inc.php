@@ -51,12 +51,15 @@ if (count($components > 0)) {
     $f5_stats['ltmVirtualServStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7', 0);
     $f5_stats['ltmVirtualServStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9', 0);
     $f5_stats['ltmVirtualServStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.11', 0);
+    $f5_stats['ltmVirtualServStatEntryCurConns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.12', 0);
 
     $f5_stats['ltmPoolMemberStatEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.5', 0);
     $f5_stats['ltmPoolMemberStatEntryPktsout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.7', 0);
     $f5_stats['ltmPoolMemberStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.6', 0);
     $f5_stats['ltmPoolMemberStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.8', 0);
     $f5_stats['ltmPoolMemberStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.10', 0);
+    $f5_stats['ltmPoolMemberStatEntryCurconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.11', 0);
+    $f5_stats['ltmPoolMemberStatEntryName'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.28', 0);
 
     // and check the status
     $f5_stats['ltmVsStatusEntryState'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.10.13.2.1.2', 0);
@@ -70,6 +73,8 @@ if (count($components > 0)) {
     $f5_stats['ltmPoolEntryMinupstatus'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.5', 0);
     $f5_stats['ltmPoolEntryMinupaction'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.6', 0);
     $f5_stats['ltmPoolEntryCurrentup'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.8', 0);
+    $f5_stats['ltmPoolEntryTotalmem'] = snmpwalk_array_num($device, '1.3.6.1.4.1.3375.2.2.5.1.2.1.23', 0);
+
 
     // Loop through the components and extract the data.
     foreach ($components as $key => &$array) {
@@ -93,6 +98,7 @@ if (count($components > 0)) {
                 'bytesin' => $f5_stats['ltmVirtualServStatEntryBytesin']['1.3.6.1.4.1.3375.2.2.10.2.3.1.7.'.$UID],
                 'bytesout' => $f5_stats['ltmVirtualServStatEntryBytesout']['1.3.6.1.4.1.3375.2.2.10.2.3.1.9.'.$UID],
                 'totconns' => $f5_stats['ltmVirtualServStatEntryTotconns']['1.3.6.1.4.1.3375.2.2.10.2.3.1.11.'.$UID],
+                'curconns' => $f5_stats['ltmVirtualServStatEntryCurConns']['1.3.6.1.4.1.3375.2.2.10.2.3.1.12.'.$UID],
             );
 
             // Let's print some debugging info.
@@ -120,10 +126,12 @@ if (count($components > 0)) {
             $array['minupstatus'] = $f5_stats['ltmPoolEntryMinupstatus']['1.3.6.1.4.1.3375.2.2.5.1.2.1.5.'.$UID];
             $array['currentup'] = $f5_stats['ltmPoolEntryCurrentup']['1.3.6.1.4.1.3375.2.2.5.1.2.1.8.'.$UID];
             $array['minupaction'] = $f5_stats['ltmPoolEntryMinupaction']['1.3.6.1.4.1.3375.2.2.5.1.2.1.6.'.$UID];
+            $array['totalmem'] = $f5_stats['ltmPoolEntryTotalmem']['1.3.6.1.4.1.3375.2.2.5.1.2.1.23.'.$UID];
 
             $fields = array(
                 'minup' => $array['minup'],
                 'currup' => $array['currentup'],
+                'totalmem' => $array['totalmem'],
             );
 
             // Let's print some debugging info.
@@ -158,6 +166,8 @@ if (count($components > 0)) {
                 'bytesin' => $f5_stats['ltmPoolMemberStatEntryBytesin']['1.3.6.1.4.1.3375.2.2.5.4.3.1.6.'.$UID],
                 'bytesout' => $f5_stats['ltmPoolMemberStatEntryBytesout']['1.3.6.1.4.1.3375.2.2.5.4.3.1.8.'.$UID],
                 'totalconns' => $f5_stats['ltmPoolMemberStatEntryTotconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.10.'.$UID],
+                'curconns' => $f5_stats['ltmPoolMemberStatEntryCurconns']['1.3.6.1.4.1.3375.2.2.5.4.3.1.11.'.$UID],
+
             );
 
             // Let's print some debugging info.
@@ -180,8 +190,13 @@ if (count($components > 0)) {
             d_echo("Type is unknown: ".$type."\n");
             continue;
         }
+        if ($type == 'f5-ltm-poolmember') {
+            $nodename = $f5_stats['ltmPoolMemberStatEntryName']['1.3.6.1.4.1.3375.2.2.5.4.3.1.28.'.$UID];
+            $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label', 'nodename' );
+        } else {
+            $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label');
+        }
 
-        $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label');
         data_update($device, $type, $tags, $fields);
     } // End foreach components
 
