@@ -25,17 +25,19 @@
 namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
-use App\Models\Ipv4Address;
+use App\Models\Sensor;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\DBTestCase;
 
 class UpsTrapsOnBatteryTest extends SnmpTrapTestCase
 {
     public function testOnBattery()
     {
         $device = factory(Device::class)->create();
+        $state = factory(Sensor::class)->make(['sensor_class' => 'state', 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']);
+        $time = factory(Sensor::class)->make(['sensor_class' => 'runtime', 'sensor_index' => '100', 'sensor_current' => '0']);
+        $remaining = factory(Sensor::class)->make(['sensor_class' => 'runtime', 'sensor_index' => '200', 'sensor_current' => '371']);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
@@ -45,10 +47,21 @@ UPS-MIB::upsEstimatedMinutesRemaining.0 100 minutes
 UPS-MIB::upsSecondsOnBattery.0 120 seconds
 UPS-MIB::upsConfigLowBattTime.0 1 minutes";
 
+        \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);
+        \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'Time on battery\' for device: " . $device->hostname);
+        \Log::shouldReceive('warning')->never()->with("Snmptrap UpsTraps: Could not find matching sensor \'upsOutputSourceState\' for device: " . $device->hostname);
+
         $message = "UPS running on battery for 120 seconds. Estimated 100 minutes remaining";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle UPS-MIB::upsTraps.0.1 trap');
+
+        $state = $state->fresh();
+        $time = $time->fresh();
+        $remaining = $remaining->fresh();
+        $this->assertEquals($state->sensor_current, '5');
+        $this->assertEquals($time->sensor_current, '120');
+        $this->assertEquals($remaining->sensor_current, '100');
     }
 }

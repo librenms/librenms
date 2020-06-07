@@ -164,3 +164,13 @@ $factory->define(\App\Models\Component::class, function (Faker\Generator $faker)
         'type' => $faker->regexify('[A-Za-z0-9]{4,20}'),
     ];
 });
+$factory->define(\App\Models\Sensor::class, function (Faker\Generator $faker) {
+    $sensor_class = ['airflow','ber','charge','chromatic_dispersion','cooling','count','current','dbm','delay','eer','fanspeed','frequency','humidity','load','loss','power','power_consumed','power_factor','pressure','quality_factor','runtime','signal','snr','state','temperature','voltage','waterflow'];
+
+    return [
+        'sensor_id' => $faker->randomDigit,
+        'sensor_index' => $faker->randomDigit,
+        'sensor_class' => $faker->randomElement($sensor_class),
+        'sensor_value' => $faker->randomDigit,
+    ];
+});
