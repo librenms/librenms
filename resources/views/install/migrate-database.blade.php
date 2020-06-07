@@ -22,7 +22,7 @@
 @section('scripts')
     <script type="text/javascript">
         var output = document.getElementById("db-update");
-        xhr = new XMLHttpRequest();
+        var xhr = new XMLHttpRequest();
         xhr.open("GET", "{{ route('install.action.migrate') }}", true);
         xhr.setRequestHeader('X-Requested-With','XMLHttpRequest');
         xhr.withCredentials = true;

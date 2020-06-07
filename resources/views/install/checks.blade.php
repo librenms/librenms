@@ -6,33 +6,32 @@
     <div class="row">
         <div class=" col-8 offset-2">
             <div class="checks card ">
-                <div class="card-header">
-                    <div class="row">
+                <div class="card-body">
+                    <div class="row bg-light check-row">
                         <div class="col-8">
                             PHP <small>(@lang('install.checks.php_required', ['version' => $php_required]))</small>
                         </div>
-                        <div class="check-status col-4 text-right text-nowrap @if($php_ok) green @else red @endif">
+                        <div class="col-4 text-right text-nowrap @if($php_ok) green @else red @endif">
                             {{ $php_version }}
                             @if($php_ok)
-                                <i class="fa fa-lg fa-check-square-o green"></i>
+                                <i class="fa fa-lg fa-check-square-o green align-middle"></i>
                             @else
-                                <i class="fa fa-lg fa-times-rectangle-o red"></i>
+                                <i class="fa fa-lg fa-times-rectangle-o red align-middle"></i>
                             @endif
 
                         </div>
                     </div>
-                </div>
-                <div class="card-body">
+
                     @foreach($modules as $module)
-                    <div class="check-row row">
+                    <div class="row check-row border-top">
                         <div class="col-8">
                             {{ $module['name'] }}
                         </div>
-                        <div class="check-status col-4 text-right">
+                        <div class="col-4 text-right">
                             @if($module['status'])
-                                <i class="fa fa-lg fa-check-square-o green"></i>
+                                <i class="fa fa-lg fa-check-square-o green align-middle"></i>
                             @else
-                                <i class="fa fa-lg fa-times-rectangle-o red"></i>
+                                <i class="fa fa-lg fa-times-rectangle-o red align-middle"></i>
                             @endif
                         </div>
                     </div>
@@ -45,17 +44,9 @@
 
 @section('style')
     <style type="text/css">
-        .check-status .fa {
-            vertical-align: middle;
-        }
-        .check-status {
-            padding-right: 5px;
-        }
         .check-row {
-            margin-top: -1px;
-            padding-top: 11px;
+            padding-top: 10px;
             padding-bottom: 10px;
-            border-top: 1px solid #ddd;
             margin-right: -20px;
             margin-left: -20px;
         }
