@@ -26,7 +26,6 @@
 namespace App\Http\Controllers\Install;
 
 use App\Models\User;
-use Doctrine\DBAL\Query\QueryException;
 use Illuminate\Http\Request;
 
 class MakeUserController extends \App\Http\Controllers\Controller
@@ -40,7 +39,7 @@ class MakeUserController extends \App\Http\Controllers\Controller
         }
 
         if (session('install.database')) {
-            $this->setDB();
+            $this->configureDatabase();
             $user = User::first();
         }
 
@@ -62,7 +61,7 @@ class MakeUserController extends \App\Http\Controllers\Controller
         ]);
 
         try {
-            $this->setDB();
+            $this->configureDatabase();
             $user = new User($request->only(['username', 'password', 'email']));
             $user->setPassword($request->get('password'));
             $res = $user->save();
@@ -72,5 +71,15 @@ class MakeUserController extends \App\Http\Controllers\Controller
         }
 
         return redirect()->back()->with('message', $message);
+    }
+
+    public static function enabled(): bool
+    {
+        return true;
+    }
+
+    public static function icon(): string
+    {
+        return 'fa-key';
     }
 }

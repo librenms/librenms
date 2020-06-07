@@ -40,53 +40,12 @@
 <body>
 <div class="container">
     <div class="card col-lg-8 offset-lg-2 col-md-10 offset-md-1 col-12 primary-panel">
-        <div class="card-header text-center">
-            <img class="card-img-top" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_" . \LibreNMS\Config::get('applied_site_style') . ".svg")) }}" alt="LibreNMS">
+        <div class="card-header text-center" style="margin: 0 -20px">
+            <img class="card-img-top p-3" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_" . \LibreNMS\Config::get('applied_site_style') . ".svg")) }}" alt="LibreNMS">
             <span class="h2">@yield('title')</span>
         </div>
         <div class="card-body">
-            <div class="d-flex flex-row justify-content-around">
-                <div>
-                    <a href="{{ route('install.checks') }}"
-                       id="install-checks-button"
-                       class="btn btn-primary btn-circle"
-                       title="@lang('install.checks.title')">
-                        <i class="fa fa-lg fa-list-ul fa-flip-horizontal"></i>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('install.database') }}"
-                       id="install-database-button"
-                       class="btn btn-primary btn-circle @if(!session('install.checks')) disabled @endif"
-                       title="@lang('install.database.title')">
-                        <i class="fa fa-lg fa-database"></i>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('install.migrate') }}"
-                       id="install-migrate-button"
-                       class="btn btn-primary btn-circle @if(!session('install.database')) disabled @endif"
-                       title="@lang('install.migrate.title')">
-                        <i class="fa fa-lg fa-repeat"></i>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('install.user') }}"
-                       id="install-user-button"
-                       class="btn btn-primary btn-circle @if(!session('install.migrate')) disabled @endif"
-                       title="@lang('install.user.title')">
-                        <i class="fa fa-lg fa-key"></i>
-                    </a>
-                </div>
-                <div>
-                    <a href="{{ route('install.finish') }}"
-                       id="install-finish-button"
-                       class="btn btn-primary btn-circle @if(!session('install.user')) disabled @endif"
-                       title="@lang('install.finish.title')">
-                        <i class="fa fa-lg fa-check"></i>
-                    </a>
-                </div>
-            </div>
+            @include('components.install_menu')
             <div class="content-divider"></div>
             <div class="row">
                 <div id="error-box" class="col-12">

@@ -40,7 +40,7 @@ class FinalizeController extends \App\Http\Controllers\Controller
             if ($conf != false) {
                 if (fwrite($conf, "<?php\n") === false) {
                     echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
-                    echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
+                    echo("<pre>&lt;?php\n" . stripslashes($config_file) . "</pre>");
                 } else {
                     $config_file = stripslashes($config_file);
                     fwrite($conf, $config_file);
@@ -49,9 +49,25 @@ class FinalizeController extends \App\Http\Controllers\Controller
                 fclose($conf);
             } else {
                 echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
-                echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
+                echo("<pre>&lt;?php\n" . stripslashes($config_file) . "</pre>");
             }
         }
+    }
+
+    public static function enabled($steps): bool
+    {
+        foreach ($steps as $step => $controller) {
+            if ($step !== 'finish' && !session("install.$step")) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static function icon(): string
+    {
+        return 'fa-check';
     }
 
     private function getConfigFileContents()

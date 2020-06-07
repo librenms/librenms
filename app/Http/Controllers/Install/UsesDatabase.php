@@ -29,7 +29,7 @@ trait UsesDatabase
 {
     protected $connection = 'setup';
 
-    protected function setDB()
+    protected function configureDatabase()
     {
         Eloquent::setConnection(
             $this->connection,

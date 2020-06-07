@@ -39,6 +39,7 @@ class ComposerServiceProvider extends ServiceProvider
     {
         View::composer('layouts.librenmsv1', \App\Http\ViewComposers\LayoutComposer::class);
         View::composer('layouts.menu', \App\Http\ViewComposers\MenuComposer::class);
+        View::composer('components.install_menu', \App\Http\ViewComposers\InstallMenuComposer::class);
     }
 
     /**

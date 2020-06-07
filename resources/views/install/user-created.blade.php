@@ -1,10 +1,11 @@
 @extends('layouts.install')
 
+@section('title', trans('install.user.created'))
+
 @section('content')
     <div class="row">
-        <div class="col-12 text-center" style="padding: 60px">
+        <div class="col-12 text-center p-5">
             <h4>
-                @lang('install.user.created'):
                 <i class="fa fa-2x fa-user-circle align-middle"></i>
                 <strong>{{ $user->username }}</strong>
             </h4>

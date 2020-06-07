@@ -73,4 +73,14 @@ class DatabaseController extends Controller
             'message' => $message,
         ]);
     }
+
+    public static function enabled(): bool
+    {
+        return true;
+    }
+
+    public static function icon(): string
+    {
+        return 'fa-database';
+    }
 }

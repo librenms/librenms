@@ -41,7 +41,7 @@ class DatabaseMigrationController extends Controller
 
     public function migrate(Request $request)
     {
-        $this->setDB();
+        $this->configureDatabase();
 
         $response = new StreamedResponse(function () use ($request) {
             try {
@@ -63,5 +63,15 @@ class DatabaseMigrationController extends Controller
         $response->headers->set('X-Accel-Buffering', 'no');
 
         return $response;
+    }
+
+    public static function enabled(): bool
+    {
+        return session('install.database');
+    }
+
+    public static function icon(): string
+    {
+        return 'fa-refresh';
     }
 }

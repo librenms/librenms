@@ -1,5 +1,7 @@
 @extends('layouts.install')
 
+@section('title', trans('install.migrate.title'))
+
 @section('content')
     <div class="row">
         <div class="col-12">

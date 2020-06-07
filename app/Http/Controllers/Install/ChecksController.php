@@ -61,4 +61,14 @@ class ChecksController extends \App\Http\Controllers\Controller
 
         return $status;
     }
+
+    public static function enabled(): bool
+    {
+        return true;
+    }
+
+    public static function icon(): string
+    {
+        return 'fa-list-ul fa-flip-horizontal';
+    }
 }
