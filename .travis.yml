@@ -37,9 +37,13 @@ install:
 after_failure:
   - tail /tmp/snmpsimd.log
 
+after_success:
+  - scripts/deploy-docs.sh
+
 before_script:
   - phpenv config-rm xdebug.ini
   - test -n "$SKIP_WEB_CHECK" || php artisan serve --env=dusk.testing  2>/dev/null &
+  - test -n "$SKIP_UNIT_CHECK" || ~/.local/bin/snmpsimd.py --data-dir=tests/snmpsim --agent-udpv4-endpoint=127.1.6.2:1162 --logging-method=file:/tmp/snmpsimd.log &
 
 script:
   - php artisan dev:check ci

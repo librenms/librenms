@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use DeviceCache;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
@@ -34,6 +35,8 @@ use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
 {
+    use DatabaseTransactions;
+
     private $discoveryModules;
     private $pollerModules;
 

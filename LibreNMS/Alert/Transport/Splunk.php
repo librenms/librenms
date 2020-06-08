@@ -16,6 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Splunk extends Transport
@@ -68,30 +69,30 @@ class Splunk extends Transport
         }
 
         switch ($obj['state']) {
-            case 0:
+            case AlertState::RECOVERED:
                 $severity = 6;
                 break;
-            case 2:
+            case AlertState::ACKNOWLEDGED:
                 $severity = 6;
                 break;
         }
-        
+
         $ignore = array("template", "contacts", "rule", "string", "debug", "faults", "builder", "transport", "alert", "msg", "transport_name");
         $splunk_prefix = '<' . $severity . '> ';
         foreach ($obj as $key => $val) {
             if (in_array($key, $ignore)) {
                 continue;
             }
-            
+
             $splunk_prefix .= $key . '="' . $val . '", ';
         }
-        
+
         $ignore = array("attribs", "vrf_lite_cisco", "community", "authlevel", "authname", "authpass", "authalgo", "cryptopass", "cryptoalgo", "snmpver", "port");
         foreach ($device as $key => $val) {
             if (in_array($key, $ignore)) {
                 continue;
             }
-            
+
             $splunk_prefix .= 'device_' . $key . '="' . $val . '", ';
         }
         $splunk_prefix = substr($splunk_prefix, 0, -1);
@@ -113,7 +114,7 @@ class Splunk extends Transport
         }
         return true;
     }
-    
+
     public static function configTemplate()
     {
         return [

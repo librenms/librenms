@@ -1,0 +1,14 @@
+os: mobileiron
+type: appliance
+group: unix
+text: MobileIron
+ifXmcbc: true
+ifname: true
+mib_dir:
+    - supermicro
+    - dell
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+processor_stacked: true

@@ -19,6 +19,8 @@ modules:
                     - ifDescr
                     - ifAlias
                     - ifAdminStatus
+                    - sfpConfigVendorPN
+                    - sfpConfigVendorSN
         temperature:
             data:
                 -
@@ -32,9 +34,9 @@ modules:
                     oid: sfpDiagTable
                     value: sfpDiagModuleTemperature
                     num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.34.{{ $index }}'
-                    descr: '{{ $ifDescr }} {{ $ifAlias }}' 
+                    descr: '{{ $ifDescr }} {{ $ifAlias }} Temperature'
                     index: 'opt-temp-{{ $index }}'
-                    group: 'Optics'
+                    group: 'Optic {{ $sfpConfigVendorPN }}, {{ $sfpConfigVendorSN }}'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     user_func: '\LibreNMS\OS\Packetlight::offsetSfpTemperature'
@@ -44,6 +46,14 @@ modules:
                             oid: sfpDiagModuleTemperature
                             op: '='
                             value: 0
+                        -
+                            oid: sfpDiagModuleTemperature
+                            op: '='
+                            value: 32768
+                        -
+                            oid: sfpDiagModuleTemperature
+                            op: '='
+                            value: -32768
         count:
             data:
                 -
@@ -87,6 +97,48 @@ modules:
                     entPhysicalIndex_measured: ports
                     index: 'edfaOperOutputPower-{{ $index }}'
                     group: '{{ $edfaFreeDescription }}'
+                -
+                    oid: sfpDiagTable
+                    value: sfpDiagTxOutputPower
+                    num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.37.{{ $index }}'
+                    descr: '{{ $ifDescr }} Tx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'txout-{{ $index }}'
+                    group: 'Optic {{ $sfpConfigVendorPN }}, {{ $sfpConfigVendorSN }}'
+                    high_limit: sfpDiagHighTxPowerAlmThreshold
+                    low_limit: sfpDiagLowTxPowerAlmThreshold
+                    user_func: '\LibreNMS\OS\Packetlight::convertWattToDbm'
+                    skip_values:
+                        -
+                            oid: ifAdminStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: sfpDiagHighTxPowerAlmThreshold
+                            op: '='
+                            value: 0
+                -
+                    oid: sfpDiagTable
+                    value: sfpDiagRxInputPower
+                    num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.38.{{ $index }}'
+                    descr: '{{ $ifDescr }} Rx'
+                    entPhysicalIndex: '{{ $index }}'
+                    entPhysicalIndex_measured: ports
+                    index: 'Rxin-{{ $index }}'
+                    group: 'Optic {{ $sfpConfigVendorPN }}, {{ $sfpConfigVendorSN }}'
+                    high_limit: sfpDiagHighRxPowerAlmThreshold
+                    low_limit: sfpDiagLowRxPowerAlmThreshold
+                    user_func: '\LibreNMS\OS\Packetlight::convertWattToDbm'
+                    skip_values:
+                        -
+                            oid: ifAdminStatus
+                            op: '!='
+                            value: 1
+                        -
+                            oid: sfpDiagHighRxPowerAlmThreshold
+                            op: '='
+                            value: 0
         quality_factor:
             data:
                 -
@@ -109,50 +161,6 @@ modules:
                     divisor: 10
                     index: 'edfaOpGain-{{ $index }}'
                     group: '{{ $edfaFreeDescription }}'
-        power:
-            data:
-                -
-                    oid: sfpDiagTable
-                    value: sfpDiagTxOutputPower
-                    num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.37.{{ $index }}'
-                    descr: '{{ $ifDescr }} Tx'
-                    entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: ports
-                    divisor: 10000000
-                    index: 'txout-{{ $index }}'
-                    group: '{{ $ifDescr }} {{ $ifAlias }}'
-                    high_limit: sfpDiagHighTxPowerAlmThreshold
-                    low_limit: sfpDiagLowTxPowerAlmThreshold
-                    skip_values:
-                        -
-                            oid: ifAdminStatus
-                            op: '='
-                            value: 2
-                        -
-                            oid: sfpDiagHighTxPowerAlmThreshold
-                            op: '='
-                            value: 0
-                -
-                    oid: sfpDiagTable
-                    value: sfpDiagRxInputPower
-                    num_oid: '.1.3.6.1.4.1.4515.1.10.2.1.1.38.{{ $index }}'
-                    descr: '{{ $ifDescr }} Rx'
-                    entPhysicalIndex: '{{ $index }}'
-                    entPhysicalIndex_measured: ports
-                    divisor: 10000000
-                    index: 'Rxin-{{ $index }}'
-                    group: '{{ $ifDescr }} {{ $ifAlias }}'
-                    high_limit: sfpDiagHighRxPowerAlmThreshold
-                    low_limit: sfpDiagLowRxPowerAlmThreshold
-                    skip_values:
-                        -
-                            oid: ifAdminStatus
-                            op: '='
-                            value: 2
-                        -
-                            oid: sfpDiagHighRxPowerAlmThreshold
-                            op: '='
-                            value: 0
         state:
              data:
                 -

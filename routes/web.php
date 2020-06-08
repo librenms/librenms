@@ -12,17 +12,21 @@
 */
 
 // Auth
-Auth::routes();
+Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // WebUI
-Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
+Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
-    Route::get('poller', 'PollerController@pollerTab')->name('poller');
-    Route::get('poller/log', 'PollerController@logTab')->name('poller.log');
-    Route::get('poller/groups', 'PollerController@groupsTab')->name('poller.groups');
-    Route::get('poller/performance', 'PollerController@performanceTab')->name('poller.performance');
+    Route::group(['prefix' => 'poller'], function () {
+        Route::get('', 'PollerController@pollerTab')->name('poller.index');
+        Route::get('log', 'PollerController@logTab')->name('poller.log');
+        Route::get('groups', 'PollerController@groupsTab')->name('poller.groups');
+        Route::get('settings', 'PollerController@settingsTab')->name('poller.settings');
+        Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
+        Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
+    });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
@@ -141,8 +145,11 @@ Route::group(['middleware' => ['auth', '2fa'], 'guard' => 'auth'], function () {
 
     // demo helper
     Route::permanentRedirect('demo', '/');
-
-    // Legacy routes
-    Route::any('/{path?}', 'LegacyController@index')
-        ->where('path', '^((?!_debugbar).)*');
 });
+
+// Legacy routes
+Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth.web');
+Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummy');
+Route::any('/{path?}', 'LegacyController@index')
+    ->where('path', '^((?!_debugbar).)*')
+    ->middleware('auth.web');

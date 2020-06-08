@@ -32,6 +32,7 @@ class Handler extends ExceptionHandler
         \LibreNMS\Exceptions\DatabaseConnectException::class,
         \LibreNMS\Exceptions\DuskUnsafeException::class,
         \LibreNMS\Exceptions\UnserializableRouteCache::class,
+        \LibreNMS\Exceptions\MaximumExecutionTimeExceeded::class,
     ];
 
     public function render($request, Exception $exception)
@@ -39,7 +40,7 @@ class Handler extends ExceptionHandler
         // If for some reason Blade hasn't been registered, try it now
         try {
             if (!app()->bound('view')) {
-                app()->register(\App\Providers\ViewServiceProvider::class);
+                app()->register(\Illuminate\View\ViewServiceProvider::class);
                 app()->register(\Illuminate\Translation\TranslationServiceProvider::class);
             }
         } catch (\Exception $e) {
@@ -47,9 +48,11 @@ class Handler extends ExceptionHandler
         }
 
         // try to upgrade generic exceptions to more specific ones
-        foreach ($this->upgradable as $class) {
-            if ($new = $class::upgrade($exception)) {
-                return parent::render($request, $new);
+        if (!config('app.debug')) {
+            foreach ($this->upgradable as $class) {
+                if ($new = $class::upgrade($exception)) {
+                    return parent::render($request, $new);
+                }
             }
         }
 
