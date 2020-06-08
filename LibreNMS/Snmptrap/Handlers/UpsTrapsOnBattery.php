@@ -68,6 +68,5 @@ class UpsTrapsOnBattery implements SnmptrapHandler
         }
         $sensor_output->sensor_current = 5;
         $sensor_output->save();
-
     }
 }
