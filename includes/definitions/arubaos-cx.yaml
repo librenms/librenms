@@ -1,0 +1,13 @@
+os: arubaos-CX
+text: 'Aruba CX'
+type: network
+icon: aruba
+over:
+    - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - .iso.org.dod.internet.private.enterprises.hpe.hpeNetworking.wiredNetworkingDevices.arubaOS-CX  #ArubaOS-CX
+    - sysDescr:
+        - Aruba
