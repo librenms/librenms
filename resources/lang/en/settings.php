@@ -519,6 +519,10 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211'
         ],
+        'distributed_poller_type' => [
+            'description' => 'Poller Group Type',
+            'help' => 'Configures method how Devices are associated to Poller Groups. "Static" means every Device has to be associated manually. "Dynamic" means Devices are associated to Poller Groups by defined rules (last matching rule wins)'
+        ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted'

@@ -26,12 +26,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use LibreNMS\Alerting\QueryBuilderFluentParser;
+use log;
+use Permissions;
+use LibreNMS\Config;
 
-class PollerGroup extends Model
+class PollerGroup extends BaseModel
 {
     public $timestamps = false;
-    protected $primaryKey = 'id';
     protected $fillable = ['group_name', 'descr'];
+    protected $casts = ['rules' => 'array'];
 
     /**
      * Initialize this class
@@ -55,5 +59,15 @@ class PollerGroup extends Model
     public function devices()
     {
         return $this->hasMany(\App\Models\Device::class, 'poller_group', 'id');
+    }
+
+    /**
+     * Get a query builder parser instance from this poller group
+     *
+     * @return QueryBuilderFluentParser
+     */
+    public function getParser()
+    {
+        return QueryBuilderFluentParser::fromJson($this->rules);
     }
 }

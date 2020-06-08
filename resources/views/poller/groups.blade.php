@@ -6,7 +6,15 @@
 
 @parent
 
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#poller-groups">@lang('Create new poller group')</button>
+<br />
+<div style="overflow: hidden;">
+    <div style="float:left;">
+        <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#poller-groups">@lang('Create new poller group')</button>
+    </div>
+    <div style="float:right;">
+        @lang('Poller Group Type'): <b><a href="/settings/poller/distributed">{{ ucfirst($distributed_poller_type) }}</a></b>
+    </div>
+</div>
 <br /><br />
 <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover table-condensed">
@@ -15,6 +23,9 @@
             <th>@lang('Group Name')</th>
             <th>@lang('Devices')</th>
             <th>@lang('Description')</th>
+            @if( $distributed_poller_type == 'dynamic')
+            <th>@lang('Pattern')</th>
+            @endif
             <th>@lang('Action')</th>
         </tr>
         <tr id="0">
@@ -22,6 +33,9 @@
             <td>General @if($default_group_id == 0) (@lang('default')) @endif</td>
             <td><a href="{{ url('devices/poller_group=0') }}">{{ $ungrouped_count }}</a></td>
             <td></td>
+            @if( $distributed_poller_type == 'dynamic')
+            <td></td>
+            @endif
             <td>
         </tr>
         @foreach ($poller_groups as $group)
@@ -30,9 +44,14 @@
             <td>{{ $group->group_name }}@if($group->id == $default_group_id) (@lang('default')) @endif</td>
             <td><a href="{{ url('devices/poller_group=' . $group->id) }}">{{ $group->devices_count }}</a></td>
             <td>{{ $group->descr }}</td>
+            @if($distributed_poller_type == 'dynamic')
+            <td>{{ $group->getParser()->toSql(false) }}</td>
+            @endif
             <td>
+                @if($group->id)
                 <button type="button" class="btn btn-success btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#poller-groups">@lang('Edit')</button>
                 <button type="button" class="btn btn-danger btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#confirm-delete">@lang('Delete')</button>
+                @endif
             </td>
         @endforeach
         </tr>
@@ -93,6 +112,15 @@
                                 <input type="input" class="form-control" id="descr" name="descr" placeholder="Description">
                             </div>
                         </div>
+                        @if($distributed_poller_type == 'dynamic')
+                        <div class="form-group @if($errors->has('rules')) has-error @endif">
+                            <label for="pattern" class="col-sm-3 control-label">@lang('Define Rules'):</label>
+                            <div class="col-sm-9">
+                                <div id="builder"></div>
+                                <span class="help-block">{{ $errors->first('rules') }}</span>
+                            </div>
+                        </div>
+                        @endif
                         <div class="form-group">
                              <div class="col-sm-offset-3 col-sm-9">
                                  <button type="submit" class="btn btn-primary btn-sm" id="create-group" name="create-group">@lang('Add Poller Group')</button>
@@ -143,11 +171,12 @@ $('#poller-groups').on('show.bs.modal', function (event) {
         $.ajax({
             type: "POST",
             url: "ajax_form.php",
-            data: { type: "parse-poller-groups", group_id: group_id },
+            data: { type: "parse-poller-groups", group_id: group_id},
             dataType: "json",
             success: function(output) {
-                $('#group_name').val(output['group_name']);
-                $('#descr').val(output['descr']);
+                $('#group_name').val(output.group_name);
+                $('#descr').val(output.descr);
+                $('#builder').queryBuilder("setRules", output.rule);
             }
         });
     }
@@ -157,11 +186,12 @@ $('#create-group').click('', function(e) {
     e.preventDefault();
     var group_name = $("#group_name").val();
     var descr = $("#descr").val();
+    var rules = JSON.stringify(builder.queryBuilder('getRules'));
     var group_id = $('#group_id').val();
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "poller-groups", group_name: group_name, descr: descr, group_id: group_id },
+        data: { type: "poller-groups", group_name: group_name, descr: descr, rules: rules, group_id: group_id},
         dataType: "html",
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {
@@ -179,6 +209,62 @@ $('#create-group').click('', function(e) {
         }
     });
 });
+
+@if($distributed_poller_type == 'dynamic')
+var builder = $('#builder').on('afterApplyRuleFlags.queryBuilder afterCreateRuleFilters.queryBuilder', function () {
+    $("[name$='_filter']").each(function () {
+        $(this).select2({
+            dropdownAutoWidth: true,
+            width: 'auto'
+        });
+    });
+}).on('ruleToSQL.queryBuilder.filter', function (e, rule) {
+    if (rule.operator === 'regexp') {
+        e.value += ' \'' + rule.value + '\'';
+    }
+}).queryBuilder({
+    plugins: [
+        'bt-tooltip-errors'
+        // 'not-group'
+    ],
+
+    filters: {!! $filters !!},
+    operators: [
+        'equal', 'not_equal', 'between', 'not_between', 'begins_with', 'not_begins_with', 'contains', 'not_contains', 'ends_with', 'not_ends_with', 'is_empty', 'is_not_empty', 'is_null', 'is_not_null', 'in', 'not_in',
+        {type: 'less', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+        {type: 'less_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+        {type: 'greater', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+        {type: 'greater_or_equal', nb_inputs: 1, multiple: false, apply_to: ['string', 'number', 'datetime']},
+        {type: 'regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']},
+        {type: 'not_regex', nb_inputs: 1, multiple: false, apply_to: ['string', 'number']}
+    ],
+    lang: {
+        operators: {
+            regexp: 'regex',
+            not_regex: 'not regex'
+        }
+    },
+    sqlOperators: {
+        regexp: {op: 'REGEXP'},
+        not_regexp: {op: 'NOT REGEXP'}
+    },
+    sqlRuleOperator: {
+        'REGEXP': function (v) {
+            return {val: v, op: 'regexp'};
+        },
+        'NOT REGEXP': function (v) {
+            return {val: v, op: 'not_regexp'};
+        }
+    }
+});
+@endif
 @endif
 </script>
 @endsection
+@if($distributed_poller_type == 'dynamic')
+
+@section('javascript')
+    <script src="{{ asset('js/sql-parser.min.js') }}"></script>
+    <script src="{{ asset('js/query-builder.standalone.min.js') }}"></script>
+@endsection
+@endif

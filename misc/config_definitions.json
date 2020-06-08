@@ -1199,6 +1199,17 @@
             "section": "distributed",
             "order": 3
         },
+        "distributed_poller_type": {
+            "default": "static",
+            "group": "poller",
+            "section": "distributed",
+            "order": -1,
+            "type": "select",
+            "options": {
+                "static": "static",
+                "dynamic": "dynamic"
+            }
+         },
         "distributed_poller_memcached_host": {
             "default": "example.net",
             "group": "poller",

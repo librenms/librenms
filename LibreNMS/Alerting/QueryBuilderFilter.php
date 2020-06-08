@@ -53,6 +53,8 @@ class QueryBuilderFilter implements \JsonSerializable
             $this->generateMacroFilter('alert.macros.rule');
         } elseif ($type == 'group') {
             $this->generateMacroFilter('alert.macros.group');
+        } elseif ($type == 'poller') {
+            $this->generateMacroFilter('alert.macros.group');
         }
 
         $this->generateTableFilter();

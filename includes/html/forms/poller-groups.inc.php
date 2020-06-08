@@ -23,15 +23,21 @@ $error      = '';
 $group_id   = $_POST['group_id'];
 $group_name = mres($_POST['group_name']);
 $descr      = mres($_POST['descr']);
+$rules      = mres($_POST['rules']);
 if (!empty($group_name)) {
+
+    $db_data = ['group_name' => $group_name,
+                'descr'      => $descr,
+                'rules'      => $rules];
+
     if (is_numeric($group_id)) {
-        if (dbUpdate(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups', 'id = ?', array($group_id)) >= 0) {
+        if (dbUpdate($db_data, 'poller_groups', 'id = ?', array($group_id)) >= 0) {
             $ok = 'Updated poller group';
         } else {
             $error = 'Failed to update the poller group';
         }
     } else {
-        if (dbInsert(array('group_name' => $group_name, 'descr' => $descr), 'poller_groups') >= 0) {
+        if (dbInsert($db_data, 'poller_groups') >= 0) {
             $ok = 'Added new poller group';
         } else {
             $error = 'Failed to create new poller group';

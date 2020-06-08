@@ -264,22 +264,32 @@ foreach (get_port_assoc_modes() as $mode) {
 <?php
 if (Config::get('distributed_poller') === true) {
     echo '
-          <div class="form-group">
-              <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>
-              <div class="col-sm-9">
+      <div class="form-group">
+          <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>
+          <div class="col-sm-9">
+    ';
+    if (\LibreNMS\Config::get('distributed_poller_type') != 'dynamic') {
+        echo '
                   <select name="poller_group" id="poller_group" class="form-control input-sm">
                       <option value="0"> Default poller group</option>
-    ';
-
-    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-        echo '<option value="'.$group['id'].'">'.$group['group_name'].'</option>';
-    }
-
-    echo '
+        ';
+        foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
+            echo '<option value="'.$group['id'].'">'.$group['group_name'].'</option>';
+        }
+        echo '   </select>
+        ';
+    } else {
+        echo '
+                  <select name="poller_group" id="poller_group" class="form-control input-sm" disabled>
+                      <option value="0"> automatic Poller Group assignment enabled</option>
                   </select>
-              </div>
-          </div>
+        ';
+    }
+    echo '
+        </div>
+    </div>
     ';
+
 }//endif
 ?>
       <div class="form-group">

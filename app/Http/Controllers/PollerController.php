@@ -9,6 +9,7 @@ use App\Models\PollerGroup;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Config;
 
 class PollerController extends Controller
@@ -37,6 +38,8 @@ class PollerController extends Controller
             'poller_groups' => PollerGroup::query()->withCount('devices')->get(),
             'default_group_id' => Config::get('default_poller_group'),
             'ungrouped_count' => Device::where('poller_group', 0)->count(),
+            'distributed_poller_type' => Config::get('distributed_poller_type'),
+            'filters' => json_encode(new QueryBuilderFilter('poller')),
         ]);
     }
 

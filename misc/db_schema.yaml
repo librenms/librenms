@@ -1369,6 +1369,7 @@ poller_groups:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: group_name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: descr, Type: varchar(255), 'Null': false, Extra: '' }
+    - { Field: rules, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 ports:

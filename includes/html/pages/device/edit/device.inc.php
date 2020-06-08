@@ -239,7 +239,7 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
    <div class="form-group">
        <label for="poller_group" class="col-sm-2 control-label">Poller Group</label>
        <div class="col-sm-6">
-           <select name="poller_group" id="poller_group" class="form-control input-sm">
+           <select name="poller_group" id="poller_group" class="form-control input-sm"<?=(\LibreNMS\Config::get('distributed_poller_type') != 'dynamic') ?: ' disabled'?>>
            <option value="0">General<?=\LibreNMS\Config::get('distributed_poller_group') == 0 ? ' (default Poller)': ''?></option>
     <?php
     foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
@@ -250,6 +250,9 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
     }
     ?>
            </select>
+       </div>
+       <div class="col-sm-2">
+           <small>Poller Group Type:<br><b><a href="/settings/poller/distributed"><?=ucwords(\LibreNMS\Config::get('distributed_poller_type'))?></a></b></small>
        </div>
    </div>
     <?php
