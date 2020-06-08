@@ -49,8 +49,10 @@
             <div class="content-divider"></div>
             <div class="row">
                 <div id="error-box" class="col-12">
-                    @if(!empty($message))
+                    @if(!empty($messages))
+                        @foreach($messages as $message)
                         <div class="alert alert-danger">{{ $message }}</div>
+                        @endforeach
                     @endif
                 </div>
             </div>

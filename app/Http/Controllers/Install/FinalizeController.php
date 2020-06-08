@@ -25,11 +25,54 @@
 
 namespace App\Http\Controllers\Install;
 
+use Exception;
+use LibreNMS\Util\EnvHelper;
+
 class FinalizeController extends \App\Http\Controllers\Controller
 {
     public function __invoke()
     {
-        return view('install.finish');
+        $env = '';
+        $config = $this->getConfigFileContents();
+        $messages = [];
+        $success = true;
+
+        try {
+            $this->writeConfigFile($config);
+        } catch (Exception $e) {
+            $messages[] = $e->getMessage();
+            $success = true;
+        }
+
+        // write env last only if everything else succeeded
+        if ($success) {
+            try {
+                $env = $this->writeEnvFile();
+            } catch (Exception $e) {
+                $messages[] = $e->getMessage();
+                $success = false;
+            }
+        }
+
+        return view('install.finish', [
+            'env' => $env,
+            'config' => $config,
+            'messages' => $messages,
+            'success' => $success,
+        ]);
+    }
+
+    private function writeEnvFile()
+    {
+        return EnvHelper::setEnv([
+            'NODE_ID' => uniqid(),
+            'DB_HOST' => session('db.host'),
+            'DB_PORT' => session('db.port'),
+            'DB_USERNAME' => session('db.username'),
+            'DB_PASSWORD' => session('db.password'),
+            'DB_DATABASE' => session('db.database'),
+            'DB_SOCKET' => session('db.socket'),
+        ], base_path('.env'));
     }
 
     private function writeConfigFile($config_file)
@@ -37,20 +80,18 @@ class FinalizeController extends \App\Http\Controllers\Controller
         $file = base_path('config.php');
         if (!file_exists($file)) {
             $conf = fopen($file, 'w');
-            if ($conf != false) {
+            if ($conf !== false) {
                 if (fwrite($conf, "<?php\n") === false) {
-                    echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
-                    echo("<pre>&lt;?php\n" . stripslashes($config_file) . "</pre>");
-                } else {
-                    $config_file = stripslashes($config_file);
-                    fwrite($conf, $config_file);
-                    echo("<div class='alert alert-success'>The config file has been created</div>");
+                    throw new Exception("We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)");
                 }
+
+                $config_file = stripslashes($config_file);
+                fwrite($conf, $config_file);
                 fclose($conf);
-            } else {
-                echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
-                echo("<pre>&lt;?php\n" . stripslashes($config_file) . "</pre>");
+                return;
             }
+
+            throw new Exception("We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)");
         }
     }
 
@@ -79,12 +120,12 @@ class FinalizeController extends \App\Http\Controllers\Controller
 ## Have a look in defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
 
 ### Database config
-\$config\['db_host'\] = '${$db['host']}';
-\$config\['db_port'\] = '${$db['port']}';
-\$config\['db_user'\] = '${$db['username']}';
-\$config\['db_pass'\] = '${$db['password']}';
-\$config\['db_name'\] = '${$db['database']}';
-\$config\['db_socket'\] = '${$db['unix_socket']}';
+\$config\['db_host'\] = '{$db['host']}';
+\$config\['db_port'\] = '{$db['port']}';
+\$config\['db_user'\] = '{$db['username']}';
+\$config\['db_pass'\] = '{$db['password']}';
+\$config\['db_name'\] = '{$db['database']}';
+\$config\['db_socket'\] = '{$db['unix_socket']}';
 
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
