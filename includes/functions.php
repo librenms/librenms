@@ -179,7 +179,6 @@ function getHostOS($device, $fetch = true)
     $deferred_os = array(
         'freebsd',
         'linux',
-        'nxos',
     );
 
     // check yaml files
