@@ -8,6 +8,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     - sysObjectID:
-        - .iso.org.dod.internet.private.enterprises.hpe.hpeNetworking.wiredNetworkingDevices.arubaOS-CX  #ArubaOS-CX
+        - '.iso.org.dod.internet.private.enterprises.hpe.hpeNetworking.wiredNetworkingDevices.arubaOS-CX'  #ArubaOS-CX
     - sysDescr:
         - Aruba
