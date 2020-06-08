@@ -73,9 +73,9 @@ class MakeUserController extends \App\Http\Controllers\Controller
         return redirect()->back()->with('message', $message);
     }
 
-    public static function enabled(): bool
+    public static function enabled()
     {
-        return true;
+        return session('install.migrate');
     }
 
     public static function icon(): string

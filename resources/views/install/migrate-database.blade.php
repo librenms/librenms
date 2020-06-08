@@ -5,24 +5,22 @@
 @section('content')
     <div class="row">
         <div class="col-12">
-            <h5 class="text-center">Importing MySQL DB - Do not close this page or interrupt the import</h5>
-            <textarea readonly id="db-update" class="form-control" rows="20" placeholder="Please Wait..." style="resize:vertical;"></textarea>
+            <label for="db-update">@lang('install.migrate.building')<br />@lang('install.migrate.building_interrupt')</label>
+            <textarea readonly id="db-update" class="form-control" rows="20" placeholder="@lang('install.migrate.wait')"></textarea>
         </div>
     </div>
     <div class="row">
         <div class="col-12">
-            If you don't see any errors or messages above then the database setup has been successful.<br />
-            <form class="form-horizontal" role="form" method="post">
-                @csrf
-                <input type="button" id="retry-btn" value="Retry" onClick="window.location.reload()" style="display: none;" class="btn btn-success">
-                <button type="submit" id="add-user-btn" class="btn btn-success float-right" disabled>Goto Add User</button>
-            </form>
+            <button type="button" id="retry-btn" onClick="window.location.reload()" class="btn btn-success pull-right">
+                @lang('install.migrate.retry')
+            </button>
         </div>
     </div>
 @endsection
 
 @section('scripts')
     <script type="text/javascript">
+        var migrate_error = false;
         var output = document.getElementById("db-update");
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "{{ route('install.action.migrate') }}", true);
@@ -33,20 +31,36 @@
             output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
             if (output.innerHTML.indexOf('Error!') !== -1) {
                 // if error word in output, show the retry button
+                migrate_error = true;
                 $("#retry-btn").css("display", "");
+                $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.error')</div>'))
             }
         };
-        xhr.timeout = 90000; // if no response for 90s, allow the user to retry
+        xhr.timeout = 240000; // if no response for 4m, allow the user to retry
         xhr.ontimeout = function (e) {
+            migrate_error = true;
             $("#retry-btn").css("display", "");
+            $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.timeout')</div>'))
         };
         xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-                if (xhr.status === 200) {
-                    $('#install-user-button').removeClass('disabled');
-                }
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200 && !migrate_error) {
+                $('#install-user-button').removeClass('disabled');
             }
         };
         xhr.send();
     </script>
+@endsection
+
+@section('style')
+    <style type="text/css">
+        label[for=db-update] {
+            font-size: large;
+        }
+        #db-update {
+            resize:vertical;
+        }
+        #retry-btn {
+            display: none;
+        }
+    </style>
 @endsection

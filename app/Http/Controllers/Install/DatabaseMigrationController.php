@@ -65,7 +65,7 @@ class DatabaseMigrationController extends Controller
         return $response;
     }
 
-    public static function enabled(): bool
+    public static function enabled()
     {
         return session('install.database');
     }

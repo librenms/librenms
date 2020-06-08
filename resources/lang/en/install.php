@@ -31,6 +31,12 @@ return [
     ],
     'migrate' => [
         'title' => 'Build Database',
+        'building' => 'Building Database structure...',
+        'building_interrupt' => 'Do not close this page or interrupt the import!',
+        'wait' => 'Please Wait...',
+        'timeout' => 'HTTP request timed out, your database structure may be inconsistent.',
+        'error' => 'Error encountered, check output for details.',
+        'retry' => 'Retry',
     ],
     'user' => [
         'title' => 'Create Admin User',

@@ -62,7 +62,7 @@ class ChecksController extends \App\Http\Controllers\Controller
         return $status;
     }
 
-    public static function enabled(): bool
+    public static function enabled()
     {
         return true;
     }

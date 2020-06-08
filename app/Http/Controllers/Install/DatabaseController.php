@@ -74,7 +74,7 @@ class DatabaseController extends Controller
         ]);
     }
 
-    public static function enabled(): bool
+    public static function enabled()
     {
         return true;
     }
