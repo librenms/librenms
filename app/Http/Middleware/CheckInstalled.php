@@ -39,7 +39,7 @@ class CheckInstalled
      */
     public function handle($request, Closure $next)
     {
-        $installed = file_exists(base_path('config.php'));
+        $installed = !config('librenms.install') && file_exists(base_path('config.php'));
         $is_install_route = $request->is('install*');
 
         if (!$installed && !$is_install_route) {
