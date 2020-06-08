@@ -36,9 +36,11 @@ class UpsTrapsOnBatteryTest extends SnmpTrapTestCase
     {
         $device = factory(Device::class)->create();
         $state = factory(Sensor::class)->make(['sensor_class' => 'state', 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']);
-        $time = factory(Sensor::class)->make(['sensor_class' => 'runtime', 'sensor_index' => '100', 'sensor_current' => '0']);
-        $remaining = factory(Sensor::class)->make(['sensor_class' => 'runtime', 'sensor_index' => '200', 'sensor_current' => '371']);
-        $device->sensors()->save($state,$time,$remaining);
+        $time = factory(Sensor::class)->make(['sensor_class' => 'runtime', 'sensor_index' => '100', 'sensor_type' => 'rfc1628', 'sensor_current' => '0']);
+        $remaining = factory(Sensor::class)->make(['sensor_class' => 'runtime', 'sensor_index' => '200', 'sensor_type' => 'rfc1628', 'sensor_current' => '371']);
+        $device->sensors()->save($state);
+        $device->sensors()->save($time);
+        $device->sensors()->save($remaining);
 
         $trapText = "$device->hostname
 UDP: [$device->ip]:161->[192.168.5.5]:162
