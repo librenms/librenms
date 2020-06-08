@@ -37,7 +37,8 @@ class LatencyController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return true;
+        return Config::get('smokeping.integration') || DB::table('device_perf')
+            ->where('device_id', $device->device_id)->exists();
     }
 
     public function slug(): string
@@ -61,7 +62,11 @@ class LatencyController implements DeviceTab
         $to = Request::get('dtpickerto', Carbon::now()->format(Config::get('dateformat.byminute')));
 
         $perf = $this->fetchPerfData($device, $from, $to);
-        $duration = abs(strtotime($perf->first()->date) - strtotime($perf->last()->date)) * 1000;
+
+        $duration = $perf && $perf->isNotEmpty()
+            ? abs(strtotime($perf->first()->date) - strtotime($perf->last()->date)) * 1000
+            : 0;
+
 
         $smokeping = new Smokeping($device);
         $smokeping_tabs = [];
