@@ -26,11 +26,17 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class Openwrt extends OS implements
     WirelessClientsDiscovery,
-    WirelessFrequencyDiscovery
+    WirelessFrequencyDiscovery,
+    WirelessNoiseFloorDiscovery,
+    WirelessRateDiscovery,
+    WirelessSnrDiscovery
 {
     /**
      * Retrieve (and explode to array) list of network interfaces, and desired display name in LibreNMS.
@@ -53,35 +59,43 @@ class Openwrt extends OS implements
     /**
      * Generic (common / shared) routine, to create new Wireless Sensors, of the sensor Type passed as the call argument.
      * type - string, matching to LibreNMS documentation => https://docs.librenms.org/Developing/os/Wireless-Sensors/
+     * query - string, query to be used at client (appends to type string, e.g. -tx, -rx)
+     * system - boolean, flag to indicate that a combined ("system level") sensor (and OID) is to be added
+     * stats - boolean, flag denoting that statistics are to be retrieved (min, max, avg)
+     * NOTE: system and stats are assumed to be mutually exclusive (at least for now!)
      *
      * @return array Sensors
      */
-    private function getSensorData($type, $system = False)
+    private function getSensorData($type, $query = '', $system = False, $stats = False)
     {
+	// Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
         $sensors = array();
         $interfaces = $this->getInterfaces();
-        $count = 1;
-        foreach ($interfaces as $index => $interface) {
-                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type-$index\"";
-                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), 'openwrt', $count, $interface);
-                $count += 1;
-        }
-        if ($system and (count($interfaces) > 1)) {
-                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type-wlan\"";
-                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), 'openwrt', $count, 'wlan');
-        }
-        return $sensors;
-    }
+	$count = 1;
 
-    /**
-     * Discover wireless frequency.  This is in MHz. Type is frequency.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array Sensors
-     */
-    public function discoverWirelessFrequency()
-    {
-        return $this->getSensorData('frequency');
+	// Build array for stats - if desired
+	$statstr = [''];
+	if ($stats) {
+		$statstr = ['-min', '-max', '-avg'];
+	}
+
+	// Loop over interfaces, adding sensors
+	foreach ($interfaces as $index => $interface) {
+		// Loop over stats, appending to sensors as needed (only a single, blank, addition if no stats)
+		foreach ($statstr as $stat) {
+	                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-$index$stat\"";
+        	        $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, "$interface$query$stat");
+                	$count += 1;
+		}
+        }
+	// If system level (i.e. overall) sensor desired, add that one as well
+        if ($system and (count($interfaces) > 1)) {
+                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-wlan\"";
+                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, 'wlan');
+        }
+
+	// And, return all the sensors that have been created above (i.e. the array of sensors)
+        return $sensors;
     }
 
     /**
@@ -92,7 +106,53 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessClients()
     {
-	return $this->getSensorData('clients', True);
+        return $this->getSensorData('clients', '', True, False);
+    }
+
+    /**
+     * Discover wireless frequency.  This is in MHz. Type is frequency.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessFrequency()
+    {
+        return $this->getSensorData('frequency', '', False, False);
+    }
+
+    /**
+     * Discover wireless noise floor.  This is in dBm. Type is noise-floor.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessNoiseFloor()
+    {
+        return $this->getSensorData('noise-floor', '', False, False);
+    }
+
+    /**
+     * Discover wireless rate. This is in bps. Type is rate.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessRate()
+    {
+	$txrate = $this->getSensorData('rate', '-tx', False, True);
+	$rxrate = $this->getSensorData('rate', '-rx', False, True);
+        return array_merge($txrate, $rxrate);
+    }
+
+    /**
+     * Discover wireless snr. This is in dB. Type is snr.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array
+     */
+    public function discoverWirelessSNR()
+    {
+	return $this->getSensorData('snr', '', False, True);
     }
 
 }
