@@ -28,6 +28,7 @@ use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
+use Illuminate\Support\Str;
 
 class UpsTrapsOnBattery implements SnmptrapHandler
 {
@@ -41,9 +42,9 @@ class UpsTrapsOnBattery implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $min_remaining = $trap->getOidData($trap->findOid('UPS-MIB::upsEstimatedMinutesRemaining.0'));
-        $sec_time  = $trap->getOidData($trap->findOid('UPS-MIB::upsSecondsOnBattery.0'));
-        Log::event("UPS running on battery for $sec_time. Estimated $min_remaining remaining", $device->device_id, 'trap', 5);
+        $min_remaining = Str::before($trap->getOidData($trap->findOid('UPS-MIB::upsEstimatedMinutesRemaining.0')), ' ');
+        $sec_time  = Str::before($trap->getOidData($trap->findOid('UPS-MIB::upsSecondsOnBattery.0')), ' ');
+        Log::event("UPS running on battery for $sec_time seconds. Estimated $min_remaining minutes remaining", $device->device_id, 'trap', 5);
         $sensor_remaining = $device->sensors()->where('sensor_index', '200')->where('sensor_type', 'rfc1628')->first();
         if (!$sensor_remaining) {
             Log::warning("Snmptrap UpsTraps: Could not find matching sensor \'Estimated battery time remaining\' for device: " . $device->hostname);
