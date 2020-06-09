@@ -1,0 +1,188 @@
+mib: HUAWEI-MIB:HUAWEI-SITE-MONITOR-MIB
+modules:
+    pre-cache:
+       data:
+           - oid:
+               - hwLvdUnitEquipName
+    sensors:
+      voltage:
+        data:
+          -
+            oid: hwRectsRatedVoltage
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.5.{{ $index }}'
+            divisor: 10
+            descr: Rectifier Rated Voltage
+            index: "ratedRectifier-{{ $index }}"
+            group: Rectifier
+          -
+            oid: hwModifyRectsOutputVoltage
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.6.{{ $index }}'
+            divisor: 10
+            descr: Rectifier Adjusted Voltage
+            index: "adjustedRectifier-{{ $index }}"
+            group: Rectifier
+          -
+            oid: hwApOrAblVoltage
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.2.1.1.4.{{ $index }}'
+            descr:  "AC Input (A-Phase)"
+            index: "acInput-{{ $index }}"
+            group: AC
+            divisor: 10
+          -
+            oid: hwDcsTotalVoltage
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.3.{{ $index }}'
+            descr:  "DC Total Voltage"
+            index: "dcTotal-{{ $index }}"
+            group: DC
+            divisor: 10
+          -
+            oid: hwDcOutputVoltage
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.2.1.1.4.{{ $index }}'
+            descr:  "DC Output Voltage"
+            index: "dcOutput-{{ $index }}"
+            group: DC
+            divisor: 10
+          -
+            oid: hwSetLvdVoltage
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.7.2.1.1.5.{{ $index }}'
+            descr: hwLvdUnitEquipName
+            index: "lvd-{{ $index }}"
+            group: LVD
+            divisor: 10
+      current:
+        data:
+          -
+            oid: hwBattsTotalCurrent
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.1.{{ $index }}'
+            descr: Battery Current
+            index: "battery-{{ $index }}"
+            group: Battery
+          -
+            oid: hwRectsTotalCurrent
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.3.{{ $index }}'
+            descr: Rectifier Current
+            index: "rectifier-{{ $index }}"
+            group: Rectifier
+          -
+            oid: hwDcsTotalCurrent
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.4.{{ $index }}'
+            descr: DC Total Current
+            index: "dcTotal-{{ $index }}"
+            group: DC
+          - 
+            oid: hwDcOutputCurrent
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.2.1.1.5.{{ $index }}'
+            descr: DC Output Current
+            index: "dcOutput-{{ $index }}"
+            group: DC
+      count:
+        data:
+          -
+            oid: hwBattsTotalQuantity
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.1.3.{{ $index }}'
+            descr: "Quantity of Batteries"
+            index: "battery-{{ $index }}"
+            group: Battery
+          -
+            oid: hwRectsTotalQuantity
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.4.{{ $index }}'
+            descr: "Quantity of Rectifiers"
+            index: "rectifier-{{ $index }}"
+            group: Rectifier
+          -
+            oid: hwDcsTotalQuantity
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.6.1.6.{{ $index }}'
+            descr: "Quantity of DCs"
+            index: "dc-{{ $index }}"
+            group: DC
+          -
+            oid: hwAcsTotalQuantity
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.5.1.4.{{ $index }}'
+            descr: "Quantity of ACs"
+            index: "ac-{{ $index }}"
+            group: AC
+
+      charge:
+        data:
+          -
+            oid: hwBattStringRemainCapacityPercent
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.4.2.1.3.{{ $index }}'
+            descr: 'Remaining battery capacity'
+            index: 'hwBattStringRemainCapacityPercent.{{ $index }}'
+            divisor: 10
+      state:
+        data:
+          -
+            oid: hwSiteDGWorkStatus
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.1.1.9.{{ $index }}'
+            group: Site Summary
+            descr: "Site Status"
+            state_name: hwSiteDGWorkStatus
+            states:
+              - { value: 1, generic: 3, graph: 1, descr: 'idle' }
+              - { value: 2, generic: 0, graph: 1, descr: 'working' }
+              - { value: 3, generic: 3, graph: 1, descr: 'unknown' }
+          -
+            oid: hwMonitorOperStatus
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.2.2.1.1.99.{{ $index }}'
+            descr: "Monitor Status"
+            group: Site Summary
+            state_name: hwMonitorOperStatus
+            states:
+              - { value: 1, generic: 0, graph: 1, descr: 'normal' }
+              - { value: 2, generic: 2, graph: 1, descr: 'commRs485Fail' }
+              - { value: 3, generic: 2, graph: 1, descr: 'commNetFail' }
+              - { value: 4, generic: 2, graph: 1, descr: 'fault' }
+              - { value: 254, generic: 1, graph: 1, descr: 'alarmResume' }
+              - { value: 255, generic: 3, graph: 1, descr: 'other' }
+          -
+            oid: hwSetMonEquipCtrlState
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.2.2.1.1.11.{{ $index }}'
+            descr: "Monitor Control Status"
+            group: Site Summary
+            state_name: hwSetMonEquipCtrlState
+            states:
+              - { value: 1, generic: 0, graph: 1, descr: 'manualMode' }
+              - { value: 2, generic: 0, graph: 1, descr: 'autoMode' }
+              - { value: 255, generic: 3, graph: 1, descr: 'unknown' }
+          -
+            oid: hwSetRectsRedundEnable
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.7.{{ $index }}'
+            descr: "Sleep Function"
+            group: Rectifier
+            state_name: hwSetRectsRedundEnable
+            states:
+              - { value: 1, generic: 0, graph: 1, descr: 'disable' }
+              - { value: 2, generic: 0, graph: 1, descr: 'enable' }
+              - { value: 3, generic: 3, graph: 1, descr: 'funcNotSuppport' }
+          -
+            oid: hwCtrlRectsAllOnOff
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.3.1.8.{{ $index }}'
+            descr: "Recirifier Module Status"
+            group: Rectifier
+            state_name: hwCtrlRectsAllOnOff
+            states:
+              - { value: 1, generic: 0, graph: 1, descr: 'on' }
+              - { value: 2, generic: 1, graph: 1, descr: 'off' }
+              - { value: 255, generic: 3, graph: 1, descr: 'nullOper' }
+          -
+            oid: hwBattsChargeStatus
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.3.{{ $index }}'
+            descr: "Battery Charge Status"
+            group: Battery
+            state_name: hwBattsChargeStatus
+            states:
+              - { value: 1, generic: 0, graph: 1, descr: 'floatCharge' }
+              - { value: 2, generic: 1, graph: 1, descr: 'boostCharge' }
+              - { value: 3, generic: 2, graph: 1, descr: 'disCharge' }
+              - { value: 255, generic: 3, graph: 1, descr: 'unknown' }
+          -
+            oid: hwBattsCurrLimitStatus
+            num_oid: '.1.3.6.1.4.1.2011.6.164.1.4.2.4.{{ $index }}'
+            descr: "Battery Limiting Status"
+            group: Battery
+            state_name: hwBattsCurrLimitStatus
+            states:
+              - { value: 1, generic: 0, graph: 1, descr: 'unlimit' }
+              - { value: 2, generic: 0, graph: 1, descr: 'limit' }
+              - { value: 255, generic: 3, graph: 1, descr: 'unknown' }                 

@@ -1,0 +1,634 @@
+-- ****************************************************************************
+-- aviatAlarmReporting.mib: Aviat Networks Alarm Reporting MIB
+--
+-- Copyright © 2016 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+AVIAT-ALARM-REPORTING-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        TEXTUAL-CONVENTION, DisplayString, TruthValue, DateAndTime
+            FROM SNMPv2-TC
+        MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+        NOTIFICATION-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        ItuPerceivedSeverity
+            FROM ITU-ALARM-TC-MIB
+        IANAItuEventType, IANAItuProbableCause
+            FROM IANA-ITU-ALARM-TC-MIB
+        AviatYangIdentityRef
+            FROM AVIAT-TEXTCONVENTION-MIB
+        aviatModules
+            FROM STXN-GLOBALREGISTER-MIB;
+
+    aviatAlarmReportingModule MODULE-IDENTITY
+        LAST-UPDATED    "201605260000Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 5200 Great America Parkway
+                                 Santa Clara
+                                 California 95054
+                                 United States of America
+
+                         Tel: 408 567 7000
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This MIB module is used to describe the status of alarms
+                 present in Aviat Networks products."
+        REVISION        "201605260000Z"
+        DESCRIPTION
+                "Initial Version."
+            ::= { aviatModules 47 }
+
+
+-- ****************************************************************************
+-- Conformance area, containing groups and compliance specifications
+-- ****************************************************************************
+    aviatAlarmReportingConformance       OBJECT IDENTIFIER ::= { aviatAlarmReportingModule 1 }
+
+    aviatAlarmReportingGroups            OBJECT IDENTIFIER ::= { aviatAlarmReportingConformance 1 }
+
+    aviatAlarmReportingCompliance        OBJECT IDENTIFIER ::= { aviatAlarmReportingConformance 2 }
+
+
+-- ****************************************************************************
+-- Sub-tree for Alarm MIB objects
+-- ****************************************************************************
+    aviatAlarmReportingMIBObjects        OBJECT IDENTIFIER ::= { aviatAlarmReportingModule 2 }
+
+    aviatAlarmReportingNotifications     OBJECT IDENTIFIER ::= { aviatAlarmReportingMIBObjects 7 }
+
+
+-- ****************************************************************************
+-- Sub-tree for Alarm MIB notifications
+-- ****************************************************************************
+    aviatAlarmReportingMIBEvents         OBJECT IDENTIFIER ::= { aviatAlarmReportingModule 0 }
+
+
+-- ****************************************************************************
+-- Textual Conventions
+-- ****************************************************************************
+
+   IetfEntityName ::= TEXTUAL-CONVENTION
+       DISPLAY-HINT "127t"
+       STATUS       current
+       DESCRIPTION
+            "A name uniquely identifying an entity within the system.
+             This corresponds to the physical entity name used by the
+             ietf-entity YANG."
+       SYNTAX       OCTET STRING (SIZE (0..127))
+
+   AviatAlarmInstanceState ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+               "The current state of an alarm instance"
+       SYNTAX         INTEGER
+       {
+              cleared (0),
+              raised (1),
+              unstable (2)
+       }
+
+   AviatAlarmReportingMode ::= TEXTUAL-CONVENTION
+       STATUS current
+       DESCRIPTION
+               "Reporting mode for alarm instances on a particular entity."
+       SYNTAX         INTEGER
+       {
+              all (0),
+              nonSummary (1),
+              summaryOnly (2),
+              none (3)
+       }
+
+-- ****************************************************************************
+-- Alarm Supported Types Table
+-- ****************************************************************************
+    aviatAlarmTypeTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatAlarmTypeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a table containing information for all alarms
+                         types that are supported by the system."
+            ::= { aviatAlarmReportingMIBObjects 1 }
+
+    aviatAlarmTypeEntry   OBJECT-TYPE
+        SYNTAX          AviatAlarmTypeEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the table holding information about a
+                         single supported alarm type."
+        INDEX           { aviatAlarmTypeIndex }
+            ::= { aviatAlarmTypeTable 1 }
+
+    AviatAlarmTypeEntry ::=
+        SEQUENCE {
+            aviatAlarmTypeIndex
+                AviatYangIdentityRef,
+            aviatAlarmTypeSecurityEvent
+                TruthValue,
+            aviatAlarmTypeDescription
+                DisplayString,
+            aviatAlarmTypeEvent
+                IANAItuEventType,
+            aviatAlarmTypeDefaultSeverity
+                ItuPerceivedSeverity
+        }
+
+    aviatAlarmTypeIndex             OBJECT-TYPE
+        SYNTAX          AviatYangIdentityRef
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "The unique Yang Identity representing a particular alarm
+                         type."
+            ::= { aviatAlarmTypeEntry 1 }
+
+    aviatAlarmTypeSecurityEvent     OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates whether or not the system views the alarm
+                         type as being security related."
+            ::= { aviatAlarmTypeEntry 2 }
+
+    aviatAlarmTypeDescription       OBJECT-TYPE
+        SYNTAX          DisplayString ( SIZE ( 0..255 ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object specifies a human-readable message
+                         describing the alarm type."
+            ::= { aviatAlarmTypeEntry 3 }
+
+    aviatAlarmTypeEvent              OBJECT-TYPE
+        SYNTAX          IANAItuEventType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The type of event associated with the alarm type."
+            ::= { aviatAlarmTypeEntry 4 }
+
+    aviatAlarmTypeDefaultSeverity    OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object specifies the default severity assigned to
+                         the alarm type by the system. By default, any entity that
+                         raises an alarm of this type will have this level of severity
+                         associated with the alarm instance.
+                         The following ITU-t X.733 severities are supported:
+                             critical        (3)
+                             major           (4)
+                             minor           (5)
+                             warning         (6)
+
+                         See http://www.iana.org."
+            ::= { aviatAlarmTypeEntry 5 }
+
+-- ****************************************************************************
+-- Alarm Status Objects
+-- ****************************************************************************
+    aviatAlarmInstanceLastChange  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time when any alarm instance in the system last
+                         changed its state."
+            ::= { aviatAlarmReportingMIBObjects 2 }
+
+    aviatAlarmInstanceTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatAlarmInstanceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a table containing information for all alarm
+                         instances currently registered within the system."
+            ::= { aviatAlarmReportingMIBObjects 3 }
+
+    aviatAlarmInstanceEntry       OBJECT-TYPE
+        SYNTAX          AviatAlarmInstanceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the table holding information for a
+                         given alarm instance."
+        INDEX           { aviatAlarmInstanceEntity, aviatAlarmTypeIndex}
+            ::= { aviatAlarmInstanceTable 1 }
+
+    AviatAlarmInstanceEntry ::=
+        SEQUENCE {
+            aviatAlarmInstanceEntity
+                IetfEntityName,
+            aviatAlarmInstanceSecurityEvent
+                TruthValue,
+            aviatAlarmInstanceDescription
+                DisplayString,
+            aviatAlarmInstanceType
+                IANAItuEventType,
+            aviatAlarmInstanceCurrentState
+                AviatAlarmInstanceState,
+            aviatAlarmInstanceCurrentSeverity
+                ItuPerceivedSeverity,
+            aviatAlarmInstanceRaisedSeverity
+                ItuPerceivedSeverity,
+            aviatAlarmInstanceLastStatusChange
+                DateAndTime,
+            aviatAlarmInstanceStatusChangeCount
+                Counter32,
+            aviatAlarmInstanceDisabled
+                TruthValue
+        }
+
+    aviatAlarmInstanceEntity    OBJECT-TYPE
+        SYNTAX          IetfEntityName
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Each alarm instance is associated with a particular
+                         system entity. This object identifies the entity in the
+                         form of a name string. Corresponds to the physical
+                         entity name as per the ietf-entity YANG."
+            ::= { aviatAlarmInstanceEntry 1 }
+
+    aviatAlarmInstanceSecurityEvent     OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates whether or not the system views the alarm
+                         instance as being security related."
+            ::= { aviatAlarmInstanceEntry 2 }
+
+    aviatAlarmInstanceDescription   OBJECT-TYPE
+        SYNTAX          DisplayString ( SIZE ( 0..255 ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object specifies a human-readable message
+                         describing the alarm instance."
+            ::= { aviatAlarmInstanceEntry 3 }
+
+    aviatAlarmInstanceType          OBJECT-TYPE
+        SYNTAX          IANAItuEventType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The type of event associated with the alarm instance."
+            ::= { aviatAlarmInstanceEntry 4 }
+
+    aviatAlarmInstanceCurrentState     OBJECT-TYPE
+        SYNTAX          AviatAlarmInstanceState
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The current state of the alarm instance.
+                         Supported states are:
+                             cleared  (0)
+                             raised   (1)
+                             unstable (2)"
+            ::= { aviatAlarmInstanceEntry 5 }
+
+    aviatAlarmInstanceCurrentSeverity   OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object shows the current severity level
+                         associated with the alarm instance:
+                             cleared        (1)
+                             indetermined   (2)
+                             critical       (3)
+                             major          (4)
+                             minor          (5)
+                             warning        (6)"
+            ::= { aviatAlarmInstanceEntry 6 }
+
+    aviatAlarmInstanceRaisedSeverity   OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The severity to be applied when this alarm instance is
+                         raised for this entity. This is either based upon the
+                         default for the alarm type, or overriden by user
+                         configuration.
+
+                         The following ITU-t X.733 severities are supported:
+                             critical       (3)
+                             major          (4)
+                             minor          (5)
+                             warning        (6)
+
+                         See http://www.iana.org."
+            ::= { aviatAlarmInstanceEntry 7 }
+
+    aviatAlarmInstanceLastStatusChange  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time when the status of the alarm instance last
+                         changed."
+            ::= { aviatAlarmInstanceEntry 8 }
+
+    aviatAlarmInstanceStatusChangeCount OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The number of times that the entity has raised or
+                         lowered this alarm instance since the system was started."
+            ::= { aviatAlarmInstanceEntry 9 }
+
+    aviatAlarmInstanceDisabled    OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates whether or not an event which causes this
+                         alarm instance to be raised or lowered by this entity,
+                         will be reported.
+
+                         When disabled, status changes for the alarm will still
+                         be shown in aviatAlarmInstanceTable, but the alarm instance
+                         will no longer appear in aviatAlarmRaisedInstanceTable,
+                         a log entry will not be made, and a notification will not
+                         be generated."
+            ::= { aviatAlarmInstanceEntry 10 }
+
+-- ****************************************************************************
+-- Raised Alarms
+-- ****************************************************************************
+
+    aviatAlarmRaisedInstanceLastChange  OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time of the last update to the raised alarms table."
+            ::= { aviatAlarmReportingMIBObjects 4 }
+
+    aviatAlarmRaisedInstanceTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatAlarmRaisedInstanceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a table containing information for all alarm
+                         instances that are currently raised or unstable in the
+                         system."
+            ::= { aviatAlarmReportingMIBObjects 5 }
+
+    aviatAlarmRaisedInstanceEntry       OBJECT-TYPE
+        SYNTAX          AviatAlarmRaisedInstanceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the table holding information for a
+                         given raised or unstable alarm instance."
+        INDEX           { aviatAlarmInstanceEntity, aviatAlarmTypeIndex }
+            ::= { aviatAlarmRaisedInstanceTable 1 }
+
+    AviatAlarmRaisedInstanceEntry ::=
+        SEQUENCE {
+            aviatAlarmRaisedInstanceSecurityEvent
+                TruthValue,
+            aviatAlarmRaisedInstanceDescription
+                DisplayString,
+            aviatAlarmRaisedInstanceSeverity
+                ItuPerceivedSeverity,
+            aviatAlarmRaisedInstanceCause
+                IANAItuProbableCause,
+            aviatAlarmRaisedInstanceTime
+                DateAndTime,
+            aviatAlarmRaisedInstanceIsUnstable
+                TruthValue
+        }
+
+    aviatAlarmRaisedInstanceSecurityEvent     OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates whether or not the system views the alarm
+                         instance as being security related."
+            ::= { aviatAlarmRaisedInstanceEntry 1 }
+
+    aviatAlarmRaisedInstanceDescription OBJECT-TYPE
+        SYNTAX          DisplayString ( SIZE ( 0..255 ) )
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object specifies a human-readable message
+                         describing the alarm instance."
+            ::= { aviatAlarmRaisedInstanceEntry 2 }
+
+    aviatAlarmRaisedInstanceSeverity    OBJECT-TYPE
+        SYNTAX          ItuPerceivedSeverity
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object shows the severity level associated with
+                         the alarm instance:
+                             critical       (3)
+                             major          (4)
+                             minor          (5)
+                             warning        (6)"
+            ::= { aviatAlarmRaisedInstanceEntry 3 }
+
+    aviatAlarmRaisedInstanceCause       OBJECT-TYPE
+        SYNTAX          IANAItuProbableCause
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object shows the probable cause of the alarm
+                         instance being active."
+            ::= { aviatAlarmRaisedInstanceEntry 4 }
+
+    aviatAlarmRaisedInstanceTime        OBJECT-TYPE
+        SYNTAX          DateAndTime
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "The time when the alarm instance was raised."
+            ::= { aviatAlarmRaisedInstanceEntry 5 }
+
+    aviatAlarmRaisedInstanceIsUnstable  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "An indication of whether the alarm instance is
+                         currently considered unstable, and hence has
+                         further state changes suspended until it is
+                         considered stable again."
+            ::= { aviatAlarmRaisedInstanceEntry 6 }
+
+-- ****************************************************************************
+-- Alarm Entity Status
+-- ****************************************************************************
+
+    aviatAlarmEntityTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatAlarmEntityEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a table containing information for all entities
+                         that have alarm instances registered against them."
+            ::= { aviatAlarmReportingMIBObjects 6 }
+
+    aviatAlarmEntityEntry       OBJECT-TYPE
+        SYNTAX          AviatAlarmEntityEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the table holding information for a
+                         given entity."
+        INDEX           { aviatAlarmInstanceEntity }
+            ::= { aviatAlarmEntityTable 1 }
+
+    AviatAlarmEntityEntry ::=
+        SEQUENCE {
+            aviatAlarmEntityReportingMode
+                AviatAlarmReportingMode
+        }
+
+    aviatAlarmEntityReportingMode     OBJECT-TYPE
+        SYNTAX          AviatAlarmReportingMode
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Indicates the alarm reporting mode configured for this
+                         entity. Supported modes are:
+
+                             all         (0)
+                             nonSummary  (1)
+                             summaryOnly (2)
+                             none        (3)
+
+                         The mode dictates alarm instances of which alarm types
+                         against the entity shall generate a log entry and a
+                         notification upon state change or suppression change."
+            ::= { aviatAlarmEntityEntry 1 }
+
+-- ****************************************************************************
+-- Notification Objects
+-- ****************************************************************************
+    aviatAlarmEntityName        OBJECT-TYPE
+        SYNTAX          IetfEntityName
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The name of the entity associated with the alarm
+                         instance. Only used for the generation of
+                         notifications."
+            ::= { aviatAlarmReportingNotifications 1 }
+
+    aviatAlarmTypeID    OBJECT-TYPE
+        SYNTAX          AviatYangIdentityRef
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION     "The index of the alarm type associated with
+                         the alarm instance. Only used for the
+                         generation of notifications."
+            ::= { aviatAlarmReportingNotifications 2 }
+
+-- ****************************************************************************
+-- Notification Events
+-- ****************************************************************************
+    aviatAlarmRaisedInstanceNotification    NOTIFICATION-TYPE
+        OBJECTS {
+            aviatAlarmInstanceLastStatusChange,
+            aviatAlarmEntityName,
+            aviatAlarmTypeID,
+            aviatAlarmInstanceCurrentSeverity
+        }
+        STATUS          current
+        DESCRIPTION     "This notification is generated whenever a system alarm
+                         is raised."
+            ::= { aviatAlarmReportingMIBEvents 1 }
+
+    aviatAlarmClearedInstanceNotification   NOTIFICATION-TYPE
+        OBJECTS {
+            aviatAlarmInstanceLastStatusChange,
+            aviatAlarmEntityName,
+            aviatAlarmTypeID
+        }
+        STATUS          current
+        DESCRIPTION     "This notification is generated whenever a system alarm
+                         is cleared."
+            ::= { aviatAlarmReportingMIBEvents 2 }
+
+    aviatAlarmUnstableInstanceNotification NOTIFICATION-TYPE
+        OBJECTS {
+            aviatAlarmInstanceLastStatusChange,
+            aviatAlarmEntityName,
+            aviatAlarmTypeID,
+            aviatAlarmInstanceCurrentSeverity
+        }
+        STATUS          current
+        DESCRIPTION     "This notification is generated whenever a system alarm
+                         is suspended."
+            ::= { aviatAlarmReportingMIBEvents 3 }
+
+    aviatAlarmStabilizedInstanceNotification NOTIFICATION-TYPE
+        OBJECTS {
+            aviatAlarmInstanceLastStatusChange,
+            aviatAlarmEntityName,
+            aviatAlarmTypeID
+        }
+        STATUS          current
+        DESCRIPTION     "This notification is generated whenever a system alarm
+                         suspension is cleared."
+            ::= { aviatAlarmReportingMIBEvents 4 }
+
+
+-- ****************************************************************************
+-- The Object and Event Groups
+-- ****************************************************************************
+    aviatAlarmReportingObjectGroup       OBJECT-GROUP
+        OBJECTS {
+            aviatAlarmTypeSecurityEvent,
+            aviatAlarmTypeDescription,
+            aviatAlarmTypeEvent,
+            aviatAlarmTypeDefaultSeverity,
+            aviatAlarmInstanceLastChange,
+            aviatAlarmInstanceSecurityEvent,
+            aviatAlarmInstanceDescription,
+            aviatAlarmInstanceType,
+            aviatAlarmInstanceCurrentState,
+            aviatAlarmInstanceCurrentSeverity,
+            aviatAlarmInstanceRaisedSeverity,
+            aviatAlarmInstanceLastStatusChange,
+            aviatAlarmInstanceStatusChangeCount,
+            aviatAlarmInstanceDisabled,
+            aviatAlarmRaisedInstanceLastChange,
+            aviatAlarmRaisedInstanceSecurityEvent,
+            aviatAlarmRaisedInstanceDescription,
+            aviatAlarmRaisedInstanceSeverity,
+            aviatAlarmRaisedInstanceCause,
+            aviatAlarmRaisedInstanceTime,
+            aviatAlarmRaisedInstanceIsUnstable,
+            aviatAlarmEntityReportingMode,
+            aviatAlarmEntityName,
+            aviatAlarmTypeID
+        }
+        STATUS          current
+        DESCRIPTION     "These are the objects for alarms in the Alarm MIB."
+            ::= { aviatAlarmReportingGroups 1 }
+
+
+    aviatAlarmReportingNotifyGroup       NOTIFICATION-GROUP
+        NOTIFICATIONS {
+            aviatAlarmRaisedInstanceNotification,
+            aviatAlarmClearedInstanceNotification,
+            aviatAlarmUnstableInstanceNotification,
+            aviatAlarmStabilizedInstanceNotification
+        }
+        STATUS          current
+        DESCRIPTION     "Alarm notifications defined in this MIB."
+            ::= { aviatAlarmReportingGroups 2 }
+
+
+-- ****************************************************************************
+-- The Compliance Specifications
+-- ****************************************************************************
+    aviatAlarmReportingComplV1           MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION     "The implementation requirements for this MIB."
+        MODULE          -- This module
+            MANDATORY-GROUPS    {
+                                    aviatAlarmReportingObjectGroup,
+                                    aviatAlarmReportingNotifyGroup
+                                }
+            ::= { aviatAlarmReportingCompliance 1 }
+
+END

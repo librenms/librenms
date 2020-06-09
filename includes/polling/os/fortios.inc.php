@@ -2,7 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$temp_data = snmp_get_multi_oid($device, 'fnSysSerial.0 fmSysVersion.0 fmDeviceEntMode.1', '-OUQs', 'FORTINET-CORE-MIB:FORTINET-FORTIMANAGER-FORTIANALYZER-MIB');
+$temp_data = snmp_get_multi_oid($device, ['fnSysSerial.0', 'fmSysVersion.0', 'fmDeviceEntMode.1'], '-OUQs', 'FORTINET-CORE-MIB:FORTINET-FORTIMANAGER-FORTIANALYZER-MIB');
 $serial = $temp_data['fnSysSerial.0'];
 $version = $temp_data['fmSysVersion.0'];
 $hardware = rewrite_fortinet_hardware($device['sysObjectID']);

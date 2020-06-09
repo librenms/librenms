@@ -2,7 +2,7 @@
 
 echo 'IPOMANII-MIB: ';
 
-$oids = array();
+$oids = [];
 
 d_echo('inletConfigFrequencyHigh ');
 $oids = snmpwalk_cache_multi_oid($device, 'inletConfigFrequencyHigh', $oids, 'IPOMANII-MIB');

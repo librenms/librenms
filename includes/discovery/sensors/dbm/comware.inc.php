@@ -17,10 +17,7 @@ $divisor    = 100;
 foreach ($pre_cache['comware_oids'] as $index => $entry) {
     if (is_numeric($entry['hh3cTransceiverCurRXPower']) && $entry['hh3cTransceiverCurRXPower'] != 2147483647 && isset($entry['hh3cTransceiverDiagnostic'])) {
         $oid                       = '.1.3.6.1.4.1.25506.2.70.1.1.1.12.' . $index;
-        $dbquery                   = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", array(
-            $index,
-            $device['device_id']
-        ));
+        $dbquery                   = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$index, $device['device_id']]);
         $limit_low                 = round(uw_to_dbm($entry['hh3cTransceiverRcvPwrLoAlarm'] / 10), 2);
         $warn_limit_low            = round(uw_to_dbm($entry['hh3cTransceiverRcvPwrLoWarn'] / 10), 2);
         $limit                     = round(uw_to_dbm($entry['hh3cTransceiverRcvPwrHiAlarm'] / 10), 2);
@@ -36,10 +33,7 @@ foreach ($pre_cache['comware_oids'] as $index => $entry) {
 
     if (is_numeric($entry['hh3cTransceiverCurTXPower']) && $entry['hh3cTransceiverCurTXPower'] != 2147483647 && isset($entry['hh3cTransceiverDiagnostic'])) {
         $oid                       = '.1.3.6.1.4.1.25506.2.70.1.1.1.9.' . $index;
-        $dbquery                   = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", array(
-            $index,
-            $device['device_id']
-        ));
+        $dbquery                   = dbFetchRows("SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ? AND `ifAdminStatus` = 'up'", [$index, $device['device_id']]);
         $limit_low                 = round(uw_to_dbm($entry['hh3cTransceiverPwrOutLoAlarm'] / 10), 2);
         $warn_limit_low            = round(uw_to_dbm($entry['hh3cTransceiverPwrOutLoWarn'] / 10), 2);
         $limit                     = round(uw_to_dbm($entry['hh3cTransceiverPwrOutHiAlarm'] / 10), 2);

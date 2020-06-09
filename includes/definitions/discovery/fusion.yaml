@@ -68,8 +68,9 @@ modules:
                 -
                     oid: switchThermalTempTable
                     value: switchThermalTempValue
+                    group: 'Unit {{ $subindex0 }}'
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.11.1.3.{{ $index }}'
-                    descr: 'Thermal {{ $index }}'
+                    descr: 'Unit {{ $subindex0 }} Thermal {{ $subindex1 }}'
                     index: 'switchThermalTempValue.{{ $index }}'
         fanspeed:
             data:
@@ -77,7 +78,8 @@ modules:
                     oid: switchFanTable
                     value: switchFanOperSpeed
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.9.1.6.{{ $index }}'
-                    descr: 'Fan {{ $index }}'
+                    group: 'Unit {{ $subindex0 }}'
+                    descr: 'Unit {{ $subindex0 }} Fan {{ $subindex1 }}'
                     index: 'switchFanOperSpeed.{{ $index }}'
         state:
             data:
@@ -85,7 +87,8 @@ modules:
                     oid: switchFanTable
                     value: switchFanStatus
                     num_oid: '.1.3.6.1.4.1.259.6.10.120.1.1.9.1.3.{{ $index }}'
-                    descr: 'Fan {{ $index }}'
+                    group: 'Unit {{ $subindex0 }}'
+                    descr: 'Unit {{ $subindex0 }} Fan {{ $subindex1 }}'
                     index: 'switchFanStatus.{{ $index }}'
                     state_name: switchFanStatus
                     states:

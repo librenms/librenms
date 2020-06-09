@@ -29,48 +29,32 @@ class Config extends BaseModel
 {
     public $timestamps = false;
     protected $table = 'config';
-    public $primaryKey = 'config_name';
-    public $incrementing = false;
+    public $primaryKey = 'config_id';
     protected $fillable = [
         'config_name',
         'config_value',
-        'config_default',
-        'config_descr',
-        'config_group',
-        'config_sub_group',
     ];
-    protected $attributes = [
-        'config_default' => '',
-        'config_descr' => '',
-        'config_group' => '',
-        'config_sub_group' => '',
+    protected $casts = [
+        'config_default' => 'array'
     ];
 
-    /**
-     * Get the config_value (type cast)
-     *
-     * @param string $value
-     * @return mixed
-     */
+    // ---- Accessors/Mutators ----
+
     public function getConfigValueAttribute($value)
     {
-        if (filter_var($value, FILTER_VALIDATE_INT)) {
-            return (int)$value;
-        } elseif (filter_var($value, FILTER_VALIDATE_FLOAT)) {
-            return (float)$value;
-        } elseif (filter_var($value, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) !== null) {
-            return filter_var($value, FILTER_VALIDATE_BOOLEAN);
-        }
-
-        return $value;
+        return json_decode($value, true);
     }
 
     public function setConfigValueAttribute($value)
     {
-        if (is_bool($value)) {
-            $this->attributes['config_value'] = $value ? 'true' : 'false';
-        } else {
-            $this->attributes['config_value'] = $value;
-        }
+        $this->attributes['config_value'] = json_encode($value, JSON_UNESCAPED_SLASHES);
+    }
+
+    // ---- Query Scopes ----
+
+    public function scopeWithChildren($query, $name)
+    {
+        return $query->where('config_name', $name)
+            ->orWhere('config_name', 'like', "$name.%");
     }
 }

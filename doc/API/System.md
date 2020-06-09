@@ -12,11 +12,13 @@ Input:
 -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/system
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",

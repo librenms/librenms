@@ -36,6 +36,7 @@ class Sensor implements DiscoveryModule, PollerModule
     protected static $name = 'Sensor';
     protected static $table = 'sensors';
     protected static $data_name = 'sensor';
+    protected static $translation_prefix = 'sensors';
 
     private $valid = true;
 
@@ -358,9 +359,14 @@ class Sensor implements DiscoveryModule, PollerModule
             $snmp_data = array_merge($snmp_data, $multi_data);
         }
 
-        // deal with string values that may be surrounded by quotes
+        // deal with string values that may be surrounded by quotes, scientific number format and remove non numerical characters
         array_walk($snmp_data, function (&$oid) {
-            $oid = trim($oid, '"') + 0;
+            preg_match('/-?\d+(\.\d+)?(e-?\d+)?/i', $oid, $matches);
+            if (isset($matches[0])) {
+                $oid = $matches[0] + 0;
+            } else {
+                $oid = trim('"', $oid); // allow string only values
+            }
         });
 
         return $snmp_data;
@@ -612,7 +618,7 @@ class Sensor implements DiscoveryModule, PollerModule
         foreach ($sensors as $sensor) {
             $sensor_value = $data[$sensor['sensor_id']];
 
-            echo "  {$sensor['sensor_descr']}: $sensor_value {$types[$sensor['sensor_class']]['unit']}\n";
+            echo "  {$sensor['sensor_descr']}: $sensor_value " . __(static::$translation_prefix . '.' . $sensor['sensor_class'] . '.unit') . PHP_EOL;
 
             // update rrd and database
             $rrd_name = array(

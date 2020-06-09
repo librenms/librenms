@@ -2,12 +2,9 @@
 
 namespace App\Exceptions;
 
-use App\Checks;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
-use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use LibreNMS\Exceptions\DatabaseConnectException;
 
 class Handler extends ExceptionHandler
 {
@@ -25,73 +22,50 @@ class Handler extends ExceptionHandler
         \Illuminate\Validation\ValidationException::class,
     ];
 
+    /**
+     * A list of the exceptions that can be upgraded. Checked in order.
+     *
+     * @var array
+     */
+    protected $upgradable = [
+        \LibreNMS\Exceptions\FilePermissionsException::class,
+        \LibreNMS\Exceptions\DatabaseConnectException::class,
+        \LibreNMS\Exceptions\DuskUnsafeException::class,
+        \LibreNMS\Exceptions\UnserializableRouteCache::class,
+        \LibreNMS\Exceptions\MaximumExecutionTimeExceeded::class,
+    ];
+
     public function render($request, Exception $exception)
     {
-        // emulate Laravel 5.5 renderable exceptions
-        if (method_exists($exception, 'render')) {
-            return $exception->render($request);
+        // If for some reason Blade hasn't been registered, try it now
+        try {
+            if (!app()->bound('view')) {
+                app()->register(\Illuminate\View\ViewServiceProvider::class);
+                app()->register(\Illuminate\Translation\TranslationServiceProvider::class);
+            }
+        } catch (\Exception $e) {
+            // continue without view
+        }
+
+        // try to upgrade generic exceptions to more specific ones
+        if (!config('app.debug')) {
+            foreach ($this->upgradable as $class) {
+                if ($new = $class::upgrade($exception)) {
+                    return parent::render($request, $new);
+                }
+            }
         }
 
         return parent::render($request, $exception);
     }
 
-    protected function convertExceptionToResponse(Exception $e)
+    protected function convertExceptionToArray(Exception $e)
     {
-        // handle database exceptions
-        if ($db_response = $this->dbExceptionToResponse($e)) {
-            return $db_response;
+        // override the non-debug error output to clue in user on how to debug
+        if (!config('app.debug') && !$this->isHttpException($e)) {
+            return ['message' => 'Server Error: Set APP_DEBUG=true to see details.'];
         }
 
-        // check for exceptions relating to not being able to write to the filesystem
-        if ($fs_response = Checks::filePermissionsException($e)) {
-            return $fs_response;
-        }
-
-        // show helpful response if debugging, otherwise print generic error so we don't leak information
-        if (config('app.debug')) {
-            return parent::convertExceptionToResponse($e);
-        }
-
-        return response()->view('errors.generic', ['exception' => $e]);
-    }
-
-    /**
-     * Convert an authentication exception into an unauthenticated response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Auth\AuthenticationException  $exception
-     * @return \Illuminate\Http\Response
-     */
-    protected function unauthenticated($request, AuthenticationException $exception)
-    {
-        if ($request->expectsJson() || $request->is('api/*')) {
-            return response()->json(['error' => 'Unauthenticated.'], 401);
-        }
-
-        return redirect()->guest(route('login'));
-    }
-
-    protected function dbExceptionToResponse(Exception $e)
-    {
-        if ($e instanceof QueryException) {
-            // connect exception, convert to our standard connection exception
-            if (config('app.debug')) {
-                // get message form PDO exception, it doesn't contain the query
-                $message = $e->getMessage();
-            } else {
-                $message = $e->getPrevious()->getMessage();
-            }
-
-            if (in_array($e->getCode(), [1044, 1045, 2002])) {
-                // this Exception has it's own render function
-                throw new DatabaseConnectException($message, $e->getCode(), $e);
-            }
-            return response()->view('errors.generic', [
-                'title' => 'Unhandled MySQL Error [' . $e->getCode() . ']',
-                'content' => $message
-            ]);
-        }
-
-        return false;
+        return parent::convertExceptionToArray($e);
     }
 }

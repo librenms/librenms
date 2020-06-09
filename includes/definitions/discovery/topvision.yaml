@@ -1,0 +1,25 @@
+mib: DOCS-IF-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - docsIfUpChannelId
+        frequency:
+            data:
+                -
+                    oid: docsIfUpstreamChannelTable
+                    value: docsIfUpChannelFrequency
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.2.1.2.{{ $index }}'
+                    descr: Upstream Channel {{ $docsIfUpChannelId }}
+        snr:
+            data:
+                -
+                    oid: docsIfSignalQualityTable
+                    value: docsIfSigQSignalNoise
+                    divisor: 10
+                    num_oid: '.1.3.6.1.2.1.10.127.1.1.4.1.5.{{ $index }}'
+                    descr: Upstream Channel {{ $docsIfUpChannelId }}
+                    skip_value_lt: 1
+                    low_limit: 24
+                    high_limit: 45

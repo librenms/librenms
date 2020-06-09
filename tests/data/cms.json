@@ -8,13 +8,13 @@
                     "sysDescr": "Corero CMS SNMP agent",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "cms",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "corero.png"
+                    "icon": "corero.png",
+                    "location": null
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": "Corero CMS SNMP agent",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "cms",
                     "type": "appliance",
                     "serial": null,
-                    "icon": "corero.png"
+                    "icon": "corero.png",
+                    "location": "<private>"
                 }
             ]
         }

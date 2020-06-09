@@ -5,19 +5,14 @@ use LibreNMS\RRD\RrdDefinition;
 echo "Polling SNOM device...\n";
 
 // Get SNOM specific version string from silly SNOM location. Silly SNOM!
-// FIXME - This needs a good cleanup...
-$cmd = 'snmpget -O qv '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'].' 1.3.6.1.2.1.7526.2.4';
-$device['sysDescr']             = `$cmd`;
+$device['sysDescr']             = snmp_get($device, '1.3.6.1.2.1.7526.2.4', '-Oqv');
 $device['sysDescr']             = str_replace('-', ' ', $device['sysDescr']);
 $device['sysDescr']             = str_replace('"', '', $device['sysDescr']);
 list($hardware, $features, $version) = explode(' ', $device['sysDescr']);
 
 // Get data for calls and network from SNOM specific SNMP OIDs.
-$cmda = 'snmpget -O qv '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'].' 1.3.6.1.2.1.7526.2.1.1 1.3.6.1.2.1.7526.2.1.2 1.3.6.1.2.1.7526.2.2.1 1.3.6.1.2.1.7526.2.2.2';
-$cmdb = 'snmpget -O qv '.snmp_gen_auth($device).' '.$device['hostname'].':'.$device['port'].' 1.3.6.1.2.1.7526.2.5 1.3.6.1.2.1.7526.2.6';
-// echo($cmda);poll
-$snmpdata  = `$cmda`;
-$snmpdatab = `$cmdb`;
+$snmpdata  = snmp_get($device, ['1.3.6.1.2.1.7526.2.1.1', '1.3.6.1.2.1.7526.2.1.2', '1.3.6.1.2.1.7526.2.2.1', '1.3.6.1.2.1.7526.2.2.2'], '-Oqv');
+$snmpdatab = snmp_get($device, ['1.3.6.1.2.1.7526.2.5', '1.3.6.1.2.1.7526.2.6'], '-Oqv');
 
 list($rxbytes, $rxpkts, $txbytes, $txpkts) = explode("\n", $snmpdata);
 list($calls, $registrations)               = explode("\n", $snmpdatab);

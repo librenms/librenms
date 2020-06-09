@@ -24,8 +24,8 @@ discover_sensor($valid['sensor'], 'temperature', $device, $system_temperature_oi
 $disk_temperature_oid = '.1.3.6.1.4.1.24681.1.2.11.1.3';
 $disk_serial_oid = '.1.3.6.1.4.1.24681.1.2.11.1.5';
 
-$hdd_temps = snmpwalk_cache_numerical_oid($device, $disk_temperature_oid, array(), null, null, '-OQUsn');
-$hdd_serials = snmpwalk_cache_numerical_oid($device, $disk_serial_oid, array(), null, null, '-OQUsn');
+$hdd_temps = snmpwalk_cache_numerical_oid($device, $disk_temperature_oid, [], null, null, '-OQUsn');
+$hdd_serials = snmpwalk_cache_numerical_oid($device, $disk_serial_oid, [], null, null, '-OQUsn');
 
 if (is_array($hdd_temps) && !empty($hdd_temps)) {
     foreach ($hdd_temps as $index => $entry) {

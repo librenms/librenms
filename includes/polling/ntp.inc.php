@@ -12,10 +12,10 @@
  *
  * This module will display NTP details from various device types.
  * To display, modules must create rrd's named: ntp-%PEER%.rrd with the following DS':
- *      DS:stratum:GAUGE:'.$config['rrd']['heartbeat'].':0:U
- *      DS:offset:GAUGE:'.$config['rrd']['heartbeat'].':0:U
- *      DS:delay:GAUGE:'.$config['rrd']['heartbeat'].':0:U
- *      DS:dispersion:GAUGE:'.$config['rrd']['heartbeat'].':0:U
+ *      DS:stratum:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
+ *      DS:offset:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
+ *      DS:delay:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
+ *      DS:dispersion:GAUGE:'.\LibreNMS\Config::get('rrd.heartbeat').':0:U
  */
 
 use LibreNMS\Config;

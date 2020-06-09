@@ -12,4 +12,4 @@ if ($service['service_ip']) {
     $resolver = $service['hostname'];
 }
 
-$check_cmd = $config['nagios_plugins'] . "/check_dns -H ".$nsquery." -s ".$resolver;
+$check_cmd = \LibreNMS\Config::get('nagios_plugins') . "/check_dns -H " . $nsquery . " -s " . $resolver;

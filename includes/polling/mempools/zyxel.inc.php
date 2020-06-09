@@ -23,9 +23,8 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-echo 'Zyxel: ';
-$oid = '.1.3.6.1.4.1.890.1.15.3.2.5.0';
-$perc = snmp_get($device, $oid, '-OvQ');
+d_echo('Zyxel: ');
+$perc = snmp_get($device, 'sysMgmtMemUsage.0', '-OvQ', 'ZYXEL-ES-COMMON');
 if (is_numeric($perc)) {
     $mempool['perc'] = $perc;
     $mempool['used'] = $perc;
@@ -34,6 +33,5 @@ if (is_numeric($perc)) {
 }
 
 unset(
-    $oid,
     $perc
 );

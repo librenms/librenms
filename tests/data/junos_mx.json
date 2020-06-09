@@ -18,7 +18,11 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 64513
+                    "bgpLocalAs": 64513,
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -36,7 +40,11 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 64513
+                    "bgpLocalAs": 64513,
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -54,7 +62,11 @@
                     "bgpPeerFsmEstablishedTime": 0,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 64513
+                    "bgpLocalAs": 64513,
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -294,7 +306,11 @@
                     "bgpPeerFsmEstablishedTime": 361781,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 64513
+                    "bgpLocalAs": 64513,
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -312,7 +328,11 @@
                     "bgpPeerFsmEstablishedTime": 437296,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 64513
+                    "bgpLocalAs": 64513,
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 },
                 {
                     "astext": "",
@@ -330,7 +350,11 @@
                     "bgpPeerFsmEstablishedTime": 633976,
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
-                    "bgpLocalAs": 64513
+                    "bgpLocalAs": 64513,
+                    "vrfLocalAs": null,
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null
                 }
             ],
             "bgpPeers_cbgp": [
@@ -549,6 +573,44 @@
                     "WithdrawnPrefixes_delta": 0,
                     "WithdrawnPrefixes_prev": 0,
                     "context_name": ""
+                }
+            ]
+        }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.2.57",
+                    "sysDescr": "Juniper Networks, Inc. mx80 internet router, kernel JUNOS 16.2R2.8, Build date: 2017-07-06 04:21:20 UTC Copyright (c) 1996-2017 Juniper Networks, Inc.",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "junos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "junos.png",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.2.57",
+                    "sysDescr": "Juniper Networks, Inc. mx80 internet router, kernel JUNOS 16.2R2.8, Build date: 2017-07-06 04:21:20 UTC Copyright (c) 1996-2017 Juniper Networks, Inc.",
+                    "sysContact": "<private>",
+                    "version": "16.2R2.8",
+                    "hardware": "Juniper MX80",
+                    "features": null,
+                    "os": "junos",
+                    "type": "network",
+                    "serial": "G0290",
+                    "icon": "junos.png",
+                    "location": "<private>"
                 }
             ]
         }

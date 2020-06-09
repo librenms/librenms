@@ -18,7 +18,7 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
             $vlans_dict[$vlan_raw] = $newvlan_id;
         }
 
-        if ($vlan['vtpVlanState'] === '1') {
+        if (($vlan['vtpVlanState'] === '1') && ($vlan_raw < 1002 || $vlan_raw > 1005)) {
             $device_vlan = array_merge($device, array('community' => $device['community'] . '@' . $vlan_raw, 'context_name' => "vlan-$vlan_raw"));
 
             $fdbPort_table = snmpwalk_group($device_vlan, 'dot1dTpFdbPort', 'BRIDGE-MIB', 0);

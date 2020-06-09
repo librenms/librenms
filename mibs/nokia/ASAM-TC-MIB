@@ -1,0 +1,183 @@
+ASAM-TC-MIB DEFINITIONS ::= BEGIN
+
+-- =============================================================================
+--  This specification is published by Alcatel under Non-Disclosure
+--  Agreement(s) (NDA) with specific parties and has to be considered as
+--  Confidential Information as defined in such NDA.
+--  Alcatel reserves the right to revise this document for any reason,
+--  including but not limited to conformity with standards promulgated by
+--  various agencies, utilisation of advances in the state of the technical
+--  areas, or the reflection of changes in the design of any equipment,
+--  techniques, or procedures described or referred to herein.
+--  The product specifications and other technical or performance information
+--  contained herein are subject to change without notice.
+--  Updates of this document will be issued under the above NDA's.
+--  Alcatel makes no representation or warranty, expressed or implied, with
+--  respect to the sufficiency, accuracy, or utility of any information or
+--  opinion contained herein. Alcatel expressly advises that any use of for 
+--  any purpose or reliance upon this technical reference is at the risk of
+--  the user and that Alcatel shall not be liable for any damage or injury
+--  incurred by any person arising out of the sufficiency, accuracy, or
+--  utility of any information or opinion contained herein.
+--  This document is not to be construed as a suggestion to any manufacturer
+--  to modify or change any of its products, nor does this document represent
+--  any commitment by Alcatel to sell or purchase any product.
+--  Nothing contained herein shall be construed as conferring by implication,
+--  estoppel, or otherwise any license or right under any patent, whether or
+--  not the use of any information herein necessarily employs an invention of
+--  any existing or later issued patent.
+--  Alcatel reserves the right not to offer any or all of these products and
+--  to withdraw any or all of them at any future time.
+--  Copyright (C) 2004, Alcatel. All Rights Reserved.
+-- =============================================================================
+
+--  MODULE-IDENTITY
+--  LAST-UPDATED   "200606131200Z"
+--  ORGANIZATION   "Alcatel"
+--  CONTACT-INFO
+--
+--          Email:  asam.mibsupport@alcatel.be"
+--
+--  DESCRIPTION
+--        "This MIB module defines Textual Conventions that are shared by
+--         Alcatel specified MIB modules.
+--
+--  REVISION 200606131200Z
+--  DESCRIPTION
+--        "Version:  3EC17922EAAA_V3.2.0.0.0
+--         Editor:   Marc Van Vlimmeren
+--         Changes:  Editorial updates"
+--
+--  REVISION 200601231200Z
+--  DESCRIPTION
+--        "Version:  3EC17922EAAA_V2.0.0.0.0
+--         Editor:   Bart Bogaert
+--         Changes:  Implemented BDFhw70643: strict syntax checks (smilint)"
+--
+--  REVISION 200007260000Z
+--  DESCRIPTION
+--        "Version:  3EC17922AAAA_E4.2.0.0
+--         Editor:   Rajesh Abbi
+--         Changes:  Initial Version"
+--
+-- =============================================================================
+IMPORTS
+    asam  FROM SYSTEM-MIB
+    Gauge FROM RFC1155-SMI;
+
+--  Profile related Textual Conventions
+--  ===================================
+
+-- Profile Index
+-- =============
+-- A Profile Index is used to uniquely identify a Profile in a
+-- Table.  The index must be unique for every profile in a table,
+-- and may not be 0.
+AsamProfileIndex    ::= INTEGER(1..65535)
+
+
+-- Profile Index
+-- =============
+-- A Profile Index is used to uniquely identify a Profile in a
+-- Table.  The index must be unique for every profile in a table,
+-- and may be 0.
+AsamProfileIndexOrZero ::= INTEGER(0..65535)
+
+
+-- Next Profile Index
+-- ==================
+-- A Next Profile Index is used by the Agent to inform the Manager
+-- of the next available Profile Index that may be used for creating
+-- a new Profile.  This index must not be in use by an existing entry
+-- in the table.  A value of 0 indicates no more profiles may be
+-- defined in the associated table.
+AsamNextProfileIndex ::= INTEGER(0..65535)
+
+-- Max Profile Index
+-- ==================
+-- The Max Profile Index is used by the manager to know the maximum number
+-- of profiles that can be created.
+AsamMaxProfileIndex ::= INTEGER(0..65535)
+
+-- Profile Pointer
+-- ===============
+-- A Profile Pointer is a reference to a profile.
+-- Its value may be equal to the Profile Index of an existing
+-- profile, or 0.  The value 0 is treated as a NULL reference -
+-- ie: no profile is assumed to be referenced.
+AsamProfilePointer  ::= INTEGER(0..65535)
+
+-- Profile Name
+-- ============
+-- A Profile Name uniquely identifies a profile in a table.
+-- It is a human readable string up to 32 characters long
+-- that is NOT case-sensitive, and may only contain following
+-- characters : ['a'..'z','A'..'Z','0'..'9', '-', '_', '.'].
+AsamProfileName     ::= OCTET STRING (SIZE(1..32))
+
+-- Profile Scope
+-- =============
+-- The Profile Scope identifies the scope of the associated
+-- Profile definition.  Following scopes are defined:
+-- o Local   : Only defined for the associated NE (Network Element).
+-- o Network : Defined for ALL NEs managed by the EMS.
+-- Network Profiles may not be created/modified/deleted via the
+-- local Craft Interface at the NE.
+AsamProfileScope    ::= INTEGER {
+                           localScope  (1),
+                           networkScope(2) 
+                        }
+
+-- Profile Reference Count
+-- =======================
+-- The Profile Reference Count indicates the number of entities using
+-- a particular Profile instance. 
+-- If the value is 0, then this profile is "not in use", and may be
+-- deleted.
+-- If the value is greater than 0, then this profile is "in use", and
+-- may NOT be deleted.
+AsamProfileRefCount ::= INTEGER(0..65535) 
+AsamProfileRefCount32 ::= INTEGER(0..4294967295)
+
+--  Logging related Textual Conventions
+--  ===========================
+
+LogLastEntry   ::=  INTEGER (0..4294967295)
+
+LogReset       ::=  INTEGER {
+                           resetCompleted      (1),
+                           reset               (2)}
+
+LogBufferSize  ::=  INTEGER (0..4294967295)
+
+LogFullAction  ::=  INTEGER {
+                            wrap     (1), 
+                            halt     (2)}
+
+LogOverflowed  ::=  INTEGER {
+                    	 notoverflowed       (1), 
+                     	 overflowed  	     (2)}
+
+LogIndex       ::=  INTEGER (0..4294967295)
+
+--  General Textual Conventions
+--  ===========================
+
+--  SMIv1 does not give an explicit limit on the range of integers.
+--  In most cases, the INTEGER range is assumed to be -2147483648 .. 2147483647.
+--  This TC simulates an Unsigned32 from SMIv2.
+
+Uint32 ::= Gauge (0 .. 4294967295)
+
+-- Type Definitions moved from ASAM_SYSTEM_MIB
+
+   NetworkTimeInSeconds ::= INTEGER (0..4294967295) 
+      -- This type gives the distributed network time in
+      -- seconds encountered since January 1, 1900.
+
+   NetworkTimeInMiliSeconds ::= INTEGER (0..4294967295) 
+      -- This type gives the distributed network time in
+      -- miliseconds encountered since January 1, 1900.
+
+
+END

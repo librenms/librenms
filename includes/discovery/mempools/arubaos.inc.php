@@ -3,7 +3,7 @@
 if ($device['os'] === 'arubaos') {
     echo 'ARUBAOS-MEMORY-POOL: ';
 
-    $memory_pool = snmp_get_multi_oid($device, 'sysXMemorySize.1 sysXMemoryUsed.1 sysXMemoryFree.1', '-OQUs', 'WLSX-SWITCH-MIB');
+    $memory_pool = snmp_get_multi_oid($device, ['sysXMemorySize.1', 'sysXMemoryUsed.1', 'sysXMemoryFree.1'], '-OQUs', 'WLSX-SWITCH-MIB');
     
     $total = $memory_pool['sysXMemorySize.1'];
     $used  = $memory_pool['sysXMemoryUsed.1'];

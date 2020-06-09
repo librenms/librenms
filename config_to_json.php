@@ -9,9 +9,9 @@
 
 use LibreNMS\Config;
 
-$init_modules = array();
+$init_modules = ['nodb'];
 require __DIR__ . '/includes/init.php';
 
 if (isCli()) {
-    echo Config::json_encode();
+    echo Config::toJson();
 }

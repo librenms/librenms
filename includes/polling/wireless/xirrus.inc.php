@@ -6,7 +6,7 @@ $associations=array();
 // if this config flag is true, don't poll for stations
 // this in case of large APs which may have many stations
 // to prevent causing long polling times
-if ($config['xirrus_disable_stations']!=true) {
+if (\LibreNMS\Config::get('xirrus_disable_stations') != true) {
     // station associations
     // custom RRDs and graph as each AP may have 16 radios
     $assoc = snmpwalk_cache_oid($device, 'XIRRUS-MIB::stationAssociationIAP', array(), 'XIRRUS-MIB');

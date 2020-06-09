@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$tmp_gaia = snmp_get_multi_oid($device, 'svnVersion.0 svnApplianceProductName.0 svnApplianceSerialNumber.0', '-OUQs', 'CHECKPOINT-MIB');
+$tmp_gaia = snmp_get_multi_oid($device, ['svnVersion.0', 'svnApplianceProductName.0', 'svnApplianceSerialNumber.0'], '-OUQs', 'CHECKPOINT-MIB');
 $serial   = $tmp_gaia['svnApplianceSerialNumber.0'];
 $hardware = $tmp_gaia['svnApplianceProductName.0'];
 $version  = $tmp_gaia['svnVersion.0'];

@@ -23,7 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-$oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.4.4.1.5', array());
+$oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.4.4.1.5', []);
 
 foreach ($oids as $oid => $data) {
     $current_id = substr($oid, strrpos($oid, '.') + 1);

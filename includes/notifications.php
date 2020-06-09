@@ -31,9 +31,8 @@
  */
 function get_notifications()
 {
-    global $config;
     $obj = array();
-    foreach ($config['notifications'] as $name => $url) {
+    foreach (\LibreNMS\Config::get('notifications') as $name => $url) {
         echo '[ '.date('r').' ] '.$url.' ';
         $feed = json_decode(json_encode(simplexml_load_string(file_get_contents($url))), true);
         if (isset($feed['channel'])) {

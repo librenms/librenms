@@ -8,13 +8,13 @@
                     "sysDescr": "IBM DPI V01.08.0003",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "dpi",
                     "type": "power",
                     "serial": null,
-                    "icon": "ibmos.svg"
+                    "icon": "ibmos.svg",
+                    "location": null
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": "IBM DPI V01.08.0003",
                     "sysContact": "<private>",
                     "version": "V01.08.0003",
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "dpi",
                     "type": "power",
                     "serial": null,
-                    "icon": "ibmos.svg"
+                    "icon": "ibmos.svg",
+                    "location": "<private>"
                 }
             ]
         }

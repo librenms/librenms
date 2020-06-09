@@ -1,6 +1,6 @@
 <?php
 /**
- * DocTest.php
+ * DocsTest.php
  *
  * Tests for Docs.
  *
@@ -27,7 +27,7 @@ namespace LibreNMS\Tests;
 
 use Symfony\Component\Yaml\Yaml;
 
-class DocTest extends TestCase
+class DocsTest extends TestCase
 {
     private $hidden_pages = [
         'API/API-Docs.md',
@@ -37,6 +37,7 @@ class DocTest extends TestCase
         'Extensions/Graphite.md',
         'Extensions/InfluxDB.md',
         'Extensions/OpenTSDB.md',
+        'Extensions/Poller-Service.md',
         'Extensions/Port-Description-Parser.md',
         'Extensions/Prometheus.md',
         'Extensions/RRDCached-Security.md',
@@ -44,6 +45,8 @@ class DocTest extends TestCase
         'General/Changelogs/2014.md',
         'General/Changelogs/2015.md',
         'General/Changelogs/2016.md',
+        'General/Changelogs/2017.md',
+        'General/Changelogs/2018.md',
         'General/Contributing.md',
         'General/Credits.md',
         'Installation/Installation-(Debian-Ubuntu).md',
@@ -59,7 +62,10 @@ class DocTest extends TestCase
         'Installation/Ubuntu-image.md',
         'Installation/CentOS-image.md',
     ];
-    
+
+    /**
+     * @group docs
+     */
     public function testDocExist()
     {
         $mkdocs = Yaml::parse(file_get_contents(__DIR__ . '/../mkdocs.yml'));
@@ -72,5 +78,7 @@ class DocTest extends TestCase
             ->each(function ($missing_doc) {
                 $this->fail("The doc $missing_doc doesn't exist in mkdocs.yml, please add it to the relevant section");
             });
+
+        $this->expectNotToPerformAssertions();
     }
 }

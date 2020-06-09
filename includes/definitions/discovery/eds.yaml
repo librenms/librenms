@@ -1,0 +1,76 @@
+mib: EDS-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                - oid:
+                    - owDeviceName
+                    - owDS18B20Temperature
+                    - owDeviceType
+                    - owDS18B20Resolution
+                    
+        count:
+            data:
+                -
+                    oid: owDeviceNumActive
+                    value: owDeviceNumActive
+                    num_oid: '.1.3.6.1.4.1.31440.10.2.1.{{ $index }}'
+                    descr: '1wire devices'
+                    index: 'NumActive'
+        temperature:
+            data:
+                -
+                    oid: owDS18B20Temperature
+                    value: owDS18B20Temperature
+                    num_oid: '.1.3.6.1.4.1.31440.10.5.1.1.{{ $index }}'
+                    descr: '#{{ $index }}: {{ $owDeviceName }}'
+                    index: 'owDS18B20Temperature{{ $index }}'
+                    skip_values:
+                        -
+                            oid: owDS18B20Resolution
+                            op: '='
+                            value: 0
+        state:
+            data:
+                -
+                    oid: owDeviceType
+                    value: owDeviceType
+                    num_oid: '.1.3.6.1.4.1.31440.10.3.1.2.{{ $index }}'
+                    descr: '#{{ $index }}: {{ $owDeviceName }}'
+                    state_name: owDeviceType
+                    group: 'Device Types'
+                    index: 'DeviceType{{ $index }}'
+                    skip_values:
+                        -
+                            oid: owDeviceType
+                            op: '='
+                            value: 0
+                    states:
+                        - { descr: owNone, graph: 0, value: 0, generic: 3 }
+                        - { descr: owUnknown, graph: 0, value: 1, generic: 3 }
+                        - { descr: owDS2406, graph: 0, value: 2, generic: 0 }
+                        - { descr: owDS18B20, graph: 0, value: 3, generic: 0 }
+                        - { descr: owDS18S20, graph: 0, value: 4, generic: 0 }
+                        - { descr: owDS2438, graph: 0, value: 5, generic: 0 }
+                        - { descr: owDS2423, graph: 0, value: 6, generic: 0 }
+                        - { descr: owDS2408, graph: 0, value: 7, generic: 0 }
+                        - { descr: owDS2450, graph: 0, value: 8, generic: 0 }
+                        - { descr: owEDS0064, graph: 0, value: 9, generic: 0 }
+                        - { descr: owEDS0065, graph: 0, value: 10, generic: 0 }
+                        - { descr: owEDS0066, graph: 0, value: 11, generic: 0 }
+                        - { descr: owEDS0067, graph: 0, value: 12, generic: 0 }
+                        - { descr: owEDS0068, graph: 0, value: 13, generic: 0 }
+                        - { descr: owEDS0069, graph: 0, value: 14, generic: 0 }
+                        - { descr: owEDS0070, graph: 0, value: 15, generic: 0 }
+                        - { descr: owEDS0071, graph: 0, value: 16, generic: 0 }
+                        - { descr: owEDS0080, graph: 0, value: 17, generic: 0 }
+                        - { descr: owEDS0082, graph: 0, value: 18, generic: 0 }
+                        - { descr: owEDS0083, graph: 0, value: 19, generic: 0 }
+                        - { descr: owEDS0085, graph: 0, value: 20, generic: 0 }
+                        - { descr: owEDS0090, graph: 0, value: 21, generic: 0 }
+                        - { descr: owEDS0091, graph: 0, value: 22, generic: 0 }
+                        - { descr: owEDS0092, graph: 0, value: 23, generic: 0 }
+                        - { descr: owDS28EA00, graph: 0, value: 24, generic: 0 }
+                        - { descr: owEDS0050, graph: 0, value: 25, generic: 0 }
+                        - { descr: chassis, graph: 0, value: 30, generic: 0 }
+

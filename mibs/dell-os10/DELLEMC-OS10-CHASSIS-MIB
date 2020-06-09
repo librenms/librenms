@@ -1,0 +1,923 @@
+-- *****************************************************************
+-- DELLEMC-OS10-CHASSIS-MIB
+--
+--
+-- Copyright (c) 2017 by Dell Inc.
+-- All rights reserved.
+-- *****************************************************************
+    
+    DELLEMC-OS10-CHASSIS-MIB DEFINITIONS ::= BEGIN
+    --  This module provides authoritative definitions for Dell EMC Networking OS10
+    --  Chassis MIB.
+    --
+    --  This module will be extended, as needed.
+    --
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, 
+        Integer32,
+        NOTIFICATION-TYPE,
+        Unsigned32
+            FROM SNMPv2-SMI
+        DisplayString, MacAddress
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+            FROM SNMPv2-CONF
+        os10
+            FROM DELLEMC-OS10-SMI-MIB
+        Os10CardOperStatus, Os10ChassisDefType,
+        Os10SystemCardType, Os10DeviceType, 
+        Os10CmnOperStatus
+            FROM DELLEMC-OS10-TC-MIB;
+        
+    
+    os10ChassisMib MODULE-IDENTITY
+    LAST-UPDATED "201706211200Z"
+    ORGANIZATION
+      "Dell EMC"
+    CONTACT-INFO
+      "http://www.dell.com/support"
+
+    DESCRIPTION
+       "Dell EMC Networking OS10 Chassis MIB."
+
+    REVISION     "201706211200Z"
+    DESCRIPTION
+          "Modified as per current yang model and removed confirmation information"
+
+    REVISION     "201701251200Z"
+    DESCRIPTION
+          "First draft revision of Dell EMC Networking OS10 chassis MIB."
+
+    ::= { os10 4 }
+
+
+-- ------------------------------------------------------------
+-- Textual conventions
+-- ------------------------------------------------------------
+
+
+-- ------------------------------------------------------------
+-- Top-level structure of the MIB
+-- ------------------------------------------------------------
+
+
+    os10SysObject        OBJECT IDENTIFIER ::={ os10ChassisMib 1 }
+    os10ChassisObject    OBJECT IDENTIFIER ::={ os10SysObject  1 }
+    os10SystemComponent  OBJECT IDENTIFIER ::={ os10SysObject  2 }
+    os10AlmObjects     OBJECT IDENTIFIER ::={ os10SysObject  3 }
+
+
+       
+    -- ### Chassis System  ###
+
+        os10NumChassis     OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The total number of chassis configured
+              on the cluster."
+         ::= {  os10ChassisObject 1 }
+
+        os10MaxNumChassis OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Indicates the maximum allowed chassis
+              configurable on the cluster."
+         ::= { os10ChassisObject 2 }
+
+    -- ## Chassis Table
+
+    -- The chassis is a multi-slots physical box.
+    -- In the chassis, there are physical slots available for
+    -- plug-in cards.  There are two types of plug-in cards,
+      -- rpm cards and line cards.  
+
+    -- The chassis table contains the management information of  
+    -- the chassis.
+
+        os10ChassisTable        OBJECT-TYPE
+         SYNTAX        SEQUENCE OF Os10ChassisEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+                      "A list of chassis in a cluster.
+                      The chassis table contains the information of  
+                       each chassis in the cluster. 
+                      "
+         ::= { os10ChassisObject 3 }
+
+        os10ChassisEntry  OBJECT-TYPE 
+         SYNTAX        Os10ChassisEntry 
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+            "A list of chassis entries containing information 
+             for the chassis.
+             "
+         INDEX    { os10ChassisIndex }
+         ::= { os10ChassisTable 1 }
+
+        Os10ChassisEntry    ::=
+         SEQUENCE {
+            os10ChassisIndex               Unsigned32,
+            os10ChassisType                Os10ChassisDefType,
+            os10ChassisMacAddr             MacAddress,
+            os10ChassisPartNum             DisplayString,
+            os10ChassisPPID                DisplayString,
+            os10ChassisHwRev               DisplayString,
+            os10ChassisServiceTag          DisplayString, 
+            os10ChassisExpServiceCode      DisplayString, 
+            os10ChassisNumFanTrays         Unsigned32,
+            os10ChassisNumPowerSupplies    Unsigned32,
+            os10ChassisTemp                INTEGER
+            os10ChassisProductBase         DisplayString,
+            os10ChassisProductSN           DisplayString,
+            os10ChassisProductPN           DisplayString
+        }
+
+        os10ChassisIndex    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+                 "A unique index for each chassis within 
+                  the cluster.
+                  This value is the chassisId assigned to the chassis."
+   
+         ::= { os10ChassisEntry 1 }
+
+        os10ChassisType     OBJECT-TYPE
+         SYNTAX          Os10ChassisDefType
+         MAX-ACCESS      read-only
+         STATUS          current
+         DESCRIPTION
+            "The Dell EMC Networking Model number of the chassis."
+        ::= { os10ChassisEntry 2 }
+
+        os10ChassisMacAddr    OBJECT-TYPE
+         SYNTAX        MacAddress
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "A 6-octet MAC Address assigned to this chassis."
+         ::= { os10ChassisEntry 3 }
+
+        os10ChassisPartNum    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..11))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis manufacturer's part number."
+         ::= { os10ChassisEntry 4 }
+
+       os10ChassisPPID    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..24))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis manufacturer's PPID."
+         ::= { os10ChassisEntry 5 }
+
+        os10ChassisHwRev    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..10))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis hardware revision number."
+          ::= { os10ChassisEntry 6 }
+
+        os10ChassisServiceTag    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..7))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis's service tag."
+         ::= { os10ChassisEntry 7 }
+
+        os10ChassisExpServiceCode    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..14))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The chassis's express service code."
+         ::= { os10ChassisEntry 8 }
+
+        os10ChassisNumFanTrays    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Number of fan trays in the chassis."
+         ::= { os10ChassisEntry 9 }
+
+        os10ChassisNumPowerSupplies    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Number of power supplies in the chassis."
+         ::= { os10ChassisEntry 10 }
+
+        os10ChassisTemp  OBJECT-TYPE
+         SYNTAX        Integer32
+         UNITS         "degrees Centigrade"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Temperature of the chassis."
+         ::= { os10ChassisEntry 11 }
+
+        os10ChassisProductBase  OBJECT-TYPE
+         SYNTAX               DisplayString (SIZE (0..16))
+         MAX-ACCESS           read-only
+         STATUS               current
+         DESCRIPTION          "The solution id product base"
+         ::= { os10ChassisEntry 12 }
+
+        os10ChassisProductSN  OBJECT-TYPE
+         SYNTAX             DisplayString (SIZE (0..16))
+         MAX-ACCESS         read-only
+         STATUS             current
+         DESCRIPTION        "The solution id product serial number"
+         ::= { os10ChassisEntry 13 }
+
+        os10ChassisProductPN  OBJECT-TYPE
+         SYNTAX             DisplayString (SIZE (0..16))
+         MAX-ACCESS         read-only
+         STATUS             current
+         DESCRIPTION        "The solution id product part number"
+         ::= { os10ChassisEntry 14 }
+
+    -- ## Card Table
+
+        os10CardTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF Os10CardEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A list of line cards resident in the chassis.
+              This table contains the information on each RPM and linecards
+              in the chassis."
+         ::= { os10ChassisObject 4 }
+
+        os10CardEntry    OBJECT-TYPE
+         SYNTAX        Os10CardEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "Entry for each card in the chassis."
+         INDEX    { os10ChassisIndex,
+                    os10CardIndex }
+         ::= { os10CardTable 1 }
+
+        Os10CardEntry    ::=
+         SEQUENCE {
+            os10CardIndex                Unsigned32,
+            os10CardType                 Os10SystemCardType,
+            os10CardDescription          DisplayString,
+            os10CardStatus               Os10CardOperStatus,
+            os10CardTemp                 Integer32,
+            os10CardPartNum              DisplayString,
+            os10CardPPID                 DisplayString,
+            os10CardHwRev                DisplayString,
+            os10CardServiceTag           DisplayString,
+            os10CardExpServiceCode       DisplayString
+        }
+
+        os10CardIndex    OBJECT-TYPE
+         SYNTAX        Unsigned32 
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+             "A unique index for each card in the chassis."
+         ::= { os10CardEntry 1 }
+
+        os10CardType    OBJECT-TYPE
+         SYNTAX        Os10SystemCardType 
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Card's type."
+         ::= { os10CardEntry 2 }
+
+        os10CardDescription    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..120))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "A short description of the card."
+         ::= { os10CardEntry 3 }
+
+        os10CardStatus    OBJECT-TYPE
+         SYNTAX        Os10CardOperStatus
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The current operational state of the card."
+         ::= { os10CardEntry 4 }
+
+        os10CardTemp    OBJECT-TYPE
+         SYNTAX        Integer32
+         UNITS         "degrees Centigrade"
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "Temperature of the card."
+         ::= { os10CardEntry 5 }
+        
+        os10CardPartNum    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..11))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The card's part number"
+         ::= { os10CardEntry 6 }
+
+        os10CardPPID OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..24))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The card's PPID."
+         ::= { os10CardEntry 7 }
+
+        os10CardHwRev    OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..10))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The card's manufacturer hardware revision number."
+         ::= { os10CardEntry 8 }
+
+        os10CardServiceTag OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..7))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The card's service tag."
+         ::= { os10CardEntry 9 }
+
+        os10CardExpServiceCode OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..14))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The card's express service code."
+         ::= { os10CardEntry 10 }
+
+
+    -- ### Power Supply Table 
+
+       os10PowerSupplyTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE OF Os10PowerSupplyEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A list of power supplies resident 
+            in the device."
+        ::= { os10SystemComponent 1 }
+
+        os10PowerSupplyEntry    OBJECT-TYPE 
+         SYNTAX        Os10PowerSupplyEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "A power supply entry provides all attributes of 
+               that power supply."
+         INDEX    { os10PowerSupplyIndex}
+         ::= { os10PowerSupplyTable 1 }
+
+        Os10PowerSupplyEntry    ::=
+         SEQUENCE {
+            os10PowerSupplyIndex          Unsigned32,
+            os10PowerSupplyDevice         Os10DeviceType,
+            os10PowerSupplyDeviceIndex    Unsigned32,
+            os10PowerSupplyOperStatus     Os10CmnOperStatus, 
+            os10PowerSupplyType           INTEGER,
+            os10PowerSupplyPPID           DisplayString,
+            os10PowerSupplyServiceTag     DisplayString,
+            os10PowerSupplyExpServiceCode DisplayString
+       
+        }
+
+         os10PowerSupplyIndex    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "The unique index of the power supply."
+         ::= { os10PowerSupplyEntry 1 }
+
+        os10PowerSupplyDevice   OBJECT-TYPE
+         SYNTAX        Os10DeviceType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "Identify the type of device the power supply unit resides
+               (chassis,line card etc..)"
+        ::= { os10PowerSupplyEntry 2 }
+
+        os10PowerSupplyDeviceIndex    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "A unique value indentifying a specific os10PowerSupplyDeviceType."
+         ::= { os10PowerSupplyEntry 3 }
+
+        os10PowerSupplyOperStatus    OBJECT-TYPE
+         SYNTAX        Os10CmnOperStatus
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The status of the power supply."
+         ::= { os10PowerSupplyEntry 4 }
+
+        os10PowerSupplyType    OBJECT-TYPE
+         SYNTAX      INTEGER {
+                         unknown(1),
+                         ac(2),
+                         dc(3)
+                     }
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+             "The type of the power supply."
+         ::= { os10PowerSupplyEntry 5 }
+
+        os10PowerSupplyPPID OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..24))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power supply's PPID."
+         ::= { os10PowerSupplyEntry 6 }
+
+        os10PowerSupplyServiceTag OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..7))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power supply's service tag."
+         ::= { os10PowerSupplyEntry 7 }
+
+        os10PowerSupplyExpServiceCode OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..14))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The power supply's express service code."
+         ::= { os10PowerSupplyEntry 8 }
+
+ 
+    -- ## Fan Tray Table 
+
+        os10FanTrayTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF Os10FanTrayEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "A list of fan trays resident in the device."
+         ::= { os10SystemComponent 2 }
+
+        os10FanTrayEntry    OBJECT-TYPE 
+         SYNTAX        Os10FanTrayEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "A fan entry containing objects for a
+              particular fan tray."
+         INDEX    { os10FanTrayIndex }
+         ::= { os10FanTrayTable 1 }
+
+        Os10FanTrayEntry    ::=
+         SEQUENCE {
+            os10FanTrayIndex           Unsigned32,
+            os10FanTrayDevice          Os10DeviceType,
+            os10FanTrayDeviceIndex     Unsigned32,
+            os10FanTrayOperStatus      Os10CmnOperStatus,
+            os10FanTrayPPID            DisplayString,
+            os10FanTrayServiceTag      DisplayString,
+            os10FanTrayExpServiceCode  DisplayString
+          }
+
+         os10FanTrayIndex    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "The unique index of the fan tray."
+         ::= { os10FanTrayEntry 1 }
+
+        os10FanTrayDevice    OBJECT-TYPE
+         SYNTAX        Os10DeviceType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "Identify the type of device this fan tray unit resides
+               (chassis,line card etc..)"
+        ::= { os10FanTrayEntry 2 }
+
+        os10FanTrayDeviceIndex    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "A unique value indentifying a specific os10FanTrayDevice."
+         ::= { os10FanTrayEntry 3 }
+
+
+        os10FanTrayOperStatus    OBJECT-TYPE
+         SYNTAX      Os10CmnOperStatus 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+              "The status of the fan tray."
+         ::= { os10FanTrayEntry 4 }
+
+        os10FanTrayPPID OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..24))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The fan tray's PPID."
+         ::= { os10FanTrayEntry 5 }
+
+        os10FanTrayServiceTag OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..7))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The fan tray's service tag."
+         ::= { os10FanTrayEntry 6 }
+
+        os10FanTrayExpServiceCode OBJECT-TYPE
+         SYNTAX        DisplayString (SIZE (0..14))
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+             "The fan tray's express service code."
+         ::= { os10FanTrayEntry 7 }
+
+ -- ## Fan Table 
+
+        os10FanTable    OBJECT-TYPE
+         SYNTAX        SEQUENCE OF Os10FanEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "A list of fans installed in the chassis."
+         ::= { os10SystemComponent 3 }
+
+        os10FanEntry    OBJECT-TYPE 
+         SYNTAX        Os10FanEntry
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "A fan entry containing objects for a
+              particular fan in the chassis."
+         INDEX    { os10FanIndex  }
+         ::= { os10FanTable 1 }
+
+        Os10FanEntry    ::=
+         SEQUENCE {
+            os10FanIndex            Unsigned32,
+            os10FanDevice           Os10DeviceType,
+            os10FanDeviceIndex      Unsigned32,
+            os10FanEntity           INTEGER,
+            os10FanEntitySlot       Unsigned32,
+            os10FanId               Unsigned32,
+            os10FanOperStatus       Os10CmnOperStatus
+          
+          }
+
+         os10FanIndex    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    not-accessible
+         STATUS        current
+         DESCRIPTION
+              "The unique value for each fan in  the device."
+         ::= { os10FanEntry 1 }
+
+         os10FanDevice    OBJECT-TYPE
+         SYNTAX        Os10DeviceType
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "Identify the type of device this fan resides.
+               (chassis,line card etc..)"
+        ::= { os10FanEntry 2 }
+
+        os10FanDeviceIndex    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "A unique value indentifying a specific os10FanDevice."
+         ::= { os10FanEntry 3 }
+
+         os10FanEntity   OBJECT-TYPE
+         SYNTAX      INTEGER {
+                         psu(1),
+                         fanTray(2)
+                     }
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "Identify the type of system componet where the fan is installed."
+         ::= { os10FanEntry 4 }
+
+        os10FanEntitySlot    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "A unique value indentifying a specific os10FanEntity."
+         ::= { os10FanEntry 5 }
+
+        os10FanId    OBJECT-TYPE
+         SYNTAX        Unsigned32
+         MAX-ACCESS    read-only
+         STATUS        current
+         DESCRIPTION
+              "A unique value indentifying a specific fan in a specific os10FanEntity."
+         ::= { os10FanEntry 6 }
+
+        os10FanOperStatus    OBJECT-TYPE
+         SYNTAX      Os10CmnOperStatus 
+         MAX-ACCESS  read-only
+         STATUS      current
+         DESCRIPTION
+              "The status of the fan."
+         ::= { os10FanEntry 7 }
+
+    --
+    -- ## Alarm Group or Traps
+    --
+
+    os10AlmMibNotifications     OBJECT IDENTIFIER ::= { os10AlmObjects 1 }
+    os10AlmVariable             OBJECT IDENTIFIER ::= { os10AlmObjects 2 }
+
+    --
+    -- TRAP VarBind Data
+    --
+
+    os10AlmVarInteger OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+         "An generic integer value in the TRAP object"
+     ::= { os10AlmVariable 1 }
+
+    os10AlmVarString OBJECT-TYPE
+     SYNTAX       OCTET STRING (SIZE(0..255))
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+         "An generic string value in the TRAP object"
+     ::= { os10AlmVariable 2 }
+
+    os10AlmVarChassisId   OBJECT-TYPE
+      SYNTAX       Integer32
+      MAX-ACCESS   accessible-for-notify
+      STATUS       current
+      DESCRIPTION
+          "The Chassis ID.
+          For the traps that does not have Chassis information the value will
+          be -1 in the TRAP PDU.
+          For Non-ON based platforms, the value is 0 based and for ON Based
+          platform it is 1 based in the Trap PDU. 
+          "
+     ::= {os10AlmVariable 3 }
+
+    os10AlmVarSlot   OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+         "The chassis slot number.
+          For the traps that does not have slot information the value will
+          -1 in the TRAP PDU.
+         "
+     ::= { os10AlmVariable 4 }
+
+    os10AlmVarPort   OBJECT-TYPE
+     SYNTAX       Integer32
+     MAX-ACCESS   accessible-for-notify
+     STATUS       current
+     DESCRIPTION
+         "The chassis port number.
+          For the traps that does not have port information the value will
+          -1 in the TRAP PDU.
+         "
+     ::= { os10AlmVariable 5 }
+
+
+    --
+    -- TRAPS
+    --
+
+    os10AlmMinorTempHigh NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS                  current
+        DESCRIPTION
+            "The agent generates this trap when the
+             chassis's temperature is exceeding the minor threshold."
+        ::= { os10AlmMibNotifications 1 }
+
+    os10AlmMinorTempClr NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS                  current
+        DESCRIPTION
+            "The agent generates this trap when the
+             chassis's temperature is within the minor threshold."
+        ::= { os10AlmMibNotifications 2 }
+
+    os10AlmMajorTempHigh     NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS                  current
+        DESCRIPTION
+            "The agent generates this trap when the
+             chassis's temperature is exceeding the mjaor threshold."
+        ::= { os10AlmMibNotifications 3 }
+
+    os10AlmMajorTempClr    NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS                  current
+        DESCRIPTION
+            "The agent generates this trap when the
+             chassis's temperature is within the mjaor threshold."
+        ::= { os10AlmMibNotifications 4 }
+
+    os10AlmPowerSupplyDown  NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS              current
+        DESCRIPTION
+            "The agent generates this trap when a
+             power supply is not operational."
+        ::= { os10AlmMibNotifications 5 }
+
+    os10AlmPowerSupplyClr  NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS              current
+        DESCRIPTION
+            "The agent generates this trap when a
+             power supply is now operational."
+        ::= { os10AlmMibNotifications 6 }
+
+    os10AlmMajorPowerSupply      NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS          current
+        DESCRIPTION
+            "The agent generates this trap when a
+             power supply major alarm is issued."
+        ::= { os10AlmMibNotifications 7 }
+
+    os10AlmMajorPowerSupplyClr   NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS          current
+        DESCRIPTION
+            "The agent generates this trap when a
+             power supply major alarm is cleared."
+        ::= { os10AlmMibNotifications 8 }
+
+    os10AlmMinorPowerSupply      NOTIFICATION-TYPE
+         OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS          current
+        DESCRIPTION
+            "The agent generates this trap when a
+             power supply minor alarm is issued."
+        ::= { os10AlmMibNotifications 9 }
+
+    os10AlmMinorPowerSupplyClr   NOTIFICATION-TYPE
+         OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS          current
+        DESCRIPTION
+            "The agent generates this trap when a
+             power supply minor alarm is cleared."
+        ::= { os10AlmMibNotifications 10 }
+
+
+    os10AlmFanTrayDown  NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS              current
+        DESCRIPTION
+            "The agent generates this trap when a
+             fan tray is missing  or not operational."
+        ::= { os10AlmMibNotifications 11 }
+
+    os10AlmFanTrayClr  NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS              current
+        DESCRIPTION
+            "The agent generates this trap when a
+             fan tray is now operational."
+        ::= { os10AlmMibNotifications 12 }
+
+    os10AlmMinorFanTray  NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS              current
+        DESCRIPTION
+            "The agent generates this trap when a
+             minor fan tray alarm is issued."
+        ::= { os10AlmMibNotifications 13 }
+
+    os10AlmMinorFanTrayClr  NOTIFICATION-TYPE
+        OBJECTS            {   
+                        os10AlmVarInteger,
+                        os10AlmVarString,
+                        os10AlmVarChassisId,
+                        os10AlmVarSlot,
+                        os10AlmVarPort
+                       }
+        STATUS              current
+        DESCRIPTION
+            "The agent generates this trap when a
+             theminor fan tray alarm is cleared."
+        ::= { os10AlmMibNotifications 14 }
+
+
+    END

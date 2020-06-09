@@ -1,0 +1,51 @@
+-------------------------------------------------------------------------------
+--
+-- SCHLEIFENBAUER-PRODUCTS-MIB.txt: Schleifenbauer Product Object Identifier Assignments
+--
+-- October 2015, Marco Veeneman
+--
+-- Copyright (c) 2015 by Schleifenbauer Holding BV
+-- All rights reserved.
+--
+-------------------------------------------------------------------------------
+
+SCHLEIFENBAUER-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    schleifenbauerProducts,
+    schleifenbauerModules
+        FROM SCHLEIFENBAUER-SMI;
+    
+schleifenbauerProductsMIB MODULE-IDENTITY
+    LAST-UPDATED
+        "201510230000Z" -- October 23th, 2015
+    ORGANIZATION
+        "Schleifenbauer Engineering"
+    CONTACT-INFO
+        "Schleifenbauer Engineering
+         Alain Schuermans
+         Chief Technology Officer
+         Turnhoutseweg 22
+         5541 NX Reusel
+         The Netherlands
+         t. +31 73 5230256
+         f. +31 73 5212383
+         alain@schleifenbauer.eu
+         www.schleifenbauer.eu"
+    DESCRIPTION
+        "TODO: description.
+        
+         Copyright (c) 2015 by Schleifenbauer Products BV
+        "
+    REVISION
+        "201510230000Z" -- October 23th, 2015
+    DESCRIPTION
+        "The initial revision of this MIB module"
+    ::= { schleifenbauerModules 2}
+
+hpdu    OBJECT IDENTIFIER ::= { schleifenbauerProducts 1 }
+dpm3    OBJECT IDENTIFIER ::= { schleifenbauerProducts 2 }
+
+END

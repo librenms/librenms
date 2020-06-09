@@ -3,6 +3,7 @@ text: 'ADVA FSP150CC'
 type: network
 icon: adva
 group: ADVA
+ifname: true
 over:
    - { graph: device_bits, text: Traffic }
    - { graph: device_temperature, text: Temperature }

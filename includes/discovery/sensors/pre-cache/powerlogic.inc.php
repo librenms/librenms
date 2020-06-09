@@ -24,13 +24,13 @@
  */
 
 echo 'loadCurrentTable ';
-$pre_cache['powerlogic_loadCurrentTable'] = snmpwalk_cache_index($device, 'loadCurrentTable', array(), 'PM8ECCMIB');
+$pre_cache['powerlogic_loadCurrentTable'] = snmpwalk_cache_index($device, 'loadCurrentTable', [], 'PM8ECCMIB');
 
 echo 'powerTable ';
-$pre_cache['powerlogic_powerTable'] = snmpwalk_cache_index($device, 'powerTable', array(), 'PM8ECCMIB');
+$pre_cache['powerlogic_powerTable'] = snmpwalk_cache_index($device, 'powerTable', [], 'PM8ECCMIB');
 
 echo 'voltageTable ';
-$pre_cache['powerlogic_voltageTable'] = snmpwalk_cache_index($device, 'voltageTable', array(), 'PM8ECCMIB');
+$pre_cache['powerlogic_voltageTable'] = snmpwalk_cache_index($device, 'voltageTable', [], 'PM8ECCMIB');
 
 echo 'frequencyTable ';
-$pre_cache['powerlogic_frequencyTable'] = snmpwalk_cache_index($device, 'frequencyTable', array(), 'PM8ECCMIB');
+$pre_cache['powerlogic_frequencyTable'] = snmpwalk_cache_index($device, 'frequencyTable', [], 'PM8ECCMIB');

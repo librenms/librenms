@@ -39,29 +39,17 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Config;
 
 class Boxcar extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
+        $boxcar_opts = $this->parseUserOptions($this->config['options']);
         $boxcar_opts['access_token'] = $this->config['boxcar-token'];
-        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $boxcar_opts[$k] = $v;
-        }
-        return $this->contactBoxcar($obj, $boxcar_opts);
-    }
 
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $api) {
-            $this->contactBoxcar($obj, $api);
-        }
-        return true;
+        return $this->contactBoxcar($obj, $boxcar_opts);
     }
 
     public static function contactBoxcar($obj, $api)
@@ -84,16 +72,16 @@ class Boxcar extends Transport
                 break;
         }
         switch ($obj['state']) {
-            case 0:
+            case AlertState::RECOVERED:
                 $title_text = "OK";
                 if (!empty($api['sound_ok'])) {
                     $data['notification[sound]'] = $api['sound_ok'];
                 }
                 break;
-            case 1:
+            case AlertState::Active:
                 $title_text = $severity;
                 break;
-            case 2:
+            case AlertState::ACKNOWLEDGED:
                 $title_text = "Acknowledged";
                 break;
         }

@@ -29,9 +29,10 @@ use App\Models\Device;
 use App\Models\Ipv4Address;
 use App\Models\Port;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use LibreNMS\Tests\LaravelTestCase;
+use LibreNMS\Tests\DBTestCase;
+use LibreNMS\Tests\TestCase;
 
-class DeviceTest extends LaravelTestCase
+class DeviceTest extends DBTestCase
 {
     use DatabaseTransactions;
 

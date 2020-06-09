@@ -137,6 +137,6 @@ class Notification extends Model
      */
     public function attribs()
     {
-        return $this->hasMany('App\Models\NotificationAttrib', 'notifications_id', 'notifications_id');
+        return $this->hasMany(\App\Models\NotificationAttrib::class, 'notifications_id', 'notifications_id');
     }
 }

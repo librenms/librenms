@@ -1,0 +1,3981 @@
+IBMIROC-MIB DEFINITIONS ::= BEGIN
+
+------------------------------------------------------------------
+-- IBM Routing Code (IROC) Enterprise MIB (SNMP Version 1 Format)
+------------------------------------------------------------------
+--
+--    This MIB defines the enterprise specific management
+--    objects for functions that are common to the base IBM
+--    routing software.
+--
+--    This MIB is defined in the SNMP version 1 SMI format.
+--
+--    September 10th, 1999
+--
+--    Contact Information:
+--
+--            Randy Worzella
+--            IBM Corp.
+--            G420/664
+--            Research Triangle Park, NC 27709
+--
+--            phone:    919-254-2202
+--            email:    worzella@us.ibm.com
+--
+------------------------------------------------------------------
+
+IMPORTS
+         enterprises, Counter, Gauge, TimeTicks, IpAddress
+                  FROM RFC1155-SMI
+         DisplayString
+                  FROM RFC1213-MIB
+         frCircuitIfIndex, frCircuitDlci
+                  FROM RFC1315-MIB
+         proResMemHeapTotal, proResMemHeapNeverAlloc, proElsSubSysEventMsg
+                  FROM PROTEON-MIB
+         TRAP-TYPE
+                  FROM RFC-1215
+         OBJECT-TYPE
+                  FROM RFC-1212;
+
+-- Path to ibmIROC
+
+ibm      OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd  OBJECT IDENTIFIER ::= { ibm 6 }
+ibmIROC  OBJECT IDENTIFIER ::= { ibmProd 119 }
+
+------------------------------------------------------------------
+-- Textual Conventions
+------------------------------------------------------------------
+MacAddressNCIROC ::= OCTET STRING (SIZE(6))   -- 802 MAC addr in non-canonical format
+
+------------------------------------------------------------------
+-- IBM IROC Anchor
+------------------------------------------------------------------
+ibmIROCadmin     OBJECT IDENTIFIER ::= { ibmIROC 1 }
+ibmIROCsystem    OBJECT IDENTIFIER ::= { ibmIROC 2 }
+ibmIROChardware  OBJECT IDENTIFIER ::= { ibmIROC 3 }
+ibmIROCrouting   OBJECT IDENTIFIER ::= { ibmIROC 4 }
+ibmIROCswitching OBJECT IDENTIFIER ::= { ibmIROC 5 }
+ibmIROCtraps     OBJECT IDENTIFIER ::= { ibmIROC 6 }
+ibmIROCconfig    OBJECT IDENTIFIER ::= { ibmIROC 7 }
+
+------------------------------------------------------------------
+-- IBM IROC Administrative
+------------------------------------------------------------------
+ibmIROCadminproducts   OBJECT IDENTIFIER ::= { ibmIROCadmin 1 }
+ibmIROCadminOID        OBJECT IDENTIFIER ::= { ibmIROCadmin 2 }
+ibmIROCadminDebug      OBJECT IDENTIFIER ::= { ibmIROCadmin 3 }
+ibmIROCadminSnmp       OBJECT IDENTIFIER ::= { ibmIROCadmin 4 }
+
+------------------------------------------------------------------
+-- IBM IROC System
+------------------------------------------------------------------
+ibmIROCsystemInfo      OBJECT IDENTIFIER ::= { ibmIROCsystem 1 }
+ibmIROCcfgInfo         OBJECT IDENTIFIER ::= { ibmIROCsystem 2 }
+-- { ibmIROCsystem 3 } is reserved for Thinserver MIB branch
+ibmIROCdumpInfo        OBJECT IDENTIFIER ::= { ibmIROCsystem 4 }
+
+------------------------------------------------------------------
+-- IBM IROC Hardware
+------------------------------------------------------------------
+ibmIROChardwareInfo    OBJECT IDENTIFIER ::= { ibmIROChardware 1 }
+
+------------------------------------------------------------------
+-- IBM IROC Routing
+--
+-- NOTES: ibmIROCrouting 1 is reserved
+--
+------------------------------------------------------------------
+ibmIROCroutingppp      OBJECT IDENTIFIER ::= { ibmIROCrouting 2 }
+ibmIROCroutingdlsw     OBJECT IDENTIFIER ::= { ibmIROCrouting 3 }
+ibmIROCroutingfr       OBJECT IDENTIFIER ::= { ibmIROCrouting 4 }
+
+ibmIROCroutingRlan     OBJECT IDENTIFIER ::= { ibmIROCrouting 5 }
+ibmIROCroutingDialOut  OBJECT IDENTIFIER ::= { ibmIROCrouting 6 }
+
+ibmIROCroutingl2tp     OBJECT IDENTIFIER ::= { ibmIROCrouting 7 }
+ibmCacheServer         OBJECT IDENTIFIER ::= { ibmIROCrouting 8 }
+ibmIROCroutingIpSec    OBJECT IDENTIFIER ::= { ibmIROCrouting 9 }
+
+ibmIROCswhw            OBJECT IDENTIFIER ::= { ibmIROCrouting 10 }
+
+ibmWanRestoralRerouteMIB  OBJECT IDENTIFIER ::= { ibmIROCrouting 11 }
+ibmBANMIB                 OBJECT IDENTIFIER ::= { ibmIROCrouting 12 }
+
+ibmIROCrmon               OBJECT IDENTIFIER ::= { ibmIROCrouting 13 }
+
+ibmIROCescon              OBJECT IDENTIFIER ::= { ibmIROCrouting 14 }
+
+ibmIROCVPNpolicy          OBJECT IDENTIFIER ::= { ibmIROCrouting 15 }
+
+ibmIROCroutingvoice       OBJECT IDENTIFIER ::= { ibmIROCrouting 16 }
+
+ibmIROCroutinginterface   OBJECT IDENTIFIER ::= { ibmIROCrouting 17 }
+
+ibmIROCroutingtn3270e     OBJECT IDENTIFIER ::= { ibmIROCrouting 18 }
+
+-- Anchor 19 defined in another release
+
+ibmIROCroutingtcpip       OBJECT IDENTIFIER ::= { ibmIROCrouting 20 }
+
+------------------------------------------------------------------
+-- IBM IROC Switching
+------------------------------------------------------------------
+-- Nothing defined yet !!
+
+------------------------------------------------------------------
+-- IBM IROC Config
+--
+-- NOTE: DO NOT DEFINE ANY OIDs UNDER THIS BRANCH WITHOUT
+--       FIRST CONTACTING THE SNMP TEAM!!!
+--
+------------------------------------------------------------------
+ibmIROCconfigAuth      OBJECT IDENTIFIER ::= { ibmIROCconfig 2 }
+
+-- { ibmIROCconfig 3 } is reserved for ibmIROCconfigToolLoad timed load objects
+--
+-- Currently, they define:
+--
+--   1.3.6.1.4.1.2.6.119.7.3.1.0   A simple object for timed load time value
+--
+--   1.3.6.1.4.1.2.6.119.7.3.2.block.rec.inst   An SRAM octet string
+--
+
+ibmIROCconfigWrite OBJECT-TYPE
+    SYNTAX  INTEGER   {
+             noaction  (1),
+             write     (2)
+            }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+            "This object is a trigger to cause the current config
+             image in memory to be written to disk or flash. A
+             SET of this object to write(2) performs the same
+             action as the T6 write command. A GET of this
+             object with always return a value of noaction(1)."
+    ::= { ibmIROCconfig 4 }
+
+------------------------------------------------------------------
+-- System Information
+------------------------------------------------------------------
+------------------------------------------------------------------
+-- SNMP Agent Status
+------------------------------------------------------------------
+ibmIROCAgentDebug  OBJECT IDENTIFIER ::= { ibmIROCadminDebug 1 }
+
+agentMemUse OBJECT-TYPE
+    SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "This object indicates the current amount (in bytes)
+             of dynamic memory allocated and in use by the SNMP
+             agent. It is primarily in place to watch for any
+             potential 'memory leaks', whereby, memory is allocated
+             but never freed. This condition is indicated by an
+             ever increasing value for this gauge."
+    ::= { ibmIROCAgentDebug 1 }
+
+------------------------------------------------------------------
+-- SNMP Authentication Failure Trap
+------------------------------------------------------------------
+ibmIROCSnmpAuthFail  OBJECT IDENTIFIER ::= { ibmIROCadminSnmp 1 }
+
+authTrapSourceIPAddr OBJECT-TYPE
+    SYNTAX  IpAddress
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "This object indicates the IP address of sender of the
+             MIB request that fails authentication.  An authentication
+             failure trap is generated when the SNMP agent
+             recives a MIB request does not have the proper
+             community name."
+    ::= { ibmIROCSnmpAuthFail 1}
+
+------------------------------------------------------------------
+-- System dump identification
+------------------------------------------------------------------
+ibmSysDumpTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IbmSysDumpEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+      "Table to provide system dump identification information."
+    ::= { ibmIROCdumpInfo 1 }
+
+ibmSysDumpEntry  OBJECT-TYPE
+    SYNTAX     IbmSysDumpEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+       "The dump identification information for a single system dump."
+    INDEX   {ibmSysDumpIndex}
+    ::= { ibmSysDumpTable 1 }
+
+IbmSysDumpEntry ::= SEQUENCE {
+    ibmSysDumpIndex                   INTEGER,
+    ibmSysDumpFileName                DisplayString,
+    ibmSysDumpFileDate                DisplayString,
+
+    ibmSysDumpBuild                   DisplayString,
+    ibmSysDumpBuilder                 DisplayString,
+    ibmSysDumpBuildName               DisplayString,
+    ibmSysDumpRetainName              DisplayString,
+    ibmSysDumpProductNumber           DisplayString,
+    ibmSysDumpBuildDate               DisplayString,
+
+    ibmSysDumpFatalMsg1               DisplayString,
+    ibmSysDumpFatalMsg2               DisplayString,
+    ibmSysDumpFatalMsg3               DisplayString,
+    ibmSysDumpFatalMsg4               DisplayString,
+    ibmSysDumpFatalMsg5               DisplayString,
+    ibmSysDumpRemoteIPAddr            DisplayString,
+    ibmSysDumpRemotePath              DisplayString
+    }
+
+ibmSysDumpIndex  OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION
+       "A unique identifier for a system dump entry."
+    ::= { ibmSysDumpEntry 1 }
+
+ibmSysDumpFileName    OBJECT-TYPE
+    SYNTAX            DisplayString
+    ACCESS            read-only
+    STATUS            mandatory
+    DESCRIPTION
+       "The system dump file name."
+    ::= { ibmSysDumpEntry 2 }
+
+ibmSysDumpFileDate    OBJECT-TYPE
+    SYNTAX            DisplayString
+    ACCESS            read-only
+    STATUS            mandatory
+    DESCRIPTION
+       "The creation date of the dump file."
+    ::= { ibmSysDumpEntry 3 }
+
+ibmSysDumpBuild       OBJECT-TYPE
+    SYNTAX            DisplayString
+    ACCESS            read-only
+    STATUS            mandatory
+    DESCRIPTION
+       "The level of software running on the router when this dump occurred."
+    ::= { ibmSysDumpEntry 4 }
+
+ibmSysDumpBuilder     OBJECT-TYPE
+    SYNTAX            DisplayString
+    ACCESS            read-only
+    STATUS            mandatory
+    DESCRIPTION
+       "The entity responsible for building the software running on the router."
+    ::= { ibmSysDumpEntry 5 }
+
+ibmSysDumpBuildName   OBJECT-TYPE
+    SYNTAX            DisplayString
+    ACCESS            read-only
+    STATUS            mandatory
+    DESCRIPTION
+       "The internal name of the software running on the router."
+    ::= { ibmSysDumpEntry 6 }
+
+ibmSysDumpRetainName  OBJECT-TYPE
+    SYNTAX            DisplayString
+    ACCESS            read-only
+    STATUS            mandatory
+    DESCRIPTION
+       "The external name of the software running on the router."
+    ::= { ibmSysDumpEntry 7 }
+
+ibmSysDumpProductNumber  OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "The program product number of the software running on the router."
+    ::= { ibmSysDumpEntry 8 }
+
+ibmSysDumpBuildDate      OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "The creation date of the software running on the router."
+    ::= { ibmSysDumpEntry 9 }
+
+ibmSysDumpFatalMsg1      OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "The first error/fatal message associated with the dump.
+        Depending on the nature of the failure, this object may or
+        may not contain any information."
+    ::= { ibmSysDumpEntry 10 }
+
+ibmSysDumpFatalMsg2      OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "The first error/fatal message associated with the dump.
+        Depending on the nature of the failure, this object may or
+        may not contain any information."
+    ::= { ibmSysDumpEntry 11 }
+
+ibmSysDumpFatalMsg3      OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "The first error/fatal message associated with the dump.
+        Depending on the nature of the failure, this object may or
+        may not contain any information."
+    ::= { ibmSysDumpEntry 12 }
+
+ibmSysDumpFatalMsg4      OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "The first error/fatal message associated with the dump.
+        Depending on the nature of the failure, this object may or
+        may not contain any information."
+    ::= { ibmSysDumpEntry 13 }
+
+ibmSysDumpFatalMsg5      OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "The first error/fatal message associated with the dump.
+        Depending on the nature of the failure, this object may or
+        may not contain any information."
+    ::= { ibmSysDumpEntry 14 }
+
+ibmSysDumpRemoteIPAddr   OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "For platforms that may operate without a fixed disk, if this
+        string is non null, it represents the remote host IP address
+        where the dump was transferred."
+    ::= { ibmSysDumpEntry 15 }
+
+ibmSysDumpRemotePath     OBJECT-TYPE
+    SYNTAX               DisplayString
+    ACCESS               read-only
+    STATUS               mandatory
+    DESCRIPTION
+       "For platforms that may operate without a fixed disk, if this
+        string is non null, it represents the remote host file path
+        where the dump was transferred."
+    ::= { ibmSysDumpEntry 16 }
+
+
+------------------------------------------------------------------
+-- Hardware Information
+------------------------------------------------------------------
+platformType OBJECT-TYPE
+        SYNTAX          INTEGER   {
+           plat-other             (1),
+           plat-mss-8210          (2),
+           plat-mss-blade         (3),
+           plat-mss-client        (4),
+           plat-2216-400          (5),
+           plat-2210-1s4          (6),
+           plat-2210-1s8          (7),
+           plat-2210-1u4          (8),
+           plat-2210-1u8          (9),
+           plat-2210-24e          (10),
+           plat-2210-24m          (11),
+           plat-2210-24t          (12),
+           plat-2210-14t          (13),
+           plat-2210-125          (14),
+           plat-2210-127          (15),
+           plat-2210-121          (16),
+           plat-2210-12t          (17),
+           plat-2210-126          (18),
+           plat-2210-128          (19),
+           plat-2210-122          (20),
+           plat-2210-12e          (21),
+           plat-2220-200          (22),
+           plat-3746-MAE          (23),
+           plat-mss-domain-client (24),
+           plat-mss-8210V2        (25),
+           plat-mss-bladeV2       (26),
+           plat-netu-xx1          (27),
+           plat-2212-10F          (28),
+           plat-2212-10H          (29),
+           plat-2212-40F          (30),
+           plat-2212-40H          (31),
+           plat-8371              (32),
+           plat-8375              (33),
+           plat-2212-15F          (34),
+           plat-2212-15H          (35),
+           plat-2212-45F          (36),
+           plat-2212-45H          (37),
+           plat-reserved1         (38),
+           plat-reserved2         (39),
+           plat-8275-RR           (40),
+           plat-8371-8260B        (41),
+           plat-reserved          (42)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The platform type containing this SNMP agent."
+    ::= { ibmIROChardwareInfo 1 }
+
+platformDRAMSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The amount of dynamic RAM (Megabytes) installed on this platform.
+             DRAM is used to contain the routing software and
+             associated data areas."
+    ::= { ibmIROChardwareInfo 2 }
+
+platformFLASHSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The amount of flash memory (Megabytes) installed on the 2210.
+             Flash is used to hold configuration and software code
+             loads, one pair of which can be loaded and made active
+             on the platform.
+
+             This object applies only to 2210, since other platforms' may or may not
+             have FLASH, and if so, the size is not of interest. For these platforms,
+             this object will take on a value of 0."
+    ::= { ibmIROChardwareInfo 3 }
+
+platformNVRAMSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The amount of non-volatile memory (Kilobytes) installed on the 2210.
+             NVRAM, sometimes referred to as SRAM, is used to hold the active
+             configuration records.
+
+             This object applies only to 2210, since other platforms' may or may not
+             have NVRAM, and if so, the size is not of interest. For these platforms,
+             this object will take on a value of 0."
+    ::= { ibmIROChardwareInfo 4 }
+
+platformFeatureSlot OBJECT-TYPE
+        SYNTAX          INTEGER   {
+           none                 (1),
+           isdn-BRI-ST          (2),
+           isdn-PRI-E1-120      (3),
+           isdn-PRI-E1-75       (4),
+           isdn-PRI-T1J1        (5),
+           atm-155              (6),
+           atm-25               (7),
+           serial-wan-4port     (8),
+           serial-wan-8port     (9),
+           modem-4port          (10),
+           modem-8port          (11),
+           isdn-BRI-4port-ST    (12),
+           isdn-BRI-4port-U     (13),
+           isdn-voice-ST-FXO    (14),
+           isdn-voice-ST-FXS    (15),
+           isdn-voice-ST-EM     (16),
+           isdn-voice-U-FXO     (17),
+           isdn-voice-U-FXS     (18),
+           isdn-voice-U-EM      (19)
+        }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The type of adapter installed in the feature slot of the
+             2210 platform. Note that not all adapter types listed
+             above are currently supported, nor does this imply they
+             will be supported in the future."
+    ::= { ibmIROChardwareInfo 5 }
+
+------------------------------------------------------------------
+-- Routing Information
+------------------------------------------------------------------
+------------------------------------------------------------------
+-- PPP Protocol and Control Protocol Statistics
+------------------------------------------------------------------
+
+   pppProtocolTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppProtocolEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of protocol and control protocol
+           statistics for protocols supported by PPP."
+        ::= { ibmIROCroutingppp 1 }
+
+   pppProtocolEntry  OBJECT-TYPE
+        SYNTAX      PppProtocolEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of protocol and control protocol information
+           for a specific protocol supported by PPP."
+        INDEX   { pppProtocolIfIndex, pppProtocolId }
+        ::= { pppProtocolTable 1 }
+
+   PppProtocolEntry ::= SEQUENCE {
+        pppProtocolIfIndex          INTEGER,
+        pppProtocolId               INTEGER,
+        pppProtocolRegistered       INTEGER,
+        pppProtocolState            INTEGER,
+        pppProtocolPreviousState    INTEGER,
+        pppProtocolLastTimeChange   TimeTicks,
+        pppProtocolCtlInRejects     Counter,
+        pppProtocolCtlInOctets      Counter,
+        pppProtocolCtlInPkts        Counter,
+        pppProtocolCtlOutOctets     Counter,
+        pppProtocolCtlOutPkts       Counter,
+        pppProtocolDataInRejects    Counter,
+        pppProtocolDataInOctets     Counter,
+        pppProtocolDataInPkts       Counter,
+        pppProtocolDataOutOctets    Counter,
+        pppProtocolDataOutPkts      Counter
+        }
+
+   pppProtocolIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for an interface running PPP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppProtocolEntry 1 }
+
+   pppProtocolId OBJECT-TYPE
+        SYNTAX          INTEGER   {
+           ip                   (1),
+           decnet               (2),
+           ipx                  (3),
+           bridge               (4),
+           appletalk            (5),
+           osi                  (6),
+           appnhpr              (7),
+           appnisr              (8),
+           vines                (9),
+           compression          (10),
+           netbios              (11),
+           netbios-forw         (12),
+           bandwidth-allocation (13),
+           encryption           (14),
+           ipv6                 (15)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier of a protocol supported by PPP."
+        ::= { pppProtocolEntry 2 }
+
+   pppProtocolRegistered OBJECT-TYPE
+        SYNTAX          INTEGER   {
+           yes                  (1),
+           no                   (2)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Indicates whether this protocol is registered with PPP."
+        ::= { pppProtocolEntry 3 }
+
+   pppProtocolState OBJECT-TYPE
+        SYNTAX          INTEGER   {
+           closed               (1),
+           listen               (2),
+           requestSent          (3),
+           ackReceived          (4),
+           ackSent              (5),
+           opened               (6),
+           termSent             (7)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The value identifies the present state of the
+            protocol."
+        ::= { pppProtocolEntry 4 }
+
+   pppProtocolPreviousState OBJECT-TYPE
+        SYNTAX          INTEGER    {
+           closed               (1),
+           listen               (2),
+           requestSent          (3),
+           ackReceived          (4),
+           ackSent              (5),
+           opened               (6),
+           termSent             (7)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The state of the protocol prior to the state given by
+            pppProtocolState.
+
+            These states are the same as those described for the object
+            pppProtocolState. "
+        ::= { pppProtocolEntry 5 }
+
+   pppProtocolLastTimeChange OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The value of sysUpTime when the last
+            protocol state change occurred."
+        ::= { pppProtocolEntry 6 }
+
+------------------------------------------------------------------
+-- PPP Network Control Protocol Statistics
+------------------------------------------------------------------
+
+   pppProtocolCtlInRejects OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of a control protocol protocol-reject
+            packets received over the PPP interface."
+        ::= { pppProtocolEntry 7 }
+
+   pppProtocolCtlInOctets OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of control protocol octets received
+            over the PPP interface."
+        ::= { pppProtocolEntry 8 }
+
+   pppProtocolCtlInPkts OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of control protocol packets
+            received over the PPP interface."
+        ::= { pppProtocolEntry 9 }
+
+   pppProtocolCtlOutOctets OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of control protocol octets transmitted over
+            the PPP interface."
+        ::= { pppProtocolEntry 10 }
+
+   pppProtocolCtlOutPkts OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of a control protocol packets
+            transmitted over the PPP interface."
+        ::= { pppProtocolEntry 11 }
+
+------------------------------------------------------------------
+-- PPP Protocol Statistics
+------------------------------------------------------------------
+
+   pppProtocolDataInRejects   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of protocol reject packets
+            received over the PPP interface."
+        ::= { pppProtocolEntry 12 }
+
+   pppProtocolDataInOctets  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of protocol octets received over
+            the PPP interface."
+        ::= { pppProtocolEntry 13 }
+
+   pppProtocolDataInPkts    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of protocol packets received
+            over the PPP interface."
+        ::= { pppProtocolEntry 14 }
+
+   pppProtocolDataOutOctets OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of protocol octets transmitted over the
+            PPP interface."
+        ::= { pppProtocolEntry 15 }
+
+   pppProtocolDataOutPkts   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of protocol packets transmitted
+            over the PPP interface."
+        ::= { pppProtocolEntry 16 }
+
+------------------------------------------------------------------
+-- PPP Link Error Statistics
+------------------------------------------------------------------
+
+   pppLinkErrTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppLinkErrEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of link error statistics."
+        ::= { ibmIROCroutingppp 2 }
+
+   pppLinkErrEntry  OBJECT-TYPE
+        SYNTAX      PppLinkErrEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of link error information
+           for a specific interface."
+        INDEX   { pppLinkErrIfIndex }
+        ::= { pppLinkErrTable 1 }
+
+   PppLinkErrEntry ::= SEQUENCE {
+        pppLinkErrIfIndex      INTEGER,
+        pppLinkErrBadAddrs     Counter,
+        pppLinkErrLastBadAddr  OCTET STRING,
+        pppLinkErrBadCtrls     Counter,
+        pppLinkErrLastBadCtrl  OCTET STRING,
+        pppLinkErrUnkProtos    Counter,
+        pppLinkErrLastUnkProto OCTET STRING,
+        pppLinkErrInvProtos    Counter,
+        pppLinkErrLastInvProto OCTET STRING,
+        pppLinkErrConfigTOs    Counter,
+        pppLinkErrTermTOs      Counter
+        }
+
+   pppLinkErrIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for an interface running PPP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppLinkErrEntry 1 }
+
+   pppLinkErrBadAddrs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of packets received with a bad
+            Address field."
+        ::= { pppLinkErrEntry 2 }
+
+   pppLinkErrLastBadAddr OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(1))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The last bad Address field received."
+        ::= { pppLinkErrEntry 3 }
+
+   pppLinkErrBadCtrls OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of packets received with a bad
+            Control field."
+        ::= { pppLinkErrEntry 4 }
+
+   pppLinkErrLastBadCtrl OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(1))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The last bad Control field received."
+        ::= { pppLinkErrEntry 5 }
+
+   pppLinkErrUnkProtos OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of packets received with a Protocol
+            identifier not registered with PPP."
+        ::= { pppLinkErrEntry 6 }
+
+   pppLinkErrLastUnkProto OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(2))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The last unknown Protocol identifier received."
+        ::= { pppLinkErrEntry 7 }
+
+   pppLinkErrInvProtos OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of packets received with a Protocol
+            identifier that is not valid."
+        ::= { pppLinkErrEntry 8 }
+
+   pppLinkErrLastInvProto OBJECT-TYPE
+        SYNTAX          OCTET STRING (SIZE(2))
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The last invalid Protocol identifier received."
+        ::= { pppLinkErrEntry 9 }
+
+   pppLinkErrConfigTOs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of timeouts that occurred
+            on this link when sending a config request
+            to open the PPP link."
+        ::= { pppLinkErrEntry 10 }
+
+   pppLinkErrTermTOs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of timeouts that occurred
+            on this link when sending a terminate request
+            to close the PPP link."
+        ::= { pppLinkErrEntry 11 }
+
+------------------------------------------------------------------
+-- PPP Link Control Protocol Statistics
+------------------------------------------------------------------
+
+   pppLCProtoTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppLCProtoEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of link control protocol statistics."
+        ::= { ibmIROCroutingppp 3 }
+
+   pppLCProtoEntry  OBJECT-TYPE
+        SYNTAX      PppLCProtoEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of link control protocol information
+           for a specific interface."
+        INDEX   { pppLCProtoIfIndex }
+        ::= { pppLCProtoTable 1 }
+
+   PppLCProtoEntry ::= SEQUENCE {
+        pppLCProtoIfIndex      INTEGER,
+        pppLCProtoState        INTEGER,
+        pppLCProtoPreviousState INTEGER,
+        pppLCProtoLastTimeChange TimeTicks,
+
+        pppLCProtoOutPackets   Counter,
+        pppLCProtoOutOctets    Counter,
+        pppLCProtoOutCRs       Counter,
+        pppLCProtoOutCAs       Counter,
+        pppLCProtoOutCNs       Counter,
+        pppLCProtoOutCRejs     Counter,
+        pppLCProtoOutTRs       Counter,
+        pppLCProtoOutTAs       Counter,
+        pppLCProtoOutCodeRejs  Counter,
+        pppLCProtoOutEchoReqs  Counter,
+        pppLCProtoOutEchoReps  Counter,
+        pppLCProtoOutDiscReqs  Counter,
+        pppLCProtoOutResetReqs Counter,
+        pppLCProtoOutResetAcks Counter,
+        pppLCProtoOutIdents    Counter,
+        pppLCProtoOutTimeRemains Counter,
+
+        pppLCProtoInRejects    Counter,
+        pppLCProtoInPackets    Counter,
+        pppLCProtoInOctets     Counter,
+        pppLCProtoInCRs        Counter,
+        pppLCProtoInCAs        Counter,
+        pppLCProtoInCNs        Counter,
+        pppLCProtoInCRejs      Counter,
+        pppLCProtoInTRs        Counter,
+        pppLCProtoInTAs        Counter,
+        pppLCProtoInCodeRejs   Counter,
+        pppLCProtoInEchoReqs   Counter,
+        pppLCProtoInEchoReps   Counter,
+        pppLCProtoInDiscReqs   Counter,
+        pppLCProtoInResetReqs  Counter,
+        pppLCProtoInResetAcks  Counter,
+        pppLCProtoInIdents     Counter,
+        pppLCProtoInTimeRemains Counter
+        }
+
+   pppLCProtoIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for an interface running PPP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppLCProtoEntry 1 }
+
+   pppLCProtoState OBJECT-TYPE
+        SYNTAX          INTEGER   {
+           closed               (1),
+           listen               (2),
+           requestSent          (3),
+           ackReceived          (4),
+           ackSent              (5),
+           opened               (6),
+           termSent             (7)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The value identifies the present state of the PPP
+            link.
+
+            The closed(1) state indicates that the link is down and
+            there is no attempt being made to open it and all connection
+            requests from peers are rejected.
+
+            In listen(2) state, the link
+            is down and there is no attempt being made to open it, however,
+            all the connection requests from peers are accepted.
+
+            The state
+            request-sent(3) indicates that an active attempt is being made
+            to open the link. In this state, a Configure-request packet has
+            been sent and no Configure-Ack has yet been received.
+
+            In the
+            state ack-received(4), a Configure-request packet has been sent
+            and Configure-Ack packet has been received.
+
+            The state ack-sent(5)
+            indicates that a Congigure-request and Configure-Ack packets
+            have been sent and Configure-Ack has not yet been received.
+
+            The opened(6) state implies that a connection has been made and
+            data may be sent.
+
+            The state term-sent(7) indicates that an
+            attempt is being made to close the connection and that a
+            Terminate-request packet has been sent and a Terminate-Ack
+            packet has not yet been received. "
+        ::= { pppLCProtoEntry 2 }
+
+   pppLCProtoPreviousState OBJECT-TYPE
+        SYNTAX          INTEGER    {
+           closed               (1),
+           listen               (2),
+           requestSent          (3),
+           ackReceived          (4),
+           ackSent              (5),
+           opened               (6),
+           termSent             (7)
+        }
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The state of the PPP link prior to the state given by
+            pppLCProtoState.
+
+            These states are the same as those described for the object
+            pppLCProtoState. "
+        ::= { pppLCProtoEntry 3 }
+
+   pppLCProtoLastTimeChange OBJECT-TYPE
+        SYNTAX          TimeTicks
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "The value of sysUpTime when the last
+            PPP link state change occurred."
+        ::= { pppLCProtoEntry 4 }
+
+   pppLCProtoOutPackets OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP packets transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 5 }
+
+   pppLCProtoOutOctets  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP octets transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 6 }
+
+   pppLCProtoOutCRs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Config-requests transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 7 }
+
+   pppLCProtoOutCAs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Config-acks transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 8 }
+
+   pppLCProtoOutCNs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Config-nacks transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 9 }
+
+   pppLCProtoOutCRejs   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Config-rejects transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 10 }
+
+   pppLCProtoOutTRs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Terminate-requests transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 11 }
+
+   pppLCProtoOutTAs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Terminate-acks transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 12 }
+
+   pppLCProtoOutCodeRejs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Code-rejects transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 13 }
+
+   pppLCProtoOutEchoReqs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Echo-requests transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 14 }
+
+   pppLCProtoOutEchoReps OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Echo-replies transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 15 }
+
+   pppLCProtoOutDiscReqs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Discard-requests transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 16 }
+
+   pppLCProtoOutResetReqs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Reset-requests transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 17 }
+
+   pppLCProtoOutResetAcks OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Reset-Acks transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 18 }
+
+   pppLCProtoOutIdents OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Identification packets transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 19 }
+
+   pppLCProtoOutTimeRemains OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Time-Remaining packets transmitted
+             over the PPP interface."
+        ::= { pppLCProtoEntry 20 }
+
+   pppLCProtoInRejects  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of a LCP protocol-reject
+            packets received over the PPP interface."
+        ::= { pppLCProtoEntry 21 }
+
+   pppLCProtoInPackets OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP packets received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 22 }
+
+   pppLCProtoInOctets  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP octets received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 23 }
+
+   pppLCProtoInCRs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Config-requests received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 24 }
+
+   pppLCProtoInCAs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Config-acks received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 25 }
+
+   pppLCProtoInCNs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Config-nacks received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 26 }
+
+   pppLCProtoInCRejs    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Config-rejects received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 27 }
+
+   pppLCProtoInTRs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Terminate-requests received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 28 }
+
+   pppLCProtoInTAs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Terminate-acks received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 29 }
+
+   pppLCProtoInCodeRejs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Code-rejects received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 30 }
+
+   pppLCProtoInEchoReqs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Echo-Requests received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 31 }
+
+   pppLCProtoInEchoReps OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Echo-replies received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 32 }
+
+   pppLCProtoInDiscReqs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Discard-requests received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 33 }
+
+   pppLCProtoInResetReqs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Reset-requests received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 34 }
+
+   pppLCProtoInResetAcks OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Reset-Acks received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 35 }
+
+   pppLCProtoInIdents OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Identification packets received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 36 }
+
+   pppLCProtoInTimeRemains OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+            "Total number of LCP Time-Remaining packets received
+             over the PPP interface."
+        ::= { pppLCProtoEntry 37 }
+
+------------------------------------------------------------------
+-- PPP PAP Statistics
+------------------------------------------------------------------
+
+   pppPAPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppPAPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of PAP statistics."
+        ::= { ibmIROCroutingppp 4 }
+
+   pppPAPEntry  OBJECT-TYPE
+        SYNTAX      PppPAPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of PAP information."
+        INDEX   { pppPAPIfIndex }
+        ::= { pppPAPTable 1 }
+
+   PppPAPEntry ::= SEQUENCE {
+        pppPAPIfIndex      INTEGER,
+        pppPAPInPackets    Counter,
+        pppPAPInOctets     Counter,
+        pppPAPInRequests   Counter,
+        pppPAPInAcks       Counter,
+        pppPAPInNacks      Counter,
+        pppPAPOutPackets   Counter,
+        pppPAPOutOctets    Counter,
+        pppPAPOutRequests  Counter,
+        pppPAPOutAcks      Counter,
+        pppPAPOutNacks     Counter
+        }
+
+   pppPAPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running PAP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppPAPEntry 1 }
+
+   pppPAPInPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP
+            packets received over the PPP interface."
+        ::= { pppPAPEntry 2 }
+
+   pppPAPInOctets       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP octets
+            received over the PPP interface."
+        ::= { pppPAPEntry 3 }
+
+   pppPAPInRequests     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP requests
+            received over the PPP interface."
+        ::= { pppPAPEntry 4 }
+
+   pppPAPInAcks         OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP acknowledgements
+            received over the PPP interface."
+        ::= { pppPAPEntry 5 }
+
+   pppPAPInNacks        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP non-acknowledgements
+            received over the PPP interface."
+        ::= { pppPAPEntry 6 }
+
+   pppPAPOutPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP
+            packets sent over the PPP interface."
+        ::= { pppPAPEntry 7 }
+
+   pppPAPOutOctets       OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP octets
+            sent over the PPP interface."
+        ::= { pppPAPEntry 8 }
+
+   pppPAPOutRequests     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP requests
+            sent over the PPP interface."
+        ::= { pppPAPEntry 9 }
+
+   pppPAPOutAcks         OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP acknowledgements
+            sent over the PPP interface."
+        ::= { pppPAPEntry 10 }
+
+   pppPAPOutNacks        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of PAP non-acknowledgements
+            sent over the PPP interface."
+        ::= { pppPAPEntry 11 }
+
+------------------------------------------------------------------
+-- PPP CHAP Statistics
+------------------------------------------------------------------
+
+   pppCHAPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppCHAPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of CHAP statistics."
+        ::= { ibmIROCroutingppp 5 }
+
+   pppCHAPEntry  OBJECT-TYPE
+        SYNTAX      PppCHAPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of CHAP information."
+        INDEX   { pppCHAPIfIndex }
+        ::= { pppCHAPTable 1 }
+
+   PppCHAPEntry ::= SEQUENCE {
+        pppCHAPIfIndex       INTEGER,
+        pppCHAPInPackets     Counter,
+        pppCHAPInOctets      Counter,
+        pppCHAPInChallenges  Counter,
+        pppCHAPInResponses   Counter,
+        pppCHAPInSuccesses   Counter,
+        pppCHAPInFailures    Counter,
+        pppCHAPOutPackets    Counter,
+        pppCHAPOutOctets     Counter,
+        pppCHAPOutChallenges Counter,
+        pppCHAPOutResponses  Counter,
+        pppCHAPOutSuccesses  Counter,
+        pppCHAPOutFailures   Counter
+        }
+
+   pppCHAPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running CHAP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppCHAPEntry 1 }
+
+
+   pppCHAPInPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP
+            packets received over the PPP interface."
+        ::= { pppCHAPEntry 2 }
+
+   pppCHAPInOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP
+            octets received over the PPP interface."
+        ::= { pppCHAPEntry 3 }
+
+   pppCHAPInChallenges  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP challenges
+            received over the PPP interface."
+        ::= { pppCHAPEntry 4 }
+
+   pppCHAPInResponses   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP responses
+            received over the PPP interface."
+        ::= { pppCHAPEntry 5 }
+
+   pppCHAPInSuccesses   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP successes
+            received over the PPP interface."
+        ::= { pppCHAPEntry 6 }
+
+   pppCHAPInFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP failures
+            received over the PPP interface."
+        ::= { pppCHAPEntry 7 }
+
+   pppCHAPOutPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP
+            packets sent over the PPP interface."
+        ::= { pppCHAPEntry 8 }
+
+   pppCHAPOutOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP
+            octets sent over the PPP interface."
+        ::= { pppCHAPEntry 9 }
+
+   pppCHAPOutChallenges  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP challenges
+            sent over the PPP interface."
+        ::= { pppCHAPEntry 10 }
+
+   pppCHAPOutResponses   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP responses
+            sent over the PPP interface."
+        ::= { pppCHAPEntry 11 }
+
+   pppCHAPOutSuccesses   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP successes
+            sent over the PPP interface."
+        ::= { pppCHAPEntry 12 }
+
+   pppCHAPOutFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CHAP failures
+            sent over the PPP interface."
+        ::= { pppCHAPEntry 13 }
+
+------------------------------------------------------------------
+-- PPP SPAP Statistics
+------------------------------------------------------------------
+
+   pppSPAPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppSPAPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of SPAP statistics."
+        ::= { ibmIROCroutingppp 6 }
+
+   pppSPAPEntry  OBJECT-TYPE
+        SYNTAX      PppSPAPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of SPAP information."
+        INDEX   { pppSPAPIfIndex }
+        ::= { pppSPAPTable 1 }
+
+   PppSPAPEntry ::= SEQUENCE {
+        pppSPAPIfIndex      INTEGER,
+        pppSPAPInPackets   Counter,
+        pppSPAPInOctets    Counter,
+        pppSPAPInRequests  Counter,
+        pppSPAPInAcks       Counter,
+        pppSPAPInNacks       Counter,
+        pppSPAPInDialbacks Counter,
+        pppSPAPInPleaseAuthenticates  Counter,
+        pppSPAPInChangePasswords   Counter,
+        pppSPAPInAlerts      Counter,
+        pppSPAPInAlertAcks  Counter,
+        pppSPAPOutPackets   Counter,
+        pppSPAPOutOctets    Counter,
+        pppSPAPOutRequests  Counter,
+        pppSPAPOutAcks      Counter,
+        pppSPAPOutNacks      Counter,
+        pppSPAPOutDialbacks Counter,
+        pppSPAPOutPleaseAuthenticates    Counter,
+        pppSPAPOutChangePasswords    Counter,
+        pppSPAPOutAlerts             Counter,
+        pppSPAPOutAlertAcks          Counter
+        }
+
+   pppSPAPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running SPAP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppSPAPEntry 1 }
+
+   pppSPAPInPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP
+            packets received over the PPP interface."
+        ::= { pppSPAPEntry 2 }
+
+   pppSPAPInOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP
+            octets received over the PPP interface."
+        ::= { pppSPAPEntry 3 }
+
+   pppSPAPInRequests    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP
+            responses received over the PPP interface."
+        ::= { pppSPAPEntry 4 }
+
+   pppSPAPInAcks        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP acknowledgements
+            received over the PPP interface."
+        ::= { pppSPAPEntry 5 }
+
+   pppSPAPInNacks      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP non-acknowledgements
+            received over the PPP interface."
+        ::= { pppSPAPEntry 6 }
+
+   pppSPAPInDialbacks  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP dialbacks
+            received over the PPP interface."
+        ::= { pppSPAPEntry 7 }
+
+   pppSPAPInPleaseAuthenticates OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP authenticate requests
+            received over the PPP interface."
+        ::= { pppSPAPEntry 8 }
+
+   pppSPAPInChangePasswords     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP password changes
+            received over the PPP interface."
+        ::= { pppSPAPEntry 9 }
+
+   pppSPAPInAlerts      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP alerts
+            received over the PPP interface."
+        ::= { pppSPAPEntry 10 }
+
+   pppSPAPInAlertAcks  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP alert acknowledgements
+            received over the PPP interface."
+        ::= { pppSPAPEntry 11 }
+
+   pppSPAPOutPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP
+            packets sent over the PPP interface."
+        ::= { pppSPAPEntry 12 }
+
+   pppSPAPOutOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP
+            octets sent over the PPP interface."
+        ::= { pppSPAPEntry 13 }
+
+   pppSPAPOutRequests    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP
+            responses sent over the PPP interface."
+        ::= { pppSPAPEntry 14 }
+
+   pppSPAPOutAcks        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP acknowledgements
+            sent over the PPP interface."
+        ::= { pppSPAPEntry 15 }
+
+   pppSPAPOutNacks      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP non-acknowledgements
+            sent over the PPP interface."
+        ::= { pppSPAPEntry 16 }
+
+   pppSPAPOutDialbacks  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP dialbacks
+            sent over the PPP interface."
+        ::= { pppSPAPEntry 17 }
+
+   pppSPAPOutPleaseAuthenticates OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP authenticate requests
+            sent over the PPP interface."
+        ::= { pppSPAPEntry 18 }
+
+   pppSPAPOutChangePasswords     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP password changes
+            sent over the PPP interface."
+        ::= { pppSPAPEntry 19 }
+
+   pppSPAPOutAlerts      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP alerts
+            sent over the PPP interface."
+        ::= { pppSPAPEntry 20 }
+
+   pppSPAPOutAlertAcks  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of SPAP alert acknowledgements
+            sent over the PPP interface."
+        ::= { pppSPAPEntry 21 }
+
+------------------------------------------------------------------
+-- PPP Bandwidth Allocation Protocol (BAP) Statistics
+------------------------------------------------------------------
+
+   pppBAPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppBAPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of BAP protocol statistics."
+        ::= { ibmIROCroutingppp 7 }
+
+   pppBAPEntry  OBJECT-TYPE
+        SYNTAX      PppBAPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of BAP information."
+        INDEX   { pppBAPIfIndex }
+        ::= { pppBAPTable 1 }
+
+   PppBAPEntry ::= SEQUENCE {
+        pppBAPIfIndex        INTEGER,
+
+        pppBAPInCallReqs     Counter,
+        pppBAPInCallAcks     Counter,
+        pppBAPInCallNaks     Counter,
+        pppBAPInCallRejs     Counter,
+        pppBAPInCallBackReqs Counter,
+        pppBAPInCallBackAcks Counter,
+        pppBAPInCallBackNaks Counter,
+        pppBAPInCallBackRejs Counter,
+        pppBAPInDropReqs     Counter,
+        pppBAPInDropAcks     Counter,
+        pppBAPInDropNaks     Counter,
+        pppBAPInDropRejs     Counter,
+        pppBAPInStatSuccs    Counter,
+        pppBAPInStatFails    Counter,
+
+        pppBAPOutCallReqs     Counter,
+        pppBAPOutCallAcks     Counter,
+        pppBAPOutCallNaks     Counter,
+        pppBAPOutCallRejs     Counter,
+        pppBAPOutCallBackReqs Counter,
+        pppBAPOutCallBackAcks Counter,
+        pppBAPOutCallBackNaks Counter,
+        pppBAPOutCallBackRejs Counter,
+        pppBAPOutDropReqs     Counter,
+        pppBAPOutDropAcks     Counter,
+        pppBAPOutDropNaks     Counter,
+        pppBAPOutDropRejs     Counter,
+        pppBAPOutStatSuccs    Counter,
+        pppBAPOutStatFails    Counter
+        }
+
+   pppBAPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running BAP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppBAPEntry 1 }
+
+   pppBAPInCallReqs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Call Request
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 2 }
+
+   pppBAPInCallAcks     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Call Acknowledgement
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 3 }
+
+   pppBAPInCallNaks     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Call Nak
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 4 }
+
+   pppBAPInCallRejs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Call Reject
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 5 }
+
+   pppBAPInCallBackReqs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming CallBack Request
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 6 }
+
+   pppBAPInCallBackAcks OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming CallBack Acknowledgement
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 7 }
+
+   pppBAPInCallBackNaks OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming CallBack Nak
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 8 }
+
+   pppBAPInCallBackRejs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming CallBack Reject
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 9 }
+
+   pppBAPInDropReqs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Drop Request
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 10 }
+
+   pppBAPInDropAcks     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Drop Acknowledgement
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 11 }
+
+   pppBAPInDropNaks     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Drop Nak
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 12 }
+
+   pppBAPInDropRejs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Drop Reject
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 13 }
+
+   pppBAPInStatSuccs    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Call Status Success
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 14 }
+
+   pppBAPInStatFails    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP incoming Call Status Fail
+            packets received over the PPP interface."
+        ::= { pppBAPEntry 15 }
+
+   pppBAPOutCallReqs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Call Request
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 16 }
+
+   pppBAPOutCallAcks     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Call Acknowledgement
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 17 }
+
+   pppBAPOutCallNaks     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Call Nak
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 18 }
+
+   pppBAPOutCallRejs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Call Reject
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 19 }
+
+   pppBAPOutCallBackReqs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing CallBack Request
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 20 }
+
+   pppBAPOutCallBackAcks OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing CallBack Acknowledgement
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 21 }
+
+   pppBAPOutCallBackNaks OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing CallBack Nak
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 22 }
+
+   pppBAPOutCallBackRejs OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing CallBack Reject
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 23 }
+
+   pppBAPOutDropReqs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Drop Request
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 24 }
+
+   pppBAPOutDropAcks     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Drop Acknowledgement
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 25 }
+
+   pppBAPOutDropNaks     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Drop Nak
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 26 }
+
+   pppBAPOutDropRejs     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Drop Reject
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 27 }
+
+   pppBAPOutStatSuccs    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Call Status Success
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 28 }
+
+   pppBAPOutStatFails    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of BAP outgoing Call Status Fail
+            packets sent over the PPP interface."
+        ::= { pppBAPEntry 29 }
+
+------------------------------------------------------------------
+-- PPP Compression Protocol and Control Protocol Statistics
+------------------------------------------------------------------
+
+   pppCPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppCPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of compression protocol and control protocol statistics."
+        ::= { ibmIROCroutingppp 8 }
+
+   pppCPEntry  OBJECT-TYPE
+        SYNTAX      PppCPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of CP and CCP information."
+        INDEX   { pppCPIfIndex }
+        ::= { pppCPTable 1 }
+
+   PppCPEntry ::= SEQUENCE {
+        pppCPIfIndex                 INTEGER,
+
+        pppCPInCompressedOctets      Counter,
+        pppCPInInCompressablePkts    Counter,
+        pppCPInDestroyeds            Counter,
+        pppCPInCopies                Counter,
+
+        pppCPOutCompressedOctets     Counter,
+        pppCPOutInCompressablePkts   Counter,
+        pppCPOutDestroyeds           Counter,
+        pppCPOutCopies               Counter,
+
+        pppCCPInResetReqs            Counter,
+        pppCCPInResetAcks            Counter,
+        pppCCPInDictResets           Counter,
+
+        pppCCPOutResetReqs           Counter,
+        pppCCPOutResetAcks           Counter,
+        pppCCPOutDictResets          Counter,
+
+        pppCCPPacketDiscards         Counter,
+        pppCCPOctetDiscards          Counter
+        }
+
+   pppCPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running CP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppCPEntry 1 }
+
+   pppCPInCompressedOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CP incoming compressed
+            octets received over the PPP interface."
+        ::= { pppCPEntry 2 }
+
+   pppCPInInCompressablePkts    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CP incoming incompressable
+            packets received over the PPP interface."
+        ::= { pppCPEntry 3 }
+
+   pppCPInDestroyeds            OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CP incoming packets discarded
+            for this PPP interface."
+        ::= { pppCPEntry 4 }
+
+   pppCPInCopies                OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CP incoming packets requiring
+            a copy to a spare buffer to correct alignment."
+        ::= { pppCPEntry 5 }
+
+   pppCPOutCompressedOctets     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CP outgoing compressed
+            octets sent over the PPP interface."
+        ::= { pppCPEntry 6 }
+
+   pppCPOutInCompressablePkts   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CP outgoing incompressable
+            packets sent over the PPP interface."
+        ::= { pppCPEntry 7 }
+
+   pppCPOutDestroyeds           OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CP outgoing packets discarded
+            for this PPP interface."
+        ::= { pppCPEntry 8 }
+
+   pppCPOutCopies               OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CP outgoing packets requiring
+            a copy to a spare buffer to correct alignment."
+        ::= { pppCPEntry 9 }
+
+   pppCCPInResetReqs            OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CCP incoming Reset request
+            packets received over the PPP interface."
+        ::= { pppCPEntry 10 }
+
+   pppCCPInResetAcks            OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CCP incoming Reset Acknowledgement
+            packets received over the PPP interface."
+        ::= { pppCPEntry 11 }
+
+   pppCCPInDictResets           OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CCP incoming Dictionary Reset
+            packets received over the PPP interface."
+        ::= { pppCPEntry 12 }
+
+   pppCCPOutResetReqs           OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CCP outgoing Reset request
+            packets sent over the PPP interface."
+        ::= { pppCPEntry 13 }
+
+   pppCCPOutResetAcks           OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CCP outgoing Reset Acknowledgement
+            packets sent over the PPP interface."
+        ::= { pppCPEntry 14 }
+
+   pppCCPOutDictResets          OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CCP outgoing Dictionary Reset
+            packets sent  over the PPP interface."
+        ::= { pppCPEntry 15 }
+
+
+   pppCCPPacketDiscards         OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CCP incoming packet
+            discards occuring for this PPP interface."
+        ::= { pppCPEntry 16 }
+
+   pppCCPOctetDiscards          OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CCP outgoing packet
+            discards occuring for this PPP interface."
+        ::= { pppCPEntry 17 }
+
+------------------------------------------------------------------
+-- PPP Encryption Protocol and Control Protocol Statistics
+------------------------------------------------------------------
+
+   pppEPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppEPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of encryption protocol and control protocol statistics."
+        ::= { ibmIROCroutingppp 9 }
+
+   pppEPEntry  OBJECT-TYPE
+        SYNTAX      PppEPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of EP and ECP information."
+        INDEX   { pppEPIfIndex }
+        ::= { pppEPTable 1 }
+
+   PppEPEntry ::= SEQUENCE {
+        pppEPIfIndex                 INTEGER,
+
+        pppEPInEncryptedOctets       Counter,
+        pppEPInDestroyeds            Counter,
+        pppEPInCopies                Counter,
+
+        pppEPOutEncryptedOctets      Counter,
+        pppEPOutDestroyeds           Counter,
+        pppEPOutCopies               Counter,
+
+        pppECPInResetReqs            Counter,
+        pppECPInResetAcks            Counter,
+        pppECPInDictResets           Counter,
+
+        pppECPOutResetReqs           Counter,
+        pppECPOutResetAcks           Counter,
+        pppECPOutDictResets          Counter,
+
+        pppECPPacketDiscards         Counter,
+        pppECPOctetDiscards          Counter
+        }
+
+   pppEPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running EP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppEPEntry 1 }
+
+   pppEPInEncryptedOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EP incoming encrypted
+            octets received over the PPP interface."
+        ::= { pppEPEntry 2 }
+
+   pppEPInDestroyeds            OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EP incoming packets discarded
+            for this PPP interface."
+        ::= { pppEPEntry 3 }
+
+   pppEPInCopies                OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EP incoming packets requiring
+            a copy to a spare buffer to correct alignment."
+        ::= { pppEPEntry 4 }
+
+   pppEPOutEncryptedOctets     OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EP outgoing encrypted
+            octets sent over the PPP interface."
+        ::= { pppEPEntry 5 }
+
+   pppEPOutDestroyeds           OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EP outgoing packets discarded
+            for this PPP interface."
+        ::= { pppEPEntry 6 }
+
+   pppEPOutCopies               OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EP outgoing packets requiring
+            a copy to a spare buffer to correct alignment."
+        ::= { pppEPEntry 7 }
+
+   pppECPInResetReqs            OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of ECP incoming Reset request
+            packets received over the PPP interface."
+        ::= { pppEPEntry 8 }
+
+   pppECPInResetAcks            OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of ECP incoming Reset Acknowledgement
+            packets received over the PPP interface."
+        ::= { pppEPEntry 9 }
+
+   pppECPInDictResets           OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of ECP incoming Dictionary Reset
+            packets received over the PPP interface."
+        ::= { pppEPEntry 10 }
+
+   pppECPOutResetReqs           OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of ECP outgoing Reset request
+            packets sent over the PPP interface."
+        ::= { pppEPEntry 11 }
+
+   pppECPOutResetAcks           OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of ECP outgoing Reset Acknowledgement
+            packets sent over the PPP interface."
+        ::= { pppEPEntry 12 }
+
+   pppECPOutDictResets          OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of ECP outgoing Dictionary Reset
+            packets sent  over the PPP interface."
+        ::= { pppEPEntry 13 }
+
+
+   pppECPPacketDiscards         OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of ECP incoming packet
+            discards occuring for this PPP interface."
+        ::= { pppEPEntry 14 }
+
+   pppECPOctetDiscards          OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of ECP outgoing packet
+            discards occuring for this PPP interface."
+        ::= { pppEPEntry 15 }
+
+
+------------------------------------------------------------------
+-- PPP MS-CHAP Statistics
+------------------------------------------------------------------
+
+   pppMSCHAPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppMSCHAPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of MSCHAP statistics."
+        ::= { ibmIROCroutingppp 10 }
+
+   pppMSCHAPEntry  OBJECT-TYPE
+        SYNTAX      PppMSCHAPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of MSCHAP information."
+        INDEX   { pppMSCHAPIfIndex }
+        ::= { pppMSCHAPTable 1 }
+
+   PppMSCHAPEntry ::= SEQUENCE {
+        pppMSCHAPIfIndex       INTEGER,
+        pppMSCHAPInPackets     Counter,
+        pppMSCHAPInOctets      Counter,
+        pppMSCHAPInChallenges  Counter,
+        pppMSCHAPInResponses   Counter,
+        pppMSCHAPInSuccesses   Counter,
+        pppMSCHAPInFailures    Counter,
+        pppMSCHAPInChangePasswords            Counter,
+
+        pppMSCHAPInRestrictedHoursFailures    Counter,
+        pppMSCHAPInAccountDisabledFailures    Counter,
+        pppMSCHAPInPasswordExpiredFailures    Counter,
+        pppMSCHAPInNoPermissionFailures       Counter,
+        pppMSCHAPInAuthenticationFailures     Counter,
+        pppMSCHAPInChangePasswordFailures     Counter,
+
+        pppMSCHAPOutPackets    Counter,
+        pppMSCHAPOutOctets     Counter,
+        pppMSCHAPOutChallenges Counter,
+        pppMSCHAPOutResponses  Counter,
+        pppMSCHAPOutSuccesses  Counter,
+        pppMSCHAPOutFailures   Counter,
+        pppMSCHAPOutChangePasswords            Counter,
+
+        pppMSCHAPOutRestrictedHoursFailures    Counter,
+        pppMSCHAPOutAccountDisabledFailures    Counter,
+        pppMSCHAPOutPasswordExpiredFailures    Counter,
+        pppMSCHAPOutNoPermissionFailures       Counter,
+        pppMSCHAPOutAuthenticationFailures     Counter,
+        pppMSCHAPOutChangePasswordFailures     Counter
+        }
+
+   pppMSCHAPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running MSCHAP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppMSCHAPEntry 1 }
+
+
+   pppMSCHAPInPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP
+            packets received over the PPP interface."
+        ::= { pppMSCHAPEntry 2 }
+
+   pppMSCHAPInOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP
+            octets received over the PPP interface."
+        ::= { pppMSCHAPEntry 3 }
+
+   pppMSCHAPInChallenges  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP challenges
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 4 }
+
+   pppMSCHAPInResponses   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP responses
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 5 }
+
+   pppMSCHAPInSuccesses   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP successes
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 6 }
+
+   pppMSCHAPInFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP failures
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 7 }
+
+   pppMSCHAPInChangePasswords   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP change passwords
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 8 }
+
+   pppMSCHAPInRestrictedHoursFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP restricted hours failures
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 9 }
+
+   pppMSCHAPInAccountDisabledFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP account disabled failures
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 10 }
+
+   pppMSCHAPInPasswordExpiredFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP password expired failures
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 11 }
+
+   pppMSCHAPInNoPermissionFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP no permission failures
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 12 }
+
+   pppMSCHAPInAuthenticationFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP authentication failures
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 13 }
+
+   pppMSCHAPInChangePasswordFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP change password failures
+            received over the PPP interface."
+        ::= { pppMSCHAPEntry 14 }
+
+   pppMSCHAPOutPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP
+            packets sent over the PPP interface."
+        ::= { pppMSCHAPEntry 15 }
+
+   pppMSCHAPOutOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP
+            octets sent over the PPP interface."
+        ::= { pppMSCHAPEntry 16 }
+
+   pppMSCHAPOutChallenges  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP challenges
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 17 }
+
+   pppMSCHAPOutResponses   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP responses
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 18 }
+
+   pppMSCHAPOutSuccesses   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP successes
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 19 }
+
+   pppMSCHAPOutFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP failures
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 20 }
+
+   pppMSCHAPOutChangePasswords    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP change passwords
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 21 }
+
+   pppMSCHAPOutRestrictedHoursFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP restricted hours failures
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 22 }
+
+   pppMSCHAPOutAccountDisabledFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP account disabled failures
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 23 }
+
+   pppMSCHAPOutPasswordExpiredFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP password expired failures
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 24 }
+
+   pppMSCHAPOutNoPermissionFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP no permission failures
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 25 }
+
+   pppMSCHAPOutAuthenticationFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP authentication failures
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 26 }
+
+   pppMSCHAPOutChangePasswordFailures    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MSCHAP change password failures
+            sent over the PPP interface."
+        ::= { pppMSCHAPEntry 27 }
+
+
+------------------------------------------------------------------
+-- PPP CBCP Statistics
+------------------------------------------------------------------
+
+   pppCBCPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppCBCPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of CBCP statistics."
+        ::= { ibmIROCroutingppp 11 }
+
+   pppCBCPEntry  OBJECT-TYPE
+        SYNTAX      PppCBCPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of CBCP information."
+        INDEX   { pppCBCPIfIndex }
+        ::= { pppCBCPTable 1 }
+
+   PppCBCPEntry ::= SEQUENCE {
+        pppCBCPIfIndex       INTEGER,
+
+        pppCBCPInPackets     Counter,
+        pppCBCPInOctets      Counter,
+
+        pppCBCPOutPackets    Counter,
+        pppCBCPOutOctets     Counter,
+
+        pppCBCPAttempts      Counter,
+        pppCBCPSuccess       Counter
+        }
+
+   pppCBCPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running CBCP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppCBCPEntry 1 }
+
+
+   pppCBCPInPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CBCP
+            packets received over the PPP interface."
+        ::= { pppCBCPEntry 2 }
+
+   pppCBCPInOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CBCP
+            octets received over the PPP interface."
+        ::= { pppCBCPEntry 3 }
+
+   pppCBCPOutPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CBCP
+            packets sent over the PPP interface."
+        ::= { pppCBCPEntry 4 }
+
+   pppCBCPOutOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CBCP
+            octets sent over the PPP interface."
+        ::= { pppCBCPEntry 5 }
+
+   pppCBCPAttempts      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CBCP attempts."
+        ::= { pppCBCPEntry 6 }
+
+   pppCBCPSuccess      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of CBCP successes."
+        ::= { pppCBCPEntry 7 }
+
+
+------------------------------------------------------------------
+-- PPP EAP Statistics
+------------------------------------------------------------------
+
+   pppEAPTable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppEAPEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of EAP statistics."
+        ::= { ibmIROCroutingppp 12 }
+
+   pppEAPEntry  OBJECT-TYPE
+        SYNTAX      PppEAPEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of EAP information."
+        INDEX   { pppEAPIfIndex }
+        ::= { pppEAPTable 1 }
+
+   PppEAPEntry ::= SEQUENCE {
+        pppEAPIfIndex       INTEGER,
+
+        pppEAPInPackets     Counter,
+        pppEAPInOctets      Counter,
+        pppEAPInRequests    Counter,
+        pppEAPInAcks        Counter,
+        pppEAPInNaks        Counter,
+
+        pppEAPOutPackets    Counter,
+        pppEAPOutOctets     Counter,
+        pppEAPOutRequests    Counter,
+        pppEAPOutAcks        Counter,
+        pppEAPOutNaks        Counter
+        }
+
+   pppEAPIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running EAP.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppEAPEntry 1 }
+
+
+   pppEAPInPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP
+            packets received over the PPP interface."
+        ::= { pppEAPEntry 2 }
+
+   pppEAPInOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP
+            octets received over the PPP interface."
+        ::= { pppEAPEntry 3 }
+
+   pppEAPInRequests    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP
+            requests received over the PPP interface."
+        ::= { pppEAPEntry 4 }
+
+   pppEAPInAcks        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP
+            acknowledgments received over the PPP interface."
+        ::= { pppEAPEntry 5 }
+
+   pppEAPInNaks        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP negative
+            acknowledgements received over the PPP interface."
+        ::= { pppEAPEntry 6 }
+
+   pppEAPOutPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP
+            packets sent over the PPP interface."
+        ::= { pppEAPEntry 7 }
+
+   pppEAPOutOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP
+            octets sent over the PPP interface."
+        ::= { pppEAPEntry 8 }
+
+   pppEAPOutRequests    OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP
+            requests sent over the PPP interface."
+        ::= { pppEAPEntry 9 }
+
+   pppEAPOutAcks        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP
+            acknowledgments sent over the PPP interface."
+        ::= { pppEAPEntry 10 }
+
+   pppEAPOutNaks        OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of EAP negative
+            acknowledgements sent over the PPP interface."
+        ::= { pppEAPEntry 11 }
+
+
+------------------------------------------------------------------
+-- PPP MPPE Statistics
+------------------------------------------------------------------
+
+   pppMPPETable  OBJECT-TYPE
+        SYNTAX     SEQUENCE OF PppMPPEEntry
+        ACCESS     not-accessible
+        STATUS     mandatory
+        DESCRIPTION
+          "A table of MPPE statistics."
+        ::= { ibmIROCroutingppp 13 }
+
+   pppMPPEEntry  OBJECT-TYPE
+        SYNTAX      PppMPPEEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+          "An entry of MPPE information."
+        INDEX   { pppMPPEIfIndex }
+        ::= { pppMPPETable 1 }
+
+   PppMPPEEntry ::= SEQUENCE {
+        pppMPPEIfIndex       INTEGER,
+
+        pppMPPEInPackets     Counter,
+        pppMPPEInOctets      Counter,
+        pppMPPEInDestroyed   Counter,
+
+        pppMPPEOutPackets    Counter,
+        pppMPPEOutOctets     Counter,
+        pppMPPEOutDestroyed  Counter
+        }
+
+   pppMPPEIfIndex OBJECT-TYPE
+        SYNTAX          INTEGER (1..65535)
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "A unique identifier for a PPP interface running MPPE.
+            This object is the same as the MIB-II ifIndex object."
+        ::= { pppMPPEEntry 1 }
+
+
+   pppMPPEInPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MPPE
+            packets received over the PPP interface."
+        ::= { pppMPPEEntry 2 }
+
+   pppMPPEInOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MPPE
+            octets received over the PPP interface."
+        ::= { pppMPPEEntry 3 }
+
+   pppMPPEInDestroyed   OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MPPE requests received
+            over the PPP interface that were discarded."
+        ::= { pppMPPEEntry 4 }
+
+   pppMPPEOutPackets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MPPE
+            packets sent over the PPP interface."
+        ::= { pppMPPEEntry 5 }
+
+   pppMPPEOutOctets      OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MPPE
+            octets sent over the PPP interface."
+        ::= { pppMPPEEntry 6 }
+
+   pppMPPEOutDestroyed  OBJECT-TYPE
+        SYNTAX          Counter
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+           "Total number of MPPE requests discarded
+            and not sent over the PPP interface."
+        ::= { pppMPPEEntry 7 }
+
+
+
+------------------------------------------------------------------
+-- DLSw Transport Connection Group Table
+------------------------------------------------------------------
+
+ibmdlswTConnGroupOperTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IbmdlswTConnGroupOperEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+       "Information about multicast groups of which this DLSw is currently
+        a member."
+    ::= { ibmIROCroutingdlsw 1 }
+
+ibmdlswTConnGroupOperEntry  OBJECT-TYPE
+    SYNTAX     IbmdlswTConnGroupOperEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+       "Information about a single multicast group of which this DLSw is
+        a member."
+    INDEX   { ibmdlswTConnGroupOperIndex }
+    ::= { ibmdlswTConnGroupOperTable 1 }
+
+IbmdlswTConnGroupOperEntry ::= SEQUENCE {
+    ibmdlswTConnGroupOperIndex                    INTEGER,
+    ibmdlswTConnGroupOperRole                     INTEGER,
+    ibmdlswTConnGroupOperJoinTime                 TimeTicks,
+    ibmdlswTConnGroupOperConfigIndex              INTEGER,
+    ibmdlswTConnGroupOperInDataPkts               Counter,
+    ibmdlswTConnGroupOperOutDataPkts              Counter,
+    ibmdlswTConnGroupOperInDataOctets             Counter,
+    ibmdlswTConnGroupOperOutDataOctets            Counter,
+    ibmdlswTConnGroupOperInCntlPkts               Counter,
+    ibmdlswTConnGroupOperOutCntlPkts              Counter,
+    ibmdlswTConnGroupOperCURexSents               Counter,
+    ibmdlswTConnGroupOperICRexRcvds               Counter,
+    ibmdlswTConnGroupOperCURexRcvds               Counter,
+    ibmdlswTConnGroupOperICRexSents               Counter,
+    ibmdlswTConnGroupOperNQexSents                Counter,
+    ibmdlswTConnGroupOperNRexRcvds                Counter,
+    ibmdlswTConnGroupOperNQexRcvds                Counter,
+    ibmdlswTConnGroupOperNRexSents                Counter
+    }
+
+ibmdlswTConnGroupOperIndex  OBJECT-TYPE
+    SYNTAX     INTEGER (0..2147483647)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The index to the conceptual row of the table.  Values are assigned
+        by the agent and are not reused, but continue to increase in
+        value."
+    ::= { ibmdlswTConnGroupOperEntry 1 }
+
+ibmdlswTConnGroupOperRole  OBJECT-TYPE
+    SYNTAX     INTEGER  {
+       peer       (1),
+       client     (2),
+       server     (3),
+       readonly   (4),
+       writeonly  (5),
+       readwrite  (6),
+       other      (7)
+    }
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The role that this DLSw plays within the group.  The first three
+        roles are used by the IBM multicast DLSw group feature.  The next
+        three roles are used when interoperating with DLSw Version 2
+        compliant partners that may not have the IBM group feature."
+    ::= { ibmdlswTConnGroupOperEntry 2 }
+
+ibmdlswTConnGroupOperJoinTime  OBJECT-TYPE
+    SYNTAX     TimeTicks
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The amount of time (in hundredths of a second) since this DLSw
+        node last became a member of this group."
+    ::= { ibmdlswTConnGroupOperEntry 3 }
+
+ibmdlswTConnGroupOperConfigIndex  OBJECT-TYPE
+    SYNTAX     INTEGER (0..2147483647)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The value of dlswTConnConfigIndex of the dlswTConnConfigEntry
+        that governs the configuration information used by this
+        ibmdlswTConnGroupOperEntry.  A management station can therefore
+        normally examine both configured and operational information
+        for this multicast group."
+    ::= { ibmdlswTConnGroupOperEntry 4 }
+
+------------------------------------------------------------------
+-- Transport Connection Statistics
+------------------------------------------------------------------
+ibmdlswTConnGroupOperInDataPkts  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of Switch-to-Switch Protocol (SSP) messages of
+        type DATAFRAME received for this group."
+    ::= { ibmdlswTConnGroupOperEntry 5 }
+
+ibmdlswTConnGroupOperOutDataPkts  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of Switch-to-Switch Protocol (SSP) messages of
+        type DATAFRAME transmitted for this group."
+    ::= { ibmdlswTConnGroupOperEntry 6 }
+
+ibmdlswTConnGroupOperInDataOctets  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of octets in Switch-to-Switch Protocol (SSP) messages
+        of type DATAFRAME received for this
+        group.  Each message is counted starting with
+        the first octet following the SSP message header."
+    ::= { ibmdlswTConnGroupOperEntry 7 }
+
+ibmdlswTConnGroupOperOutDataOctets  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of octets in Switch-to-Switch Protocol (SSP) messages
+        of type DATAFRAME transmitted for this
+        group.  Each message is counted starting with
+        the first octet following the SSP message header."
+    ::= { ibmdlswTConnGroupOperEntry 8 }
+
+ibmdlswTConnGroupOperInCntlPkts  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of Switch-to-Switch Protocol (SSP) messages
+        received for this group which were not of type DATAFRAME."
+    ::= { ibmdlswTConnGroupOperEntry 9 }
+
+ibmdlswTConnGroupOperOutCntlPkts  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of Switch-to-Switch Protocol (SSP) messages
+        transmitted for this group which were not of type DATAFRAME."
+    ::= { ibmdlswTConnGroupOperEntry 10 }
+
+ibmdlswTConnGroupOperCURexSents  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of CanUReach_ex messages sent for this group."
+    ::= { ibmdlswTConnGroupOperEntry 11 }
+
+ibmdlswTConnGroupOperICRexRcvds  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of ICanReach_ex messages received for this group."
+    ::= { ibmdlswTConnGroupOperEntry 12 }
+
+ibmdlswTConnGroupOperCURexRcvds  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of CanUReach_ex messages received for this group."
+    ::= { ibmdlswTConnGroupOperEntry 13 }
+
+ibmdlswTConnGroupOperICRexSents  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of ICanReach_ex messages sent for this group."
+    ::= { ibmdlswTConnGroupOperEntry 14 }
+
+ibmdlswTConnGroupOperNQexSents  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of NetBIOS_NQ_ex (NetBIOS Name Query-explorer) messages
+        sent for this group."
+    ::= { ibmdlswTConnGroupOperEntry 15 }
+
+ibmdlswTConnGroupOperNRexRcvds  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of NETBIOS_NR_ex (NetBIOS Name Recognized-explorer)
+        messages received for this group."
+    ::= { ibmdlswTConnGroupOperEntry 16 }
+
+ibmdlswTConnGroupOperNQexRcvds  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of NETBIOS_NQ_ex messages received for this group."
+    ::= { ibmdlswTConnGroupOperEntry 17 }
+
+ibmdlswTConnGroupOperNRexSents  OBJECT-TYPE
+    SYNTAX     Counter
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The number of NETBIOS_NR_ex messages sent for this group."
+    ::= { ibmdlswTConnGroupOperEntry 18 }
+
+
+------------------------------------------------------------------
+-- DLSw QLLC Link Station Table
+------------------------------------------------------------------
+ibmdlswQllcLsTable  OBJECT-TYPE
+    SYNTAX     SEQUENCE OF IbmdlswQllcLsEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+      "Table to provide an address mapping from configured QLLC
+       addresses to DLSw MAC and SAP addresses, and other configured
+       QLLC station information."
+    ::= { ibmIROCroutingdlsw 2 }
+
+ibmdlswQllcLsEntry  OBJECT-TYPE
+    SYNTAX     IbmdlswQllcLsEntry
+    ACCESS     not-accessible
+    STATUS     mandatory
+    DESCRIPTION
+       "The configured information for a single QLLC station."
+    INDEX   {ibmdlswQllcLsIfIndex, ibmdlswQllcLsQdomain, ibmdlswQllcLsQaddress}
+    ::= { ibmdlswQllcLsTable 1 }
+
+IbmdlswQllcLsEntry ::= SEQUENCE {
+    ibmdlswQllcLsIfIndex                   INTEGER,
+    ibmdlswQllcLsQdomain                   INTEGER,
+    ibmdlswQllcLsQaddress                  OCTET STRING,
+    ibmdlswQllcLsChannel                   INTEGER,
+    ibmdlswQllcLsLocalMac                  MacAddressNCIROC,
+    ibmdlswQllcLsLocalSap                  OCTET STRING,
+    ibmdlswQllcLsRemoteMac                 MacAddressNCIROC,
+    ibmdlswQllcLsRemoteSap                 OCTET STRING,
+    ibmdlswQllcLsPuType                    INTEGER,
+    ibmdlswQllcLsBlkNum                    DisplayString,
+    ibmdlswQllcLsIdNum                     DisplayString
+    }
+
+ibmdlswQllcLsIfIndex  OBJECT-TYPE
+    SYNTAX     INTEGER
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "A unique identifier for the X.25 interface running QLLC through
+        which this station is reached.  This object is the same as the
+        MIB-II ifIndex object."
+    ::= { ibmdlswQllcLsEntry 1 }
+
+ibmdlswQllcLsQdomain  OBJECT-TYPE
+    SYNTAX     INTEGER  {
+       pvc (1),
+       svc (2)
+    }
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "X.25 circuit type identifier, permanent or switched"
+    ::= { ibmdlswQllcLsEntry 2 }
+
+ibmdlswQllcLsQaddress  OBJECT-TYPE
+    SYNTAX     OCTET STRING (SIZE (1..15))
+    ACCESS     read-write
+    STATUS     mandatory
+    DESCRIPTION
+       "For PVCs, this is the logical channel number dedicated to this
+        X.25 circuit.  For SVCs, this is the DTE address of the remote
+        QLLC device (i.e., the address that the DLSw node places a call
+        to or receives a call from)."
+    ::= { ibmdlswQllcLsEntry 3 }
+
+ibmdlswQllcLsChannel  OBJECT-TYPE
+    SYNTAX     INTEGER (0..4095)
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "Logical channel number for PVCs and connected SVCs.
+        A value of zero indicates an SVC without a connected call."
+    ::= { ibmdlswQllcLsEntry 4 }
+
+ibmdlswQllcLsLocalMac  OBJECT-TYPE
+    SYNTAX     MacAddressNCIROC
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The MAC address that represents this QLLC station to other devices
+        within the DLSw network."
+    ::= { ibmdlswQllcLsEntry 5 }
+
+ibmdlswQllcLsLocalSap  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The SAP that accompanies ibmdlswQllcLsLocalMac."
+    ::= { ibmdlswQllcLsEntry 6 }
+
+ibmdlswQllcLsRemoteMac  OBJECT-TYPE
+    SYNTAX     MacAddressNCIROC
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The MAC address of a device in the DLSw network that this QLLC
+        device can initiate a DLSw circuit to.  If zero, the QLLC device
+        cannot originate a DLSw circuit, but can only be the destination."
+    ::= { ibmdlswQllcLsEntry 7 }
+
+ibmdlswQllcLsRemoteSap  OBJECT-TYPE
+    SYNTAX     OCTET STRING
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "The SAP that accompanies ibmdlswQllcLsRemoteMac.  If zero, the
+        QLLC device cannot originate a DLSw circuit, but can only be
+        the destination."
+    ::= { ibmdlswQllcLsEntry 8 }
+
+ibmdlswQllcLsPuType  OBJECT-TYPE
+    SYNTAX     INTEGER  {
+       type1 (1),
+       type2 (2),
+       type4 (4),
+       type5 (5),
+       other (6)
+    }
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "SNA Physical Unit type of the QLLC device."
+    ::= { ibmdlswQllcLsEntry 9 }
+
+ibmdlswQllcLsBlkNum  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (3))
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "SNA XID_0 block number for the QLLC device.  A non-zero value implies
+        that the DLSw node will generate an XID_0 on behalf of the device."
+    ::= { ibmdlswQllcLsEntry 10 }
+
+ibmdlswQllcLsIdNum  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE (5))
+    ACCESS     read-only
+    STATUS     mandatory
+    DESCRIPTION
+       "SNA XID_0 id number for the QLLC device.  A non-zero value implies
+        that the DLSw node will generate an XID_0 on behalf of the device."
+    ::= { ibmdlswQllcLsEntry 11 }
+
+
+
+------------------------------------------------------------------
+-- Frame Relay CLLM Statistics Table
+------------------------------------------------------------------
+frCLLMStatsTable       OBJECT-TYPE
+         SYNTAX   SEQUENCE OF FrCLLMStatsEntry
+         ACCESS   not-accessible
+         STATUS   mandatory
+         DESCRIPTION
+            "A table containing information about CLLM messages
+             received from the switch."
+         ::= { ibmIROCroutingfr 1 }
+
+         frCLLMStatsEntry OBJECT-TYPE
+             SYNTAX   FrCLLMStatsEntry
+             ACCESS   not-accessible
+             STATUS   mandatory
+             DESCRIPTION
+                "The CLLM information for a particular virtual
+                 circuit."
+            INDEX { frCLLMStatsIfIndex, frCLLMStatsDlci }
+            ::= { frCLLMStatsTable 1 }
+
+
+         FrCLLMStatsEntry ::=
+             SEQUENCE {
+                 frCLLMStatsIfIndex
+                     INTEGER,
+                 frCLLMStatsDlci
+                     INTEGER,
+                 frCLLMStatsRcvds
+                     Counter
+         }
+
+         frCLLMStatsIfIndex OBJECT-TYPE
+             SYNTAX   INTEGER
+             ACCESS   read-only
+             STATUS   mandatory
+             DESCRIPTION
+                "The ifIndex value identifying the Frame Relay
+                 interface to which this CLLM information pertains."
+            ::= { frCLLMStatsEntry 1 }
+
+         frCLLMStatsDlci OBJECT-TYPE
+             SYNTAX   INTEGER
+             ACCESS   read-only
+             STATUS   mandatory
+             DESCRIPTION
+                "The DLCI value identifying the Frame Relay
+                 virtual circuit to which this CLLM information pertains."
+           ::= { frCLLMStatsEntry 2 }
+
+         frCLLMStatsRcvds OBJECT-TYPE
+             SYNTAX   Counter
+             ACCESS   read-only
+             STATUS   mandatory
+             DESCRIPTION
+                "The number of CLLM messages received which
+                 reported status on this virtual circuit."
+           ::= { frCLLMStatsEntry 3 }
+
+
+------------------------------------------------------------------
+-- Frame Relay CLLM Cause Table
+------------------------------------------------------------------
+frCLLMCauseTable       OBJECT-TYPE
+         SYNTAX   SEQUENCE OF FrCLLMCauseEntry
+         ACCESS   not-accessible
+         STATUS   mandatory
+         DESCRIPTION
+            "A table containing information about CLLM message
+             cause codes."
+         ::= { ibmIROCroutingfr 2 }
+
+         frCLLMCauseEntry OBJECT-TYPE
+             SYNTAX   FrCLLMCauseEntry
+             ACCESS   not-accessible
+             STATUS   mandatory
+             DESCRIPTION
+                "The CLLM cause information for a particular
+                 interface."
+            INDEX { frCLLMCauseIfIndex }
+            ::= { frCLLMCauseTable 1 }
+
+
+         FrCLLMCauseEntry ::=
+             SEQUENCE {
+                 frCLLMCauseIfIndex
+                     INTEGER,
+                 frCLLMCauseCode
+                     INTEGER
+         }
+
+         frCLLMCauseIfIndex OBJECT-TYPE
+             SYNTAX   INTEGER
+             ACCESS   read-only
+             STATUS   mandatory
+             DESCRIPTION
+                "The ifIndex value identifying the Frame Relay
+                 interface to which this CLLM cause information pertains."
+            ::= { frCLLMCauseEntry 1 }
+
+         frCLLMCauseCode OBJECT-TYPE
+             SYNTAX   INTEGER
+             ACCESS   read-only
+             STATUS   mandatory
+             DESCRIPTION
+                "The cause code in the last CLLM message received
+                 on this interface."
+           ::= { frCLLMCauseEntry 2 }
+
+
+------------------------------------------------------------------
+-- Frame Relay Simple Objects
+------------------------------------------------------------------
+frSimpleObjs           OBJECT IDENTIFIER ::= { ibmIROCroutingfr 3 }
+
+frCLLMDlciList OBJECT-TYPE
+                SYNTAX     OCTET STRING  (SIZE (1..1024))
+                ACCESS     read-only
+                STATUS     mandatory
+                DESCRIPTION
+                  "The list of DLCIs contained in the last CLLM message
+                   received."
+                ::= { frSimpleObjs 1 }
+
+
+frTrapStateFECN OBJECT-TYPE
+                SYNTAX  INTEGER { enabled(1), disabled(2) }
+                ACCESS   read-write
+                STATUS   mandatory
+                DESCRIPTION
+                   "This variable  indicates  whether  the  system
+                    produces the frrcvdFECN trap."
+                DEFVAL { disabled }
+                ::= { frSimpleObjs 2 }
+
+
+frTrapStateBECN OBJECT-TYPE
+                SYNTAX  INTEGER { enabled(1), disabled(2) }
+                ACCESS   read-write
+                STATUS   mandatory
+                DESCRIPTION
+                   "This variable  indicates  whether  the  system
+                    produces the frrcvdBECN trap."
+                DEFVAL { disabled }
+                ::= { frSimpleObjs 3 }
+
+
+frTrapStateCLLM OBJECT-TYPE
+                SYNTAX  INTEGER { enabled(1), disabled(2) }
+                ACCESS   read-write
+                STATUS   mandatory
+                DESCRIPTION
+                   "This variable  indicates  whether  the  system
+                    produces the frrcvdCLLM trap."
+                DEFVAL { disabled }
+                ::= { frSimpleObjs 4 }
+
+------------------------------------------------------------------
+-- Frame Relay BRS anchor
+------------------------------------------------------------------
+ibmIROCfrBRS           OBJECT IDENTIFIER ::= { ibmIROCroutingfr 4 }
+
+------------------------------------------------------------------
+-- Frame Relay circuit statistics anchor
+------------------------------------------------------------------
+ibmIROCfrcircuit       OBJECT IDENTIFIER ::= { ibmIROCroutingfr 5 }
+
+
+------------------------------------------------------------------
+-- TCP/IP related objects
+------------------------------------------------------------------
+------------------------------------------------------------------
+-- TCP/IP routing table and cache capacity information
+------------------------------------------------------------------
+tcpiprouteTabSize   OBJECT-TYPE
+                    SYNTAX  INTEGER
+                    ACCESS   read-only
+                    STATUS   mandatory
+                    DESCRIPTION
+                     "The configured number of entries that the routing
+                      table can maintain."
+                    ::= { ibmIROCroutingtcpip 1 }
+
+tcpiprouteTabUsed   OBJECT-TYPE
+                    SYNTAX  Gauge
+                    ACCESS   read-only
+                    STATUS   mandatory
+                    DESCRIPTION
+                     "The current number of routing table entries being
+                      used. The number includes both active and inactive
+                      entries."
+                    ::= { ibmIROCroutingtcpip 2 }
+
+tcpiprouteCacheSize   OBJECT-TYPE
+                      SYNTAX  INTEGER
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The configured number of entries that the routing
+                        cache can maintain."
+                      ::= { ibmIROCroutingtcpip 3 }
+
+tcpiprouteCacheUsed   OBJECT-TYPE
+                      SYNTAX  Gauge
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The current number of routing cache entries being
+                        used."
+                      ::= { ibmIROCroutingtcpip 4 }
+
+------------------------------------------------------------------
+-- TCP/IP routing statistics
+------------------------------------------------------------------
+tcpiprouteOverFlow    OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of routes that had to be discarded
+                        because the routing table was full."
+                      ::= { ibmIROCroutingtcpip 5 }
+
+tcpiprouteNoReach     OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of packets that could not be forwarded
+                        because of unknown destinations. This does not count the
+                        number of packets forwarded to the default gateway."
+                      ::= { ibmIROCroutingtcpip 6 }
+
+tcpiprouteBadSubnet   OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of packets and routes that have been
+                        received for illegal subnets (all ones or all zeroes)."
+                      ::= { ibmIROCroutingtcpip 7 }
+
+tcpiprouteBadNet      OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of packets and routes that have been
+                        received for illegal IP destinations."
+                      ::= { ibmIROCroutingtcpip 8 }
+
+tcpiprouteUnhBcast    OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of non-local IP broadcasts received
+                        (which are not forwarded)."
+                      ::= { ibmIROCroutingtcpip 9 }
+
+tcpiprouteUnhMcast    OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of IP multicasts received, but whose
+                        addresses were not recognized by the router (and
+                        are discarded)."
+                      ::= { ibmIROCroutingtcpip 10 }
+
+tcpiprouteUnhDirBcast   OBJECT-TYPE
+                        SYNTAX  Counter
+                        ACCESS   read-only
+                        STATUS   mandatory
+                        DESCRIPTION
+                         "The number of directed, non-local IP broadcasts received
+                          when forwarding of these packets is disabled."
+                        ::= { ibmIROCroutingtcpip 11 }
+
+tcpiprouteUnhLLbcast  OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of packets received having non-local
+                        IP addresses but were sent to a link-level broadcst
+                        address (and are discarded)."
+                      ::= { ibmIROCroutingtcpip 12 }
+
+tcpiprouteDiscFilt    OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of packets received that have been
+                        addressed to filtered networks or subnets
+                        (and are discarded)."
+                      ::= { ibmIROCroutingtcpip 13 }
+
+tcpiprouteMultRcvd    OBJECT-TYPE
+                      SYNTAX  Counter
+                      ACCESS   read-only
+                      STATUS   mandatory
+                      DESCRIPTION
+                       "The number of IP multicasts that have been
+                        received and processed successfully."
+                      ::= { ibmIROCroutingtcpip 14 }
+
+------------------------------------------------------------------
+-- TCP and server connection statistics
+------------------------------------------------------------------
+tcpCurrConnections    OBJECT-TYPE
+                      SYNTAX  Gauge
+                      ACCESS  read-only
+                      STATUS  mandatory
+                      DESCRIPTION
+                       "The current number of TCP connections, which
+                        can be in any state. This object and
+                        tcpMaxConnections are defined mainly to
+                        monitor the number of TCP connections and
+                        their affect on memory usage in the router."
+                      ::= { ibmIROCroutingtcpip 15 }
+
+tcpMaxConnections     OBJECT-TYPE
+                      SYNTAX  INTEGER
+                      ACCESS  read-only
+                      STATUS  mandatory
+                      DESCRIPTION
+                       "The maximum number of TCP connections allowed.
+                        This object and tcpCurrConnections are defined
+                        mainly to monitor the number of TCP connections
+                        and their affect on memory usage in the router."
+                      ::= { ibmIROCroutingtcpip 16 }
+
+serverCurrConnections    OBJECT-TYPE
+                         SYNTAX  Gauge
+                         ACCESS  read-only
+                         STATUS  mandatory
+                         DESCRIPTION
+                          "The current number of connections to a local
+                           server application (for example, TN3270E or
+                           Web Cache). This object and
+                           serverMaxConnections are defined mainly to
+                           monitor the number of server connections and
+                           their affect on memory usage in the router."
+                         ::= { ibmIROCroutingtcpip 17 }
+
+serverMaxConnections     OBJECT-TYPE
+                         SYNTAX  INTEGER
+                         ACCESS  read-only
+                         STATUS  mandatory
+                         DESCRIPTION
+                          "The maximum number of connections allowed to a
+                           local server application (for example, TN3270E
+                           or Web Cache).
+                           This object and serverCurrConnections are defined
+                           mainly to monitor the number of server connections
+                           and their affect on memory usage in the router."
+                         ::= { ibmIROCroutingtcpip 18 }
+
+
+------------------------------------------------------------------
+-- IBM IROC Trap Definitions
+------------------------------------------------------------------
+ibmIROCtrapsfr         OBJECT IDENTIFIER ::= { ibmIROCtraps 1 }
+
+         frrcvdFECN TRAP-TYPE
+             ENTERPRISE ibmIROCtrapsfr
+             VARIABLES  { frCircuitIfIndex, frCircuitDlci }
+             DESCRIPTION
+                "This trap indicates that a frame was received
+                 from the network on this virtual circuit and it
+                 indicated forward congestion."
+             ::= 1
+
+         frrcvdBECN TRAP-TYPE
+             ENTERPRISE ibmIROCtrapsfr
+             VARIABLES  { frCircuitIfIndex, frCircuitDlci }
+             DESCRIPTION
+                "This trap indicates that a frame was received
+                 from the network on this virtual circuit and it
+                 indicated backward congestion."
+             ::= 2
+
+         frrcvdCLLM TRAP-TYPE
+             ENTERPRISE ibmIROCtrapsfr
+             VARIABLES  { frCLLMCauseIfIndex, frCLLMCauseCode, frCLLMDlciList }
+             DESCRIPTION
+                "This trap indicates that a CLLM message was received
+                 from the network."
+             ::= 3
+
+
+
+ibmIROCtrapssys        OBJECT IDENTIFIER ::= { ibmIROCtraps 2 }
+
+         mosMemLow TRAP-TYPE
+             ENTERPRISE ibmIROCtrapssys
+             VARIABLES  { proResMemHeapTotal, proResMemHeapNeverAlloc }
+             DESCRIPTION
+                "This trap indicates that the free heap amount has
+                 dropped below a given percentage of the total heap
+                 memory available. The default percentage is 10%,
+                 however this threshhold can be modified by the user
+                 via a patch variable."
+             ::= 1
+
+ibmIROCtrapsels        OBJECT IDENTIFIER ::= { ibmIROCtraps 3 }
+
+         elsTrap TRAP-TYPE
+             ENTERPRISE   ibmIROCtrapsels
+             VARIABLES    { proElsSubSysEventMsg }
+             DESCRIPTION
+                "When the routing subsystem ELS component is configured to
+                 generate SNMP traps, the following trap is generated.
+                 It contains a single varBind containing a text string in one
+                 of the two following formats.
+
+                 If ELS timestamping is enabled:
+
+                     hr:min:sec subsys_name.event_num: message_text
+
+                     For example - 09:32:56 IP.008: no rte 9.7.1.8 -> 9.7.4.3 dsc
+
+                 If ELS timestamping is disabled:
+
+                     subsys_name.event_num: message_text
+
+                     For example - IP.008: no rte 9.7.1.8 -> 9.7.4.3 dsc
+
+
+              NOTE: The following subsystems cannot have their events sent
+                    in SNMP traps (ARP, ICMP, UDP, SNMP and IP (excluding
+                    IP access control events)). This restriction is due to the
+                    fact that these subsystems are involved in sending an SNMP
+                    trap and allowing them could cause an infinite loop in the
+                    router software."
+
+             ::= 2
+
+END

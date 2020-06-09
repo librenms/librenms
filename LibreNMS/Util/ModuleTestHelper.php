@@ -25,9 +25,12 @@
 
 namespace LibreNMS\Util;
 
+use DeviceCache;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\OS;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -56,6 +59,9 @@ class ModuleTestHelper
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
+        'mpls' => ['ports', 'vrf', 'mpls'],
+        'nac' => ['ports', 'nac'],
+        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
     ];
 
 
@@ -86,15 +92,15 @@ class ModuleTestHelper
         $this->json_file = $this->json_dir . $this->file_name . ".json";
 
         // never store time series data
-        Config::set('norrd', true);
+        Config::set('rrd.enable', false);
         Config::set('hide_rrd_disabled', true);
-        Config::set('noinfluxdb', true);
-        $influxdb = false;
-        Config::set('nographite', true);
+        Config::set('influxdb.enable', false);
+        Config::set('graphite.enable', false);
+        Config::set('prometheus.enable', false);
 
         if (is_null(self::$module_tables)) {
             // only load the yaml once, then keep it in memory
-            self::$module_tables = Yaml::parse($install_dir . '/tests/module_tables.yaml');
+            self::$module_tables = Yaml::parse(file_get_contents($install_dir . '/tests/module_tables.yaml'));
         }
     }
 
@@ -139,18 +145,19 @@ class ModuleTestHelper
         $snmp_oids = $this->collectOids($device_id);
 
         $device = device_by_id_cache($device_id, true);
+        DeviceCache::setPrimary($device_id);
 
         $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
             $this->qPrint(" " . $oid_data['oid']);
 
-            $snmp_options = '-OUneb -Ih';
+            $snmp_options = ['-OUneb', '-Ih'];
             if ($oid_data['method'] == 'walk') {
-                $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             } elseif ($oid_data['method'] == 'get') {
-                $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             } elseif ($oid_data['method'] == 'getnext') {
-                $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib']);
+                $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
             }
 
             if (isset($data) && $data !== false) {
@@ -168,6 +175,7 @@ class ModuleTestHelper
         global $debug, $vdebug, $device;
 
         $device = device_by_id_cache($device_id);
+        DeviceCache::setPrimary($device_id);
 
         // Run discovery
         ob_start();
@@ -189,7 +197,7 @@ class ModuleTestHelper
         $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
         // extract snmp queries
-        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+) .+:HOSTNAME:[0-9]+(.+)\]/';
+        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+:HOSTNAME:[0-9]+\' \'(.+)\'\]/';
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
@@ -198,14 +206,18 @@ class ModuleTestHelper
             'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
         ];
         foreach ($snmp_matches[0] as $index => $line) {
-            preg_match('/-m \+?([a-zA-Z0-9:\-]+)/', $line, $mib_matches);
+            preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
             $mib = $mib_matches[1];
+            preg_match("/'-M' '\+?([a-zA-Z0-9:\-\/]+)'/", $line, $mibdir_matches);
+            $mibdir = $mibdir_matches[1];
             $method = $snmp_matches[1][$index];
-            $oids = explode(' ', trim($snmp_matches[2][$index]));
+            $oids = explode("' '", trim($snmp_matches[2][$index]));
+
             foreach ($oids as $oid) {
                 $snmp_oids["{$oid}_$method"] = [
                     'oid' => $oid,
                     'mib' => $mib,
+                    'mibdir' => $mibdir,
                     'method' => $method,
                 ];
             }
@@ -278,7 +290,7 @@ class ModuleTestHelper
     {
         $full_name = basename($os_file, '.json');
 
-        if (!str_contains($full_name, '_')) {
+        if (!Str::contains($full_name, '_')) {
             return [$full_name, ''];
         } elseif (is_file(Config::get('install_dir') . "/includes/definitions/$full_name.yaml")) {
             return [$full_name, ''];
@@ -355,7 +367,7 @@ class ModuleTestHelper
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
                     list($raw_type, $data) = explode(':', $raw_data, 2);
-                    if (starts_with($raw_type, 'Wrong Type (should be ')) {
+                    if (Str::startsWith($raw_type, 'Wrong Type (should be ')) {
                         // device returned the wrong type, save the wrong type to emulate the device behavior
                         list($raw_type, $data) = explode(':', ltrim($data), 2);
                     }
@@ -477,7 +489,7 @@ class ModuleTestHelper
         foreach ($private_oid as $oid) {
             if (isset($data[$oid])) {
                 $parts = explode('|', $data[$oid], 3);
-                $parts[2] = '<private>';
+                $parts[2] = $parts[1] === '4' ? '<private>' : '3C707269766174653E';
                 $data[$oid] = implode('|', $parts);
             }
         }
@@ -495,6 +507,7 @@ class ModuleTestHelper
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
         global $device, $debug, $vdebug;
+        Config::set('rrd.enable', false); // disable rrd
 
         if (!is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
@@ -521,6 +534,7 @@ class ModuleTestHelper
 
         // Populate the device variable
         $device = device_by_id_cache($device_id, true);
+        DeviceCache::setPrimary($device_id);
 
         $data = [];  // array to hold dumped data
 
@@ -666,7 +680,7 @@ class ModuleTestHelper
 
         // only dump data for the given modules
         foreach ($modules as $module) {
-            foreach ($module_dump_info[$module] as $table => $info) {
+            foreach ($module_dump_info[$module] ?: [] as $table => $info) {
                 // check for custom where
                 $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `$table`.`device_id`=?";
                 $params = [$device_id];
@@ -674,7 +688,7 @@ class ModuleTestHelper
                 // build joins
                 $join = '';
                 $select = ["`$table`.*"];
-                foreach ($info['joins'] as $join_info) {
+                foreach ($info['joins'] ?: [] as $join_info) {
                     if (isset($join_info['custom'])) {
                         $join .= ' ' . $join_info['custom'];
 

@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
 use ReflectionClass;
 
@@ -174,7 +175,7 @@ class Validator
             $group = 'unknown';
             $bt = debug_backtrace();
             foreach ($bt as $entry) {
-                if (starts_with($entry['class'], 'LibreNMS\Validations')) {
+                if (Str::startsWith($entry['class'], 'LibreNMS\Validations')) {
                     $group = str_replace('LibreNMS\Validations\\', '', $entry['class']);
                     break;
                 }
@@ -251,7 +252,7 @@ class Validator
     public function execAsUser($command, &$output = null, &$code = null)
     {
         if (self::getUsername() === 'root') {
-            $command = 'su ' . Config::get('user') . ' -c "' . $command . '"';
+            $command = 'su ' . Config::get('user') . ' -s /bin/sh -c "' . $command . '"';
         }
         exec($command, $output, $code);
     }

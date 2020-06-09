@@ -102,6 +102,10 @@ foreach ($bypass_volts as $index => $data) {
     if (count($bypass_volts) > 1) {
         $descr .= " Phase $index";
     }
+    if (is_array($data['upsBypassVoltage'])) {
+        $data['upsBypassVoltage'] = $data['upsBypassVoltage'][0];
+        $vold_oid .= ".0";
+    }
 
     discover_sensor(
         $valid['sensor'],

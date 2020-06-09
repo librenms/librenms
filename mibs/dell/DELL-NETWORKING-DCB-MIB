@@ -1,0 +1,1609 @@
+-- Dell Networking OS DCB Proprietary MIB Definition
+
+-- This document explains the proprietary MIB implemented
+-- for the DCB Features.
+
+-- Data Center Bridging is a flexible framework that defines the 
+-- capabilities required for switches and end points to be part of a 
+-- data center network.
+
+-- DCB contains the following capabilities:
+
+--  1. Priority-based flow control (PFC; IEEE 802.1Qbb) 
+--     The Priority-based Flow Control (PFC) feature is used for a 
+--     link level flow control mechanism that can be independently 
+--     controlled for each priority.
+--  2. Enhanced transmission selection (ETS; IEEE 802.1Qaz) 
+--     The Enhanced Transmission Selection (ETS) feature provides a 
+--     common management framework for assignment of bandwidth to 
+--     traffic classes
+--  3. DCBX is a discovery and capability exchange protocol that is used 
+--     by devices enabled for Data Center Bridging to exchange 
+--     configuration information. "
+
+DELL-NETWORKING-DCB-MIB DEFINITIONS ::= BEGIN
+
+--  This MIB contains tables used to configure a Dell Networking OS switch
+--  for the DCB functionality
+--
+--  This module will be extended, as needed.
+   
+IMPORTS
+    	Unsigned32,
+	MODULE-IDENTITY, 
+	OBJECT-TYPE,
+	NOTIFICATION-TYPE,
+	Counter32,
+	Integer32
+		FROM SNMPv2-SMI
+       InterfaceIndex 
+              FROM IF-MIB
+	TEXTUAL-CONVENTION,
+	TruthValue,
+	MacAddress
+		FROM SNMPv2-TC
+       MODULE-COMPLIANCE,
+       OBJECT-GROUP,
+       NOTIFICATION-GROUP
+              FROM SNMPv2-CONF
+       dellNetMgmt 
+		FROM DELL-NETWORKING-SMI;
+
+ dellNetDcb MODULE-IDENTITY
+        LAST-UPDATED "201204160000Z"  -- Apr 16, 2012
+        ORGANIZATION "Dell Inc."
+        CONTACT-INFO
+            "http://www.dell.com/support"
+        
+
+  	  DESCRIPTION 
+         "The proprietary extension MIB module for Dell Networking OS DCB and DCBX."
+
+         REVISION   "201204160000Z"  -- Apr 16, 2012
+         DESCRIPTION
+                    "1.Modified Access permission of following objects to read-only
+                       dellNetETSAdminMode,dellNetPFCAdminMode,dellNetDCBXAdminStatus,
+                       dellNetDcbPfcMinThreshold,dellNetDcbPfcMaxThreshold,
+                       dellNetDcbETSAdminStatus,dellNetDcbPFCAdminStatus,
+                       dellNetETSSystemControl,dellNetETSModuleStatus,
+                       dellNetPFCSystemControl,dellNetPFCModuleStatus,
+                       dellNetETSGlobalEnableTrap,dellNetPFCGlobalEnableTrap,
+                       as enabling DCB on interface has been changed to policy based options.
+                     2.Removed 'auto' from DcbAdminMode as ets/pfc mode supported are on/off.
+                     3.Removed dellNetDcbRowStatus,dellNetETSRowStatus,dellNetPFCRowStatus objects."
+
+         REVISION   "201111240000Z" -- Nov 24, 2011
+         DESCRIPTION 
+                    "Added interoperablity support - Modified MIB to reflect 
+                    Configuration Exchange and Auto detection of version.
+                    1. Modified DcbState Textual Convention to include internally 
+                    propagated information from Config Source.
+                    2. Modified DcbStateMachineType - for legacy DCBX versions 
+                    like CIN, CEE we only have a feature state machine.
+                    3. Added textual convention DcbxPortRole for various port 
+                    roles supported for Configuration Exchange.
+                    4. Added textual convention DcbxVersion for the different 
+                    versions of DCBX - CIN/ CEE /IEEEv2.4.
+                    5. Added a new table dellNetDCBXPortStatusTable for the 
+                    statistics and configuration exchange and version specific 
+                    details.
+                    6. Added Compliance and Conformance information."
+         REVISION   "201009250000Z" -- Aug 25 2010 
+         DESCRIPTION "Initial version of DCBX mib."
+    ::=  { dellNetMgmt 15}
+
+ EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+ DcbAdminMode ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+
+         "'on(1)', In this mode, the configurations,  
+         either from this system or the remote system will take
+         effect based on DCBX negotiations.
+
+         'off(2)', In this mode, all the operational(local) parameters 
+	 for the feature will be same as Admin Configuration Parameters. 
+	 But Operational(local) parameters do not have any impact in the system."
+
+    SYNTAX      INTEGER { on(1), off(2)}
+
+ DcbState ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+ 	"The state of the DCBX state machine.
+
+	 off '(0)', In this state all Operational(local) parameters
+	 for the feature will be same as Admin Configuration parameters
+	 but will not be operational in the system(hardware).
+
+        init '(1)', In this state all Operational(local) parameters
+	 for the feature will be same as Admin Configuration Parameters.
+
+        rxrecommended '(2)', In this state all the Operational(local) 
+	 parameters for the feature will be same as particular 
+	 feature Remote Parameters.
+	  
+	 internallypropagated '(3)', In this state all the Operational(local)
+	 parameters for the feature will be same as the internal propagated 
+	 information from the config source."
+    SYNTAX      INTEGER { off(0), init(1), rxrecommended(2), internallypropagated(3) }
+
+ DcbStateMachineType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "asymmetric'(1)',By using this state machine the operational parameters 
+                        for the DCB feature can be same as peer or not.
+         symmetric '(2)',By using this state machine the operational parameters 
+                        for the DCB feature will be same as peer. 
+	  feature '(3)' Feature State machine as used by legacy DCBX - CIN/CEE 
+			versions."
+    SYNTAX      INTEGER { asymmetric(1), symmetric(2), feature(3) }
+
+ DcbxPortRole ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "."
+    SYNTAX      INTEGER  {
+            manual(1),
+            autoup(2),
+            autodown(3),
+            configSource(4)
+    }
+
+ DcbxVersion ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "."
+    SYNTAX      INTEGER  {
+            auto(1),
+            ieee(2),
+            cin(3),
+            cee(4)
+    }
+
+-- ****************************************************************************
+--                           Groups in the MIB
+-- ****************************************************************************
+
+dellNetDcbSystem   		OBJECT IDENTIFIER ::= { dellNetDcb 1 }
+dellNetDcbObjects  		OBJECT IDENTIFIER ::= { dellNetDcb 2 }
+dellNetDcbApplicationObjects   OBJECT IDENTIFIER ::= { dellNetDcb 3 }
+dellNetDcbNotificationObjects  OBJECT IDENTIFIER ::= { dellNetDcb 4 }
+
+dellNetDCBXObjects 	OBJECT IDENTIFIER ::= { dellNetDcbApplicationObjects 1 }
+dellNetETSObjects	OBJECT IDENTIFIER ::= { dellNetDcbApplicationObjects 2 }
+dellNetPFCObjects	OBJECT IDENTIFIER ::= { dellNetDcbApplicationObjects 3 }
+
+dellNetDCBXScalars	OBJECT IDENTIFIER ::= { dellNetDCBXObjects 1 }
+dellNetETSScalars	OBJECT IDENTIFIER ::= { dellNetETSObjects 1 }
+dellNetPFCScalars	OBJECT IDENTIFIER ::= { dellNetPFCObjects 1 }
+
+
+-- ****************************************************************************
+-- DCB Scalar  MIB Objects
+-- ****************************************************************************
+
+ dellNetDcbPfcMinThreshold    OBJECT-TYPE
+    SYNTAX        Unsigned32 ( 1..65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The minimum PFC(Priority Based Flow Control) threshold for the switch.
+         This Object indicates the minimum Receive queue buffer count. 
+         The minimum and maximum values for this object may vary based on the 
+         underlying hardware's capacity."
+    ::= { dellNetDcbSystem 1 }
+
+ dellNetDcbPfcMaxThreshold    OBJECT-TYPE
+    SYNTAX        Unsigned32 ( 1..65535 )
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum PFC(Priority Based Flow Control)threshold for the switch.
+         This Object indicates the maximum Receive queue buffer count. 
+         The minimum and maximum values for this object may vary based 
+         on the underlying hardware's capacity. "
+    ::= { dellNetDcbSystem 2 }
+
+ dellNetDcbMaxPfcProfiles    OBJECT-TYPE
+    SYNTAX        Unsigned32 (1..256)
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The maximum number of PFC(Priority Based Flow Control)profiles supported 
+         by the device.
+
+         A PFC profile is a bitmap, containing the status of PFC for all the
+         priorities.
+
+         If Bit 0 is set, then it means PFC is enabled for priority 0, otherwise 
+         PFC is disabled for priority 0.
+         
+         If Bit 1 is set, then it means PFC is enabled for priority 1, otherwise 
+         PFC is disabled for priority 1, and so on.
+
+         If this object value is zero, it means all the bits are set to zero and 
+         PFC is disabled for all priorities.
+
+         If this object's value is 3, it means the bits 0 and 1 are set and 
+         PFC is enabled for priorities 0 and 1 and disabled for all other priorities.
+
+         Device supporting 256 PFC profiles, means all possible combination of
+         PFC status on 8 priorities are supported. "
+
+    DEFVAL { 256 }
+    ::= { dellNetDcbSystem 3}
+
+-- ****************************************************************************
+-- DCB Port Configuration MIB Objects
+-- ****************************************************************************
+
+ dellNetDcbPortTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetDcbPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "Port table contains the DCB features 
+         (Enhanced Transmission Selection/Priortiy Based Flow Control) 
+         status (enabled or disabled)."
+    ::= { dellNetDcbObjects 1 }
+
+ dellNetDcbPortEntry    OBJECT-TYPE
+    SYNTAX      DellNetDcbPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "An entry containing DCB control parameters for a particular port."
+    INDEX  {dellNetDcbPortNumber}
+    ::= { dellNetDcbPortTable 1 }
+
+ DellNetDcbPortEntry ::= 
+ SEQUENCE {
+    dellNetDcbPortNumber	  InterfaceIndex,
+    dellNetDcbETSAdminStatus     EnabledStatus,
+    dellNetDcbPFCAdminStatus     EnabledStatus
+    }
+
+ dellNetDcbPortNumber OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible 
+    STATUS       obsolete
+    DESCRIPTION
+       "This indicates the interface identifier for which the Dcb 
+        configuration is applied." 
+    ::= { dellNetDcbPortEntry 1 }
+
+ dellNetDcbETSAdminStatus    OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to display if ETS feature is 
+         enabled or disabled on the given port."
+
+    DEFVAL { enabled }
+    ::= { dellNetDcbPortEntry 2 }
+
+ dellNetDcbPFCAdminStatus    OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "This object is used to display if PFC feature is
+         enabled or disabled on the given port."
+
+    DEFVAL { enabled }
+    ::= { dellNetDcbPortEntry 3 }
+
+-- ****************************************************************************
+-- DCBX Scalar Objects
+-- ****************************************************************************
+
+ dellNetDcbxGlobalTraceLevel    OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object is used to enable Trace Statements in DCBX Module.
+
+         A FOUR BYTE integer is used for enabling the level of tracing.
+         Each BIT in the four byte integer represents a particular
+         level of Trace.
+
+         The mapping between the bit positions & the level of trace is
+         as follows:
+                  1 - Management Traces
+                  2 - DCBX State Machine Traces
+                  3 - TLV Traces
+                  4 - System Resource Traces
+                  5 - Failure Traces
+                  6 - Configuration Exchange Traces
+                  7 - Auto Detection Traces
+
+         The remaining bits are unused.
+
+         The user has to enter the corresponding INTEGER VALUE for the
+         trace to be set. Only one trace can be enabled at a time.
+         To enable all the traces, sum of all individual
+         traces must be provided."
+    ::= { dellNetDCBXScalars 1 }
+
+ dellNetDCBXGlobalVersion       OBJECT-TYPE
+    SYNTAX        DcbxVersion
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+         "CIN is Cisco Intel Nuova DCBX (version 1.0). 
+         CEE is converged enhanced ethernet DCBX (version 1.06). 
+         IEEE is 802-1 az version.
+         The default value is auto.
+
+         DCBX supports the legacy implementations v1.0 (CIN) and 
+         v1.06 (CEE) in addition to standard IEEE version 2.4 DCBX.
+
+         1.DCBX starts in standard IEEE mode by sending an IEEE 
+         standard version 2.4 DCBX frame. If the peer responds, 
+         then IEEE standard version 2.4 DCBX is used,Starts means
+         after a link up, a DCBX timeout (or multiple peer 
+         condition) or when commanded by the network operator. 
+         If DCBX receives a DCBX frame with an OUI indicating a 
+         legacy version, it immediately switches into legacy mode
+         for the detected version and does not wait for the
+         3x LLDP fast timeout.
+         2.If no IEEE DCBX response is received within 3 times the 
+         LLDP fast transmit timeout period, DCBX immediately 
+         transmits a version 1.06 DCBX frame with the 
+         appropriate version number. If DCBX receives a DCBX
+         frame with an OUI indicating IEEE standard support, 
+         it immediately switches into IEEE standard mode and 
+         does not wait for the timer. If DCBX receives a DCBX 
+         frame with an OUI indicating legacy mode and a version
+         number indicating version 1.0 support, it immediately 
+         switches into legacy 1.0 mode and does not wait for the
+         timer.
+         3.If no version 1.06 response is received within 3 times
+         the DCBX fast transmit timeout period, DCBX falls back 
+         to version 1.0 and immediately transmits a version 1.0 
+         frame. If no response is received within 3 times the 
+         DCBX fast transmit period, DCBX waits the standard LLDP 
+         timeout period, and then begins again with step 1. If 
+         DCBX receives a DCBX frame with an OUI indicating IEEE 
+         standard mode, it immediately switches into IEEE 
+         standard mode."
+     DEFVAL { 1 }
+     ::= { dellNetDCBXScalars 2 }
+
+-- ****************************************************************************
+-- DCBX Port Configuration MIB Objects
+-- ****************************************************************************
+
+ dellNetDCBXPortTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetDCBXPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Port table contains the DCBX feature status (enabled or disabled)."
+    ::= { dellNetDCBXObjects 2 }
+
+ dellNetDCBXPortEntry    OBJECT-TYPE
+    SYNTAX      DellNetDCBXPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing DCBX control parameters for a particular port."
+    INDEX  {dellNetDCBXPortNumber}
+    ::= { dellNetDCBXPortTable 1 }
+
+ DellNetDCBXPortEntry ::= 
+ SEQUENCE {
+    dellNetDCBXPortNumber	   		InterfaceIndex,
+    dellNetDCBXAdminStatus     		EnabledStatus,
+    dellNetDCBXAutoCfgPortRole 		DcbxPortRole,
+    dellNetDCBXPortVersion     		DcbxVersion,    
+    dellNetDCBXPortSupportedTLVs   	BITS,
+    dellNetDCBXPortConfigTLVsTxEnable 	BITS
+    }
+
+ dellNetDCBXPortNumber OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible 
+    STATUS       current
+    DESCRIPTION
+       "This indicates the interface identifier for which the DCBX 
+        configuration is applied." 
+    ::= { dellNetDCBXPortEntry 1 }
+
+ dellNetDCBXAdminStatus    OBJECT-TYPE
+    SYNTAX      EnabledStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to display if DCBX feature is 
+         enabled(1) or disabled(2) on the given port."
+
+    DEFVAL { enabled }
+    ::= { dellNetDCBXPortEntry 2 }
+
+ dellNetDCBXAutoCfgPortRole OBJECT-TYPE
+    SYNTAX      DcbxPortRole   
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        " Ports operating in the manual role do not have their 
+          configuration affected by peer devices or by internal 
+          propagation of configuration. These ports will advertise 
+          their configuration to their peer if DCBX is enabled 
+          on that port.
+
+          Auto-up: Advertises a configuration, but is also willing 
+          to accept a configuration from the link-partner and 
+          propagate it internally to the auto-downstream ports 
+          as well as receive configuration propagated internally 
+          by other auto-upstream ports.
+
+          Auto-down: Advertises a configuration but is not willing 
+          to accept one from the link partner. However, the port 
+          will accept a configuration propagated internally by the 
+          configuration source.
+
+          Configuration Source:In this role, the port has been 
+          manually selected to be the configuration source. 
+          Configuration received over this port is propagated 
+          to the other auto-configuration ports."
+    DEFVAL { 1 }
+    ::= { dellNetDCBXPortEntry 3 }
+
+ dellNetDCBXPortVersion OBJECT-TYPE
+    SYNTAX      DcbxVersion 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "CIN is Cisco Intel Nuova DCBX (version 1.0). 
+          CEE is converged enhanced ethernet DCBX (version 1.06). 
+          IEEE is 802-1 az version.
+          The default value is auto.
+
+          DCBX supports the legacy implementations v1.0 (CIN) and 
+          v1.06 (CEE) in addition to standard IEEE version 2.4 DCBX.
+
+          1.DCBX starts in standard IEEE mode by sending an IEEE 
+          standard version 2.4 DCBX frame. If the peer responds, 
+          then IEEE standard version 2.4 DCBX is used,Starts means
+          after a link up, a DCBX timeout (or multiple peer 
+          condition) or when commanded by the network operator. 
+          If DCBX receives a DCBX frame with an OUI indicating a 
+          legacy version, it immediately switches into legacy mode
+          for the detected version and does not wait for the
+          3x LLDP fast timeout.
+          2.If no IEEE DCBX response is received within 3 times the 
+          LLDP fast transmit timeout period, DCBX immediately 
+          transmits a version 1.06 DCBX frame with the 
+          appropriate version number. If DCBX receives a DCBX
+          frame with an OUI indicating IEEE standard support, 
+          it immediately switches into IEEE standard mode and 
+          does not wait for the timer. If DCBX receives a DCBX 
+          frame with an OUI indicating legacy mode and a version
+          number indicating version 1.0 support, it immediately 
+          switches into legacy 1.0 mode and does not wait for the
+          timer.
+          3.If no version 1.06 response is received within 3 times
+          the DCBX fast transmit timeout period, DCBX falls back 
+          to version 1.0 and immediately transmits a version 1.0 
+          frame. If no response is received within 3 times the 
+          DCBX fast transmit period, DCBX waits the standard LLDP 
+          timeout period, and then begins again with step 1. If 
+          DCBX receives a DCBX frame with an OUI indicating IEEE 
+          standard mode, it immediately switches into IEEE 
+          standard mode."
+    DEFVAL { 1 }
+    ::= { dellNetDCBXPortEntry 4 }
+
+ dellNetDCBXPortSupportedTLVs      OBJECT-TYPE
+    SYNTAX       BITS {
+                    pfc(0),
+                    etsConfig(1),
+                    etsRecom(2),
+                    applicationPriorityFCOE(3),
+                    applicationPriorityISCSI(4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION  
+        "Bitmap that includes the supported set of DCBX LLDP
+        TLVs the device is capable of and whose transmission is allowed on
+        the local LLDP agent by network management.
+
+        Having the bit 'pfc(0)' set indicates that the LLDP
+        transmit PFC TLV as part of DCBX TLVs.
+
+        Having the bit 'etcConfig(1)' set indicates that the LLDP
+        transmit ETS configuration TLV as part of DCBX TLVs.
+
+        Having the bit 'etsRecom(2)' set indicates that
+        transmit ETS Recommendation TLV as part of DCBX TLVs.
+
+        Having the bit 'applicationPriorityFCOE(3)' set indicates that
+        the LLDP transmit applicationPriority TLV for FCOE as part of
+        DCBX TLVs.
+            
+        Having the bit 'applicationPriorityISCSI(4)' set indicates that
+        the LLDP transmit applicationPriority TLV for ISCSI as part of
+        DCBX TLVs."
+   ::= { dellNetDCBXPortEntry 5 }
+
+ dellNetDCBXPortConfigTLVsTxEnable OBJECT-TYPE
+    SYNTAX       BITS {
+                        pfc(0),
+                        etsConfig(1),
+                        etsRecom(2),
+                        applicationPriorityFCOE(3),
+                        applicationPriorityISCSI(4)
+    }  
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Bitmap that includes the DCBX defined set of LLDP
+       TLVs whose transmission is enabled on the local LLDP agent by 
+       network management.
+
+       Having the bit 'pfc(0)' set indicates that the LLDP
+       transmit PFC TLV as part of DCBX TLVs.
+
+       Having the bit 'etsConfig(1)' set indicates that the LLDP
+       transmit ETS configuration TLV as part of DCBX TLVs.
+
+       Having the bit 'etsRecom(2)' set indicates that
+       transmit ETS Recommendation TLV as part of DCBX TLVs.
+
+       Having the bit 'applicationPriorityFCOE(3)' set indicates that
+       the LLDP transmit applicationPriority TLV for FCOE as part of 
+       DCBX TLVs.
+            
+       Having the bit 'applicationPriorityISCSI(4)' set indicates that
+       the LLDP transmit applicationPriority TLV for ISCSI as part of 
+       DCBX TLVs."
+    ::= { dellNetDCBXPortEntry 6 }
+         
+-- ****************************************************************************
+-- DCBX Statistics 
+-- ****************************************************************************
+
+ dellNetDCBXPortStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetDCBXPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "."
+    ::= { dellNetDCBXObjects 3 }
+
+ dellNetDCBXPortStatusEntry OBJECT-TYPE
+    SYNTAX      DellNetDCBXPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "."
+    AUGMENTS { dellNetDCBXPortEntry }
+    ::= { dellNetDCBXPortStatusTable 1 }
+
+ DellNetDCBXPortStatusEntry::=
+    SEQUENCE {
+            dellNetDCBXPortOperVersion
+                DcbxVersion,
+            dellNetDCBXPortPeerMACaddress
+                MacAddress,
+            dellNetDCBXPortCfgSource
+                INTEGER,
+            dellNetDCBXOperStatus 
+                EnabledStatus,
+            dellNetDCBXPortMultiplePeerCount
+                Counter32,
+            dellNetDCBXPortPeerRemovedCount
+                Counter32,
+            dellNetDCBXPortPeerOperVersionNum
+                Unsigned32,
+            dellNetDCBXPortPeerMaxVersion
+                Unsigned32,
+            dellNetDCBXPortSeqNum
+                Unsigned32,
+            dellNetDCBXPortAckNum
+                Unsigned32,
+            dellNetDCBXPortPeerRcvdAckNum
+                Unsigned32,
+            dellNetDCBXPortTxCount
+                Counter32,
+            dellNetDCBXPortRxCount
+                Counter32,
+            dellNetDCBXPortErrorFramesCount
+                Counter32
+         }
+
+ dellNetDCBXPortOperVersion     OBJECT-TYPE
+    SYNTAX      DcbxVersion
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the DCBX mode in which  the interface is 
+         currently operating."
+    DEFVAL { 1 }
+    ::= { dellNetDCBXPortStatusEntry 2 }
+
+ dellNetDCBXPortPeerMACaddress  OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MAC Address of the DCBX peer."
+    ::= { dellNetDCBXPortStatusEntry 3 }
+
+ dellNetDCBXPortCfgSource    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                       false(0),
+                       true(1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates if this port is the source of configuration 
+         information for auto-* ports."     
+    ::= { dellNetDCBXPortStatusEntry 4 }
+
+ dellNetDCBXOperStatus OBJECT-TYPE
+    SYNTAX         EnabledStatus
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+        "This object gives information on the operational status of 
+         DCBX on the given port.
+         Enabled(1) indicates DCBX on the port is in sync with the
+         remote and is operationally up.
+         Disabled(2) indicates DCBX on the port is operationally 
+         disabled."
+    ::= { dellNetDCBXPortStatusEntry 5 }
+
+ dellNetDCBXPortMultiplePeerCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates number of times multiple peers were detected. 
+         A duplicate peer is when more than one DCBX peer is 
+         detected on a port."
+    ::= { dellNetDCBXPortStatusEntry 6 }
+
+ dellNetDCBXPortPeerRemovedCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "."
+    ::= { dellNetDCBXPortStatusEntry 7 }
+
+ dellNetDCBXPortPeerOperVersionNum  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the operational version of the peer DCBX device. 
+         Valid only when peer device is a CEE/CIN DCBX device."
+    ::= { dellNetDCBXPortStatusEntry 8 }
+
+ dellNetDCBXPortPeerMaxVersion  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the max version of the peer DCBX device. 
+         Valid only when peer device is CEE/CIN DCBX device."
+    ::= { dellNetDCBXPortStatusEntry 9 }
+
+ dellNetDCBXPortSeqNum  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the current sequence number that is sent 
+         in DCBX control TLVs in CEE/CIN Mode."
+    ::= { dellNetDCBXPortStatusEntry 10 }
+
+ dellNetDCBXPortAckNum  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the current ACK number that is to be sent 
+         to peer in DCBX control TLVs in CEE/CIN Mode."
+    ::= { dellNetDCBXPortStatusEntry 11 }
+
+ dellNetDCBXPortPeerRcvdAckNum  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Specifies the current ACK number that is sent by peer 
+         in DCBX control TLV in CEE/CIN Mode."
+    ::= { dellNetDCBXPortStatusEntry 12 }
+
+ dellNetDCBXPortTxCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DCBX frames transmitted per interface."
+    ::= { dellNetDCBXPortStatusEntry 13 }
+
+ dellNetDCBXPortRxCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DCBX frames received per interface."
+    ::= { dellNetDCBXPortStatusEntry 14 }
+
+ dellNetDCBXPortErrorFramesCount  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of DCBX frames discarded due to errors in the frame."
+    ::= { dellNetDCBXPortStatusEntry 15 }
+
+-- ****************************************************************************
+-- ETS Scalar Objects
+-- ****************************************************************************
+
+ dellNetETSSystemControl   OBJECT-TYPE
+    SYNTAX        INTEGER { running(1), shutdown(2) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The ETS(Enhanced Transmission selection) system control status 
+	 for the switch.
+	 
+	 It indicates whether ETS Module in the system is 
+	 running or shutdown. When this object returns 'running', 
+	 resources required by ETS module are allocated and 
+	 the module is running. When this object returns 'shutdown', 
+	 all the pools used by ETS module are released to the system."
+    DEFVAL { running }
+    ::= { dellNetETSScalars 1 }
+
+ dellNetETSModuleStatus   OBJECT-TYPE
+    SYNTAX        EnabledStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The ETS(Enhanced Transmission Selection) Module status for the switch.
+	 
+	 If this object returns with 'disabled', then all the ports
+	 have the ETS feature disabled in the system(hardware)
+	 and the DCBX state machine has stopped on the ports.
+	
+	 If this object returns with 'enabled', then all the ports 
+	 have the ETS feature enabled in the system(hardware) 
+	 and the DCBX state machine is running on the ports."
+    DEFVAL { enabled }
+    ::= { dellNetETSScalars 2 }
+
+ dellNetETSClearCounters   OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object when set to TRUE, clears the following counters
+         for the ETS Module:
+	    dellNetETSConfTxTLVCounter,  
+	    dellNetETSConfRxTLVCounter,
+	    dellNetETSConfRxTLVErrors,
+	    dellNetETSRecoTxTLVCounter,
+	    dellNetETSRecoRxTLVCounter,
+	    dellNetETSRecoRxTLVErrors.	 
+
+         Setting this object to FALSE has no effect. 
+         This object always returns FALSE when read."   
+    DEFVAL { false }
+    ::= {dellNetETSScalars 3 }
+
+ dellNetETSGlobalEnableTrap   OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+           "This object indicates whether the transmission of TRAP
+            notification messages for ETS feature is enabled or disabled."
+
+    DEFVAL { 0 }
+    ::= { dellNetETSScalars 4 }
+
+-- ****************************************************************************
+-- ETS Port Configuration table 
+-- ****************************************************************************
+
+ dellNetETSPortTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetETSPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ETS Port table contains the ETS (Enhanced Transmission Selection) features 
+         information specific to this port. 
+
+	 An entry created in this table in the following tables in the standard 
+	 DCBX Mib for this port.
+	 lldpXdot1dcbxConfigTCSupportedTable,
+	 lldpXdot1dcbxConfigETSConfigurationTable,
+	 lldpXdot1dcbxConfigETSRecommendationTable,
+	 lldpXdot1dcbxLocTCSupportedTable,
+	 lldpXdot1dcbxLocETSBasicConfigurationTable,
+	 lldpXdot1dcbxLocETSConPriorityAssignmentTable,
+	 lldpXdot1dcbxLocETSRecommendationTable,
+	 lldpXdot1dcbxAdminTCSupportedTable,
+	 lldpXdot1dcbxAdminETSBasicConfigurationTable,
+	 lldpXdot1dcbxAdminETSConPriorityAssignmentTable,
+	 lldpXdot1dcbxAdminETSRecommendationTable.
+ 
+	 Deletion of entry in this table deletes all the entries in the above tables 
+	 in the standatd DCBX mib for this port."
+    ::= { dellNetETSObjects 2 }
+
+ dellNetETSPortEntry    OBJECT-TYPE
+    SYNTAX      DellNetETSPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing ETS control parameters and ETS information
+	 for a particular port."
+    INDEX  {dellNetETSPortNumber}
+    ::= { dellNetETSPortTable 1 }
+
+ DellNetETSPortEntry ::= 
+ SEQUENCE {
+    dellNetETSPortNumber	  InterfaceIndex,
+    dellNetETSAdminMode     	  DcbAdminMode,
+    dellNetETSDcbxOperState      DcbState,
+    dellNetETSDcbxStateMachine   DcbStateMachineType,
+    dellNetETSOperStatus         EnabledStatus,
+    dellNetETSClearTLVCounters   TruthValue,
+    dellNetETSConfTxTLVCounter   Counter32,
+    dellNetETSConfRxTLVCounter   Counter32,
+    dellNetETSConfRxTLVErrors    Counter32,
+    dellNetETSRecoTxTLVCounter   Counter32,
+    dellNetETSRecoRxTLVCounter   Counter32,
+    dellNetETSRecoRxTLVErrors    Counter32
+    }
+
+ dellNetETSPortNumber OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible 
+    STATUS       current
+    DESCRIPTION
+       "This indicates the interface identifier for which the ETS 
+        configuration is applied." 
+    ::= { dellNetETSPortEntry 1 }
+
+ dellNetETSAdminMode    OBJECT-TYPE
+    SYNTAX      DcbAdminMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to display the Admin mode for ETS feature on
+         the given port.
+          
+         If the mode is 'on(1)',ETS feature is enabled on this port.
+         ETS configurations, either from this system or
+         the remote system will take effect based on DCBX negotiations.
+
+         If the mode is 'off(2)', ETS feature is disabled on this port. 
+         Operational(local) parameters is same as Admin Configuration 
+         Parameters. But Operational(local) parameters do not have any impact 
+         in the system and dellNetETSOperState is in 'Off' state.
+         dellNetETSDcbxOperState becomes oper up if remote is also disabled.
+
+         The Operational(local) parameters do not have any impact in 
+         the system if this object value is 'on(1)' and 
+         dellNetETSModuleStatus is disabled. dellNetETSDcbxOperState will 
+         be in 'Off' State."
+    DEFVAL { on }
+    ::= { dellNetETSPortEntry 2 }
+
+ dellNetETSDcbxOperState    OBJECT-TYPE
+    SYNTAX      DcbState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to display the current state of the
+	 DCBX state machine for the ETS feature on the given port.
+
+         If state is Off '(0)', then ETS Operational(local) parameters
+	 will be same as ETS Admin Configuration Parameters and will
+	 not have any impact in the system(hardware).
+
+         If state is init '(1)', then ETS Operational(local) parameters
+	 will be same as ETS Admin Configuration Parameters.
+
+         If state is rxrecommended '(2)', then ETS Operational(local) parameters
+	 will be same as ETS Remote Parameters.
+	  
+	  internallypropagated '(3)', In this state all the Operational(local)
+	 parameters for the feature will be same as the internal propagated 
+	 information from the config source."
+    ::= { dellNetETSPortEntry 3 }
+
+ dellNetETSDcbxStateMachine    OBJECT-TYPE
+    SYNTAX      DcbStateMachineType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to display the DCBX state machine 
+	 type that is used by the ETS feature on the given port."
+    ::= { dellNetETSPortEntry 4 }
+
+ dellNetETSOperStatus      OBJECT-TYPE
+    SYNTAX         EnabledStatus
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "This object gives information on the operational status of ETS
+        on the given port.
+        Enabled(1) indicates ETS on the port is in sync with the remote
+        and is operationally up.
+        Disabled(2) indicates ETS on the port is operationally disabled."
+    ::= { dellNetETSPortEntry 5 }
+
+ dellNetETSClearTLVCounters    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object when set to TRUE, clears the following counters
+         associated with a Port:
+	    dellNetETSConfTxTLVCounter,  
+	    dellNetETSConfRxTLVCounter,
+	    dellNetETSConfRxTLVErrors,
+	    dellNetETSRecoTxTLVCounter,
+	    dellNetETSRecoRxTLVCounter,
+	    dellNetETSRecoRxTLVErrors.	    
+
+         Setting this object to FALSE has no effect. 
+         This object always returns FALSE when read."    
+    DEFVAL { false }
+    ::= { dellNetETSPortEntry 6 }
+
+ dellNetETSConfTxTLVCounter    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of the number of ETS 
+	 configuration TLV that are transmitted from this port. 
+	 This counter will be incremented every time when there 
+	 is ETS Configuration TLV is generated and transmitted 
+	 to the LLDP."
+    ::= { dellNetETSPortEntry 7 }
+
+ dellNetETSConfRxTLVCounter    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of the number of ETS 
+	 ConfigurationTLV that are received in this port. This 
+	 counter will be incremented every time when there is ETS 
+	 Configuration TLV is received from the LLDP."
+    ::= { dellNetETSPortEntry 8 }
+
+ dellNetETSConfRxTLVErrors    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of number of malformed 
+	 ETS Conf TLVs received by ETS. This counter will be 
+	 incremented every time a ETS Conf TLV is dropped by ETS."
+    ::= { dellNetETSPortEntry 9 }
+
+
+ dellNetETSRecoTxTLVCounter    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of the number of ETS 
+	 Recommendation TLV that are transmitted from this port. 
+	 This counter will be incremented every time when there 
+	 is ETS Recommendation TLV is generated and transmitted 
+	 to the LLDP."
+    ::= { dellNetETSPortEntry 10 }
+
+ dellNetETSRecoRxTLVCounter    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of the number of ETS 
+	 Recommendation TLV that are received in this port. This 
+	 counter will be incremented every time when there is ETS 
+	 Recommendation TLV is received from the LLDP."
+    ::= { dellNetETSPortEntry 11 }
+
+ dellNetETSRecoRxTLVErrors    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of number of malformed 
+	 ETS Reco TLVs received by ETS. This counter will be 
+	 incremented every time a ETS Reco TLV is dropped by ETS."
+    ::= { dellNetETSPortEntry 12 }
+
+-- ****************************************************************************
+--  PFC Scalar Objects
+-- ****************************************************************************
+
+ dellNetPFCSystemControl   OBJECT-TYPE
+    SYNTAX        INTEGER { running(1), shutdown(2) }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The PFC(Priority Based Flow Control) system control status for the switch.
+
+         It indicates whether PFC Module in the system is
+         running or shutdown. When this object returns 'running',
+         resources required by PFC module are allocated and
+         the module is running. When this object returns 'shutdown',
+         all the pools used by PFC module are released to the system."
+
+    DEFVAL { running }
+    ::= { dellNetPFCScalars 1 }
+ 
+ dellNetPFCModuleStatus   OBJECT-TYPE
+    SYNTAX        EnabledStatus
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "The PFC(Priority Based Flow Control) Module status for the switch.
+	 
+	 If this object returns with 'disabled', then all the ports
+	 have the PFC feature disabled in the system(hardware)
+	 and the DCBX state machine has stopped on the ports.
+
+	 If this object returns with 'enabled', then all the ports
+	 have the PFC feature enabled in the system(hardware)
+	 and the DCBX state machine is running on the ports."
+    DEFVAL { enabled }
+    ::= { dellNetPFCScalars 2 }
+
+ dellNetPFCClearCounters   OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This object when set to TRUE, clears the following counters
+         for the PFC Module:
+	    dellNetPFCTxTLVCounter,
+	    dellNetPFCRxTLVCounter,
+	    dellNetPFCRxTLVErrors.
+
+         Setting this object to FALSE has no effect. 
+         This object always returns FALSE when read."    
+    DEFVAL { false }
+    ::= {dellNetPFCScalars 3 }
+
+ dellNetPFCGlobalEnableTrap   OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+           "This object indicates whether the transmission of TRAP
+            notification messages for PFC feature is enabled or disabled."
+
+    DEFVAL { 0 }           
+    ::= { dellNetPFCScalars 4 }
+
+-- ****************************************************************************
+--  PFC Port Configuration table 
+-- ****************************************************************************
+
+ dellNetPFCPortTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF DellNetPFCPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PFC Port table contains the PFC (Priortiy Based Flow Control) features 
+         information specific to this port. 
+
+	 An entry created in the port table populates the entry in this table and 
+	 in the following tables in the standard DCBX Mib for this port. 
+	 lldpXdot1dcbxConfigPFCTable,
+	 lldpXdot1dcbxLocPFCBasicTable,
+	 lldpXdot1dcbxLocPFCEnableTable,
+	 lldpXdot1dcbxAdminPFCBasicTable,
+ 	 lldpXdot1dcbxAdminPFCEnableTable.
+	 
+	 Deletion of entry in the port table deletes the entry in this table and
+	 all the entries in the above tables in the standatd DCBX mib for this port."
+    ::= { dellNetPFCObjects 2 }
+
+ dellNetPFCPortEntry    OBJECT-TYPE
+    SYNTAX      DellNetPFCPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing PFC control parameters and PFC information
+	 for a particular port."
+    INDEX  {dellNetPFCPortNumber}
+    ::= { dellNetPFCPortTable 1 }
+
+ DellNetPFCPortEntry ::= 
+ SEQUENCE {
+    dellNetPFCPortNumber	    InterfaceIndex,
+    dellNetPFCAdminMode     	    DcbAdminMode,
+    dellNetPFCDcbxOperState      DcbState,
+    dellNetPFCDcbxStateMachine   DcbStateMachineType,
+    dellNetPFCOperStatus         EnabledStatus,
+    dellNetPFCClearTLVCounters   TruthValue,
+    dellNetPFCTxTLVCounter	    Counter32,
+    dellNetPFCRxTLVCounter	    Counter32,
+    dellNetPFCRxTLVErrors	    Counter32
+    }
+
+ dellNetPFCPortNumber OBJECT-TYPE
+    SYNTAX       InterfaceIndex
+    MAX-ACCESS   not-accessible 
+    STATUS       current
+    DESCRIPTION
+       "This indicates the interface identifier for which the PFC 
+        configuration is applied." 
+    ::= { dellNetPFCPortEntry 1 }
+
+ dellNetPFCAdminMode    OBJECT-TYPE
+    SYNTAX      DcbAdminMode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to display Admin mode for PFC feature on
+         the given port.
+
+         If mode is 'on(1)',PFC feature is enabled on this port.
+         PFC configurations, either from this system or
+         the remote system will take effect based on DCBX negotiations.  
+
+         If mode is 'off(2)',PFC feature is disabled on this port. 
+         Operational(local) parameters is same as Admin Configuration 
+         Parameters. But Operational(local) parameters do not have any impact 
+         in the system.dellNetPFCDcbxOperState becomes up if remote is also disabled
+
+         The Operational(local) parameters do not have any impact in 
+         the system if this object value is 'on(1)'
+         and dellNetPFCModuleStatus is disabled. dellNetPFCDcbxOperState 
+         will be in 'Off' State."
+    DEFVAL { on }
+    ::= { dellNetPFCPortEntry 2 }
+
+ dellNetPFCDcbxOperState    OBJECT-TYPE
+    SYNTAX      DcbState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to display the current state of the
+	 DCBX state machine for the PFC feature on the given port.
+
+         If state is Off '(0)', then PFC Operational(local) parameters
+	 will be same as PFC Admin Configuration Parameters and will
+	 not have any impact in the system(hardware).
+
+         If state is init '(1)', then PFC Operational(local) parameters
+	 will be same as PFC Admin Configuration Parameters.
+
+         If state is rxrecommended '(2)',then PFC Operational(local) parameters
+	 will be same as PFC Remote Parameters.
+        
+	  internallypropagated '(3)', In this state all the Operational(local)
+	 parameters for the feature will be same as the internal propagated 
+	 information from the config source."
+    ::= { dellNetPFCPortEntry 3 }
+
+ dellNetPFCDcbxStateMachine    OBJECT-TYPE
+    SYNTAX      DcbStateMachineType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to display the DCBX state machine 
+	 type that is used by the PFC feature on the given port."
+    ::= { dellNetPFCPortEntry 4 }
+
+ dellNetPFCOperStatus      OBJECT-TYPE
+    SYNTAX         EnabledStatus
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION
+       "This object gives information on the operational status of PFC
+        on the given port.
+        Enabled(1) indicates PFC on the port is in sync with the remote
+        and is operationally up.
+        Disabled(2) indicates PFC on the port is operationally disabled."
+    ::= { dellNetPFCPortEntry 5 }
+
+ dellNetPFCClearTLVCounters    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object when set to TRUE, clears the following counters
+         associated with a Port:
+	    dellNetPFCTxTLVCounter,
+	    dellNetPFCRxTLVCounter,
+	    dellNetPFCRxTLVErrors.
+
+         Setting this object to FALSE has no effect. 
+         This object always returns FALSE when read."    
+    DEFVAL { false }
+    ::= { dellNetPFCPortEntry 6 }
+
+ dellNetPFCTxTLVCounter    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of the number of PFC TLV
+	 that are transmitted from this port. This counter will be 
+	 incremented every time when there is PFC TLV is generated 
+	 and transmitted to the LLDP."
+    ::= { dellNetPFCPortEntry 7 }
+
+ dellNetPFCRxTLVCounter    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of the number of PFC TLV
+	 that are received in this port. This counter will be 
+	 incremented every time when there is PFC TLV is received
+	 from the LLDP."
+    ::= { dellNetPFCPortEntry 8 }
+
+ dellNetPFCRxTLVErrors    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object is used to keep track of number of malformed TLVs received by PFC. 
+         This counter will be incremented every time a PFC-TLV is dropped by PFC."
+    ::= { dellNetPFCPortEntry 9 }
+
+-- ****************************************************************************
+--  dellNetDCbNotification subtree contains the objects related to notifications.
+-- ****************************************************************************
+ dellNetDCBTraps OBJECT IDENTIFIER ::= { dellNetDcbNotificationObjects 0 }
+ dellNetDCBTrapObjects OBJECT IDENTIFIER ::= { dellNetDcbNotificationObjects 1 }
+
+    dellNetDcbTrapPortNumber OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object refers to the Port number for which the DCBX feature
+	 is enabled. And will be used in sending the feature port specific Traps."
+    ::= { dellNetDCBTrapObjects 1 }
+
+ dellNetDcbPeerUpStatus OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "This object refers to the DCBX Peer Up or Peer down status 
+	 on the port.
+	 If the value is 'true', then the DCBX Peer will be present
+	 and UP. 
+	 If the value is 'false', then the DCBX Peer will be absent
+	 and DOWN."
+    ::= { dellNetDCBTrapObjects 2 }
+ 
+ dellNetETSModuleStatusTrap NOTIFICATION-TYPE
+    OBJECTS  {
+        dellNetETSModuleStatus 
+    }
+    STATUS   current
+    DESCRIPTION
+        "This trap is generated when there is a change in the ETS Module 
+        status. This trap is generated only if dellNetETSGlobalEnableTrap 
+        is enabled to send the trap."
+    ::= { dellNetDCBTraps 1 }
+
+ dellNetETSPortAdminStatusTrap NOTIFICATION-TYPE
+    OBJECTS  {
+            dellNetDcbTrapPortNumber,
+            dellNetETSAdminMode
+    }
+    STATUS   current
+    DESCRIPTION
+        "This trap is generated in the following conditions.
+        Whenever there is a change in the ETS Admin status and the 
+        dellNetETSGlobalEnableTrap is enabled to send the trap 
+        for ETS Admin mode change. "
+    ::= {dellNetDCBTraps 2 }   
+
+ dellNetETSPortPeerStatusTrap NOTIFICATION-TYPE
+    OBJECTS  {
+            dellNetDcbTrapPortNumber,
+	     dellNetDcbPeerUpStatus
+    }
+    STATUS   current
+    DESCRIPTION
+        "This trap is generated in the following conditions.
+        Whenever there is a change in the DCBX Peer Status and the 
+        dellNetETSGlobalEnableTrap is enabled
+        to send the trap for Peer Up or Peer Down."
+    ::= {dellNetDCBTraps 3 }   
+
+ dellNetETSPortDcbxOperStateTrap NOTIFICATION-TYPE
+     OBJECTS  {
+             dellNetDcbTrapPortNumber,
+             dellNetETSDcbxOperState
+     }
+     STATUS   current
+     DESCRIPTION
+         "This trap is generated in the following conditions.
+         Whenever there is a change in the ETS Operational State and the 
+         dellNetETSGlobalEnableTrap is enabled
+         to send the trap for ETS state machine state change."
+     ::= {dellNetDCBTraps 4 }   
+
+ dellNetPFCModuleStatusTrap NOTIFICATION-TYPE
+    OBJECTS  {
+            dellNetPFCModuleStatus 
+    }
+    STATUS   current
+    DESCRIPTION
+        "This trap is generated when there is a change in the PFC Module 
+        status is enabled. This trap is generated only if 
+        dellNetPFCGlobalEnableTrap is enabled to send the trap."
+    ::= { dellNetDCBTraps 5 }
+
+ dellNetPFCPortAdminStatusTrap NOTIFICATION-TYPE
+    OBJECTS  {
+            dellNetDcbTrapPortNumber,
+	     dellNetPFCAdminMode	
+    }
+    STATUS   current
+    DESCRIPTION
+        "This trap is generated in the following conditions.
+        Whenever there is a change in the PFC Admin Status and the 
+        dellNetPFCGlobalEnableTrap is enabled
+        to send the trap for PFC Admin Status change." 
+    ::= {dellNetDCBTraps 6 }   
+
+ dellNetPFCPortPeerStatusTrap NOTIFICATION-TYPE
+    OBJECTS  {
+            dellNetDcbTrapPortNumber,
+            dellNetDcbPeerUpStatus
+    }
+    STATUS   current
+    DESCRIPTION
+        "This trap is generated in the following conditions.
+        Whenever there is a change in the DCBX Peer Status and the 
+        dellNetPFCGlobalEnableTrap is enabled
+        to send the trap for Peer Up or Peer Down."
+    ::= {dellNetDCBTraps 7 }   
+
+ dellNetPFCPortDcbxOperStateTrap NOTIFICATION-TYPE
+    OBJECTS  {
+            dellNetDcbTrapPortNumber,
+            dellNetPFCDcbxOperState
+    }
+    STATUS   current
+    DESCRIPTION
+        "This trap is generated in the following conditions.
+        Whenever there is a change in the PFC Operational State and the 
+        dellNetPFCGlobalEnableTrap is enabled
+        to send the trap for PFC state machine state change."
+    ::= {dellNetDCBTraps 8 }   
+
+-- ############################################################################
+-- Conformance information
+-- ############################################################################
+
+  dellNetDCBMibConformance     OBJECT IDENTIFIER
+        ::=    { dellNetDcb 5 }
+
+  dellNetDCBMibCompliances     OBJECT IDENTIFIER
+        ::=    { dellNetDCBMibConformance 1 }
+
+  dellNetDCBMibGroups     OBJECT IDENTIFIER
+        ::=    { dellNetDCBMibConformance 2 }
+
+-- ############################################################################
+-- Compliance Statements 
+-- ############################################################################
+
+dellNetDCBMibComplianceRev1       MODULE-COMPLIANCE
+  STATUS                       current
+  DESCRIPTION 
+      "The compliance statement for Dell Networking OS product which implement the 
+      Dell Networking OS dcbx MIB. "
+  MODULE 
+  MANDATORY-GROUPS {
+      dellNetDcbSystemObjectGroup,
+      dellNetDcbxScalarsGroup,
+      dellNetDCBXPortTableGroup,
+      dellNetETSScalarsGroup,
+      dellNetETSPortTableGroup,
+      dellNetPFCScalarsGroup,
+      dellNetPFCPortTableGroup,
+      dellNetDCBNotificationObjectsGroup,
+      dellNetDCBNotificationsGroup
+  }
+  ::= { dellNetDCBMibCompliances 1 }
+
+dellNetDCBMibCompliance      MODULE-COMPLIANCE
+  STATUS                  obsolete
+  DESCRIPTION
+    "The compliance statement for Dell Networking OS product which implement the
+    Dell Networking OS dcb MIB. This module consists of the obsolete MIB objects."
+  MODULE 
+  MANDATORY-GROUPS {
+      dellNetDcbObjectGroup
+  }
+  ::= { dellNetDCBMibCompliances 2 }
+
+-- ##########################################################################
+-- Units of conformance
+-- ##########################################################################
+ 
+dellNetDcbSystemObjectGroup OBJECT-GROUP
+   OBJECTS {
+           dellNetDcbPfcMinThreshold,
+           dellNetDcbPfcMaxThreshold,
+           dellNetDcbMaxPfcProfiles
+   }
+   STATUS            current
+   DESCRIPTION 
+       "This group represents a collection of objects providing the 
+       DCB system information."
+   ::= { dellNetDCBMibGroups 1 }
+       
+ dellNetDcbObjectGroup      OBJECT-GROUP
+    OBJECTS { 
+          dellNetDcbETSAdminStatus,
+          dellNetDcbPFCAdminStatus
+    }
+    STATUS             obsolete
+    DESCRIPTION 
+        "This group represents a collection of objects providing the 
+        information on the DCB control parameters for a particular port."
+    ::= { dellNetDCBMibGroups 2 }
+
+ dellNetDcbxScalarsGroup    OBJECT-GROUP
+    OBJECTS {
+          dellNetDcbxGlobalTraceLevel,
+          dellNetDCBXGlobalVersion
+    }
+    STATUS             current
+    DESCRIPTION 
+        "This group represents the DCBX scalars in the DellNet DCB mib. "
+    ::= { dellNetDCBMibGroups 3 }
+ 
+ dellNetDCBXPortTableGroup     OBJECT-GROUP
+    OBJECTS  {
+          dellNetDCBXAdminStatus,
+          dellNetDCBXAutoCfgPortRole,
+          dellNetDCBXPortVersion,
+          dellNetDCBXPortSupportedTLVs,
+          dellNetDCBXPortConfigTLVsTxEnable,
+          dellNetDCBXPortOperVersion,
+          dellNetDCBXPortPeerMACaddress,
+          dellNetDCBXPortCfgSource,
+          dellNetDCBXOperStatus,
+          dellNetDCBXPortMultiplePeerCount,
+          dellNetDCBXPortPeerRemovedCount,
+          dellNetDCBXPortPeerOperVersionNum,
+          dellNetDCBXPortPeerMaxVersion,
+          dellNetDCBXPortSeqNum,
+          dellNetDCBXPortAckNum,
+          dellNetDCBXPortPeerRcvdAckNum,
+          dellNetDCBXPortTxCount,
+          dellNetDCBXPortRxCount,
+          dellNetDCBXPortErrorFramesCount
+    }
+    STATUS             current
+    DESCRIPTION 
+        "This group contains the collection of objects describing the 
+        DCBX specific information on the particular port. "
+    ::= { dellNetDCBMibGroups 4 }
+
+ dellNetETSScalarsGroup  OBJECT-GROUP
+    OBJECTS {
+          dellNetETSSystemControl,
+          dellNetETSModuleStatus,
+          dellNetETSClearCounters,
+          dellNetETSGlobalEnableTrap
+    }
+    STATUS            current
+    DESCRIPTION
+        "This object represents the collection of objects providing the ETS 
+        Information on the system."
+    ::= { dellNetDCBMibGroups 5 }
+
+ dellNetETSPortTableGroup    OBJECT-GROUP
+    OBJECTS  {
+          dellNetETSAdminMode,
+          dellNetETSDcbxOperState,
+          dellNetETSDcbxStateMachine,
+          dellNetETSOperStatus,
+          dellNetETSClearTLVCounters,
+          dellNetETSConfTxTLVCounter,
+          dellNetETSConfRxTLVCounter,
+          dellNetETSConfRxTLVErrors,
+          dellNetETSRecoTxTLVCounter,
+          dellNetETSRecoRxTLVCounter,
+          dellNetETSRecoRxTLVErrors
+    }
+    STATUS            current
+    DESCRIPTION
+        "This object group represents the collection of objects providing 
+        ETS specific status information on a specific port."
+    ::= { dellNetDCBMibGroups 6 }
+
+ dellNetPFCScalarsGroup     OBJECT-GROUP
+    OBJECTS   {
+         dellNetPFCSystemControl,
+         dellNetPFCModuleStatus,
+         dellNetPFCClearCounters,
+         dellNetPFCGlobalEnableTrap
+    }
+    STATUS            current
+    DESCRIPTION
+        "This group represents a collection of objects providing the system
+        information related to PFC."
+    ::= { dellNetDCBMibGroups 7 }
+
+ dellNetPFCPortTableGroup   OBJECT-GROUP 
+    OBJECTS {
+         dellNetPFCAdminMode,
+         dellNetPFCDcbxOperState,
+         dellNetPFCDcbxStateMachine,
+         dellNetPFCOperStatus,
+         dellNetPFCClearTLVCounters,
+         dellNetPFCTxTLVCounter,
+         dellNetPFCRxTLVCounter,
+         dellNetPFCRxTLVErrors
+    }
+    STATUS            current
+    DESCRIPTION
+        "This group represents a collection of objects providing the
+        PFC specific status information per port. "
+    ::= { dellNetDCBMibGroups 8 }
+
+ dellNetDCBNotificationObjectsGroup    OBJECT-GROUP
+    OBJECTS {
+         dellNetDcbTrapPortNumber,
+         dellNetDcbPeerUpStatus
+    }
+    STATUS            current
+    DESCRIPTION
+        "This object group represents the collection of objects used by the 
+        notification group dellNetDCBNotificationsGroup."
+    ::= { dellNetDCBMibGroups 9 }
+         
+ dellNetDCBNotificationsGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+         dellNetETSModuleStatusTrap,
+         dellNetETSPortAdminStatusTrap,
+         dellNetETSPortPeerStatusTrap,
+         dellNetETSPortDcbxOperStateTrap,
+         dellNetPFCModuleStatusTrap,
+         dellNetPFCPortAdminStatusTrap,
+         dellNetPFCPortPeerStatusTrap,
+         dellNetPFCPortDcbxOperStateTrap
+    }
+    STATUS               current
+    DESCRIPTION
+        "A collection on notification objects in the DellNet-DCB mib"
+    ::= { dellNetDCBMibGroups 10 }
+
+
+END
+

@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+-- Copyright 2010-2014 Ruckus Wireless, Inc. All rights reserved.
 --
 -- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
 -- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
@@ -20,19 +20,19 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 ruckusTCMIB MODULE-IDENTITY
-    LAST-UPDATED "201010150800Z"
+    LAST-UPDATED "201405191100Z"
     ORGANIZATION "Ruckus Wireless, Inc."
     CONTACT-INFO
         "Ruckus Wireless, Inc.
 
-        Postal:
         350 West Java Dr.
         Sunnyvale, CA 94089
         USA
 
-        EMail: support@ruckuswireless.com
-
-        Phone: +1-650-265-4200"
+        T: +1 (650) 265-4200
+        F: +1 (408) 738-2065
+        EMail: info@ruckuswireless.com
+        Web: www.ruckuswireless.com"
     DESCRIPTION
         "This is the mib module for defining all the textual
         conventions."
@@ -49,7 +49,8 @@ RuckusRadioMode ::= TEXTUAL-CONVENTION
             ieee802dot11Mixed(3),
             ieee802dot11a(4),
             ieee802dot11ng(5),
-            ieee802dot11na(6) }
+            ieee802dot11na(6),
+            ieee802dot11ac(7) }
 
 
 RuckusWEPKey ::= TEXTUAL-CONVENTION
@@ -483,6 +484,92 @@ RuckusZDAPManagementAdminControl ::= TEXTUAL-CONVENTION
             delete(1),
             associated(2) }
 
+
+RuckusSystemNodeStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The System status."
+     SYNTAX INTEGER {
+             out-of-service(0),
+	     in-service(8)}
+
+RuckusSystemClusterStatus ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The Cluster status."
+     SYNTAX INTEGER {
+             in-service(0),
+             out-of-service(1),
+	     maintenance(2),
+	     network-partition-suspected(4) }
+
+RuckusUUID ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "4x-2x-2x-2x-6x"
+    STATUS current
+    DESCRIPTION
+        "Represents a UUID over 16 hex number"
+    SYNTAX       OCTET STRING (SIZE (16))
+
+RuckusMeshRoles ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "AP Mesh Roles."
+     SYNTAX INTEGER {
+             disable(0),
+             rap(1),
+	     map(2),
+	     emap(3),
+	     mesh-is-down(4),
+	     mesh-role-is-undefined(5) }
+
+RuckusUUIDType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "UUID type of RuckusSummaryApTable index"
+     SYNTAX INTEGER {
+             domain(1),
+             zone(2),
+	     apgroup(3)}
+
+RuckusWLANAuthMethodType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the security mode.
+	 if wep, only open;
+	 if wpa, open,wpa-eap-802-1x,auto ; for auto,is open,wpa-eap-802-1x"
+     SYNTAX INTEGER {
+             open(1),
+             wep-shared(2),
+	     auto(3),
+	     wpa-eap-802-1x(4)}
+
+RuckusWLANEncryptionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the security mode of this WLAN."
+     SYNTAX INTEGER {
+             open(1),
+             wep(2),
+	     wpa(3)}
+
+RuckusChannelWidthType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Specifies the channel width."
+     SYNTAX INTEGER {
+             cw10(10),
+             cw20(20),
+             cw2040(2040),
+	     cw40(40),
+	     cw80(80)}
+
+RuckusAuthStatusType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The authorized status."
+     SYNTAX INTEGER {
+             unauthorized(1),
+             authorized(2)}
 
 -- Scalars and Tables
 --

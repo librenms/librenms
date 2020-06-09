@@ -10,7 +10,7 @@ if (Config::get('enable_inventory')) {
         include Config::get('install_dir') . "/includes/discovery/entity-physical/{$device['os']}.inc.php";
     }
 
-    // Delete any entries that have not bee accounted for.
+    // Delete any entries that have not been accounted for.
     $sql = 'SELECT * FROM `entPhysical` WHERE `device_id` = ?';
     foreach (dbFetchRows($sql, array($device['device_id'])) as $test) {
         $id = $test['entPhysicalIndex'];

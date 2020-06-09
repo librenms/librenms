@@ -8,13 +8,13 @@
                     "sysDescr": "S5800 FHN USP (R) Software, Version V210R240,Hw Version 2.0,Copyrig",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg"
+                    "icon": "fiberhome.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "V210R240",
                     "hardware": "FHN S5800 V 2.0",
                     "features": null,
-                    "location": "<private>",
                     "os": "fiberhome-switch",
                     "type": "network",
                     "serial": null,
-                    "icon": "fiberhome.svg"
+                    "icon": "fiberhome.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -48,6 +48,7 @@
                     "sensor_index": "3222475008",
                     "sensor_type": "cpuStatus",
                     "sensor_descr": "CPU Status",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -71,6 +72,7 @@
                     "sensor_index": "1611796736",
                     "sensor_type": "powerState",
                     "sensor_descr": "Supply Power-1/1",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -94,6 +96,7 @@
                     "sensor_index": "1612845312",
                     "sensor_type": "powerState",
                     "sensor_descr": "Supply Power-1/2",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -117,6 +120,7 @@
                     "sensor_index": "2148733184",
                     "sensor_type": "fiberhome-switch",
                     "sensor_descr": "Temper-1/0/1",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 36,
@@ -140,6 +144,7 @@
                     "sensor_index": "3759345920",
                     "sensor_type": "fiberhome-switch",
                     "sensor_descr": "Int. Voltage-1/0/1",
+                    "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 11.819,
@@ -163,6 +168,7 @@
                     "sensor_index": "3760394496",
                     "sensor_type": "fiberhome-switch",
                     "sensor_descr": "Int. Voltage-1/0/2",
+                    "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 0.998,
@@ -186,6 +192,7 @@
                     "sensor_index": "3761443072",
                     "sensor_type": "fiberhome-switch",
                     "sensor_descr": "Int. Voltage-1/0/3",
+                    "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 3.264,
@@ -209,6 +216,7 @@
                     "sensor_index": "3762491648",
                     "sensor_type": "fiberhome-switch",
                     "sensor_descr": "Int. Voltage-1/0/4",
+                    "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 2.56,
@@ -232,6 +240,7 @@
                     "sensor_index": "3763540224",
                     "sensor_type": "fiberhome-switch",
                     "sensor_descr": "Int. Voltage-1/0/5",
+                    "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 1.792,
@@ -255,6 +264,7 @@
                     "sensor_index": "3764588800",
                     "sensor_type": "fiberhome-switch",
                     "sensor_descr": "Int. Voltage-1/0/6",
+                    "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 1.19,
@@ -319,32 +329,32 @@
                     "entPhysicalIndex": null,
                     "hrDeviceIndex": null,
                     "mempool_type": "fiberhome-switch",
-                    "mempool_precision": "1",
+                    "mempool_precision": 1,
                     "mempool_descr": "Memory-1/0/1",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "3491959040",
                     "entPhysicalIndex": null,
                     "hrDeviceIndex": null,
                     "mempool_type": "fiberhome-switch",
-                    "mempool_precision": "1",
+                    "mempool_precision": 1,
                     "mempool_descr": "Memory-1/0/2",
-                    "mempool_perc": "0",
-                    "mempool_used": "0",
-                    "mempool_free": "0",
-                    "mempool_total": "0",
+                    "mempool_perc": 0,
+                    "mempool_used": 0,
+                    "mempool_free": 0,
+                    "mempool_total": 0,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 }
             ]
         },
@@ -355,32 +365,86 @@
                     "entPhysicalIndex": null,
                     "hrDeviceIndex": null,
                     "mempool_type": "fiberhome-switch",
-                    "mempool_precision": "1",
+                    "mempool_precision": 1,
                     "mempool_descr": "Memory-1/0/1",
-                    "mempool_perc": "74",
-                    "mempool_used": "65502560",
-                    "mempool_free": "23090592",
-                    "mempool_total": "88593152",
+                    "mempool_perc": 74,
+                    "mempool_used": 65502560,
+                    "mempool_free": 23090592,
+                    "mempool_total": 88593152,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "3491959040",
                     "entPhysicalIndex": null,
                     "hrDeviceIndex": null,
                     "mempool_type": "fiberhome-switch",
-                    "mempool_precision": "1",
+                    "mempool_precision": 1,
                     "mempool_descr": "Memory-1/0/2",
-                    "mempool_perc": "67",
-                    "mempool_used": "89771840",
-                    "mempool_free": "44445888",
-                    "mempool_total": "134217728",
+                    "mempool_perc": 67,
+                    "mempool_used": 89771840,
+                    "mempool_free": 44445888,
+                    "mempool_total": 134217728,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
-                    "mempool_deleted": "0",
-                    "mempool_perc_warn": "75"
+                    "mempool_deleted": 0,
+                    "mempool_perc_warn": 90
+                }
+            ]
+        }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.3222475008",
+                    "processor_index": "3222475008",
+                    "processor_type": "fiberhome-switch",
+                    "processor_usage": 8,
+                    "processor_descr": "Cpu-1/0/1",
+                    "processor_precision": 100,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.",
+                    "processor_index": "",
+                    "processor_type": "fiberhome-switch",
+                    "processor_usage": 0,
+                    "processor_descr": "cpuIndexDescr",
+                    "processor_precision": 100,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.3222475008",
+                    "processor_index": "3222475008",
+                    "processor_type": "fiberhome-switch",
+                    "processor_usage": 0,
+                    "processor_descr": "Cpu-1/0/1",
+                    "processor_precision": 100,
+                    "processor_perc_warn": 75
+                },
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.3807.1.8012.1.4.1.1.2.",
+                    "processor_index": "",
+                    "processor_type": "fiberhome-switch",
+                    "processor_usage": 0,
+                    "processor_descr": "cpuIndexDescr",
+                    "processor_precision": 100,
+                    "processor_perc_warn": 75
                 }
             ]
         }

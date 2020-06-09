@@ -25,22 +25,38 @@
 
 namespace App\Models;
 
-class Component extends BaseModel
+class Component extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $table = 'component';
+    protected $fillable = ['device_id', 'type', 'label', 'status', 'disabled', 'ignore', 'error'];
 
-    // ---- Query Scopes ----
+    // ---- Accessors/Mutators ----
 
-    public function scopeHasAccess($query, User $user)
+    public function setStatusAttribute($status)
     {
-        return $this->hasDeviceAccess($query, $user);
+        $this->attributes['status'] = (int)$status;
+    }
+
+    public function setDisabledAttribute($disabled)
+    {
+        $this->attributes['disabled'] = (int)$disabled;
+    }
+
+    public function setIgnoreAttribute($ignore)
+    {
+        $this->attributes['ignore'] = (int)$ignore;
     }
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function logs()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id');
+        return $this->hasMany(\App\Models\ComponentStatusLog::class, 'component_id', 'id');
+    }
+
+    public function prefs()
+    {
+        return $this->hasMany(\App\Models\ComponentPref::class, 'component', 'id');
     }
 }

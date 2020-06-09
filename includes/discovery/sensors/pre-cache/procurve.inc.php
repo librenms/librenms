@@ -24,7 +24,7 @@
  */
 
 echo 'hpicfSensorTable ';
-$pre_cache['procurve_hpicfSensorTable'] = snmpwalk_cache_oid($device, 'hpicfSensorTable', array(), 'HP-ICF-CHASSIS', null, '-OeQUs');
+$pre_cache['procurve_hpicfSensorTable'] = snmpwalk_cache_oid($device, 'hpicfSensorTable', [], 'HP-ICF-CHASSIS', null, '-OeQUs');
 
 echo 'hpicfXcvrInfoTable ';
-$pre_cache['procurve_hpicfXcvrInfoTable'] = snmpwalk_cache_oid($device, 'hpicfXcvrInfoTable', array(), 'HP-ICF-TRANSCEIVER-MIB', null, '-OeQUs');
+$pre_cache['procurve_hpicfXcvrInfoTable'] = snmpwalk_cache_oid($device, 'hpicfXcvrInfoTable', [], 'HP-ICF-TRANSCEIVER-MIB', null, '-OeQUs');

@@ -25,26 +25,29 @@
  */
 
 if (!isset($init_modules)) {
-    $init_modules = array('nodb');
-    require __DIR__ . '/includes/init.php';
-
     $opts = getopt('ldh:u:p:n:t:s:');
 
-    if (isset($opts['h'])) {
-        dbConnect(
-            isset($opts['h']) ? $opts['h'] : null,
-            isset($opts['u']) ? $opts['u'] : '',
-            isset($opts['p']) ? $opts['p'] : '',
-            isset($opts['n']) ? $opts['n'] : '',
-            isset($opts['t']) ? $opts['t'] : null,
-            isset($opts['s']) ? $opts['s'] : null
-        );
-    } else {
-        // use configured database credentials
-        \LibreNMS\DB\Eloquent::boot();
+    $map = [
+        'h' => 'DB_HOST',
+        'u' => 'DB_USERNAME',
+        'p' => 'DB_PASSWORD',
+        'n' => 'DB_DATABASE',
+        't' => 'DB_PORT',
+        's' => 'DB_SOCKET',
+    ];
+
+    // set env variables
+    foreach ($map as $opt => $env_name) {
+        if (isset($opts[$opt])) {
+            putenv("$env_name=" . $opts[$opt]);
+        }
     }
 
+    $init_modules = ['nodb', 'laravel'];
+    require __DIR__ . '/includes/init.php';
+
     set_debug(isset($opts['d']));
+
     $skip_schema_lock = isset($opts['l']);
 }
 

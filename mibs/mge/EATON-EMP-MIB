@@ -1,0 +1,272 @@
+EATON-EMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+      MODULE-IDENTITY, OBJECT-TYPE, Integer32 
+           FROM SNMPv2-SMI
+      DisplayString
+           FROM SNMPv2-TC
+      MODULE-COMPLIANCE, OBJECT-GROUP
+           FROM SNMPv2-CONF
+      xupsEnvironment
+           FROM EATON-OIDS;
+
+eatonEMPMIB MODULE-IDENTITY
+    LAST-UPDATED "200703120000Z"
+    ORGANIZATION "Eaton Corporation"
+    CONTACT-INFO
+        "Eaton Power Quality Technical Support (PQTS) group
+            www.eaton.com/powerxpert 
+            Technical Resource Center phone numbers 
+			United States:  1.800.843.9433 or 919.870.3028
+			Canada:  1.800.461.9166 ext. 260
+			All other countries:  Call your local service representative." 
+    DESCRIPTION
+        "The MIB module for Eaton Environment Monitoring Probes (EMP).
+         The elements of this MIB have been extracted from the 
+         Eaton PowerMIB and placed in this separate MIB file for convenience.
+
+        Copyright (C) Eaton Corporation (2007)."
+
+    REVISION        "200703120000Z"
+    DESCRIPTION
+        "Initial Version of eatonEMPMIB."
+
+    ::= { xupsEnvironment 0 }
+
+--  ::= { enterprises 534  8  1  }
+-- eatonEMPMIB { iso org(3) dod(6) internet(1) private(4)
+--       enterprises(1) eaton(534) xupsMIB(1) xupsEnvironment(6) (0) }
+
+
+--
+-- EMP group
+--
+-- The objects defined in this group are provided by the EMP.
+-- They are Temperature and Humidity readings and alarming limits,
+-- and the (two) contacts readings and setup information.
+-- These objects are considered "Remote" since the EMP is a
+-- separate probe from the Eaton device or gateway it is connected to.
+--
+-- Notices/Traps: two different types of traps may be sent in response
+-- to EMP changes, depending upon the type of device the EMP is attached to.
+-- If connected to a UPS device, normally the PowerMIB traps are sent:
+--      xupstdRemoteTempBad
+--      xupstdRemoteHumidityBad
+--      xupstdContactActiveNotice
+--      xupstdContactInactiveNotice
+-- If connected to a Toolkit-enabled PowerXpert Gateway, Toolkit traps are sent:
+--      powerChainCriticalAlarm
+--      powerChainCautionaryAlarm
+--      powerChainAlarmAcknowledged
+--      powerChainAlarmCleared
+-- Both sets of traps are defined in their respective MIB files.
+
+
+xupsEnvRemoteTemp OBJECT-TYPE
+    SYNTAX  Integer32 (-100..200)   
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The reading of an EMP's temperature sensor."
+    ::= { xupsEnvironment  5 }
+
+xupsEnvRemoteHumidity OBJECT-TYPE
+    SYNTAX  Integer32 (0..100)  
+    UNITS       "percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The reading of an EMP's humidity sensor."
+    ::= { xupsEnvironment  6 }
+
+--
+-- The Environmental Contact Sensing Table
+--      Contains the table for monitoring all contacts (digital 
+--      inputs, normally 2 in an EMP).
+--
+
+xupsEnvNumContacts OBJECT-TYPE
+    SYNTAX  Integer32 (1..1024)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The number of Contacts in the xupsContactSenseTable.
+        This object indicates the number of rows in the 
+        xupsContactSenseTable."
+    ::= { xupsEnvironment  7 }
+
+xupsContactSenseTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF XupsContactsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "A list of Contact Sensing table entries.  
+        The number of entries is given by the value of 
+        xupsEnvNumContacts."
+    ::= { xupsEnvironment  8 }
+
+xupsContactsTableEntry OBJECT-TYPE
+    SYNTAX  XupsContactsTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "An entry containing information applicable 
+        to a particular Contact input."
+    INDEX   { xupsContactIndex }
+    ::= { xupsContactSenseTable  1 }
+
+XupsContactsTableEntry ::= SEQUENCE {
+    xupsContactIndex   Integer32,
+    xupsContactType    INTEGER,
+    xupsContactState   INTEGER,
+    xupsContactDescr   DisplayString
+    }
+
+xupsContactIndex OBJECT-TYPE
+    SYNTAX  Integer32 (1..1024)
+    MAX-ACCESS  read-only           -- actually not-accessible
+    STATUS  current
+    DESCRIPTION
+       "The Contact identifier; identical to the Contact Number.
+        This object is not-accessible to MIB browsers, but had to be changed to
+        read-only to satisfy SMIv2 syntax checkers if it is included in traps."
+    ::= { xupsContactsTableEntry  1 }
+
+xupsContactType OBJECT-TYPE
+    SYNTAX  INTEGER {
+        normallyOpen(1),            -- or Input Normally High
+        normallyClosed(2),          -- or Input Normally Low
+        anyChange(3),               -- No normal Open/Closed state
+        notUsed(4)                  -- Contact not in service or not alarming
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "The normal state for this contact.  The 'other' (not 'Normally')
+        state is the Active state for generating the xupstdContactActiveNotice
+        trap.  If anyChange(3) is selected, then this trap is sent
+        any time the contact changes to either Open or Closed.
+        No traps are sent if the Contact is set to notUsed(4).
+        In many cases, the configuration for Contacts may be done by other 
+        means, so this object may be read-only."
+    ::= { xupsContactsTableEntry  2 }
+
+xupsContactState OBJECT-TYPE
+    SYNTAX  INTEGER {
+        open(1),
+        closed(2),
+        openWithNotice(3),
+        closedWithNotice(4)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "The current state of the Contact input;
+        the value is based on the open/closed input state 
+        and the setting for xupsContactType.
+        When entering the openWithNotice(3) and closedWithNotice(4) 
+        states, no entries added to the xupsAlarmTable, but
+        the xupstdContactActiveNotice trap is sent."
+    ::= { xupsContactsTableEntry  3 }
+
+xupsContactDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..63))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+       "A label identifying the Contact.  This object should be
+        set by the administrator."
+    ::= { xupsContactsTableEntry  4 }
+
+xupsEnvRemoteTempLowerLimit OBJECT-TYPE
+    SYNTAX  Integer32 (-100..200) 
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Lower Limit of the EMP temperature; if xupsEnvRemoteTemp 
+        falls below this value, the xupsRemoteTempBad alarm will occur."
+    ::= { xupsEnvironment  9 }
+
+xupsEnvRemoteTempUpperLimit OBJECT-TYPE
+    SYNTAX  Integer32 (-100..200) 
+    UNITS       "degrees Centigrade"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Upper Limit of the EMP temperature; if xupsEnvRemoteTemp 
+        rises above this value, the xupsRemoteTempBad alarm will occur.
+        This value should be greater than xupsEnvRemoteTempLowerLimit."
+    ::= { xupsEnvironment  10 }
+
+xupsEnvRemoteHumidityLowerLimit OBJECT-TYPE
+    SYNTAX  Integer32 (0..100) 
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Lower Limit of the EMP humidity reading; if xupsEnvRemoteHumidity
+        falls below this value, the xupsRemoteHumidityBad alarm will occur."
+    ::= { xupsEnvironment  11 }
+
+xupsEnvRemoteHumidityUpperLimit OBJECT-TYPE
+    SYNTAX  Integer32 (0..100) 
+    UNITS       "percent"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "The Upper Limit of the EMP humidity reading; if xupsEnvRemoteHumidity 
+        rises above this value, the xupsRemoteHumidityBad alarm will occur.
+        This value should be greater than xupsEnvRemoteHumidityLowerLimit."
+    ::= { xupsEnvironment  12 }
+
+
+--
+-- Traps / Notifications for the EMP in the PowerMIB style
+-- The special EMP traps are not normally provided by Power Xpert Gateways (which use
+-- the PXG-style traps instead) but could be provided by PowerMIB implementations
+-- These are found in the PowerMIB:
+--    xupstdContactActiveNotice   
+--    xupstdContactInactiveNotice 
+--    xupstdRemoteTempBad         
+--    xupstdRemoteHumidityBad     
+
+
+--
+-- Conformance-related definitions
+--
+eatonEMPConformance OBJECT IDENTIFIER ::= { eatonEMPMIB 2 }
+
+eatonEMPGroup  OBJECT-GROUP
+    OBJECTS { xupsEnvRemoteTemp, xupsEnvRemoteHumidity,
+              xupsEnvRemoteTempLowerLimit, xupsEnvRemoteTempUpperLimit,
+              xupsEnvRemoteHumidityLowerLimit, xupsEnvRemoteHumidityUpperLimit  }
+    STATUS  current
+    DESCRIPTION
+        "The EMP scalar objects."
+    ::= { eatonEMPConformance 1 }
+
+eatonEMPTableGroup  OBJECT-GROUP
+    OBJECTS { xupsEnvNumContacts, xupsContactIndex, xupsContactType,    
+              xupsContactState, xupsContactDescr }
+    STATUS  current
+    DESCRIPTION
+        "The EMP Contacts Table objects."
+    ::= { eatonEMPConformance 2 }
+
+
+eatonEMPSimpleCompliance MODULE-COMPLIANCE
+    STATUS     current
+    DESCRIPTION
+       "The compliance statement for a normal EMP."
+    MODULE -- this module
+       MANDATORY-GROUPS  { eatonEMPGroup, eatonEMPTableGroup }
+    ::= { eatonEMPConformance 4 }
+
+
+
+
+
+END
+

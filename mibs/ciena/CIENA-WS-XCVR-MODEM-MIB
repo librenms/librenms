@@ -1,0 +1,507 @@
+-- This file was automatically generated from ciena-ws-xcvr-modem.yang. Do not edit.
+
+CIENA-WS-XCVR-MODEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    Decimal2Dig, EnabledDisabledEnum, XcvrId, YesNoEnum
+        FROM CIENA-WS-TYPEDEFS-MIB
+    cwsXcvrVendorDiagnosticMonitoringEntry
+        FROM CIENA-WS-XCVR-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI;
+
+cienaWsXcvrModemMIB MODULE-IDENTITY
+    LAST-UPDATED "201703020000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This YANG module defines Ciena's XCVR modem specific data for the NETCONF protocol. It will augment the ciena-ws-xcvr module."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3"
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201603030000Z"
+    DESCRIPTION "Waveserver Rel 1.1 revised.  
+Added leaf 'edfa' to 'modem-transmitter-technology' container."
+    REVISION "201502250000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 16 }
+
+cwsXcvrAugXcvrModemVendorDiagnosticMonitoringTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrAugXcvrModemVendorDiagnosticMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrModemMIB 3 }
+
+cwsXcvrAugXcvrModemVendorDiagnosticMonitoringEntry OBJECT-TYPE
+    SYNTAX CwsXcvrAugXcvrModemVendorDiagnosticMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrAugXcvrModemVendorDiagnosticMonitoringTable."
+    AUGMENTS { cwsXcvrVendorDiagnosticMonitoringEntry }
+    ::= { cwsXcvrAugXcvrModemVendorDiagnosticMonitoringTable 1 }
+
+CwsXcvrAugXcvrModemVendorDiagnosticMonitoringEntry ::= SEQUENCE { 
+    cwsXcvrModemVendorDiagnosticMonitoringDiagnosticSupport YesNoEnum,
+    cwsXcvrModemVendorDiagnosticMonitoringDispersionMeasurement YesNoEnum 
+}
+
+cwsXcvrModemVendorDiagnosticMonitoringDiagnosticSupport OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Diagnostic Monitoring, is Diagnostic Support turned on."
+    ::= { cwsXcvrAugXcvrModemVendorDiagnosticMonitoringEntry 1 }
+
+cwsXcvrModemVendorDiagnosticMonitoringDispersionMeasurement OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Diagnostic Monitoring, is Dispersion Measurement turned on."
+    ::= { cwsXcvrAugXcvrModemVendorDiagnosticMonitoringEntry 2 }
+
+cwsXcvrModemTransmitterTechnologyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrModemTransmitterTechnologyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrModemMIB 4 }
+
+cwsXcvrModemTransmitterTechnologyEntry OBJECT-TYPE
+    SYNTAX CwsXcvrModemTransmitterTechnologyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrModemTransmitterTechnologyTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrModemTransmitterTechnologyTableSnmpKey }
+    ::= { cwsXcvrModemTransmitterTechnologyTable 1 }
+
+CwsXcvrModemTransmitterTechnologyEntry ::= SEQUENCE { 
+    cwsXcvrModemTransmitterTechnologyTableSnmpKey Integer32,
+    cwsXcvrModemTransmitterTechnologyWavelengthControl INTEGER,
+    cwsXcvrModemTransmitterTechnologyTunable YesNoEnum,
+    cwsXcvrModemTransmitterTechnologyWavelengthMin Decimal2Dig,
+    cwsXcvrModemTransmitterTechnologyWavelengthMax Decimal2Dig,
+    cwsXcvrModemTransmitterTechnologyWavelengthTolerance Unsigned32,
+    cwsXcvrModemTransmitterTechnologyFrequencyMin Unsigned32,
+    cwsXcvrModemTransmitterTechnologyFrequencyMax Unsigned32,
+    cwsXcvrModemTransmitterTechnologyTxDispersionMin Unsigned32,
+    cwsXcvrModemTransmitterTechnologyTxDispersionMax Unsigned32,
+    cwsXcvrModemTransmitterTechnologyEdfa YesNoEnum 
+}
+
+cwsXcvrModemTransmitterTechnologyTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrModemTransmitterTechnology"
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 1 }
+
+cwsXcvrModemTransmitterTechnologyWavelengthControl OBJECT-TYPE
+    SYNTAX INTEGER { none(0), active(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Wavelength Control."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 2 }
+
+cwsXcvrModemTransmitterTechnologyTunable OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Tunable."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 3 }
+
+cwsXcvrModemTransmitterTechnologyWavelengthMin OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Wavelength Min value, in nanometers."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 4 }
+
+cwsXcvrModemTransmitterTechnologyWavelengthMax OBJECT-TYPE
+    SYNTAX Decimal2Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Wavelength Max value, in nanometers."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 5 }
+
+cwsXcvrModemTransmitterTechnologyWavelengthTolerance OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Wavelength Tolerance value, in nanometers."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 6 }
+
+cwsXcvrModemTransmitterTechnologyFrequencyMin OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Frequency Min."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 7 }
+
+cwsXcvrModemTransmitterTechnologyFrequencyMax OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Frequency Max."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 8 }
+
+cwsXcvrModemTransmitterTechnologyTxDispersionMin OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Tx Dispersion Min (ps/nm)."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 9 }
+
+cwsXcvrModemTransmitterTechnologyTxDispersionMax OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Modem Transmitter Technology, Tx Dispersion Max (ps/nm)."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 10 }
+
+cwsXcvrModemTransmitterTechnologyEdfa OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether this modem is an EDFA modem."
+    ::= { cwsXcvrModemTransmitterTechnologyEntry 11 }
+
+cwsXcvrModemModulationSupportTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrModemModulationSupportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrModemMIB 5 }
+
+cwsXcvrModemModulationSupportEntry OBJECT-TYPE
+    SYNTAX CwsXcvrModemModulationSupportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrModemModulationSupportTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrModemModulationSupportTableSnmpKey }
+    ::= { cwsXcvrModemModulationSupportTable 1 }
+
+CwsXcvrModemModulationSupportEntry ::= SEQUENCE { 
+    cwsXcvrModemModulationSupportTableSnmpKey Integer32,
+    cwsXcvrModemModulationSupportModulation16qam YesNoEnum,
+    cwsXcvrModemModulationSupportModulationQpsk YesNoEnum,
+    cwsXcvrModemModulationSupportModulationBpsk YesNoEnum,
+    cwsXcvrModemModulationSupportModulation8qam YesNoEnum 
+}
+
+cwsXcvrModemModulationSupportTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrModemModulationSupport"
+    ::= { cwsXcvrModemModulationSupportEntry 1 }
+
+cwsXcvrModemModulationSupportModulation16qam OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem supports Modulation for 16QAM."
+    ::= { cwsXcvrModemModulationSupportEntry 2 }
+
+cwsXcvrModemModulationSupportModulationQpsk OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem supports Modulation for QPSK."
+    ::= { cwsXcvrModemModulationSupportEntry 3 }
+
+cwsXcvrModemModulationSupportModulationBpsk OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem supports Modulation for BPSK."
+    ::= { cwsXcvrModemModulationSupportEntry 4 }
+
+cwsXcvrModemModulationSupportModulation8qam OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem supports Modulation for 8QAM."
+    ::= { cwsXcvrModemModulationSupportEntry 5 }
+
+cwsXcvrModemTransportProtocolsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrModemTransportProtocolsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrModemMIB 6 }
+
+cwsXcvrModemTransportProtocolsEntry OBJECT-TYPE
+    SYNTAX CwsXcvrModemTransportProtocolsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrModemTransportProtocolsTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrModemTransportProtocolsTableSnmpKey }
+    ::= { cwsXcvrModemTransportProtocolsTable 1 }
+
+CwsXcvrModemTransportProtocolsEntry ::= SEQUENCE { 
+    cwsXcvrModemTransportProtocolsTableSnmpKey Integer32,
+    cwsXcvrModemTransportProtocolsOtnBookended YesNoEnum,
+    cwsXcvrModemTransportProtocolsOtnInterworking YesNoEnum,
+    cwsXcvrModemTransportProtocolsEthernet YesNoEnum 
+}
+
+cwsXcvrModemTransportProtocolsTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrModemTransportProtocols"
+    ::= { cwsXcvrModemTransportProtocolsEntry 1 }
+
+cwsXcvrModemTransportProtocolsOtnBookended OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Transport Protocols OTN Bookended supported or not."
+    ::= { cwsXcvrModemTransportProtocolsEntry 2 }
+
+cwsXcvrModemTransportProtocolsOtnInterworking OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Transport Protocols OTN Interworking supported or not."
+    ::= { cwsXcvrModemTransportProtocolsEntry 3 }
+
+cwsXcvrModemTransportProtocolsEthernet OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Transport Protocols Ethernet supported or not."
+    ::= { cwsXcvrModemTransportProtocolsEntry 4 }
+
+cwsXcvrModemLineSystemSupportTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrModemLineSystemSupportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrModemMIB 7 }
+
+cwsXcvrModemLineSystemSupportEntry OBJECT-TYPE
+    SYNTAX CwsXcvrModemLineSystemSupportEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrModemLineSystemSupportTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrModemLineSystemSupportTableSnmpKey }
+    ::= { cwsXcvrModemLineSystemSupportTable 1 }
+
+CwsXcvrModemLineSystemSupportEntry ::= SEQUENCE { 
+    cwsXcvrModemLineSystemSupportTableSnmpKey Integer32,
+    cwsXcvrModemLineSystemSupportColoured YesNoEnum,
+    cwsXcvrModemLineSystemSupportColourless YesNoEnum,
+    cwsXcvrModemLineSystemSupportContentionless YesNoEnum,
+    cwsXcvrModemLineSystemSupportCoherentSelectColoured YesNoEnum,
+    cwsXcvrModemLineSystemSupportCoherentSelectColourless YesNoEnum,
+    cwsXcvrModemLineSystemSupportThirdParty YesNoEnum 
+}
+
+cwsXcvrModemLineSystemSupportTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrModemLineSystemSupport"
+    ::= { cwsXcvrModemLineSystemSupportEntry 1 }
+
+cwsXcvrModemLineSystemSupportColoured OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem support coloured Line System or not."
+    ::= { cwsXcvrModemLineSystemSupportEntry 2 }
+
+cwsXcvrModemLineSystemSupportColourless OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem support colourless Line System or not."
+    ::= { cwsXcvrModemLineSystemSupportEntry 3 }
+
+cwsXcvrModemLineSystemSupportContentionless OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem support Contentionless Line System or not."
+    ::= { cwsXcvrModemLineSystemSupportEntry 4 }
+
+cwsXcvrModemLineSystemSupportCoherentSelectColoured OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem support Coherent Select Coloured Line System or not."
+    ::= { cwsXcvrModemLineSystemSupportEntry 5 }
+
+cwsXcvrModemLineSystemSupportCoherentSelectColourless OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem support Coherent Select Colourless Line System or not."
+    ::= { cwsXcvrModemLineSystemSupportEntry 6 }
+
+cwsXcvrModemLineSystemSupportThirdParty OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the Modem support third party Line System or not."
+    ::= { cwsXcvrModemLineSystemSupportEntry 7 }
+
+cwsXcvrModemEquipmentStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrModemEquipmentStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrModemMIB 8 }
+
+cwsXcvrModemEquipmentStatusEntry OBJECT-TYPE
+    SYNTAX CwsXcvrModemEquipmentStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrModemEquipmentStatusTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrModemEquipmentStatusTableSnmpKey }
+    ::= { cwsXcvrModemEquipmentStatusTable 1 }
+
+CwsXcvrModemEquipmentStatusEntry ::= SEQUENCE { 
+    cwsXcvrModemEquipmentStatusTableSnmpKey Integer32,
+    cwsXcvrModemEquipmentStatusTransmitterState EnabledDisabledEnum,
+    cwsXcvrModemEquipmentStatusEquipmentOutOfSpec YesNoEnum,
+    cwsXcvrModemEquipmentStatusEquipmentFailure YesNoEnum,
+    cwsXcvrModemEquipmentStatusDataLinkSuspect YesNoEnum,
+    cwsXcvrModemEquipmentStatusCommsLinkSuspect YesNoEnum,
+    cwsXcvrModemEquipmentStatusClockSuspect YesNoEnum,
+    cwsXcvrModemEquipmentStatusLossOfSynchronizationTick YesNoEnum 
+}
+
+cwsXcvrModemEquipmentStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrModemEquipmentStatus"
+    ::= { cwsXcvrModemEquipmentStatusEntry 1 }
+
+cwsXcvrModemEquipmentStatusTransmitterState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Transmitter State of the Modem."
+    ::= { cwsXcvrModemEquipmentStatusEntry 2 }
+
+cwsXcvrModemEquipmentStatusEquipmentOutOfSpec OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is the alarm associated with Equipment Out of Spec raised."
+    ::= { cwsXcvrModemEquipmentStatusEntry 3 }
+
+cwsXcvrModemEquipmentStatusEquipmentFailure OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is the alarm associated with Equipment Failure raised."
+    ::= { cwsXcvrModemEquipmentStatusEntry 4 }
+
+cwsXcvrModemEquipmentStatusDataLinkSuspect OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is the alarm associated with Data Link Suspect raised."
+    ::= { cwsXcvrModemEquipmentStatusEntry 5 }
+
+cwsXcvrModemEquipmentStatusCommsLinkSuspect OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is the alarm associated with Comms Link Suspect raised."
+    ::= { cwsXcvrModemEquipmentStatusEntry 6 }
+
+cwsXcvrModemEquipmentStatusClockSuspect OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is the alarm associated with Clock Suspect raised."
+    ::= { cwsXcvrModemEquipmentStatusEntry 7 }
+
+cwsXcvrModemEquipmentStatusLossOfSynchronizationTick OBJECT-TYPE
+    SYNTAX YesNoEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Is the alarm associated with Loss of Synchronization Tick raised."
+    ::= { cwsXcvrModemEquipmentStatusEntry 8 }
+
+
+
+-- Conformance statements
+cienaWsXcvrModemObjects OBJECT IDENTIFIER
+    ::= { cienaWsXcvrModemMIB 1 }
+
+cienaWsXcvrModemConformance OBJECT IDENTIFIER
+    ::= { cienaWsXcvrModemMIB 2 }
+
+cienaWsXcvrModemGroups OBJECT IDENTIFIER
+    ::= { cienaWsXcvrModemConformance 1 }
+
+cienaWsXcvrModemGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsXcvrModemVendorDiagnosticMonitoringDiagnosticSupport,
+        cwsXcvrModemVendorDiagnosticMonitoringDispersionMeasurement,
+        cwsXcvrModemTransmitterTechnologyWavelengthControl,
+        cwsXcvrModemTransmitterTechnologyTunable,
+        cwsXcvrModemTransmitterTechnologyWavelengthMin,
+        cwsXcvrModemTransmitterTechnologyWavelengthMax,
+        cwsXcvrModemTransmitterTechnologyWavelengthTolerance,
+        cwsXcvrModemTransmitterTechnologyFrequencyMin,
+        cwsXcvrModemTransmitterTechnologyFrequencyMax,
+        cwsXcvrModemTransmitterTechnologyTxDispersionMin,
+        cwsXcvrModemTransmitterTechnologyTxDispersionMax,
+        cwsXcvrModemTransmitterTechnologyEdfa,
+        cwsXcvrModemModulationSupportModulation16qam,
+        cwsXcvrModemModulationSupportModulationQpsk,
+        cwsXcvrModemModulationSupportModulationBpsk,
+        cwsXcvrModemModulationSupportModulation8qam,
+        cwsXcvrModemTransportProtocolsOtnBookended,
+        cwsXcvrModemTransportProtocolsOtnInterworking,
+        cwsXcvrModemTransportProtocolsEthernet,
+        cwsXcvrModemLineSystemSupportColoured,
+        cwsXcvrModemLineSystemSupportColourless,
+        cwsXcvrModemLineSystemSupportContentionless,
+        cwsXcvrModemLineSystemSupportCoherentSelectColoured,
+        cwsXcvrModemLineSystemSupportCoherentSelectColourless,
+        cwsXcvrModemLineSystemSupportThirdParty,
+        cwsXcvrModemEquipmentStatusTransmitterState,
+        cwsXcvrModemEquipmentStatusEquipmentOutOfSpec,
+        cwsXcvrModemEquipmentStatusEquipmentFailure,
+        cwsXcvrModemEquipmentStatusDataLinkSuspect,
+        cwsXcvrModemEquipmentStatusCommsLinkSuspect,
+        cwsXcvrModemEquipmentStatusClockSuspect,
+        cwsXcvrModemEquipmentStatusLossOfSynchronizationTick
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsXcvrModemGroups 1 }
+
+cienaWsXcvrModemCompliances OBJECT IDENTIFIER
+    ::= { cienaWsXcvrModemConformance 2 }
+
+cienaWsXcvrModemCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsXcvrModemGroup }
+    ::= { cienaWsXcvrModemCompliances 1 }
+
+END -- End module

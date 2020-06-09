@@ -1,0 +1,103 @@
+-- MIB created 7/22/97 16:30:52, by
+--   SMIC (the next generation) version 1.6.29, November 22, 1994.
+
+NWAYSMSS-MIB DEFINITIONS ::= BEGIN
+
+-- From file: "ibmlesrv.mi2"
+-- Compile options "G A T M"
+
+IMPORTS
+    Integer32
+            FROM SNMPv2-SMI-v1
+    enterprises
+            FROM RFC1155-SMI;
+
+nwaysMSS OBJECT IDENTIFIER ::= { ibmProd 118 }
+-- MODULE-IDENTITY
+--  LastUpdated
+--    9705231200Z
+--  OrgName
+--    IBM Corporation
+--  ContactInfo
+--     Florian K Kandefer
+--       Postal:  IBM Corporation
+--                800 Park Offices Drive
+--                Research Triangle Park, NC 27709
+--                US
+--       Tel:     +1 919 254 0685
+--       Fax:     +1 919 254 0391
+--       E-mail:  kandefer@vnet.ibm.com     
+--  Descr
+--    
+--    This MIB module contains definitions for common object identifiers
+--    and textual conventions for the other IBM NWays MSS product MIBs.
+--    
+--    Note: this file contains more them one MIB (BEGIN/END), so each
+--    MIB has its own Module Identity and revision section.
+--    
+--  RevDate
+--    9705231200Z
+--  RevDescr
+--    
+--    3)  Added lecsDomainName in the ibmLecsConfTable. This was added
+--        so the Network Management application could store the name
+--        where the other LECS information is maintained at the agent.
+--  RevDate
+--    9701161200Z
+--  RevDescr
+--    
+--    2)  Updated MIB import names to match ATM Forum MIB names.
+--    
+--        Updated some of the description fields.
+--    
+--        Note: this file contains more them one MIB (BEGIN/END), so each
+--        MIB has its own Module Identity and revision section.
+--  RevDate
+--    9608281200Z
+--  RevDescr
+--    
+--    1)  The  creation
+
+ibm             OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd         OBJECT IDENTIFIER ::= { ibm 6 }
+mssCommon       OBJECT IDENTIFIER ::= { nwaysMSS 1 }
+mssCommonHWVPD  OBJECT IDENTIFIER ::= { mssCommon 1 }
+mssCmnSrvrs     OBJECT IDENTIFIER ::= { mssCommon 2 }
+mssServerLanE   OBJECT IDENTIFIER ::= { mssCmnSrvrs 1 }
+mssCmnClnts     OBJECT IDENTIFIER ::= { mssCommon 3 }
+
+AtmPrivateAddrEsi ::= OCTET STRING(SIZE(6))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--     
+
+AtmSelector ::= OCTET STRING(SIZE(1))
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--     
+
+AtmVccTrafficType ::= INTEGER {
+        bestEffort(1),
+        reservedBandwidth(2)
+        }
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    Specifies type of traffic characteristics to be associated with
+--     a VCC.
+
+Bandwidth ::= Integer32
+-- TEXTUAL-CONVENTION
+--  Status
+--    mandatory
+--  Descr
+--    A measure of speed in units of kilobits per
+--    second (kbps), where a kilobit is 1000 bits
+
+
+END

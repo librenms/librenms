@@ -7,3 +7,5 @@ over:
 discovery:
     - sysDescr:
         - 'Perle MCR-MGT'
+    - sysObjectID:
+        - .1.3.6.1.4.1.1966

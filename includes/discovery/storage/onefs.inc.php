@@ -24,7 +24,7 @@
  */
 
 if ($device['os'] === 'onefs') {
-    $oids = snmp_get_multi_oid($device, 'ifsTotalBytes.0 ifsUsedBytes.0 ifsAvailableBytes.0', '-OUQn', 'ISILON-MIB');
+    $oids = snmp_get_multi_oid($device, ['ifsTotalBytes.0', 'ifsUsedBytes.0', 'ifsAvailableBytes.0'], '-OUQn', 'ISILON-MIB');
 
     $fstype = "ifs";
     $descr  = "Internal File System";

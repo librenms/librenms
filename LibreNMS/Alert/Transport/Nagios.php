@@ -23,21 +23,14 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Nagios extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $opts = $this->config['nagios-fifo'];
-        return $this->contactNagios($obj, $opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
         return $this->contactNagios($obj, $opts);
     }
 

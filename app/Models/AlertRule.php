@@ -26,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Enum\AlertState;
 
 class AlertRule extends BaseModel
 {
@@ -39,7 +40,7 @@ class AlertRule extends BaseModel
      */
     public function scopeEnabled($query)
     {
-        return $query->where('disabled', 0);
+        return $query->where('alert_rules.disabled', 0);
     }
 
     /**
@@ -52,7 +53,7 @@ class AlertRule extends BaseModel
     {
         return $query->enabled()
             ->join('alerts', 'alerts.rule_id', 'alert_rules.id')
-            ->where('alerts.state', 1);
+            ->whereNotIn('alerts.state', [AlertState::CLEAR, AlertState::ACKNOWLEDGED, AlertState::RECOVERED]);
     }
 
     /**
@@ -80,11 +81,11 @@ class AlertRule extends BaseModel
 
     public function alerts()
     {
-        return $this->hasMany('App\Models\Alert', 'rule_id');
+        return $this->hasMany(\App\Models\Alert::class, 'rule_id');
     }
 
     public function devices()
     {
-        return $this->belongsToMany('App\Models\Device', 'alert_device_map', 'device_id', 'device_id', 'devices');
+        return $this->belongsToMany(\App\Models\Device::class, 'alert_device_map', 'device_id', 'device_id');
     }
 }

@@ -23,18 +23,10 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-if ($device['group'] == 'zyxel') {
-    echo 'Zyxel : ';
-    $oid = '.1.3.6.1.4.1.890.1.15.3.2.5.0';
-    $usage = snmp_get($device, $oid, '-Ovq');
-    $descr = 'Memory';
+if ($device['os_group'] == 'zyxel') {
+    d_echo('Zyxel');
+    $usage = snmp_get($device, "sysMgmtMemUsage.0", '-OvQ', 'ZYXEL-ES-COMMON');
     if (is_numeric($usage)) {
-        discover_mempool($valid_mempool, $device, '0', 'zyxel', $descr, '1', null, null);
+        discover_mempool($valid_mempool, $device, '0', 'zyxel', 'Memory', '1', null, null);
     }
 }
-
-unset(
-    $oid,
-    $usage,
-    $descr
-);

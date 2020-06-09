@@ -37,7 +37,7 @@ if ($value) {
     discover_sensor($valid['sensor'], 'temperature', $device, $current_oid, 'climateTempF', 'geist-watchdog', $descr, 1, 1, null, null, null, null, $value, null, null, null, 'fahrenheit_to_celsius');
 }
 
-$temp_table = snmpwalk_cache_oid($device, 'tempSensorTable', array(), 'GEIST-MIB-V3');
+$temp_table = snmpwalk_cache_oid($device, 'tempSensorTable', [], 'GEIST-MIB-V3');
 
 foreach ($temp_table as $index => $temp_data) {
     if ($temp_data['tempSensorAvail'] == 1) {

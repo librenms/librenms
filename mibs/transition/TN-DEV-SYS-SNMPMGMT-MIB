@@ -1,0 +1,587 @@
+-- ***********************************************************************************************
+-- TN-DEV-SYS-SNMPMGMT-MIB.smi:  Transition Networks Enterprise MIB for TN snmp management feature
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- ***********************************************************************************************
+--
+TN-DEV-SYS-SNMPMGMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32 FROM SNMPv2-SMI
+        DisplayString, RowStatus, TDomain, TAddress FROM SNMPv2-TC
+        InetAddressType, InetAddress FROM INET-ADDRESS-MIB
+        SnmpAdminString  FROM SNMP-FRAMEWORK-MIB
+        entPhysicalIndex FROM ENTITY-MIB
+        tnDevMgmt FROM TN-MGMT-MIB
+        SnmpEngineID FROM SNMP-FRAMEWORK-MIB
+        PortList FROM Q-BRIDGE-MIB;
+
+tnDevSysSnmpmgmt    MODULE-IDENTITY
+     LAST-UPDATED "201402190000Z"
+     ORGANIZATION "Transition Networks, Inc."
+     CONTACT-INFO
+                 "       Transition Networks
+                         Technical Support
+                         10900 Red Circle Drive
+                         Minnetonka, MN 55343 USA
+                         Tel: +1-800-526-9267
+
+                     E-mail: techsupport@transition.com"
+
+     DESCRIPTION
+         "The mib provides functionalities for SNMP managing in TN modules."
+
+     REVISION      "201402190000Z"
+     DESCRIPTION
+         "Added tnDevSysSnmpTrapCfgVersion, tnDevSysSnmpTrapCfgInformMode,
+          tnDevSysSnmpTrapCfgInformTimeout, tnDevSysSnmpTrapCfgInformRetry to
+          tnDevSysSnmpTrapCfgTable."
+
+     REVISION      "201305160000Z"
+     DESCRIPTION
+         "Initial Revision of this module"
+     ::= { tnDevMgmt 14 }
+
+
+tnDevSysSnmpMgmtTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TnDevSysSnmpMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Table to manage SNMP status for each device."
+    ::= { tnDevSysSnmpmgmt 1 }
+
+tnDevSysSnmpMgmtEntry OBJECT-TYPE
+    SYNTAX TnDevSysSnmpMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An entry containing SNMP status for each device."
+    INDEX   { entPhysicalIndex }
+    ::= { tnDevSysSnmpMgmtTable 1 }
+
+TnDevSysSnmpMgmtEntry ::=
+    SEQUENCE {
+       tnDevSysSnmpAccess             INTEGER,
+       tnDevSysSnmpVersion            DisplayString,
+       tnDevSysSnmpReadCommunity      DisplayString,
+       tnDevSysSnmpWriteCommunity     DisplayString
+    }
+
+tnDevSysSnmpAccess OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The status of SNMP. Set this value to enabled(1) to enable SNMP access,
+                 set this value to disabled(2) to disable the SNMP access."
+    ::= { tnDevSysSnmpMgmtEntry 1 }
+
+tnDevSysSnmpVersion OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..8))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "The current active SNMP version. Possible versions are:
+                 v1:   SNMP supported version 1.
+                 v2c:  SNMP supported version 2c.
+                 v3:   SNMP supported version 3."
+    ::= { tnDevSysSnmpMgmtEntry 2 }
+
+tnDevSysSnmpReadCommunity OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "The SNMP Read-community string. Valid in v1/v2c version, default value is 'public'."
+    ::= { tnDevSysSnmpMgmtEntry 3 }
+
+tnDevSysSnmpWriteCommunity OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(0..255))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "The SNMP Write-community string. Valid in v1/v2c version, default value is 'private'."
+    ::= { tnDevSysSnmpMgmtEntry 4 }
+
+tnDevSysSnmpLocal    OBJECT IDENTIFIER ::= { tnDevSysSnmpmgmt 3 }
+
+tnDevSysSnmpLocalEngineID OBJECT-TYPE
+    SYNTAX     SnmpEngineID
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "The SNMPv3 engine ID."
+    ::= { tnDevSysSnmpLocal 1 }
+
+tnDevSysSnmpTrapManagerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDevSysSnmpTrapManagerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table to maintain the engine IDs of the SNMPv3 trap managers."
+    ::= { tnDevSysSnmpmgmt 4 }
+
+tnDevSysSnmpTrapManagerEntry OBJECT-TYPE
+    SYNTAX      TnDevSysSnmpTrapManagerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in this table, containing the engineID
+                 of a SNMPv3 trap manager."
+    INDEX       { tnDevSysSnmpTrapManagerIndex }
+    ::= { tnDevSysSnmpTrapManagerTable 1 }
+
+TnDevSysSnmpTrapManagerEntry ::= SEQUENCE
+{
+    tnDevSysSnmpTrapManagerIndex           Integer32,
+    tnDevSysSnmpTrapManagerAddrTDomain     TDomain,
+    tnDevSysSnmpTrapManagerAddrTAddress    TAddress,
+    tnDevSysSnmpTrapManagerEngineID        SnmpEngineID,
+    tnDevSysSnmpTrapManagerStatus          RowStatus
+}
+
+tnDevSysSnmpTrapManagerIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index of this table."
+    ::= { tnDevSysSnmpTrapManagerEntry 1 }
+
+tnDevSysSnmpTrapManagerAddrTDomain  OBJECT-TYPE
+    SYNTAX      TDomain
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The transport address type of the SNMP trap manager. The default
+                 value of this variable is snmpUDPDomain."
+    ::= { tnDevSysSnmpTrapManagerEntry 2 }
+
+tnDevSysSnmpTrapManagerAddrTAddress  OBJECT-TYPE
+    SYNTAX      TAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The transport address of the SNMP trap manager. For snmpUDPDomain,
+                 a TAddress is 6 octets long, the initial 4 octets containing the
+                 IP-address in network-byte order and the last 2 containing the UDP
+                 port in network-byte order."
+    ::= { tnDevSysSnmpTrapManagerEntry 3 }
+
+tnDevSysSnmpTrapManagerEngineID  OBJECT-TYPE
+    SYNTAX      SnmpEngineID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The engine ID of the SNMPv3 trap manager. "
+    ::= { tnDevSysSnmpTrapManagerEntry 4 }
+
+tnDevSysSnmpTrapManagerStatus  OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION "This variable is used to dynamically create or delete an entry for this table."
+    ::= { tnDevSysSnmpTrapManagerEntry 20 }
+
+tnDevSysSnmpTrapCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDevSysSnmpTrapCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table to maintain the SNMP trap configurations."
+    ::= { tnDevSysSnmpmgmt 5 }
+
+tnDevSysSnmpTrapCfgEntry OBJECT-TYPE
+    SYNTAX      TnDevSysSnmpTrapCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in this table, containing the SNMP trap configurations."
+    INDEX       { entPhysicalIndex }
+    ::= { tnDevSysSnmpTrapCfgTable 1 }
+
+TnDevSysSnmpTrapCfgEntry  ::= SEQUENCE
+{
+    tnDevSysSnmpTrapCfgMode               INTEGER,
+    tnDevSysSnmpTrapCfgCommunity          SnmpAdminString,
+    tnDevSysSnmpTrapCfgAuthFailure        INTEGER,
+    tnDevSysSnmpTrapCfgLinkChange         INTEGER,
+    tnDevSysSnmpTrapCfgEngineIdProbe      INTEGER,
+    tnDevSysSnmpTrapCfgAdminEngineId      SnmpEngineID,
+    tnDevSysSnmpTrapCfgSecurityName       SnmpAdminString,
+    tnDevSysSnmpTrapCfgVersion            INTEGER,
+    tnDevSysSnmpTrapCfgInformMode         INTEGER,
+    tnDevSysSnmpTrapCfgInformTimeout      INTEGER,
+    tnDevSysSnmpTrapCfgInformRetry        INTEGER
+}
+
+tnDevSysSnmpTrapCfgMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The SNMP trap mode operation. Possible modes are:
+                 enabled  - Enable SNMP trap mode operation.
+                 disabled - Disable SNMP trap mode operation."
+    ::= { tnDevSysSnmpTrapCfgEntry 1 }
+
+tnDevSysSnmpTrapCfgCommunity  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION " the community access string when sending SNMP trap packet."
+    ::= { tnDevSysSnmpTrapCfgEntry 2 }
+
+tnDevSysSnmpTrapCfgAuthFailure   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates that the SNMP entity is permitted to generate authentication failure traps. Possible modes are:
+                 enabled  - Enable SNMP trap authentication failure.
+                 disabled - Disable SNMP trap authentication failure."
+    ::= { tnDevSysSnmpTrapCfgEntry 3 }
+
+tnDevSysSnmpTrapCfgLinkChange   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap link-up and link-down mode operation. Possible modes are:
+                 enabled  - Enable SNMP trap link-up and link-down mode operation.
+                 disabled - Disable SNMP trap link-up and link-down mode operation."
+    ::= { tnDevSysSnmpTrapCfgEntry 4 }
+
+tnDevSysSnmpTrapCfgEngineIdProbe   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap probe security engine ID mode of operation. Possible values are:
+                 enabled  - Enable SNMP trap probe security engine ID mode of operation.
+                 disabled - Disable SNMP trap probe security engine ID mode of operation."
+    ::= { tnDevSysSnmpTrapCfgEntry 5 }
+
+tnDevSysSnmpTrapCfgAdminEngineId   OBJECT-TYPE
+    SYNTAX      SnmpEngineID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap security engine ID. SNMPv3 sends traps and informs using USM for authentication and privacy. A unique engine ID for these traps and informs is needed. When tnDevSysSnmpTrapCfgEngineIdProbe is enabled, the ID will be probed automatically. Otherwise, the ID specified in this field is used."
+    ::= { tnDevSysSnmpTrapCfgEntry 6 }
+
+tnDevSysSnmpTrapCfgSecurityName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap security name. SNMPv3 traps and informs using USM for authentication and privacy. A unique security name is needed when traps and informs are enabled."
+    ::= { tnDevSysSnmpTrapCfgEntry 7 }
+
+tnDevSysSnmpTrapCfgVersion OBJECT-TYPE
+    SYNTAX     INTEGER
+                {
+                    v1(1),
+                    v2c(2),
+                    v3(3)
+                }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "The current active SNMP Trap version. Possible versions are:
+                 v1:   SNMP supported version 1.
+                 v2c:  SNMP supported version 2c.
+                 v3:   SNMP supported version 3."
+    ::= { tnDevSysSnmpTrapCfgEntry 8 }
+
+tnDevSysSnmpTrapCfgInformMode   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap inform mode operation. Possible modes are:
+                Enabled: Enable SNMP trap inform mode operation.
+                Disabled: Disable SNMP trap inform mode operation."
+    ::= { tnDevSysSnmpTrapCfgEntry 9 }
+
+tnDevSysSnmpTrapCfgInformTimeout   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap inform timeout. The allowed range is 0 to 2147 seconds."
+    ::= { tnDevSysSnmpTrapCfgEntry 10 }
+
+tnDevSysSnmpTrapCfgInformRetry   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap inform number of retry times. The allowed range is 0 to 255."
+    ::= { tnDevSysSnmpTrapCfgEntry 11 }
+
+-- ------------------------------------------------------
+-- ------------------------------------------------------
+-- ------------------------------------------------------
+-- ------------------------------------------------------
+
+
+
+tnDevSysSnmpTrapServerCfgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnDevSysSnmpTrapServerCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table to maintain the SNMP trap configurations."
+    ::= { tnDevSysSnmpmgmt 6 }
+
+tnDevSysSnmpTrapServerCfgEntry OBJECT-TYPE
+    SYNTAX      TnDevSysSnmpTrapServerCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in this table, containing the SNMP trap configurations."
+    INDEX       { IMPLIED tnDevSysSnmpTrapServerCfgName }
+    ::= { tnDevSysSnmpTrapServerCfgTable 1 }
+
+TnDevSysSnmpTrapServerCfgEntry  ::= SEQUENCE
+{
+    tnDevSysSnmpTrapServerCfgName               SnmpAdminString,
+    tnDevSysSnmpTrapServerCfgMode               INTEGER,
+    tnDevSysSnmpTrapServerCfgVersion            INTEGER,
+    tnDevSysSnmpTrapServerCfgCommunity          SnmpAdminString,
+    tnDevSysSnmpTrapServerCfgDstAddress         InetAddress,
+    tnDevSysSnmpTrapServerCfgDstPort            INTEGER,
+    tnDevSysSnmpTrapServerCfgInformMode         INTEGER,
+    tnDevSysSnmpTrapServerCfgInformTimeout      INTEGER,
+    tnDevSysSnmpTrapServerCfgInformRetry        INTEGER,
+    tnDevSysSnmpTrapServerCfgEngineIdProbe      INTEGER,
+    tnDevSysSnmpTrapServerCfgAdminEngineId      SnmpEngineID,
+    tnDevSysSnmpTrapServerCfgSecurityName       SnmpAdminString,
+    tnDevSysSnmpTrapServerCfgEvtWstart          INTEGER,
+    tnDevSysSnmpTrapServerCfgEvtCstart          INTEGER,
+    tnDevSysSnmpTrapServerCfgEvtLinkUp          PortList,
+    tnDevSysSnmpTrapServerCfgEvtLinkDown        PortList,
+    tnDevSysSnmpTrapServerCfgEvtLldp            PortList,
+    tnDevSysSnmpTrapServerCfgEvtAuthFail        INTEGER,
+    tnDevSysSnmpTrapServerCfgEvtStp             INTEGER,
+    tnDevSysSnmpTrapServerCfgEvtRmon            INTEGER,
+    tnDevSysSnmpTrapServerCfgRowStatus          RowStatus
+}
+
+tnDevSysSnmpTrapServerCfgName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION " the trap configuration name."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 1 }
+
+tnDevSysSnmpTrapServerCfgMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The SNMP trap mode operation. Possible modes are:
+                 enabled  - Enable SNMP trap mode operation.
+                 disabled - Disable SNMP trap mode operation."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 2 }
+
+tnDevSysSnmpTrapServerCfgVersion OBJECT-TYPE
+    SYNTAX     INTEGER
+                {
+                    v1(1),
+                    v2c(2),
+                    v3(3)
+                }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION "The current active SNMP Trap version. Possible versions are:
+                 v1:   SNMP supported version 1.
+                 v2c:  SNMP supported version 2c.
+                 v3:   SNMP supported version 3."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 3 }
+
+tnDevSysSnmpTrapServerCfgCommunity  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION " the community access string when sending SNMP trap packet."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 4 }
+
+tnDevSysSnmpTrapServerCfgDstAddress  OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "Indicates destination ip address."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 5 }
+
+tnDevSysSnmpTrapServerCfgDstPort  OBJECT-TYPE
+    SYNTAX          INTEGER(1..65535)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "The allowed range for the port number is from 1 through 65535."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 6 }
+
+tnDevSysSnmpTrapServerCfgInformMode   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap inform mode operation. Possible modes are:
+                Enabled: Enable SNMP trap inform mode operation.
+                Disabled: Disable SNMP trap inform mode operation."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 7 }
+
+tnDevSysSnmpTrapServerCfgInformTimeout   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap inform timeout. The allowed range is 0 to 2147 seconds."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 8 }
+
+tnDevSysSnmpTrapServerCfgInformRetry   OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap inform number of retry times. The allowed range is 0 to 255."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 9 }
+
+tnDevSysSnmpTrapServerCfgEngineIdProbe   OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap probe security engine ID mode of operation. Possible values are:
+                 enabled  - Enable SNMP trap probe security engine ID mode of operation.
+                 disabled - Disable SNMP trap probe security engine ID mode of operation."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 10 }
+
+tnDevSysSnmpTrapServerCfgAdminEngineId   OBJECT-TYPE
+    SYNTAX      SnmpEngineID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap security engine ID. SNMPv3 sends traps and informs using USM for authentication and privacy. A unique engine ID for these traps and informs is needed. When tnDevSysSnmpTrapCfgEngineIdProbe is enabled, the ID will be probed automatically. Otherwise, the ID specified in this field is used."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 11 }
+
+tnDevSysSnmpTrapServerCfgSecurityName  OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates the SNMP trap security name. SNMPv3 traps and informs using USM for authentication and privacy. A unique security name is needed when traps and informs are enabled."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 12 }
+
+tnDevSysSnmpTrapServerCfgEvtWstart OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION " "
+    ::= { tnDevSysSnmpTrapServerCfgEntry 13 }
+
+tnDevSysSnmpTrapServerCfgEvtCstart OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION " "
+    ::= { tnDevSysSnmpTrapServerCfgEntry 14 }
+
+tnDevSysSnmpTrapServerCfgEvtLinkUp OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION " "
+    ::= { tnDevSysSnmpTrapServerCfgEntry 15 }
+
+tnDevSysSnmpTrapServerCfgEvtLinkDown OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION " "
+    ::= { tnDevSysSnmpTrapServerCfgEntry 16 }
+
+tnDevSysSnmpTrapServerCfgEvtLldp OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION " "
+    ::= { tnDevSysSnmpTrapServerCfgEntry 17 }
+
+tnDevSysSnmpTrapServerCfgEvtAuthFail OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Indicates that the SNMP entity is permitted to generate authentication failure traps. Possible modes are:
+                 enabled  - Enable SNMP trap authentication failure.
+                 disabled - Disable SNMP trap authentication failure."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 18 }
+
+tnDevSysSnmpTrapServerCfgEvtStp OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION " "
+    ::= { tnDevSysSnmpTrapServerCfgEntry 19 }
+
+tnDevSysSnmpTrapServerCfgEvtRmon OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION " "
+    ::= { tnDevSysSnmpTrapServerCfgEntry 20 }
+
+tnDevSysSnmpTrapServerCfgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This indicates the status of the entry, and is used to create
+        and delete entries in this table."
+    ::= { tnDevSysSnmpTrapServerCfgEntry 21 }
+
+
+tnDevSysSnmpTrapGlobalCfgMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The global SNMP trap mode operation. Possible modes are:
+                 enabled  - Enable SNMP trap mode operation.
+                 disabled - Disable SNMP trap mode operation."
+    ::= { tnDevSysSnmpmgmt 7 }
+
+END

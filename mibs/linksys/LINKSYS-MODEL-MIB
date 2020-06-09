@@ -1,0 +1,3554 @@
+--LINKSYS-MODEL-MIB { iso(1) org(3) dod(6) internet(1) private(4)
+--      Enterprises(1) linksys(3955) }
+
+
+LINKSYS-MODEL-MIB DEFINITIONS ::= BEGIN
+-- Title: Linksys propritary MIB
+-- Date: January 28, 2003    Version 1.01
+--
+
+    IMPORTS
+		enterprises, IpAddress,             FROM RFC1155-SMI
+		DisplayString, PhysAddress          FROM RFC1213-MIB
+		OBJECT-TYPE                         FROM RFC-1212
+		TRAP-TYPE                           FROM RFC-1215;
+
+
+internet				OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+directory				OBJECT IDENTIFIER ::= { internet 1 }
+mgmt					OBJECT IDENTIFIER ::= { internet 2 }
+experimental			OBJECT IDENTIFIER ::= { internet 3 }
+private					OBJECT IDENTIFIER ::= { internet 4 }
+enterprises				OBJECT IDENTIFIER ::= { private 1 }
+linksys                 OBJECT IDENTIFIER ::= { enterprises 3955 }
+common                  OBJECT IDENTIFIER ::= { linksys 1 }
+management              OBJECT IDENTIFIER ::= { linksys 2 }
+control                 OBJECT IDENTIFIER ::= { linksys 3 }
+information             OBJECT IDENTIFIER ::= { linksys 4 }
+products                OBJECT IDENTIFIER ::= { linksys 5 }
+basicMgt                OBJECT IDENTIFIER ::= { management 1 }
+advanceMgt              OBJECT IDENTIFIER ::= { management 2 }
+wanMgt                  OBJECT IDENTIFIER ::= { management 3 }
+vpnMgt                  OBJECT IDENTIFIER ::= { management 4 }
+firewallMgt             OBJECT IDENTIFIER ::= { management 5 }
+wirelessMgt             OBJECT IDENTIFIER ::= { management 6 }
+adslRemoteNode          OBJECT IDENTIFIER ::= { management 7 }
+wirelessCommon          OBJECT IDENTIFIER ::= { wirelessMgt 1 }
+ieee80211b              OBJECT IDENTIFIER ::= { wirelessMgt 2 }
+ieee80211a              OBJECT IDENTIFIER ::= { wirelessMgt 3 }
+statusInfo              OBJECT IDENTIFIER ::= { information 1 }
+statisticsInfo          OBJECT IDENTIFIER ::= { information 2 }
+printServer             OBJECT IDENTIFIER ::= { products 1 }
+networkStorageServer    OBJECT IDENTIFIER ::= { products 2 }
+
+
+-- the Common Group
+
+	commonFirmwareVer OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				" The firmware version of this managed node. "
+		::= { common 1 }
+	
+	commonMIBfileVer OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				" Defines the current version of Linksys MIB definition.
+				Initially the version number is 1.00.00. "
+		::= { common 2 }
+	
+	commonDevType OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		others(1),
+		      		adsl-gateway(2),
+		      		cable-gateway(3),
+		      		router(4),
+		      		accessPoint(5),
+		      		wirelessNIC(6),
+		      		wirelessAdapter(7),
+		      		managementNIC(8)
+		      	}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"The hardware type of this managed node."
+		::= { common 3 }
+	
+	commonModelId OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				" The hardware model ID of this managed node. "
+		::= { common 4 }
+	
+	commonTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF CommonEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				" Table of basic information that can be used to identify this
+			managed node."
+		::= { common 5 }
+	
+	commonEntry OBJECT-TYPE
+		SYNTAX	CommonEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				" An entry in the table, containing read only identification
+				information."
+		INDEX	{ commonIfIndex, commonFunIndex }
+		::= { commonTable 1 }
+	
+	CommonEntry ::=
+		SEQUENCE {
+			commonIfIndex 			INTEGER,
+			commonFunIndex			INTEGER,
+			commonNote    			DisplayString
+		}
+	
+	commonIfIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"The interface on which this entry's equivalence is effective.
+				The interface identified by a particular value of this index is
+				the same interface as identified by the same value of ifIndex."
+		::= { commonEntry 1 }
+	
+	commonFunIndex OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		wan-connection(1),
+		      		dhcp(2),
+		      		access-log(3),
+		      		ip-range-filter(4),
+		      		port-range-filter(5),
+		      		mac-filter(6),
+		      		app-forwarding(7),
+		      		upnp-forwarding(8),
+		      		dynamic-route(9),
+		      		static-route(10),
+		      		dmz(11),
+		      		mac-clone(12),
+		      		ieee802dot11(13),
+		      		firewall(14),
+		      		vpn(15)
+		      	}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"The type of function, distinguished according to hardware
+				model of this managed node."
+		::= { commonEntry 2 }
+	
+	commonNote OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"Notification for the specified function."
+		::= { commonEntry 3 }
+
+
+-- the Management Group
+
+	mgtSystemReset OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		warm-start(1),
+		      		cold-start(2)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates whether to set the managed node to do warm start or
+				cold start. Definition refers to RFC1215."
+		::= { basicMgt 1 }
+	
+	mgtFactoryReset OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates whether to set the managed node to restore factory
+				default settings or not."
+		::= { basicMgt 2 }
+	
+	mgtAdministrator OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..64))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The authorized password used to access the system."
+		::= { basicMgt 3 }
+	
+	mgtAdminUsername OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..64))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The user name used to access the system."
+		::= { basicMgt 4 }
+	
+	mgtSaveConfiguration OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		none(0),
+		      		apply(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates whether to store Enterprise MIB objects value in
+				non-volatile RAM and reinitializing the managed node."
+		::= { basicMgt 5 }
+	
+	mgtHostName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..32))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Supply a host name for the router. Some ISPs require this name as
+				identification. Leaving this field will work."
+		::= { basicMgt 6 }
+	
+	mgtDomainName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..64))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Supply a domain name for the router. Some ISPs require this name as
+				identification. Leaving this field will work."
+		::= { basicMgt 7 }
+	
+	mgtNodeNetAddress OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The IP address to which identifies this managed node from
+				internal networking."
+		::= { basicMgt 8 }
+	
+	mgtNodeSubnetMask OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The subnet mask associated with the IP address of this system. The
+				value of the mask is an IP address with all the network bits set to
+				1 and all the hosts bits set to 0."
+		::= { basicMgt 9 }
+	
+	mgtDhcpStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates whether to configure the managed node to automatically
+				assign IP address to each of LAN clients."
+		::= { basicMgt 10 }
+	
+	mgtDhcpStartNetAddr OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies a start IP address to which DHCP will issue to "
+		::= { basicMgt 11 }
+	
+	mgtDhcpNumberUsers OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The number of clients to which plan on networking to this
+				managed node."
+		::= { basicMgt 12 }
+
+-- the Community Table
+
+	mgtCommunityTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF MgtCommunityEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			" Table of access community. "
+		::= { basicMgt 13 }
+	
+	mgtCommunityEntry OBJECT-TYPE
+		SYNTAX	MgtCommunityEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			 	" An entry in the table, containing read/write
+			 	community names. "
+		INDEX	{ mgtCommunityIndex }
+		::= { mgtCommunityTable 1 }
+	
+	MgtCommunityEntry ::=
+		SEQUENCE {
+			mgtCommunityIndex		INTEGER,
+			mgtCommunityName 		DisplayString,
+			mgtCommunityType 		INTEGER
+		}
+	
+	mgtCommunityIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"An unique value for each community."
+		::= { mgtCommunityEntry 1 }
+	
+	mgtCommunityName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..32))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The name used to manage the SNMP protocol entity."
+		::= { mgtCommunityEntry 2 }
+	
+	mgtCommunityType OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		read-only(1),
+		      		read-write(2)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Specifies the privilege for this community name."
+		::= { mgtCommunityEntry 3 }
+
+
+-- The Advance Management Group --
+
+	advMgtRefreshMIB OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		none(0),
+		      		apply(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Refresh Enterprise MIB object data from RAM NV."
+		::= { advanceMgt 1 }
+	
+	advMgtWanReqBlockStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Set to enable(1) will prevent local network from
+				being 'pinged' or detected and also can reinforce
+				local network security by hiding the network port."
+		::= { advanceMgt 2 }
+	
+	advMgtIpSecPassThroughStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies to enable(1) or disable(0) IPSec Pass
+				Through ability."
+		::= { advanceMgt 3 }
+	
+	advMgtPptpPassThroughStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Point-to-Point Tunneling Protocol is the method
+				used to enable VPN tunnels. This object can be
+				used to specify the PPTP pass through ability."
+		::= { advanceMgt 4 }
+	
+	advMgtL2TPPassThroughStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies to enable(1) or disable(0) Layer Two
+				Tunneling Protocol Pass Through ability."
+		::= { advanceMgt 5 }
+	
+	advMgtRemoteMgtStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies whether allow this managed node to be
+				managed from a remote location."
+		::= { advanceMgt 6 }
+	
+	advMgtRemoteUpgradeStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies whether allow the managed node's firmware
+				to be upgraded from a remote location."
+		::= { advanceMgt 7 }
+	
+	advMgtAccessLogStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies whether to send access log messages to
+				specific management entities."
+		::= { advanceMgt 8 }
+	
+	advMgtMulticastPassStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies whether allow for multiple transmissions
+				to specific receptions at the same time."
+		::= { advanceMgt 9 }
+	
+	advMgtMtuStatus OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		enable(1)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates whether to use specific MTU size, refer
+				to advMgtMtuSize object, as the largest packet size."
+		::= { advanceMgt 10 }
+	
+	advMgtMtuSize OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies the largest packet size permitted for
+				network transmission."
+		::= { advanceMgt 11 }
+	
+	advMgtLocalTimeZone OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates local time zone for this managed node."
+		::= { advanceMgt 12 }
+
+
+-- The Routing group for both LAN and WAN. --
+
+	routingMethodTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF RoutingMethodEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"The table of dynamic routing settings which can
+				automatically adjust to physical changes in the
+				network's layout."
+		::= { advanceMgt 13 }
+	
+	routingMethodEntry OBJECT-TYPE
+		SYNTAX	RoutingMethodEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"The protocol information for one of this entity's
+				routing method."
+		INDEX	{ routingMethodIndex }
+		::= { routingMethodTable 1 }
+	
+	RoutingMethodEntry ::=
+		SEQUENCE {
+			routingMethodIndex			INTEGER,
+			dynamicRoutingTX  			INTEGER,
+			dynamicRoutingRX  			INTEGER
+		}
+	
+	routingMethodIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"An unique value for each routing method."
+		::= { routingMethodEntry 1 }
+	
+	dynamicRoutingTX OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		rip1(1),
+		      		rip1-compatible(2),
+		      		rip2(3)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates the protocol to which transmit data on the
+				network."
+		::= { routingMethodEntry 2 }
+	
+	dynamicRoutingRX OBJECT-TYPE
+		SYNTAX	INTEGER {
+		      		disable(0),
+		      		rip1(1),
+		      		rip2(2)
+		      	}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+		 		"Indicates the protocol to which receive data on the
+		 		network."
+		::= { routingMethodEntry 3 }
+
+
+-- The DMZ group which can support multiple DMZ. --
+
+	dmzTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF DmzEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"The table of DMZ settings which allow one local
+				user to be exposed to the Internet to use a
+				special-purpose service."
+		::= { advanceMgt 14 }
+	
+	dmzEntry OBJECT-TYPE
+		SYNTAX	DmzEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"The IP addresses information for one of DMZ."
+		INDEX	{ dmzIndex }
+		::= { dmzTable 1 }
+	
+	DmzEntry ::=
+		SEQUENCE {
+			dmzIndex					INTEGER,
+			dmzRemoteIPAddress			IpAddress,
+			dmzHostIPAddress			IpAddress
+		}
+	
+	dmzIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"An unique value for each DMZ setting."
+		::= { dmzEntry 1 }
+	
+	dmzRemoteIPAddress OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies the remote host IP address to which maps
+				to the local host specified by dmzHostIPAddress
+				object."
+		::= { dmzEntry 2 }
+
+	dmzHostIPAddress OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+		        "Specifies the local host IP address which will be
+		        exposed to the Internet."
+		::= { dmzEntry 3 }
+
+
+-- the StaticRoutingTable Group
+
+	staticRoutingTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF StaticRoutingEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"The table of static routing methods which
+				specifies pre-determined pathway that network
+				information must travel to reach a specific
+				host or network."
+		::= { advanceMgt 15 }
+
+	staticRoutingEntry OBJECT-TYPE
+		SYNTAX	StaticRoutingEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"The configuration information for one of static
+				routing."
+		INDEX	{ staticRoutingIndex }
+		::= { staticRoutingTable 1 }
+
+	StaticRoutingEntry ::=
+		SEQUENCE {
+			staticRoutingIndex				INTEGER,
+			destinationNetAddress			IpAddress,
+			routingSubnetMask				IpAddress,
+			routingDefaultGateway			IpAddress,
+			routingHopCount					INTEGER,
+			routingInterface				INTEGER,
+			nFlagStatus						INTEGER
+		}
+
+	staticRoutingIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"An unique value for each static routing method."
+		::= { staticRoutingEntry 1 }
+
+	destinationNetAddress OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The IP address of the remote network or host to
+				which will be assigned a static route."
+		::= { staticRoutingEntry 2 }
+
+	routingSubnetMask OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Determines which portion of an IP address is the
+                network portion, and which portion is the host
+                portion."
+        ::= { staticRoutingEntry 3 }
+
+	routingDefaultGateway OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the IP address of the gateway device
+                that allows for contact between the managed node
+                and the remote network or host."
+        ::= { staticRoutingEntry 4 }
+
+	routingHopCount OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the maximun number of hops that packets to
+                the destination specified by this route entry should
+                be forwarded."
+        ::= { staticRoutingEntry 5 }
+
+	routingInterface OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		lan(1),
+              		wan(2)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the physical interface to which will apply
+                this routing configuration."
+        ::= { staticRoutingEntry 6 }
+
+	nFlagStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		free(0),
+              		ready(1),
+              		active(2)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the operation status for this routing
+                entry."
+        ::= { staticRoutingEntry 7 }
+
+
+-- the TrapManagerTable Group
+
+	trapManagerTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF TrapManagerEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table of SNMP Trap message receivers."
+        ::= { advanceMgt 16 }
+
+	trapManagerEntry OBJECT-TYPE
+        SYNTAX	TrapManagerEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the table contains the host IP
+                address which will receive trap messages."
+        INDEX	{ trapManagerIndex }
+        ::= { trapManagerTable 1 }
+
+	TrapManagerEntry ::=
+        SEQUENCE {
+        	trapManagerIndex                INTEGER,
+        	trapMgrNetAddress               IpAddress
+        }
+
+	trapManagerIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "An unique value for each trap receiver."
+        ::= { trapManagerEntry 1 }
+
+	trapMgrNetAddress OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The IP address to which will receive the Log
+                message sent via trap protocol."
+        ::= { trapManagerEntry 2 }
+
+	advMgtUPnPStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+					disable(0),
+					enable(1)
+				}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies whether allow Windows XP to automatically
+                confiure the managed node for various Internet
+                applications."
+        ::= { advanceMgt 17 }
+
+	advMgtUPnPControl OBJECT-TYPE
+        SYNTAX	INTEGER {
+					disable(0),
+					enable(1)
+				}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies whether allow Windows XP to read and write
+                the UPnP Forwarding of managed node using UPnP."
+        ::= { advanceMgt 18 }
+        
+	advMgtUPnPConnectControl OBJECT-TYPE
+        SYNTAX	INTEGER {
+					disable(0),
+					enable(1)
+				}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies whether allow Windows XP to read and write
+                the UPnP WAN Connection of managed node using UPnP."
+        ::= { advanceMgt 19 }        
+
+
+-- The WAN Management Group --
+
+	wanConnectionTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WanConnectionEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                " Table of WAN connection management. "
+        ::= { wanMgt 1 }
+
+	wanConnectionEntry OBJECT-TYPE
+        SYNTAX	WanConnectionEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                " An entry in the table specifies the connection
+                configuration for WAN interface."
+        INDEX	{ wanIndex }
+        ::= { wanConnectionTable 1 }
+
+	WanConnectionEntry ::=
+        SEQUENCE {
+			wanIndex						INTEGER,
+			wanIfIndex						INTEGER,
+			wanConnectionType				INTEGER,
+			wanNetAddress					IpAddress,
+			wanPhysicalAddr					PhysAddress,
+			wanSubnetMask					IpAddress,
+			wanDefaultGateway				IpAddress,
+			wanDHCPStatus					INTEGER,
+			wanLoginStatus					INTEGER,
+			wanLoginUserName				DisplayString,
+			wanLoginPassword				DisplayString,
+			wanRasPlan						INTEGER,
+			wanWorkingMode					INTEGER,
+			wanConnectedState				INTEGER,
+			wanConnectedIdleTime			INTEGER,
+			wanConnectedRedialPeriod		INTEGER
+        }
+
+	wanIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "An unique value for each WAN connection configuration."
+        ::= { wanConnectionEntry 1 }
+
+	wanIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "The interface on which this entry's equivalence is effective.
+                The interface identified by a particular value of this index is
+                the same interface as identified by the same value of ifIndex."
+        ::= { wanConnectionEntry 2 }
+
+	wanConnectionType OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		dynamic(1),
+              		static(2),
+              		pppoe(3),
+              		ras(4),
+              		pptp(5),
+              		hbs(6)                  -- heart-beat-signal
+				}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the protocol to which adopted by this
+                WAN connection."
+        ::= { wanConnectionEntry 3 }
+
+	wanNetAddress OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The IP address that this managed node has, when
+                seen from the external WAN, or the Internet."
+        ::= { wanConnectionEntry 4 }
+
+	wanPhysicalAddr OBJECT-TYPE
+        SYNTAX	PhysAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The physical address that this managed node has,
+                when seen from the external WAN, or the Internet."
+        ::= { wanConnectionEntry 5 }
+
+	wanSubnetMask OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The subnet mask seen by external users on the
+                Internet."
+        ::= { wanConnectionEntry 6 }
+
+	wanDefaultGateway OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The IP address of remote host to which in respect
+                to the forwarding of datagrams received by, but not
+                addressed to, this managed node."
+        ::= { wanConnectionEntry 7 }
+
+	wanDHCPStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		release(0),
+              		renew(1)
+				}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates to release or renew the IP address of
+                this managed node which seen from the external
+                WAN, or the Internet."
+        ::= { wanConnectionEntry 8 }
+
+	wanLoginStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		pppoe(1),
+              		ras(2)
+				}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies to cut the connection to ISP, set to
+                disable(0), or to build up a PPPoE or RAS
+                connection."
+        ::= { wanConnectionEntry 9 }
+
+	wanLoginUserName OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..64))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The authorized user name used to access the ISP."
+        ::= { wanConnectionEntry 10 }
+
+	wanLoginPassword OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..64))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The authorized password used to access the ISP."
+        ::= { wanConnectionEntry 11 }
+
+	wanRasPlan OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		ethernet-512k(0),
+              		ethernet-256k(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the type of Remote Access Service plan
+                used to connect with the ISP."
+        ::= { wanConnectionEntry 12 }
+
+	wanWorkingMode OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		gateway(1),             -- enable NAT
+              		router(2)               -- disable NAT
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the working mode for this managed node.
+                Gateway mode should be used if this node is hosting
+                local network's connection to the Internet. Router
+                mode should be used if this node exists on a
+                network with other routers."
+        ::= { wanConnectionEntry 13 }
+
+	wanConnectedState OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		keepAlive(0),
+              		onDemand(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the state to keepAlive(0) will keep the
+                PPPoE-enabled Internet access connected indefinitely,
+                even when it sits idle. Otherwise the connection
+                to the ISP will be cutted after a preiod of time
+                specified in wanConnectedIdleTime object."
+        ::= { wanConnectionEntry 14 }
+
+	wanConnectedIdleTime OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the number of minutes that want to have
+                elapsed before Internet access disconnects. A zero
+                value indicates to remain the Internet connection
+                on at all times."
+        ::= { wanConnectionEntry 15 }
+
+	wanConnectedRedialPeriod OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "PPPoE retry to dial to ISP, due to ISP equipment bug in HK"
+        ::= { wanConnectionEntry 16 }
+
+
+-- the WAN Dns Network Address Table Group
+
+	wanDnsNetAddressTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WanDnsNetAddressEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table of DNS Server IP addresses."
+        ::= { wanMgt 2 }
+
+
+	wanDnsNetAddressEntry OBJECT-TYPE
+        SYNTAX	WanDnsNetAddressEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the table contains one DNS server IP
+                address."
+        INDEX	{ wanDnsNetAddressIndex }
+        ::= { wanDnsNetAddressTable 1 }
+
+	WanDnsNetAddressEntry ::=
+        SEQUENCE {
+			wanDnsNetAddressIndex 			INTEGER,
+			wanDnsIfIndex					INTEGER,
+			wanDnsNetAddress				IpAddress
+        }
+
+	wanDnsNetAddressIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "An unique value for each DNS server."
+        ::= { wanDnsNetAddressEntry 1 }
+
+	wanDnsIfIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "The interface on which this entry's equivalence is
+                effective. The interface identified by a particular
+                value of this index isthe same interface as identified
+                by the same value of ifIndex."
+        ::= { wanDnsNetAddressEntry 2 }
+
+	wanDnsNetAddress OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the IP address of DNS server to which
+                will translate domain or website names into
+                Internet addresses or URLs."
+        ::= { wanDnsNetAddressEntry 3 }
+
+
+-- the VPN Management Group
+
+	vpnIpsecTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF VpnIpsecEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table of VPN Tunnel configuration."
+        ::= { vpnMgt 1 }
+
+	vpnIpsecEntry OBJECT-TYPE
+        SYNTAX	VpnIpsecEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the table contains configuration
+                for each tunnel."
+        INDEX	{ vpnTunnelIndex }
+        ::= { vpnIpsecTable 1 }
+
+	VpnIpsecEntry ::=
+        SEQUENCE {
+			vpnTunnelIndex					INTEGER,
+			vpnTunnelState					INTEGER,
+			vpnTunnelName					DisplayString,
+			vpnLocalIdType					INTEGER,
+			vpnLocalIp						IpAddress,
+			vpnLocalSubnet					IpAddress,
+			vpnLocalSubnetMask				IpAddress,
+			vpnLocalRangeBeg				IpAddress,
+			vpnLocalRangeEnd				IpAddress,
+			vpnRemoteIdType					INTEGER,
+			vpnRemoteIp						IpAddress,
+			vpnRemoteSubnet					IpAddress,
+			vpnRemoteSubnetMask				IpAddress,
+			vpnRemoteRangeBeg				IpAddress,
+			vpnRemoteRangeEnd				IpAddress,
+			vpnRemoteSecurityGateway		IpAddress,
+			vpnEspEncrypt					INTEGER,
+			vpnEspAuth						INTEGER,
+			vpnKeyMethod					INTEGER,
+			vpnIsakmpPfs					INTEGER,
+			vpnIsakmpPreSharedKey			DisplayString,
+			vpnManualEncryptKey				DisplayString,
+			vpnManualAuthKey				DisplayString,
+			vpnManualInboundSpi				DisplayString,
+			vpnManualOutboundSpi			DisplayString,
+			vpnTunnelStatus					INTEGER
+        }
+
+	vpnTunnelIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "An unique value for each independent tunnel."
+        ::= { vpnIpsecEntry 1 }
+
+	vpnTunnelState OBJECT-TYPE
+        SYNTAX	INTEGER { disable(0), enable(1) }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Status of selected tunnel, disable or enable."
+        ::= { vpnIpsecEntry 2 }
+
+	vpnTunnelName OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..15))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Name of selected tunnel."
+        ::= { vpnIpsecEntry 3 }
+
+	vpnLocalIdType OBJECT-TYPE
+        SYNTAX	INTEGER { ip(0), subnet(1), range(2) }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Select the local LAN user(s) behind the router
+                that can use this VPN tunnel. This may be a single
+                IP address, a Sub-network or a range of addresses.
+                Notice that the Local Secure Group must match the
+                other router's Remote Secure Group."
+        ::= { vpnIpsecEntry 4 }
+
+	vpnLocalIp OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The IP address if vpnLocalIdType is ip(0)."
+        ::= { vpnIpsecEntry 5 }
+
+	vpnLocalSubnet OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The Sub-network IP if vpnLocalIdType is subnet(1)."
+        ::= { vpnIpsecEntry 6 }
+
+	vpnLocalSubnetMask OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The Sub-network mask if vpnLocalIdType is subnet(1)."
+        ::= { vpnIpsecEntry 7 }
+
+	vpnLocalRangeBeg OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The start address of IP range if vpnLocalIdType
+                is range(2)."
+        ::= { vpnIpsecEntry 8 }
+
+	vpnLocalRangeEnd OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The end address of IP range if vpnLocalIdType is
+                range(2)."
+        ::= { vpnIpsecEntry 9 }
+
+	vpnRemoteIdType OBJECT-TYPE
+        SYNTAX	INTEGER { ip(0), subnet(1), range(2) }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Select the remote LAN user(s) behind the remote
+                gateway can use this VPN tunnel. This may be a
+                single IP address, a Sub-network, range of addresses
+                or any addresses. If [Any] is set, the router acts
+                as responder and accepts request from any remote user.
+                In this case, the pre-shared key of this tunnel should
+                be set as a different string from other tunnels'.
+                Notice that Remote Secure Group must match the
+                other router's Local Secure Group."
+        ::= { vpnIpsecEntry 10 }
+
+	vpnRemoteIp OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The IP address if vpnRemoteIdType is ip(0)."
+        ::= { vpnIpsecEntry 11 }
+
+	vpnRemoteSubnet OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The Sub-network IP if vpnRemoteIdType is subnet(1)."
+        ::= { vpnIpsecEntry 12 }
+
+	vpnRemoteSubnetMask OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The Sub-network mask if vpnRemoteIdType is subnet(1)."
+        ::= { vpnIpsecEntry 13 }
+
+	vpnRemoteRangeBeg OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The start address of IP range if vpnRemoteIdType
+                is range(2)."
+        ::= { vpnIpsecEntry 14 }
+
+	vpnRemoteRangeEnd OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The end address of IP range if vpnRemoteIdType is
+                range(2)."
+        ::= { vpnIpsecEntry 15 }
+
+	vpnRemoteSecurityGateway OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The IP address in this field must match the public
+                IP address (i.e. WAN IP Address) of the remote gateway
+                at the other end of this tunnel. If the remote gateway
+                has a dynamic IP address, select [Any] in this field.
+                In this case, the pre-shared key of this tunnel should
+                be set as a different string from other tunnels'.
+                Another type is [FQDN]. It allows you to enter a
+                fully-qualified domain name of the remote gateway."
+        ::= { vpnIpsecEntry 16 }
+
+	vpnEspEncrypt OBJECT-TYPE
+        SYNTAX	INTEGER { disable(0), des(1), des3(2) }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The Encryption method determines the length of the
+                key used to encrypt/decrypt ESP packets. Either DES
+                or 3DES may be selected. Notice that both sides must
+                use the same Encryption method."
+        ::= { vpnIpsecEntry 17 }
+
+	vpnEspAuth OBJECT-TYPE
+        SYNTAX	INTEGER { disable(0), md5(1), sha(2) }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Authentication, determines a method to authenticate
+                the ESP packets. Either MD5 or SHA may be selected.
+                Notice that both sides must use the same Authentication
+                method."
+        ::= { vpnIpsecEntry 18 }
+
+	vpnKeyMethod OBJECT-TYPE
+        SYNTAX	INTEGER { isakmp(0), manual(1) }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The router supports both automatic and manual key
+                management. When choosing automatic key management,
+                IKE(Internet Key Exchange) protocols are used to
+                negotiate key material for SA. If manual key management
+                is selected, no key negotiation is needed. Basically,
+                manual key management is used in small static
+                environments or for troubleshooting purpose. Notice
+                that both sides must use the same Key Management method."
+        ::= { vpnIpsecEntry 19 }
+
+	vpnIsakmpPfs OBJECT-TYPE
+        SYNTAX	INTEGER { disable(0), enable(1) }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "If PFS is enabled, IKE Phase 2 negotiation will
+                generate a new key material for IP traffic encryption
+                and authentication. Note: that both sides must have
+                this selected."
+        ::= { vpnIpsecEntry 20 }
+
+	vpnIsakmpPreSharedKey OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..23))
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "IKE uses the Pre-shared Key field to authenticate the
+                remote IKE peer. Both character and hexadecimal value
+                are acceptable in this field. e.g. [My-@123] or
+                [0x4d795f40313233] Note: that both sides must use the
+                same Pre-shared Key."
+        ::= { vpnIpsecEntry 21 }
+
+	vpnManualEncryptKey OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..23))
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "This field specifies a key used to encrypt and decrypt
+                IP traffic. Both character and hexadecimal value are
+                acceptable in this field. Note: that both sides must use
+                the same Encryption Key."
+        ::= { vpnIpsecEntry 22 }
+
+	vpnManualAuthKey OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..19))
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "This field specifies a key used to authenticate IP
+                traffic.Both character and hexadecimal value are
+                acceptable in this field. Note: that both sides must
+                use the same Authentication Key."
+        ::= { vpnIpsecEntry 23 }
+
+	vpnManualInboundSpi OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..9))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The SPI(Security Parameter Index) is carried in the ESP
+                header. This enables the receiver to select the SA, under
+                which a packet should be processed. The SPI is a 32-bit
+                value. Both decimal and hexadecimal values are acceptable.
+                e.g. [987654321] or [0x3ade68b1]. Each tunnel must have
+                unique an Inbound SPI and Outbound SPI. No two tunnels
+                share the same SPI. Notice that Inbound SPI must match
+                the other router's Outbound SPI, and vice versa."
+        ::= { vpnIpsecEntry 24 }
+
+	vpnManualOutboundSpi OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..9))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The SPI(Security Parameter Index) is carried in the ESP
+                header. This enables the receiver to select the SA, under
+                which a packet should be processed. The SPI is a 32-bit
+                value. Both decimal and hexadecimal values are acceptable.
+                e.g. [987654321] or [0x3ade68b1]. Each tunnel must have
+                unique an Inbound SPI and Outbound SPI. No two tunnels
+                share the same SPI. Notice that Inbound SPI must match
+                the other router's Outbound SPI, and vice versa."
+        ::= { vpnIpsecEntry 25 }
+
+
+	vpnTunnelStatus OBJECT-TYPE
+        SYNTAX	INTEGER { connected(0), disconnected(1) }
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the connection status of the selected tunnel.
+                The state is either connected(0) or disconnected(1)."
+        ::= { vpnIpsecEntry 26 }
+
+
+-- the Firewall Management Group
+
+	fwProtection OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Set to disable or enable the firewall function
+                utilized on this managed node."
+        ::= { firewallMgt 1 }
+
+
+-- the Wireless Common Group
+
+	stationMacFilter OBJECT-TYPE
+		SYNTAX	INTEGER {
+					disable(0),
+					enable(1)
+				}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Set to disable(0) or enable(1) the wireless
+				station physical address filter."
+		::= { wirelessCommon 1 }
+	
+	apClientModeEnable OBJECT-TYPE
+		SYNTAX	INTEGER {			   
+					disable (0),
+					enable (1)
+				} 
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get enable or disable AP client mode"
+		::= { wirelessCommon 2 }
+	    
+	apClientMacNum OBJECT-TYPE
+		SYNTAX	INTEGER (1..20)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get the numbers of AP Client MAC address list"
+		::= { wirelessCommon 3 }
+	    
+	apClientMacTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ApClientMacEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get the MAC address list of AP Client"
+		::= { wirelessCommon 4 }
+
+	apClientMacEntry OBJECT-TYPE
+		SYNTAX  ApClientMacEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+				"A MAC address table for AP client mode."
+		INDEX  { apClientMacIndex }
+		::= { apClientMacTable 1 }
+	
+	ApClientMacEntry ::=
+		SEQUENCE {
+			apClientMacIndex      INTEGER,
+			apClientMacAddress    PhysAddress,
+		}                               
+	                                    
+	apClientMacIndex OBJECT-TYPE        
+		SYNTAX	INTEGER                 
+		ACCESS	read-only               
+		STATUS	mandatory               
+		DESCRIPTION                     
+				"A index value for each MAC address. "
+		::= { apClientMacEntry 1 }
+	
+	apClientMacAddress OBJECT-TYPE
+		SYNTAX	PhysAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The MAC address."
+		::= { apClientMacEntry 2 }    
+
+	apBridgeModeEnable OBJECT-TYPE
+		SYNTAX	INTEGER {			   
+					disable (0),
+					enable (1)
+				} 
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get enable or disable  Bridge mode"
+		::= { wirelessCommon 5 }
+	    
+	apBridgeMacNum OBJECT-TYPE
+		SYNTAX	INTEGER (1..20)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get the numbers of Bridge MAC address list"
+		::= { wirelessCommon 6 }
+	    
+	apBridgeMacTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ApBridgeMacEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get the MAC address list of  Bridge"
+		::= { wirelessCommon 7 }
+
+	apBridgeMacEntry OBJECT-TYPE
+		SYNTAX	ApBridgeMacEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"A MAC address table for AP Bridge mode."
+		INDEX  { apBridgeMacIndex }
+		::= { apBridgeMacTable 1 }
+	
+	ApBridgeMacEntry ::=
+		SEQUENCE {
+			apBridgeMacIndex      INTEGER,
+			apBridgeMacAddress    PhysAddress,
+		}
+	
+	apBridgeMacIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"A index value for each MAC address. "
+		::= { apBridgeMacEntry 1 }
+	
+	apBridgeMacAddress OBJECT-TYPE
+		SYNTAX	PhysAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The MAC address."
+		::= { apBridgeMacEntry 2 }    
+
+	apRepeatorModeEnable OBJECT-TYPE
+		SYNTAX	INTEGER {			   
+					disable (0),
+					enable (1)
+				} 
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get enable or disable repeater mode"
+		::= { wirelessCommon 8 }
+	    
+	apRepeatorMacNum OBJECT-TYPE
+		SYNTAX	INTEGER (1..20)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get the numbers of repeater MAC address list"
+		::= { wirelessCommon 9 }
+	    
+	apRepeatorMacTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF ApRepeatorMacEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"set/get the MAC address list of repeater"
+		::= { wirelessCommon 10 }
+
+	apRepeatorMacEntry OBJECT-TYPE
+		SYNTAX	ApRepeatorMacEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"A MAC address table for AP Repeator mode."
+		INDEX  { apRepeatorMacIndex }
+		::= { apRepeatorMacTable 1 }
+	
+	ApRepeatorMacEntry ::=
+		SEQUENCE {
+			apRepeatorMacIndex      INTEGER,
+			apRepeatorMacAddress    PhysAddress,
+		}
+	
+	apRepeatorMacIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"A index value for each MAC address. "
+		::= { apRepeatorMacEntry 1 }
+	
+	apRepeatorMacAddress OBJECT-TYPE
+		SYNTAX	PhysAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"The MAC address."
+		::= { apRepeatorMacEntry 2 }    
+
+
+-- the Wireless 802.11b Group
+	ieee80211bBroadcastSSID OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The attribute is only valid for Access Point and the 
+				master of IBSS.	When the attribute is enable, the SSID 
+				field in beacon frames is blank, also the device will 
+				not response the Probe Request with unspecified SSID."
+        ::= { ieee80211b 1 }
+
+	ieee80211bSSIDString OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..32))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"When in read access, this attribute reflects the Service 
+				Set ID of the current wireless connection. When in write 
+				access, it is the desired Service Set ID."
+        ::= { ieee80211b 2 }
+
+	ieee80211bChannel OBJECT-TYPE
+        SYNTAX	INTEGER (1..14)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"When in read access, this attribute reflects the channel 
+				number of the current wireless connection. When in write 
+				access, it is the desired channel to connect."
+        ::= { ieee80211b 3 }
+
+	ieee80211bWep OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"Specify the WEP status of device. If the attribute is 
+				set as enable, the WEP mechanism is used for transmitting 
+				data frames."
+        ::= { ieee80211b 4 }
+
+	ieee80211bWepAuthMethod  OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		both(0),
+              		open-key(1),
+              		share-key(2)
+              		}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specify the authentication algorithms supported by the 
+                station or AP."
+        ::= { ieee80211b 5 }
+
+	ieee80211bWepBits OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		wep64bits(0),
+              		wep128bits(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"When WEP is enabled, this attribute specifies whether 
+				64-bit or 128-bit encryption/decryption algorithm is used."
+        ::= { ieee80211b 6 }
+
+	ieee80211bDefaultKey  OBJECT-TYPE
+        SYNTAX	INTEGER (1..4)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The index of default WEP encryption key for transmission. 
+                It can be 1 to 4."
+        ::= { ieee80211b 7 }
+
+	ieee80211bWep64bitkey1 OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..10))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The WEP key #1 value for 64-bit WEP encryption. It's HEX 
+				value in ASCII format. For example: WEP key: 0x12 0x34 
+				0x56 0x78 0x90 is specified as '1234567890'."
+        ::= { ieee80211b 8 }
+
+	ieee80211bWep64bitkey2 OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..10))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The WEP key #2 value for 64-bit WEP encryption. It's HEX 
+				value in ASCII format. For example: WEP key: 0x12 0x34 
+				0x56 0x78 0x90 is specified as '1234567890'."
+        ::= { ieee80211b 9 }
+
+	ieee80211bWep64bitkey3 OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..10))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The WEP key #3 value for 64-bit WEP encryption. It's HEX 
+				value in ASCII format. For example: WEP key: 0x12 0x34 
+				0x56 0x78 0x90 is specified as '1234567890'."
+        ::= { ieee80211b 10 }
+
+	ieee80211bWep64bitkey4 OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..10))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The WEP key #4 value for 64-bit WEP encryption. It's HEX 
+				value in ASCII format. For example: WEP key: 0x12 0x34 
+				0x56 0x78 0x90 is specified as '1234567890'."
+        ::= { ieee80211b 11 }
+
+	ieee80211bWep128bitkey1 OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..26))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The WEP key #1 value for 128-bit WEP encryption. It's HEX 
+				value in ASCII format. For example: WEP key: 0x12 0x34 
+				0x56 0x78 0x90 is specified as '1234567890'."
+        ::= { ieee80211b 12 }
+
+	ieee80211bWep128bitkey2 OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..26))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The WEP key #2 value for 128-bit WEP encryption. It's HEX 
+				value in ASCII format. For example: WEP key: 0x12 0x34 
+				0x56 0x78 0x90 is specified as '1234567890'."
+        ::= { ieee80211b 13 }
+
+	ieee80211bWep128bitkey3 OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..26))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The WEP key #3 value for 128-bit WEP encryption. It's HEX 
+				value in ASCII format. For example: WEP key: 0x12 0x34 
+				0x56 0x78 0x90 is specified as '1234567890'."
+        ::= { ieee80211b 14 }
+
+	ieee80211bWep128bitkey4 OBJECT-TYPE
+        SYNTAX	OCTET STRING (SIZE(0..26))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The WEP key #4 value for 128-bit WEP encryption. It's HEX 
+                value in ASCII format. For example: WEP key: 0x12 0x34 
+                0x56 0x78 0x90 is specified as '1234567890'."
+        ::= { ieee80211b 15 }
+
+
+	ieee80211bBeaconInterval OBJECT-TYPE
+        SYNTAX	INTEGER (0..65535)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This value specifies the beacon interval duration in 
+                miliseconds."
+        ::= { ieee80211b 16 }
+
+	ieee80211bRTSThreshold OBJECT-TYPE
+        SYNTAX	INTEGER (0..2347)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "This attribute shall indicate the number of octets in an 
+                MPDU, below which an RTS/CTS handshake shall not be 
+                performed at the beginning of any frame exchange sequence 
+                where the MPDU is of type Data or Management, the MPDU has 
+                an individual address in the address1 field, and the length 
+                of the MPDU is greater than this threshold. Setting this 
+                attribute to be larger than the maximum MSDU size shall 
+                have the effect of turnning off the RTS/CTS	handshake for 
+                frames of Data and Management type transmitted by this 
+                device.	Setting this attribute to zero shall have the 
+                effect of turnning on the RTS/CTS handshake for all frames 
+                of Data and Management type transmitted by the device."
+        ::= { ieee80211b 17 }
+
+	ieee80211bFragmentThreshold OBJECT-TYPE
+        SYNTAX	INTEGER (256..2346)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"This attribute shall specify the current maximum size, in 
+				octets, of the MPDU that may be delivered to PHY. An MSDU 
+				shall be broken into fragments if its size exceeds the value 
+				of this attribute after adding MAC headers and trailers. An 
+				MSDU or MMPDU shall be fragmented when the resulting frame
+				has an individual address in Address1 field, and the length 
+				of frame is larger than this threshold."
+        ::= { ieee80211b 18 }
+
+	ieee80211bDTIMInterval OBJECT-TYPE
+        SYNTAX	INTEGER (0..255)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"Specify the number of beacon intervals that shall elapse 
+				between transmission of Beacon frames containing a TIM 
+				element whose DTIM Count field is 0. This value is 
+				transmitted in the DTIM Period field of Beacon frames."
+        ::= { ieee80211b 19 }
+
+	ieee80211bBasicRate    OBJECT-TYPE
+        SYNTAX	INTEGER (1..15)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The value is a bit-map of basic data rates. It specifies 
+				the basic rates used and reported for this BSS by the AP. 
+				The highest rate specified is the rate that the AP uses 
+				when transmitting broadcast/multicast and management 
+				frames. Bit0 = 1Mbps, Bit1 = 2Mbps, Bit2 = 5.5Mbps, and
+				Bit3 = 11Mbps. The basic data rates also specifies the 
+				rates that must be supported by all stations to join this 
+				BSS."
+        ::= { ieee80211b 20 }
+
+	ieee80211bTXRate OBJECT-TYPE
+        SYNTAX	INTEGER {
+					rate-1Mbps(1),
+					rate-2Mbps(2),
+					rate-5dot5Mbps(3),
+					rate-11Mbps(4),
+					auto-fallback(5)
+				}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"The default transmission rate of the staion or access 
+				point. When set as auto-fallback, the tx rate auto-fallback 
+				between 11, 5.5, 2, and 1Mbps."
+        ::= { ieee80211b 21 }
+
+	ieee80211bPreambleType OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		longPreamble(0),
+              		shortPreamble(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"For wireless stations, this attribute specifies whether 
+				frames are transmitted with the short or long preamble. 
+				For access points, when set to shortPreamble, it force 
+				the AP to disallow associations from stations that do not 
+				support short preamble. In longPreamble mode, it allow 
+				all stations to associate, which carries the risk that 
+				legacy systems may associate with the BSS and then 
+				proceed to interfere with the short preamble packets."
+        ::= { ieee80211b 22 }
+
+	ieee80211bRadioFunction OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"Enable/Disable the RF radio function. When disable, no RF 
+				signal will be generated on the air, also no RF signal 
+				will be received. But the MAC function of the wireless 
+				interface is still working. When enable, the interface is 
+				working normally."
+        ::= { ieee80211b 23 }
+
+	ieee80211bDeviceFunction OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"Enable/Disable the function of the device. When disable, 
+				not only the RF radio is turned off, but also the MAC 
+				function of wireless interface is also turned off. When 
+				enable, the interface is working normally."
+        ::= { ieee80211b 24 }
+
+	ieee80211bDomain OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		usa-canada(1),
+              		most-of-europe(2),
+              		spain(3),
+              		france(4),
+              		japan(5),
+              		worldwide(6)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+				"The attribute describe the regulatory domain the PLCP 
+				and PMD support in this wireless interface."
+        ::= { ieee80211b 25 }
+
+	ieee80211bSignalStrength OBJECT-TYPE
+        SYNTAX	INTEGER (0..100)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+				"The signal strength of the current wireless connection. 
+				The unit is percentage. It's only valid for wireless 
+				station in infrastructure mode. When the link is 
+				disconnected, the value should be 0."
+        ::= { ieee80211b 26 }
+
+	ieee80211bOperationMode OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		adhoc(0),
+              		infrastructure(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+				"Specify the type of BSS the station shall use when 
+				scanning for a BSS with which to connect. When set to 
+				infrastructure, the station shall only connect to an 
+				Access Point. When set to adhoc, the station shall only
+		 connect to an IBSS network."
+        ::= { ieee80211b 27 }
+
+	ieee80211bPassPhrase OBJECT-TYPE
+        SYNTAX          DisplayString (SIZE(0..30))
+        ACCESS          read-write
+        STATUS          mandatory
+        DESCRIPTION
+				"The ASCII string used to generate the actual 4 WEP 
+				keys. The length of the attribute can be 0 to 30. 
+				The algorithm of the WEP key generation is based on 
+				the algorithm proposed by Intersil. The algorithm
+				to generate 64-bit WEP key and 128-bit WEP key are 
+				different. When in 64-bit mode, it uses Intersil's 
+				proprietary algorithm to generate 4 different WEP
+				keys. When in 128-bit mode, it uses MD5 to generate 
+				4 WEP keys with identical key value."
+        ::= { ieee80211b 28 }
+
+	ieee80211bLinkQuality OBJECT-TYPE
+        SYNTAX	INTEGER (0..100)
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+				"The link quality of the current wireless connection. 
+				The unit is percentage. If the link is disconnected, 
+				the value should be 0."
+        ::= { ieee80211b 29 }
+
+
+-- the Wireless 802.11a Group
+	ieee80211aBroadcastSSID OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get enable or disable broadcast SSID"
+        ::= { ieee80211a 1 }
+
+	ieee80211aSSIDString OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..32))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get SSID String"
+        ::= { ieee80211a 2 }
+
+	ieee80211aChannel OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		channel36(1),
+              		channel40(2),
+              		channel44(3),
+              		channel48(4),
+              		channel52(5),
+              		channel56(6),
+              		channel60(7),
+              		channel64(8),
+              		channel42(9),
+              		channel50(10),
+              		channel58(11)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get Current Channel, 42/50/58 channel is for turbo mode"
+        ::= { ieee80211a 3 }
+
+	ieee80211aWep OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get enable or disable WEP encryption"
+        ::= { ieee80211a 4 }
+
+	ieee80211aWepauthmethod  OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		both(0),
+              		open-key(1),
+              		share-key(2)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get Authentication method"
+        ::= { ieee80211a 5 }
+
+	ieee80211aDefaultKey  OBJECT-TYPE
+        SYNTAX	INTEGER (1..4)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get the default WEP KEY ID"
+        ::= { ieee80211a 6 }
+
+	ieee80211aWepbits OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		wep64bits(0),
+              		wep128bits(1),
+              		wep152bits(2)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get WEP encryption bit length"
+        ::= { ieee80211a 7 }
+
+	ieee80211aWep64bitkey1 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..10))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 64bit key 1"
+        ::= { ieee80211a 8 }
+
+	ieee80211aWep64bitkey2 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..10))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 64bit key 2"
+        ::= { ieee80211a 9 }
+
+	ieee80211aWep64bitkey3 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..10))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 64bit key 3"
+        ::= { ieee80211a 10 }
+
+	ieee80211aWep64bitkey4 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..10))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 64bit key 4"
+        ::= { ieee80211a 11 }
+
+	ieee80211aWep128bitkey1 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..26))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 128 bit key 1"
+        ::= { ieee80211a 12 }
+
+	ieee80211aWep128bitkey2 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..26))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 128 bit key 2"
+        ::= { ieee80211a 13 }
+
+	ieee80211aWep128bitkey3 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..26))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 128 bit key 3"
+        ::= { ieee80211a 14 }
+
+	ieee80211aWep128bitkey4 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..26))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 128 bit key 4"
+        ::= { ieee80211a 15 }
+
+	ieee80211aWep152bitkey1 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..32))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 152 bit key 1"
+        ::= { ieee80211a 16 }
+
+	ieee80211aWep152bitkey2 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..32))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 152 bit key 2"
+        ::= { ieee80211a 17 }
+
+	ieee80211aWep152bitkey3 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..32))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 152 bit key 3"
+        ::= { ieee80211a 18 }
+
+	ieee80211aWep152bitkey4 OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..32))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get 152 bit key 4"
+        ::= { ieee80211a 19 }
+
+	ieee80211aBeaconInterval OBJECT-TYPE
+        SYNTAX	INTEGER (0..65535)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get Beacon Interval"
+        ::= { ieee80211a 20 }
+
+	ieee80211aRTSThreshold OBJECT-TYPE
+        SYNTAX	INTEGER (0..2432)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get RTS Threshold"
+        ::= { ieee80211a 21 }
+
+	ieee80211aFragmentThreshold OBJECT-TYPE
+        SYNTAX	INTEGER (0..2346)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get Fragmentation Threshold"
+        ::= { ieee80211a 22 }
+
+	ieee80211aDTIMInterval OBJECT-TYPE
+        SYNTAX	INTEGER (0..255)
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get DTIM Interval"
+        ::= { ieee80211a 23 }
+
+	ieee80211aBasicRate OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		rate6mbps(0)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get Basic rate"
+        ::= { ieee80211a 24 }
+
+	ieee80211aTXRate OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		rate6Mbps(0),
+              		rate9Mbps(1),
+              		rate12Mbps(2),
+              		rate18Mbps(3),
+              		rate24Mbps(4),
+              		rate36Mbps(5),
+              		rate48Mbps(6),
+              		rate54Mbps(7),
+              		bestRate(8)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get Transmit rate"
+        ::= { ieee80211a 25 }
+
+	ieee80211aTurboMode OBJECT-TYPE
+        SYNTAX	INTEGER {
+					disable(0),
+					enable(1)
+				}
+        MAX-ACCESS read-write
+        STATUS	current
+        DESCRIPTION
+				"set/get enable or disable turbo mode"
+		::= { ieee80211a 26 }
+
+	ieee80211aPhyOFDMEnable OBJECT-TYPE
+        SYNTAX	INTEGER {
+					disable(0),
+					enable(1)
+				}
+        MAX-ACCESS read-write
+        STATUS	current
+        DESCRIPTION
+				"set/get enable or disable OFDM modulation"
+		::= { ieee80211a 27 }
+
+	ieee80211aPhyOFDMAutoChannelSelect OBJECT-TYPE
+        SYNTAX	INTEGER {
+					disable(0),
+					enable(1)
+				}
+        MAX-ACCESS read-write
+        STATUS	current
+        DESCRIPTION
+			"set/get enable or disable auto find the channel with less 
+			interference "
+		::= { ieee80211a 28 }
+
+	ieee80211aRadioFunction OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get enable or disable radio function"
+        ::= { ieee80211a 29 }
+
+	ieee80211aDeviceFunction OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disable(0),
+              		enable(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get enable or disable device"
+        ::= { ieee80211a 30 }
+
+	ieee80211aDomain OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		usa-canada(1),
+              		most-of-europe(2),
+              		spain(3),
+              		france(4),
+              		japan(5),
+              		worldwide(6)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Get regular domain"
+        ::= { ieee80211a 31 }
+
+	ieee80211aSignalStrength OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Get signal strength (for NIC)"
+        ::= { ieee80211a 32 }
+
+	ieee80211aOperationMode OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		adhoc(0),
+              		infrastructure(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "set/get The operation mode of this NIC."
+        ::= { ieee80211a 33 }
+
+	ieee80211aLinkQuality OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Get the link quality of this NIC."
+        ::= { ieee80211a 34 }
+
+
+-- the DSL group
+
+        -- the remote Node group
+        -- When user want to creat one remote entry who should create the
+        -- entry from remoteNodeTable first and then setting the relative
+        -- information at remoteNodeIPBridgeTable, remoteNodeATMTable and
+        -- remoteNodeFilterSetTable.  After that the user can then set up
+        -- this object by setting it to active. At the mean time the snmp
+        -- agent will do the relationship check, the status will be active
+        -- if sucdessful, otherwise the status will be deactive and the
+        -- error status will shows at remoteNodeErrString.
+
+        -- adslRemoteNode OBJECT-TYPE
+        remoteNodeNumber OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of network interfaces (regardless of
+                        their current state) present on this system."
+                ::= { adslRemoteNode 1 }
+
+        remoteNodeErrString OBJECT-TYPE
+                SYNTAX  DisplayString
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The error status of saving one remote node settings.
+                        The string will clear once it is accessed from the
+                        SNMP server."
+                ::= { adslRemoteNode 2 }
+
+        remoteNodeStatusTable OBJECT-TYPE
+                SYNTAX  SEQUENCE OF RemoteNodeStatusEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION
+                        "A list of remote node status entries."
+                ::= { adslRemoteNode 3 }
+
+        remoteNodeStatusEntry OBJECT-TYPE
+                SYNTAX  RemoteNodeStatusEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION
+                "An remote node status entry containing comment object
+                 for a remote node status."
+                INDEX   { remoteNodeStatusIndex }
+                ::= { remoteNodeStatusTable 1 }
+
+        RemoteNodeStatusEntry ::=
+                SEQUENCE {
+                        remoteNodeStatusIndex
+                                INTEGER,
+                                remoteNodeStatusIfIndex
+                                                INTEGER,
+                        remoteNodeStatus
+                                INTEGER,
+                        remoteNodeISPnode
+                                INTEGER
+                }
+
+        remoteNodeStatusIndex OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The index of remote node status entry."
+                ::= { remoteNodeStatusEntry 1 }
+
+		remoteNodeStatusIfIndex OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-only
+		        STATUS  deprecated
+		        DESCRIPTION
+		        		"The interface on which this entry's equivalence is effective.
+						The interface identified by a particular value of this index is
+						the same interface as identified by the same value of ifIndex."
+		        ::= { remoteNodeStatusEntry 2 }
+
+        remoteNodeStatus OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        other(1),          -- none of the following
+                        active(2),          -- active one remote node entry.
+                        deactive(3),        -- deactive one remote node entry.
+                        delete(4)            -- delete one remote node entry.
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                "This object allows you to activate/deactivate/delete this remote node."
+                ::= { remoteNodeStatusEntry 3 }
+
+        remoteNodeISPnode OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        no(0),
+                        yes(1)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The object allows you to set the remote node to ISP node."
+                ::= { remoteNodeStatusEntry 4 }
+
+        remoteNodeGeneralTable OBJECT-TYPE
+                SYNTAX  SEQUENCE OF RemoteNodeGeneralEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION
+                        "A list of remote node general entries."
+                ::= { adslRemoteNode 4 }
+
+        remoteNodeGeneralEntry OBJECT-TYPE
+                SYNTAX  RemoteNodeGeneralEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION
+                "An remote node general entry containing comment object for a
+                remote node general information."
+                INDEX   { remoteNodeGeneralIndex }
+                ::= { remoteNodeGeneralTable 1 }
+
+        RemoteNodeGeneralEntry ::=
+                SEQUENCE {
+                        remoteNodeGeneralIndex
+                                INTEGER,
+                                remoteNodeGeneralIfIndex
+                                                INTEGER,
+                        remoteNodeName
+                                DisplayString,
+                        remoteNodeEncap
+                                INTEGER,
+                        remoteNodeMultiplex
+                                INTEGER,
+                        remoteNodeServiceName
+                                DisplayString,
+                        remoteNodeAuthen
+                                INTEGER,
+                        remoteNodeRoute
+                                INTEGER,
+                        remoteNodeBridge
+                                INTEGER
+                }
+
+        remoteNodeGeneralIndex OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The index of remote node general entry."
+                ::= { remoteNodeGeneralEntry 1 }
+
+		remoteNodeGeneralIfIndex OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-only
+		        STATUS  deprecated
+		        DESCRIPTION
+		        		"The interface on which this entry's equivalence is effective.
+						The interface identified by a particular value of this index is
+						the same interface as identified by the same value of ifIndex."
+		        ::= { remoteNodeGeneralEntry 2 }
+
+        remoteNodeName OBJECT-TYPE
+                SYNTAX  DisplayString (SIZE (0..10))
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The name of the Internet service provider.  This
+                        information is for identification purpose only."
+                ::= { remoteNodeGeneralEntry 3 }
+
+        remoteNodeEncap OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        other(1),          -- none of the following
+                        ppp(2),
+                        pppoe(3),
+                        mpoa(4),
+                        enet-encap(5)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This if the method of encapsulation used by the ISP."
+                ::= { remoteNodeGeneralEntry 4 }
+
+        remoteNodeMultiplex OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        other(1),          -- none of the following
+                        llc-based(2),
+                        vc-based(3)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This if the methos of multiplexing used by the ISP.
+                        Choices are vc-based or llc-based"
+                ::= { remoteNodeGeneralEntry 5 }
+
+        remoteNodeServiceName OBJECT-TYPE
+                SYNTAX  DisplayString (SIZE (0..32))
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The PPPoE service name.  This is valid only when PPPoE
+                        encapsulation is chosen."
+                ::= { remoteNodeGeneralEntry 6 }
+
+
+        remoteNodeAuthen OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        other(1),          -- none of the following
+                        chap-pap(2),
+                        chap(3),
+                        pap(4)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object sets the authentication protocol used
+                        for outgoing calls.  Options for this object are :
+                        chap/pap - Your Device will accept CHAP or PAP.
+                        chap - Your Device will accept CHAP.
+                        PAP - Your Device will accept PAP."
+                ::= { remoteNodeGeneralEntry 7 }
+
+        remoteNodeRoute OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        other(1),          -- none of the following
+                        ip(2),
+                        none(3)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determines the protocol that your Device
+                        will route.  Choices are IP or none."
+                ::= { remoteNodeGeneralEntry 8 }
+
+        remoteNodeBridge OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        no(0),
+                        yes(1)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Bridging is used for protocols that the Device
+                        does not route, e.g. SNA, or not truned on in the
+                        previous Route object.  When bridging is enabled,
+                        your Device will forward any packet that it does
+                        not route to this remote node; otherwise, the
+                        packets are discarded.  Choose Yes to enable or No
+                        to disable the Bridge field."
+                ::= { remoteNodeGeneralEntry 9 }
+
+
+
+
+
+        -- remoteNodeATMTable OBJECT-TYPE
+
+        remoteNodeATMTable OBJECT-TYPE
+                SYNTAX  SEQUENCE OF RemoteNodeATMEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION
+                        "A list of remote node ATM entries."
+                ::= { adslRemoteNode 5 }
+
+        remoteNodeATMEntry OBJECT-TYPE
+                SYNTAX  RemoteNodeATMEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION
+                		"An remote node ATM entry containing comment object for a
+                		remote node ATM information."
+                INDEX   	{ remoteNodeATMIndex }
+                ::= { remoteNodeATMTable 1 }
+
+        RemoteNodeATMEntry ::=
+                SEQUENCE {
+                        remoteNodeATMIndex
+                                INTEGER,
+                                remoteNodeATMIfIndex
+                                                INTEGER,
+                        remoteNodeVPI
+                                INTEGER,
+                        remoteNodeVCI
+                                INTEGER,
+                        remoteNodeQosType
+                                INTEGER,
+                        remoteNodePCR
+                                INTEGER,
+                        remoteNodeSCR
+                                INTEGER,
+                        remoteNodeMBS
+                                INTEGER
+                }
+
+        remoteNodeATMIndex OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The index of remote node ATM entry."
+                ::= { remoteNodeATMEntry 1 }
+
+		remoteNodeATMIfIndex OBJECT-TYPE
+		        SYNTAX  INTEGER
+		        ACCESS  read-only
+		        STATUS  deprecated
+		        DESCRIPTION
+		        		"The interface on which this entry's equivalence is effective.
+						The interface identified by a particular value of this index is
+						the same interface as identified by the same value of ifIndex."
+		        ::= { remoteNodeATMEntry 2 }
+
+        remoteNodeVPI OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The Virtual Path Identifier(VPI) is supplied by your
+                        telephone company.  The valid range for the VPI is 0 to 255."
+                ::= { remoteNodeATMEntry 3 }
+
+        remoteNodeVCI OBJECT-TYPE
+                SYNTAX  INTEGER (32..65535)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The Virtual Channel Identifier(VCI) number is supplied by
+                        your telephone company.  The valid range is 32 to 65535."
+                ::= { remoteNodeATMEntry 4 }
+
+        remoteNodeQosType OBJECT-TYPE
+                SYNTAX  INTEGER {
+                        other(1),          -- none of the following
+                        cbr(2),
+                        ubr(3)
+                }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the ATM Qos Type.  There are 2 options: cbr and ubr.
+                        cbr (Continuous Bit Rate) specifys fixed (always-on) bandwidth.
+                        UBR (Unspecified Bit Rage) is for applications that are non-time
+                        senstive, such as e-mail."
+                ::= { remoteNodeATMEntry 5 }
+
+        remoteNodePCR OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This is the maximum rate at shich the sender can send cells."
+                ::= { remoteNodeATMEntry 6 }
+
+        remoteNodeSCR OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Sustained Cell Rate (SCR) is the mean cell rate of
+                        a bursty, on-off traffic source that can be sent at
+                        the peak rate, and a parameter for burst-type traffic.
+                        The SCR must be less than the PCR."
+                ::= { remoteNodeATMEntry 7 }
+
+        remoteNodeMBS OBJECT-TYPE
+                SYNTAX  INTEGER (0..65535)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "MBS is the Maximum Burst Size  of cells that can be sent
+                         at the peak rate.  The MBS must be less than 65535"
+                ::= { remoteNodeATMEntry 8 }
+
+
+-- the Control Group
+
+-- the FilterIPRangeTable Group
+
+	filterIPRangeTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF FilterIPRangeEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "A list of filter IP range entry."
+        ::= { control 1 }
+
+	filterIPRangeEntry OBJECT-TYPE
+        SYNTAX	FilterIPRangeEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Filter IP range entry can be used to block specific internal users from
+                 accessing the Internet.  Each entry has start IP and end IP settings,
+                 if user's IP is in this range, he will be blocked."
+        INDEX	{ filterIPRangeIndex }
+        ::= { filterIPRangeTable 1 }
+
+	FilterIPRangeEntry ::=
+        SEQUENCE {
+			filterIPRangeIndex				INTEGER,
+			filterIPStart					IpAddress,
+			filterIPEnd						IpAddress
+        }
+
+	filterIPRangeIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Index of filter IP range table."
+        ::= { filterIPRangeEntry 1 }
+
+	filterIPStart OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Start IP address of filter IP range entry."
+        ::= { filterIPRangeEntry 2 }
+
+	filterIPEnd OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "End IP address of filter IP range entry."
+        ::= { filterIPRangeEntry 3 }
+
+
+-- the FilterPortRangeTable Group
+
+	filterPortRangeTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF FilterPortRangeEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "A list of filter port range entry."
+        ::= { control 2 }
+
+	filterPortRangeEntry OBJECT-TYPE
+        SYNTAX	FilterPortRangeEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+				"Filter port range entry can be used to block specific 
+				packets from  going out to Internet.  Each entry has 
+				protocol and port range settings, if out-going packet's 
+				destination port is in this port range and protocol is 
+				identical, then it will be blocked."
+        INDEX	{ filterPortRangeIndex }
+        ::= { filterPortRangeTable 1 }
+
+	FilterPortRangeEntry ::=
+        SEQUENCE {
+			filterPortRangeIndex				INTEGER,
+			filterPortProto						INTEGER,
+			filterPortStart						INTEGER,
+			filterPortEnd						INTEGER
+        }
+
+	filterPortRangeIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Index of filter port range table."
+        ::= { filterPortRangeEntry 1 }
+
+	filterPortProto OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		both(0),
+              		udp(1),
+              		tcp(2)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Protocol setting of FilterPortRangeEntry, it can be TCP, 
+                UDP or both (TCP and UDP)."
+        ::= { filterPortRangeEntry 2 }
+
+	filterPortStart OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Start port setting of FilterPortRangeEntry"
+        ::= { filterPortRangeEntry 3 }
+
+	filterPortEnd OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "End port setting of FilterPortRangeEntry"
+        ::= { filterPortRangeEntry 4 }
+
+
+-- the FilterMACTable Group
+
+	filterMACTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF FilterMACEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "A list of filter Mac entry."
+        ::= { control 3 }
+
+	filterMACEntry OBJECT-TYPE
+        SYNTAX	FilterMACEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+				"Filter MAC range entry can be used to block specific 
+				internal users from accessing the Internet. Each entry 
+				has a MAC setting, if user's MAC is identical with this 
+				setting, he will be blocked."
+        INDEX	{ filterMACIndex }
+        ::= { filterMACTable 1 }
+
+	FilterMACEntry ::=
+        SEQUENCE {
+			filterMACIndex					INTEGER,
+			filterMAC						PhysAddress
+        }
+
+	filterMACIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Index of filterMACTable."
+        ::= { filterMACEntry 1 }
+
+	filterMAC OBJECT-TYPE
+        SYNTAX	PhysAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The MAC setting of filterMACEntry."
+        ::= { filterMACEntry 2 }
+
+
+-- the ForwardTable Group
+
+	forwardTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF ForwardEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "A list of forwardEntry."
+        ::= { control 4 }
+
+	forwardEntry OBJECT-TYPE
+        SYNTAX	ForwardEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+				"You can use Forwarding to set up public services on your 
+				network.  When user send this type of request to your 
+				network via the Internet, the router will forward those 
+				requests to the appropriate PC."
+        INDEX	{ forwardIndex }
+        ::= { forwardTable 1 }
+
+	ForwardEntry ::=
+        SEQUENCE {
+			forwardIndex					INTEGER,
+			servicePortStart				INTEGER,
+			servicePortEnd					INTEGER,
+			servicePortProto				INTEGER,
+			forwardIPAddress				IpAddress
+        }
+
+	forwardIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Index of forwardTable"
+        ::= { forwardEntry 1 }
+
+	servicePortStart OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The start port setting of forward public service port range."
+        ::= { forwardEntry 2 }
+
+	servicePortEnd OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The end port setting of forward public service port range."
+        ::= { forwardEntry 3 }
+
+	servicePortProto OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		both(0),
+              		udp(1),
+              		tcp(2)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The protocol setting of forward public service port range."
+        ::= { forwardEntry 4 }
+
+	forwardIPAddress OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The LAN side forward server IP address."
+        ::= { forwardEntry 5 }
+
+
+-- the Port Triggering Group
+
+	portTriggeringTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF PortTriggeringEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "A list of portTriggeringEntry"
+        ::= { control 5 }
+
+	portTriggeringEntry OBJECT-TYPE
+        SYNTAX	PortTriggeringEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Port triggering allows the Router to watch outgoing data for specific port numbers.
+                 The IP address of the computer that sends the matching data is remembered by the
+                 Router, so that when the requested data returns through the firewall, the data is
+                 pulled back to the proper computer by way of IP address and port mapping rules."
+        INDEX	{ portTriggeringIndex }
+        ::= { portTriggeringTable 1 }
+
+	PortTriggeringEntry ::=
+        SEQUENCE {
+			portTriggeringIndex				INTEGER,
+			appName							DisplayString,
+			triggerPortStart				INTEGER,
+			triggerPortEnd					INTEGER,
+			incomingPortStart				INTEGER,
+			incomingPortEnd					INTEGER
+        }
+
+	portTriggeringIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Index of portTriggeringTable."
+        ::= { portTriggeringEntry 1 }
+
+	appName OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..12))
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Name description of this portTriggeringEntry."
+        ::= { portTriggeringEntry 2 }
+
+	triggerPortStart OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The start port of triggering port range."
+        ::= { portTriggeringEntry 3 }
+
+	triggerPortEnd OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The end port of triggering port range."
+        ::= { portTriggeringEntry 4 }
+
+	incomingPortStart OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The start port of incoming port range."
+        ::= { portTriggeringEntry 5 }
+
+	incomingPortEnd OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "The end port of incoming port range."
+        ::= { portTriggeringEntry 6 }
+
+
+-- the Wireless MAC Access Group
+
+	wlanAccessMACTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF WlanAccessMACEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "Table of wireless station physical addresses that
+                will put under control."
+        ::= { control 6 }
+
+	wlanAccessMACEntry OBJECT-TYPE
+        SYNTAX	WlanAccessMACEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "An entry in the table controls the assocaition
+                with access point for each wireless station."
+        INDEX	{ wlanAccessMACIndex }
+        ::= { wlanAccessMACTable 1 }
+
+	WlanAccessMACEntry ::=
+        SEQUENCE {
+			wlanAccessMACIndex				INTEGER,
+			wlanAccessMAC					PhysAddress,
+			wlanAccessStatus				INTEGER
+        }
+
+	wlanAccessMACIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION  
+                "An unique value for each wireless station."
+        ::= { wlanAccessMACEntry 1 }
+
+	wlanAccessMAC OBJECT-TYPE
+        SYNTAX	PhysAddress
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Specifies the physical address to which will be
+                controlled the association state with the access
+                point."
+        ::= { wlanAccessMACEntry 2 }
+
+	wlanAccessStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		block(0),
+              		allow(1)
+              	}
+        ACCESS	read-write
+        STATUS	mandatory
+        DESCRIPTION
+                "Indicates the association state with the access
+                point for the specified wireless client."
+        ::= { wlanAccessMACEntry 3 }
+
+
+-- the UPnP ForwardTable Group
+
+	uPnPforwardTable OBJECT-TYPE
+		SYNTAX	SEQUENCE OF UPnPforwardEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"A list of UPnP forwarding application setting entry."
+		::= { control 7 }
+
+	uPnPforwardEntry OBJECT-TYPE
+		SYNTAX	UPnPforwardEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+				"UPnP forwarding entry can be used to preset
+				application	setting as well as options for
+				customization of port services for other
+				applications."
+		INDEX	{ uPnPforwardIndex }
+		::= { uPnPforwardTable 1 }
+
+	UPnPforwardEntry ::=
+		SEQUENCE {
+			uPnPforwardIndex				INTEGER,
+			uPnPserviceName					DisplayString,
+			uPnPExtPort						INTEGER,
+			uPnPservicePortProto			INTEGER,
+			uPnPIntPort						INTEGER,
+			uPnPforwardIPAddress			IpAddress,
+			uPnPforwardStatus				INTEGER
+		}
+
+	uPnPforwardIndex OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+				"An unique value for each UPnP forwarding setting."
+		::= { uPnPforwardEntry 1 }
+
+	uPnPserviceName OBJECT-TYPE
+		SYNTAX	DisplayString (SIZE(0..11))
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates the most widely used Internet applicaiton 
+				name. Such as FTP, Telnet, SMTP and DNS."
+		::= { uPnPforwardEntry 2 }
+
+	uPnPExtPort OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies the external port number used by Internet
+				application server. Check with the Internet application
+				software documentation for more information."
+		::= { uPnPforwardEntry 3 }
+	
+	uPnPservicePortProto OBJECT-TYPE
+		SYNTAX	INTEGER {
+					udp(1),
+					tcp(2)
+				}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies the Transport layer protocol to which
+				this Internet application will use."
+		::= { uPnPforwardEntry 4 }
+	
+	uPnPIntPort OBJECT-TYPE
+		SYNTAX	INTEGER
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies the internal port number used by Internet
+				application server. Check with the Internet application
+				software documentation for more information."
+		::= { uPnPforwardEntry 5 }
+	
+	uPnPforwardIPAddress OBJECT-TYPE
+		SYNTAX	IpAddress
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Specifies the IP address of Internet application server
+				to which the Internet users can access."
+		::= { uPnPforwardEntry 6 }
+
+	uPnPforwardStatus OBJECT-TYPE
+		SYNTAX	INTEGER { 
+					disable(0), 
+					enable(1)
+				}
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+				"Indicates whether to enable the defined service."
+		::= { uPnPforwardEntry 7 }
+
+
+-- the Status Information Group
+
+-- the DHCPActiveTable Group
+
+	dhcpActiveTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF DHCPActiveEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "A list of dhcpActiveEntry."
+        ::= { statusInfo 1 }
+
+	dhcpActiveEntry OBJECT-TYPE
+        SYNTAX	DHCPActiveEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "The dhcpActiveEntry shows out the information of DHCP client PCs."
+        INDEX	{ dhcpActiveIndex }
+        ::= { dhcpActiveTable 1 }
+
+	DHCPActiveEntry ::=
+        SEQUENCE {
+			dhcpActiveIndex                 INTEGER,
+			dhcpClientHostName              DisplayString,
+			dhcpNetAddress                  IpAddress,
+			dhcpPhysicalAddress             PhysAddress
+        }
+
+	dhcpActiveIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The index of dhcpActiveTable."
+        ::= { dhcpActiveEntry 1 }
+
+	dhcpClientHostName OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..32))
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The host name of DHCP client PC."
+        ::= { dhcpActiveEntry 2 }
+
+	dhcpNetAddress OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The IP address of DHCP client PC."
+        ::= { dhcpActiveEntry 3 }
+
+	dhcpPhysicalAddress OBJECT-TYPE
+        SYNTAX	PhysAddress
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The MAC address of DHCP client PC."
+        ::= { dhcpActiveEntry 4 }
+
+
+-- the OutingLogTable Group
+
+	outgoingLogTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF OutgoingLogEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "A list of outgoingLogEntry."
+        ::= { statusInfo 2 }
+
+	outgoingLogEntry OBJECT-TYPE
+        SYNTAX	OutgoingLogEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+				"The outgoing log entry lists the IP address of Internet 
+				site that users on your network have accessed."
+        INDEX	{ outgoingLogIndex }
+        ::= { outgoingLogTable 1 }
+
+	OutgoingLogEntry ::=
+        SEQUENCE {
+			outgoingLogIndex				INTEGER,
+			sourceIPLAN						IpAddress,
+			destinationIP					IpAddress,
+			servicePortNumber				INTEGER
+        }
+
+	outgoingLogIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The index of outgoingLogTable"
+        ::= { outgoingLogEntry 1 }
+
+	sourceIPLAN OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The source IP address of the outgoing log entry."
+        ::= { outgoingLogEntry 2 }
+
+	destinationIP OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The destination IP address of the outgoing log entry."
+        ::= { outgoingLogEntry 3 }
+
+
+	servicePortNumber OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The destination port number of the outgoing log entry."
+        ::= { outgoingLogEntry 4 }
+
+
+-- the IncomingLogTable Group
+
+	incomingLogTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF IncomingLogEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "A list of incomingLogEntry."
+        ::= { statusInfo 3 }
+
+	incomingLogEntry OBJECT-TYPE
+        SYNTAX	IncomingLogEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                "The incoming log entry shows out the log of incoming 
+                Internet traffic."
+        INDEX	{ incomingLogIndex }
+        ::= { incomingLogTable 1 }
+
+	IncomingLogEntry ::=
+        SEQUENCE {
+			incomingLogIndex					INTEGER,
+			sourceIP							IpAddress,
+			destinationPortNumber				INTEGER
+        }
+
+	incomingLogIndex OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Index of incomingLogTable."
+        ::= { incomingLogEntry 1 }
+
+	sourceIP OBJECT-TYPE
+        SYNTAX	IpAddress
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The source IP address of incoming log entry."
+        ::= { incomingLogEntry 2 }
+
+	destinationPortNumber OBJECT-TYPE
+        SYNTAX	INTEGER
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The destination port number of incoming log entry."
+        ::= { incomingLogEntry 3 }
+
+
+-- the WAN Connection Status Information Group --
+
+	infWANStatusTable OBJECT-TYPE
+        SYNTAX	SEQUENCE OF InfWANStatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                " Table of WAN connection status. "
+        ::= { statusInfo 4 }
+
+	infWANStatusEntry OBJECT-TYPE
+        SYNTAX	InfWANStatusEntry
+        ACCESS	not-accessible
+        STATUS	mandatory
+        DESCRIPTION
+                " An entry in the table, containing connection status of
+                one WAN interface. "
+        INDEX	{ infWANStatusIndex }
+        ::= { infWANStatusTable 1 }
+
+	InfWANStatusEntry ::=
+        SEQUENCE {
+			infWANStatusIndex						INTEGER,
+			infWANPortStatus						INTEGER,
+			infWANPPPoEFailureCode					INTEGER,
+			infWANPPPoEDetailErrorCode				DisplayString,
+			infWANDHCPStatus						INTEGER,
+			infWANDHCPDetailErrorCode				DisplayString,
+			infWANDNSStatus							INTEGER,
+			infWANPPTPFailureCode					INTEGER,
+			infWANPPTPDetailErrorCode				DisplayString
+        }
+
+	infWANStatusIndex OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  deprecated
+        DESCRIPTION
+                "Index of infWANStatusTable."
+        ::= { infWANStatusEntry 1 }
+
+	infWANPortStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		link(0),
+              		no-link(1)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Show the WAN Port physical link status"
+        ::= { infWANStatusEntry 2 }
+
+	infWANPPPoEFailureCode OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		connected(0),
+              		other-error(1),
+              		no-pppoe-server(2),
+              		username-password-error(3),
+              		lcp-nego-fail(4),
+              		disconnected-by-ISP(5)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Show out the WAN PPPoE connection status."
+        ::= { infWANStatusEntry 3 }
+
+	infWANPPPoEDetailErrorCode OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..4))
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                " Detail error code of the current PPPoE connection."
+        ::= { infWANStatusEntry 4 }
+
+	infWANDHCPStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		ok(0),
+              		other-error(1),
+              		no-DHCP-server(2)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Show out the status of WAN DHCP."
+        ::= { infWANStatusEntry 5 }
+
+	infWANDHCPDetailErrorCode OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..4))
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Detail error code of the current DHCP connection."
+        ::= { infWANStatusEntry 6 }
+
+	infWANDNSStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		ok(0),
+              		no-DNS-server-assigned(1),
+              		no-DNS-server-working(2)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Show the WAN DNS status."
+        ::= { infWANStatusEntry 7 }
+
+	infWANPPTPFailureCode OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		connected(0),
+              		other-error(1),
+              		no-PPTP-server(2),
+              		username-password-error(3),
+              		disconnected-by-ISP(4)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Show the WAN PPTP connection status."
+        ::= { infWANStatusEntry 8 }
+
+	infWANPPTPDetailErrorCode OBJECT-TYPE
+        SYNTAX	DisplayString (SIZE(0..4))
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                " Detail error code of the current PPTP connection."
+        ::= { infWANStatusEntry 9 }
+
+
+	infNodeWLANStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		wlan-OK(0),
+              		initialization-failed(1)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "Show the WLAN status."
+        ::= { statusInfo 5 }
+
+	nicDevicePresent OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		absent(0),
+              		present(1)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The target device is present on the system or not."
+        ::= { statusInfo 6 }
+
+	nicDriverInstallation OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		not-installed(0),
+              		installed(1)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The driver was installed or not."
+        ::= { statusInfo 7 }
+
+	nicDriverStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		disabled(1),
+              		working(2),
+              		not-working(3)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The working status of the driver."
+        ::= { statusInfo 8 }
+
+
+	nicConnectionStatus OBJECT-TYPE
+        SYNTAX	INTEGER {
+              		connected(0),
+              		disconnected(1)
+              	}
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The connection status of the device."
+        ::= { statusInfo 9 }
+
+	nicOSVersion OBJECT-TYPE
+        SYNTAX	DisplayString
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The version number of the Windows OS."
+        ::= { statusInfo 10 }
+
+	nicDriverVersion OBJECT-TYPE
+        SYNTAX	DisplayString
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The version number of the device driver"
+        ::= { statusInfo 11 }
+
+	nicFirmwareVersion OBJECT-TYPE
+        SYNTAX	DisplayString
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The version number of the device firmware"
+        ::= { statusInfo 12 }
+
+	nicUtilityVersion OBJECT-TYPE
+        SYNTAX	DisplayString
+        ACCESS	read-only
+        STATUS	mandatory
+        DESCRIPTION
+                "The version number of the configure Utility"
+        ::= { statusInfo 13 }
+
+
+-- the Statistics Information Group
+
+END
+
+

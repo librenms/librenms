@@ -11,13 +11,13 @@
  */
 
 echo 'JnxDomCurrentEntry ';
-$pre_cache['junos_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
+$pre_cache['junos_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentEntry', [], 'JUNIPER-DOM-MIB', 'junos');
 
 echo 'JnxDomCurrentLaneEntry ';
-$pre_cache['junos_multilane_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentLaneEntry', array(), 'JUNIPER-DOM-MIB', 'junos');
+$pre_cache['junos_multilane_oids'] = snmpwalk_cache_multi_oid($device, 'JnxDomCurrentLaneEntry', [], 'JUNIPER-DOM-MIB', 'junos');
 
 echo 'jnxoptIfOTNPMFECCurrentTable';
-$pre_cache['junos_ifotn_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMFECCurrentTable', array(), 'JNX-OPT-IF-EXT-MIB', 'junos', '-OQUsb');
+$pre_cache['junos_ifotn_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMFECCurrentTable', [], 'JNX-OPT-IF-EXT-MIB', 'junos', '-OQUsb');
 
 echo 'JnxoptIfOTNPMFECCurrentEntry ';
-$pre_cache['junos_prefec_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMCurrentFECMinBERMantissa', array(), 'JNX-OPT-IF-EXT-MIB', 'junos');
+$pre_cache['junos_prefec_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMCurrentFECMinBERMantissa', [], 'JNX-OPT-IF-EXT-MIB', 'junos');

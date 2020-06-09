@@ -1,0 +1,331 @@
+IBM2216-MIB DEFINITIONS ::= BEGIN
+
+------------------------------------------------------------------
+-- IBM 2216 Enterprise MIB (SNMP Version 1 Format)
+------------------------------------------------------------------
+--
+--    This MIB defines the enterprise specific management
+--    objects for the 2216 family of products.
+--
+--    This MIB is defined in the SNMP version 1 SMI format.
+--
+--    January 12, 1998
+--
+--    Contact Information:
+--
+--            Randy Worzella
+--            IBM Corp.
+--            G420/664
+--            Research Triangle Park, NC 27709
+--
+--            phone:    919-254-2202
+--            email:    worzella@us.ibm.com
+--
+------------------------------------------------------------------
+
+IMPORTS
+         enterprises
+                  FROM RFC1155-SMI
+         OBJECT-TYPE
+                  FROM RFC-1212;
+
+-- Path to ibm2216 product
+
+ibm      OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd  OBJECT IDENTIFIER ::= { ibm 6 }
+ibm2216  OBJECT IDENTIFIER ::= { ibmProd 131 }
+
+------------------------------------------------------------------
+-- IBM 2216 Anchor
+------------------------------------------------------------------
+ibm2216admin     OBJECT IDENTIFIER ::= { ibm2216 1 }
+ibm2216system    OBJECT IDENTIFIER ::= { ibm2216 2 }
+ibm2216hardware  OBJECT IDENTIFIER ::= { ibm2216 3 }
+ibm2216routing   OBJECT IDENTIFIER ::= { ibm2216 4 }
+ibm2216switching OBJECT IDENTIFIER ::= { ibm2216 5 }
+
+------------------------------------------------------------------
+-- IBM 2216 Administrative
+------------------------------------------------------------------
+ibm2216adminproducts   OBJECT IDENTIFIER ::= { ibm2216admin 1 }
+
+ibm2216mod400    OBJECT IDENTIFIER ::= { ibm2216adminproducts 1 }
+
+ibm2216adminOID   OBJECT IDENTIFIER ::= { ibm2216admin 2 }
+
+ibm2216adminDebug OBJECT IDENTIFIER ::= { ibm2216admin 3 }
+
+------------------------------------------------------------------
+-- IBM 2216 System
+------------------------------------------------------------------
+ibm2216systemInfo    OBJECT IDENTIFIER ::= { ibm2216system 1 }
+ibm2216cfgInfo       OBJECT IDENTIFIER ::= { ibm2216system 2 }
+
+------------------------------------------------------------------
+-- IBM 2216 Hardware
+------------------------------------------------------------------
+ibm2216hardwareGeneral     OBJECT IDENTIFIER ::= { ibm2216hardware 1 }
+ibm2216hardware400Specific OBJECT IDENTIFIER ::= { ibm2216hardware 2 }
+
+------------------------------------------------------------------
+-- IBM 2216 Routing
+------------------------------------------------------------------
+
+-- Nothing defined yet !!
+
+------------------------------------------------------------------
+-- IBM 2216 Switching
+------------------------------------------------------------------
+
+-- Nothing defined yet !!
+
+------------------------------------------------------------------
+-- Hardware Information
+------------------------------------------------------------------
+------------------------------------------------------------------
+-- Hardware Chip Set Information
+------------------------------------------------------------------
+
+ibm2216EnetChipSet  OBJECT IDENTIFIER ::= { ibm2216adminOID 1 }
+
+------------------------------------------------------------------
+-- The 2216 10 Megabit Ethernet LAN adapters use an Ethernet
+-- chipset comprised of the following:
+--
+--   MultiProtocolChip     MPC-1 ASIC        Toshiba
+--
+--   10BaseT               PE65428           Pulse Engineering
+--                         DP83912           National
+--                         SF1012            Valor
+--
+--   10Base2               S553-10060AE      Belfuse
+--                         DP8392CV-1        National
+--
+-- For the Ethernet MIB, however, the OID identifying the chipset
+-- will simply be enetChipSetToshiba.
+--
+-- The 2216 10/100 Megabit Fast Ethernet LAN adapters use an
+-- Ethernet chipset comprised of the following:
+--
+--   Controller            AM79C971          Advanced Micro Devices
+--
+--   Physical Layer        DP83840A          National Semi
+--
+--   Content Addressable   MU9C4480A         Music Semi
+--   Memory
+--
+--   TB Filter PLA         Xilinx PLA        Xilinx
+--
+-- For the Ethernet MIB, however, the OID identifying the chipset
+-- will simply be enetChipSetAMD.
+--
+------------------------------------------------------------------
+enetChipSetToshiba  OBJECT IDENTIFIER ::= { ibm2216EnetChipSet 1 }
+enetChipSetAMD      OBJECT IDENTIFIER ::= { ibm2216EnetChipSet 2 }
+
+
+------------------------------------------------------------------
+-- Hardware PCI Adapter Information
+------------------------------------------------------------------
+
+ibm2216PCIAdapTable  OBJECT-TYPE
+   SYNTAX  SEQUENCE OF Ibm2216PCIAdapEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "A table of information about PCI adapters in this box."
+   ::= { ibm2216hardwareGeneral 1 }
+
+ibm2216PCIAdapEntry  OBJECT-TYPE
+   SYNTAX  Ibm2216PCIAdapEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "An entry containing objects to describe the adapter
+         in a given slot."
+   INDEX  { ibm2216PCIAdapSlotNum }
+   ::= { ibm2216PCIAdapTable 1 }
+
+Ibm2216PCIAdapEntry  ::=
+   SEQUENCE {
+        ibm2216PCIAdapSlotNum
+           INTEGER,
+        ibm2216PCIAdapType
+           INTEGER,
+        ibm2216PCIAdapOperStatus
+           INTEGER
+   }
+
+ibm2216PCIAdapSlotNum  OBJECT-TYPE
+   SYNTAX  INTEGER (1..65535)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a slot location where an adapter
+         can be inserted."
+   ::= { ibm2216PCIAdapEntry 1 }
+
+ibm2216PCIAdapType  OBJECT-TYPE
+   SYNTAX  INTEGER {
+           unknown                       (1),
+           not-present                   (2),
+           atm-mmf-lic294                (3),
+           atm-mmf-lic284                (4),
+           atm-smf-lic295                (5),
+           atm-smf-lic293                (6),
+           token-ring-lic280             (7),
+           escon-lic287                  (8),
+           isdn-t1j1-lic283              (9),
+           isdn-e1-lic292                (10),
+           serial-rs232-lic282           (11),
+           serial-v35-lic290             (12),
+           serial-x21-lic291             (13),
+           ethernet-lic281               (14),
+           ethernet-fast-lic288          (15),
+           serial-hssi-lic289            (16),
+           fddi-lic286                   (17),
+           isdn-t1j1-lic297              (18),
+           isdn-e1-lic298                (19),
+           parallel-channel-lic299       (20)}
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The type of adapter that is inserted into this slot.
+         If no adapter is present, the variable will take the value
+         not-present(2)."
+   ::= { ibm2216PCIAdapEntry 2 }
+
+ibm2216PCIAdapOperStatus  OBJECT-TYPE
+   SYNTAX  INTEGER {
+           unknown         (1),
+           not-configured  (2),
+           not-present     (3),
+           does-not-apply  (4),
+           enable-pending  (5),
+           enabled         (6),
+           disable-pending (7),
+           disabled        (8),
+           not-initialized (9),
+           unknown-device  (10),
+           hardware-error  (11),
+           not-powered     (12),
+           diagnostics     (13),
+           wrs-available   (14),
+           mis-configured  (15)}
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The operational status of this PCI adapter.
+
+         unknown (1) : If there was problem determining the operational
+                       status of the adapter.
+
+         not-configured (2) : If the adapter inserted in the slot is
+                              recognized but no router configuration exists.
+
+         not-present (3) : If no adapter is currently inserted.
+
+         does-not-apply (4) : If this adapter does not contain an
+                              operational state.
+
+         enable-pending (5) : If commands have been issued to enable the
+                              adapter but have not been completed.
+
+         enabled (6) : If commands have been successfully issued
+                       to enable the adapter.
+
+         disable-pending (7) : If commands have been issued to disable the
+                               adapter but have not been completed.
+
+         disabled (8) : If commands have been successfully issued
+                        to disable the adapter.
+
+         not-initialized (9) : If the adapter has not completed its
+                               initialization.
+
+         unknown-device (10) : If the adapter inserted in the slot can not be
+                               recognized.
+
+         hardware-error (11) : If the adapter can not be used nor made
+                               ready to be used.
+
+         not-powered (12) : If the adapter has had a problem obtaining
+                            power from its slot.
+
+         diagnostics (13) : If the adapter is currently undergoing diagnostics.
+
+         wrs-available (14) : If the adapter is currently configured and
+                              available for WAN restoral.
+
+         mis-configured (15) : If the adapter is inserted in the slot but the
+                               router configuration is of a different type."
+
+   ::= { ibm2216PCIAdapEntry 3 }
+
+
+
+------------------------------------------------------------------
+-- Management application graphic accelerator table
+------------------------------------------------------------------
+
+ibm2216GraphicTable  OBJECT-TYPE
+   SYNTAX  SEQUENCE OF Ibm2216GraphicEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "A table of information mapping a slot and port to
+         an interface table ifIndex. An entry exists
+         in this table only if the ifConnectorPresent
+         object is true"
+   ::= { ibm2216hardwareGeneral 2 }
+
+ibm2216GraphicEntry  OBJECT-TYPE
+   SYNTAX  Ibm2216GraphicEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "An entry mapping slot and port to an interface
+         table ifIndex."
+   INDEX  { ibm2216GraphicSlotNum, ibm2216GraphicPortNum }
+   ::= { ibm2216GraphicTable 1 }
+
+Ibm2216GraphicEntry  ::=
+   SEQUENCE {
+        ibm2216GraphicSlotNum
+           INTEGER,
+        ibm2216GraphicPortNum
+           INTEGER,
+        ibm2216GraphicifIndex
+           INTEGER
+   }
+
+ibm2216GraphicSlotNum  OBJECT-TYPE
+   SYNTAX  INTEGER (0..2147483647)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a slot location where an adapter
+         can be inserted."
+   ::= { ibm2216GraphicEntry 1 }
+
+ibm2216GraphicPortNum  OBJECT-TYPE
+   SYNTAX  INTEGER (0..2147483647)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a port on a given adapter. A port
+         implies a physical connector is associated with it."
+   ::= { ibm2216GraphicEntry 2 }
+
+ibm2216GraphicifIndex  OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The ifIndex of the interface table entry associated with this
+         port on an adapter. By definition, the ifEntry has
+         ifConnectorPresent = true."
+   ::= { ibm2216GraphicEntry 3 }
+
+
+END

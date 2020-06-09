@@ -1,4 +1,4 @@
---- ArubaOS 6.5.2.0_59123
+--- ArubaOS 8.5.0.0_70258
 -- vim:set ts=4 sw=4:
    WLSX-SWITCH-MIB DEFINITIONS ::= BEGIN
 
@@ -84,7 +84,8 @@
 						master(1),
 						local(2),
 						standbymaster(3),
-						branch(4)
+						branch(4),
+						md(5)
 						}
         MAX-ACCESS   read-only
         STATUS       current
@@ -148,7 +149,8 @@
 						master(1),
 						local(2),
 						standbymaster(3),
-						branch(4)
+						branch(4),
+						md(5)
 					}
          MAX-ACCESS   read-only
          STATUS       current
@@ -493,6 +495,25 @@
 			 The license serial number of the switch
 			"
         ::= { wlsxSystemXGroup 12 }
+
+   wlsxSwitchIpv6 OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..45))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "Switch IPv6 as configured by the user. This IPv6 address uniquely
+            identifies the switch."
+        ::= { wlsxSystemXGroup 13 }
+
+   wlsxSwitchMasterIpv6 OBJECT-TYPE
+        SYNTAX       DisplayString(SIZE(0..45))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "
+             Master IPv6 address of the switch
+            "
+        ::= { wlsxSystemXGroup 14 }
 
 -- wlsxUserInfoGroup contains information about the users connected to the switch.
 
@@ -1577,8 +1598,6 @@
             "
         ::= { wlsxSwitchAccessPointStatsEntry 17 }
 
-
-
 -- wlsxSwitchTraps
 -- This group defines all the traps related to the switch platform. 
 wlsxSwitchTrapObjectsGroup      OBJECT IDENTIFIER ::= { wlsxSwitchTraps 100 }
@@ -1882,6 +1901,17 @@ wlsxSlotNumber OBJECT-TYPE
 				of sysExtCardSlot.
             "
 ::= { wlsxSwitchTrapObjectsGroup 27 }
+
+wlsxStationBlackListReasonStr OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE(0..32))
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+                    "                       
+            This object is used in the traps to indicate the
+            type of Blacklist reason.
+                                "
+::= { wlsxSwitchTrapObjectsGroup 28 }
 
 -- Trap Definitions.
 
@@ -2192,7 +2222,7 @@ wlsxChannelChanged NOTIFICATION-TYPE
     ::= { wlsxSwitchTraps 1033}
 
 wlsxStationAddedToBlackList NOTIFICATION-TYPE        
-	OBJECTS {wlsxStationMacAddress, wlsxStationBlackListReason}
+	OBJECTS {wlsxStationMacAddress, wlsxStationBlackListReason, wlsxStationBlackListReasonStr}
     STATUS  current
     DESCRIPTION
 			"
@@ -2280,5 +2310,34 @@ wlsxLicenseExpiry NOTIFICATION-TYPE
 			switch will expire in <wlsxLicenseDaysRemaining> days
 			"
     ::= { wlsxSwitchTraps 1042}
+
+wlsxAceUsageThreshold NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+                       "
+                       A trap which indicates that the Acl Entries table has reached
+                       eighty percent of the maximum limit.
+                       "
+    ::= { wlsxSwitchTraps 1043 }
+
+wlsxFanAbsent NOTIFICATION-TYPE
+       OBJECTS {wlsxFanNumber}
+    STATUS  current
+    DESCRIPTION
+                       "
+                       A trap which indicates that the fan is absent.
+                       "
+    ::= { wlsxSwitchTraps 1044 }
+
+wlsxWebCCLicenseEnforcement NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+                       "
+                       A trap which indicates that the WebCC license enforcement has
+                       been triggered.
+                       "
+    ::= { wlsxSwitchTraps 1045 }
+
 END
+
 

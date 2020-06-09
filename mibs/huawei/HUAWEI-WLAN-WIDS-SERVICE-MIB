@@ -1,0 +1,2788 @@
+-- ============================================================================
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Description: The mib is used for WIDS.
+-- Reference: 
+-- Version: V1.11
+-- ============================================================================
+-- Module definition
+
+	HUAWEI-WLAN-WIDS-SERVICE-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			hwWlan
+				FROM HUAWEI-WLAN-MIB
+			hwWlanApId
+						FROM HUAWEI-WLAN-AP-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+				FROM SNMPv2-CONF
+			IpAddress, Integer32, Unsigned32, Counter64, OBJECT-TYPE,
+			MODULE-IDENTITY, NOTIFICATION-TYPE
+				FROM SNMPv2-SMI
+			MacAddress, RowStatus, DateAndTime
+				FROM SNMPv2-TC;
+		--1.3.6.1.4.1.2011.6.139.15
+		hwWlanWidsService MODULE-IDENTITY
+			LAST-UPDATED "201606271543Z"		-- June 27, 2016 at 15:43 GMT
+			ORGANIZATION 
+				"Huawei Technologies Co.,Ltd."
+			CONTACT-INFO 
+                                                                                       "Huawei Industrial Base
+				   Bantian, Longgang
+				   Shenzhen 518129
+				   People's Republic of China
+				   Website: http://www.huawei.com
+				   Email: support@huawei.com
+				  "
+			DESCRIPTION 
+				"V1.11, Add hwWlanWidsDetDevStatisticsTable."
+			REVISION "201606271543Z"		-- June 27, 2016 at 15:43 GMT      		
+			DESCRIPTION 
+				"V1.10, Add hwWlanWidsDynamicBlacklistLeftAgeTime, hwWlanWidsDynamicBlacklistBlockTime nodes."
+			REVISION "201606011030Z"		-- June 1, 2016 at 10:30 GMT                                                                
+			DESCRIPTION 
+				"V1.09, Add Authentication nodes."
+			REVISION "201601201030Z"		-- Jan 20, 2016 at 10:30 GMT
+			DESCRIPTION 			
+				"V1.08, Modify the trap nodes."
+			REVISION "201510101030Z"		-- Oct 10, 2015 at 10:30 GMT
+			DESCRIPTION 
+				"V1.07, Add AP ID in the trap node."
+			REVISION "201509151030Z"		-- Sept 15, 2015 at 10:30 GMT 
+			DESCRIPTION 
+				"V1.06,Add hwWlanWidsDetDevMonitorApId node for hwWlanWidsDetDevMonitorEntry."
+			REVISION "201509090950Z"		-- Sept 9, 2015 at 09:50 GMT
+			DESCRIPTION 
+				"V1.05,Add node for hwWlanWidsAttackStatOthersSpoofAttack."
+			REVISION "201508190950Z"		-- August 19, 2015 at 09:50 GMT
+			DESCRIPTION 
+				"The MIB module defines the WIDS operation."
+			REVISION "201505111624Z"		-- May 11, 2015 at 16:24 GMT
+			DESCRIPTION 
+				"
+				V1.04, Add the description of mib nodes.
+				"
+			REVISION "201504231624Z"		-- April 23, 2015 at 16:24 GMT
+			DESCRIPTION 
+				"
+				V1.03, Add node for hwWlanWidsDynamicBlacklistAPEntry.
+				"
+			REVISION "201504100952Z"		-- April 10, 2015 at 09:52 GMT
+			DESCRIPTION 
+				"
+				V1.02, Modify index nodes in OBJECT-GROUP.
+				"
+			REVISION "201504070952Z"		-- April 7, 2015 at 09:52 GMT
+			DESCRIPTION 
+				"
+				V1.01, Add node for hwWlanWidsAttackDetorEntry.
+				"
+			REVISION "201502021452Z"		-- February 2, 2015 at 14:52 GMT
+			DESCRIPTION 
+				"
+				V1.00, Inital version.
+				"
+			::= { hwWlan 15 }
+		
+	
+	
+--
+-- Node definitions
+--
+	
+-- Node definitions
+-- 
+-- 1.3.6.1.4.1.2011.6.139.15.1
+		-- 1.3.6.1.4.1.2011.6.139.15.1
+		hwWlanWidsTrapInfo OBJECT IDENTIFIER ::= { hwWlanWidsService 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1
+		hwWlanWidsTrap OBJECT IDENTIFIER ::= { hwWlanWidsTrapInfo 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.1
+		hwWlanWidsRougeDevDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjRogueDevMAC, hwWlanWidsObjRogueDevType, hwWlanWidsObjRogueDevChannel, hwWlanWidsObjRogueDevRSSI, hwWlanWidsObjRogueDevSSID, 
+				hwWlanWidsObjDetAPName, hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetAPID
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the rogue device alarm."
+			::= { hwWlanWidsTrap 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.2
+		hwWlanWidsRougeDevClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjRogueDevMAC, hwWlanWidsObjRogueDevType, hwWlanWidsObjRogueDevChannel, hwWlanWidsObjRogueDevRSSI, hwWlanWidsObjRogueDevSSID, 
+				hwWlanWidsObjDetAPName, hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetAPID
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the rogue device clear alarm."
+			::= { hwWlanWidsTrap 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.3
+		hwWlanWidsNonWifiDetTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetAPName, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetRadioType, hwWlanWidsObjNonWifiDeviceType, 
+				hwWlanWidsObjNonWifiRssi, hwWlanWidsObjNonWifiInterChannel, hwWlanWidsObjDetAPID }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the non-Wi-Fi device alarm."
+			::= { hwWlanWidsTrap 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.4
+		hwWlanWidsNonWifiClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetAPName, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetRadioType, hwWlanWidsObjNonWifiDeviceType, 
+				hwWlanWidsObjNonWifiRssi, hwWlanWidsObjNonWifiInterChannel, hwWlanWidsObjDetAPID }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the non-Wi-Fi device clear alarm."
+			::= { hwWlanWidsTrap 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.5
+		hwWlanWidsFloodAttackDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the flood attack alarm."
+			::= { hwWlanWidsTrap 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.6
+		hwWlanWidsFloodAttackClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the flood attack clear alarm."
+			::= { hwWlanWidsTrap 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.7
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.7
+		hwWlanWidsSpoofAttackDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the spoofing attack alarm."
+			::= { hwWlanWidsTrap 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.8
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.8
+		hwWlanWidsSpoofAttackClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the spoofing attack clear alarm."
+			::= { hwWlanWidsTrap 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.9
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.9
+		hwWlanWidsWeakIvAttackDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr, hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the weak IV attack alarm."
+			::= { hwWlanWidsTrap 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.10
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.10
+		hwWlanWidsWeakIvAttackClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr, hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the weak IV attack clear alarm."
+			::= { hwWlanWidsTrap 10 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.11
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.11
+		hwWlanWidsPSKAttackDetectedTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjAttackTypeStr, hwWlanWidsObjAttackType, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPMAC
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the brute-force PSK attack alarm."
+			::= { hwWlanWidsTrap 11 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.1.12
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.12
+		hwWlanWidsPSKAttackClearTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjAttackTypeStr, hwWlanWidsObjAttackType, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPMAC
+				 }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the brute-force PSK attack clear alarm."
+			::= { hwWlanWidsTrap 12 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2
+		hwWlanWidsTrapObjects OBJECT IDENTIFIER ::= { hwWlanWidsTrapInfo 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.1
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.1
+		hwWlanWidsObjRogueDevMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"MAC address of the rogue device (MacAddress)."
+			::= { hwWlanWidsTrapObjects 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.2
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.2
+		hwWlanWidsObjRogueDevType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Type of the rogue device (Integer32)."
+			::= { hwWlanWidsTrapObjects 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.3
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.3
+		hwWlanWidsObjRogueDevChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Channel of the rogue device (Integer32)."
+			::= { hwWlanWidsTrapObjects 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.4
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.4
+		hwWlanWidsObjRogueDevRSSI OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"RSSI of the rogue device (Integer32)."
+			::= { hwWlanWidsTrapObjects 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.5
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.5
+		hwWlanWidsObjRogueDevSSID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"SSID of the rogue device (OCTET STRING)."
+			::= { hwWlanWidsTrapObjects 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.6
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.6
+		hwWlanWidsObjDetAPID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"DESCRIPTION"
+			::= { hwWlanWidsTrapObjects 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.7
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.7
+		hwWlanWidsObjDetRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Radio ID of the monitor AP (Integer32)."
+			::= { hwWlanWidsTrapObjects 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.8
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.8
+		hwWlanWidsObjDetAPChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Channel of the monitor AP (Integer32)."
+			::= { hwWlanWidsTrapObjects 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.9
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.9
+		hwWlanWidsObjDetAPMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"MAC address of the monitor AP (MacAddress)."
+			::= { hwWlanWidsTrapObjects 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.10
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.10
+		hwWlanWidsObjDetAPIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"IP address of the monitor AP (IpAddress)."
+			::= { hwWlanWidsTrapObjects 10 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.11
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.11
+		hwWlanWidsObjNonWifiDeviceType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Type of the non-Wi-Fi device (Integer32)."
+			::= { hwWlanWidsTrapObjects 11 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.12
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.12
+		hwWlanWidsObjNonWifiInterChannel OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Channel of the non-Wi-Fi device (OCTET STRING)."
+			::= { hwWlanWidsTrapObjects 12 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.13
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.13
+		hwWlanWidsObjNonWifiRssi OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"RSSI of the non-Wi-Fi device (OCTET STRING)."
+			::= { hwWlanWidsTrapObjects 13 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.14
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.14
+		hwWlanWidsObjDetAPName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Name of the monitor AP (OCTET STRING)."
+			::= { hwWlanWidsTrapObjects 14 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.15
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.15
+		hwWlanWidsObjDetRadioType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Radio type (Integer32)."
+			::= { hwWlanWidsTrapObjects 15 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.16
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.16
+		hwWlanWidsObjAttackDevMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"MAC address of the attack device (MacAddress)."
+			::= { hwWlanWidsTrapObjects 16 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.17
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.17
+		hwWlanWidsObjAttackType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Type of the attack device (Integer32)."
+			::= { hwWlanWidsTrapObjects 17 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.1.2.18
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.18
+		hwWlanWidsObjAttackTypeStr OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Character string description of the attack device type (OCTET STRING)."
+			::= { hwWlanWidsTrapObjects 18 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2
+		-- 1.3.6.1.4.1.2011.6.139.15.2
+		hwWlanWidsGloablOper OBJECT IDENTIFIER ::= { hwWlanWidsService 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.1
+		-- 1.3.6.1.4.1.2011.6.139.15.2.1
+		hwWlanWidsResetDetDevTableAll OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates that all devices are deleted."
+			::= { hwWlanWidsGloablOper 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.2
+		-- 1.3.6.1.4.1.2011.6.139.15.2.2
+		hwWlanWidsResetDetDevTableByType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ap(1),
+				adhoc(2),
+				bridge(3),
+				client(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates that entries are deleted based on device types."
+			::= { hwWlanWidsGloablOper 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.3
+		-- 1.3.6.1.4.1.2011.6.139.15.2.3
+		hwWlanWidsResetRogueHistoryAll OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates that all devices are deleted."
+			::= { hwWlanWidsGloablOper 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.4
+		-- 1.3.6.1.4.1.2011.6.139.15.2.4
+		hwWlanWidsResetRogueHistoryByDevType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ap(1),
+				adhoc(2),
+				bridge(3),
+				client(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates that entries are deleted based on device types."
+			::= { hwWlanWidsGloablOper 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.5
+		-- 1.3.6.1.4.1.2011.6.139.15.2.5
+		hwWlanWidsResetAttackDev OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates deletion of the historical attack table."
+			::= { hwWlanWidsGloablOper 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.6
+		-- 1.3.6.1.4.1.2011.6.139.15.2.6
+		hwWlanWidsResetAttackStat OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates deletion of attack statistics."
+			::= { hwWlanWidsGloablOper 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.7
+		-- 1.3.6.1.4.1.2011.6.139.15.2.7
+		hwWlanWidsResetDynamicBlacklist OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates deletion of all dynamic blacklists."
+			::= { hwWlanWidsGloablOper 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.8
+		-- 1.3.6.1.4.1.2011.6.139.15.2.8
+		hwWlanWidsResetDynamicBlacklistMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates deletion of dynamic blacklist entries based on MAC addresses."
+			::= { hwWlanWidsGloablOper 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.2.9
+		-- 1.3.6.1.4.1.2011.6.139.15.2.9
+		hwWlanWidsResetAttackHistory OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object indicates deletion of historical attack records."
+			::= { hwWlanWidsGloablOper 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3
+		-- 1.3.6.1.4.1.2011.6.139.15.3
+		hwWlanWidsDetDevTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsDetDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes detected device information."
+			::= { hwWlanWidsService 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1
+		hwWlanWidsDetDevEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsDetDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of this table is hwWlanWidsDetDevMac."
+			INDEX { hwWlanWidsDetDevMac }
+			::= { hwWlanWidsDetDevTable 1 }
+		
+		HwWlanWidsDetDevEntry ::=
+			SEQUENCE { 
+				hwWlanWidsDetDevMac
+					MacAddress,
+				hwWlanWidsDetDevType
+					INTEGER,
+				hwWlanWidsDetDevRssi
+					Integer32,
+				hwWlanWidsDetDevChannel
+					Integer32,
+				hwWlanWidsDetDevSSID
+					OCTET STRING,
+				hwWlanWidsDetDevRogue
+					INTEGER,
+				hwWlanWidsDetDevLastTime
+					Unsigned32,
+				hwWlanWidsDetDevIsContained
+					INTEGER,
+				hwWlanWidsDetDevInterference
+					INTEGER,
+				hwWlanWidsDetDevBSSID
+					MacAddress,
+				hwWlanWidsDetDevFirstDetTime
+					Unsigned32,
+				hwWlanWidsDetDevAuthenMethod
+					INTEGER
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.1
+		hwWlanWidsDetDevMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the detected device."
+			::= { hwWlanWidsDetDevEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.2
+		hwWlanWidsDetDevType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ap(1),
+				adhoc(2),
+				bridge(3),
+				client(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device type."
+			::= { hwWlanWidsDetDevEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.3
+		hwWlanWidsDetDevRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI."
+			::= { hwWlanWidsDetDevEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.4
+		hwWlanWidsDetDevChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel."
+			::= { hwWlanWidsDetDevEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.5
+		hwWlanWidsDetDevSSID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the SSID."
+			::= { hwWlanWidsDetDevEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.6
+		hwWlanWidsDetDevRogue OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				legal(1),
+				illegal(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether the device is a rogue device."
+			::= { hwWlanWidsDetDevEntry 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.7
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.7
+		hwWlanWidsDetDevLastTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the latest time when the device is detected.."
+			::= { hwWlanWidsDetDevEntry 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.8
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.8
+		hwWlanWidsDetDevIsContained OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				no(1),
+				yes(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether the device is countered."
+			::= { hwWlanWidsDetDevEntry 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.9
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.9
+		hwWlanWidsDetDevInterference OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				no(1),
+				yes(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether the device is an interference device."
+			::= { hwWlanWidsDetDevEntry 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.10
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.10
+		hwWlanWidsDetDevBSSID OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the BSSID of the detected device."
+			::= { hwWlanWidsDetDevEntry 10 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.3.1.11
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.11
+		hwWlanWidsDetDevFirstDetTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when the device is detected."
+			::= { hwWlanWidsDetDevEntry 11 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.12
+		hwWlanWidsDetDevAuthenMethod OBJECT-TYPE
+			SYNTAX INTEGER
+					{
+					unknown(1),
+					open(2),
+					wep(3),
+					wpa(4),
+					wpa2(5),
+					dot1x(6),
+					wapi(7),
+					wpawpa2(8)	
+					}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the authentication of the detected device."
+			::= { hwWlanWidsDetDevEntry 12 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.4
+		-- 1.3.6.1.4.1.2011.6.139.15.4
+		hwWlanWidsRogueHistoryTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsRogueHistoryEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes historical information about rogue devices."
+			::= { hwWlanWidsService 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.4.1
+		-- 1.3.6.1.4.1.2011.6.139.15.4.1
+		hwWlanWidsRogueHistoryEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsRogueHistoryEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of this table is hwWlanWidsRogueDevMac."
+			INDEX { hwWlanWidsRogueDevMac }
+			::= { hwWlanWidsRogueHistoryTable 1 }
+		
+		HwWlanWidsRogueHistoryEntry ::=
+			SEQUENCE { 
+				hwWlanWidsRogueDevMac
+					MacAddress,
+				hwWlanWidsRogueDevType
+					INTEGER,
+				hwWlanWidsRogueDevRssi
+					Integer32,
+				hwWlanWidsRogueDevChannel
+					Integer32,
+				hwWlanWidsRogueDevSSID
+					OCTET STRING,
+				hwWlanWidsRogueDevLastTime
+					Unsigned32,
+				hwWlanWidsRogueDevAuthenMethod
+					INTEGER
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.4.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.4.1.1
+		hwWlanWidsRogueDevMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the detected device."
+			::= { hwWlanWidsRogueHistoryEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.4.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.4.1.2
+		hwWlanWidsRogueDevType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ap(1),
+				adhoc(2),
+				bridge(3),
+				client(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device type."
+			::= { hwWlanWidsRogueHistoryEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.4.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.4.1.3
+		hwWlanWidsRogueDevRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI.."
+			::= { hwWlanWidsRogueHistoryEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.4.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.4.1.4
+		hwWlanWidsRogueDevChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel."
+			::= { hwWlanWidsRogueHistoryEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.4.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.4.1.5
+		hwWlanWidsRogueDevSSID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the SSID."
+			::= { hwWlanWidsRogueHistoryEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.4.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.4.1.6
+		hwWlanWidsRogueDevLastTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the latest time when the device is detected."
+			::= { hwWlanWidsRogueHistoryEntry 6 }
+			
+-- 1.3.6.1.4.1.2011.6.139.15.4.1.7		
+		-- 1.3.6.1.4.1.2011.6.139.15.4.1.7
+		hwWlanWidsRogueDevAuthenMethod OBJECT-TYPE
+			SYNTAX INTEGER
+					{
+					unknown(1),
+					open(2),
+					wep(3),
+					wpa(4),
+					wpa2(5),
+					dot1x(6),
+					wapi(7),
+					wpawpa2(8)	
+					}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the authentication."
+			::= { hwWlanWidsRogueHistoryEntry 7 }
+		
+
+-- 1.3.6.1.4.1.2011.6.139.15.5
+		-- 1.3.6.1.4.1.2011.6.139.15.5
+		hwWlanWidsDetNonWifiDevTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsDetNonWifiDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about non-Wi-Fi devices."
+			::= { hwWlanWidsService 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1
+		hwWlanWidsDetNonWifiDevEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsDetNonWifiDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanWidsDetNonWifiDevMonitorApMac, hwWlanWidsDetNonWifiDevMonitorRadioId, and hwWlanWidsDetNonWifiType."
+			INDEX { hwWlanWidsDetNonWifiDevMonitorApMac, hwWlanWidsDetNonWifiDevMonitorRadioId, hwWlanWidsDetNonWifiType }
+			::= { hwWlanWidsDetNonWifiDevTable 1 }
+		
+		HwWlanWidsDetNonWifiDevEntry ::=
+			SEQUENCE { 
+				hwWlanWidsDetNonWifiDevMonitorApMac
+					MacAddress,
+				hwWlanWidsDetNonWifiDevMonitorRadioId
+					Integer32,
+				hwWlanWidsDetNonWifiType
+					Integer32,
+				hwWlanWidsDetNonWifiRssi
+					OCTET STRING,
+				hwWlanWidsDetNonWifiSpectrumType
+					INTEGER,
+				hwWlanWidsDetNonWifiChannel
+					OCTET STRING,
+				hwWlanWidsDetNonWifiDevLastTime
+					Integer32,
+				hwWlanWidsDetNonWifiCenterFrequency
+					Integer32,
+				hwWlanWidsDetNonWifiBandwidth
+					Integer32,
+				hwWlanWidsDetNonWifiDutycycle
+					Integer32,
+				hwWlanWidsDetNonWifiInterferenceLevel
+					INTEGER,
+				hwWlanWidsDetNonWifiDevMonitorAPName
+					OCTET STRING,
+				hwWlanWidsDetNonWifiDevRadioType
+					Integer32,
+				hwWlanWidsDetNonWifiDevMonitorAPChannel
+					Integer32,
+				hwWlanWidsDetNonWifiDevFirstTime
+					Integer32
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.1
+		hwWlanWidsDetNonWifiDevMonitorApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the monitor AP."
+			::= { hwWlanWidsDetNonWifiDevEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.2
+		hwWlanWidsDetNonWifiDevMonitorRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the radio ID of the monitor AP."
+			::= { hwWlanWidsDetNonWifiDevEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.3
+		hwWlanWidsDetNonWifiType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of the detected non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.4
+		hwWlanWidsDetNonWifiRssi OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI."
+			::= { hwWlanWidsDetNonWifiDevEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.5
+		hwWlanWidsDetNonWifiSpectrumType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				hopFrequence(1),
+				narrowBandwidth(2),
+				wideBandwidth(3),
+				sweepFrequence(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the frequency type of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.6
+		hwWlanWidsDetNonWifiChannel OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevEntry 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.7
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.7
+		hwWlanWidsDetNonWifiDevLastTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the latest time when the non-Wi-Fi device is detected."
+			::= { hwWlanWidsDetNonWifiDevEntry 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.8
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.8
+		hwWlanWidsDetNonWifiCenterFrequency OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the center frequency of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevEntry 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.9
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.9
+		hwWlanWidsDetNonWifiBandwidth OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the bandwidth of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevEntry 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.10
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.10
+		hwWlanWidsDetNonWifiDutycycle OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the duty cycle of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevEntry 10 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.11
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.11
+		hwWlanWidsDetNonWifiInterferenceLevel OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				tiny(1),
+				light(2),
+				badly(3),
+				critical(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the interference level of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevEntry 11 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.12
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.12
+		hwWlanWidsDetNonWifiDevMonitorAPName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of the monitor AP."
+			::= { hwWlanWidsDetNonWifiDevEntry 12 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.13
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.13
+		hwWlanWidsDetNonWifiDevRadioType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of the monitor radio."
+			::= { hwWlanWidsDetNonWifiDevEntry 13 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.14
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.14
+		hwWlanWidsDetNonWifiDevMonitorAPChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the working channel of the monitor AP."
+			::= { hwWlanWidsDetNonWifiDevEntry 14 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.5.1.15
+		-- 1.3.6.1.4.1.2011.6.139.15.5.1.15
+		hwWlanWidsDetNonWifiDevFirstTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when the non-Wi-Fi device is detected."
+			::= { hwWlanWidsDetNonWifiDevEntry 15 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6
+		-- 1.3.6.1.4.1.2011.6.139.15.6
+		hwWlanWidsAttackHistoryTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsAttackHistoryEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes historical information about attacking devices."
+			::= { hwWlanWidsService 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1
+		hwWlanWidsAttackHistoryEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsAttackHistoryEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanWidsAttackHistorySeq and hwWlanWidsAttackHistorySubSeq."
+			INDEX { hwWlanWidsAttackHistorySeq, hwWlanWidsAttackHistorySubSeq }
+			::= { hwWlanWidsAttackHistoryTable 1 }
+		
+		HwWlanWidsAttackHistoryEntry ::=
+			SEQUENCE { 
+				hwWlanWidsAttackHistorySeq
+					Unsigned32,
+				hwWlanWidsAttackHistorySubSeq
+					Unsigned32,
+				hwWlanWidsAttackHistoryDevMac
+					MacAddress,
+				hwWlanWidsAttackHistoryDevType
+					Integer32,
+				hwWlanWidsAttackHistoryRssi
+					Integer32,
+				hwWlanWidsAttackHistoryChannel
+					Integer32,
+				hwWlanWidsAttackHistoryAttackType
+					Integer32,
+				hwWlanWidsAttackHistoryPacketBmp1
+					Integer32,
+				hwWlanWidsAttackHistoryPacketBmp2
+					Integer32,
+				hwWlanWidsAttackHistorySSID
+					OCTET STRING,
+				hwWlanWidsAttackHistoryDetTime
+					Unsigned32,
+				hwWlanWidsAttackHistoryDetectorApName
+					OCTET STRING
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.1
+		hwWlanWidsAttackHistorySeq OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the internal index of an entry."
+			::= { hwWlanWidsAttackHistoryEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.2
+		hwWlanWidsAttackHistorySubSeq OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the internal subindex of an entry."
+			::= { hwWlanWidsAttackHistoryEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.3
+		hwWlanWidsAttackHistoryDevMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the attack device."
+			::= { hwWlanWidsAttackHistoryEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.4
+		hwWlanWidsAttackHistoryDevType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of the attack device."
+			::= { hwWlanWidsAttackHistoryEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.5
+		hwWlanWidsAttackHistoryRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI."
+			::= { hwWlanWidsAttackHistoryEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.6
+		hwWlanWidsAttackHistoryChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel."
+			::= { hwWlanWidsAttackHistoryEntry 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.7
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.7
+		hwWlanWidsAttackHistoryAttackType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack type."
+			::= { hwWlanWidsAttackHistoryEntry 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.8
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.8
+		hwWlanWidsAttackHistoryPacketBmp1 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack packet type."
+			::= { hwWlanWidsAttackHistoryEntry 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.9
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.9
+		hwWlanWidsAttackHistoryPacketBmp2 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack packets."
+			::= { hwWlanWidsAttackHistoryEntry 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.10
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.10
+		hwWlanWidsAttackHistorySSID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the SSID."
+			::= { hwWlanWidsAttackHistoryEntry 10 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.11
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.11
+		hwWlanWidsAttackHistoryDetTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack detection time."
+			::= { hwWlanWidsAttackHistoryEntry 11 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.6.1.12
+		-- 1.3.6.1.4.1.2011.6.139.15.6.1.12
+		hwWlanWidsAttackHistoryDetectorApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the AP that detects the attack."
+			::= { hwWlanWidsAttackHistoryEntry 12 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7
+		hwWlanWidsAttackStatTable OBJECT IDENTIFIER ::= { hwWlanWidsService 7 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.1
+		hwWlanWidsAttackStatProbeRequestFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 1 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.2
+		hwWlanWidsAttackStatAuthRequestFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 2 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.3
+		hwWlanWidsAttackStatDeAuthenFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 3 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.4
+		hwWlanWidsAttackStatAssocReqFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 4 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.5
+		hwWlanWidsAttackStatDisassocReqFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 5 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.6
+		hwWlanWidsAttackStatReassocReqFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 6 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.7
+		hwWlanWidsAttackStatActionFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 7 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.8
+		hwWlanWidsAttackStatNullDataFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 8 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.9
+		hwWlanWidsAttackStatWeakIvAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 9 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.10
+		hwWlanWidsAttackStatDeauthSpoofAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 10 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.11
+		hwWlanWidsAttackStatDisassocSpoofAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 11 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.12
+		hwWlanWidsAttackStatWepShareKeyAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 12 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.13
+		hwWlanWidsAttackStatWpaAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 13 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.14
+		hwWlanWidsAttackStatWpa2Attack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 14 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.15
+		hwWlanWidsAttackStatWapiAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 15 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.16
+		hwWlanWidsAttackStatEAPOLStartFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 16 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.17
+		hwWlanWidsAttackStatEAPOLLogoffFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 17 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.18
+		hwWlanWidsAttackStatNullQosFloodAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsAttackStatTable 18 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.19
+		hwWlanWidsAttackStatStartTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the counting start time."
+			::= { hwWlanWidsAttackStatTable 19 }
+			
+
+		-- 1.3.6.1.4.1.2011.6.139.15.7.20
+		hwWlanWidsAttackStatOthersSpoofAttack OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the other types of spoofing frames."
+			::= { hwWlanWidsAttackStatTable 20 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.8
+		hwWlanWidsDynamicBlacklistTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsDynamicBlacklistEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about dynamic blacklists."
+			::= { hwWlanWidsService 8 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1
+		hwWlanWidsDynamicBlacklistEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsDynamicBlacklistEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of this table is hwWlanWidsDynamicBlacklistDevMac."
+			INDEX { hwWlanWidsDynamicBlacklistDevMac }
+			::= { hwWlanWidsDynamicBlacklistTable 1 }
+		
+		HwWlanWidsDynamicBlacklistEntry ::=
+			SEQUENCE { 
+				hwWlanWidsDynamicBlacklistDevMac
+					MacAddress,
+				hwWlanWidsDynamicBlacklistDevType
+					Integer32,
+				hwWlanWidsDynamicBlacklistDevAttackType
+					Integer32,
+				hwWlanWidsDynamicBlacklistAttackPacketBmp1
+					Integer32,
+				hwWlanWidsDynamicBlacklistAttackPacketBmp2
+					Integer32,
+				hwWlanWidsDynamicBlacklistLastTime
+					Unsigned32,
+			        hwWlanWidsDynamicBlacklistLeftAgeTime
+                                        Unsigned32,
+                                hwWlanWidsDynamicBlacklistBlockTime
+                                        Unsigned32
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.8.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1.1
+		hwWlanWidsDynamicBlacklistDevMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the device."
+			::= { hwWlanWidsDynamicBlacklistEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.8.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1.2
+		hwWlanWidsDynamicBlacklistDevType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device type, such as the AP or Ad-hoc device."
+			::= { hwWlanWidsDynamicBlacklistEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.8.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1.3
+		hwWlanWidsDynamicBlacklistDevAttackType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack type."
+			::= { hwWlanWidsDynamicBlacklistEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.8.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1.4
+		hwWlanWidsDynamicBlacklistAttackPacketBmp1 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack packet type."
+			::= { hwWlanWidsDynamicBlacklistEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.8.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1.5
+		hwWlanWidsDynamicBlacklistAttackPacketBmp2 OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack packets."
+			::= { hwWlanWidsDynamicBlacklistEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.8.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1.6
+		hwWlanWidsDynamicBlacklistLastTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the latest time when the attack is detected."
+			::= { hwWlanWidsDynamicBlacklistEntry 6 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.8.1.7
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1.7
+		hwWlanWidsDynamicBlacklistLeftAgeTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the alive time when the attack is detected."
+			::= { hwWlanWidsDynamicBlacklistEntry 7 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.8.1.8
+		-- 1.3.6.1.4.1.2011.6.139.15.8.1.8
+		hwWlanWidsDynamicBlacklistBlockTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the block time when the attack is detected."
+			::= { hwWlanWidsDynamicBlacklistEntry 8 }
+				
+-- 1.3.6.1.4.1.2011.6.139.15.9
+		-- 1.3.6.1.4.1.2011.6.139.15.9
+		hwWlanWidsSrvObjects OBJECT IDENTIFIER ::= { hwWlanWidsService 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1
+		hwWlanWidsDetNonWifiDevHistTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsDetNonWifiDevHistEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes historical records about non-Wi-Fi devices."
+			::= { hwWlanWidsSrvObjects 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1
+		hwWlanWidsDetNonWifiDevHistEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsDetNonWifiDevHistEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of this table is hwWlanWidsDetNonWifiHistIndex."
+			INDEX { hwWlanWidsDetNonWifiHistIndex }
+			::= { hwWlanWidsDetNonWifiDevHistTable 1 }
+		
+		HwWlanWidsDetNonWifiDevHistEntry ::=
+			SEQUENCE { 
+				hwWlanWidsDetNonWifiHistIndex
+					Integer32,
+				hwWlanWidsDetNonWifiHistMonitorApMac
+					MacAddress,
+				hwWlanWidsDetNonWifiHistMonitorAPName
+					OCTET STRING,
+				hwWlanWidsDetNonWifiHistMonitorRadioId
+					Integer32,
+				hwWlanWidsDetNonWifiHistMonitorRadioType
+					Integer32,
+				hwWlanWidsDetNonWifiHistMonitorAPChannel
+					Integer32,
+				hwWlanWidsDetNonWifiHistDevType
+					Integer32,
+				hwWlanWidsDetNonWifiHistRssi
+					OCTET STRING,
+				hwWlanWidsDetNonWifiHistFrequencyType
+					INTEGER,
+				hwWlanWidsDetNonWifiHistChannel
+					OCTET STRING,
+				hwWlanWidsDetNonWifiHistDevLastTime
+					Integer32,
+				hwWlanWidsDetNonWifiHistCenterFrequency
+					Integer32,
+				hwWlanWidsDetNonWifiHistBandwidth
+					Integer32,
+				hwWlanWidsDetNonWifiHistDutycycle
+					Integer32,
+				hwWlanWidsDetNonWifiHistInterferenceLevel
+					INTEGER,
+				hwWlanWidsDetNonWifiHistDevFirstTime
+					Integer32
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.1
+		hwWlanWidsDetNonWifiHistIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the index of the table."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.2
+		hwWlanWidsDetNonWifiHistMonitorApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the monitor AP."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.3
+		hwWlanWidsDetNonWifiHistMonitorAPName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of the monitor AP."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.4
+		hwWlanWidsDetNonWifiHistMonitorRadioId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the radio ID of the monitor AP."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.5
+		hwWlanWidsDetNonWifiHistMonitorRadioType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of the monitor radio."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.6
+		hwWlanWidsDetNonWifiHistMonitorAPChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the working channel of the monitor AP."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.7
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.7
+		hwWlanWidsDetNonWifiHistDevType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the type of the detected non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.8
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.8
+		hwWlanWidsDetNonWifiHistRssi OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.9
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.9
+		hwWlanWidsDetNonWifiHistFrequencyType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				hopFrequence(1),
+				narrowBandwidth(2),
+				wideBandwidth(3),
+				sweepFrequence(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the interference type of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.10
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.10
+		hwWlanWidsDetNonWifiHistChannel OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 10 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.11
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.11
+		hwWlanWidsDetNonWifiHistDevLastTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the latest time when the non-Wi-Fi device is detected."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 11 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.12
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.12
+		hwWlanWidsDetNonWifiHistCenterFrequency OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the center frequency of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 12 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.13
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.13
+		hwWlanWidsDetNonWifiHistBandwidth OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the bandwidth of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 13 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.14
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.14
+		hwWlanWidsDetNonWifiHistDutycycle OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the duty cycle of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 14 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.15
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.15
+		hwWlanWidsDetNonWifiHistInterferenceLevel OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				tiny(1),
+				light(2),
+				badly(3),
+				critical(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the interference level of the non-Wi-Fi device."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 15 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.16
+		-- 1.3.6.1.4.1.2011.6.139.15.9.1.1.16
+		hwWlanWidsDetNonWifiHistDevFirstTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when the non-Wi-Fi device is detected."
+			::= { hwWlanWidsDetNonWifiDevHistEntry 16 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.2
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2
+		hwWlanWidsAttDevTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsAttDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about attacking devices."
+			::= { hwWlanWidsSrvObjects 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.2.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2.1
+		hwWlanWidsAttDevEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsAttDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The index of this table is hwWlanWidsAttackDevMac."
+			INDEX { hwWlanWidsAttackDevMac }
+			::= { hwWlanWidsAttDevTable 1 }
+		
+		HwWlanWidsAttDevEntry ::=
+			SEQUENCE { 
+				hwWlanWidsAttackDevMac
+					MacAddress,
+				hwWlanWidsAttackDevChannel
+					Integer32,
+				hwWlanWidsAttackDevRssi
+					Integer32,
+				hwWlanWidsAttackDevLastAttType
+					Unsigned32,
+				hwWlanWidsAttackDevLastPacketBmp
+					Unsigned32,
+				hwWlanWidsAttackDevLastDetTime
+					Unsigned32
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.1
+		hwWlanWidsAttackDevMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the attack device."
+			::= { hwWlanWidsAttDevEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.2
+		hwWlanWidsAttackDevChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel."
+			::= { hwWlanWidsAttDevEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.3
+		hwWlanWidsAttackDevRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI of the attack device."
+			::= { hwWlanWidsAttDevEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.4
+		hwWlanWidsAttackDevLastAttType OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack type."
+			::= { hwWlanWidsAttDevEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.5
+		hwWlanWidsAttackDevLastPacketBmp OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack packet type."
+			::= { hwWlanWidsAttDevEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2.1.6
+		hwWlanWidsAttackDevLastDetTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the latest time when the attack is detected."
+			::= { hwWlanWidsAttDevEntry 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.3
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3
+		hwWlanWidsDetDevMonitorTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsDetDevMonitorEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about monitoring devices."
+			::= { hwWlanWidsSrvObjects 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.3.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1
+		hwWlanWidsDetDevMonitorEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsDetDevMonitorEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanWidsDetDevMonitorDevMac, hwWlanWidsDetDevMonitorApMac, and hwWlanWidsDetDevMonitorApRadioID."
+			INDEX { hwWlanWidsDetDevMonitorDevMac, hwWlanWidsDetDevMonitorApMac, hwWlanWidsDetDevMonitorApRadioID }
+			::= { hwWlanWidsDetDevMonitorTable 1 }
+		
+		HwWlanWidsDetDevMonitorEntry ::=
+			SEQUENCE { 
+				hwWlanWidsDetDevMonitorDevMac
+					MacAddress,
+				hwWlanWidsDetDevMonitorApMac
+					MacAddress,
+				hwWlanWidsDetDevMonitorApName
+					OCTET STRING,
+				hwWlanWidsDetDevMonitorApRadioID
+					Integer32,
+				hwWlanWidsDetDevMonitorApIP
+					IpAddress,
+				hwWlanWidsDetDevMonitorApChannel
+					Integer32,
+				hwWlanWidsDetDevMonitorApRssi
+					Integer32,
+				hwWlanWidsDetDevMonitorApLastDetTime
+					Unsigned32,
+				hwWlanWidsDetDevMonitorApCountermeasuresDev
+					INTEGER,
+				hwWlanWidsDetDevMonitorDetAtt
+					INTEGER,
+				hwWlanWidsDetDevMonitorApId
+					Unsigned32
+			 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.1
+		hwWlanWidsDetDevMonitorDevMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the detected device."
+			::= { hwWlanWidsDetDevMonitorEntry 1 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.2
+		hwWlanWidsDetDevMonitorApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the monitor AP."
+			::= { hwWlanWidsDetDevMonitorEntry 2 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.3
+		hwWlanWidsDetDevMonitorApName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of the monitor AP."
+			::= { hwWlanWidsDetDevMonitorEntry 3 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.4
+		hwWlanWidsDetDevMonitorApRadioID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the radio ID of the monitor AP."
+			::= { hwWlanWidsDetDevMonitorEntry 4 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.5
+		hwWlanWidsDetDevMonitorApIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IP address of the monitor AP."
+			::= { hwWlanWidsDetDevMonitorEntry 5 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.6
+		hwWlanWidsDetDevMonitorApChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel of the device detected by the monitor AP."
+			::= { hwWlanWidsDetDevMonitorEntry 6 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.7
+		hwWlanWidsDetDevMonitorApRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI of the device detected by the monitor AP."
+			::= { hwWlanWidsDetDevMonitorEntry 7 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.8
+		hwWlanWidsDetDevMonitorApLastDetTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the latest time when the device is detected."
+			::= { hwWlanWidsDetDevMonitorEntry 8 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.9
+		hwWlanWidsDetDevMonitorApCountermeasuresDev OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				no(1),
+				yes(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This objects indicates whether the monitor device counters the wireless device."
+			::= { hwWlanWidsDetDevMonitorEntry 9 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.10
+		hwWlanWidsDetDevMonitorDetAtt OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				no(1),
+				yes(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This objects indicates whether the detected device is an attack device."
+			::= { hwWlanWidsDetDevMonitorEntry 10 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3.1.11
+		hwWlanWidsDetDevMonitorApId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the AP ID."
+			::= { hwWlanWidsDetDevMonitorEntry 11 }
+			
+			
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4
+		hwWlanWidsDynamicBlacklistAPTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsDynamicBlacklistAPEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes information about APs enabled with dynamic blacklists."
+			::= { hwWlanWidsSrvObjects 4 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4.1
+		hwWlanWidsDynamicBlacklistAPEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsDynamicBlacklistAPEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanWidsDynamicBlacklistDevMac and hwWlanWidsDynamicBlacklistApMac."
+			INDEX { hwWlanWidsDynamicBlacklistApMac, hwWlanWidsDynamicBlacklistDevMac }
+			::= { hwWlanWidsDynamicBlacklistAPTable 1 }
+		
+		HwWlanWidsDynamicBlacklistAPEntry ::=
+			SEQUENCE { 
+				hwWlanWidsDynamicBlacklistApMac
+					MacAddress,
+				hwWlanWidsDynamicBlacklistApName
+					OCTET STRING,
+				hwWlanWidsDynamicBlacklistApIP
+					IpAddress,
+				hwWlanWidsDynamicBlacklistAttackType
+					Unsigned32,
+				hwWlanWidsDynamicBlacklistAPLastTime
+					Unsigned32,
+				hwWlanWidsDynamicBlacklistAttackPacketBmp
+					Integer32		
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.1
+		hwWlanWidsDynamicBlacklistApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the AP that adds the device to the dynamic blacklist."
+			::= { hwWlanWidsDynamicBlacklistAPEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.2
+		hwWlanWidsDynamicBlacklistApName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of the AP that adds the device to the dynamic blacklist."
+			::= { hwWlanWidsDynamicBlacklistAPEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.3
+		hwWlanWidsDynamicBlacklistApIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IP address of the AP that adds the device to the dynamic blacklist."
+			::= { hwWlanWidsDynamicBlacklistAPEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.4
+		hwWlanWidsDynamicBlacklistAttackType OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack type."
+			::= { hwWlanWidsDynamicBlacklistAPEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.5
+		hwWlanWidsDynamicBlacklistAPLastTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the time when the device is added to the dynamic blacklist."
+			::= { hwWlanWidsDynamicBlacklistAPEntry 5 }     
+			
+-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4.1.6
+		hwWlanWidsDynamicBlacklistAttackPacketBmp OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack packet type."
+			::= { hwWlanWidsDynamicBlacklistAPEntry 6 }
+
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5
+		hwWlanWidsAttackDetorTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsAttackDetorEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes attack detection information about the monitoring AP."
+			::= { hwWlanWidsSrvObjects 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1
+		hwWlanWidsAttackDetorEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsAttackDetorEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanWidsAttackDetorDevMac and hwWlanWidsAttackDetorApMac."
+			INDEX { hwWlanWidsAttackDetorDevMac, hwWlanWidsAttackDetorApMac }
+			::= { hwWlanWidsAttackDetorTable 1 }
+		
+		HwWlanWidsAttackDetorEntry ::=
+			SEQUENCE { 
+				hwWlanWidsAttackDetorDevMac
+					MacAddress,
+				hwWlanWidsAttackDetorApMac
+					MacAddress,
+				hwWlanWidsAttackDetorApName
+					OCTET STRING,
+				hwWlanWidsAttackDetorAttTypeBmp
+					Unsigned32,
+				hwWlanWidsAttackDetorPacketBmpFlood
+					Unsigned32,
+				hwWlanWidsAttackDetorPacketBmpSpoof
+					Unsigned32,
+				hwWlanWidsAttackDetorFirstDetTimeFlood
+					Unsigned32,
+				hwWlanWidsAttackDetorFirstDetTimeSpoof
+					Unsigned32,
+				hwWlanWidsAttackDetorFirstDetTimeWeakIv
+					Unsigned32,
+				hwWlanWidsAttackDetorFirstDetTimeWep
+					Unsigned32,
+				hwWlanWidsAttackDetorFirstDetTimeWpa
+					Unsigned32,
+				hwWlanWidsAttackDetorFirstDetTimeWpa2
+					Unsigned32,
+				hwWlanWidsAttackDetorFirstDetTimeWapi
+					Unsigned32,
+				hwWlanWidsAttackDetorRSSI
+					Integer32,
+				hwWlanWidsAttackDetorChannel
+					Integer32,
+				hwWlanWidsAttackDetorLastDetTime
+					Unsigned32
+			 }
+
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.1
+		hwWlanWidsAttackDetorDevMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the detected attack device."
+			::= { hwWlanWidsAttackDetorEntry 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.2
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.2
+		hwWlanWidsAttackDetorApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the monitor AP."
+			::= { hwWlanWidsAttackDetorEntry 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.3
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.3
+		hwWlanWidsAttackDetorApName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (1..31))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the name of the monitor AP."
+			::= { hwWlanWidsAttackDetorEntry 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.4
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.4
+		hwWlanWidsAttackDetorAttTypeBmp OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the attack type bitmap."
+			::= { hwWlanWidsAttackDetorEntry 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.5
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.5
+		hwWlanWidsAttackDetorPacketBmpFlood OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the flood attack packet bitmap."
+			::= { hwWlanWidsAttackDetorEntry 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.6
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.6
+		hwWlanWidsAttackDetorPacketBmpSpoof OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the flood attack packet bitmap."
+			::= { hwWlanWidsAttackDetorEntry 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.7
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.7
+		hwWlanWidsAttackDetorFirstDetTimeFlood OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when a flood attack is detected."
+			::= { hwWlanWidsAttackDetorEntry 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.8
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.8
+		hwWlanWidsAttackDetorFirstDetTimeSpoof OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when a spoofing attack is detected."
+			::= { hwWlanWidsAttackDetorEntry 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.9
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.9
+		hwWlanWidsAttackDetorFirstDetTimeWeakIv OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when a Weak IV attack is detected."
+			::= { hwWlanWidsAttackDetorEntry 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.10
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.10
+		hwWlanWidsAttackDetorFirstDetTimeWep OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when a WEP attack is detected."
+			::= { hwWlanWidsAttackDetorEntry 10 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.11
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.11
+		hwWlanWidsAttackDetorFirstDetTimeWpa OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when a WPA attack is detected."
+			::= { hwWlanWidsAttackDetorEntry 11 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.12
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.12
+		hwWlanWidsAttackDetorFirstDetTimeWpa2 OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when a WPA2 attack is detected."
+			::= { hwWlanWidsAttackDetorEntry 12 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.13
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.13
+		hwWlanWidsAttackDetorFirstDetTimeWapi OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the first time when a WAPI attack is detected."
+			::= { hwWlanWidsAttackDetorEntry 13 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.14
+		hwWlanWidsAttackDetorRSSI OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI of the device that implements the wireless attack detection."
+			::= { hwWlanWidsAttackDetorEntry 14 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.15
+		hwWlanWidsAttackDetorChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel of the device that implements the wireless attack detection."
+			::= { hwWlanWidsAttackDetorEntry 15 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5.1.16
+		hwWlanWidsAttackDetorLastDetTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the last time when the device detects the attack."
+			::= { hwWlanWidsAttackDetorEntry 16 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6
+		hwWlanWidsApDetDevTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanWidsApDetDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes detected device information."
+			::= { hwWlanWidsSrvObjects 6 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1
+		hwWlanWidsApDetDevEntry OBJECT-TYPE
+			SYNTAX HwWlanWidsApDetDevEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"The indexes of this table are hwWlanWidsApDetDevApMac, hwWlanWidsApDetDevApRadioID and hwWlanWidsApDetDevMac."
+			INDEX { hwWlanWidsApDetDevApMac, hwWlanWidsApDetDevApRadioID, hwWlanWidsApDetDevMac }
+			::= { hwWlanWidsApDetDevTable 1 }
+
+		
+		HwWlanWidsApDetDevEntry ::=
+			SEQUENCE { 
+				hwWlanWidsApDetDevApMac
+					MacAddress,
+				hwWlanWidsApDetDevApRadioID
+					Integer32,
+				hwWlanWidsApDetDevMac
+					MacAddress,
+				hwWlanWidsApDetDevType
+					INTEGER,
+				hwWlanWidsApDetDevRssi
+					Integer32,
+				hwWlanWidsApDetDevChannel
+					Integer32,
+				hwWlanWidsApDetDevSsid
+					OCTET STRING,
+				hwWlanWidsApDetDevRogueFlag
+					INTEGER,
+				hwWlanWidsApDetDevLastTime
+					Unsigned32,
+				hwWlanWidsApDetDevContainFlag
+					INTEGER,
+				hwWlanWidsApDetDevBSSID
+					MacAddress
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.1
+		hwWlanWidsApDetDevApMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the monitor AP."
+			::= { hwWlanWidsApDetDevEntry 1 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.2
+		hwWlanWidsApDetDevApRadioID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the radio ID of the monitor AP."
+			::= { hwWlanWidsApDetDevEntry 2 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.3
+		hwWlanWidsApDetDevMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the MAC address of the detected device."
+			::= { hwWlanWidsApDetDevEntry 3 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.4
+		hwWlanWidsApDetDevType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ap(1),
+				adhoc(2),
+				bridge(3),
+				client(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device type."
+			::= { hwWlanWidsApDetDevEntry 4 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.5
+		hwWlanWidsApDetDevRssi OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the RSSI."
+			::= { hwWlanWidsApDetDevEntry 5 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.6
+		hwWlanWidsApDetDevChannel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the channel."
+			::= { hwWlanWidsApDetDevEntry 6 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.7
+		hwWlanWidsApDetDevSsid OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the SSID."
+			::= { hwWlanWidsApDetDevEntry 7 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.8
+		hwWlanWidsApDetDevRogueFlag OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				legal(1),
+				illegal(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether the device is a rogue device."
+			::= { hwWlanWidsApDetDevEntry 8 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.9
+		hwWlanWidsApDetDevLastTime OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the latest time when the device is detected.."
+			::= { hwWlanWidsApDetDevEntry 9 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.10
+		hwWlanWidsApDetDevContainFlag OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				no(1),
+				yes(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether the device is countered."
+			::= { hwWlanWidsApDetDevEntry 10 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.11
+		hwWlanWidsApDetDevBSSID OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the BSSID of the detected device."
+			::= { hwWlanWidsApDetDevEntry 11 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.7
+		hwWlanWidsDetDevStatisticsTable OBJECT IDENTIFIER ::= { hwWlanWidsSrvObjects 7 }
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.7.1
+		hwWlanWidsDetDevRougeAdhocCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 1 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.2
+		hwWlanWidsDetDevContainAdhocCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 2 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.3
+		hwWlanWidsDetDevRougeAPCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 3 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.4
+		hwWlanWidsDetDevPermitAPCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 4 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.5
+		hwWlanWidsDetDevInterfaceAPCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 5 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6
+		hwWlanWidsDetDevContainAPCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 6 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.7
+		hwWlanWidsDetDevRougeClientCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 7 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.8
+		hwWlanWidsDetDevPermitClientCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 8 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.9
+		hwWlanWidsDetDevContainClientCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 9 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.10
+		hwWlanWidsDetDevRougeBridgeCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 10 }
+		
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.11
+		hwWlanWidsDetDevPermitBridgeCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 11 }
+
+
+			
+-- 1.3.6.1.4.1.2011.6.139.15.10
+		-- 1.3.6.1.4.1.2011.6.139.15.10
+		hwWlanWidsSrvConformance OBJECT IDENTIFIER ::= { hwWlanWidsService 10 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.1
+		-- 1.3.6.1.4.1.2011.6.139.15.10.1
+		hwWlanWidsSrvCompliances OBJECT IDENTIFIER ::= { hwWlanWidsSrvConformance 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.1.1
+		-- 1.3.6.1.4.1.2011.6.139.15.10.1.1
+		hwWlanWidsSrvCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			MODULE -- this module
+				MANDATORY-GROUPS { hwWlanWidsTrapObjectGroup, hwWlanWidsGlobalOperGroup, hwWlanWidsDetDevGroup, hwWlanWidsRogueHistoryGroup, hwWlanWidsDetNonWifiDevGroup, 
+					hwWlanWidsAttackDetectGroup, hwWlanWidsAttackStatGroup, hwWlanWidsDynamicBlacklistGroup, hwWlanWidsSrvObjectsGroup }
+			::= { hwWlanWidsSrvCompliances 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2
+		hwWlanWidsSrvObjectGroups OBJECT IDENTIFIER ::= { hwWlanWidsSrvConformance 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.1
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.1
+		hwWlanWidsTrapGroup NOTIFICATION-GROUP
+			NOTIFICATIONS { hwWlanWidsRougeDevDetectedTrap, hwWlanWidsRougeDevClearTrap, hwWlanWidsNonWifiDetTrap, hwWlanWidsNonWifiClearTrap, hwWlanWidsFloodAttackDetectedTrap, 
+				hwWlanWidsFloodAttackClearTrap, hwWlanWidsSpoofAttackDetectedTrap, hwWlanWidsSpoofAttackClearTrap, hwWlanWidsWeakIvAttackDetectedTrap, hwWlanWidsWeakIvAttackClearTrap, 
+				hwWlanWidsPSKAttackDetectedTrap, hwWlanWidsPSKAttackClearTrap }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 1 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.2
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.2
+		hwWlanWidsTrapObjectGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsObjRogueDevMAC, hwWlanWidsObjRogueDevType, hwWlanWidsObjRogueDevChannel, hwWlanWidsObjRogueDevRSSI, hwWlanWidsObjRogueDevSSID, 
+				hwWlanWidsObjDetAPID, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetAPChannel, hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetAPIP, 
+				hwWlanWidsObjNonWifiDeviceType, hwWlanWidsObjNonWifiInterChannel, hwWlanWidsObjNonWifiRssi, hwWlanWidsObjDetAPName, hwWlanWidsObjDetRadioType, 
+				hwWlanWidsObjAttackDevMAC, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 2 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.3
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.3
+		hwWlanWidsGlobalOperGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsResetDetDevTableAll, hwWlanWidsResetDetDevTableByType, hwWlanWidsResetRogueHistoryAll, hwWlanWidsResetRogueHistoryByDevType, hwWlanWidsResetAttackDev, 
+				hwWlanWidsResetAttackStat, hwWlanWidsResetDynamicBlacklist, hwWlanWidsResetDynamicBlacklistMac, hwWlanWidsResetAttackHistory }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 3 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.4
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.4
+		hwWlanWidsDetDevGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsDetDevType, hwWlanWidsDetDevRssi, hwWlanWidsDetDevChannel, hwWlanWidsDetDevSSID, 
+				hwWlanWidsDetDevRogue, hwWlanWidsDetDevLastTime, hwWlanWidsDetDevIsContained, hwWlanWidsDetDevInterference, hwWlanWidsDetDevBSSID, 
+			hwWlanWidsDetDevFirstDetTime, hwWlanWidsDetDevAuthenMethod, hwWlanWidsDetDevMonitorApName, 
+				hwWlanWidsDetDevMonitorApIP, hwWlanWidsDetDevMonitorApChannel, hwWlanWidsDetDevMonitorApRssi, hwWlanWidsDetDevMonitorApLastDetTime, hwWlanWidsDetDevMonitorApCountermeasuresDev, 
+				hwWlanWidsDetDevMonitorDetAtt, hwWlanWidsDetDevMonitorApId }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 4 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.5
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.5
+		hwWlanWidsRogueHistoryGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsRogueDevType, hwWlanWidsRogueDevRssi, hwWlanWidsRogueDevChannel, hwWlanWidsRogueDevSSID, 
+				hwWlanWidsRogueDevLastTime, hwWlanWidsRogueDevAuthenMethod }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 5 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.6
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.6
+		hwWlanWidsDetNonWifiDevGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsDetNonWifiRssi, hwWlanWidsDetNonWifiSpectrumType, 
+				hwWlanWidsDetNonWifiChannel, hwWlanWidsDetNonWifiDevLastTime, hwWlanWidsDetNonWifiCenterFrequency, hwWlanWidsDetNonWifiBandwidth, hwWlanWidsDetNonWifiDutycycle, 
+				hwWlanWidsDetNonWifiInterferenceLevel, hwWlanWidsDetNonWifiDevMonitorAPName, hwWlanWidsDetNonWifiDevRadioType, hwWlanWidsDetNonWifiDevMonitorAPChannel, hwWlanWidsDetNonWifiDevFirstTime
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 6 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.7
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.7
+		hwWlanWidsAttackDetectGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsAttackHistoryDevMac, hwWlanWidsAttackHistoryDevType, hwWlanWidsAttackHistoryRssi, 
+				hwWlanWidsAttackHistoryChannel, hwWlanWidsAttackHistoryAttackType, hwWlanWidsAttackHistoryPacketBmp1, hwWlanWidsAttackHistoryPacketBmp2, hwWlanWidsAttackHistorySSID, 
+				hwWlanWidsAttackHistoryDetTime, hwWlanWidsAttackHistoryDetectorApName, hwWlanWidsAttackDevChannel, hwWlanWidsAttackDevRssi, 
+				hwWlanWidsAttackDevLastAttType, hwWlanWidsAttackDevLastPacketBmp, hwWlanWidsAttackDevLastDetTime,  
+				hwWlanWidsAttackDetorApName, hwWlanWidsAttackDetorAttTypeBmp, hwWlanWidsAttackDetorPacketBmpFlood, hwWlanWidsAttackDetorPacketBmpSpoof, hwWlanWidsAttackDetorFirstDetTimeFlood, 
+				hwWlanWidsAttackDetorFirstDetTimeSpoof, hwWlanWidsAttackDetorFirstDetTimeWeakIv, hwWlanWidsAttackDetorFirstDetTimeWep, hwWlanWidsAttackDetorFirstDetTimeWpa, hwWlanWidsAttackDetorFirstDetTimeWpa2, 
+				hwWlanWidsAttackDetorFirstDetTimeWapi, hwWlanWidsAttackDetorRSSI, hwWlanWidsAttackDetorChannel, hwWlanWidsAttackDetorLastDetTime, hwWlanWidsApDetDevType, 
+				hwWlanWidsApDetDevRssi, hwWlanWidsApDetDevChannel, hwWlanWidsApDetDevSsid, hwWlanWidsApDetDevRogueFlag, hwWlanWidsApDetDevLastTime, 
+				hwWlanWidsApDetDevContainFlag, hwWlanWidsApDetDevBSSID }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 7 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.8
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.8
+		hwWlanWidsAttackStatGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsAttackStatProbeRequestFloodAttack, hwWlanWidsAttackStatAuthRequestFloodAttack, hwWlanWidsAttackStatDeAuthenFloodAttack, hwWlanWidsAttackStatAssocReqFloodAttack, hwWlanWidsAttackStatDisassocReqFloodAttack, 
+				hwWlanWidsAttackStatReassocReqFloodAttack, hwWlanWidsAttackStatActionFloodAttack, hwWlanWidsAttackStatNullDataFloodAttack, hwWlanWidsAttackStatWeakIvAttack, hwWlanWidsAttackStatDeauthSpoofAttack, 
+				hwWlanWidsAttackStatDisassocSpoofAttack, hwWlanWidsAttackStatWepShareKeyAttack, hwWlanWidsAttackStatWpaAttack, hwWlanWidsAttackStatWpa2Attack, hwWlanWidsAttackStatWapiAttack, 
+				hwWlanWidsAttackStatEAPOLStartFloodAttack, hwWlanWidsAttackStatEAPOLLogoffFloodAttack, hwWlanWidsAttackStatNullQosFloodAttack, hwWlanWidsAttackStatStartTime }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 8 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.9
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.9
+		hwWlanWidsDynamicBlacklistGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsDynamicBlacklistDevType, hwWlanWidsDynamicBlacklistDevAttackType, hwWlanWidsDynamicBlacklistAttackPacketBmp1, hwWlanWidsDynamicBlacklistAttackPacketBmp2, 
+			hwWlanWidsDynamicBlacklistLastTime, hwWlanWidsDynamicBlacklistApName, hwWlanWidsDynamicBlacklistApIP, hwWlanWidsDynamicBlacklistAttackType, 
+				hwWlanWidsDynamicBlacklistAPLastTime }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 9 }
+		
+-- 1.3.6.1.4.1.2011.6.139.15.10.2.10
+		-- 1.3.6.1.4.1.2011.6.139.15.10.2.10
+		hwWlanWidsSrvObjectsGroup OBJECT-GROUP
+			OBJECTS { hwWlanWidsDetNonWifiHistMonitorApMac, hwWlanWidsDetNonWifiHistMonitorAPName, hwWlanWidsDetNonWifiHistMonitorRadioId, hwWlanWidsDetNonWifiHistMonitorRadioType, 
+				hwWlanWidsDetNonWifiHistMonitorAPChannel, hwWlanWidsDetNonWifiHistDevType, hwWlanWidsDetNonWifiHistRssi, hwWlanWidsDetNonWifiHistFrequencyType, hwWlanWidsDetNonWifiHistChannel, 
+				hwWlanWidsDetNonWifiHistDevLastTime, hwWlanWidsDetNonWifiHistCenterFrequency, hwWlanWidsDetNonWifiHistBandwidth, hwWlanWidsDetNonWifiHistDutycycle, hwWlanWidsDetNonWifiHistInterferenceLevel, 
+				hwWlanWidsDetNonWifiHistDevFirstTime }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanWidsSrvObjectGroups 10 }
+		
+	
+	END
+
+--
+-- HUAWEI-WLAN-WIDS-SERVICE-MIB.mib
+--

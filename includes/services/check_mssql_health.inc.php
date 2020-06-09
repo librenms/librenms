@@ -1,6 +1,6 @@
 <?php
 
-$check_cmd = $config['nagios_plugins'] . "/check_mssql_health --server ";
+$check_cmd = \LibreNMS\Config::get('nagios_plugins') . "/check_mssql_health --server ";
 
 if ($service['service_ip']) {
     $check_cmd .= $service['service_ip'];

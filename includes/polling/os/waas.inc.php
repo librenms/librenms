@@ -2,7 +2,7 @@
 /*
  * LibreNMS
  *
- * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com> 
+ * Copyright (c) 2016 Søren Friis Rosiak <sorenrosiak@gmail.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -12,7 +12,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$oids = 'entPhysicalContainedIn.1 entPhysicalSoftwareRev.1 entPhysicalSerialNum.1 entPhysicalModelName.1';
+$oids = ['entPhysicalContainedIn.1', 'entPhysicalSoftwareRev.1', 'entPhysicalSerialNum.1', 'entPhysicalModelName.1'];
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB');
 if ($data[1]['entPhysicalContainedIn'] == '0') {
     if (!empty($data[1]['entPhysicalSoftwareRev'])) {

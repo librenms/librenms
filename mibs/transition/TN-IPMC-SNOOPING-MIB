@@ -1,0 +1,710 @@
+-- *****************************************************************
+-- TN-IPMC-SNOOPING-MIB.smi : TN-IPMC-SNOOPING-MIB
+--
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+-- Version 1.00, 2012/10/11, Tonyl
+--
+-- *****************************************************************
+
+TN-IPMC-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Integer32,
+    Counter32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC
+    InetAddress,InetAddressPrefixLength
+        FROM INET-ADDRESS-MIB
+    PortList, VlanId
+        FROM Q-BRIDGE-MIB
+    InterfaceIndex
+        FROM IF-MIB
+    tnProducts FROM TRANSITION-SMI;
+
+tnIpmcSnoopingMib MODULE-IDENTITY
+          LAST-UPDATED "201207061930Z"
+          ORGANIZATION "Transition Networks, Inc."
+          CONTACT-INFO
+               "Transition Networks
+                  Technical Support
+
+                  10900 Red Circle Drive
+                  Minnetonka, MN 55343 USA
+                  Tel: +1-800-526-9267
+
+                  E-mail: techsupport@transition.com"
+          DESCRIPTION
+               "The structure of IPMC snooping for
+                    the proprietary enterprise."
+        ::= { tnProducts 115 }
+
+tnIpmcSnoopingMibNotifications     OBJECT IDENTIFIER ::= { tnIpmcSnoopingMib 1 }
+tnIpmcSnoopingMibObjects           OBJECT IDENTIFIER ::= { tnIpmcSnoopingMib 2 }
+tnIpmcSnoopingMibConformance       OBJECT IDENTIFIER ::= { tnIpmcSnoopingMib 3 }
+-- Textual Conventions
+TnIpmcType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "A value that represents the protocol type of IPMC:
+                     igmp(1)     : type of IPMC is IGMP
+                     mld(2)      : type of IPMC is MLD
+                     unknown(0)      : type of IPMC is not determined."
+    SYNTAX          INTEGER  {
+                        igmp (1),
+                        mld  (2),
+                        unknown  (4)
+                    }
+
+TnIpmcVersion ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION     "A value that represents the version of IGMP or MLD:
+                     version1(1)     : Version 1 of IGMP or MLD
+                     version2(2)     : Version 2 of IGMP or MLD
+                     version2(3)     : Version 2 of IGMP
+                     unknown(4)      : Version of IGMP or MLD is not determined."
+    SYNTAX          INTEGER  {
+                        version1 (1),
+                        version2 (2),
+                        version3 (3),
+                        unknown  (4)
+                    }
+----------------------------------------------------------------------------
+--tnIpmcSnoopingMibObjects
+----------------------------------------------------------------------------
+
+tnIpmcSnoopingMgmt             OBJECT IDENTIFIER ::= { tnIpmcSnoopingMibObjects 1 }
+
+tnSystemCfgInfo                OBJECT IDENTIFIER ::= { tnIpmcSnoopingMgmt 1 }
+tnPortCfgInfo                  OBJECT IDENTIFIER ::= { tnIpmcSnoopingMgmt 2 }
+tnVlanCfgInfo                  OBJECT IDENTIFIER ::= { tnIpmcSnoopingMgmt 3 }
+tnPortFilterCfgInfo            OBJECT IDENTIFIER ::= { tnIpmcSnoopingMgmt 4 }
+tnPortStatusInfo               OBJECT IDENTIFIER ::= { tnIpmcSnoopingMgmt 5 }
+tnVlanStatisticInfo            OBJECT IDENTIFIER ::= { tnIpmcSnoopingMgmt 6 }
+tnIpmcGroupInfo                OBJECT IDENTIFIER ::= { tnIpmcSnoopingMgmt 7 }
+tnIpmcSfmInfo                  OBJECT IDENTIFIER ::= { tnIpmcSnoopingMgmt 8 }
+
+----------------------------------------------------------------------------
+-- tnSystemInfo
+----------------------------------------------------------------------------
+tnSystemCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnSystemCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Table contains System based configuration information
+                     for Ipmc Snooping."
+    ::= { tnSystemCfgInfo 1 }
+
+tnSystemCfgEntry OBJECT-TYPE
+    SYNTAX          TnSystemCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry is created for each active port in the device."
+    INDEX           { tnIpmcSnoopingType }
+    ::= { tnSystemCfgTable 1 }
+
+TnSystemCfgEntry ::= SEQUENCE {
+        tnIpmcSnoopingType               TnIpmcType,
+        tnIpmcSnoopingEnabled            TruthValue,
+        tnIpmcSnoopingFloodingEnabled    TruthValue,
+        tnIpmcSnoopingLeaveProxyEnabled  TruthValue,
+        tnIpmcSnoopingProxyEnabled       TruthValue,
+        tnIpmcSnoopingSsmRange           InetAddress,
+        tnIpmcSnoopingSsmRangePrefix     InetAddressPrefixLength,
+        tnIpmcSnoopingStatisticClear     TruthValue
+        }
+
+tnIpmcSnoopingType  OBJECT-TYPE
+        SYNTAX         TnIpmcType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This object indicates whether IGMP or MLD Snooping has been
+                        configued for the system."
+        ::={ tnSystemCfgEntry 1 }
+
+tnIpmcSnoopingEnabled  OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "This object indicates whether IGMP or MLD Snooping has been
+                        enabled for the system."
+        ::={ tnSystemCfgEntry 2 }
+
+tnIpmcSnoopingFloodingEnabled  OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Enable unregistered IPMCv6 traffic flooding.
+                         The flooding control takes effect only when IGMP or MLD Snooping 
+                         is enabled.When Ipmc Snooping is disabled, unregistered
+                         IPMCv4 traffic flooding is always active in spite of this
+                         setting."
+        ::={ tnSystemCfgEntry 3 }
+
+tnIpmcSnoopingLeaveProxyEnabled  OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Enable Ipmc Leave proxy. This feature can be used to
+                        avoid forwarding unnecessary leave messages to the
+                        router side."
+        ::={ tnSystemCfgEntry 4 }
+
+tnIpmcSnoopingProxyEnabled  OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Enable Ipmc proxy. This feature can be used to avoid
+                        forwarding unnecessary join and leave messages to the
+                        router side."
+        ::={ tnSystemCfgEntry 5 }
+
+tnIpmcSnoopingSsmRange  OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "SSM (Source-Specific Multicast) Range allows the SSM-aware
+                       hosts and routers run the SSM service model for the groups
+                       in the address range."
+        ::={ tnSystemCfgEntry 6 }
+
+tnIpmcSnoopingSsmRangePrefix  OBJECT-TYPE
+        SYNTAX         InetAddressPrefixLength
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Denotes the length of a generic Internet network address
+                        prefix."
+        ::={ tnSystemCfgEntry 7 }
+        
+tnIpmcSnoopingStatisticClear  OBJECT-TYPE
+        SYNTAX         TruthValue
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Clears all Statistics counters."
+        ::={ tnSystemCfgEntry 8 }
+----------------------------------------------------------------------
+-- tnPortConfigInfo
+----------------------------------------------------------------------
+
+tnPortCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnPortCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Table contains Port based configuration information
+                     for Ipmc Snooping."
+    ::= { tnPortCfgInfo 1 }
+
+tnPortCfgEntry OBJECT-TYPE
+    SYNTAX          TnPortCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry is created for each active port in the device."
+    INDEX           { tnIpmcSnoopingType, ifIndex }
+    ::= { tnPortCfgTable 1 }
+
+TnPortCfgEntry ::= SEQUENCE {
+        tnPortRoutePortEnabled    TruthValue,
+        tnPortFastLeaveEnabled    TruthValue,
+        tnPortThrottling          Unsigned32
+}
+
+tnPortRoutePortEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Specify which ports act as router ports. A router port
+                     is a port on the Ethernet switch that leads towards the
+                     Layer 3 multicast device or Ipmc querier. If an aggregation
+                     member port is selected as a router port, the whole
+                     aggregation will act as a router port."
+    ::= { tnPortCfgEntry 1 }
+
+tnPortFastLeaveEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable the fast leave on the port."
+    ::= { tnPortCfgEntry 2 }
+
+tnPortThrottling OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..10)
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION     "Enable to limit the number of multicast groups to which a
+                     switch port can belong. The range is 1-10 for S3280.
+                     0 means disabled."
+    ::= { tnPortCfgEntry 3 }
+
+----------------------------------------------------------------------------
+-- tnVlanConfigInfo
+----------------------------------------------------------------------------
+tnVlanCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnVlanCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Table contains VLAN based configuration information
+                     for Ipmc Snooping."
+    ::= { tnVlanCfgInfo 1 }
+
+tnVlanCfgEntry OBJECT-TYPE
+    SYNTAX          TnVlanCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry is created for each active VLAN in the device"
+    INDEX           { tnIpmcSnoopingType, tnVlanIndex }
+    ::= { tnVlanCfgTable 1 }
+
+TnVlanCfgEntry ::= SEQUENCE {
+        tnVlanIndex                  VlanId,
+        tnVlanIpmcSnoopingEnabled    TruthValue,
+        tnVlanIpmcQuerierEnabled     TruthValue,
+        tnVlanIpmcCompatibility      INTEGER,
+        tnVlanIpmcSnoopingRV         Unsigned32,
+        tnVlanIpmcSnoopingQI         Unsigned32,
+        tnVlanIpmcSnoopingQRI        Unsigned32,
+        tnVlanIpmcSnoopingLLQI       Unsigned32,
+        tnVlanIpmcSnoopingURI        Unsigned32,
+        tnVlanIpmcRowStatus          RowStatus
+}
+
+tnVlanIndex OBJECT-TYPE
+    SYNTAX          VlanId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This object indicates the VLAN in which Ipmc Snooping is
+                     configured."
+    ::= { tnVlanCfgEntry 1 }
+
+tnVlanIpmcSnoopingEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "When this object is set to 'true' Ipmc Snooping
+                     is enabled on this VLAN else disabled."
+    ::= { tnVlanCfgEntry 2 }
+
+tnVlanIpmcQuerierEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "When this object is set to 'true' Ipmc Snooping
+                     is enabled on this VLAN else disabled."
+    ::= { tnVlanCfgEntry 3 }
+ 
+tnVlanIpmcCompatibility OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        ipmc-auto (0),
+                        ipmc-v1   (1),
+                        ipmc-v2   (2),
+                        ipmc-v3   (3)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Compatibility is maintained by hosts and routers taking
+                     appropriate actions depending on the versions of IGMP or MLD operating
+                     on hosts and routers within a network. The allowed selection
+                     is IGMP or MLD-Auto, Forced IGMPv1 or MLDv1, Forced IGMPv2 or MLDv2,
+                     Forced IGMPv3,default compatibility value is IGMP or MLD-Auto."
+    ::= { tnVlanCfgEntry 4 }
+
+tnVlanIpmcSnoopingRV OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..255)
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Robustness Variable. The Robustness Variable allows tuning
+                     for the expected packet loss on a network.
+                     The allowed range is 1 to 255,default robustness variable
+                     value is 2."
+    DEFVAL          { 2 }
+    ::= { tnVlanCfgEntry 5 }
+
+tnVlanIpmcSnoopingQI OBJECT-TYPE
+    SYNTAX          Unsigned32 (1..31744)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Query Interval. The Query Interval is the interval between
+                     General Queries sent by the Querier. The allowed range is
+                     1 to 31744 seconds,default query interval is 125 seconds."
+    DEFVAL          { 125 }
+    ::= { tnVlanCfgEntry 6 }
+
+tnVlanIpmcSnoopingQRI OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..31744)
+    UNITS           "deciseconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Query Response Interval. The Maximum Response Delay used to calculate
+                     the Maximum Response Code inserted into the periodic General Queries.
+                     The allowed range is 0 to 31744 in tenths of seconds, default query
+                     response interval is 100 in tenths of seconds (10 seconds)."
+    DEFVAL          { 100 }
+    ::= { tnVlanCfgEntry 7 }
+
+tnVlanIpmcSnoopingLLQI OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..31744)
+    UNITS           "deciseconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Last Member Query Interval. The Last Member Query Time is the time value
+                     represented by the Last Member Query Interval, multiplied by the Last Member
+                     Query Count. The allowed range is 0 to 31744 in tenths of seconds, default
+                     last member query interval is 10 in tenths of seconds (1 second)."
+    DEFVAL          { 10 }
+    ::= { tnVlanCfgEntry 8 }
+
+tnVlanIpmcSnoopingURI OBJECT-TYPE
+    SYNTAX          Unsigned32 (0..31744)
+    UNITS           "seconds"
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "Unsolicited Report Interval. The Unsolicited Report Interval is the time
+                     between repetitions of a host's initial report of membership in a group.
+                     The allowed range is 0 to 31744 seconds, default unsolicited report interval
+                     is 1 second. "
+    DEFVAL          { 1 }
+    ::= { tnVlanCfgEntry 9 }
+
+tnVlanIpmcRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This object indicates RowStatus "
+    ::= { tnVlanCfgEntry 10 }
+
+------------------------------------------------------------------------------
+-- tnPortFilterCfgInfo
+------------------------------------------------------------------------------
+tnPortFilterCfgTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF TnPortFilterCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "Table contains VLAN based configuration information
+                     for IGMP or MLD Snooping."
+    ::= { tnPortFilterCfgInfo 1 }
+
+tnPortFilterCfgEntry OBJECT-TYPE
+    SYNTAX          TnPortFilterCfgEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "An entry is created for each active VLAN in the device"
+    INDEX           { tnIpmcSnoopingType, tnPortFilterIfIndex, tnPortFilterIpmcIp }
+    ::= { tnPortFilterCfgTable 1 }
+
+TnPortFilterCfgEntry ::= SEQUENCE {
+        tnPortFilterIfIndex          Unsigned32,
+        tnPortFilterIpmcIp           InetAddress,
+        tnPortFilterRowStatus        RowStatus
+}
+
+tnPortFilterIfIndex OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This object indicates the Port in which IGMP or MLD Snooping is
+                     configured."
+    ::= { tnPortFilterCfgEntry 1 }
+
+tnPortFilterIpmcIp   OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This object indicates the IP group in which IGMP or MLD Snooping is
+                     configured."
+    ::= { tnPortFilterCfgEntry 2 }
+
+tnPortFilterRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION     "This object indicates RowStatus."
+    ::= { tnPortFilterCfgEntry 3 }
+
+-------------------------------------------------------------------------------
+-- tnPortStatusInfo
+-------------------------------------------------------------------------------
+tnPortStatusTable    OBJECT-TYPE
+    SYNTAX           SEQUENCE OF TnPortStatusEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION      "Table contains Port based configuration information
+                      for IGMP or MLD Snooping."
+    ::= { tnPortStatusInfo 1 }
+
+tnPortStatusEntry    OBJECT-TYPE
+    SYNTAX           TnPortStatusEntry
+    MAX-ACCESS       not-accessible
+    STATUS           current
+    DESCRIPTION      "An entry is created for each active port in the device"
+    INDEX            { tnIpmcSnoopingType, ifIndex }
+    ::= { tnPortStatusTable 1 }
+
+TnPortStatusEntry ::= SEQUENCE {
+        tnPortStatusRouteEnabled    TruthValue
+}
+
+tnPortStatusRouteEnabled OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Display which ports act as router ports. A router port is
+                     a port on the Ethernet switch that leads towards the Layer 3
+                     multicast device or IGMP or MLD querier. Static denotes the specific
+                     port is configured to be a router port. Dynamic denotes the 
+                     specific port is learned to be a router port."
+    ::= { tnPortStatusEntry 1 }
+
+----------------------------------------------------------------------------
+--tnVlanStatisticInfo
+----------------------------------------------------------------------------
+tnVlanStatisticTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF TnVlanStatisticEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "This contains information about the Ipmc snooping VLAN
+                    statistic counter info table."
+    ::= { tnVlanStatisticInfo 1 }
+
+tnVlanStatisticEntry OBJECT-TYPE
+    SYNTAX         TnVlanStatisticEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "This is an entry of the tnVlanStatisticTable."
+    INDEX          { tnIpmcSnoopingType, tnVlanStatisticVlanID }
+    ::= { tnVlanStatisticTable 1 }
+
+TnVlanStatisticEntry ::= SEQUENCE {
+        tnVlanStatisticVlanID          VlanId,
+        tnVlanStatisticQuerierVersion  TnIpmcVersion,
+        tnVlanStatisticHostVersion     TnIpmcVersion,
+        tnVlanStatisticQuerierState    INTEGER,
+        tnVlanStatisticQuerierTx       Counter32,
+        tnVlanStatisticQuerierRx       Counter32,
+        tnVlanStatisticV1ReportsRx     Counter32,
+        tnVlanStatisticV2ReportsRx     Counter32,
+        tnVlanStatisticV3ReportsRx     Counter32,
+        tnVlanStatisticLeavesRx        Counter32
+    }
+
+tnVlanStatisticVlanID OBJECT-TYPE
+        SYNTAX         VlanId
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "This indicates the VLAN ID of the entry."
+        ::= { tnVlanStatisticEntry 1 }
+
+tnVlanStatisticQuerierVersion OBJECT-TYPE
+        SYNTAX         TnIpmcVersion
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates working querier version currently
+                        in this VLAN."
+        ::= { tnVlanStatisticEntry 2 }
+
+tnVlanStatisticHostVersion OBJECT-TYPE
+        SYNTAX         TnIpmcVersion 
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates working host version currently
+                        in this VLAN."
+        ::= { tnVlanStatisticEntry 3 }
+
+tnVlanStatisticQuerierState OBJECT-TYPE
+        SYNTAX         INTEGER {
+                           disabled (0),
+                           active   (1),
+                           idle     (2)
+                       }
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates the querier status is 'ACTIVE' or 'IDLE'.
+                        'DISABLED' denotes the specific interface is
+                        administratively disabled."
+        ::= { tnVlanStatisticEntry 4 }
+
+tnVlanStatisticQuerierTx OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates the count of transmitted IPMC Query
+                        packets in this VLAN."
+        ::= { tnVlanStatisticEntry 5 }
+
+tnVlanStatisticQuerierRx OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates the count of transmitted IPMC Query
+                        packets in this VLAN."
+        ::= { tnVlanStatisticEntry 6 }
+
+tnVlanStatisticV1ReportsRx OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates the count of received IGMPv1 or MLDv1 Query
+                        packets in this VLAN."
+        ::= { tnVlanStatisticEntry 7 }
+
+tnVlanStatisticV2ReportsRx OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates the count of received IGMPv2 or MLDv2 Query
+                        packets in this VLAN."
+        ::= { tnVlanStatisticEntry 8 }
+
+tnVlanStatisticV3ReportsRx OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates the count of received IGMPv3 Query
+                        packets in this VLAN."
+        ::= { tnVlanStatisticEntry 9 }
+        
+tnVlanStatisticLeavesRx OBJECT-TYPE
+        SYNTAX         Counter32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "This indicates the count of received IPMC(IGMPv2 or MLDv1) Leaves
+                        packets in this VLAN."
+        ::= { tnVlanStatisticEntry 10 }
+
+----------------------------------------------------------------------------
+-- tnIpmcGroupInfo
+----------------------------------------------------------------------------
+tnIpmcGroupTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnIpmcGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Table containing multicast group address information for
+                   IGMP or MLD Snooping."
+    ::= { tnIpmcGroupInfo 1 }
+
+tnIpmcGroupEntry OBJECT-TYPE
+    SYNTAX         TnIpmcGroupEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry is created by IGMP or MLD Snooping for each group learned
+                    in the VLAN."
+    INDEX          { tnIpmcSnoopingType, tnIpmcGroupVlanIndex, tnIpmcGroupAddress }
+    ::= { tnIpmcGroupTable 1 }
+
+TnIpmcGroupEntry ::= SEQUENCE {
+        tnIpmcGroupVlanIndex        VlanId,
+        tnIpmcGroupAddress          InetAddress,
+        tnIpmcGroupPortList         PortList
+}
+
+tnIpmcGroupVlanIndex OBJECT-TYPE
+    SYNTAX          VlanId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This object indicates the VLAN in which the group is learned."
+    ::= { tnIpmcGroupEntry 1 }
+
+tnIpmcGroupAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This object indicates IP multicast address learned by IGMP or MLD Snooping."
+    ::= { tnIpmcGroupEntry 2 }
+
+tnIpmcGroupPortList OBJECT-TYPE
+    SYNTAX          PortList
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object indicates the set of ports on which IPMC Membership Reports
+                     are received for the group indicating interest to receive traffic sent
+                     to the group."
+    ::= { tnIpmcGroupEntry 3 }
+
+------------------------------------------------------------------------------
+-- tnIpmcSfmInfo
+------------------------------------------------------------------------------
+tnIpmcSfmTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnIpmcSfmEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Table containing multicast group address information for
+                   IGMP or MLD Snooping."
+    ::= { tnIpmcSfmInfo 1 }
+
+tnIpmcSfmEntry OBJECT-TYPE
+    SYNTAX         TnIpmcSfmEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "An entry is created by IPMC Snooping for each group learned in the VLAN."
+    INDEX          { tnIpmcSnoopingType, tnIpmcSfmVlanIndex, tnIpmcSfmInetAddress,tnIpmcSfmPort, tnIpmcSfmSrcAddress }
+    ::= { tnIpmcSfmTable 1 }
+
+TnIpmcSfmEntry ::= SEQUENCE {
+        tnIpmcSfmVlanIndex        VlanId,
+        tnIpmcSfmInetAddress      InetAddress,
+        tnIpmcSfmPort             InterfaceIndex,
+        tnIpmcSfmSrcAddress       InetAddress,
+        tnIpmcSfmMode             INTEGER,
+        tnIpmcSfmSrcType          INTEGER,
+        tnIpmcSfmHardFilter       TruthValue
+}
+
+tnIpmcSfmVlanIndex OBJECT-TYPE
+    SYNTAX          VlanId
+    MAX-ACCESS      not-accessible
+    STATUS          current
+   DESCRIPTION      "This object indicates the VLAN in which the group is learned."
+    ::= { tnIpmcSfmEntry 1 }
+
+tnIpmcSfmInetAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This object indicates IP multicast address learned by IPMC Snooping."
+    ::= { tnIpmcSfmEntry 2 }
+
+tnIpmcSfmPort OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This object indicates the switch port number."
+    ::= { tnIpmcSfmEntry 3 }
+
+tnIpmcSfmSrcAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "This object indicates IP Address of the source. Currently,
+                     system limits the total number of IP source addresses for
+                     filtering to be 128."
+    ::= { tnIpmcSfmEntry 4 }
+    
+tnIpmcSfmMode OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        include (1),
+                        exclude (2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object indicates the filtering mode maintained per
+                     (VLAN ID, port number, Group Address) basis. It can be
+                     either Include or Exclude."
+    ::= { tnIpmcSfmEntry 5 }
+
+tnIpmcSfmSrcType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                        allow (1),
+                        deny  (2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object indicates the Type. It can be either Allow or Deny."
+    ::= { tnIpmcSfmEntry 6 }
+
+tnIpmcSfmHardFilter OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "This object indicates Indicates whether data plane destined to the specific
+                     group address from the source IP address could be handled by chip or not."
+    ::= { tnIpmcSfmEntry 7 }
+END

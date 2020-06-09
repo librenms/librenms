@@ -29,6 +29,7 @@ use App\Models\Eventlog;
 use Carbon\Carbon;
 use LibreNMS\Config;
 use LibreNMS\Util\Url;
+use LibreNMS\Enum\Alert;
 
 class EventlogController extends TableController
 {
@@ -36,6 +37,7 @@ class EventlogController extends TableController
     {
         return [
             'device' => 'nullable|int',
+            'device_group' => 'nullable|int',
             'eventtype' => 'nullable|string',
         ];
     }
@@ -43,6 +45,14 @@ class EventlogController extends TableController
     public function searchFields($request)
     {
         return ['message'];
+    }
+
+    protected function filterFields($request)
+    {
+        return [
+            'device_id' => 'device',
+            'type' => 'eventtype',
+        ];
     }
 
     /**
@@ -53,17 +63,11 @@ class EventlogController extends TableController
      */
     public function baseQuery($request)
     {
-        $query = Eventlog::hasAccess($request->user())->with('device');
-
-        if ($device_id = $request->get('device')) {
-            $query->where('device_id', $device_id);
-        }
-
-        if ($type = $request->get('eventtype')) {
-            $query->where('type', $type);
-        }
-
-        return $query;
+        return Eventlog::hasAccess($request->user())
+            ->with('device')
+            ->when($request->device_group, function ($query) use ($request) {
+                $query->inDeviceGroup($request->device_group);
+            });
     }
 
     public function formatItem($eventlog)
@@ -82,7 +86,16 @@ class EventlogController extends TableController
         if ($eventlog->type == 'interface') {
             if (is_numeric($eventlog->reference)) {
                 $port = $eventlog->related;
-                return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
+                if (isset($port)) {
+                    return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
+                }
+            }
+        } elseif (in_array($eventlog->type, \App\Models\Sensor::getTypes())) {
+            if (is_numeric($eventlog->reference)) {
+                $sensor = $eventlog->related;
+                if (isset($sensor)) {
+                    return '<b>' . Url::sensorLink($sensor, $sensor->sensor_descr) . '</b>';
+                }
             }
         }
 
@@ -107,15 +120,15 @@ class EventlogController extends TableController
     private function severityLabel($eventlog_severity)
     {
         switch ($eventlog_severity) {
-            case 1:
+            case Alert::OK:
                 return "label-success"; //OK
-            case 2:
+            case Alert::INFO:
                 return "label-info"; //Informational
-            case 3:
+            case Alert::NOTICE:
                 return "label-primary"; //Notice
-            case 4:
+            case Alert::WARNING:
                 return "label-warning"; //Warning
-            case 5:
+            case Alert::ERROR:
                 return "label-danger"; //Critical
             default:
                 return "label-default"; //Unknown

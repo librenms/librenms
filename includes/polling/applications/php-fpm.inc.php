@@ -5,7 +5,7 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'php-fpm';
 $app_id = $app['app_id'];
 
-$options      = '-O qv';
+$options      = '-Oqv';
 $oid          = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.104.112.102.112.109.115.112';
 $phpfpm = snmp_walk($device, $oid, $options);
 

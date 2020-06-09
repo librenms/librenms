@@ -1,0 +1,70 @@
+-- *****************************************************************
+-- TN-CONFIG-MIB.my : TN Configuration MIB
+--
+-- Copyright (c) 2014 by Transition Networks, Inc.
+-- All rights reserved.
+--
+-- *************************************************************************************************
+--
+
+TN-CONFIG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    NOTIFICATION-TYPE,
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    tnProducts
+        FROM TRANSITION-SMI;
+
+--
+-- main body
+--
+tnConfigMIB MODULE-IDENTITY
+    LAST-UPDATED    "201402080000Z"
+    ORGANIZATION    "Transition Networks, Inc."
+    CONTACT-INFO
+            "Transition Networks
+             Technical Support
+             10900 Red Circle Drive
+             Minnetonka, MN 55343 USA
+             Tel: +1-800-526-9267
+             E-mail: techsupport@transition.com
+            "
+    DESCRIPTION
+        "The MIB module for general device configuration."
+    REVISION        "201402080000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { tnProducts 11 }
+
+tnConfigNotifications    OBJECT IDENTIFIER ::= { tnConfigMIB 0 }
+tnConfigObjects          OBJECT IDENTIFIER ::= { tnConfigMIB 1 }
+
+tnConfigModuleName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The configuration module name on the device."
+    ::= { tnConfigObjects 1 }
+
+
+-- ******************************************************************
+-- NOTIFICATIONS (TRAPS)
+-- These notifications will be sent to the management entity
+-- ******************************************************************
+
+tnConfigChangeNotification NOTIFICATION-TYPE
+    OBJECTS     {
+                  tnConfigModuleName
+                }
+    STATUS      current
+    DESCRIPTION
+       "A tnConfigChangeNotification trap is sent when the device configuration is changed.
+        The module name for the configuration is indicated by the included value of
+        configModuleName."
+    ::= { tnConfigNotifications 1 }
+END

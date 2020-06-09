@@ -33,6 +33,10 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\OS;
 
 class Routeros extends OS implements
@@ -42,7 +46,11 @@ class Routeros extends OS implements
     WirelessNoiseFloorDiscovery,
     WirelessRateDiscovery,
     WirelessRssiDiscovery,
-    WirelessDistanceDiscovery
+    WirelessDistanceDiscovery,
+    WirelessRsrqDiscovery,
+    WirelessRsrpDiscovery,
+    WirelessSinrDiscovery,
+    WirelessQualityDiscovery
 {
     private $data;
 
@@ -125,6 +133,20 @@ class Routeros extends OS implements
             'rssi',
             'mtxrWl60GRssi',
             '.1.3.6.1.4.1.14988.1.1.1.8.1.12.'
+        );
+    }
+    /**
+     * Discover wireless Quality.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessQuality()
+    {
+        return $this->discoverSensor(
+            'quality',
+            'mtxrWl60GSignal',
+            '.1.3.6.1.4.1.14988.1.1.1.8.1.8.'
         );
     }
     /**
@@ -240,5 +262,50 @@ class Routeros extends OS implements
             }
         }
         return $sensors;
+    }
+    public function discoverWirelessRsrq()
+    {
+        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.3.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRQ
+        return array(
+            new WirelessSensor(
+                'rsrq',
+                $this->getDeviceId(),
+                $sinr,
+                'routeros',
+                0,
+                'Signal RSRQ',
+                null
+            )
+        );
+    }
+    public function discoverWirelessRsrp()
+    {
+        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.4.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRP
+        return array(
+            new WirelessSensor(
+                'rsrp',
+                $this->getDeviceId(),
+                $sinr,
+                'routeros',
+                0,
+                'Signal RSRP',
+                null
+            )
+        );
+    }
+    public function discoverWirelessSinr()
+    {
+        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.7.1'; //MIKROTIK-MIB::mtxrLTEModemSignalSINR
+        return array(
+            new WirelessSensor(
+                'sinr',
+                $this->getDeviceId(),
+                $sinr,
+                'routeros',
+                0,
+                'Signal SINR',
+                null
+            )
+        );
     }
 }

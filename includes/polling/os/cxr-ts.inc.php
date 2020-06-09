@@ -1,6 +1,6 @@
 <?php
 
-$oids = 'productName.0 version.0';
+$oids = ['productName.0', 'version.0'];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'CXR-TS-MIB');
 

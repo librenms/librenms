@@ -1,0 +1,61 @@
+DKT-GENERIC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    Counter32                   FROM SNMPv2-SMI
+    OBJECT-GROUP				FROM SNMPv2-CONF
+    dkt                         FROM DKT-MIB;
+
+genericMIB MODULE-IDENTITY
+    LAST-UPDATED  "200812170000Z"
+    ORGANIZATION "DKT A/S"
+    CONTACT-INFO
+        "postal:  DKT A/S
+                  Fanoevej 6
+                  DK-4060 Kirke Saaby
+                  Denmark
+
+         email:   info@dktcomega.com"
+    DESCRIPTION   "DKT GENERIC MIB."
+    ::= { dkt 10 }
+
+hwVersion OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Version string for the HW"
+    ::= { genericMIB 1 }
+
+swVersion OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE(0..100))
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Version string for the SW"
+    ::= { genericMIB 2 }
+
+reboot OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  write-only
+    STATUS      current
+    DESCRIPTION
+        "Set to 1 to reboot the device"
+    ::= { genericMIB 3 }
+
+
+genericModuleGroup OBJECT-GROUP
+    OBJECTS {
+		hwVersion,
+		swVersion,
+		reboot
+    }
+    STATUS current
+    DESCRIPTION
+        "The objects are related to all DKT modules."
+    ::= { genericMIB 4 }
+
+END
+
+
+

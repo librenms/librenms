@@ -25,7 +25,7 @@
 
 namespace App\Models;
 
-class OspfNbr extends BaseModel
+class OspfNbr extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $fillable = [
@@ -45,18 +45,4 @@ class OspfNbr extends BaseModel
         'ospfNbmaNbrPermanence',
         'ospfNbrHelloSuppressed',
     ];
-
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
-    }
 }

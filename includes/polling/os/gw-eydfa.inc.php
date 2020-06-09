@@ -23,7 +23,7 @@
  * @author     TheGreatDoc
  */
 
-$data = snmp_get_multi($device, "commonDeviceModelNumber.1 commonDeviceSerialNumber.1 commonDeviceVendorInfo.1", "-OQUs", 'NSCRTV-HFCEMS-COMMON-MIB');
+$data = snmp_get_multi($device, ['commonDeviceModelNumber.1', 'commonDeviceSerialNumber.1', 'commonDeviceVendorInfo.1'], "-OQUs", 'NSCRTV-HFCEMS-COMMON-MIB');
 
 $hardware = $data['1']['commonDeviceModelNumber'];
 $serial = $data['1']['commonDeviceSerialNumber'];

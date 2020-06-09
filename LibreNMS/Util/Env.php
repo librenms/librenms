@@ -37,12 +37,25 @@ class Env
      */
     public static function parseArray($env_name, $default = null, $except = [''])
     {
-        $value = env($env_name, $default);
+        $value = getenv($env_name);
+        if ($value === false) {
+            $value = $default;
+        }
 
         if (is_string($value) && !in_array($value, $except)) {
             $value = explode(',', $value);
         }
 
         return $value;
+    }
+
+    /**
+     * Detect if LibreNMS is installed from the official Docker image.
+     *
+     * @return bool
+     */
+    public static function librenmsDocker()
+    {
+        return getenv('LIBRENMS_DOCKER') === '1';
     }
 }

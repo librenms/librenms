@@ -1,0 +1,258 @@
+-- This file was automatically generated from ciena-ws-encryption.yang. Do not edit.
+
+CIENA-WS-ENCRYPTION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    PortId, StringMaxl32
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsEncryptionMIB MODULE-IDENTITY
+    LAST-UPDATED "201703020000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+        Hanover, Maryland 21076
+        U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "Datapath encryption support on Waveserver.
+
+Encryption support includes a global encryption state and per-port pre-shared-key
+provisioning, authentication, and state."
+    REVISION "201703020000Z"
+    DESCRIPTION "Initial revision"
+    ::= { cienaWsConfig 23 }
+
+cwsEncryptionPortEncryptionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsEncryptionPortEncryptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Data Path Encryption properties for a port."
+    ::= { cienaWsEncryptionMIB 3 }
+
+cwsEncryptionPortEncryptionEntry OBJECT-TYPE
+    SYNTAX CwsEncryptionPortEncryptionEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsEncryptionPortEncryptionTable."
+    INDEX { cwsPortPortsPortId, cwsEncryptionPortEncryptionTableSnmpKey }
+    ::= { cwsEncryptionPortEncryptionTable 1 }
+
+CwsEncryptionPortEncryptionEntry ::= SEQUENCE { 
+    cwsEncryptionPortEncryptionTableSnmpKey Integer32,
+    cwsEncryptionPortEncryptionPeerAuthenticationStatus INTEGER 
+}
+
+cwsEncryptionPortEncryptionTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsEncryptionPortEncryption"
+    ::= { cwsEncryptionPortEncryptionEntry 1 }
+
+cwsEncryptionPortEncryptionPeerAuthenticationStatus OBJECT-TYPE
+    SYNTAX INTEGER { unknown(0), pass(1), fail(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Whether the port is authenticated with its peer."
+    ::= { cwsEncryptionPortEncryptionEntry 2 }
+
+cwsEncryptionPreSharedKeyTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsEncryptionPreSharedKeyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Port data path encryption pre-shared-key properties."
+    ::= { cienaWsEncryptionMIB 4 }
+
+cwsEncryptionPreSharedKeyEntry OBJECT-TYPE
+    SYNTAX CwsEncryptionPreSharedKeyEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsEncryptionPreSharedKeyTable."
+    INDEX { cwsPortPortsPortId, cwsEncryptionPreSharedKeyTableSnmpKey }
+    ::= { cwsEncryptionPreSharedKeyTable 1 }
+
+CwsEncryptionPreSharedKeyEntry ::= SEQUENCE { 
+    cwsEncryptionPreSharedKeyTableSnmpKey Integer32,
+    cwsEncryptionPreSharedKeyValue OCTET STRING,
+    cwsEncryptionPreSharedKeyFingerprint StringMaxl32,
+    cwsEncryptionPreSharedKeyStatus TruthValue,
+    cwsEncryptionPreSharedKeyDescription OCTET STRING 
+}
+
+cwsEncryptionPreSharedKeyTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsEncryptionPreSharedKey"
+    ::= { cwsEncryptionPreSharedKeyEntry 1 }
+
+cwsEncryptionPreSharedKeyValue OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0 ..512))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Value for a pre-shared-key (PSK). 
+The value must be specified as a hexadecimal encoded string.
+The string must be 32 characters to 512 characters consisting of (0-9, a-f, A-F).
+This is for support of 128bit key to 2048bit key in increment of 8 bits.
+Setting this attribute to an empty or blank string will clear the PSK.
+A read of this attribute will always return empty to protect the plaintext value.
+
+Note: This is a write-only attribute."
+    ::= { cwsEncryptionPreSharedKeyEntry 2 }
+
+cwsEncryptionPreSharedKeyFingerprint OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "A system generated hash value based on the provisioned pre-shared-key. 
+If no key is provisioned, the fingerprint is empty."
+    ::= { cwsEncryptionPreSharedKeyEntry 3 }
+
+cwsEncryptionPreSharedKeyStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Boolean value to indicate whether the pre-shared-key has been setup by user or not."
+    ::= { cwsEncryptionPreSharedKeyEntry 4 }
+
+cwsEncryptionPreSharedKeyDescription OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..60))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "A human-readable description for the applied pre-shared-key.
+Eg. 'PSK for site 1 and site 2'"
+    ::= { cwsEncryptionPreSharedKeyEntry 5 }
+
+cwsEncryptionReAuthenticationTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsEncryptionReAuthenticationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Port data path encryption re-authentication properties."
+    ::= { cienaWsEncryptionMIB 5 }
+
+cwsEncryptionReAuthenticationEntry OBJECT-TYPE
+    SYNTAX CwsEncryptionReAuthenticationEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsEncryptionReAuthenticationTable."
+    INDEX { cwsPortPortsPortId, cwsEncryptionReAuthenticationTableSnmpKey }
+    ::= { cwsEncryptionReAuthenticationTable 1 }
+
+CwsEncryptionReAuthenticationEntry ::= SEQUENCE { 
+    cwsEncryptionReAuthenticationTableSnmpKey Integer32,
+    cwsEncryptionReAuthenticationPeriod Unsigned32,
+    cwsEncryptionReAuthenticationFailureMode INTEGER 
+}
+
+cwsEncryptionReAuthenticationTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsEncryptionReAuthentication"
+    ::= { cwsEncryptionReAuthenticationEntry 1 }
+
+cwsEncryptionReAuthenticationPeriod OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This determines how often peer re-authentication will be performed.  Default is 1 hour.  Range is 1 to 24 hours in increment of 1 hour."
+    ::= { cwsEncryptionReAuthenticationEntry 2 }
+
+cwsEncryptionReAuthenticationFailureMode OBJECT-TYPE
+    SYNTAX INTEGER { unknown(0), drop(1), allow(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "This attribute is useful for hitless per-shared-key renewal. It determines what the system would do when peer re-authentication fails.
+If this is set to allow, then traffic will be maintained using the last known good encryption key.
+If this is set to drop, then traffic will be down until peer re-authentication passes."
+    ::= { cwsEncryptionReAuthenticationEntry 3 }
+
+cwsEncryptionEncryptionStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsEncryptionEncryptionStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Chassis level data path encryption properties."
+    ::= { cienaWsEncryptionMIB 6 }
+
+cwsEncryptionEncryptionStateEntry OBJECT-TYPE
+    SYNTAX CwsEncryptionEncryptionStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsEncryptionEncryptionStateTable."
+    INDEX { cwsEncryptionEncryptionStateTableSnmpKey }
+    ::= { cwsEncryptionEncryptionStateTable 1 }
+
+CwsEncryptionEncryptionStateEntry ::= SEQUENCE { 
+    cwsEncryptionEncryptionStateTableSnmpKey Integer32,
+    cwsEncryptionEncryptionStateLicenseState INTEGER,
+    cwsEncryptionEncryptionStateFeatureState INTEGER 
+}
+
+cwsEncryptionEncryptionStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsEncryptionEncryptionState"
+    ::= { cwsEncryptionEncryptionStateEntry 1 }
+
+cwsEncryptionEncryptionStateLicenseState OBJECT-TYPE
+    SYNTAX INTEGER { missing(0), available(1), held(2), na(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Datapath license feature state of this Waveserver."
+    ::= { cwsEncryptionEncryptionStateEntry 2 }
+
+cwsEncryptionEncryptionStateFeatureState OBJECT-TYPE
+    SYNTAX INTEGER { notSupported(0), notReady(1), ready(2), na(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Datapath encryption feature state of this Waveserver."
+    ::= { cwsEncryptionEncryptionStateEntry 3 }
+
+
+
+-- Conformance statements
+cienaWsEncryptionObjects OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionMIB 1 }
+
+cienaWsEncryptionConformance OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionMIB 2 }
+
+cienaWsEncryptionGroups OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionConformance 1 }
+
+cienaWsEncryptionGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsEncryptionPortEncryptionPeerAuthenticationStatus,
+        cwsEncryptionPreSharedKeyValue,
+        cwsEncryptionPreSharedKeyFingerprint,
+        cwsEncryptionPreSharedKeyStatus,
+        cwsEncryptionPreSharedKeyDescription,
+        cwsEncryptionReAuthenticationPeriod,
+        cwsEncryptionReAuthenticationFailureMode,
+        cwsEncryptionEncryptionStateLicenseState,
+        cwsEncryptionEncryptionStateFeatureState
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsEncryptionGroups 1 }
+
+cienaWsEncryptionCompliances OBJECT IDENTIFIER
+    ::= { cienaWsEncryptionConformance 2 }
+
+cienaWsEncryptionCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsEncryptionGroup }
+    ::= { cienaWsEncryptionCompliances 1 }
+
+END -- End module

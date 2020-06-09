@@ -151,6 +151,18 @@ modules:
                         - { descr: yes, graph: 1, value: 1, generic: 2 }
                         - { descr: 'null', graph: 1, value: 2, generic: 3 }
                 -
+                    oid: mtxrPOETable
+                    value: mtxrPOEStatus
+                    num_oid: '.1.3.6.1.4.1.14988.1.1.15.1.1.3.{{ $index }}'
+                    descr: '{{ $mtxrPOEName }} POE'
+                    index: 'mtxrPOEStatus.{{ $index }}'
+                    state_name: mtxrPOEStatus
+                    states:
+                        - { descr: 'disabled', graph: 1, value: 1, generic: 3 }
+                        - { descr: 'waitingForLoad', graph: 1, value: 2, generic: 3 }
+                        - { descr: 'poweredOn', graph: 1, value: 3, generic: 0 }
+                        - { descr: 'overload', graph: 1, value: 4, generic: 2 }
+                -
                     oid: mtxrHlPowerSupplyState
                     num_oid: '.1.3.6.1.4.1.14988.1.1.3.15.{{ $index }}'
                     descr: Primary PSU
@@ -172,7 +184,7 @@ modules:
                     oid: mtxrWl60GConnected
                     num_oid: '.1.3.6.1.4.1.14988.1.1.1.8.1.4.{{ $index }}'
                     descr: Station Connected
-                    index: 'mtxrWl60GConnected.{{ $index ]]'
+                    index: 'mtxrWl60GConnected.{{ $index }}'
                     state_name: mtxrWl60GConnected
                     states:
                         - { value: 0, generic: 2, graph: 1, descr: 'disconnected' }

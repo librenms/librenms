@@ -38,6 +38,10 @@ if ($device['os'] == 'gw-eydfa') {
     include 'includes/discovery/sensors/gw-eydfa.inc.php';
 }
 
+if ($device['os_group'] == 'printer') {
+    include 'includes/discovery/sensors/state/printer.inc.php';
+}
+
 $run_sensors = array(
     'airflow',
     'current',
@@ -47,10 +51,14 @@ $run_sensors = array(
     'frequency',
     'humidity',
     'load',
+    'loss',
     'power',
+    'power_consumed',
+    'power_factor',
     'runtime',
     'signal',
     'state',
+    'count',
     'temperature',
     'voltage',
     'snr',

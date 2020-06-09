@@ -28,7 +28,7 @@ if (is_numeric($_GET['bill_hist_id'])) {
     $urlargs['to'] = $_GET['to'];
 }
 
-$url = "{$config['base_url']}graph.php?";
+$url = Config::get('base_url') . 'graph.php?';
 $i = 0;
 foreach ($urlargs as $name => $value) {
     if ($i++ > 0) {

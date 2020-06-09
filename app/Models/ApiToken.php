@@ -25,6 +25,8 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Str;
+
 class ApiToken extends BaseModel
 {
     public $timestamps = false;
@@ -60,6 +62,18 @@ class ApiToken extends BaseModel
         return User::find(self::idFromToken($token));
     }
 
+    public static function generateToken(User $user, $description = '')
+    {
+        $token = new static;
+        $token->user_id = $user->user_id;
+        $token->token_hash = $bytes = bin2hex(random_bytes(16));
+        $token->description = $description;
+        $token->disabled = false;
+        $token->save();
+
+        return $token;
+    }
+
     /**
      * Get the user_id for the given token.
      *
@@ -82,6 +96,6 @@ class ApiToken extends BaseModel
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 }

@@ -1,4 +1,4 @@
---- ArubaOS 6.5.2.0_59123
+--- ArubaOS 8.5.0.0_70258
 ARUBA-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
@@ -27,6 +27,13 @@ arubaEnterpriseMibModules OBJECT IDENTIFIER ::= { aruba 2}
 -- Extensions.
 
 arubaMgmt OBJECT IDENTIFIER ::= { aruba 3}
+
+--Node arubaPki.
+arubaPki OBJECT-IDENTITY
+       STATUS  current
+       DESCRIPTION
+            "Aruba PKI OIDs. This arc is not used in Aruba SNMP MIBs."
+    ::= { aruba  4}
 
 -- List of all the products.
 
@@ -126,6 +133,7 @@ mc-va   OBJECT IDENTIFIER ::= { switchProducts 52 }
 mm-hw-1K   OBJECT IDENTIFIER ::= { switchProducts 53 }
 mm-hw-5K   OBJECT IDENTIFIER ::= { switchProducts 54 }
 mm-hw-10K   OBJECT IDENTIFIER ::= { switchProducts 55 }
+a9004   OBJECT IDENTIFIER ::= { switchProducts 56 }
 
 
 --Undefined switch.
@@ -460,6 +468,48 @@ ap203R OBJECT IDENTIFIER ::= {apProducts 91}
 
 --ap203RP, this object is the SYSOID
 ap203RP OBJECT IDENTIFIER ::= {apProducts 92}
+
+--ap344, this object is the SYSOID
+ap344 OBJECT IDENTIFIER ::= {apProducts 93}
+
+--ap345, this object is the SYSOID
+ap345 OBJECT IDENTIFIER ::= {apProducts 94}
+
+--ap374, this object is the SYSOID
+ap374 OBJECT IDENTIFIER ::= {apProducts 95}
+
+--ap375, this object is the SYSOID
+ap375 OBJECT IDENTIFIER ::= {apProducts 96}
+
+--ap377, this object is the SYSOID
+ap377 OBJECT IDENTIFIER ::= {apProducts 97}
+
+--ap318, this object is the SYSOID
+ap318 OBJECT IDENTIFIER ::= {apProducts 98}
+
+--ap303, this object is the SYSOID
+ap303 OBJECT IDENTIFIER ::= {apProducts 99}
+
+--ap555, this object is the SYSOID
+ap555 OBJECT IDENTIFIER ::= {apProducts 100}
+
+--ap534, this object is the SYSOID
+ap534 OBJECT IDENTIFIER ::= {apProducts 101}
+
+--ap535, this object is the SYSOID
+ap535 OBJECT IDENTIFIER ::= {apProducts 102}
+
+--ap514, this object is the SYSOID
+ap514 OBJECT IDENTIFIER ::= {apProducts 106}
+
+--ap515, this object is the SYSOID
+ap515 OBJECT IDENTIFIER ::= {apProducts 107}
+
+--ap544, this object is the SYSOID
+ap544 OBJECT IDENTIFIER ::= {apProducts 108}
+
+--ap545, this object is the SYSOID
+ap545 OBJECT IDENTIFIER ::= {apProducts 109}
 
 --Undefined ap.
 apUndefined OBJECT IDENTIFIER ::= { apProducts 9999}

@@ -30,19 +30,29 @@ use Illuminate\Database\Eloquent\Builder;
 
 class SyslogController extends TableController
 {
+    public function rules()
+    {
+        return [
+            'device' => 'nullable|int',
+            'device_group' => 'nullable|int',
+            'program' => 'nullable|string',
+            'priority' => 'nullable|string',
+            'to' => 'nullable|date',
+            'from' => 'nullable|date',
+        ];
+    }
+
     public function searchFields($request)
     {
         return ['msg'];
     }
 
-    public function rules()
+    public function filterFields($request)
     {
         return [
-            'device' => 'nullable|int',
-            'program' => 'nullable|string',
-            'priority' => 'nullable|string',
-            'to' => 'nullable|date',
-            'from' => 'nullable|date',
+            'device_id' => 'device',
+            'program' => 'program',
+            'priority' => 'priority',
         ];
     }
 
@@ -55,29 +65,17 @@ class SyslogController extends TableController
     public function baseQuery($request)
     {
         /** @var Builder $query */
-        $query = Syslog::hasAccess($request->user())->with('device');
-
-        if ($device_id = $request->get('device')) {
-            $query->where('device_id', $device_id);
-        }
-
-        if ($program = $request->get('program')) {
-            $query->where('program', $program);
-        }
-
-        if ($priority = $request->get('priority')) {
-            $query->where('priority', $priority);
-        }
-
-        if ($from = $request->get('from')) {
-            $query->where('timestamp', '>=', $from);
-        }
-
-        if ($to = $request->get('to')) {
-            $query->where('timestamp', '<=', $to);
-        }
-
-        return $query;
+        return Syslog::hasAccess($request->user())
+            ->with('device')
+            ->when($request->device_group, function ($query) use ($request) {
+                $query->inDeviceGroup($request->device_group);
+            })
+            ->when($request->from, function ($query) use ($request) {
+                $query->where('timestamp', '>=', $request->from);
+            })
+            ->when($request->to, function ($query) use ($request) {
+                $query->where('timestamp', '<=', $request->to);
+            });
     }
 
     public function formatItem($syslog)
@@ -85,6 +83,7 @@ class SyslogController extends TableController
         $device = $syslog->device;
 
         return [
+            'label' => $this->setLabel($syslog),
             'timestamp' => $syslog->timestamp,
             'level' => htmlentities($syslog->level),
             'device_id' => $device ? \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) : '',
@@ -93,4 +92,40 @@ class SyslogController extends TableController
             'priority' => htmlentities($syslog->priority),
         ];
     }
+
+    private function setLabel($syslog)
+    {
+        $output = "<span class='alert-status ";
+        $output .= $this->priorityLabel($syslog->priority);
+        $output .= "'>";
+        $output .= "</span>";
+
+        return $output;
+    }
+
+    /**
+     * @param int $syslog_priority
+     * @return string $syslog_priority_icon
+     */
+    private function priorityLabel($syslog_priority)
+    {
+        switch ($syslog_priority) {
+            case "debug":
+                return "label-default"; //Debug
+            case "info":
+                return "label-info"; //Informational
+            case "notice":
+                return "label-primary"; //Notice
+            case "warning":
+                return "label-warning"; //Warning
+            case "err":
+                return "label-danger"; //Error
+            case "crit":
+                return "label-danger"; //Critical
+            case "alert":
+                return "label-danger"; //Alert
+            case "emerg":
+                return "label-danger"; //Emergency
+        }
+    } // end syslog_priority
 }

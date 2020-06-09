@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
-$fusion_tmp = snmp_get_multi_oid($device, 'swSerialNumber.1 swOpCodeVer.1 swModelNumber.1', '-OUQs', 'ES4552BH2-MIB');
+$fusion_tmp = snmp_get_multi_oid($device, ['swSerialNumber.1', 'swOpCodeVer.1', 'swModelNumber.1'], '-OUQs', 'ES4552BH2-MIB');
 $serial     = $fusion_tmp['swSerialNumber.1'];
 $hardware   = $fusion_tmp['swModelNumber.1'];
 $version    = $fusion_tmp['swOpCodeVer.1'];

@@ -4,7 +4,7 @@
 echo 'Benu Sensors ';
 $sensor_index = 0;
 
-$data = snmp_get_multi($device, 'benuSensorName.1.10 benuSensorName.1.11 benuSensorValue.1.10 benuSensorValue.1.11', '-OQUs', 'BENU-CHASSIS-MIB');
+$data = snmp_get_multi($device, ['benuSensorName.1.10', 'benuSensorName.1.11', 'benuSensorValue.1.10', 'benuSensorValue.1.11'], '-OQUs', 'BENU-CHASSIS-MIB');
 
 $sensor_index = 0;
 for ($index = 10; $index <= 11; $index++) { //Benu Voltage Sensors are index 10 and 11

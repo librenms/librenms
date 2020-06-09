@@ -37,33 +37,17 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Pushover extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $pushover_opts = $this->config;
-        unset($pushover_opts['options']);
-        foreach (explode(PHP_EOL, $this->config['options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $pushover_opts['options'][$k] = $v;
-        }
-        return $this->contactPushover($obj, $pushover_opts);
-    }
+        $pushover_opts['options'] = $this->parseUserOptions($this->config['options']);
 
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $api) {
-            $response = $this->contactPushover($obj, $api);
-            if ($response !== true) {
-                return $response;
-            }
-        }
-        return true;
+        return $this->contactPushover($obj, $pushover_opts);
     }
 
     public function contactPushover($obj, $api)
@@ -74,22 +58,22 @@ class Pushover extends Transport
         switch ($obj['severity']) {
             case "critical":
                 $data['priority'] = 1;
-                if (!empty($api['sound_critical'])) {
-                    $data['sound'] = $api['sound_critical'];
+                if (!empty($api['options']['sound_critical'])) {
+                    $data['sound'] = $api['options']['sound_critical'];
                 }
                 break;
             case "warning":
                 $data['priority'] = 1;
-                if (!empty($api['sound_warning'])) {
-                    $data['sound'] = $api['sound_warning'];
+                if (!empty($api['options']['sound_warning'])) {
+                    $data['sound'] = $api['options']['sound_warning'];
                 }
                 break;
         }
         switch ($obj['state']) {
-            case 0:
+            case AlertState::RECOVERED:
                 $data['priority'] = 0;
-                if (!empty($api['sound_ok'])) {
-                    $data['sound'] = $api['sound_ok'];
+                if (!empty($api['options']['sound_ok'])) {
+                    $data['sound'] = $api['options']['sound_ok'];
                 }
                 break;
         }

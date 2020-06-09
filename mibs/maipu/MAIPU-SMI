@@ -1,0 +1,150 @@
+-- ***************************************************************************
+-- MAIPU-SMI.mib:  Maipu Enterprise Structure of Management Information
+
+-- December 2000, Zheng Xue, Huang Lulu, Tang Zhiwei, Wu Fei, Kong Wei
+
+
+-- Copyright(c) 1999-2007 by Maipu Data Communication, Inc.
+--
+-- ***************************************************************************
+
+MAIPU-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY,
+	OBJECT-IDENTITY,
+	enterprises
+		FROM SNMPv2-SMI;
+
+maipu	MODULE-IDENTITY
+	LAST-UPDATED "0101010000Z"
+	ORGANIZATION "Maipu Data Communication, Inc."
+	CONTACT-INFO
+		"E-mail: maipu2@mail.sc.cninfo.net"
+	DESCRIPTION
+		"The Structure of Management Information for Maipu."
+	REVISION      "0101010000Z"
+	DESCRIPTION
+		"Initial version of this MIB module."
+	::= { enterprises 5651 }
+
+mpProducts OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"products is the root OBJECT IDENTIFIER from which sysObjectID
+		values are assigned.  Actual values are defined in
+		MAIPU-PRODUCTS-MIB."
+	::= { maipu 1 }
+
+mpTrapObject	OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"main subtree for maipu Traps."
+	::= { maipu 2 }
+
+mpMgmt OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpMgmt is the main subtree for implemented MIB branch.
+		Note that different type of maipu products may have the same
+		protocol implementation, so we put such content into here so
+		that every types could utilize corresponding module."
+	::= { maipu 3 }
+
+mpExperiment OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"maipuExperiment provides a root object identifier from which
+		experimental mibs may be temporarily based. MIBs are typicially
+		based here if they fall in one of two categories:
+
+		1) IETF work-in-process mibs which have not been assigned a
+		   permanent object identifier by the IANA.
+		2) Maipu work-in-process which has not been assigned a
+		   permanent object identifier by the maipu assigned number
+		   authority, typicially because the mib is not ready for
+		   deployment.
+
+		NOTE:  support for mibs in the maipuExperiment subtree will be
+		erased when a permanent object identifier assignment is made."
+	::= { maipu 4 }
+
+
+mpSecurity	OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpSecurity is the main subtree for security product MIB branch."
+	::= { maipu 5 }
+
+--2007.10.22
+mpMgmt2        OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpMgmt2 is the new subtree for implemented MIB branch."
+	::= { maipu 6 }
+
+mpSystem      OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpSystem is the subtree  for system mib."
+	::= { mpMgmt2 1 }
+
+mpRouterTech    OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpLayer2 is the subtree for Layer3 MIB."
+	::= { mpMgmt2 2 }
+
+mpSwitchTech      OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpLayer3 is the subtree for Layer2 MIB."
+	::= { mpMgmt2 3 }
+
+mpVoipTech        OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpVoip is the subtree for maipu voip MIB."
+	::= { mpMgmt2 4 }
+
+mpSecurityTech    OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpSec  is the subtree for maipu security MIB"
+	::= { mpMgmt2 5 }
+
+mpApp        OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpApp is the subtree for maipu application MIB."
+	::= { mpMgmt2 6 }
+
+mpOtherSys        OBJECT-IDENTITY
+	STATUS	current
+	DESCRIPTION
+		"mpOtherSys is the subtree for third part MIB."
+	::= { mpMgmt2 7 }
+
+
+-- panel	1
+-- if		2
+-- file		3
+-- hdlc		4
+-- ppp		5
+-- fr		6
+-- x25		7
+-- sdlc		8
+-- slip		9
+-- isdn 	10
+-- rip		11
+-- ospf		12
+-- voip		13
+-- protocol	14
+-- modem	15
+-- route	17
+-- ddr		19
+-- ios		20
+-- qos		21
+
+
+END

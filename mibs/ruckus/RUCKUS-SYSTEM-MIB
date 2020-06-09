@@ -1,0 +1,254 @@
+--
+-- Copyright (c) 2010 by Ruckus Wireless, Inc.
+-- All Rights Reserved
+--
+
+RUCKUS-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ruckusCommonSystemModule
+        FROM RUCKUS-ROOT-MIB
+    TruthValue,
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI;
+
+ruckusSystemMIB MODULE-IDENTITY
+    LAST-UPDATED "201010150800Z"
+    ORGANIZATION "Ruckus Wireless, Inc."
+    CONTACT-INFO
+        "Ruckus Wireless Inc.
+
+        Postal:
+        880 W Maude Ave
+        Sunnyvale, CA 94085
+        USA
+
+        EMail: support@ruckuswireless.com
+
+        Phone: +1-650-265-4200"
+    DESCRIPTION
+        "Ruckus system objects."
+    ::= { ruckusCommonSystemModule 1 }
+
+
+-- Groups
+--
+
+ruckusSystemObjects OBJECT IDENTIFIER   ::= { ruckusSystemMIB 1 }
+
+ruckusSystemInfo OBJECT IDENTIFIER          ::= { ruckusSystemObjects 1 }
+
+ruckusSystemServices OBJECT IDENTIFIER      ::= { ruckusSystemObjects 2 }
+
+ruckusSystemCommands OBJECT IDENTIFIER      ::= { ruckusSystemObjects 3 }
+
+ruckusSystemEvents OBJECT IDENTIFIER    ::= { ruckusSystemMIB 2 }
+
+
+-- System Info
+--
+
+ruckusSystemCPUUtil OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "CPU utilization."
+    ::= { ruckusSystemInfo 1 }
+
+
+ruckusSystemMemoryUtil OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Memory utilization."
+    ::= { ruckusSystemInfo 2 }
+
+
+-- System Services
+--
+
+ruckusSystemHTTP OBJECT IDENTIFIER              ::= { ruckusSystemServices 1 }
+
+ruckusSystemHTTPS OBJECT IDENTIFIER             ::= { ruckusSystemServices 2 }
+
+ruckusSystemTelnet OBJECT IDENTIFIER            ::= { ruckusSystemServices 3 }
+
+ruckusSystemSSH OBJECT IDENTIFIER               ::= { ruckusSystemServices 4 }
+
+ruckusSystemBonjour OBJECT IDENTIFIER           ::= { ruckusSystemServices 5 }
+
+ruckusSystemSyslog OBJECT IDENTIFIER            ::= { ruckusSystemServices 6 }
+
+ruckusSystemNTP OBJECT IDENTIFIER               ::= { ruckusSystemServices 7 }
+
+ruckusSystemFlexMaster OBJECT IDENTIFIER        ::= { ruckusSystemServices 8 }
+
+ruckusSystemHTTPStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable HTTP service."
+    DEFVAL { true }
+    ::= { ruckusSystemHTTP 1 }
+
+
+ruckusSystemHTTPSStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable HTTPS service."
+    DEFVAL { true }
+    ::= { ruckusSystemHTTPS 1 }
+
+
+ruckusSystemTelnetStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable Telnet service."
+    DEFVAL { true }
+    ::= { ruckusSystemTelnet 1 }
+
+
+ruckusSystemSSHStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable SSH service."
+    DEFVAL { true }
+    ::= { ruckusSystemSSH 1 }
+
+
+ruckusSystemBonjourStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable Bonjour service."
+    DEFVAL { true }
+    ::= { ruckusSystemBonjour 1 }
+
+
+ruckusSystemSyslogStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable/disable Syslog service."
+    DEFVAL { true }
+    ::= { ruckusSystemSyslog 1 }
+
+
+ruckusSystemSyslogServerIP OBJECT-TYPE
+    SYNTAX  OCTET STRING  (SIZE (2..40))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "IP(v4 or v6) of syslog server."
+    ::= { ruckusSystemSyslog 2 }
+
+
+ruckusSystemSyslogServerPort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Port of syslog server."
+    ::= { ruckusSystemSyslog 3 }
+
+
+ruckusSystemNTPStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Enable/disable NTP service."
+    DEFVAL { true }
+    ::= { ruckusSystemNTP 1 }
+
+
+ruckusSystemNTPGMTTime OBJECT-TYPE
+    SYNTAX  OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "GMT time."
+    ::= { ruckusSystemNTP 2 }
+
+
+ruckusSystemNTPActiveServer OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Active NTP server."
+    ::= { ruckusSystemNTP 3 }
+
+
+ruckusSystemNTPUpdate OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Update GMT time."
+    ::= { ruckusSystemNTP 4 }
+
+
+ruckusSystemFlexMasterURL OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..128))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Config FlexMaster server URL. URL start with 'http://' or 'https://'"
+    ::= { ruckusSystemFlexMaster 1 }
+    
+-- System Commands
+--
+
+ruckusSystemReboot OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Reboot."
+    DEFVAL { true }
+    ::= { ruckusSystemCommands 1 }
+
+
+ruckusSystemSetFactory OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Set factory default."
+    DEFVAL { true }
+    ::= { ruckusSystemCommands 2 }
+
+
+ruckusSystemDHCPRenew OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Renew DHCP IP."
+    DEFVAL { true }
+    ::= { ruckusSystemCommands 3 }
+
+
+-- Conformance & Compliance
+--
+
+END

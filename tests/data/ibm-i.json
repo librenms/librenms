@@ -10,11 +10,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "ibm-i",
                     "type": "server",
                     "serial": null,
-                    "icon": "ibmos.svg"
+                    "icon": "ibmos.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "V7R1M0",
                     "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "ibm-i",
                     "type": "server",
                     "serial": null,
-                    "icon": "ibmos.svg"
+                    "icon": "ibmos.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -47,21 +47,23 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "*LOOPBACK",
-                    "ifName": null,
+                    "ifName": "*LOOPBACK",
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifHighSpeed_prev": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": null,
-                    "ifType": null,
-                    "ifAlias": null,
+                    "ifType": "other",
+                    "ifAlias": "*LOOPBACK",
                     "ifPhysAddress": null,
                     "ifHardType": null,
                     "ifLastChange": 0,
@@ -152,21 +154,23 @@
                     "port_descr_speed": null,
                     "port_descr_notes": null,
                     "ifDescr": "ETHLINE",
-                    "ifName": null,
+                    "ifName": "ETHLINE",
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifHighSpeed_prev": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
                     "ifMtu": null,
-                    "ifType": null,
-                    "ifAlias": null,
+                    "ifType": "ethernetCsmacd",
+                    "ifAlias": "ETHLINE",
                     "ifPhysAddress": null,
                     "ifHardType": null,
                     "ifLastChange": 0,
@@ -265,11 +269,13 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -370,11 +376,13 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": 1000000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifHighSpeed": null,
+                    "ifHighSpeed_prev": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -513,7 +521,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "3",
@@ -529,7 +537,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "4",
@@ -545,7 +553,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         },
@@ -565,7 +573,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "3",
@@ -581,7 +589,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 },
                 {
                     "mempool_index": "4",
@@ -597,7 +605,7 @@
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
-                    "mempool_perc_warn": 75
+                    "mempool_perc_warn": 90
                 }
             ]
         }

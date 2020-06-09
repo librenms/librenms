@@ -1,0 +1,51 @@
+-- DELL-NETWORKING-SYSLOG-MIB: Syslog mib
+
+-- Dell Networking OS Syslog Proprietary MIB Definition
+
+-- This SNMP Management Information Specification
+-- explains the proprietary MIB implemented for the Syslog support.
+
+DELL-NETWORKING-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                                                      FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+                                                      FROM SNMPv2-CONF
+    dellNetMgmt                                       FROM DELL-NETWORKING-SMI;
+
+    dellNetSyslogMib MODULE-IDENTITY
+        LAST-UPDATED    "201410230000Z"
+        ORGANIZATION    "Dell Inc."
+        CONTACT-INFO    "support.dell.com"
+        DESCRIPTION
+          "The Dell Networking OS Private MIB for Syslog support."
+        REVISION "201410230000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    
+        ::= { dellNetMgmt 30 }
+
+--*************************************************************************************
+--   Traps
+--**************************************************************************************
+
+dellNetSyslogNotifications OBJECT IDENTIFIER ::= { dellNetSyslogMib 1 }
+dellNetSyslogTraps         OBJECT IDENTIFIER ::= { dellNetSyslogNotifications 1 }
+
+    dellNetSyslogServerNotReachableTrap NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when syslog server is not reachable. 
+                         It works for syslog servers configured as TCP or TLS"
+        ::= { dellNetSyslogTraps 1 }
+
+    dellNetSyslogServerReachableTrap NOTIFICATION-TYPE
+        STATUS          current
+        DESCRIPTION
+                        "This trap is sent when syslog server is reachable.
+                         It works for syslog servers configured as TCP or TLS"
+        ::= { dellNetSyslogTraps 2 }
+
+END
+

@@ -3,8 +3,8 @@ path: blob/master/doc/
 
 ### `get_all_ports`
 
-Get info for all ports on all devices.
-Strongly recommend that you use the `columns` parameter to avoid pulling too much data.
+Get info for all ports on all devices. Strongly recommend that you use
+the `columns` parameter to avoid pulling too much data.
 
 Route: `/api/v0/ports`
 
@@ -12,10 +12,10 @@ Route: `/api/v0/ports`
 
 Input:
 
-  - columns: Comma separated list of columns you want returned.
-
+- columns: Comma separated list of columns you want returned.
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports?columns=ifName%2Cport_id
 ```
@@ -44,19 +44,66 @@ Output:
 }
 ```
 
-### `get_port_info`
+### `search_ports`
 
-Get all info for a particular port.
+Search for ports matching the query.
 
-Route: `/api/v0/ports/:portid`
+Route: `/api/v0/ports/search/:search`
 
-  - portid must be an integer
+- search string to search in fields: ifAlias, ifDescr, and ifName
 
 Input:
 
   -
 
 Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/search/lo
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports": [
+        {
+            "device_id": 1,
+            "port_id": 1,
+            "ifIndex": 1,
+            "ifName": "lo"
+        },
+        {
+            "device_id": 2,
+            "port_id": 3,
+            "ifIndex": 1,
+            "ifName": "lo"
+        },
+        {
+            "device_id": 3,
+            "port_id": 5,
+            "ifIndex": 1,
+            "ifName": "lo"
+        }
+    ]
+}
+```
+
+### `get_port_info`
+
+Get all info for a particular port.
+
+Route: `/api/v0/ports/:portid`
+
+- portid must be an integer
+
+Input:
+
+  -
+
+Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323
 ```
@@ -152,13 +199,14 @@ Get all IP info (v4 and v6) for a given port id.
 
 Route: `/api/v0/ports/:portid/ip`
 
-  - portid must be an integer
+- portid must be an integer
 
 Input:
 
   -
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/323/ip
 ```

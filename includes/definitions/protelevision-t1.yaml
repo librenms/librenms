@@ -1,0 +1,13 @@
+os: protelevision-t1
+text: 'DVB-T Transmitter'
+type: network
+icon: protelevision
+group: protelevision
+mib_dir:
+     - protelevision
+over:
+     - { graph: device_dbm, text: 'dBm' }
+     - { graph: device_wireless_rate, text: 'On Air TS Bitrate' }
+discovery:
+     - sysObjectID:
+         - .1.3.6.1.4.1.18086.8

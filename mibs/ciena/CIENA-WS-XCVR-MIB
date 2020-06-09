@@ -1,0 +1,1175 @@
+-- This file was automatically generated from ciena-ws-xcvr.yang. Do not edit.
+
+CIENA-WS-XCVR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    cienaWsConfig
+        FROM CIENA-WS-MIB
+    ChannelsNumber, ConnectorTypeDescEnum, Decimal1Dig, EnabledDisabledEnum, NameString, PtpId, StringMaxl128, StringMaxl16, StringMaxl254, StringMaxl32, XcvrId, XcvrMode, XcvrProfileId, XcvrSerdesRxAmplitude, XcvrSerdesRxEmphasis, XcvrSerdesTxEq, XcvrType
+        FROM CIENA-WS-TYPEDEFS-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
+
+cienaWsXcvrMIB MODULE-IDENTITY
+    LAST-UPDATED "201707240000Z"
+    ORGANIZATION "Ciena Corporation"
+    CONTACT-INFO "Web URL: http://www.ciena.com/
+Postal:  7035 Ridge Road
+         Hanover, Maryland 21076
+         U.S.A.
+Phone:   +1 800-921-1144
+Fax:     +1 410-694-5750"
+    DESCRIPTION "This module defines the common XCVR model. The XCVR is augmented by specific types of transceiver modules if applicable. XCVR objects are permanently available for all ports and reported as empty if the device is not physically present. Attributes read from the device are only available while the device is present."
+    REVISION "201707240000Z"
+    DESCRIPTION "Waveserver Release 1.5
+Added 'serdes-configuration-group' grouping.
+Added 'xcvr-profiles' list.
+Added 'ws-xcvr-profiles-apply' rpc.
+Added ncx:user-write to 'xcvrs'."
+    REVISION "201703020000Z"
+    DESCRIPTION "Waveserver Release 1.4
+
+Aligned MIB files to respect YANG read/write status."
+    REVISION "201612120000Z"
+    DESCRIPTION "Waveserver Rel 1.3 revised.
+'optical-power-group' grouping added."
+    REVISION "201606140000Z"
+    DESCRIPTION "Waveserver Rel 1.2 revised.
+Major restructuring of this YANG module."
+    REVISION "201502250000Z"
+    DESCRIPTION "Initial version."
+    ::= { cienaWsConfig 15 }
+
+XcvrOpEnum ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION "None"
+    SYNTAX INTEGER { empty(0), up(1), down(2), uncertified(3), lowpowermode(4), unknown(5) }
+
+cwsXcvrXcvrsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrXcvrsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 3 }
+
+cwsXcvrXcvrsEntry OBJECT-TYPE
+    SYNTAX CwsXcvrXcvrsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrXcvrsTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex }
+    ::= { cwsXcvrXcvrsTable 1 }
+
+CwsXcvrXcvrsEntry ::= SEQUENCE { 
+    cwsXcvrXcvrsXcvrIndex Integer32 
+}
+
+cwsXcvrXcvrsXcvrIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "XCVR tranceiver index, unique, key value for the XCVR List."
+    ::= { cwsXcvrXcvrsEntry 1 }
+
+cwsXcvrXcvrIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrXcvrIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Identification information of this XCVR instance."
+    ::= { cienaWsXcvrMIB 4 }
+
+cwsXcvrXcvrIdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrXcvrIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrXcvrIdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrXcvrIdTableSnmpKey }
+    ::= { cwsXcvrXcvrIdTable 1 }
+
+CwsXcvrXcvrIdEntry ::= SEQUENCE { 
+    cwsXcvrXcvrIdTableSnmpKey Integer32,
+    cwsXcvrXcvrIdName NameString,
+    cwsXcvrXcvrIdDescription StringMaxl128 
+}
+
+cwsXcvrXcvrIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrXcvrId"
+    ::= { cwsXcvrXcvrIdEntry 1 }
+
+cwsXcvrXcvrIdName OBJECT-TYPE
+    SYNTAX NameString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the XCVR transceiver. Auto generated, and cannot be modified."
+    ::= { cwsXcvrXcvrIdEntry 2 }
+
+cwsXcvrXcvrIdDescription OBJECT-TYPE
+    SYNTAX StringMaxl128
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Description of the XCVR. Auto generated, and cannot be modified."
+    ::= { cwsXcvrXcvrIdEntry 3 }
+
+cwsXcvrXcvrStateTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrXcvrStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "State information of this XCVR instance."
+    ::= { cienaWsXcvrMIB 5 }
+
+cwsXcvrXcvrStateEntry OBJECT-TYPE
+    SYNTAX CwsXcvrXcvrStateEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrXcvrStateTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrXcvrStateTableSnmpKey }
+    ::= { cwsXcvrXcvrStateTable 1 }
+
+CwsXcvrXcvrStateEntry ::= SEQUENCE { 
+    cwsXcvrXcvrStateTableSnmpKey Integer32,
+    cwsXcvrXcvrStateAdminState EnabledDisabledEnum,
+    cwsXcvrXcvrStateOperationalState XcvrOpEnum,
+    cwsXcvrXcvrStatePowerState INTEGER 
+}
+
+cwsXcvrXcvrStateTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrXcvrState"
+    ::= { cwsXcvrXcvrStateEntry 1 }
+
+cwsXcvrXcvrStateAdminState OBJECT-TYPE
+    SYNTAX EnabledDisabledEnum
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Whether Admin State is enabled or disabled for this XCVR's ptp."
+    ::= { cwsXcvrXcvrStateEntry 2 }
+
+cwsXcvrXcvrStateOperationalState OBJECT-TYPE
+    SYNTAX XcvrOpEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Opertional state of this XCVR, for DCU, it will be empty by default."
+    ::= { cwsXcvrXcvrStateEntry 3 }
+
+cwsXcvrXcvrStatePowerState OBJECT-TYPE
+    SYNTAX INTEGER { normal(0), low(1) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Power State of the XCVR. If it is in low power mode or normal power mode."
+    ::= { cwsXcvrXcvrStateEntry 4 }
+
+cwsXcvrXcvrPropertiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrXcvrPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "All the Configurable and operational data of this XCVR instance."
+    ::= { cienaWsXcvrMIB 6 }
+
+cwsXcvrXcvrPropertiesEntry OBJECT-TYPE
+    SYNTAX CwsXcvrXcvrPropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrXcvrPropertiesTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrXcvrPropertiesTableSnmpKey }
+    ::= { cwsXcvrXcvrPropertiesTable 1 }
+
+CwsXcvrXcvrPropertiesEntry ::= SEQUENCE { 
+    cwsXcvrXcvrPropertiesTableSnmpKey Integer32,
+    cwsXcvrXcvrPropertiesType XcvrType,
+    cwsXcvrXcvrPropertiesMode XcvrMode,
+    cwsXcvrXcvrPropertiesNumberOfChannels ChannelsNumber 
+}
+
+cwsXcvrXcvrPropertiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrXcvrProperties"
+    ::= { cwsXcvrXcvrPropertiesEntry 1 }
+
+cwsXcvrXcvrPropertiesType OBJECT-TYPE
+    SYNTAX XcvrType
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Transceiver type, different transceiver types will have different operational data. Type depends on what is physically plugged in. Read only attribute."
+    ::= { cwsXcvrXcvrPropertiesEntry 2 }
+
+cwsXcvrXcvrPropertiesMode OBJECT-TYPE
+    SYNTAX XcvrMode
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Mode of the XCVR."
+    ::= { cwsXcvrXcvrPropertiesEntry 3 }
+
+cwsXcvrXcvrPropertiesNumberOfChannels OBJECT-TYPE
+    SYNTAX ChannelsNumber
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Number of channels this tranceiver has. Only applicable if a transceiver is plugged in."
+    ::= { cwsXcvrXcvrPropertiesEntry 4 }
+
+cwsXcvrChildPtpIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrChildPtpIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "The child ptp this xcvr is associated with."
+    ::= { cienaWsXcvrMIB 7 }
+
+cwsXcvrChildPtpIdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrChildPtpIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrChildPtpIdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrXcvrPropertiesTableSnmpKey, cwsXcvrChildPtpIdTableSnmpKey }
+    ::= { cwsXcvrChildPtpIdTable 1 }
+
+CwsXcvrChildPtpIdEntry ::= SEQUENCE { 
+    cwsXcvrChildPtpIdTableSnmpKey Integer32,
+    cwsXcvrChildPtpId PtpId 
+}
+
+cwsXcvrChildPtpIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrChildPtpId"
+    ::= { cwsXcvrChildPtpIdEntry 1 }
+
+cwsXcvrChildPtpId OBJECT-TYPE
+    SYNTAX PtpId
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "The child ptp this xcvr is associated with."
+    ::= { cwsXcvrChildPtpIdEntry 2 }
+
+cwsXcvrCienaIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrCienaIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "If the plugged transceiver is a Ciena product, display the Ciena product information. The leafs in this container will be blank if the transceiver is not plugged in or if it is not a Ciena product."
+    ::= { cienaWsXcvrMIB 8 }
+
+cwsXcvrCienaIdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrCienaIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrCienaIdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrCienaIdTableSnmpKey }
+    ::= { cwsXcvrCienaIdTable 1 }
+
+CwsXcvrCienaIdEntry ::= SEQUENCE { 
+    cwsXcvrCienaIdTableSnmpKey Integer32,
+    cwsXcvrCienaIdCienaItemNumber StringMaxl32,
+    cwsXcvrCienaIdRevision StringMaxl32,
+    cwsXcvrCienaIdDescription StringMaxl254 
+}
+
+cwsXcvrCienaIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrCienaId"
+    ::= { cwsXcvrCienaIdEntry 1 }
+
+cwsXcvrCienaIdCienaItemNumber OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "If the plugged transceiver is a Ciena product, display the product item number. If it is not a Ciena product or if nothing is plugged in, this field will be blank"
+    ::= { cwsXcvrCienaIdEntry 2 }
+
+cwsXcvrCienaIdRevision OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "If the plugged transceiver is a Ciena product, display the Ciena revision in the format of <prefix>.<number>.<suffix>. If it is not a Ciena product or if nothing is plugged in, this field will be blank"
+    ::= { cwsXcvrCienaIdEntry 3 }
+
+cwsXcvrCienaIdDescription OBJECT-TYPE
+    SYNTAX StringMaxl254
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "If the plugged transceiver is a Ciena product, display the Ciena description. If it is not a Ciena product or if nothing is plugged in, this field will be blank"
+    ::= { cwsXcvrCienaIdEntry 4 }
+
+cwsXcvrVendorIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrVendorIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Display the transceiver vendor identification information."
+    ::= { cienaWsXcvrMIB 9 }
+
+cwsXcvrVendorIdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrVendorIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrVendorIdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrVendorIdTableSnmpKey }
+    ::= { cwsXcvrVendorIdTable 1 }
+
+CwsXcvrVendorIdEntry ::= SEQUENCE { 
+    cwsXcvrVendorIdTableSnmpKey Integer32,
+    cwsXcvrVendorIdName StringMaxl32,
+    cwsXcvrVendorIdPartNumber StringMaxl32,
+    cwsXcvrVendorIdRevision StringMaxl32,
+    cwsXcvrVendorIdSerialNumber StringMaxl32,
+    cwsXcvrVendorIdManufacturedDate StringMaxl16 
+}
+
+cwsXcvrVendorIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrVendorId"
+    ::= { cwsXcvrVendorIdEntry 1 }
+
+cwsXcvrVendorIdName OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Name of the Vendor that produced this transceiver. For Ciena transceiver, the value will be Ciena."
+    ::= { cwsXcvrVendorIdEntry 2 }
+
+cwsXcvrVendorIdPartNumber OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Vendor part number of the transceiver."
+    ::= { cwsXcvrVendorIdEntry 3 }
+
+cwsXcvrVendorIdRevision OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Vendor Revision of the transceiver."
+    ::= { cwsXcvrVendorIdEntry 4 }
+
+cwsXcvrVendorIdSerialNumber OBJECT-TYPE
+    SYNTAX StringMaxl32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Vendor serial number of the XCVR transceiver."
+    ::= { cwsXcvrVendorIdEntry 5 }
+
+cwsXcvrVendorIdManufacturedDate OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Manufactured Date, in the format of mm/dd/yy."
+    ::= { cwsXcvrVendorIdEntry 6 }
+
+cwsXcvrDeviceIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 10 }
+
+cwsXcvrDeviceIdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrDeviceIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrDeviceIdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrDeviceIdTableSnmpKey }
+    ::= { cwsXcvrDeviceIdTable 1 }
+
+CwsXcvrDeviceIdEntry ::= SEQUENCE { 
+    cwsXcvrDeviceIdTableSnmpKey Integer32,
+    cwsXcvrDeviceIdConnectorType ConnectorTypeDescEnum 
+}
+
+cwsXcvrDeviceIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrDeviceId"
+    ::= { cwsXcvrDeviceIdEntry 1 }
+
+cwsXcvrDeviceIdConnectorType OBJECT-TYPE
+    SYNTAX ConnectorTypeDescEnum
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Human readable description of Vendor's connector type byte value. Reference SFF-8024, table 4-3"
+    ::= { cwsXcvrDeviceIdEntry 2 }
+
+cwsXcvrVendorTransmitterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrVendorTransmitterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 11 }
+
+cwsXcvrVendorTransmitterEntry OBJECT-TYPE
+    SYNTAX CwsXcvrVendorTransmitterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrVendorTransmitterTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrVendorTransmitterTableSnmpKey }
+    ::= { cwsXcvrVendorTransmitterTable 1 }
+
+CwsXcvrVendorTransmitterEntry ::= SEQUENCE { 
+    cwsXcvrVendorTransmitterTableSnmpKey Integer32,
+    cwsXcvrVendorTransmitterNominalBitRate StringMaxl16 
+}
+
+cwsXcvrVendorTransmitterTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrVendorTransmitter"
+    ::= { cwsXcvrVendorTransmitterEntry 1 }
+
+cwsXcvrVendorTransmitterNominalBitRate OBJECT-TYPE
+    SYNTAX StringMaxl16
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Bit rate, nominal, in Gbps."
+    ::= { cwsXcvrVendorTransmitterEntry 2 }
+
+cwsXcvrVendorDiagnosticMonitoringTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrVendorDiagnosticMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 12 }
+
+cwsXcvrVendorDiagnosticMonitoringEntry OBJECT-TYPE
+    SYNTAX CwsXcvrVendorDiagnosticMonitoringEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrVendorDiagnosticMonitoringTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrVendorDiagnosticMonitoringTableSnmpKey }
+    ::= { cwsXcvrVendorDiagnosticMonitoringTable 1 }
+
+CwsXcvrVendorDiagnosticMonitoringEntry ::= SEQUENCE { 
+    cwsXcvrVendorDiagnosticMonitoringTableSnmpKey Integer32,
+    cwsXcvrVendorDiagnosticMonitoringRxPowerMeasurement INTEGER,
+    cwsXcvrVendorDiagnosticMonitoringTxPowerMeasurement INTEGER 
+}
+
+cwsXcvrVendorDiagnosticMonitoringTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrVendorDiagnosticMonitoring"
+    ::= { cwsXcvrVendorDiagnosticMonitoringEntry 1 }
+
+cwsXcvrVendorDiagnosticMonitoringRxPowerMeasurement OBJECT-TYPE
+    SYNTAX INTEGER { zeroma(0), averagepower(1), yes(2), no(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Rx power measurement, bit 3 of diagnostic monitoring type. Reference SFF 8472 section 8.8 and table 9.5 for detail."
+    ::= { cwsXcvrVendorDiagnosticMonitoringEntry 2 }
+
+cwsXcvrVendorDiagnosticMonitoringTxPowerMeasurement OBJECT-TYPE
+    SYNTAX INTEGER { notsupported(0), supported(1), yes(2), no(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Tx ower measurement, related to diagnostic monitoring type."
+    ::= { cwsXcvrVendorDiagnosticMonitoringEntry 3 }
+
+cwsXcvrTemperatureTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrTemperatureEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 13 }
+
+cwsXcvrTemperatureEntry OBJECT-TYPE
+    SYNTAX CwsXcvrTemperatureEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrTemperatureTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrTemperatureTableSnmpKey }
+    ::= { cwsXcvrTemperatureTable 1 }
+
+CwsXcvrTemperatureEntry ::= SEQUENCE { 
+    cwsXcvrTemperatureTableSnmpKey Integer32,
+    cwsXcvrTemperatureActual Integer32 
+}
+
+cwsXcvrTemperatureTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrTemperature"
+    ::= { cwsXcvrTemperatureEntry 1 }
+
+cwsXcvrTemperatureActual OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature Status, actual temperature in degrees Celsius (C). Range must be between -128 and 128."
+    ::= { cwsXcvrTemperatureEntry 2 }
+
+cwsXcvrTemperatureStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrTemperatureStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 14 }
+
+cwsXcvrTemperatureStatusEntry OBJECT-TYPE
+    SYNTAX CwsXcvrTemperatureStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrTemperatureStatusTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrTemperatureStatusTableSnmpKey }
+    ::= { cwsXcvrTemperatureStatusTable 1 }
+
+CwsXcvrTemperatureStatusEntry ::= SEQUENCE { 
+    cwsXcvrTemperatureStatusTableSnmpKey Integer32,
+    cwsXcvrTemperatureStatusHighAlarmStatus TruthValue,
+    cwsXcvrTemperatureStatusLowAlarmStatus TruthValue,
+    cwsXcvrTemperatureStatusHighWarningStatus TruthValue,
+    cwsXcvrTemperatureStatusLowWarningStatus TruthValue 
+}
+
+cwsXcvrTemperatureStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrTemperatureStatus"
+    ::= { cwsXcvrTemperatureStatusEntry 1 }
+
+cwsXcvrTemperatureStatusHighAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature high alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsXcvrTemperatureStatusEntry 2 }
+
+cwsXcvrTemperatureStatusLowAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature low alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsXcvrTemperatureStatusEntry 3 }
+
+cwsXcvrTemperatureStatusHighWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature high warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsXcvrTemperatureStatusEntry 4 }
+
+cwsXcvrTemperatureStatusLowWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature low warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsXcvrTemperatureStatusEntry 5 }
+
+cwsXcvrTemperatureThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrTemperatureThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 15 }
+
+cwsXcvrTemperatureThresholdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrTemperatureThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrTemperatureThresholdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrTemperatureThresholdTableSnmpKey }
+    ::= { cwsXcvrTemperatureThresholdTable 1 }
+
+CwsXcvrTemperatureThresholdEntry ::= SEQUENCE { 
+    cwsXcvrTemperatureThresholdTableSnmpKey Integer32,
+    cwsXcvrTemperatureThresholdHighAlarmThreshold Integer32,
+    cwsXcvrTemperatureThresholdLowAlarmThreshold Integer32,
+    cwsXcvrTemperatureThresholdHighWarningThreshold Integer32,
+    cwsXcvrTemperatureThresholdLowWarningThreshold Integer32 
+}
+
+cwsXcvrTemperatureThresholdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrTemperatureThreshold"
+    ::= { cwsXcvrTemperatureThresholdEntry 1 }
+
+cwsXcvrTemperatureThresholdHighAlarmThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature high alarm threshold, in degrees Celsius (C)."
+    ::= { cwsXcvrTemperatureThresholdEntry 2 }
+
+cwsXcvrTemperatureThresholdLowAlarmThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature low alarm threshold, in degrees Celsius (C)"
+    ::= { cwsXcvrTemperatureThresholdEntry 3 }
+
+cwsXcvrTemperatureThresholdHighWarningThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature high warning threshold, in degrees Celsius (C)"
+    ::= { cwsXcvrTemperatureThresholdEntry 4 }
+
+cwsXcvrTemperatureThresholdLowWarningThreshold OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Temperature low warning threshold, in degrees Celsius (C)"
+    ::= { cwsXcvrTemperatureThresholdEntry 5 }
+
+cwsXcvrChannelDiagnosticsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrChannelDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "List of common xcvr channel diagnostic data fields of the XCVR."
+    ::= { cienaWsXcvrMIB 16 }
+
+cwsXcvrChannelDiagnosticsEntry OBJECT-TYPE
+    SYNTAX CwsXcvrChannelDiagnosticsEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrChannelDiagnosticsTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrChannelDiagnosticsChannelNumber }
+    ::= { cwsXcvrChannelDiagnosticsTable 1 }
+
+CwsXcvrChannelDiagnosticsEntry ::= SEQUENCE { 
+    cwsXcvrChannelDiagnosticsChannelNumber Integer32 
+}
+
+cwsXcvrChannelDiagnosticsChannelNumber OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Channel number of XCVR."
+    ::= { cwsXcvrChannelDiagnosticsEntry 1 }
+
+cwsXcvrChannelRxPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrChannelRxPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 17 }
+
+cwsXcvrChannelRxPowerEntry OBJECT-TYPE
+    SYNTAX CwsXcvrChannelRxPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrChannelRxPowerTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrChannelDiagnosticsChannelNumber, cwsXcvrChannelRxPowerTableSnmpKey }
+    ::= { cwsXcvrChannelRxPowerTable 1 }
+
+CwsXcvrChannelRxPowerEntry ::= SEQUENCE { 
+    cwsXcvrChannelRxPowerTableSnmpKey Integer32,
+    cwsXcvrChannelRxPowerActual Decimal1Dig 
+}
+
+cwsXcvrChannelRxPowerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrChannelRxPower"
+    ::= { cwsXcvrChannelRxPowerEntry 1 }
+
+cwsXcvrChannelRxPowerActual OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Actual Rx optical power in dBm."
+    ::= { cwsXcvrChannelRxPowerEntry 2 }
+
+cwsXcvrRxPowerStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrRxPowerStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 18 }
+
+cwsXcvrRxPowerStatusEntry OBJECT-TYPE
+    SYNTAX CwsXcvrRxPowerStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrRxPowerStatusTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrChannelDiagnosticsChannelNumber, cwsXcvrRxPowerStatusTableSnmpKey }
+    ::= { cwsXcvrRxPowerStatusTable 1 }
+
+CwsXcvrRxPowerStatusEntry ::= SEQUENCE { 
+    cwsXcvrRxPowerStatusTableSnmpKey Integer32,
+    cwsXcvrRxPowerStatusHighAlarmStatus TruthValue,
+    cwsXcvrRxPowerStatusLowAlarmStatus TruthValue,
+    cwsXcvrRxPowerStatusHighWarningStatus TruthValue,
+    cwsXcvrRxPowerStatusLowWarningStatus TruthValue 
+}
+
+cwsXcvrRxPowerStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrRxPowerStatus"
+    ::= { cwsXcvrRxPowerStatusEntry 1 }
+
+cwsXcvrRxPowerStatusHighAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsXcvrRxPowerStatusEntry 2 }
+
+cwsXcvrRxPowerStatusLowAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsXcvrRxPowerStatusEntry 3 }
+
+cwsXcvrRxPowerStatusHighWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsXcvrRxPowerStatusEntry 4 }
+
+cwsXcvrRxPowerStatusLowWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsXcvrRxPowerStatusEntry 5 }
+
+cwsXcvrRxPowerThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrRxPowerThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 19 }
+
+cwsXcvrRxPowerThresholdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrRxPowerThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrRxPowerThresholdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrChannelDiagnosticsChannelNumber, cwsXcvrRxPowerThresholdTableSnmpKey }
+    ::= { cwsXcvrRxPowerThresholdTable 1 }
+
+CwsXcvrRxPowerThresholdEntry ::= SEQUENCE { 
+    cwsXcvrRxPowerThresholdTableSnmpKey Integer32,
+    cwsXcvrRxPowerThresholdHighAlarmThreshold Decimal1Dig,
+    cwsXcvrRxPowerThresholdLowAlarmThreshold Decimal1Dig,
+    cwsXcvrRxPowerThresholdHighWarningThreshold Decimal1Dig,
+    cwsXcvrRxPowerThresholdLowWarningThreshold Decimal1Dig 
+}
+
+cwsXcvrRxPowerThresholdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrRxPowerThreshold"
+    ::= { cwsXcvrRxPowerThresholdEntry 1 }
+
+cwsXcvrRxPowerThresholdHighAlarmThreshold OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high alarm threshold, in dBm. If it is modem Tx-power, the threshold can change based on provisioned tx power. High threshold = target power + 3."
+    ::= { cwsXcvrRxPowerThresholdEntry 2 }
+
+cwsXcvrRxPowerThresholdLowAlarmThreshold OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low alarm threshold, in dBm. If it is modem Tx-power, the threshold can change based on provisioned tx power. Low threshold = target power - 10."
+    ::= { cwsXcvrRxPowerThresholdEntry 3 }
+
+cwsXcvrRxPowerThresholdHighWarningThreshold OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high warning threshold, in dBm."
+    ::= { cwsXcvrRxPowerThresholdEntry 4 }
+
+cwsXcvrRxPowerThresholdLowWarningThreshold OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low warning threshold, in dBm."
+    ::= { cwsXcvrRxPowerThresholdEntry 5 }
+
+cwsXcvrChannelTxPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrChannelTxPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 20 }
+
+cwsXcvrChannelTxPowerEntry OBJECT-TYPE
+    SYNTAX CwsXcvrChannelTxPowerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrChannelTxPowerTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrChannelDiagnosticsChannelNumber, cwsXcvrChannelTxPowerTableSnmpKey }
+    ::= { cwsXcvrChannelTxPowerTable 1 }
+
+CwsXcvrChannelTxPowerEntry ::= SEQUENCE { 
+    cwsXcvrChannelTxPowerTableSnmpKey Integer32,
+    cwsXcvrChannelTxPowerActual Decimal1Dig 
+}
+
+cwsXcvrChannelTxPowerTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrChannelTxPower"
+    ::= { cwsXcvrChannelTxPowerEntry 1 }
+
+cwsXcvrChannelTxPowerActual OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Actual Tx optical power in dBm."
+    ::= { cwsXcvrChannelTxPowerEntry 2 }
+
+cwsXcvrTxPowerStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrTxPowerStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 21 }
+
+cwsXcvrTxPowerStatusEntry OBJECT-TYPE
+    SYNTAX CwsXcvrTxPowerStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrTxPowerStatusTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrChannelDiagnosticsChannelNumber, cwsXcvrTxPowerStatusTableSnmpKey }
+    ::= { cwsXcvrTxPowerStatusTable 1 }
+
+CwsXcvrTxPowerStatusEntry ::= SEQUENCE { 
+    cwsXcvrTxPowerStatusTableSnmpKey Integer32,
+    cwsXcvrTxPowerStatusHighAlarmStatus TruthValue,
+    cwsXcvrTxPowerStatusLowAlarmStatus TruthValue,
+    cwsXcvrTxPowerStatusHighWarningStatus TruthValue,
+    cwsXcvrTxPowerStatusLowWarningStatus TruthValue 
+}
+
+cwsXcvrTxPowerStatusTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrTxPowerStatus"
+    ::= { cwsXcvrTxPowerStatusEntry 1 }
+
+cwsXcvrTxPowerStatusHighAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsXcvrTxPowerStatusEntry 2 }
+
+cwsXcvrTxPowerStatusLowAlarmStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low alarm status, boolean, true if alarm is raised, false if alarm is not raised."
+    ::= { cwsXcvrTxPowerStatusEntry 3 }
+
+cwsXcvrTxPowerStatusHighWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsXcvrTxPowerStatusEntry 4 }
+
+cwsXcvrTxPowerStatusLowWarningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low warning status, boolean, true if warning is raised, false if warning is not raised."
+    ::= { cwsXcvrTxPowerStatusEntry 5 }
+
+cwsXcvrTxPowerThresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrTxPowerThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 22 }
+
+cwsXcvrTxPowerThresholdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrTxPowerThresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrTxPowerThresholdTable."
+    INDEX { cwsXcvrXcvrsXcvrIndex, cwsXcvrChannelDiagnosticsChannelNumber, cwsXcvrTxPowerThresholdTableSnmpKey }
+    ::= { cwsXcvrTxPowerThresholdTable 1 }
+
+CwsXcvrTxPowerThresholdEntry ::= SEQUENCE { 
+    cwsXcvrTxPowerThresholdTableSnmpKey Integer32,
+    cwsXcvrTxPowerThresholdHighAlarmThreshold Decimal1Dig,
+    cwsXcvrTxPowerThresholdLowAlarmThreshold Decimal1Dig,
+    cwsXcvrTxPowerThresholdHighWarningThreshold Decimal1Dig,
+    cwsXcvrTxPowerThresholdLowWarningThreshold Decimal1Dig 
+}
+
+cwsXcvrTxPowerThresholdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrTxPowerThreshold"
+    ::= { cwsXcvrTxPowerThresholdEntry 1 }
+
+cwsXcvrTxPowerThresholdHighAlarmThreshold OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high alarm threshold, in dBm. If it is modem Tx-power, the threshold can change based on provisioned tx power. High threshold = target power + 3."
+    ::= { cwsXcvrTxPowerThresholdEntry 2 }
+
+cwsXcvrTxPowerThresholdLowAlarmThreshold OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low alarm threshold, in dBm. If it is modem Tx-power, the threshold can change based on provisioned tx power. Low threshold = target power - 10."
+    ::= { cwsXcvrTxPowerThresholdEntry 3 }
+
+cwsXcvrTxPowerThresholdHighWarningThreshold OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power high warning threshold, in dBm."
+    ::= { cwsXcvrTxPowerThresholdEntry 4 }
+
+cwsXcvrTxPowerThresholdLowWarningThreshold OBJECT-TYPE
+    SYNTAX Decimal1Dig
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Optical power low warning threshold, in dBm."
+    ::= { cwsXcvrTxPowerThresholdEntry 5 }
+
+cwsXcvrXcvrProfilesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrXcvrProfilesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cienaWsXcvrMIB 23 }
+
+cwsXcvrXcvrProfilesEntry OBJECT-TYPE
+    SYNTAX CwsXcvrXcvrProfilesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrXcvrProfilesTable."
+    INDEX { cwsXcvrXcvrProfilesXcvrProfileIndex }
+    ::= { cwsXcvrXcvrProfilesTable 1 }
+
+CwsXcvrXcvrProfilesEntry ::= SEQUENCE { 
+    cwsXcvrXcvrProfilesXcvrProfileIndex Integer32 
+}
+
+cwsXcvrXcvrProfilesXcvrProfileIndex OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "XCVR tranceiver profile index, unique, key value for the XCVR Profile List."
+    ::= { cwsXcvrXcvrProfilesEntry 1 }
+
+cwsXcvrXcvrProfileIdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrXcvrProfileIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Identification information of this XCVR Profile instance."
+    ::= { cienaWsXcvrMIB 24 }
+
+cwsXcvrXcvrProfileIdEntry OBJECT-TYPE
+    SYNTAX CwsXcvrXcvrProfileIdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrXcvrProfileIdTable."
+    INDEX { cwsXcvrXcvrProfilesXcvrProfileIndex, cwsXcvrXcvrProfileIdTableSnmpKey }
+    ::= { cwsXcvrXcvrProfileIdTable 1 }
+
+CwsXcvrXcvrProfileIdEntry ::= SEQUENCE { 
+    cwsXcvrXcvrProfileIdTableSnmpKey Integer32,
+    cwsXcvrXcvrProfileIdVendorName OCTET STRING,
+    cwsXcvrXcvrProfileIdVendorOui OCTET STRING,
+    cwsXcvrXcvrProfileIdVendorPn OCTET STRING,
+    cwsXcvrXcvrProfileIdVendorRev OCTET STRING 
+}
+
+cwsXcvrXcvrProfileIdTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrXcvrProfileId"
+    ::= { cwsXcvrXcvrProfileIdEntry 1 }
+
+cwsXcvrXcvrProfileIdVendorName OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..16))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "Name of the XCVR vendor."
+    ::= { cwsXcvrXcvrProfileIdEntry 2 }
+
+cwsXcvrXcvrProfileIdVendorOui OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..8))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "OUI of the XCVR vendor."
+    ::= { cwsXcvrXcvrProfileIdEntry 3 }
+
+cwsXcvrXcvrProfileIdVendorPn OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..16))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "XCVR vendor part number."
+    ::= { cwsXcvrXcvrProfileIdEntry 4 }
+
+cwsXcvrXcvrProfileIdVendorRev OBJECT-TYPE
+    SYNTAX OCTET STRING(SIZE(0..2))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "XCVR vendor revision."
+    ::= { cwsXcvrXcvrProfileIdEntry 5 }
+
+cwsXcvrXcvrProfilePropertiesTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF CwsXcvrXcvrProfilePropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "All the configurable and operational data of this XCVR Profile instance."
+    ::= { cienaWsXcvrMIB 25 }
+
+cwsXcvrXcvrProfilePropertiesEntry OBJECT-TYPE
+    SYNTAX CwsXcvrXcvrProfilePropertiesEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Entry for cwsXcvrXcvrProfilePropertiesTable."
+    INDEX { cwsXcvrXcvrProfilesXcvrProfileIndex, cwsXcvrXcvrProfilePropertiesTableSnmpKey }
+    ::= { cwsXcvrXcvrProfilePropertiesTable 1 }
+
+CwsXcvrXcvrProfilePropertiesEntry ::= SEQUENCE { 
+    cwsXcvrXcvrProfilePropertiesTableSnmpKey Integer32,
+    cwsXcvrXcvrProfilePropertiesSerdesTxEq XcvrSerdesTxEq,
+    cwsXcvrXcvrProfilePropertiesSerdesRxAmplitude XcvrSerdesRxAmplitude,
+    cwsXcvrXcvrProfilePropertiesSerdesRxEmphasis XcvrSerdesRxEmphasis 
+}
+
+cwsXcvrXcvrProfilePropertiesTableSnmpKey OBJECT-TYPE
+    SYNTAX Integer32(0..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION "Unique key for cwsXcvrXcvrProfileProperties"
+    ::= { cwsXcvrXcvrProfilePropertiesEntry 1 }
+
+cwsXcvrXcvrProfilePropertiesSerdesTxEq OBJECT-TYPE
+    SYNTAX XcvrSerdesTxEq
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cwsXcvrXcvrProfilePropertiesEntry 2 }
+
+cwsXcvrXcvrProfilePropertiesSerdesRxAmplitude OBJECT-TYPE
+    SYNTAX XcvrSerdesRxAmplitude
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cwsXcvrXcvrProfilePropertiesEntry 3 }
+
+cwsXcvrXcvrProfilePropertiesSerdesRxEmphasis OBJECT-TYPE
+    SYNTAX XcvrSerdesRxEmphasis
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION "None"
+    ::= { cwsXcvrXcvrProfilePropertiesEntry 4 }
+
+
+
+-- Conformance statements
+cienaWsXcvrObjects OBJECT IDENTIFIER
+    ::= { cienaWsXcvrMIB 1 }
+
+cienaWsXcvrConformance OBJECT IDENTIFIER
+    ::= { cienaWsXcvrMIB 2 }
+
+cienaWsXcvrGroups OBJECT IDENTIFIER
+    ::= { cienaWsXcvrConformance 1 }
+
+cienaWsXcvrGroup OBJECT-GROUP
+    OBJECTS { 
+        cwsXcvrXcvrsXcvrIndex,
+        cwsXcvrXcvrIdName,
+        cwsXcvrXcvrIdDescription,
+        cwsXcvrXcvrStateAdminState,
+        cwsXcvrXcvrStateOperationalState,
+        cwsXcvrXcvrStatePowerState,
+        cwsXcvrXcvrPropertiesType,
+        cwsXcvrXcvrPropertiesMode,
+        cwsXcvrXcvrPropertiesNumberOfChannels,
+        cwsXcvrCienaIdCienaItemNumber,
+        cwsXcvrCienaIdRevision,
+        cwsXcvrCienaIdDescription,
+        cwsXcvrVendorIdName,
+        cwsXcvrVendorIdPartNumber,
+        cwsXcvrVendorIdRevision,
+        cwsXcvrVendorIdSerialNumber,
+        cwsXcvrVendorIdManufacturedDate,
+        cwsXcvrDeviceIdConnectorType,
+        cwsXcvrVendorTransmitterNominalBitRate,
+        cwsXcvrVendorDiagnosticMonitoringRxPowerMeasurement,
+        cwsXcvrVendorDiagnosticMonitoringTxPowerMeasurement,
+        cwsXcvrTemperatureActual,
+        cwsXcvrTemperatureStatusHighAlarmStatus,
+        cwsXcvrTemperatureStatusLowAlarmStatus,
+        cwsXcvrTemperatureStatusHighWarningStatus,
+        cwsXcvrTemperatureStatusLowWarningStatus,
+        cwsXcvrTemperatureThresholdHighAlarmThreshold,
+        cwsXcvrTemperatureThresholdLowAlarmThreshold,
+        cwsXcvrTemperatureThresholdHighWarningThreshold,
+        cwsXcvrTemperatureThresholdLowWarningThreshold,
+        cwsXcvrChannelDiagnosticsChannelNumber,
+        cwsXcvrChannelRxPowerActual,
+        cwsXcvrRxPowerStatusHighAlarmStatus,
+        cwsXcvrRxPowerStatusLowAlarmStatus,
+        cwsXcvrRxPowerStatusHighWarningStatus,
+        cwsXcvrRxPowerStatusLowWarningStatus,
+        cwsXcvrRxPowerThresholdHighAlarmThreshold,
+        cwsXcvrRxPowerThresholdLowAlarmThreshold,
+        cwsXcvrRxPowerThresholdHighWarningThreshold,
+        cwsXcvrRxPowerThresholdLowWarningThreshold,
+        cwsXcvrChannelTxPowerActual,
+        cwsXcvrTxPowerStatusHighAlarmStatus,
+        cwsXcvrTxPowerStatusLowAlarmStatus,
+        cwsXcvrTxPowerStatusHighWarningStatus,
+        cwsXcvrTxPowerStatusLowWarningStatus,
+        cwsXcvrTxPowerThresholdHighAlarmThreshold,
+        cwsXcvrTxPowerThresholdLowAlarmThreshold,
+        cwsXcvrTxPowerThresholdHighWarningThreshold,
+        cwsXcvrTxPowerThresholdLowWarningThreshold,
+        cwsXcvrXcvrProfilesXcvrProfileIndex,
+        cwsXcvrXcvrProfileIdVendorName,
+        cwsXcvrXcvrProfileIdVendorOui,
+        cwsXcvrXcvrProfileIdVendorPn,
+        cwsXcvrXcvrProfileIdVendorRev,
+        cwsXcvrXcvrProfilePropertiesSerdesTxEq,
+        cwsXcvrXcvrProfilePropertiesSerdesRxAmplitude,
+        cwsXcvrXcvrProfilePropertiesSerdesRxEmphasis
+    }
+    STATUS current
+    DESCRIPTION "Conformance Group"
+    ::= { cienaWsXcvrGroups 1 }
+
+cienaWsXcvrCompliances OBJECT IDENTIFIER
+    ::= { cienaWsXcvrConformance 2 }
+
+cienaWsXcvrCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION "Compliance"
+    MODULE MANDATORY-GROUPS { cienaWsXcvrGroup }
+    ::= { cienaWsXcvrCompliances 1 }
+
+END -- End module

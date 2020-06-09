@@ -27,16 +27,16 @@ namespace LibreNMS\Util;
 
 use App;
 use Illuminate\Database\Events\QueryExecuted;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Log;
+use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Laravel
 {
     public static function bootCli()
     {
         // make sure Laravel isn't already booted
-        if (class_exists('App') && App::isBooted()) {
+        if (self::isBooted()) {
             return;
         }
 
@@ -45,6 +45,37 @@ class Laravel
         $app = require_once $install_dir . '/bootstrap/app.php';
         $kernel = $app->make(\Illuminate\Contracts\Console\Kernel::class);
         $kernel->bootstrap();
+    }
+
+    /**
+     * Boot Laravel in a non-Laravel web script
+     *
+     * @param bool $authenticate Use session+db to authenticate user (does not authorize)
+     */
+    public static function bootWeb($authenticate = false)
+    {
+        // this is not a substitute for the normal Laravel boot, just a way to make auth work for external php
+        if (self::isBooted()) {
+            return;
+        }
+
+        define('LARAVEL_START', microtime(true));
+        $install_dir = realpath(__DIR__ . '/../..');
+        $app = require_once $install_dir . '/bootstrap/app.php';
+        $kernel = $app->make(\Illuminate\Contracts\Http\Kernel::class);
+
+        $request = \Illuminate\Http\Request::capture();
+
+        self::rewriteDummyHeaders($request, $authenticate);
+
+        $response = $kernel->handle($request);
+
+//        $response->send(); // don't send response, legacy code will
+    }
+
+    public static function isBooted()
+    {
+        return function_exists('app') && !empty(app()->isAlias('Illuminate\Foundation\Application')) && app()->isBooted();
     }
 
     public static function enableQueryDebug()
@@ -62,7 +93,7 @@ class Laravel
                     return $item;
                 })->toJson();
 
-                if (class_exists('Log')) {
+                if (self::isBooted()) {
                     Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
                 } else {
                     c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
@@ -83,48 +114,33 @@ class Laravel
 
     public static function enableCliDebugOutput()
     {
-        if (class_exists('Log')) {
-            $logger = Log::getMonolog();
-
-            // only install if not existing
-            $install = true;
-            $logfile = Config::get('log_file', base_path('logs/librenms.log'));
-            foreach ($logger->getHandlers() as $handler) {
-                if ($handler instanceof \Monolog\Handler\StreamHandler) {
-                    if ($handler->getUrl() == 'php://stdout') {
-                        $install = false;
-                    } elseif ($handler->getUrl() == $logfile) {
-                        // send to librenms log file if not a cli app
-                        if (!App::runningInConsole()) {
-                            set_error_handler(function ($errno, $errstr, $errfile, $errline) {
-                                Log::error("$errno $errfile:$errline $errstr");
-                            });
-                            $handler->setLevel(\Monolog\Logger::DEBUG);
-                        }
-                    }
-                }
-            }
-
-            if ($install) {
-                $handler = new \Monolog\Handler\StreamHandler(
-                    'php://stdout',
-                    \Monolog\Logger::DEBUG
-                );
-
-                $handler->setFormatter(new CliColorFormatter());
-
-                $logger->pushHandler($handler);
-            }
+        if (self::isBooted() && App::runningInConsole()) {
+            Log::setDefaultDriver('console');
         }
     }
 
     public static function disableCliDebugOutput()
     {
-        if (class_exists('Log')) {
-            $handlers = Log::getMonolog()->getHandlers();
-            if (isset($handlers[0]) && $handlers[0]->getUrl() == 'php://stdout') {
-                Log::getMonolog()->popHandler();
-            }
+        if (self::isBooted()) {
+            Log::setDefaultDriver('logfile');
         }
+    }
+
+    /**
+     * Add prefix and strip .php to make the url helper work in non-laravel php scripts
+     *
+     * @param $request
+     * @param $auth
+     */
+    private static function rewriteDummyHeaders($request, $auth)
+    {
+        // set dummy path allows url helper to work and prevents full init again
+        $new_uri = ($auth ? '/dummy_legacy_auth' : '/dummy_legacy_unauth');
+        $request->server->set('REQUEST_URI', $new_uri);
+
+        // set json type to prevent redirects in the dummy page
+        $request->server->set('HTTP_ACCEPT', 'dummy/json');
+
+        $request->headers = new HeaderBag($request->server->getHeaders());
     }
 }

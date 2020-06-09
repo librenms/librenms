@@ -25,24 +25,9 @@
 
 namespace App\Models;
 
-class CefSwitching extends BaseModel
+class CefSwitching extends DeviceRelatedModel
 {
     public $timestamps = false;
     protected $table = 'cef_switching';
     protected $primaryKey = 'cef_switching_id';
-
-
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
-    // ---- Define Relationships ----
-
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
-    }
 }

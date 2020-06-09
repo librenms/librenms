@@ -1,0 +1,164 @@
+-- *****************************************************************
+-- TN-MIRRORING-MIB
+--
+-- Copyright (c) 2012, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+TN-MIRRORING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Integer32   FROM SNMPv2-SMI
+    NOTIFICATION-GROUP  FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, TimeStamp,
+    RowStatus, TruthValue  FROM SNMPv2-TC
+    entPhysicalIndex  FROM ENTITY-MIB
+    tnProducts FROM TRANSITION-SMI
+    ifIndex, InterfaceIndex FROM IF-MIB;
+
+tnMirroringMIB MODULE-IDENTITY
+        LAST-UPDATED "201207270000Z"
+    ORGANIZATION "Transition Networks, Inc."
+    CONTACT-INFO
+        "Transition Networks
+        Technical Support
+
+        10900 Red Circle Drive
+        Minnetonka, MN 55343 USA
+        Tel: +1-800-526-9267
+
+            E-mail: techsupport@transition.com"
+    DESCRIPTION
+        "The mib module for mirroring between the source mirroring ports and
+        the destination port."
+
+        REVISION "201208060000Z"    -- 6 August, 2012
+        DESCRIPTION
+        "Initial Revision of this module"
+
+    ::= { tnProducts 25 }
+
+tnMirroringMIBObjects
+        OBJECT IDENTIFIER ::= { tnMirroringMIB 1 }
+
+tnMirroringMIBNotifications
+        OBJECT IDENTIFIER ::= { tnMirroringMIB 2 }
+
+--
+-- Textual Conventions
+--
+
+
+
+--
+-- MIB variables
+--
+
+tnMirroringMgmt
+    OBJECT IDENTIFIER ::= { tnMirroringMIBObjects 1 }
+
+
+
+--
+-- tnMirroringGroupTable
+--
+
+tnMirroringGroupTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnMirroringGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table is for user to configure a mirroring group."
+    ::= { tnMirroringMgmt 1 }
+
+tnMirroringGroupEntry OBJECT-TYPE
+    SYNTAX        TnMirroringGroupEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "Each entry represents a mirroring group, devices which don't
+        support groups will have a only one default entry."
+    INDEX { tnMirroringGroupID }
+    ::= { tnMirroringGroupTable 1 }
+
+TnMirroringGroupEntry ::= SEQUENCE {
+    tnMirroringGroupID             INTEGER,
+    tnMirroringGroupDestIfIndex    InterfaceIndex
+    }
+
+tnMirroringGroupID OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value identifies the mirroring group. The default ID is 1"
+    ::= { tnMirroringGroupEntry 1 }
+
+tnMirroringGroupDestIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndex
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The ifIndex of the mirror port which receives the mirrored
+        traffic from other ports"
+    ::= { tnMirroringGroupEntry 2 }
+
+
+
+--
+-- tnMirroringIfTable
+--
+
+tnMirroringIfTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnMirroringIfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "This table lets user to configure the source mirroring ports
+        which are monitored by the destination port defined in
+        the mirroring group."
+    ::= { tnMirroringMgmt 2 }
+
+tnMirroringIfEntry OBJECT-TYPE
+    SYNTAX        TnMirroringIfEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION
+        "The entry lists all source mirroring ports."
+    INDEX { ifIndex }
+    ::= { tnMirroringIfTable 1 }
+
+TnMirroringIfEntry ::= SEQUENCE {
+    tnMirroringIfGroupID    INTEGER,
+    tnMirroringIfMode         INTEGER
+    }
+
+tnMirroringIfGroupID OBJECT-TYPE
+    SYNTAX     INTEGER
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The mirroring group which current mirroring port belongs to."
+    ::= { tnMirroringIfEntry 1 }
+
+tnMirroringIfMode OBJECT-TYPE
+    SYNTAX     INTEGER { none(0), onlyTx(10), onlyRx(20), bothTxRx(30) }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The mirroring mode.  Valid values are:
+        none(0)      : Mirror nothing.
+        onlyTx(10)   : Mirror the transmitted frames only.
+        onlyRx(20)   : Mirror the received frames only.
+        bothTxRx(30) : Mirror both of transmitted and received frames."
+    ::= { tnMirroringIfEntry 2 }
+
+
+--
+-- Notifications
+--
+
+END

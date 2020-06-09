@@ -1,0 +1,11 @@
+os: panasonic-ns
+text: 'Panasonic KX-NS Series'
+type: server
+icon: panasonic
+mib_dir:
+    - panasonic
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.258.601.3

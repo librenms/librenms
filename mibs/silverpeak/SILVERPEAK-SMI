@@ -1,0 +1,69 @@
+-- ************************************************************
+-- SILVERPEAK-SMI.txt:   Silver Peak Systems, Inc.
+--                   Structure of Management Information
+--
+-- Copyright (c) 2011 Silver Peak Systems, Inc.
+-- All rights reserved.
+--
+-- ************************************************************
+--
+
+SILVERPEAK-SMI DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises
+        FROM SNMPv2-SMI;
+
+silverpeakNW MODULE-IDENTITY
+    LAST-UPDATED    "201101240000Z"
+    ORGANIZATION    "Silver Peak Systems, Inc."
+    CONTACT-INFO
+            "  URL: http://www.silver-peak.com/contact
+            E-mail: support@silver-peak.com "
+    DESCRIPTION
+        "The Structure of Management Information for the
+        Silverpeak Systems enterprise."
+    ::= { enterprises 23867 }
+
+--
+-- silverpeakNW 10 is being saved for LDAP usage
+--
+
+silverpeakProducts OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "silverpeakProducts is the root OBJECT IDENTIFIER from
+        which sysObjectID values are assigned. Actual values
+        are defined in SILVERPEAK-PRODUCTS-MIB."
+    ::= { silverpeakNW 1 }
+
+silverpeakModules OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "silverpeakModules provides a root object identifier from
+        which MODULE-ENTITY values may be assigned."
+    ::= { silverpeakNW 2 }
+
+silverpeakMgmt OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "silverpeakMgmt is the main subtree for management mibs."
+    ::= { silverpeakNW 3 }
+
+silverpeakNotifications OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "silverpeakNotifications is the main subtree for agent notifications."
+    ::= { silverpeakNW 4 }
+
+silverpeakAgentCapability OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "silverpeakAgentCapability provides a root object identifier
+        from which AGENT-CAPABILITIES values may be assigned."
+    ::= { silverpeakNW 5 }
+
+
+END

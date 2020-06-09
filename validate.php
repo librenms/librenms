@@ -21,15 +21,11 @@ chdir(__DIR__); // cwd to the directory containing this script
 
 ini_set('display_errors', 1);
 
-require_once 'includes/common.php';
-require_once 'includes/functions.php';
-require_once 'includes/dbFacile.php';
-
 $options = getopt('g:m:s::h::');
 
 if (isset($options['h'])) {
     echo
-        "\n Validate setup tool
+    "\n Validate setup tool
 
     Usage: ./validate.php [-g <group>] [-s] [-h]
         -h This help section.
@@ -47,6 +43,7 @@ if (isset($options['h'])) {
           - php: check that various PHP modules and functions exist
           - poller: check that the poller and discovery are running properly
           - programs: check that external programs exist and are executable
+          - python: check that various Python modules and functions exist
           - updates: checks the status of git and updates
           - user: check that the LibreNMS user is set properly
 
@@ -57,6 +54,17 @@ if (isset($options['h'])) {
     exit;
 }
 
+// Check autoload
+if (!file_exists('vendor/autoload.php')) {
+    print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
+    exit;
+}
+
+require_once 'vendor/autoload.php';
+require_once 'includes/common.php';
+require_once 'includes/functions.php';
+require_once 'includes/dbFacile.php';
+
 
 // Buffer output
 ob_start();
@@ -65,6 +73,10 @@ register_shutdown_function(function () {
     global $precheck_complete;
 
     if (!$precheck_complete) {
+        // use this in case composer autoloader isn't available
+        spl_autoload_register(function ($class) {
+            include str_replace('\\', '/', $class) . '.php';
+        });
         print_header(version_info());
     }
 });
@@ -77,45 +89,24 @@ if (!file_exists('config.php')) {
 
 $pre_checks_failed = false;
 $syntax_check = `php -ln config.php`;
-if (!str_contains($syntax_check, 'No syntax errors detected')) {
+if (strpos($syntax_check, 'No syntax errors detected') === false) {
     print_fail('Syntax error in config.php');
     echo $syntax_check;
     $pre_checks_failed = true;
 }
 
 $first_line = rtrim(`head -n1 config.php`);
-if (!starts_with($first_line, '<?php')) {
+if (!strpos($first_line, '<?php') === 0) {
     print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
     $pre_checks_failed = true;
 }
-if (str_contains(`tail config.php`, '?>')) {
+if (strpos(`tail config.php`, '?>') !== false) {
     print_fail("Remove the ?> at the end of config.php");
     $pre_checks_failed = true;
 }
 
-// Composer checks
-if (!file_exists('vendor/autoload.php')) {
-    print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
-    exit;
-}
 
-// init autoloading
-require_once 'vendor/autoload.php';
-
-
-$dep_check = shell_exec('php scripts/composer_wrapper.php install --no-dev --dry-run');
-preg_match_all('/Installing ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_missing);
-if (!empty($dep_missing[0])) {
-    print_fail("Missing dependencies!", "./scripts/composer_wrapper.php install --no-dev");
-    $pre_checks_failed = true;
-    print_list($dep_missing[1], "\t %s\n");
-}
-preg_match_all('/Updating ([^ ]+\/[^ ]+) \(/', $dep_check, $dep_outdated);
-if (!empty($dep_outdated[0])) {
-    print_fail("Outdated dependencies", "./scripts/composer_wrapper.php install --no-dev");
-    print_list($dep_outdated[1], "\t %s\n");
-}
-
+// Composer check
 $validator = new Validator();
 $validator->validate(array('dependencies'));
 if ($validator->getGroupStatus('dependencies') == ValidationResult::FAILURE) {
@@ -126,27 +117,21 @@ if ($pre_checks_failed) {
     exit;
 }
 
-$init_modules = array('nodb');
+$init_modules = [];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
 if (!file_exists(Config::get('install_dir').'/config.php')) {
     $suggested = realpath(__DIR__);
-    print_fail('$config[\'install_dir\'] is not set correctly.', "It should probably be set to: $suggested");
+    print_fail('\'install_dir\' config setting is not set correctly.', "It should probably be set to: $suggested");
     exit;
 }
-
-
-// Connect to MySQL
-\LibreNMS\DB\Eloquent::boot();
 
 if (\LibreNMS\DB\Eloquent::isConnected()) {
     $validator->ok('Database connection successful', null, 'database');
 } else {
     $validator->fail('Error connecting to your database.', null, 'database');
 }
-
-Config::load();
 
 $precheck_complete = true; // disable shutdown function
 print_header($validator->getVersions());
@@ -175,6 +160,7 @@ Component | Version
 LibreNMS  | ${versions['local_ver']}
 DB Schema | ${versions['db_schema']}
 PHP       | ${versions['php_ver']}
+Python    | ${versions['python_ver']}
 MySQL     | ${versions['mysql_ver']}
 RRDTool   | ${versions['rrdtool_ver']}
 SNMP      | ${versions['netsnmp_ver']}

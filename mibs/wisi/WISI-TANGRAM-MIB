@@ -1,0 +1,170 @@
+
+WISI-TANGRAM-MIB DEFINITIONS ::= BEGIN
+--============================================================================--
+
+IMPORTS
+	MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, Integer32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION
+	    FROM SNMPv2-TC
+	tangram
+		FROM WISI-ROOT-MIB;
+
+
+tangramMIB MODULE-IDENTITY
+	LAST-UPDATED "201609080000Z"
+	ORGANIZATION "WISI Communications GmbH & Co. KG"
+	CONTACT-INFO
+		"https://wisiconnect.tv/"
+	DESCRIPTION
+		"This MIB comprises all base OIDs of Tangram-related MIBs."
+
+	REVISION "201609080000Z"
+	DESCRIPTION
+		"Fixed parse warnings. Updated contact information."
+	REVISION "201404290000Z"
+	DESCRIPTION
+		"Add oid 'gtTS'."
+	REVISION "201212060900Z"
+	DESCRIPTION
+		"Fixed compile errors."
+	REVISION "201210310000Z"
+	DESCRIPTION
+		"Changes: Initial Chameleon support."
+	REVISION "201112130000Z"
+	DESCRIPTION
+		"Changes: Updated MIBs to revision 12 for GT22ex."
+	REVISION "201104120000Z"
+	DESCRIPTION
+		"Initial Version"
+	::= { tangram 0 }
+
+--============================================================================--
+
+	gtUnit  OBJECT IDENTIFIER ::= { tangram 1 }
+
+--	gtAlarmsMIB  OBJECT IDENTIFIER ::= { gtUnit 1 }
+--	gtModulesMIB  OBJECT IDENTIFIER ::= { gtUnit 2 }
+--	gtSensorsMIB  OBJECT IDENTIFIER ::= { gtUnit 3 }
+	gtGeneric  OBJECT IDENTIFIER ::= { gtUnit 4 }
+
+--------------------------------------------------------------------------------
+
+gtGenericNotifications OBJECT IDENTIFIER ::= { gtGeneric 0 }
+gtGenericObjects OBJECT IDENTIFIER ::= { gtGeneric 1 }
+
+gtGenericNotifyUsertrap NOTIFICATION-TYPE
+	STATUS  current
+	DESCRIPTION
+		"The gtGenericNotifyUsertrap notification is raised by a user event."
+::= { gtGenericNotifications 1 }
+
+gtGenericObjectUsertrap OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The gtGenericObjectUsertrap contain the latest data sent with a user event."
+::= { gtGenericObjects 1 }
+
+--------------------------------------------------------------------------------
+
+--	gtConfig  OBJECT IDENTIFIER ::= { tangram 2 }
+
+--	gtEthernetMIB  OBJECT IDENTIFIER ::= { gtConfig 1 }
+--	gtInternetMIB  OBJECT IDENTIFIER ::= { gtConfig 2 }
+--	gtConnectorsMIB  OBJECT IDENTIFIER ::= { gtConfig 3 }
+
+--------------------------------------------------------------------------------
+
+--	gtExtra  OBJECT IDENTIFIER ::= { tangram 3 }
+
+--	gt11SwitchMIB  OBJECT IDENTIFIER ::= { gtExtra 11 }
+--	gt12ExtentionMIB  OBJECT IDENTIFIER ::= { gtExtra 12 }
+--	gt21EdgePALMIB  OBJECT IDENTIFIER ::= { gtExtra 21 }
+--	gt22EdgeFMMIB  OBJECT IDENTIFIER ::= { gtExtra 22 }
+--	gt23EdgeQAMMIB  OBJECT IDENTIFIER ::= { gtExtra 23 }
+--	gt31FrontEndMIB  OBJECT IDENTIFIER ::= { gtExtra 31 }
+--	gt35EncoderMIB  OBJECT IDENTIFIER ::= { gtExtra 35 }
+--	gt42CIMIB  OBJECT IDENTIFIER ::= { gtExtra 42 }
+
+--------------------------------------------------------------------------------
+
+	gtStandards  OBJECT IDENTIFIER ::= { tangram 4 }
+
+	gtIP  OBJECT IDENTIFIER ::= { gtStandards 1 }
+--	gtIPv4MIB  OBJECT IDENTIFIER ::= { gtIP 1 }
+--	gtIPv6MIB  OBJECT IDENTIFIER ::= { gtIP 2 }
+
+--	gtIO  OBJECT IDENTIFIER ::= { gtStandards 2 }
+--	gtAVMIB  OBJECT IDENTIFIER ::= { gtIO 1 }
+--	gtSDIMIB  OBJECT IDENTIFIER ::= { gtIO 2 }
+--	gtASIMIB  OBJECT IDENTIFIER ::= { gtIO 3 }
+--	gtHDMIMIB  OBJECT IDENTIFIER ::= { gtIO 4 }
+
+	gtRF  OBJECT IDENTIFIER ::= { gtStandards 3 }
+--	gtAMMIB  OBJECT IDENTIFIER ::= { gtRF 1 }
+--	gtFMMIB  OBJECT IDENTIFIER ::= { gtRF 2 }
+--	gtNTSCMIB  OBJECT IDENTIFIER ::= { gtRF 3 }
+--	gtSECAMMIB  OBJECT IDENTIFIER ::= { gtRF 4 }
+--	gtPALMIB  OBJECT IDENTIFIER ::= { gtRF 5 }
+
+	gtDVB  OBJECT IDENTIFIER ::= { gtStandards 4 }
+--	gtDVBCMIB  OBJECT IDENTIFIER ::= { gtDVB 1 }
+--	gtDVBTMIB  OBJECT IDENTIFIER ::= { gtDVB 2 }
+--	gtDVBSMIB  OBJECT IDENTIFIER ::= { gtDVB 3 }
+--	gtDVBS2MIB  OBJECT IDENTIFIER ::= { gtDVB 4 }
+--	gtDVBT2MIB  OBJECT IDENTIFIER ::= { gtDVB 5 }
+--	gtDVBC2MIB  OBJECT IDENTIFIER ::= { gtDVB 6 }
+
+--------------------------------------------------------------------------------
+
+	gtTS  OBJECT IDENTIFIER ::= { tangram 5 }
+
+--	gtAnalysisMIB  OBJECT IDENTIFIER ::= { gtTS 1 }
+--	gtMultiplexMIB  OBJECT IDENTIFIER ::= { gtTS 2 }
+--	gtStreamMIB  OBJECT IDENTIFIER ::= { gtTS 3 }
+
+--------------------------------------------------------------------------------
+
+	gtProcessing  OBJECT IDENTIFIER ::= { tangram 6 }
+
+--	gtScrambleMIB  OBJECT IDENTIFIER ::= { gtProcessing 1 }
+--	gtDescramleMIB  OBJECT IDENTIFIER ::= { gtProcessing 2 }
+--	gtDecodeMIB  OBJECT IDENTIFIER ::= { gtProcessing 3 }
+--	gtFMDecodeMIB  OBJECT IDENTIFIER ::= { gtProcessing 4 }
+
+--============================================================================--
+
+FloatingPoint ::= TEXTUAL-CONVENTION
+	DISPLAY-HINT
+		"63a"
+	STATUS current
+	DESCRIPTION
+		"
+		FloatingPoint provides a way of representing non-integer
+		numbers in SNMP. Numbers are represented as a string of
+		ASCII characters in the natural way. So for example, '3',
+		'3.142' and '0.3142E1' are all valid numbers.
+
+		The syntax for the string is as follows.  [] enclose an
+		optional element, | is the separator for a set of
+		alternatives.  () enclose syntax which is to be viewed
+		as a unit.
+
+		FloatingPoint ::= [Sign]
+		(Float1 | Float2 | DigitSequence)
+		[ExponentPart]
+
+		Float1        ::= DigitSequence '.' [DigitSequence]
+		Float2        ::= '.' DigitSequence
+		DigitSequence ::= Digit [DigitSequence]
+
+		ExponentPart  ::= ('e' | 'E') [Sign] DigitSequence
+
+		Digit         ::= '0'..'9'
+		Sign          ::= '+' | '-'
+		"
+	SYNTAX OCTET STRING (SIZE (1..63))
+
+END

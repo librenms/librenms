@@ -12,5 +12,10 @@
  * the source code distribution for details.
  */
 
-$version  = snmp_get($device, 'rbSwBank1Version.0', '-Osqnv', '+RADIO-BRIDGE-MIB');
+if (snmp_get($device, 'rbSwBank1Running.0', '-Osqnv', '+RADIO-BRIDGE-MIB') == 'running') {
+    $version  = snmp_get($device, 'rbSwBank1Version.0', '-Osqnv', '+RADIO-BRIDGE-MIB');
+} else {
+    $version  = snmp_get($device, 'rbSwBank2Version.0', '-Osqnv', '+RADIO-BRIDGE-MIB');
+}
 $hardware = $device['sysDescr'];
+$serial = snmp_get($device, 'entPhysicalSerialNum.1', '-Osqnv', '+ENTITY-MIB');

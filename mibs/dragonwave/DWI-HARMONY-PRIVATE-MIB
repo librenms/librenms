@@ -1,0 +1,38 @@
+
+-- 
+
+DWI-HARMONY-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, enterprises
+		FROM SNMPv2-SMI;
+
+dragonwave MODULE-IDENTITY
+	LAST-UPDATED "201207201200Z"
+	ORGANIZATION 
+		"Dragonwave Inc."
+	CONTACT-INFO 
+		""
+	DESCRIPTION 
+		"Definition of the DWI products OIDs
+		 for Harmony product line."
+::= { enterprises 7262 }
+
+
+-- 
+-- Node definitions
+-- 
+
+harmony              OBJECT IDENTIFIER ::= { dragonwave 4 }
+
+-- List of OIDs to be used for sysObjectId values.
+
+lite                 OBJECT IDENTIFIER ::= { harmony 1 }
+harmonyMultiRadio    OBJECT IDENTIFIER ::= { harmony 2 }
+harmonyFPH800        OBJECT IDENTIFIER ::= { harmony 3 }
+harmonyFM            OBJECT IDENTIFIER ::= { harmony 4 }
+mwr                  OBJECT IDENTIFIER ::= { harmony 5 }
+equipmentCommon      OBJECT IDENTIFIER ::= { dragonwave 20 }
+switch               OBJECT IDENTIFIER ::= { dragonwave 50 }
+END
+

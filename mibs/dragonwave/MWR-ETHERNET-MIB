@@ -1,0 +1,5855 @@
+
+-- File Name : mwrEth-MIB.mib
+-- Version   : 1.0.0
+-- Date      : October 29, 2014
+-- Author    : DragonWave Inc.
+
+MWR-ETHERNET-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+	Unsigned32, Counter32, Counter64, IpAddress, Integer32
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, TruthValue, RowStatus, 
+	DateAndTime, DisplayString
+		FROM SNMPv2-TC
+	mwr
+		FROM DWI-HARMONY-PRIVATE-MIB
+		equipmentTrapInfo, equipmentOutTrapsCounter, equipmentAlarmActiveConditionId, EnableType
+		FROM EQUIPMENT-COMMON-MIB
+	InetAddress, InetAddressType
+		FROM INET-ADDRESS-MIB;
+
+mwrModIdentity MODULE-IDENTITY
+	LAST-UPDATED "201410081406Z"
+	ORGANIZATION 
+		"Dragonwave Inc."
+	CONTACT-INFO 
+		"http://www.dragonwaveinc.com
+		600-411 Legget Drive
+		Ottawa, Ontario
+		Canada, K2K 3C9
+		
+		Tel : 613-599-9991
+		Fax: 613-599-4265
+		Support: 613-271-7010"
+	DESCRIPTION 
+		"This specifies the contact information and the revision tracking information for the MIB module version."
+
+	REVISION "201410061406Z"
+	DESCRIPTION 
+		"First release."
+::= { mwr 1000 }
+
+
+ClassType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"The Qos class numbers from 1 to 13."
+	SYNTAX  INTEGER {
+		c1 (1),
+		c2 (2),
+		c3 (3),
+		c4 (4),
+		c5 (5),
+		c6 (6),
+		c7 (7),
+		c8 (8),
+		c9 (9),
+		c10 (10),
+		c11 (11),
+		c12 (12),
+		c13 (13)
+	}
+
+
+-- 
+-- Textual conventions
+-- 
+
+FlowType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"The Qos flow numbers from 1 to 13."
+	SYNTAX  INTEGER {
+		flow1 (1),
+		flow2 (2),
+		flow3 (3),
+		flow4 (4),
+		flow5 (5),
+		flow6 (6),
+		flow7 (7),
+		flow8 (8),
+		flow9 (9),
+		flow10 (10),
+		flow11 (11),
+		flow12 (12),
+		flow13 (13)
+	}
+
+
+PMIntervalType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"The available interval period for statistical counters."
+	SYNTAX  INTEGER {
+		quarter (1),
+		day (2)
+	}
+
+
+PortType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"The list of system Ethernet ports"
+	SYNTAX  INTEGER {
+		gi01 (1),
+		gi02 (2),
+		gi03 (3),
+		gi04 (4)
+	}
+
+
+QueueType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"The queue numbers from 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	SYNTAX  INTEGER {
+		q1 (1),
+		q2 (2),
+		q3 (3),
+		q4 (4),
+		q5 (5),
+		q6 (6),
+		q7 (7),
+		q8 (8)
+	}
+
+
+RadioInstanceType ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"The radio instance type."
+	SYNTAX  INTEGER {
+		radio1 (1)
+	}
+
+mwrPlatformObjId     OBJECT IDENTIFIER ::= { mwr 1 }
+mwrEbandObjId        OBJECT IDENTIFIER ::= { mwrPlatformObjId 1 }
+mwrEnhancedObjId     OBJECT IDENTIFIER ::= { mwrPlatformObjId 2 }
+
+-- 
+-- Node definitions
+-- 
+
+mwrSystem            OBJECT IDENTIFIER ::= { mwr 2 }
+mwrSystemConfigurations  OBJECT IDENTIFIER ::= { mwrSystem 1 }
+mwrSysSpeed          OBJECT IDENTIFIER ::= { mwrSystemConfigurations 3 }
+mwrSystemStatus      OBJECT IDENTIFIER ::= { mwrSystem 2 }
+mwrSystemCommands    OBJECT IDENTIFIER ::= { mwrSystem 3 }
+mwrSystemInventory   OBJECT IDENTIFIER ::= { mwrSystem 4 }
+
+-- ----------------------------
+--   mwrInventory
+-- ----------------------------  
+
+mwrHwInventory       OBJECT IDENTIFIER ::= { mwrSystemInventory 1 }
+mwrSwInventory       OBJECT IDENTIFIER ::= { mwrSystemInventory 2 }
+mwrSystemNotifications  OBJECT IDENTIFIER ::= { mwrSystem 5 }
+mwrSoftware          OBJECT IDENTIFIER ::= { mwr 3 }
+mwrSoftwareConfigurations  OBJECT IDENTIFIER ::= { mwrSoftware 1 }
+mwrSoftwareStatus    OBJECT IDENTIFIER ::= { mwrSoftware 2 }
+mwrSoftwareCommands  OBJECT IDENTIFIER ::= { mwrSoftware 3 }
+mwrSoftwareNotifications  OBJECT IDENTIFIER ::= { mwrSoftware 4 }
+mwrLicensing         OBJECT IDENTIFIER ::= { mwr 4 }
+mwrLicensingConfigurations  OBJECT IDENTIFIER ::= { mwrLicensing 1 }
+mwrLicensingStatus   OBJECT IDENTIFIER ::= { mwrLicensing 2 }
+mwrSyncE             OBJECT IDENTIFIER ::= { mwr 5 }
+mwrSyncEConfigurations  OBJECT IDENTIFIER ::= { mwrSyncE 1 }
+mwrSyncEStatus       OBJECT IDENTIFIER ::= { mwrSyncE 2 }
+mwrSyncENotifications  OBJECT IDENTIFIER ::= { mwrSyncE 3 }
+mwrTiming            OBJECT IDENTIFIER ::= { mwr 6 }
+mwrTimingConfigurations  OBJECT IDENTIFIER ::= { mwrTiming 1 }
+mwrTimingStatus      OBJECT IDENTIFIER ::= { mwrTiming 2 }
+mwrTimingCommands    OBJECT IDENTIFIER ::= { mwrTiming 3 }
+mwrTimingNotifications  OBJECT IDENTIFIER ::= { mwrTiming 4 }
+mwrAAA               OBJECT IDENTIFIER ::= { mwr 7 }
+mwrAAAConfigurations  OBJECT IDENTIFIER ::= { mwrAAA 1 }
+mwrRadiusConfigurations  OBJECT IDENTIFIER ::= { mwrAAAConfigurations 2 }
+mwrNetworking        OBJECT IDENTIFIER ::= { mwr 8 }
+mwrNetworkingConfigurations  OBJECT IDENTIFIER ::= { mwrNetworking 1 }
+mwrNetMgmtPriority   OBJECT IDENTIFIER ::= { mwrNetworkingConfigurations 1 }
+mwrNetMgmtIpv4       OBJECT IDENTIFIER ::= { mwrNetworkingConfigurations 2 }
+mwrNetMgmttIpv6      OBJECT IDENTIFIER ::= { mwrNetworkingConfigurations 3 }
+mwrUserInterfaceMgmt  OBJECT IDENTIFIER ::= { mwrNetworkingConfigurations 4 }
+mwrFileTransfer      OBJECT IDENTIFIER ::= { mwrNetworkingConfigurations 5 }
+mwrNetworkingStatus  OBJECT IDENTIFIER ::= { mwrNetworking 2 }
+mwrMaintenanceIpv4   OBJECT IDENTIFIER ::= { mwrNetworkingStatus 1 }
+mwrMaintenanceIpv6   OBJECT IDENTIFIER ::= { mwrNetworkingStatus 2 }
+mwrPeerNetworkingStatus  OBJECT IDENTIFIER ::= { mwrNetworking 3 }
+mwrNetworkingNotifications  OBJECT IDENTIFIER ::= { mwrNetworking 4 }
+mwrEthernet          OBJECT IDENTIFIER ::= { mwr 9 }
+mwrEthernetConfigurations  OBJECT IDENTIFIER ::= { mwrEthernet 1 }
+mwrQos               OBJECT IDENTIFIER ::= { mwrEthernetConfigurations 1 }
+mwrEthThresholdAlarm  OBJECT IDENTIFIER ::= { mwrEthernetConfigurations 2 }
+mwrEthernetStatus    OBJECT IDENTIFIER ::= { mwrEthernet 2 }
+mwrEthernetPerformance  OBJECT IDENTIFIER ::= { mwrEthernet 3 }
+mwrEthernetNotifications  OBJECT IDENTIFIER ::= { mwrEthernet 4 }
+mwrAcm               OBJECT IDENTIFIER ::= { mwr 10 }
+mwrAcmConfigurations  OBJECT IDENTIFIER ::= { mwrAcm 1 }
+mwrAcmStatus         OBJECT IDENTIFIER ::= { mwrAcm 2 }
+mwrAcmDiagnostics    OBJECT IDENTIFIER ::= { mwrAcm 3 }
+mwrAcmNotifications  OBJECT IDENTIFIER ::= { mwrAcm 4 }
+mwrAtpc              OBJECT IDENTIFIER ::= { mwr 11 }
+mwrAtpcConfigurations  OBJECT IDENTIFIER ::= { mwrAtpc 1 }
+mwrAtpcStatus        OBJECT IDENTIFIER ::= { mwrAtpc 2 }
+mwrAtpcNotifications  OBJECT IDENTIFIER ::= { mwrAtpc 3 }
+mwrRadio             OBJECT IDENTIFIER ::= { mwr 12 }
+mwrCompression       OBJECT IDENTIFIER ::= { mwr 13 }
+mwrCompressionConfigurations  OBJECT IDENTIFIER ::= { mwrCompression 1 }
+mwrCompressionStatus  OBJECT IDENTIFIER ::= { mwrCompression 2 }
+mwrCompressionNotifications  OBJECT IDENTIFIER ::= { mwrCompression 3 }
+mwrEvents            OBJECT IDENTIFIER ::= { mwr 14 }
+mwrEventsConfigurations  OBJECT IDENTIFIER ::= { mwrEvents 1 }
+mwrLogs              OBJECT IDENTIFIER ::= { mwr 15 }
+mwrLogsConfigurations  OBJECT IDENTIFIER ::= { mwrLogs 1 }
+mwrPM                OBJECT IDENTIFIER ::= { mwr 16 }
+mwrPMConfigurations  OBJECT IDENTIFIER ::= { mwrPM 1 }
+mwrPMStatus          OBJECT IDENTIFIER ::= { mwrPM 2 }
+mwrPMNotifications   OBJECT IDENTIFIER ::= { mwrPM 3 }
+mwrUserMgmt          OBJECT IDENTIFIER ::= { mwr 17 }
+mwrUserConfiguration  OBJECT IDENTIFIER ::= { mwrUserMgmt 1 }
+mwrUserStatus        OBJECT IDENTIFIER ::= { mwrUserMgmt 2 }
+mwrUserNotifications  OBJECT IDENTIFIER ::= { mwrUserMgmt 3 }
+
+mwrSystemType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		onePlusZero1cr (1),
+		onePlusZero2cr (2),
+		onePlusZero2crXpic (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Available system types for single carrier and multi carriers systems are:
+		onePlusZero1cr - 1+0 single carrier
+		onePlusZero2cr - 1+0 dual carriers
+		onePlusZero2crXpic - 1+0 dual carriers XPIC"
+	::= { mwrSystemConfigurations 1 }
+
+mwrPacketSwitchMode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		bridge (1),
+		port-isolation (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"In bridge mode the system is always inband managed on any of the user ports. However in port-isolation mode, the system can be managed outOfBand or inband on a specific port."
+	::= { mwrSystemConfigurations 2 }
+
+-- ----------------------------
+--   mwrSysSpeed
+-- ----------------------------   
+
+mwrSystemCurrentSpeed  OBJECT-TYPE
+	SYNTAX     Integer32 (0..1000)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Changes the working speed of the system."
+	::= { mwrSysSpeed 1 }
+
+mwrSystemOperStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		up (1),
+		down (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current operational state of the system."
+	::= { mwrSystemStatus 1 }
+
+mwrSystemFaultSeverity  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		noAlarm (1),
+		test (2),
+		warning (3),
+		minor (4),
+		major (5),
+		critical (6)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current state of the most serious system alarm severity. If system is running diagnostics, the status will be test."
+	::= { mwrSystemStatus 2 }
+
+mwrSystemTemperature  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current system temperature."
+	::= { mwrSystemStatus 3 }
+
+mwrPlatformType  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		eband (1),
+		enhanced (2),
+		enhanced-mc (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Identifies the system platform type. The possible system types are:
+		- eband
+		- enhanced
+		- enhanced-mc"
+	::= { mwrSystemStatus 4 }
+
+mwrPacketSwitchModeStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		bridge (1),
+		port-isolation (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the running configuration for the packet switch mode."
+	::= { mwrSystemStatus 5 }
+
+mwrSystemTypeStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		onePlusZero1cr (1),
+		onePlusZero2cr (2),
+		onePlusZero2crXpic (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the running configuration for the system type status."
+	::= { mwrSystemStatus 6 }
+
+-- ----------------------------
+--   mwrGeneral
+-- ----------------------------   
+
+mwrResetSystem  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		reset (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Writing '1' to this object resets the system."
+	::= { mwrSystemCommands 1 }
+
+mwrSaveConfig  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		save (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Writing '1' or 'save' to this object saves running configuration of the system."
+	::= { mwrSystemCommands 2 }
+
+mwrDeleteConfig  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		startup (1),
+		switch (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Using this object, either the startup config or the switch config can be deleted. Deleting startup config removes all system configuration for next system restart. Deleting switch config only clears the switch configuration."
+	::= { mwrSystemCommands 3 }
+
+-- 
+--   
+
+mwrMacAddress  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The MAC Address of the system."
+	::= { mwrHwInventory 1 }
+
+mwrTargetCfgFilePartNumber  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing part number of the target configuration file."
+	::= { mwrHwInventory 2 }
+
+mwrUnitSerialNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing Serial Number of the Unit."
+	::= { mwrHwInventory 3 }
+
+mwrUnitAssemblyNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing the Assembly Number of the Unit."
+	::= { mwrHwInventory 4 }
+
+mwrBasebandSerialNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing Serial no of the baseband."
+	::= { mwrHwInventory 5 }
+
+mwrBasebandAssemblyNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing assembly no of the baseband."
+	::= { mwrHwInventory 6 }
+
+mwrPsuSerialNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing Serial no of the PSU."
+	::= { mwrHwInventory 7 }
+
+mwrPsuAssemblyNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing assembly no of the PSU."
+	::= { mwrHwInventory 8 }
+
+mwrRfSerialNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing Serial no of the RF."
+	::= { mwrHwInventory 9 }
+
+mwrRfAssemblyNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing assembly no of the RF."
+	::= { mwrHwInventory 10 }
+
+mwrRfRevisionNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing revision no of the RF."
+	::= { mwrHwInventory 11 }
+
+mwrDiplexerSerialNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing Serial no of the Diplexer."
+	::= { mwrHwInventory 12 }
+
+mwrDiplexerAssemblyNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing assembly no of the Diplexer."
+	::= { mwrHwInventory 13 }
+
+mwrSystemCleiNo  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A textual string containing system CLEI code."
+	::= { mwrHwInventory 14 }
+
+-- ----------------------------
+--   mwrSwInventory
+-- ----------------------------
+
+mwrSwInventoryTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrSwInventoryEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing the software inventory."
+	::= { mwrSwInventory 1 }
+
+mwrSwInventoryEntry  OBJECT-TYPE
+	SYNTAX 	MwrSwInventoryEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Software inventory entry."
+	INDEX { mwrSwInvBank }
+	::= { mwrSwInventoryTable 1 }
+
+MwrSwInventoryEntry ::= SEQUENCE {
+	mwrSwInvBank
+		INTEGER,
+	mwrSwInvStatus
+		INTEGER,
+	mwrSwInvOmniRelease
+		DisplayString,
+	mwrSwInvTargetConfFileVersion
+		DisplayString,
+	mwrSwInvMibVersion
+		DisplayString,
+	mwrSwInvSecurityVersion
+		DisplayString
+}
+
+mwrSwInvBank  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		bankA (1),
+		bankB (2)
+	}
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Software bank in the flash."
+	::= { mwrSwInventoryEntry 1 }
+
+mwrSwInvStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		active (1),
+		backup (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Software bank status. "
+	::= { mwrSwInventoryEntry 2 }
+
+mwrSwInvOmniRelease  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The version number of the Omni."
+	::= { mwrSwInventoryEntry 3 }
+
+mwrSwInvTargetConfFileVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The version number of the target configuration file."
+	::= { mwrSwInventoryEntry 4 }
+
+mwrSwInvMibVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The version number of the system MIB."
+	::= { mwrSwInventoryEntry 5 }
+
+mwrSwInvSecurityVersion  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The version number of the security package."
+	::= { mwrSwInventoryEntry 6 }
+
+mwrSysTcfInvalid  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when The HW specific factory defined information (TCF) in the system is not valid."
+	::= { mwrSystemNotifications 1 }
+
+mwrSysTempOutOfLimit  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the system temperature is out of limits."
+	::= { mwrSystemNotifications 2 }
+
+mwrSwBackupBankStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notValid (1),
+		valid (2),
+		upgrading (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object represents the status of the backup bank."
+	::= { mwrSoftwareStatus 1 }
+
+mwrSwCommit  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		commit (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Writing '1' to this object commits all the active bank settings to the backup bank."
+	::= { mwrSoftwareCommands 1 }
+
+mwrSwSwitchBanks  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		bankA (1),
+		bankB (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This objects switches bank to the specified bank. Next time the system resets, it loads up from that bank."
+	::= { mwrSoftwareCommands 2 }
+
+mwrLicenseUpgradeKey  OBJECT-TYPE
+	SYNTAX     OCTET STRING (SIZE(33))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The 33 Bytes licensing key used for upgrading features/capacity. Reading this object always returns an empty string."
+	::= { mwrLicensingConfigurations 1 }
+
+mwrLicenseCount  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the number of times the system has been upgraded/downgraded with features/capacity."
+	::= { mwrLicensingStatus 1 }
+
+mwrLicensedSpeed  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the system licensed speed."
+	::= { mwrLicensingStatus 2 }
+
+mwrLicenseFeaturesTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrLicenseFeaturesEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing supported system licensed features."
+	::= { mwrLicensingStatus 3 }
+
+mwrLicenseFeaturesEntry  OBJECT-TYPE
+	SYNTAX 	MwrLicenseFeaturesEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing supported system licensed features."
+	INDEX { mwrLicenseFeatureIndex }
+	::= { mwrLicenseFeaturesTable 1 }
+
+MwrLicenseFeaturesEntry ::= SEQUENCE {
+	mwrLicenseFeatureIndex
+		Integer32,
+	mwrLicenseFeatureId
+		Integer32,
+	mwrLicenseFeature
+		DisplayString,
+	mwrLicenseFeatureStatus
+		INTEGER
+}
+
+mwrLicenseFeatureIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the list of system features."
+	::= { mwrLicenseFeaturesEntry 1 }
+
+mwrLicenseFeatureId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"2          ACM (includes WMA where applicable) (LF2)                    
+		3          Ethernet UNI (ELINE/ELAN MEF service)  (LF3)
+		4          Packet Fragmentation  (LF4)
+		5          Secured Access   (LF5)                     
+		6          Ethernet OAM (802.1ag, 802.3ah, Y.1731)  (LF6)               
+		7          Advanced Performance Monitoring (LF7)        
+		11         Bandwidth Accelerator (LF11)
+		13         Header Compression (LF13)"
+	::= { mwrLicenseFeaturesEntry 2 }
+
+mwrLicenseFeature  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The name of the feature."
+	::= { mwrLicenseFeaturesEntry 3 }
+
+mwrLicenseFeatureStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		unlicensed (1),
+		licensed (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Specifies whether the feature is unlicensed or licensed."
+	::= { mwrLicenseFeaturesEntry 4 }
+
+mwrSyncEState  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (1),
+		manual (2),
+		auto (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"In manual mode, SyncE source will use primary clock source and when the primary source has loss of lock, the SyncE goes into holdover. The primary source will be used again after the system regains the lock on primary source. In auto mode, if the current clock source goes out of lock, the recovered clock from the other source will be used."
+	::= { mwrSyncEConfigurations 1 }
+
+mwrSyncEPrimarySource  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gi01 (1),
+		gi02 (2),
+		gi03 (3),
+		gi04 (4),
+		radio (5),
+		free-run (6)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Selects which port to be used as SyncE master clock source."
+	::= { mwrSyncEConfigurations 2 }
+
+mwrSyncESecondarySource  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gi01 (1),
+		gi02 (2),
+		gi03 (3),
+		gi04 (4),
+		radio (5),
+		free-run (6)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Selects which port to be used as SyncE clock source when the master SyncE clock source is not available."
+	::= { mwrSyncEConfigurations 3 }
+
+mwrSyncEMemberPorts  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enter a string indicating all SyncE member ports.
+		Example: gi01 gi04 
+		Port options: gi01 gi02 gi03 gi04 radio"
+	::= { mwrSyncEConfigurations 4 }
+
+mwrSyncEForcedHoldover  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This forces SyncE into holdover mode. After the configurable timeout value, the forced holdover will be taken out. The forced timeout can be 0 to 300sec, where 0 means infinite and default is 30sec.
+		An example of the format of the string is as follows: 'on 20' or 'off'.  The second parameter indicates the holdover time in sec. The single quote marks i.e. ' ' are not used in the command."
+	::= { mwrSyncEConfigurations 5 }
+
+mwrSyncERevertive  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"In revertive mode, if the current source is secondary and the primary is Ok for configured amount of time, the primary will be used. The default revertive time is 10sec.
+		An example of the format of the string is as follows: 'on 20' or 'off'.  The second parameter when revertive is turned on is the time in sec. The single quote marks i.e. ' ' are not used in the command."
+	::= { mwrSyncEConfigurations 6 }
+
+mwrSyncEWanderFilter  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		option1 (1),
+		option2 (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"ITU G.8262 specifies different wander filter requirements for networks based on the 2.048 kbit/s hierarchy , option1, vs those based on the 1.544kbit/s hierarchy, option2.  Option 2 specifies a low pass filter bandwidth of 0.1Hz, while option1 specifies a bandwidth between 1 and 10 Hz. "
+	::= { mwrSyncEConfigurations 7 }
+
+mwrSyncEClockSource  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gi01 (1),
+		gi02 (2),
+		gi03 (3),
+		gi04 (4),
+		radio (5),
+		free-run (6)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Retrieves SyncE clock source currently in use."
+	::= { mwrSyncEStatus 1 }
+
+mwrSyncEAcquisitionStatus  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Retrieves SyncE acquisition status."
+	::= { mwrSyncEStatus 2 }
+
+mwrSynceLostLock  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when system has lost synchronization to syncE clock source. "
+	::= { mwrSyncENotifications 1 }
+
+mwrSynceSecondarySourceInUse  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised whens ystem has lost synchronization to primary syncE clock source, and now synchronized to secondary source."
+	::= { mwrSyncENotifications 2 }
+
+mwrSynceConfigMismatch  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrEventInstanceIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the configuration of syncE between the peers in the radio link is mismatched."
+	::= { mwrSyncENotifications 3 }
+
+mwrDateTime  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The system date and time."
+	::= { mwrTimingConfigurations 1 }
+
+-- 
+-- mwrSntp
+-- 
+
+mwrSntpEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether SNTP feature is enabled."
+	DEFVAL  { enabled }
+	::= { mwrTimingConfigurations 2 }
+
+mwrSntpOffset  OBJECT-TYPE
+	SYNTAX     Integer32 (-140..140)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"System time offset from GMT in tenths of hours. For example, an offset of 10 indicates 10 tenths, or 1 hour.  An offset of 5 indicates half an hour."
+	DEFVAL  { -40 }
+	::= { mwrTimingConfigurations 3 }
+
+mwrSntpServerTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrSntpServerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing SNTP server entries"
+	::= { mwrTimingConfigurations 4 }
+
+mwrSntpServerEntry  OBJECT-TYPE
+	SYNTAX 	MwrSntpServerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Contains the SNTP server information"
+	INDEX { mwrSntpServerIndex }
+	::= { mwrSntpServerTable 1 }
+
+MwrSntpServerEntry ::= SEQUENCE {
+	mwrSntpServerIndex
+		Integer32,
+	mwrSntpServerDomain
+		InetAddressType,
+	mwrSntpServerAddress
+		InetAddress,
+	mwrSntpServerStatus
+		INTEGER,
+	mwrSntpServerStratum
+		Integer32
+}
+
+mwrSntpServerIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..5)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each server."
+	::= { mwrSntpServerEntry 1 }
+
+mwrSntpServerDomain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates SNTP server inet address type. Valid types are ipv4 or ipv6. "
+	::= { mwrSntpServerEntry 2 }
+
+mwrSntpServerAddress  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates SNTP server inet address octet string. "
+	::= { mwrSntpServerEntry 3 }
+
+mwrSntpServerStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		good (1),
+		failed (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The status of the SNTP server."
+	::= { mwrSntpServerEntry 4 }
+
+mwrSntpServerStratum  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Specifies the stratum of a server, 0 for failed server"
+	::= { mwrSntpServerEntry 5 }
+
+mwrTimingLastDateTimeChanged  OBJECT-TYPE
+	SYNTAX     DateAndTime
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Date and Time for the last system time adjustment."
+	::= { mwrTimingStatus 1 }
+
+mwrTimingLastTimeAdjustment  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Last system time adjustment in hundredths of seconds."
+	::= { mwrTimingStatus 2 }
+
+mwrTimingCummulativeTimeChange  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Cumulative system time adjustment in hundredths of seconds."
+	::= { mwrTimingStatus 3 }
+
+mwrSntpRestoreDefault  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		restore (1)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Restores SNTP servers to default Addresses."
+	::= { mwrTimingCommands 1 }
+
+mwrSntpServerUnreachable  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when one or more of the configured SNTP server is not reachable by the system."
+	::= { mwrTimingNotifications 1 }
+
+mwrSystemTimeCorrected  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrTimingLastDateTimeChanged, 
+		mwrTimingLastTimeAdjustment, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised change in system time is detected, and system time is adjusted"
+	::= { mwrTimingNotifications 2 }
+
+mwrAAAUserAuthentication  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		internal (1),
+		radius (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object configures the user authentication method."
+	::= { mwrAAAConfigurations 1 }
+
+-- 
+-- mwrRadius
+-- 
+
+mwrRadiusAdminUserStrict  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		off (1),
+		on (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"If strict mode is off, the admin user can login when radius is turned off or unreachable. When strict mode is on, admin user will only be authenticated against the radius server."
+	DEFVAL  { off }
+	::= { mwrRadiusConfigurations 1 }
+
+mwrRadiusServerTimeOut  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		" Timeout period for authentication requests"
+	::= { mwrRadiusConfigurations 2 }
+
+mwrRadiusServerDeadTime  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		" Time to declare an unresponsive server 'dead'"
+	::= { mwrRadiusConfigurations 3 }
+
+mwrRadiusServerReTransmit  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Maximum number of retransmits to an unresponsive server"
+	::= { mwrRadiusConfigurations 4 }
+
+mwrRadiusServerTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrRadiusServerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing radius server entries"
+	::= { mwrRadiusConfigurations 5 }
+
+mwrRadiusServerEntry  OBJECT-TYPE
+	SYNTAX 	MwrRadiusServerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Contains the SNTP server information"
+	INDEX { mwrRadiusServerIndex }
+	::= { mwrRadiusServerTable 1 }
+
+MwrRadiusServerEntry ::= SEQUENCE {
+	mwrRadiusServerIndex
+		Integer32,
+	mwrRadiusCfgdHostDomain
+		InetAddressType,
+	mwrRadiusCfgdHostAddress
+		InetAddress,
+	mwrRadiusCfgdHostKey
+		DisplayString
+}
+
+mwrRadiusServerIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..5)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each radius server."
+	::= { mwrRadiusServerEntry 1 }
+
+mwrRadiusCfgdHostDomain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates configured radius inet address type. Valid types are ipv4 or ipv6. "
+	::= { mwrRadiusServerEntry 2 }
+
+mwrRadiusCfgdHostAddress  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates configured radius server inet address octet string."
+	::= { mwrRadiusServerEntry 3 }
+
+mwrRadiusCfgdHostKey  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The key of the configured radius server."
+	::= { mwrRadiusServerEntry 4 }
+
+mwrNetMgmtVlanPriority  OBJECT-TYPE
+	SYNTAX     Integer32 (0..7)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The object configures the VLAN priority(0...7)"
+	::= { mwrNetMgmtPriority 1 }
+
+mwrNetMgmtDscp  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Differentiated Services Code Point (DSCP) of IP traffic generated by the system (0...63)"
+	::= { mwrNetMgmtPriority 2 }
+
+mwrIpv4Table  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrIpv4Entry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing the IPv4 information."
+	::= { mwrNetMgmtIpv4 1 }
+
+mwrIpv4Entry  OBJECT-TYPE
+	SYNTAX 	MwrIpv4Entry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing the IPv4 information."
+	INDEX { mwrIpv4Index }
+	::= { mwrIpv4Table 1 }
+
+MwrIpv4Entry ::= SEQUENCE {
+	mwrIpv4Index
+		Integer32,
+	mwrIpv4Address
+		IpAddress,
+	mwrIpv4SubnetMask
+		IpAddress,
+	mwrIpv4DefaultGateway
+		IpAddress,
+	mwrIpv4RowStatus
+		RowStatus
+}
+
+mwrIpv4Index  OBJECT-TYPE
+	SYNTAX     Integer32 (1)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The IPv4 table index. There is only one entry in this table and can not be deleted."
+	::= { mwrIpv4Entry 1 }
+
+mwrIpv4Address  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The IPv4 address of the system."
+	::= { mwrIpv4Entry 2 }
+
+mwrIpv4SubnetMask  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The IPv4 subnet mask of the system."
+	::= { mwrIpv4Entry 3 }
+
+mwrIpv4DefaultGateway  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The IPv4 default gateway of the system."
+	::= { mwrIpv4Entry 4 }
+
+mwrIpv4RowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used for applying ipv4 configuration attributes simultaneously."
+	::= { mwrIpv4Entry 5 }
+
+mwrSecondaryGateway  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The IPv4 secondary gateway of the system."
+	::= { mwrNetMgmtIpv4 2 }
+
+mwrIpv6Table  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrIpv6Entry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing the IPv6 information."
+	::= { mwrNetMgmttIpv6 1 }
+
+mwrIpv6Entry  OBJECT-TYPE
+	SYNTAX 	MwrIpv6Entry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing the IPv6 information."
+	INDEX { mwrIpv6Index }
+	::= { mwrIpv6Table 1 }
+
+MwrIpv6Entry ::= SEQUENCE {
+	mwrIpv6Index
+		Integer32,
+	mwrIpv6Domain
+		InetAddressType,
+	mwrIpv6Address
+		InetAddress,
+	mwrIpv6Prefix
+		Integer32,
+	mwrIpv6GatewayDomain
+		InetAddressType,
+	mwrIpv6GatewayAddress
+		InetAddress,
+	mwrIpv6RowStatus
+		RowStatus
+}
+
+mwrIpv6Index  OBJECT-TYPE
+	SYNTAX     Integer32 (1)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The IPv6 table index. There is only one entry in this table and can not be deleted."
+	::= { mwrIpv6Entry 1 }
+
+mwrIpv6Domain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates ipv6 inet address type. "
+	::= { mwrIpv6Entry 2 }
+
+mwrIpv6Address  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates IPv6 inet address octet string."
+	::= { mwrIpv6Entry 3 }
+
+mwrIpv6Prefix  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates ipv6 prefix."
+	::= { mwrIpv6Entry 4 }
+
+mwrIpv6GatewayDomain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates IPv6 gateway inet address type. This will always return IPv6 inet address type. "
+	::= { mwrIpv6Entry 5 }
+
+mwrIpv6GatewayAddress  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates IPv6 gateway inet address octet string."
+	::= { mwrIpv6Entry 6 }
+
+mwrIpv6RowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used for applying IPv6 configuration attributes simultaneously."
+	::= { mwrIpv6Entry 7 }
+
+mwrSecondaryIpv6GatewayDomain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object will  return the secondary IPv6 gateway inet address type."
+	::= { mwrNetMgmttIpv6 2 }
+
+mwrSecondaryIpv6GatewayAddress  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object will  return the secondary IPv6 gateway inet address."
+	::= { mwrNetMgmttIpv6 3 }
+
+mwrTelnetEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether telnet access is allowed."
+	DEFVAL  { enabled }
+	::= { mwrUserInterfaceMgmt 1 }
+
+mwrSshEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether ssh access is allowed. This configuration only applies to security mode."
+	::= { mwrUserInterfaceMgmt 2 }
+
+-- 
+-- HTTPS group
+-- 
+
+mwrHttpEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether http is enabled."
+	DEFVAL  { enabled }
+	::= { mwrUserInterfaceMgmt 3 }
+
+mwrHttpsEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether secured http access is allowed. This configuration only applies to security mode."
+	::= { mwrUserInterfaceMgmt 4 }
+
+mwrSnmpv1v2cEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether SNMP v1/v2c is allowed in security mode. This configuration only applies to security mode."
+	::= { mwrUserInterfaceMgmt 5 }
+
+mwrFtpEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object allows enabling or disabling ftp when in secure mode. By default ftp is enabled."
+	::= { mwrUserInterfaceMgmt 6 }
+
+-- ****************************************************************
+-- FTP Management configuration
+-- ****************************************************************
+
+mwrFileXfrDirection  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		serverMode (1),
+		clientMode (2),
+		both (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		" The behavior of the FTP/SFTP machine:
+		1 - ServerMode  
+		2 - ClientMode
+		3 - both Server and Client available
+		
+		Mwr 1.0 just supports Client Mode.
+		
+		  "
+	DEFVAL  { clientMode }
+	::= { mwrFileTransfer 1 }
+
+mwrFileXfrTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrFileXfrEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing the FTP client parameters."
+	::= { mwrFileTransfer 2 }
+
+mwrFileXfrEntry  OBJECT-TYPE
+	SYNTAX 	MwrFileXfrEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing the FTP client parameters."
+	INDEX { mwrFileXfrSeqID }
+	::= { mwrFileXfrTable 1 }
+
+MwrFileXfrEntry ::= SEQUENCE {
+	mwrFileXfrSeqID
+		Integer32,
+	mwrFileXfrIdentifier
+		INTEGER,
+	mwrFileXfrName
+		DisplayString,
+	mwrFileXfrMode
+		INTEGER,
+	mwrFileXfrServerDomain
+		InetAddressType,
+	mwrFileXfrServerAddress
+		InetAddress,
+	mwrFileXfrClientDirection
+		INTEGER,
+	mwrFileXfrUserName
+		DisplayString,
+	mwrFileXfrPassword
+		DisplayString,
+	mwrFileXfrNumEntries
+		Integer32,
+	mwrFileXfrStatus
+		INTEGER,
+	mwrFileXfrRowStatus
+		RowStatus
+}
+
+mwrFileXfrSeqID  OBJECT-TYPE
+	SYNTAX     Integer32 (1..20)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"For the same manager, the possibility to define different FTP/SFTP transfer actions."
+	::= { mwrFileXfrEntry 1 }
+
+mwrFileXfrIdentifier  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		omni (1),
+		tcfFile (2),
+		configFile (3),
+		eventLog (4),
+		pmFile (5),
+		security (6),
+		perfLog (7)
+	}
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		"The identifier of the type of file to be imported/exported."
+	::= { mwrFileXfrEntry 2 }
+
+mwrFileXfrName  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(1..32))
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		"The Name of the file to be imported/exported."
+	::= { mwrFileXfrEntry 3 }
+
+mwrFileXfrMode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		ftp (1),
+		sftp (2)
+	}
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		"The file transfer mode specifying either a ftp or sftp request. The sftp mode is only supported when security is licensed/installed."
+	::= { mwrFileXfrEntry 4 }
+
+mwrFileXfrServerDomain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		"The server domain such as IPv4 or IPv6 type."
+	::= { mwrFileXfrEntry 5 }
+
+mwrFileXfrServerAddress  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		"The server IP address in InetAddress format which could be an IPv4 or IPv6 address."
+	::= { mwrFileXfrEntry 6 }
+
+mwrFileXfrClientDirection  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		import (1),
+		export (2)
+	}
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		" The behavior of the FTP or SFTP Client:
+		1 - import, i.e. download data file 
+		2 - export, i.e. upload data file.
+		  
+		
+		The only supported option for omni and tcf is import since these files are used only in upgrade case. Also the supported option for pm, eventlog and perfLog is export option. The rest can be imported or exported."
+	DEFVAL  { export }
+	::= { mwrFileXfrEntry 7 }
+
+mwrFileXfrUserName  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(1..32))
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		" FTP or SFTP User Name when Client Mode is selected."
+	::= { mwrFileXfrEntry 8 }
+
+mwrFileXfrPassword  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(1..32))
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		" FTP or SFTP password when Client Mode is selected. For get operation - the returned value will be zero length string.
+		"
+	::= { mwrFileXfrEntry 9 }
+
+mwrFileXfrNumEntries  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		"This object is used to indicate the number of entries for the performance log to be transferred. If it's set to zero, it will transfer the entire file."
+	::= { mwrFileXfrEntry 10 }
+
+mwrFileXfrStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		success (1),
+		inProgress (2),
+		failed (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object contains the current status of the last requested import/export of the corresponding row component."
+	::= { mwrFileXfrEntry 11 }
+
+mwrFileXfrRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-create
+	STATUS     current
+	DESCRIPTION 
+		"The row status variable, used according to:
+		 - Manager can create a row using the createAndWait.
+		 - Once created, the row is put into notInService by Agent.
+		 - On Manager request, row status can be set to active one at a time. This means that the Client has 
+		   to start the file transfer. 
+		 - Row data, such as the FileServerAddress, User Name or Password
+		   can be changed once the row has been created, but only if this field
+		   is set to notInService. All other fields can not be set once the row
+		   is created, but the row must be removed and created again.
+		 - Manager can use destroy to remove the row.
+		"
+	::= { mwrFileXfrEntry 12 }
+
+mwrNetMgmtInterfaceTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrNetMgmtInterfaceEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing the network management interface configurations."
+	::= { mwrNetworkingConfigurations 6 }
+
+mwrNetMgmtInterfaceEntry  OBJECT-TYPE
+	SYNTAX 	MwrNetMgmtInterfaceEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Entry for the network management interface table."
+	INDEX { mwrNetMgmtInterfaceIndex }
+	::= { mwrNetMgmtInterfaceTable 1 }
+
+MwrNetMgmtInterfaceEntry ::= SEQUENCE {
+	mwrNetMgmtInterfaceIndex
+		Integer32,
+	mwrNetMgmtVlanId
+		Integer32,
+	mwrNetMgmtInterface1
+		EnableType,
+	mwrNetMgmtInterface1Mode
+		INTEGER,
+	mwrNetMgmtInterface1Tagged
+		INTEGER,
+	mwrNetMgmtInterface2
+		EnableType,
+	mwrNetMgmtInterface2Mode
+		INTEGER,
+	mwrNetMgmtInterface2Tagged
+		INTEGER,
+	mwrNetMgmtInterface3
+		EnableType,
+	mwrNetMgmtInterface3Mode
+		INTEGER,
+	mwrNetMgmtInterface3Tagged
+		INTEGER,
+	mwrNetMgmtInterface4
+		EnableType,
+	mwrNetMgmtInterface4Mode
+		INTEGER,
+	mwrNetMgmtInterface4Tagged
+		INTEGER,
+	mwrNetMgmtInterfaceRowStatus
+		RowStatus
+}
+
+mwrNetMgmtInterfaceIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"This object is an index to network management interface table. There will always be one entry in this table."
+	::= { mwrNetMgmtInterfaceEntry 1 }
+
+mwrNetMgmtVlanId  OBJECT-TYPE
+	SYNTAX     Integer32 (1..4090)
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates the VLAN Id (1...4090)"
+	::= { mwrNetMgmtInterfaceEntry 2 }
+
+mwrNetMgmtInterface1  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"When this object is enabled the gi0/1 port will be configured as a management port. Also the corresponding mode (inband/outOfBand) should be set as well."
+	::= { mwrNetMgmtInterfaceEntry 3 }
+
+mwrNetMgmtInterface1Mode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		inband (1),
+		outOfBand (2),
+		none (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates whether the gi0/1 management interface is inband or outOfBand. This applies only when the packet switch mode is configured in port isolation mode. In Bridge mode setup, this will always be inband."
+	::= { mwrNetMgmtInterfaceEntry 4 }
+
+mwrNetMgmtInterface1Tagged  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		no-vlan-tag (1),
+		vlan-tag (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates whether the system will be managed with vlan tagged management traffic or not."
+	::= { mwrNetMgmtInterfaceEntry 5 }
+
+mwrNetMgmtInterface2  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"When this object is enabled the gi0/2 port will be configured as a management port. Also the corresponding mode (inband/outOfBand) should be set as well."
+	::= { mwrNetMgmtInterfaceEntry 6 }
+
+mwrNetMgmtInterface2Mode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		inband (1),
+		outOfBand (2),
+		none (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates whether the gi0/2 management interface is inband or outOfBand. This applies only when the packet switch mode is configured in port isolation mode. In Bridge mode setup, this will always be inband."
+	::= { mwrNetMgmtInterfaceEntry 7 }
+
+mwrNetMgmtInterface2Tagged  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		no-vlan-tag (1),
+		vlan-tag (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates whether the system will be managed with vlan tagged management traffic or not."
+	::= { mwrNetMgmtInterfaceEntry 8 }
+
+mwrNetMgmtInterface3  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"When this object is enabled the gi0/3 port will be configured as a management port. Also the corresponding mode (inband/outOfBand) should be set as well."
+	::= { mwrNetMgmtInterfaceEntry 9 }
+
+mwrNetMgmtInterface3Mode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		inband (1),
+		outOfBand (2),
+		none (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates whether the gi0/3 management interface is inband or outOfBand. This applies only when the packet switch mode is configured in port isolation mode. In Bridge mode setup, this will always be inband."
+	::= { mwrNetMgmtInterfaceEntry 10 }
+
+mwrNetMgmtInterface3Tagged  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		no-vlan-tag (1),
+		vlan-tag (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates whether the system will be managed with vlan tagged management traffic or not."
+	::= { mwrNetMgmtInterfaceEntry 11 }
+
+mwrNetMgmtInterface4  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"When this object is enabled the gi0/4 port will be configured as a management port. Also the corresponding mode (inband/outOfBand) should be set as well."
+	::= { mwrNetMgmtInterfaceEntry 12 }
+
+mwrNetMgmtInterface4Mode  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		inband (1),
+		outOfBand (2),
+		none (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates whether the gi0/4 management interface is inband or outOfBand. This applies only when the packet switch mode is configured in port isolation mode. In Bridge mode setup, this will always be inband."
+	::= { mwrNetMgmtInterfaceEntry 13 }
+
+mwrNetMgmtInterface4Tagged  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		no-vlan-tag (1),
+		vlan-tag (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates whether the system will be managed with vlan tagged management traffic or not."
+	::= { mwrNetMgmtInterfaceEntry 14 }
+
+mwrNetMgmtInterfaceRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used for applying all management interface configuration in an atomic operation."
+	::= { mwrNetMgmtInterfaceEntry 15 }
+
+mwrMaintenanceIpv4Address  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the maintenance IPv4 address."
+	::= { mwrMaintenanceIpv4 1 }
+
+mwrMaintenanceSubnetMask  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the maintenance IPv4 subnet mask."
+	::= { mwrMaintenanceIpv4 2 }
+
+mwrActiveIpv4Gateway  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the active IPv4 gateway."
+	::= { mwrMaintenanceIpv4 3 }
+
+mwrIpv6LinkLocalIPrefix  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the IPv6 link local prefix."
+	::= { mwrMaintenanceIpv6 1 }
+
+mwrIpv6LinkLocalAddress  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates ipv6 link local inet address octet string."
+	::= { mwrMaintenanceIpv6 2 }
+
+mwrActiveIpv6Gateway  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the active IPv6 gateway."
+	::= { mwrMaintenanceIpv6 3 }
+
+-- ----------------------
+--  mwrPeerSysInfo
+-- ---------------------
+
+mwrPeerMacAddress  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The MAC Address of the peer."
+	::= { mwrPeerNetworkingStatus 1 }
+
+mwrPeerIpv4Address  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer IPv4 Address."
+	::= { mwrPeerNetworkingStatus 2 }
+
+mwrPeerIpv4SubnetMask  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer IPv4 subnet mask."
+	::= { mwrPeerNetworkingStatus 3 }
+
+mwrPeerIpv4DefaultGateway  OBJECT-TYPE
+	SYNTAX     IpAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer IPv4 default gateway."
+	::= { mwrPeerNetworkingStatus 4 }
+
+mwrPeerIpv6Prefix  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer IPv6 prefix."
+	::= { mwrPeerNetworkingStatus 5 }
+
+mwrPeerIpv6Domain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer IPv6 domain."
+	::= { mwrPeerNetworkingStatus 6 }
+
+mwrPeerIpv6Address  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer IPv6 address."
+	::= { mwrPeerNetworkingStatus 7 }
+
+mwrPeerIpv6GatewayDomain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer IPv6 gateway domain"
+	::= { mwrPeerNetworkingStatus 8 }
+
+mwrPeerIpv6GatewayAddress  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer IPv6 gateway address."
+	::= { mwrPeerNetworkingStatus 9 }
+
+mwrPeerVlanId  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer vlan Id."
+	::= { mwrPeerNetworkingStatus 10 }
+
+mwrPeerVlanPriority  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer vlan priority."
+	::= { mwrPeerNetworkingStatus 11 }
+
+mwrPeerDscp  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The peer management dscp."
+	::= { mwrPeerNetworkingStatus 12 }
+
+-- 
+-- Qos
+-- 
+
+mwrQosState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether QOS is enabled."
+	DEFVAL  { disabled }
+	::= { mwrQos 1 }
+
+mwrCosSource  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		oTag (1),
+		iTag (2),
+		dscp (3),
+		mplsExp (4)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates the class of service tag type.  Based on the setting system will use the CoS value in the outer VLAN tag, inner VLAN tag, DSCP or MPLS exp."
+	::= { mwrQos 2 }
+
+mwrOuterTpid  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Sets the value of the Q-in-Q outer tag. This tag is also used to classify the single tagged traffic. Default value is 0x8100."
+	::= { mwrQos 3 }
+
+mwrInnerTpid  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Sets the value of the Q-in-Q inner VLAN tag. Default value is 0x8100."
+	::= { mwrQos 4 }
+
+mwrCosTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrCosEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of Qos Settings per port, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 5 }
+
+mwrCosEntry  OBJECT-TYPE
+	SYNTAX 	MwrCosEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry of Qos setting per port"
+	INDEX { mwrCosIndex }
+	::= { mwrCosTable 1 }
+
+MwrCosEntry ::= SEQUENCE {
+	mwrCosIndex
+		INTEGER,
+	mwrCos0
+		QueueType,
+	mwrCos1
+		QueueType,
+	mwrCos2
+		QueueType,
+	mwrCos3
+		QueueType,
+	mwrCos4
+		QueueType,
+	mwrCos5
+		QueueType,
+	mwrCos6
+		QueueType,
+	mwrCos7
+		QueueType,
+	mwrCosRowStatus
+		RowStatus
+}
+
+mwrCosIndex  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gi01 (1),
+		gi02 (2),
+		gi03 (3),
+		gi04 (4),
+		bridgeMode (5)
+	}
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique name identifying each enet port in port isolation mode or the bridgeMode index when system is configured in bridge mode."
+	::= { mwrCosEntry 1 }
+
+mwrCos0  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue assignments for CoS0. There are 8 CoS queues. Their corresponding queue numbers are 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	::= { mwrCosEntry 2 }
+
+mwrCos1  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue assignments for CoS1. There are 8 CoS queues. Their corresponding queue numbers are 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	::= { mwrCosEntry 3 }
+
+mwrCos2  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue assignments for CoS2. There are 8 CoS queues. Their corresponding queue numbers are 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	::= { mwrCosEntry 4 }
+
+mwrCos3  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue assignments for CoS3. There are 8 CoS queues. Their corresponding queue numbers are 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	::= { mwrCosEntry 5 }
+
+mwrCos4  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue assignments for CoS4. There are 8 CoS queues. Their corresponding queue numbers are 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	::= { mwrCosEntry 6 }
+
+mwrCos5  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue assignments for CoS5. There are 8 CoS queues. Their corresponding queue numbers are 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	::= { mwrCosEntry 7 }
+
+mwrCos6  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue assignments for CoS6. There are 8 CoS queues. Their corresponding queue numbers are 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	::= { mwrCosEntry 8 }
+
+mwrCos7  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue assignments for CoS7. There are 8 CoS queues. Their corresponding queue numbers are 1 to 8 where 1 is the lowest priority queue and 8 is the highest priority queue."
+	::= { mwrCosEntry 9 }
+
+mwrCosRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Row status for CoS queue mapping. This object is used to apply all CoS settings simultaneously."
+	::= { mwrCosEntry 10 }
+
+mwrCosDefValueTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrCosDefValueEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing the CoS default value, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 6 }
+
+mwrCosDefValueEntry  OBJECT-TYPE
+	SYNTAX 	MwrCosDefValueEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing the CoS default value."
+	INDEX { mwrCosDefValueIndex }
+	::= { mwrCosDefValueTable 1 }
+
+MwrCosDefValueEntry ::= SEQUENCE {
+	mwrCosDefValueIndex
+		INTEGER,
+	mwrCosDefValue
+		Integer32
+}
+
+mwrCosDefValueIndex  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gi01 (1),
+		gi02 (2),
+		gi03 (3),
+		gi04 (4),
+		bridgeMode (5)
+	}
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies CoS default value for each port in port isolation or in bridge mode."
+	::= { mwrCosDefValueEntry 1 }
+
+mwrCosDefValue  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies CoS default value for each port in port isolation or in bridge mode."
+	::= { mwrCosDefValueEntry 2 }
+
+mwrCirQTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrCirQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing the CIR value for each queue, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 7 }
+
+mwrCirQEntry  OBJECT-TYPE
+	SYNTAX 	MwrCirQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing the CIR value for each radio queue."
+	INDEX { mwrCirQIndex }
+	::= { mwrCirQTable 1 }
+
+MwrCirQEntry ::= SEQUENCE {
+	mwrCirQIndex
+		QueueType,
+	mwrCirQ1
+		Integer32,
+	mwrCirQ2
+		Integer32,
+	mwrCirQ3
+		Integer32,
+	mwrCirQ4
+		Integer32,
+	mwrCirQ5
+		Integer32,
+	mwrCirQ6
+		Integer32,
+	mwrCirQ7
+		Integer32,
+	mwrCirQ8
+		Integer32,
+	mwrCirQRowStatus
+		RowStatus
+}
+
+mwrCirQIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies CIR queue index for each radio queue."
+	::= { mwrCirQEntry 1 }
+
+mwrCirQ1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CIR setting for queue 1."
+	::= { mwrCirQEntry 2 }
+
+mwrCirQ2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CIR setting for queue 2."
+	::= { mwrCirQEntry 3 }
+
+mwrCirQ3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CIR setting for queue 3."
+	::= { mwrCirQEntry 4 }
+
+mwrCirQ4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CIR setting for queue 4."
+	::= { mwrCirQEntry 5 }
+
+mwrCirQ5  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CIR setting for queue 5."
+	::= { mwrCirQEntry 6 }
+
+mwrCirQ6  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CIR setting for queue 6."
+	::= { mwrCirQEntry 7 }
+
+mwrCirQ7  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CIR setting for queue 7."
+	::= { mwrCirQEntry 8 }
+
+mwrCirQ8  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CIR setting for queue 8."
+	::= { mwrCirQEntry 9 }
+
+mwrCirQRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The CIR table Row status. This object is used to apply all queue CIR settings simultaneously."
+	::= { mwrCirQEntry 10 }
+
+mwrCbsQTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrCbsQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing CBS settings for each queue,  the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 8 }
+
+mwrCbsQEntry  OBJECT-TYPE
+	SYNTAX 	MwrCbsQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing CBS settings for each queue."
+	INDEX { mwrCbsQIndex }
+	::= { mwrCbsQTable 1 }
+
+MwrCbsQEntry ::= SEQUENCE {
+	mwrCbsQIndex
+		QueueType,
+	mwrCbsQ1
+		Integer32,
+	mwrCbsQ2
+		Integer32,
+	mwrCbsQ3
+		Integer32,
+	mwrCbsQ4
+		Integer32,
+	mwrCbsQ5
+		Integer32,
+	mwrCbsQ6
+		Integer32,
+	mwrCbsQ7
+		Integer32,
+	mwrCbsQ8
+		Integer32,
+	mwrCbsQRowStatus
+		RowStatus
+}
+
+mwrCbsQIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies CBS queue index for each radio queue."
+	::= { mwrCbsQEntry 1 }
+
+mwrCbsQ1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CBS setting for queue 1."
+	::= { mwrCbsQEntry 2 }
+
+mwrCbsQ2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CBS setting for queue 2."
+	::= { mwrCbsQEntry 3 }
+
+mwrCbsQ3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CBS setting for queue 3."
+	::= { mwrCbsQEntry 4 }
+
+mwrCbsQ4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CBS setting for queue 4."
+	::= { mwrCbsQEntry 5 }
+
+mwrCbsQ5  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CBS setting for queue 5."
+	::= { mwrCbsQEntry 6 }
+
+mwrCbsQ6  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CBS setting for queue 6."
+	::= { mwrCbsQEntry 7 }
+
+mwrCbsQ7  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CBS setting for queue 7."
+	::= { mwrCbsQEntry 8 }
+
+mwrCbsQ8  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User CBS setting for queue 8."
+	::= { mwrCbsQEntry 9 }
+
+mwrCbsQRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The CBS table Row status. This object is used to apply all queue CBS settings simultaneously."
+	::= { mwrCbsQEntry 10 }
+
+mwrWeightQTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrWeightQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing queue weight setting for each queue, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 9 }
+
+mwrWeightQEntry  OBJECT-TYPE
+	SYNTAX 	MwrWeightQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing queue weight setting for each queue."
+	INDEX { mwrWeightQIndex }
+	::= { mwrWeightQTable 1 }
+
+MwrWeightQEntry ::= SEQUENCE {
+	mwrWeightQIndex
+		QueueType,
+	mwrWeightQ1
+		Integer32,
+	mwrWeightQ2
+		Integer32,
+	mwrWeightQ3
+		Integer32,
+	mwrWeightQ4
+		Integer32,
+	mwrWeightQ5
+		Integer32,
+	mwrWeightQ6
+		Integer32,
+	mwrWeightQ7
+		Integer32,
+	mwrWeightQ8
+		Integer32,
+	mwrWeightQRowStatus
+		RowStatus
+}
+
+mwrWeightQIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight index for each radio queue."
+	::= { mwrWeightQEntry 1 }
+
+mwrWeightQ1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight value for queue 1."
+	::= { mwrWeightQEntry 2 }
+
+mwrWeightQ2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight value for queue 2."
+	::= { mwrWeightQEntry 3 }
+
+mwrWeightQ3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight value for queue 3."
+	::= { mwrWeightQEntry 4 }
+
+mwrWeightQ4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight value for queue 4."
+	::= { mwrWeightQEntry 5 }
+
+mwrWeightQ5  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight value for queue 5."
+	::= { mwrWeightQEntry 6 }
+
+mwrWeightQ6  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight value for queue 6."
+	::= { mwrWeightQEntry 7 }
+
+mwrWeightQ7  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight value for queue 7."
+	::= { mwrWeightQEntry 8 }
+
+mwrWeightQ8  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue weight value for queue 8."
+	::= { mwrWeightQEntry 9 }
+
+mwrWeightQRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The queue weight table Row status. This object is used to apply all queue weight settings simultaneously."
+	::= { mwrWeightQEntry 10 }
+
+mwrQbsQTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrQbsQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing queue buffer size, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 10 }
+
+mwrQbsQEntry  OBJECT-TYPE
+	SYNTAX 	MwrQbsQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing queue buffer size."
+	INDEX { mwrQbsQIndex }
+	::= { mwrQbsQTable 1 }
+
+MwrQbsQEntry ::= SEQUENCE {
+	mwrQbsQIndex
+		QueueType,
+	mwrQbsQ1
+		Integer32,
+	mwrQbsQ2
+		Integer32,
+	mwrQbsQ3
+		Integer32,
+	mwrQbsQ4
+		Integer32,
+	mwrQbsQ5
+		Integer32,
+	mwrQbsQ6
+		Integer32,
+	mwrQbsQ7
+		Integer32,
+	mwrQbsQ8
+		Integer32,
+	mwrQbsQRowStatus
+		RowStatus
+}
+
+mwrQbsQIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies QBS queue index for each radio queue."
+	::= { mwrQbsQEntry 1 }
+
+mwrQbsQ1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue buffer size (QBS) for queue 1."
+	::= { mwrQbsQEntry 2 }
+
+mwrQbsQ2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue buffer size (QBS) for queue 2."
+	::= { mwrQbsQEntry 3 }
+
+mwrQbsQ3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue buffer size (QBS) for queue 3."
+	::= { mwrQbsQEntry 4 }
+
+mwrQbsQ4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue buffer size (QBS) for queue 4."
+	::= { mwrQbsQEntry 5 }
+
+mwrQbsQ5  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue buffer size (QBS) for queue 5."
+	::= { mwrQbsQEntry 6 }
+
+mwrQbsQ6  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue buffer size (QBS) for queue 6."
+	::= { mwrQbsQEntry 7 }
+
+mwrQbsQ7  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue buffer size (QBS) for queue 7."
+	::= { mwrQbsQEntry 8 }
+
+mwrQbsQ8  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue buffer size (QBS) for queue 8."
+	::= { mwrQbsQEntry 9 }
+
+mwrQbsQRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The queue buffer size (QBS) table Row status. This object is used to apply all queue QBS settings simultaneously."
+	::= { mwrQbsQEntry 10 }
+
+mwrPolicyQTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPolicyQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing queue policy for each queue, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 11 }
+
+mwrPolicyQEntry  OBJECT-TYPE
+	SYNTAX 	MwrPolicyQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing queue policy for each queue."
+	INDEX { mwrPolicyQIndex }
+	::= { mwrPolicyQTable 1 }
+
+MwrPolicyQEntry ::= SEQUENCE {
+	mwrPolicyQIndex
+		QueueType,
+	mwrPolicyQ1
+		INTEGER,
+	mwrPolicyQ2
+		INTEGER,
+	mwrPolicyQ3
+		INTEGER,
+	mwrPolicyQ4
+		INTEGER,
+	mwrPolicyQ5
+		INTEGER,
+	mwrPolicyQ6
+		INTEGER,
+	mwrPolicyQ7
+		INTEGER,
+	mwrPolicyQ8
+		INTEGER,
+	mwrPolicyQRowStatus
+		RowStatus
+}
+
+mwrPolicyQIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies queue policy index for each radio queue."
+	::= { mwrPolicyQEntry 1 }
+
+mwrPolicyQ1  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		wfq (1),
+		priority (2),
+		pf (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue policy value for queue 1."
+	::= { mwrPolicyQEntry 2 }
+
+mwrPolicyQ2  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		wfq (1),
+		priority (2),
+		pf (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue policy value for queue 2."
+	::= { mwrPolicyQEntry 3 }
+
+mwrPolicyQ3  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		wfq (1),
+		priority (2),
+		pf (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue policy value for queue 3."
+	::= { mwrPolicyQEntry 4 }
+
+mwrPolicyQ4  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		wfq (1),
+		priority (2),
+		pf (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue policy value for queue 4."
+	::= { mwrPolicyQEntry 5 }
+
+mwrPolicyQ5  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		wfq (1),
+		priority (2),
+		pf (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue policy value for queue 5."
+	::= { mwrPolicyQEntry 6 }
+
+mwrPolicyQ6  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		wfq (1),
+		priority (2),
+		pf (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue policy value for queue 6."
+	::= { mwrPolicyQEntry 7 }
+
+mwrPolicyQ7  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		wfq (1),
+		priority (2),
+		pf (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue policy value for queue 7."
+	::= { mwrPolicyQEntry 8 }
+
+mwrPolicyQ8  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		wfq (1),
+		priority (2),
+		pf (3)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"User queue policy value for queue 8."
+	::= { mwrPolicyQEntry 9 }
+
+mwrPolicyQRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The queue policy table Row status. This object is used to apply all queue policy settings simultaneously."
+	::= { mwrPolicyQEntry 10 }
+
+mwrUserClassTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrUserClassEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing QOS user class settings, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 12 }
+
+mwrUserClassEntry  OBJECT-TYPE
+	SYNTAX 	MwrUserClassEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing QOS user class settings."
+	INDEX { mwrUserClassIndex }
+	::= { mwrUserClassTable 1 }
+
+MwrUserClassEntry ::= SEQUENCE {
+	mwrUserClassIndex
+		ClassType,
+	mwrUserClassOffset
+		Integer32,
+	mwrUserClassValue
+		DisplayString,
+	mwrUserClassMask
+		DisplayString
+}
+
+mwrUserClassIndex  OBJECT-TYPE
+	SYNTAX     ClassType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies user class queue index for each radio queue."
+	::= { mwrUserClassEntry 1 }
+
+mwrUserClassOffset  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies user class offset value."
+	::= { mwrUserClassEntry 2 }
+
+mwrUserClassValue  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies user class value."
+	::= { mwrUserClassEntry 3 }
+
+mwrUserClassMask  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies user class mask."
+	::= { mwrUserClassEntry 4 }
+
+mwrUserFlowTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrUserFlowEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing QOS user flow settings, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 13 }
+
+mwrUserFlowEntry  OBJECT-TYPE
+	SYNTAX 	MwrUserFlowEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing QOS user flow settings."
+	INDEX { mwrUserFlowIndex }
+	::= { mwrUserFlowTable 1 }
+
+MwrUserFlowEntry ::= SEQUENCE {
+	mwrUserFlowIndex
+		FlowType,
+	mwrUserFlowFilter
+		DisplayString
+}
+
+mwrUserFlowIndex  OBJECT-TYPE
+	SYNTAX     FlowType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies user flow filter queue index for each queue."
+	::= { mwrUserFlowEntry 1 }
+
+mwrUserFlowFilter  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies user flow filter value for each queue."
+	::= { mwrUserFlowEntry 2 }
+
+mwrUserFlowMappingTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrUserFlowMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing QOS user flow mapping settings in port isolation mode."
+	::= { mwrQos 14 }
+
+mwrUserFlowMappingEntry  OBJECT-TYPE
+	SYNTAX 	MwrUserFlowMappingEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing QOS user flow mapping settings in port isolation mode."
+	INDEX { mwrUserFlowMappingIndex }
+	::= { mwrUserFlowMappingTable 1 }
+
+MwrUserFlowMappingEntry ::= SEQUENCE {
+	mwrUserFlowMappingIndex
+		FlowType,
+	mwrUserFlowMappingState
+		EnableType,
+	mwrUserFlowMapping1Q
+		QueueType,
+	mwrUserFlowMapping2Q
+		QueueType,
+	mwrUserFlowMapping3Q
+		QueueType,
+	mwrUserFlowMapping4Q
+		QueueType,
+	mwrUserFlowMappingRowStatus
+		RowStatus
+}
+
+mwrUserFlowMappingIndex  OBJECT-TYPE
+	SYNTAX     FlowType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies user flow mapping index for each flow in port isolation mode."
+	::= { mwrUserFlowMappingEntry 1 }
+
+mwrUserFlowMappingState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disabled user flow mapping for a specific flow in port isolation mode."
+	::= { mwrUserFlowMappingEntry 2 }
+
+mwrUserFlowMapping1Q  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies the selected queue for gi01 in port isolation mode."
+	::= { mwrUserFlowMappingEntry 3 }
+
+mwrUserFlowMapping2Q  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies the selected queue for gi02 in port isolation mode."
+	::= { mwrUserFlowMappingEntry 4 }
+
+mwrUserFlowMapping3Q  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies the selected queue for gi03 in port isolation mode."
+	::= { mwrUserFlowMappingEntry 5 }
+
+mwrUserFlowMapping4Q  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies the selected queue for gi04 in port isolation mode."
+	::= { mwrUserFlowMappingEntry 6 }
+
+mwrUserFlowMappingRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Row status for user flow mapping in port isolation mode."
+	::= { mwrUserFlowMappingEntry 7 }
+
+mwrUserFlowMappingBridgeModeTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrUserFlowMappingBridgeModeEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing QOS user flow mapping settings in bridge mode, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrQos 15 }
+
+mwrUserFlowMappingBridgeModeEntry  OBJECT-TYPE
+	SYNTAX 	MwrUserFlowMappingBridgeModeEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing QOS user flow mapping settings in bridge mode."
+	INDEX { mwrUserFlowMappingBridgeModeIndex }
+	::= { mwrUserFlowMappingBridgeModeTable 1 }
+
+MwrUserFlowMappingBridgeModeEntry ::= SEQUENCE {
+	mwrUserFlowMappingBridgeModeIndex
+		FlowType,
+	mwrUserFlowMappingBridgeModeState
+		EnableType,
+	mwrUserFlowMappingBridgeModeQ
+		QueueType,
+	mwrUserFlowMappingBridgeModeRowStatus
+		RowStatus
+}
+
+mwrUserFlowMappingBridgeModeIndex  OBJECT-TYPE
+	SYNTAX     FlowType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies user flow mapping index for each flow in bridge mode."
+	::= { mwrUserFlowMappingBridgeModeEntry 1 }
+
+mwrUserFlowMappingBridgeModeState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disabled user flow mapping for a specific flow in bridge mode."
+	::= { mwrUserFlowMappingBridgeModeEntry 2 }
+
+mwrUserFlowMappingBridgeModeQ  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies the selected user flow mapping queue in bridge mode."
+	::= { mwrUserFlowMappingBridgeModeEntry 3 }
+
+mwrUserFlowMappingBridgeModeRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Row status for user flow mapping in bridge mode."
+	::= { mwrUserFlowMappingBridgeModeEntry 4 }
+
+mwrPortThresholdAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPortThresholdAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing threshold alarms parameters."
+	::= { mwrEthThresholdAlarm 1 }
+
+mwrPortThresholdAlarmEntry  OBJECT-TYPE
+	SYNTAX 	MwrPortThresholdAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing threshold alarms parameters."
+	INDEX { mwrPortThresholdAlarmIndex }
+	::= { mwrPortThresholdAlarmTable 1 }
+
+MwrPortThresholdAlarmEntry ::= SEQUENCE {
+	mwrPortThresholdAlarmIndex
+		Integer32,
+	mwrDroppedPktsThresholdParams
+		DisplayString,
+	mwrOutBWUtilizationThresholdParams
+		DisplayString,
+	mwrThroughputThresholdParams
+		DisplayString
+}
+
+mwrPortThresholdAlarmIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Index to Threshold alarm table. Instance 1 indicates Radio port."
+	::= { mwrPortThresholdAlarmEntry 1 }
+
+mwrDroppedPktsThresholdParams  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..24))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object configures the dropped packets threshold settings. The threshold, in percent and the number of seconds that it must exceed this threshold. An example of the format of the string is as follows: '70 10'. The first parameter is the percentage of packets that are dropped, the second is the time in seconds that the threshold must be exceeded. The single quote marks i.e. ' ' are not used in the command."
+	::= { mwrPortThresholdAlarmEntry 2 }
+
+mwrOutBWUtilizationThresholdParams  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object configures the BW utilization threshold settings. The threshold, in percent and the number of seconds that it must exceed this threshold. An example of the format of the string is as follows: '70 10'. The first parameter is the percentage of BW threshold, the second is the time in seconds that the threshold must be exceeded. The single quote marks i.e. ' ' are not used in the command"
+	::= { mwrPortThresholdAlarmEntry 3 }
+
+mwrThroughputThresholdParams  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object configures the radio throughput threshold settings. The threshold, in percent and the number of seconds that it must exceed this threshold. An example of the format of the string is as follows: '70 10'. The first parameter is the percentage of the throughput, the second is the time in seconds that the threshold must be exceeded. The single quote marks i.e. ' ' are not used in the command"
+	::= { mwrPortThresholdAlarmEntry 4 }
+
+mwrRadioQThresholdAlarmTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrRadioQThresholdAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of radio port queue based Threshold Alarm settings, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrEthThresholdAlarm 2 }
+
+mwrRadioQThresholdAlarmEntry  OBJECT-TYPE
+	SYNTAX 	MwrRadioQThresholdAlarmEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry of queue based Threshold Alarm settings."
+	INDEX { mwrRadioQThresholdAlarmIndex }
+	::= { mwrRadioQThresholdAlarmTable 1 }
+
+MwrRadioQThresholdAlarmEntry ::= SEQUENCE {
+	mwrRadioQThresholdAlarmIndex
+		QueueType,
+	mwrRadioQDepthThresholdParams
+		DisplayString,
+	mwrRadioQDroppedPktsThresholdParams
+		DisplayString
+}
+
+mwrRadioQThresholdAlarmIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A unique identifier for one of the 8 queues"
+	::= { mwrRadioQThresholdAlarmEntry 1 }
+
+mwrRadioQDepthThresholdParams  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The threshold, in percent, and the number of seconds that it must exceed this threshold are programmed by the user. An example of the format of the string is as follows: '70 10'. The first parameter is the percentage of queue depth, the second is the time in seconds that the threshold must be exceeded."
+	::= { mwrRadioQThresholdAlarmEntry 2 }
+
+mwrRadioQDroppedPktsThresholdParams  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The threshold, in packets, and the number of seconds that it must exceed this threshold are programmed by the user. An example of the format of the string is as follows: '70 10'. The first parameter is the number of packets that are dropped, the second is the time in seconds that the threshold must be exceeded."
+	::= { mwrRadioQThresholdAlarmEntry 3 }
+
+mwrEnetPerfPortStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEnetPerfPortStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing Ethernet port statistics."
+	::= { mwrEthernetPerformance 1 }
+
+mwrEnetPerfPortStatsEntry  OBJECT-TYPE
+	SYNTAX 	MwrEnetPerfPortStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing Ethernet port statistics."
+	INDEX { mwrEnetPortStatsIndex }
+	::= { mwrEnetPerfPortStatsTable 1 }
+
+MwrEnetPerfPortStatsEntry ::= SEQUENCE {
+	mwrEnetPortStatsIndex
+		INTEGER,
+	mwrPortStatsInOctet
+		Counter64,
+	mwrPortStatsInGoodPkts
+		Counter64,
+	mwrPortStatsInErrPkts
+		Counter64,
+	mwrPortStatsInDiscardPkts
+		Counter64,
+	mwrPortStatsOutOctets
+		Counter64,
+	mwrPortStatsOutGoodPkts
+		Counter64,
+	mwrPortStatsOutErrPkts
+		Counter64,
+	mwrPortStatsOutDiscardPkts
+		Counter64,
+	mwrPortStatsOutBwUtilization
+		Integer32,
+	mwrPortStatsInBwUtilization
+		Integer32,
+	mwrPortStatsInDataRate
+		Integer32,
+	mwrPortStatsThroughput
+		Integer32
+}
+
+mwrEnetPortStatsIndex  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gi01 (1),
+		gi02 (2),
+		gi03 (3),
+		gi04 (4),
+		radio (5)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A table index to Ethernet ports."
+	::= { mwrEnetPerfPortStatsEntry 1 }
+
+mwrPortStatsInOctet  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 64-bit counter representing the incoming octets."
+	::= { mwrEnetPerfPortStatsEntry 2 }
+
+mwrPortStatsInGoodPkts  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 64-bit counter representing the incoming good packets."
+	::= { mwrEnetPerfPortStatsEntry 3 }
+
+mwrPortStatsInErrPkts  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 64-bit counter representing the incoming error packets."
+	::= { mwrEnetPerfPortStatsEntry 4 }
+
+mwrPortStatsInDiscardPkts  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 64-bit counter representing the incoming discarded packets."
+	::= { mwrEnetPerfPortStatsEntry 5 }
+
+mwrPortStatsOutOctets  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 64-bit counter representing the outgoing octets."
+	::= { mwrEnetPerfPortStatsEntry 6 }
+
+mwrPortStatsOutGoodPkts  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 64-bit counter representing the outgoing good packets."
+	::= { mwrEnetPerfPortStatsEntry 7 }
+
+mwrPortStatsOutErrPkts  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 64-bit counter representing the outgoing error packets."
+	::= { mwrEnetPerfPortStatsEntry 8 }
+
+mwrPortStatsOutDiscardPkts  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 64-bit counter representing the outgoing discarded packets."
+	::= { mwrEnetPerfPortStatsEntry 9 }
+
+mwrPortStatsOutBwUtilization  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"%"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object represents the ratio of egress data rate and the egress link capacity of the port.  The value is represented in %."
+	::= { mwrEnetPerfPortStatsEntry 10 }
+
+mwrPortStatsInBwUtilization  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"%"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object represents the ratio of ingress data rate and the ingress link capacity of the port.  The value is represented in %."
+	::= { mwrEnetPerfPortStatsEntry 11 }
+
+mwrPortStatsInDataRate  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Mbps"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Ethernet data rate coming into the port. The data rate is multiplied by 100. e.g. A display of 1530 is actually 15.30 Mpbs"
+	::= { mwrEnetPerfPortStatsEntry 12 }
+
+mwrPortStatsThroughput  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Mbps"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Ethernet  data rate going out of the port. The data rate is multiplied by 100. e.g. A display of 1530 is actually 15.30 Mpbs."
+	::= { mwrEnetPerfPortStatsEntry 13 }
+
+mwrEnetPerfPortStats32BitTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEnetPerfPortStats32BitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing 32-bit Ethernet statistics. This table is provided to satisfy snmp v1 users where they can't access 64-bit counters."
+	::= { mwrEthernetPerformance 2 }
+
+mwrEnetPerfPortStats32BitEntry  OBJECT-TYPE
+	SYNTAX 	MwrEnetPerfPortStats32BitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing 32-bit Ethernet statistics. This table is provided to satisfy snmp v1 users where they can't access 64-bit counters."
+	INDEX { mwrPortStats32BitIndex }
+	::= { mwrEnetPerfPortStats32BitTable 1 }
+
+MwrEnetPerfPortStats32BitEntry ::= SEQUENCE {
+	mwrPortStats32BitIndex
+		INTEGER,
+	mwrPortStatsInOctet32Bit
+		Counter32,
+	mwrPortStatsInGoodPkts32Bit
+		Counter32,
+	mwrPortStatsInErrPkts32Bit
+		Counter32,
+	mwrPortStatsInDiscardPkts32Bit
+		Counter32,
+	mwrPortStatsOutOctets32Bit
+		Counter32,
+	mwrPortStatsOutGoodPkts32Bit
+		Counter32,
+	mwrPortStatsOutErrPkts32Bit
+		Counter32,
+	mwrPortStatsOutDiscardPkts32Bit
+		Counter32
+}
+
+mwrPortStats32BitIndex  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		gi01 (1),
+		gi02 (2),
+		gi03 (3),
+		gi04 (4),
+		radio (5)
+	}
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table index to ports carrying Ethernet packets."
+	::= { mwrEnetPerfPortStats32BitEntry 1 }
+
+mwrPortStatsInOctet32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the incoming octets."
+	::= { mwrEnetPerfPortStats32BitEntry 2 }
+
+mwrPortStatsInGoodPkts32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the incoming good packets."
+	::= { mwrEnetPerfPortStats32BitEntry 3 }
+
+mwrPortStatsInErrPkts32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the incoming error packets."
+	::= { mwrEnetPerfPortStats32BitEntry 4 }
+
+mwrPortStatsInDiscardPkts32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the incoming discarded packets."
+	::= { mwrEnetPerfPortStats32BitEntry 5 }
+
+mwrPortStatsOutOctets32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the outgoing octets."
+	::= { mwrEnetPerfPortStats32BitEntry 6 }
+
+mwrPortStatsOutGoodPkts32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the outgoing good packets."
+	::= { mwrEnetPerfPortStats32BitEntry 7 }
+
+mwrPortStatsOutErrPkts32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the outgoing error packets."
+	::= { mwrEnetPerfPortStats32BitEntry 8 }
+
+mwrPortStatsOutDiscardPkts32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the outgoing discarded packets."
+	::= { mwrEnetPerfPortStats32BitEntry 9 }
+
+mwrEnetPerfRadioQStatsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEnetPerfRadioQStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing radio queue statistics."
+	::= { mwrEthernetPerformance 3 }
+
+mwrEnetPerfRadioQStatsEntry  OBJECT-TYPE
+	SYNTAX 	MwrEnetPerfRadioQStatsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing radio queue statistics."
+	INDEX { mwrRadioQStatsIndex }
+	::= { mwrEnetPerfRadioQStatsTable 1 }
+
+MwrEnetPerfRadioQStatsEntry ::= SEQUENCE {
+	mwrRadioQStatsIndex
+		QueueType,
+	mwrRadioQStatsInGoodPkts
+		Counter64,
+	mwrRadioQStatsInDiscardPkts
+		Counter64,
+	mwrRadioQStatsOutBwUtilization
+		Integer32,
+	mwrRadioQStatsInDataRate
+		Integer32,
+	mwrRadioQStatsThroughput
+		Integer32
+}
+
+mwrRadioQStatsIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each of the 8 queues."
+	::= { mwrEnetPerfRadioQStatsEntry 1 }
+
+mwrRadioQStatsInGoodPkts  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current count of packets in queues."
+	::= { mwrEnetPerfRadioQStatsEntry 2 }
+
+mwrRadioQStatsInDiscardPkts  OBJECT-TYPE
+	SYNTAX     Counter64
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The current count of packets received in queues that were discarded due to queue overflow."
+	::= { mwrEnetPerfRadioQStatsEntry 3 }
+
+mwrRadioQStatsOutBwUtilization  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"%"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The ratio of egress data rate and user configured radio queue CIR."
+	::= { mwrEnetPerfRadioQStatsEntry 4 }
+
+mwrRadioQStatsInDataRate  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Mbps"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The ingress data rate of the radio queue."
+	::= { mwrEnetPerfRadioQStatsEntry 5 }
+
+mwrRadioQStatsThroughput  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"Mbps"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The throughput of the radio queue."
+	::= { mwrEnetPerfRadioQStatsEntry 6 }
+
+mwrEnetPerfRadioQStats32BitTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEnetPerfRadioQStats32BitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing 32-bit counters for radio queue statistics."
+	::= { mwrEthernetPerformance 4 }
+
+mwrEnetPerfRadioQStats32BitEntry  OBJECT-TYPE
+	SYNTAX 	MwrEnetPerfRadioQStats32BitEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing 32-bit counters for radio queue statistics."
+	INDEX { mwrRadioQStats32BitIndex }
+	::= { mwrEnetPerfRadioQStats32BitTable 1 }
+
+MwrEnetPerfRadioQStats32BitEntry ::= SEQUENCE {
+	mwrRadioQStats32BitIndex
+		QueueType,
+	mwrRadioQStatsInGoodPkts32Bit
+		Counter32,
+	mwrRadioQStatsDiscardPkts32Bit
+		Counter32
+}
+
+mwrRadioQStats32BitIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each of the 8 queues."
+	::= { mwrEnetPerfRadioQStats32BitEntry 1 }
+
+mwrRadioQStatsInGoodPkts32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the current count of packets in queues."
+	::= { mwrEnetPerfRadioQStats32BitEntry 2 }
+
+mwrRadioQStatsDiscardPkts32Bit  OBJECT-TYPE
+	SYNTAX     Counter32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A 32-bit counter representing the current count of packets received in queues that were discarded due to queue overflow ."
+	::= { mwrEnetPerfRadioQStats32BitEntry 3 }
+
+mwrDroppedPktsThreshold  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrPortThresholdAlarmIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the ethernet packet drops in an interface has exceeded user set limit."
+	::= { mwrEthernetNotifications 1 }
+
+mwrRadioQDroppedPktsThreshold  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrRadioQThresholdAlarmIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when Ethernet packet drops over radio traffic queue has exceeded the user configured limit. The mwrRadioQThresholdAlarmIndex varbind indicates specific queue number."
+	::= { mwrEthernetNotifications 2 }
+
+mwrRadioQDepthThreshold  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrRadioQThresholdAlarmIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the data buffered in the specific radio traffic queue has exceeded the user set limit. The mwrRadioQThresholdAlarmIndex varbind indicates specific queue number."
+	::= { mwrEthernetNotifications 3 }
+
+mwrOutBWUtilizationThreshold  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrPortThresholdAlarmIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the out bandwidth utilization of an interface has exceeded the user configured limit."
+	::= { mwrEthernetNotifications 4 }
+
+mwrThroughputThreshold  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrPortThresholdAlarmIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when the throughput of an interface has exceeded the user configured limit."
+	::= { mwrEthernetNotifications 5 }
+
+mwrAcmManualMode  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Adaptive Coding Modulation (ACM) Manual Mode."
+	::= { mwrAcmConfigurations 1 }
+
+-- ----------------------------
+--   mwrAcm
+-- ----------------------------   
+
+mwrAcmState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Adaptive Code Modulation (ACM)."
+	DEFVAL  { disabled }
+	::= { mwrAcmConfigurations 2 }
+
+mwrAcmWaitToRestore  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object configures the ACM wait to restore duration time in seconds."
+	::= { mwrAcmConfigurations 3 }
+
+mwrAcmModeTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrAcmModeEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing available Adaptive Code Modulation (ACM) tx profiles."
+	::= { mwrAcmConfigurations 4 }
+
+mwrAcmModeEntry  OBJECT-TYPE
+	SYNTAX 	MwrAcmModeEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing available Adaptive Code Modulation (ACM) tx profiles."
+	INDEX { mwrAcmModeIndex }
+	::= { mwrAcmModeTable 1 }
+
+MwrAcmModeEntry ::= SEQUENCE {
+	mwrAcmModeIndex
+		Integer32,
+	mwrAcmTxProfileName
+		DisplayString,
+	mwrAcmTxProfileRange
+		INTEGER
+}
+
+mwrAcmModeIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each Adaptive Code Modulation (ACM) tx profile. "
+	::= { mwrAcmModeEntry 1 }
+
+mwrAcmTxProfileName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Adaptive Code Modulation (ACM) tx profile name."
+	::= { mwrAcmModeEntry 2 }
+
+mwrAcmTxProfileRange  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		notAllowed (1),
+		allowed (2),
+		max (3),
+		min (4)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Specifies the range for the Adaptive Code Modulation (ACM) TX Profile."
+	DEFVAL  { notAllowed }
+	::= { mwrAcmModeEntry 3 }
+
+-- ----------------
+-- mwrAcmTable
+-- ----------------
+
+mwrAcmStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrAcmStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing Adaptive Code Modulation (ACM) status."
+	::= { mwrAcmStatus 1 }
+
+mwrAcmStatusEntry  OBJECT-TYPE
+	SYNTAX 	MwrAcmStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing Adaptive Code Modulation (ACM) status."
+	INDEX { mwrAcmStatusIndex }
+	::= { mwrAcmStatusTable 1 }
+
+MwrAcmStatusEntry ::= SEQUENCE {
+	mwrAcmStatusIndex
+		RadioInstanceType,
+	mwrAcmActualTxProfile
+		DisplayString
+}
+
+mwrAcmStatusIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each interface. "
+	::= { mwrAcmStatusEntry 1 }
+
+mwrAcmActualTxProfile  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..24))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A read-only string specifying the currently running ACM TX profile."
+	::= { mwrAcmStatusEntry 2 }
+
+-- ----------------------------
+--   mwrAcmDiagnostics
+-- ----------------------------   
+
+mwrAcmDiagTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrAcmDiagEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing ACM diagnostic settings."
+	::= { mwrAcmDiagnostics 1 }
+
+mwrAcmDiagEntry  OBJECT-TYPE
+	SYNTAX 	MwrAcmDiagEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing ACM diagnostic settings."
+	INDEX { mwrAcmDiagIndex }
+	::= { mwrAcmDiagTable 1 }
+
+MwrAcmDiagEntry ::= SEQUENCE {
+	mwrAcmDiagIndex
+		RadioInstanceType,
+	mwrAcmDiagnose
+		INTEGER,
+	mwrAcmDiagnosticResult
+		DisplayString
+}
+
+mwrAcmDiagIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each radio channel if applicable."
+	::= { mwrAcmDiagEntry 1 }
+
+mwrAcmDiagnose  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		up (1),
+		down (2)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This service effecting object accepts either 'up' or 'down' to diagnose whether the modulation speed can be increased or decreased. Poll the mwrAcmDiagnosticResult object to determine the results."
+	::= { mwrAcmDiagEntry 2 }
+
+mwrAcmDiagnosticResult  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The result from ACM Diagnostic is read from this object."
+	::= { mwrAcmDiagEntry 3 }
+
+mwrAcmConfigMismatch  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrEventInstanceIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when ACM configuration mismatch between the link partners."
+	::= { mwrAcmNotifications 1 }
+
+mwrAcmProfileLowered  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrAcmStatusIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when system is executing ACM and working at a lower radio profile than the configured nominal radio profile."
+	::= { mwrAcmNotifications 2 }
+
+mwrAcmProfileChanged  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrAcmStatusIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when system is executing in ACM and has changed the radio profile."
+	::= { mwrAcmNotifications 3 }
+
+mwrAtpcConfigurationsTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrAtpcConfigurationsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing ATPC configurations."
+	::= { mwrAtpcConfigurations 1 }
+
+mwrAtpcConfigurationsEntry  OBJECT-TYPE
+	SYNTAX 	MwrAtpcConfigurationsEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing ATPC configurations."
+	INDEX { mwrAtpcConfigIndex }
+	::= { mwrAtpcConfigurationsTable 1 }
+
+MwrAtpcConfigurationsEntry ::= SEQUENCE {
+	mwrAtpcConfigIndex
+		RadioInstanceType,
+	mwrAtpcState
+		EnableType,
+	mwrAtpcCoordinatedPower
+		Integer32,
+	mwrAtpcCoordinatedPowerEnable
+		EnableType,
+	mwrAtpcMinTxPower
+		Integer32,
+	mwrAtpcMaxTxPower
+		Integer32,
+	mwrAtpcRslTarget
+		Integer32,
+	mwrAtpcRslTargetUseDefault
+		EnableType
+}
+
+mwrAtpcConfigIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each of the radio channel instance."
+	::= { mwrAtpcConfigurationsEntry 1 }
+
+-- ----------------------------
+--   mwrAtpc
+-- ----------------------------  		    
+
+mwrAtpcState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether the Adaptive Transmit Power Control (ATPC) feature is enabled."
+	DEFVAL  { disabled }
+	::= { mwrAtpcConfigurationsEntry 2 }
+
+mwrAtpcCoordinatedPower  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dB"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is the value at which the system will transmit if the ATPC and the coordinated power are enabled. This is only if the system is transmitting the maximum power for 5 minutes.
+		The value is multiplied by 10. e.g. A display of 133 is actually 13.3 dB."
+	DEFVAL  { 0 }
+	::= { mwrAtpcConfigurationsEntry 3 }
+
+mwrAtpcCoordinatedPowerEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether Adaptive Transmit Power Control (ATPC) coordinated power option is enabled."
+	DEFVAL  { disabled }
+	::= { mwrAtpcConfigurationsEntry 4 }
+
+mwrAtpcMinTxPower  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dB"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Sets the minimum ATPC transmit power in dB x 10."
+	::= { mwrAtpcConfigurationsEntry 5 }
+
+mwrAtpcMaxTxPower  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"dB"
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Sets the maximum ATPC transmit power in dB x 10. When ATPC is enabled, transmit power range will be between ATPC min. and ATPC max. power."
+	::= { mwrAtpcConfigurationsEntry 6 }
+
+mwrAtpcRslTarget  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object configures Received Signal Level that should be maintained by the link by adjusting the transmit power when ATPC is enabled."
+	::= { mwrAtpcConfigurationsEntry 7 }
+
+mwrAtpcRslTargetUseDefault  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"When this object is enabled the default RSL target will be used instead of the configured mwrAtpcRslTarget. The mwrAtpcDefaultRslTarget displays the default value."
+	::= { mwrAtpcConfigurationsEntry 8 }
+
+mwrAtpcStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrAtpcStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing ATPC status."
+	::= { mwrAtpcStatus 1 }
+
+mwrAtpcStatusEntry  OBJECT-TYPE
+	SYNTAX 	MwrAtpcStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing ATPC status."
+	INDEX { mwrAtpcStatusIndex }
+	::= { mwrAtpcStatusTable 1 }
+
+MwrAtpcStatusEntry ::= SEQUENCE {
+	mwrAtpcStatusIndex
+		RadioInstanceType,
+	mwrAtpcRunningStatus
+		INTEGER,
+	mwrAtpcDefaultRslTarget
+		Integer32,
+	mwrAtpcActualMinTxPower
+		Integer32,
+	mwrAtpcActualMaxTxPower
+		Integer32,
+	mwrAtpcActualCoordinatedPower
+		Integer32,
+	mwrAtpcPeerRslTarget
+		Integer32,
+	mwrAtpcMinRslTarget
+		Integer32,
+	mwrAtpcMaxRslTarget
+		Integer32,
+	mwrAtpcPeerRsl
+		Integer32
+}
+
+mwrAtpcStatusIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each of the radio instance."
+	::= { mwrAtpcStatusEntry 1 }
+
+mwrAtpcRunningStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		disabled (1),
+		disabledAuto (2),
+		running (3),
+		runningToggling (4),
+		suspended (5),
+		suspendedLostComm (6),
+		suspendedRadioDown (7),
+		suspendedRadioMuted (8),
+		suspendedRadioLoopback (9)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Indicates the actual condition of ATPC:
+		- disabled: Configuration is set to off.
+		- disabledAuto: Feature was automatically disabled and is transmitting at coordinated power.
+		- running: Feature is running normally.
+		- runningToggling: Feature is toggling between maximum and minimum power to recover from a loss of mod sync.
+		- suspended: Feature was suspended.
+		- suspendedLostComm: Feature is suspended because communication is lost with peer ATPC.
+		- suspendedRadioDown: Feature is suspended because the radio is down.
+		- suspendedRadioMuted: Feature is suspended because the radio is muted.
+		- suspendedRadioLoopback: Feature is suspended because the radio is in loopback mode."
+	::= { mwrAtpcStatusEntry 2 }
+
+mwrAtpcDefaultRslTarget  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object is the default value of the Received Signal Level target when ATPC  is enabled."
+	::= { mwrAtpcStatusEntry 3 }
+
+mwrAtpcActualMinTxPower  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the running configuration for ATPC min tx power."
+	::= { mwrAtpcStatusEntry 4 }
+
+mwrAtpcActualMaxTxPower  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object indicates the running configuration for ATPC max tx power."
+	::= { mwrAtpcStatusEntry 5 }
+
+mwrAtpcActualCoordinatedPower  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This value is the running configuration of the coordinated power. 
+		The value is multiplied by 10. e.g. A display of 133 is actually 13.3 dB."
+	::= { mwrAtpcStatusEntry 6 }
+
+mwrAtpcPeerRslTarget  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object is the peer Received Signal Level target when ATPC  is enabled."
+	::= { mwrAtpcStatusEntry 7 }
+
+mwrAtpcMinRslTarget  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the minimum RSL target value."
+	::= { mwrAtpcStatusEntry 8 }
+
+mwrAtpcMaxRslTarget  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the maximum RSL target value."
+	::= { mwrAtpcStatusEntry 9 }
+
+mwrAtpcPeerRsl  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"This object represents the peer actual RSL value.  Divide the value by 10 to get the actual RSL value. Once this number is divided by 10 the units are dB.  For example -352 is actually -35.2dB"
+	::= { mwrAtpcStatusEntry 10 }
+
+mwrAtpcConfigMismatch  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrEventInstanceIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when ATPC configuration mismatch has occurred between link partners."
+	::= { mwrAtpcNotifications 1 }
+
+mwrAtpcAutoDisabled  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrAtpcStatusIndex, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when ATPC is automatically disabled due to coordinated power condition. When this notification is raised the radio will be transmitting at coordinated power. The mwrAtpcStatusIndex varbind indicates the radio instance."
+	::= { mwrAtpcNotifications 2 }
+
+mwrBacRecordAvgPeriod  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Configures the average period used for computing the running average BAC gain and uncompressed ratio. Default average period is set to 10 seconds. "
+	::= { mwrCompressionConfigurations 1 }
+
+mwrBacTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrBacEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing Bandwidth Acceleration entries."
+	::= { mwrCompressionConfigurations 2 }
+
+mwrBacEntry  OBJECT-TYPE
+	SYNTAX 	MwrBacEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Contains Bandwidth Acceleration entries."
+	INDEX { mwrBacQIndex }
+	::= { mwrBacTable 1 }
+
+MwrBacEntry ::= SEQUENCE {
+	mwrBacQIndex
+		QueueType,
+	mwrBacQEnable
+		EnableType,
+	mwrBacQBlockSize
+		Integer32,
+	mwrBacRecordLogging
+		EnableType
+}
+
+mwrBacQIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each of the 8 radio egress Queues."
+	::= { mwrBacEntry 1 }
+
+mwrBacQEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Configure queue compression state to disable/enable."
+	::= { mwrBacEntry 2 }
+
+mwrBacQBlockSize  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Configure queue compression block size (256...8000). Block size has to be in increments of 64 bytes. Otherwise it will be rounded off to nearest 64 bytes.
+		Valid block sizes are <256 512 1024 4032 8000>"
+	::= { mwrBacEntry 3 }
+
+mwrBacRecordLogging  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		" Enables/disables logging of BAC related statistics like Maximum BAC gain and Maximum uncompressed ratio 
+		 on a  per queue basis to syslog and flashlog."
+	::= { mwrBacEntry 4 }
+
+mwrHcQTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrHcQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table containing Header Compression settings for each queue, the configuration corresponds to the egress QoS of radio port."
+	::= { mwrCompressionConfigurations 3 }
+
+mwrHcQEntry  OBJECT-TYPE
+	SYNTAX 	MwrHcQEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table entry containing Header Compression settings for each queue."
+	INDEX { mwrHcQIndex }
+	::= { mwrHcQTable 1 }
+
+MwrHcQEntry ::= SEQUENCE {
+	mwrHcQIndex
+		QueueType,
+	mwrHcQ1
+		EnableType,
+	mwrHcQ2
+		EnableType,
+	mwrHcQ3
+		EnableType,
+	mwrHcQ4
+		EnableType,
+	mwrHcQ5
+		EnableType,
+	mwrHcQ6
+		EnableType,
+	mwrHcQ7
+		EnableType,
+	mwrHcQ8
+		EnableType,
+	mwrHcQRowStatus
+		RowStatus
+}
+
+mwrHcQIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Specifies Header Compression queue index for each radio queue."
+	::= { mwrHcQEntry 1 }
+
+mwrHcQ1  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Header Compression on queue 1."
+	::= { mwrHcQEntry 2 }
+
+mwrHcQ2  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Header Compression on queue 2."
+	::= { mwrHcQEntry 3 }
+
+mwrHcQ3  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Header Compression on queue 3."
+	::= { mwrHcQEntry 4 }
+
+mwrHcQ4  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Header Compression on queue 4."
+	::= { mwrHcQEntry 5 }
+
+mwrHcQ5  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Header Compression on queue 5."
+	::= { mwrHcQEntry 6 }
+
+mwrHcQ6  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Header Compression on queue 6."
+	::= { mwrHcQEntry 7 }
+
+mwrHcQ7  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Header Compression on queue 7."
+	::= { mwrHcQEntry 8 }
+
+mwrHcQ8  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Enables or disables the Header Compression on queue 8."
+	::= { mwrHcQEntry 9 }
+
+mwrHcQRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The Header Compression table Row Status. This object is used to apply Header Compression settings for all queues simultaneously."
+	::= { mwrHcQEntry 10 }
+
+mwrBacStatusTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrBacStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing Bandwidth Acceleration status entries."
+	::= { mwrCompressionStatus 1 }
+
+mwrBacStatusEntry  OBJECT-TYPE
+	SYNTAX 	MwrBacStatusEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Contains Bandwidth Acceleration status entries."
+	INDEX { mwrBacStatusQIndex }
+	::= { mwrBacStatusTable 1 }
+
+MwrBacStatusEntry ::= SEQUENCE {
+	mwrBacStatusQIndex
+		QueueType,
+	mwrBacUncompressedRatio
+		DisplayString,
+	mwrBacGain
+		DisplayString
+}
+
+mwrBacStatusQIndex  OBJECT-TYPE
+	SYNTAX     QueueType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each of the 8 Queues."
+	::= { mwrBacStatusEntry 1 }
+
+mwrBacUncompressedRatio  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Running average Uncompressed ratio is calculated by collecting n samples of bytes uncompressed and bytes in to queue over specified average period in percentage."
+	::= { mwrBacStatusEntry 2 }
+
+mwrBacGain  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Running Average BAC gain is the sum of all bytes getting into the compressor divided by the sum of all compressed and uncompressed bytes calculated over an average period."
+	::= { mwrBacStatusEntry 3 }
+
+mwrEventConfigTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrEventConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of alarm configuration"
+	::= { mwrEventsConfigurations 1 }
+
+mwrEventConfigEntry  OBJECT-TYPE
+	SYNTAX 	MwrEventConfigEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"An entry of alarm configuration"
+	INDEX { mwrEventConfigIndex, 
+		mwrEventInstanceIndex }
+	::= { mwrEventConfigTable 1 }
+
+MwrEventConfigEntry ::= SEQUENCE {
+	mwrEventConfigIndex
+		Unsigned32,
+	mwrEventInstanceIndex
+		Unsigned32,
+	mwrEventConfigSeverity
+		INTEGER,
+	mwrEventName
+		DisplayString,
+	mwrAlarmConfigState
+		EnableType,
+	mwrTrapConfigState
+		EnableType,
+	mwrLogEventState
+		EnableType
+}
+
+mwrEventConfigIndex  OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each alarm."
+	::= { mwrEventConfigEntry 1 }
+
+mwrEventInstanceIndex  OBJECT-TYPE
+	SYNTAX     Unsigned32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each instance of an alarm."
+	::= { mwrEventConfigEntry 2 }
+
+mwrEventConfigSeverity  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		clear (0),
+		warning (1),
+		minor (2),
+		major (3),
+		critical (4)
+	}
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The severity of the alarm as minor, major or critical."
+	::= { mwrEventConfigEntry 3 }
+
+mwrEventName  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Represents the event name."
+	::= { mwrEventConfigEntry 4 }
+
+mwrAlarmConfigState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The state of the alarm which can be either enabled or disabled."
+	::= { mwrEventConfigEntry 5 }
+
+mwrTrapConfigState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The state of the trap which can be either enabled or disabled."
+	::= { mwrEventConfigEntry 6 }
+
+mwrLogEventState  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used to enable or disable logging the events."
+	::= { mwrEventConfigEntry 7 }
+
+-- 
+-- mwrLogs
+-- 
+
+mwrEventLogEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether event log is enabled."
+	DEFVAL  { enabled }
+	::= { mwrLogsConfigurations 1 }
+
+mwrPerfmLogEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether performance log is enabled."
+	DEFVAL  { enabled }
+	::= { mwrLogsConfigurations 2 }
+
+mwrPerfmLogInterval  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..10))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Performance statistics are logged periodically by this interval. The interval can be up to 00:15:00 (15 minutes) and as short as 00:00:1 (1 seconds)."
+	::= { mwrLogsConfigurations 3 }
+
+mwrSysLogServerTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrSysLogServerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The syslog server table."
+	::= { mwrLogsConfigurations 4 }
+
+mwrSysLogServerEntry  OBJECT-TYPE
+	SYNTAX 	MwrSysLogServerEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The syslog server table entry."
+	INDEX { mwrSysLogServerIndex }
+	::= { mwrSysLogServerTable 1 }
+
+MwrSysLogServerEntry ::= SEQUENCE {
+	mwrSysLogServerIndex
+		Integer32,
+	mwrSysLogEnable
+		EnableType,
+	mwrSysLogHostDomain
+		InetAddressType,
+	mwrSysLogHostAddress
+		InetAddress
+}
+
+mwrSysLogServerIndex  OBJECT-TYPE
+	SYNTAX     Integer32 (1..5)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The syslog server table index."
+	::= { mwrSysLogServerEntry 1 }
+
+mwrSysLogEnable  OBJECT-TYPE
+	SYNTAX     EnableType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates whether sys log is enabled."
+	::= { mwrSysLogServerEntry 2 }
+
+mwrSysLogHostDomain  OBJECT-TYPE
+	SYNTAX     InetAddressType
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates sys log host inet address type. Valid types are ipv4 or ipv6. "
+	::= { mwrSysLogServerEntry 3 }
+
+mwrSysLogHostAddress  OBJECT-TYPE
+	SYNTAX     InetAddress
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Indicates sys log host inet address octet string."
+	::= { mwrSysLogServerEntry 4 }
+
+mwrPmRspiThresholdTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPmRspiThresholdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Performance Monitoring table for Radio Synchronous Physical Interface thresholds."
+	::= { mwrPMConfigurations 1 }
+
+mwrPmRspiThresholdEntry  OBJECT-TYPE
+	SYNTAX 	MwrPmRspiThresholdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Contains entries for Radio Synchronous Physical Interface thresholds."
+	INDEX { mwrPmRspiThrIndex }
+	::= { mwrPmRspiThresholdTable 1 }
+
+MwrPmRspiThresholdEntry ::= SEQUENCE {
+	mwrPmRspiThrIndex
+		RadioInstanceType,
+	mwrPmRLT1
+		Integer32,
+	mwrPmRLT2
+		Integer32,
+	mwrPmRLT3
+		Integer32,
+	mwrPmRLT4
+		Integer32,
+	mwrPmTLT1
+		Integer32,
+	mwrPmTLT2
+		Integer32,
+	mwrPmRspiThrRowStatus
+		RowStatus
+}
+
+mwrPmRspiThrIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Index to PM RSPI Threshold table."
+	::= { mwrPmRspiThresholdEntry 1 }
+
+mwrPmRLT1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Receive Level Threshold 1, represents the value of the first received power level threshold."
+	::= { mwrPmRspiThresholdEntry 2 }
+
+mwrPmRLT2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Receive Level Threshold 2, represents the value of the second received power level threshold."
+	::= { mwrPmRspiThresholdEntry 3 }
+
+mwrPmRLT3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Receive Level Threshold 3, represents the value of the third received power level threshold."
+	::= { mwrPmRspiThresholdEntry 4 }
+
+mwrPmRLT4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Receive Level Threshold 4, represents the value of the fourth received power level threshold."
+	::= { mwrPmRspiThresholdEntry 5 }
+
+mwrPmTLT1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Transmit Level Threshold 1, represents the value of the first transmitted power level threshold."
+	::= { mwrPmRspiThresholdEntry 6 }
+
+mwrPmTLT2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Transmit Level Threshold 2, represents the value of the second transmitted power level threshold."
+	::= { mwrPmRspiThresholdEntry 7 }
+
+mwrPmRspiThrRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used for applying all RSPI thresholds simultaneously. Set RowStatus to NotInService, make changes to all or some threshold values and then change RowStatus back to Active."
+	::= { mwrPmRspiThresholdEntry 8 }
+
+mwrPmBwThresholdTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPmBwThresholdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Performance monitoring out bandwidth utilization thresholds table."
+	::= { mwrPMConfigurations 2 }
+
+mwrPmBwThresholdEntry  OBJECT-TYPE
+	SYNTAX 	MwrPmBwThresholdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Contains entries for performance monitoring out bandwidth utilization thresholds."
+	INDEX { mwrPmBWThrIndex }
+	::= { mwrPmBwThresholdTable 1 }
+
+MwrPmBwThresholdEntry ::= SEQUENCE {
+	mwrPmBWThrIndex
+		Integer32,
+	mwrPmBWT1
+		Integer32,
+	mwrPmBWT2
+		Integer32,
+	mwrPmBWT3
+		Integer32,
+	mwrPmBWT4
+		Integer32,
+	mwrPmBWT5
+		Integer32,
+	mwrPmBWT6
+		Integer32,
+	mwrPmBWT7
+		Integer32,
+	mwrPmBWT8
+		Integer32,
+	mwrPmBWT9
+		Integer32,
+	mwrPmBWT10
+		Integer32,
+	mwrPmBWTRowStatus
+		RowStatus
+}
+
+mwrPmBWThrIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Index to PM out BW Threshold table. Index 1 represents the radio port."
+	::= { mwrPmBwThresholdEntry 1 }
+
+mwrPmBWT1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 1."
+	::= { mwrPmBwThresholdEntry 2 }
+
+mwrPmBWT2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 2."
+	::= { mwrPmBwThresholdEntry 3 }
+
+mwrPmBWT3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 3."
+	::= { mwrPmBwThresholdEntry 4 }
+
+mwrPmBWT4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 4."
+	::= { mwrPmBwThresholdEntry 5 }
+
+mwrPmBWT5  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 5."
+	::= { mwrPmBwThresholdEntry 6 }
+
+mwrPmBWT6  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 6."
+	::= { mwrPmBwThresholdEntry 7 }
+
+mwrPmBWT7  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 7."
+	::= { mwrPmBwThresholdEntry 8 }
+
+mwrPmBWT8  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 8."
+	::= { mwrPmBwThresholdEntry 9 }
+
+mwrPmBWT9  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 9."
+	::= { mwrPmBwThresholdEntry 10 }
+
+mwrPmBWT10  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization threshold 10."
+	::= { mwrPmBwThresholdEntry 11 }
+
+mwrPmBWTRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used for applying all PM bandwidth threshold settings simultaneously. Set RowStatus to NotInService, make changes to all or some threshold values and then change RowStatus back to Active."
+	::= { mwrPmBwThresholdEntry 12 }
+
+mwrPmTpThresholdTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPmTpThresholdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Performance monitoring throughput thresholds table."
+	::= { mwrPMConfigurations 3 }
+
+mwrPmTpThresholdEntry  OBJECT-TYPE
+	SYNTAX 	MwrPmTpThresholdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Contains entries for performance monitoring throughput thresholds."
+	INDEX { mwrPmTPThrIndex }
+	::= { mwrPmTpThresholdTable 1 }
+
+MwrPmTpThresholdEntry ::= SEQUENCE {
+	mwrPmTPThrIndex
+		Integer32,
+	mwrPmTPT1
+		Integer32,
+	mwrPmTPT2
+		Integer32,
+	mwrPmTPT3
+		Integer32,
+	mwrPmTPT4
+		Integer32,
+	mwrPmTPT5
+		Integer32,
+	mwrPmTPT6
+		Integer32,
+	mwrPmTPT7
+		Integer32,
+	mwrPmTPT8
+		Integer32,
+	mwrPmTPT9
+		Integer32,
+	mwrPmTPT10
+		Integer32,
+	mwrPmTPTRowStatus
+		RowStatus
+}
+
+mwrPmTPThrIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Index to PM throughput Threshold table. Index 1 represents the radio port."
+	::= { mwrPmTpThresholdEntry 1 }
+
+mwrPmTPT1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 1."
+	::= { mwrPmTpThresholdEntry 2 }
+
+mwrPmTPT2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 2."
+	::= { mwrPmTpThresholdEntry 3 }
+
+mwrPmTPT3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 3."
+	::= { mwrPmTpThresholdEntry 4 }
+
+mwrPmTPT4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 4."
+	::= { mwrPmTpThresholdEntry 5 }
+
+mwrPmTPT5  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 5."
+	::= { mwrPmTpThresholdEntry 6 }
+
+mwrPmTPT6  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 6."
+	::= { mwrPmTpThresholdEntry 7 }
+
+mwrPmTPT7  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 7."
+	::= { mwrPmTpThresholdEntry 8 }
+
+mwrPmTPT8  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 8."
+	::= { mwrPmTpThresholdEntry 9 }
+
+mwrPmTPT9  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 9."
+	::= { mwrPmTpThresholdEntry 10 }
+
+mwrPmTPT10  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput threshold 10."
+	::= { mwrPmTpThresholdEntry 11 }
+
+mwrPmTPTRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used for applying all PM throughput threshold settings simultaneously. Set RowStatus to NotInService, make changes to all or some threshold values and then change RowStatus back to Active."
+	::= { mwrPmTpThresholdEntry 12 }
+
+mwrPmAdvThresholdTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPmAdvThresholdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The advanced performance monitoring thresholds table."
+	::= { mwrPMConfigurations 4 }
+
+mwrPmAdvThresholdEntry  OBJECT-TYPE
+	SYNTAX 	MwrPmAdvThresholdEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The advanced performance monitoring thresholds entries."
+	INDEX { mwrPmAdvThrIndex }
+	::= { mwrPmAdvThresholdTable 1 }
+
+MwrPmAdvThresholdEntry ::= SEQUENCE {
+	mwrPmAdvThrIndex
+		Integer32,
+	mwrPmAdvTxHitsT1
+		Integer32,
+	mwrPmAdvRxHitsT1
+		Integer32,
+	mwrPmAdvRowStatus
+		RowStatus
+}
+
+mwrPmAdvThrIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The advanced performance monitoring thresholds table index. Index 1 represents the radio port."
+	::= { mwrPmAdvThresholdEntry 1 }
+
+mwrPmAdvTxHitsT1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The advanced performance monitoring Tx hits threshold 1."
+	::= { mwrPmAdvThresholdEntry 2 }
+
+mwrPmAdvRxHitsT1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The advanced performance monitoring Rx hits threshold 1."
+	::= { mwrPmAdvThresholdEntry 3 }
+
+mwrPmAdvRowStatus  OBJECT-TYPE
+	SYNTAX     RowStatus
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"This object is used for applying all PM advanced threshold settings simultaneously. Set RowStatus to NotInService, make changes to all threshold values and then change back RowStatus to Active."
+	::= { mwrPmAdvThresholdEntry 4 }
+
+mwrPmRspiTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPmRspiEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Performance Monitoring table for Radio Synchronous Physical Interface."
+	::= { mwrPMStatus 1 }
+
+mwrPmRspiEntry  OBJECT-TYPE
+	SYNTAX 	MwrPmRspiEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Contains information for Radio Synchronous Physical Interface. The table is indexed by the granularity period and 
+		         by the interval number. 22 rows are always presents, 20 are the historical 
+		         measurements for 16 intervals in the quarter granularity and 4 intervals 
+		         in the 24 hours granularity period. 2 rows represent the current measures."
+	INDEX { mwrPmRspiStatusIndex, 
+		mwrPmRspiInterval, 
+		mwrPmRspiIntervalID }
+	::= { mwrPmRspiTable 1 }
+
+MwrPmRspiEntry ::= SEQUENCE {
+	mwrPmRspiStatusIndex
+		RadioInstanceType,
+	mwrPmRspiInterval
+		PMIntervalType,
+	mwrPmRspiIntervalID
+		Integer32,
+	mwrPmRspiMeasSuspect
+		TruthValue,
+	mwrPmRspiMeasIntervalStatus
+		INTEGER,
+	mwrPmRspiMeasTimeLength
+		Integer32,
+	mwrPmRspiMeasTLTMMin
+		Integer32,
+	mwrPmRspiMeasTLTMMax
+		Integer32,
+	mwrPmRspiMeasTLTS1
+		Integer32,
+	mwrPmRspiMeasTLTS2
+		Integer32,
+	mwrPmRspiMeasRLTMMin
+		Integer32,
+	mwrPmRspiMeasRLTMMax
+		Integer32,
+	mwrPmRspiMeasRLTS1
+		Integer32,
+	mwrPmRspiMeasRLTS2
+		Integer32,
+	mwrPmRspiMeasRLTS3
+		Integer32,
+	mwrPmRspiMeasRLTS4
+		Integer32
+}
+
+mwrPmRspiStatusIndex  OBJECT-TYPE
+	SYNTAX     RadioInstanceType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each of the radio instance."
+	::= { mwrPmRspiEntry 1 }
+
+mwrPmRspiInterval  OBJECT-TYPE
+	SYNTAX     PMIntervalType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The interval period of the row. Quarter means the 15 minutes interval and day means the 24 hours interval."
+	::= { mwrPmRspiEntry 2 }
+
+mwrPmRspiIntervalID  OBJECT-TYPE
+	SYNTAX     Integer32 (0..16)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The interval identifier of the row, from 1 (last quarter) to 16 (oldest quarter) for the 15-minute
+		         and from 1 (yesterday) to 4 (4 days ago) for the 24-hour.
+		         Value 0 can be used to retrieve current measurements, according to the requested granularity."
+	::= { mwrPmRspiEntry 3 }
+
+mwrPmRspiMeasSuspect  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Any problem that invalidates the measurement."
+	::= { mwrPmRspiEntry 4 }
+
+mwrPmRspiMeasIntervalStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		invalid (1),
+		valid (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An indication if the interval is a valid measurement. When the system comes up, all the previous intervals are invalid."
+	::= { mwrPmRspiEntry 5 }
+
+mwrPmRspiMeasTimeLength  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The interval duration in seconds."
+	::= { mwrPmRspiEntry 6 }
+
+mwrPmRspiMeasTLTMMin  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The transmitted power level tide mark low value."
+	::= { mwrPmRspiEntry 7 }
+
+mwrPmRspiMeasTLTMMax  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The transmitted power level tide mark high value."
+	::= { mwrPmRspiEntry 8 }
+
+mwrPmRspiMeasTLTS1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the first transmitted power level threshold."
+	::= { mwrPmRspiEntry 9 }
+
+mwrPmRspiMeasTLTS2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the second transmitted power level threshold."
+	::= { mwrPmRspiEntry 10 }
+
+mwrPmRspiMeasRLTMMin  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The received power level tide mark low value."
+	::= { mwrPmRspiEntry 11 }
+
+mwrPmRspiMeasRLTMMax  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The received power level tide mark high value."
+	::= { mwrPmRspiEntry 12 }
+
+mwrPmRspiMeasRLTS1  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds below the first received power level threshold."
+	::= { mwrPmRspiEntry 13 }
+
+mwrPmRspiMeasRLTS2  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds below the second received power level threshold."
+	::= { mwrPmRspiEntry 14 }
+
+mwrPmRspiMeasRLTS3  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds below the third received power level threshold."
+	::= { mwrPmRspiEntry 15 }
+
+mwrPmRspiMeasRLTS4  OBJECT-TYPE
+	SYNTAX     Integer32
+	UNITS 	"seconds"
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds below the fourth received power level threshold."
+	::= { mwrPmRspiEntry 16 }
+
+mwrPmBWTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPmBWEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing performance monitoring measurements in 15 min and 24 hrs intervals for out BW utilization."
+	::= { mwrPMStatus 2 }
+
+mwrPmBWEntry  OBJECT-TYPE
+	SYNTAX 	MwrPmBWEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entries containing performance monitoring measurements in 15 min and 24 hrs intervals for out BW utilization."
+	INDEX { mwrPmBWStatusIndex, 
+		mwrPmBWInterval, 
+		mwrPmBWIntervalID }
+	::= { mwrPmBWTable 1 }
+
+MwrPmBWEntry ::= SEQUENCE {
+	mwrPmBWStatusIndex
+		Integer32,
+	mwrPmBWInterval
+		PMIntervalType,
+	mwrPmBWIntervalID
+		Integer32,
+	mwrPmBWMeasSuspect
+		TruthValue,
+	mwrPmBWMeasIntervalStatus
+		INTEGER,
+	mwrPmBWMeasTimeLength
+		Integer32,
+	mwrPmMeasBWTS1
+		Integer32,
+	mwrPmMeasBWTS2
+		Integer32,
+	mwrPmMeasBWTS3
+		Integer32,
+	mwrPmMeasBWTS4
+		Integer32,
+	mwrPmMeasBWTS5
+		Integer32,
+	mwrPmMeasBWTS6
+		Integer32,
+	mwrPmMeasBWTS7
+		Integer32,
+	mwrPmMeasBWTS8
+		Integer32,
+	mwrPmMeasBWTS9
+		Integer32,
+	mwrPmMeasBWTS10
+		Integer32
+}
+
+mwrPmBWStatusIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring out BW utilization measurements table index. Index 1 represents the radio port."
+	::= { mwrPmBWEntry 1 }
+
+mwrPmBWInterval  OBJECT-TYPE
+	SYNTAX     PMIntervalType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The interval period of the row. Quarter means the 15 minutes interval and day means the 24 hours interval."
+	::= { mwrPmBWEntry 2 }
+
+mwrPmBWIntervalID  OBJECT-TYPE
+	SYNTAX     Integer32 (0..16)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The interval identifier of the row, from 1 (last quarter) to 16 (oldest quarter) for the 15-minute
+		         and from 1 (yesterday) to 4 (4 days ago) for the 24-hour.
+		         Value 0 can be used to retrieve current measurements, according to the requested granularity."
+	::= { mwrPmBWEntry 3 }
+
+mwrPmBWMeasSuspect  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Any problem that invalidates the measurement."
+	::= { mwrPmBWEntry 4 }
+
+mwrPmBWMeasIntervalStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		invalid (1),
+		valid (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An indication if the interval is a valid measurement. When the system comes up, all the previous intervals are invalid."
+	::= { mwrPmBWEntry 5 }
+
+mwrPmBWMeasTimeLength  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The interval duration in seconds."
+	::= { mwrPmBWEntry 6 }
+
+mwrPmMeasBWTS1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the first BW utilization threshold."
+	::= { mwrPmBWEntry 7 }
+
+mwrPmMeasBWTS2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the second BW utilization threshold."
+	::= { mwrPmBWEntry 8 }
+
+mwrPmMeasBWTS3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the third BW utilization threshold."
+	::= { mwrPmBWEntry 9 }
+
+mwrPmMeasBWTS4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the fourth BW utilization threshold."
+	::= { mwrPmBWEntry 10 }
+
+mwrPmMeasBWTS5  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the fifth BW utilization threshold."
+	::= { mwrPmBWEntry 11 }
+
+mwrPmMeasBWTS6  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the sixth BW utilization threshold."
+	::= { mwrPmBWEntry 12 }
+
+mwrPmMeasBWTS7  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the seventh BW utilization threshold."
+	::= { mwrPmBWEntry 13 }
+
+mwrPmMeasBWTS8  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the eighth BW utilization threshold."
+	::= { mwrPmBWEntry 14 }
+
+mwrPmMeasBWTS9  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the ninth BW utilization threshold."
+	::= { mwrPmBWEntry 15 }
+
+mwrPmMeasBWTS10  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the tenth BW utilization threshold."
+	::= { mwrPmBWEntry 16 }
+
+mwrPmTPTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPmTPEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table containing performance monitoring measurements in 15 min and 24 hrs intervals for throughput."
+	::= { mwrPMStatus 3 }
+
+mwrPmTPEntry  OBJECT-TYPE
+	SYNTAX 	MwrPmTPEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Table entry containing performance monitoring throughput measurements in 15 min and 24 hrs intervals."
+	INDEX { mwrPmTPStatusIndex, 
+		mwrPmTPInterval, 
+		mwrPmTPIntervalID }
+	::= { mwrPmTPTable 1 }
+
+MwrPmTPEntry ::= SEQUENCE {
+	mwrPmTPStatusIndex
+		Integer32,
+	mwrPmTPInterval
+		PMIntervalType,
+	mwrPmTPIntervalID
+		Integer32,
+	mwrPmTPMeasSuspect
+		TruthValue,
+	mwrPmTPMeasIntervalStatus
+		INTEGER,
+	mwrPmTPMeasTimeLength
+		Integer32,
+	mwrPmMeasTPTS1
+		Integer32,
+	mwrPmMeasTPTS2
+		Integer32,
+	mwrPmMeasTPTS3
+		Integer32,
+	mwrPmMeasTPTS4
+		Integer32,
+	mwrPmMeasTPTS5
+		Integer32,
+	mwrPmMeasTPTS6
+		Integer32,
+	mwrPmMeasTPTS7
+		Integer32,
+	mwrPmMeasTPTS8
+		Integer32,
+	mwrPmMeasTPTS9
+		Integer32,
+	mwrPmMeasTPTS10
+		Integer32
+}
+
+mwrPmTPStatusIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The performance monitoring throughput measurements table index. Index 1 represents the radio port."
+	::= { mwrPmTPEntry 1 }
+
+mwrPmTPInterval  OBJECT-TYPE
+	SYNTAX     PMIntervalType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The interval period of the row. Quarter means the 15 minutes interval and day means the 24 hours interval."
+	::= { mwrPmTPEntry 2 }
+
+mwrPmTPIntervalID  OBJECT-TYPE
+	SYNTAX     Integer32 (0..16)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The interval identifier of the row, from 1 (last quarter) to 16 (oldest quarter) for the 15-minute
+		         and from 1 (yesterday) to 4 (4 days ago) for the 24-hour.
+		         Value 0 can be used to retrieve current measurements, according to the requested granularity."
+	::= { mwrPmTPEntry 3 }
+
+mwrPmTPMeasSuspect  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Any problem that invalidates the measurement."
+	::= { mwrPmTPEntry 4 }
+
+mwrPmTPMeasIntervalStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		invalid (1),
+		valid (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An indication if the interval is a valid measurement. When the system comes up, all the previous intervals are invalid."
+	::= { mwrPmTPEntry 5 }
+
+mwrPmTPMeasTimeLength  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The interval duration in seconds."
+	::= { mwrPmTPEntry 6 }
+
+mwrPmMeasTPTS1  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the first throughput threshold."
+	::= { mwrPmTPEntry 7 }
+
+mwrPmMeasTPTS2  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the second throughput threshold."
+	::= { mwrPmTPEntry 8 }
+
+mwrPmMeasTPTS3  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the third throughput threshold."
+	::= { mwrPmTPEntry 9 }
+
+mwrPmMeasTPTS4  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the fourth throughput threshold."
+	::= { mwrPmTPEntry 10 }
+
+mwrPmMeasTPTS5  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the fifth throughput threshold."
+	::= { mwrPmTPEntry 11 }
+
+mwrPmMeasTPTS6  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the sixth throughput threshold."
+	::= { mwrPmTPEntry 12 }
+
+mwrPmMeasTPTS7  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the seventh throughput threshold."
+	::= { mwrPmTPEntry 13 }
+
+mwrPmMeasTPTS8  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the eighth throughput threshold."
+	::= { mwrPmTPEntry 14 }
+
+mwrPmMeasTPTS9  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the ninth throughput threshold."
+	::= { mwrPmTPEntry 15 }
+
+mwrPmMeasTPTS10  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds above the tenth throughput threshold."
+	::= { mwrPmTPEntry 16 }
+
+mwrPmAdvTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrPmAdvEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The advanced performance monitoring measurements table."
+	::= { mwrPMStatus 4 }
+
+mwrPmAdvEntry  OBJECT-TYPE
+	SYNTAX 	MwrPmAdvEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The advanced performance monitoring measurements table entries."
+	INDEX { mwrPmAdvStatusIndex, 
+		mwrPmAdvInterval, 
+		mwrPmAdvIntervalID }
+	::= { mwrPmAdvTable 1 }
+
+MwrPmAdvEntry ::= SEQUENCE {
+	mwrPmAdvStatusIndex
+		Integer32,
+	mwrPmAdvInterval
+		PMIntervalType,
+	mwrPmAdvIntervalID
+		Integer32,
+	mwrPmAdvMeasSuspect
+		TruthValue,
+	mwrPmAdvMeasIntervalStatus
+		INTEGER,
+	mwrPmAdvMeasTimeLength
+		Integer32,
+	mwrPmAdvTxCapPeak
+		Integer32,
+	mwrPmAdvTxCapRatio
+		Integer32,
+	mwrPmAdvTxCapAvg
+		Integer32,
+	mwrPmAdvTxCapAvgRatio
+		Integer32,
+	mwrPmAdvTxCapHits
+		Integer32,
+	mwrPmAdvRxCapPeak
+		Integer32,
+	mwrPmAdvRxCapRatio
+		Integer32,
+	mwrPmAdvRxCapAvg
+		Integer32,
+	mwrPmAdvRxCapHits
+		Integer32
+}
+
+mwrPmAdvStatusIndex  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The advanced performance monitoring measurements table index. Index 1 represents the radio port."
+	::= { mwrPmAdvEntry 1 }
+
+mwrPmAdvInterval  OBJECT-TYPE
+	SYNTAX     PMIntervalType
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The interval period of the row. Quarter means the 15 minutes interval and day means the 24 hours interval."
+	::= { mwrPmAdvEntry 2 }
+
+mwrPmAdvIntervalID  OBJECT-TYPE
+	SYNTAX     Integer32 (0..16)
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The interval identifier of the row, from 1 (last quarter) to 16 (oldest quarter) for the 15-minute
+		         and from 1 (yesterday) to 4 (4 days ago) for the 24-hour.
+		         Value 0 can be used to retrieve current measurements, according to the requested granularity."
+	::= { mwrPmAdvEntry 3 }
+
+mwrPmAdvMeasSuspect  OBJECT-TYPE
+	SYNTAX     TruthValue
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Any problem that invalidates the measurement."
+	::= { mwrPmAdvEntry 4 }
+
+mwrPmAdvMeasIntervalStatus  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		invalid (1),
+		valid (2)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"An indication if the interval is a valid measurement. When the system comes up, all the previous intervals are invalid."
+	::= { mwrPmAdvEntry 5 }
+
+mwrPmAdvMeasTimeLength  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The interval duration in seconds."
+	::= { mwrPmAdvEntry 6 }
+
+mwrPmAdvTxCapPeak  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of bits per second peak transmitted capacity during the time interval."
+	::= { mwrPmAdvEntry 7 }
+
+mwrPmAdvTxCapRatio  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The percentage of peak transmitted capacity 
+		referred to the total allowed capacity 
+		during the time interval.
+		"
+	::= { mwrPmAdvEntry 8 }
+
+mwrPmAdvTxCapAvg  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of bits per second average transmitted capacity 
+		during the time interval.
+		"
+	::= { mwrPmAdvEntry 9 }
+
+mwrPmAdvTxCapAvgRatio  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The percentage of average transmitted capacity 
+		during the time interval."
+	::= { mwrPmAdvEntry 10 }
+
+mwrPmAdvTxCapHits  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds where the transmitted 
+		capacity has overcome a configurable 
+		threshold during the time interval.
+		"
+	::= { mwrPmAdvEntry 11 }
+
+mwrPmAdvRxCapPeak  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of bits per second peak received capacity 
+		during the time interval.
+		"
+	::= { mwrPmAdvEntry 12 }
+
+mwrPmAdvRxCapRatio  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The percentage of peak received capacity 
+		referred to the total allowed capacity 
+		during the time interval."
+	::= { mwrPmAdvEntry 13 }
+
+mwrPmAdvRxCapAvg  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of bits per second average received capacity 
+		during the time interval."
+	::= { mwrPmAdvEntry 14 }
+
+mwrPmAdvRxCapHits  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of seconds where the received 
+		capacity has overcome a configurable 
+		threshold during the time interval.
+		"
+	::= { mwrPmAdvEntry 15 }
+
+-- ------------------------------
+-- mwrManagementSessions       
+-- ------------------------------
+
+mwrUserSessionTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF MwrUserSessionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A table of user sessions"
+	::= { mwrUserStatus 1 }
+
+mwrUserSessionEntry  OBJECT-TYPE
+	SYNTAX 	MwrUserSessionEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"User session entry"
+	INDEX { mwrUserIndex }
+	::= { mwrUserSessionTable 1 }
+
+MwrUserSessionEntry ::= SEQUENCE {
+	mwrUserIndex
+		INTEGER,
+	mwrUserName
+		DisplayString,
+	mwrUserConnectionType
+		DisplayString,
+	mwrUserConnectionState
+		INTEGER
+}
+
+mwrUserIndex  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		user1 (1),
+		user2 (2),
+		user3 (3),
+		user4 (4),
+		user5 (5),
+		user6 (6),
+		user7 (7),
+		user8 (8),
+		user9 (9),
+		user10 (10),
+		user11 (11),
+		user12 (12),
+		user13 (13),
+		user14 (14),
+		user15 (15),
+		user16 (16),
+		user17 (17),
+		user18 (18),
+		user19 (19),
+		user20 (20)
+	}
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"A unique value for each user."
+	::= { mwrUserSessionEntry 1 }
+
+mwrUserName  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(0..32))
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The username of a management session using Telnet or HTTP. The session state variable must be checked to determine if the management session is currently in progress."
+	::= { mwrUserSessionEntry 2 }
+
+mwrUserConnectionType  OBJECT-TYPE
+	SYNTAX     DisplayString
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"Either telnet, ssh, http or https. Ethernet connection may be through any physical port(s) dedicated to management of the equipment."
+	::= { mwrUserSessionEntry 3 }
+
+mwrUserConnectionState  OBJECT-TYPE
+	SYNTAX     INTEGER {
+		informationNotAvailable (1),
+		sessionTerminated (2),
+		sessionInProgress (3)
+	}
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The state of the session. The session is inProgress if the user is currently logged into the system. The session is terminated if the user has logged out of the system."
+	::= { mwrUserSessionEntry 4 }
+
+mwrUserSession  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrUserName, 
+		mwrUserConnectionType, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when a change in the state of user access is recognized, a new user has logged in or an existing user has logged out."
+	::= { mwrUserNotifications 1 }
+
+mwrUserLoginFailed  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrUserName, 
+		mwrUserConnectionType, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when a user has failed to login."
+	::= { mwrUserNotifications 2 }
+
+mwrUserAccountChanged  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrUserName, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when a change in user account information in the system is detected."
+	::= { mwrUserNotifications 3 }
+
+mwrUserPasswordChanged  NOTIFICATION-TYPE
+	OBJECTS { mwrEventConfigSeverity, 
+		mwrUserName, 
+		equipmentAlarmActiveConditionId, 
+		equipmentTrapInfo,
+		equipmentOutTrapsCounter }
+	STATUS     current
+	DESCRIPTION 
+		"This notification is raised when a user password has changed."
+	::= { mwrUserNotifications 4 }
+END
+

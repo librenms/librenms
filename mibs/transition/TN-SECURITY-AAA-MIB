@@ -1,0 +1,351 @@
+-- *****************************************************************
+-- Transition Networks Security AAA MIB
+--
+-- Copyright (C) 2012  Transition Networks, Inc. All Rights Reserved.
+-- *****************************************************************
+
+TN-SECURITY-AAA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+    Counter32, Unsigned32
+        FROM SNMPv2-SMI
+    tnDevMgmt 
+        FROM TN-MGMT-MIB;
+
+TnAAAProtocol ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "Protocol used with this server.
+                            tacacsplus(1) - TACACS+
+                            radius(2)     - RADIUS
+                       "
+        REFERENCE      "RFC 2138 Remote Authentication Dial In User Service
+                        RFC 2139 RADIUS Accounting 
+                        The TACACS+ Protocol Version 1.78, Internet Draft"
+        SYNTAX         INTEGER {
+                           tacacsplus (1),
+                           radius     (2)
+                       }
+
+TnAAAType ::= TEXTUAL-CONVENTION
+        STATUS         current
+        DESCRIPTION    "Type used with this server.
+                           authentication (1),
+                           authorization  (2),
+                           accounting     (3)
+                       "
+        REFERENCE      "RFC 2138 Remote Authentication Dial In User Service
+                        RFC 2139 RADIUS Accounting 
+                        The TACACS+ Protocol Version 1.78, Internet Draft"
+        SYNTAX         INTEGER {
+                           authentication (1),
+                           authorization  (2),
+                           accounting     (3)
+                       }
+
+tnSecurityAAAMIB OBJECT IDENTIFIER ::= { tnDevMgmt 20 }
+
+
+--
+-- Mib variables
+--
+
+tnAAAServerTimeout OBJECT-TYPE
+    SYNTAX         INTEGER (3..3600)
+    UNITS          "seconds"
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Common Configuration Server Timeout (seconds)."
+    DEFVAL         { 15 }
+    ::= { tnSecurityAAAMIB 1 }
+
+tnAAAServerDeadTime OBJECT-TYPE
+    SYNTAX         INTEGER (0..3600)
+    UNITS          "seconds"
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "Common Configuration Server Dead Time (seconds)."
+    DEFVAL         { 300 }
+    ::= { tnSecurityAAAMIB 2 }
+--
+-- tnAAAServerTable
+--
+
+tnAAAServerTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF TnAAAServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "AAA Server Table"
+    ::= { tnSecurityAAAMIB 3 }
+
+tnAAAServerEntry OBJECT-TYPE
+    SYNTAX         TnAAAServerEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Each entry represents a Server on a device."
+    INDEX          { tnAAAProtocol, tnAAAType, tnAAAServerIndex }
+    ::= { tnAAAServerTable 1 }
+
+TnAAAServerEntry ::= SEQUENCE {
+    tnAAAProtocol             TnAAAProtocol,
+    tnAAAType                 TnAAAType,
+    tnAAAServerIndex          Unsigned32,
+    tnAAAServerEnable         TruthValue,
+    tnAAAServerAddrType       InetAddressType,
+    tnAAAServerAddr           InetAddress,
+    tnAAAServerPort           INTEGER,
+    tnAAAServerSecret         DisplayString
+}
+
+tnAAAProtocol OBJECT-TYPE
+        SYNTAX         TnAAAProtocol
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "The variable denotes the protocol used by the
+                        managed device with the AAA server corresponding to
+                        this entry in the table."
+       ::= { tnAAAServerEntry 1 }
+
+tnAAAType OBJECT-TYPE
+        SYNTAX         TnAAAType
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION    "AAA commonly stands for authentication, authorization and accounting.
+                        It refers to a security architecture for distributed systems,
+                        which enables control over which users are allowed access to which services,
+                        and how much of the resources they have used."
+       ::= { tnAAAServerEntry 2 }
+
+tnAAAServerIndex OBJECT-TYPE
+    SYNTAX         Unsigned32 (1..4294967295)
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "A management station wishing to initiate a new AAA server
+                    configuration should use a random value for this object
+                    when creating an instance of tnAAAServerEntry."
+    ::= { tnAAAServerEntry 3 }
+
+tnAAAServerEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "To enable or disable a server."
+    DEFVAL        { false }
+        ::= { tnAAAServerEntry 4 }
+
+tnAAAServerAddrType OBJECT-TYPE
+    SYNTAX        InetAddressType
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION   "The IP address type of the server.
+                   For a detailed description of this type,
+                   please refer to INET-ADDRESS-MIB.
+                  "
+    ::= { tnAAAServerEntry 5 }
+
+tnAAAServerAddr OBJECT-TYPE
+    SYNTAX         InetAddress
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "The IP address of the server.
+                    For a detailed description of this type, 
+                    please refer to INET-ADDRESS-MIB.
+                   "
+    ::= { tnAAAServerEntry 6 }
+
+tnAAAServerPort OBJECT-TYPE
+    SYNTAX         INTEGER (1..65535)
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "The port to use on theServer."
+    ::= { tnAAAServerEntry 7 }
+
+tnAAAServerSecret OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(1..29))
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION    "The secret - up to 29 characters long - shared
+                    between the Server and the switch.
+                   "
+    ::= { tnAAAServerEntry 8 }
+
+--
+-- Server Statistics
+--
+
+tnStatisticsTable OBJECT-TYPE
+    SYNTAX         SEQUENCE OF TnStatisticsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Table providing statistics for each server."
+    ::= { tnSecurityAAAMIB 4 }
+
+tnStatisticsEntry OBJECT-TYPE
+    SYNTAX         TnStatisticsEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION    "Statistical information about a particular server.
+                    Objects in this table are read-only and appear
+                    automatically whenever a row in the tnStatisticsTable
+                    is made active.
+                   "
+    AUGMENTS       { tnAAAServerEntry }
+    ::= { tnStatisticsTable 1 }
+
+TnStatisticsEntry::=
+    SEQUENCE {
+        tnAcceptPkts             Counter32,
+        tnRejectPkts             Counter32,
+        tnChallengesPkts         Counter32,
+        tnMalResponsePkts        Counter32,
+        tnBadAuthPkts            Counter32,
+        tnUnknownTypePkts        Counter32,
+        tnDroppedPkts            Counter32,
+        tnRequestPkts            Counter32,
+        tnRetransPkts            Counter32,
+        tnPendRequestPkts        Counter32,
+        tnTimeouts               Counter32,
+        tnState                  INTEGER,
+        tnRoundTripTime          Counter32
+    }
+
+--
+-- Authentication statistics
+--
+
+tnAcceptPkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of Accept packets (valid or invalid) received from the server."
+    ::= { tnStatisticsEntry 1 }
+
+tnRejectPkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of Reject packets (valid or invalid) received from the server."
+    ::= { tnStatisticsEntry 2 }
+
+tnChallengesPkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of Challenge packets (valid or invalid) received from the server."
+    ::= { tnStatisticsEntry 3 }
+
+tnMalResponsePkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of malformed packets received from the server.
+                    Malformed packets include packets with an invalid length.
+                    Bad authenticators or Message Authenticator attributes or unknown types
+                    are not included as malformed access responses.
+                   "
+    ::= { tnStatisticsEntry 4 }
+
+tnBadAuthPkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of packets containing invalid authenticators
+                    or Message Authenticator attributes received from the server.
+                   "
+    ::= { tnStatisticsEntry 5 }
+
+tnUnknownTypePkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of packets of unknown types
+                    that were received from the server on the port.
+                   "
+    ::= { tnStatisticsEntry 6 }
+
+tnDroppedPkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of packets that were received from
+                    the server on the port and dropped for some other reason.
+                   "
+    ::= { tnStatisticsEntry 7 }
+
+tnRequestPkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of packets sent to the server.
+                    This does not include retransmissions.
+                   "
+    ::= { tnStatisticsEntry 8 }
+
+tnRetransPkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of packets retransmitted to the server."
+    ::= { tnStatisticsEntry 9 }
+
+tnPendRequestPkts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of packets destined for the server
+                    that have not yet timed out or received a response.
+                    This variable is incremented when a Request is sent and decremented
+                    due to receipt of a Response, timeout, or retransmission.
+                   "
+    ::= { tnStatisticsEntry 10 }
+
+tnTimeouts OBJECT-TYPE
+    SYNTAX         Counter32
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The number of timeouts to the server. After a timeout,
+                    the client may retry to the same server, send to a different server,
+                    or give up. A retry to the same server is counted as a retransmit as well as a timeout.
+                    A send to a different server is counted as a Request as well as a timeout.
+                   "
+    ::= { tnStatisticsEntry 11 }
+
+tnState OBJECT-TYPE
+    SYNTAX         INTEGER {
+                       disabled (1),
+                       notready (2),
+                       ready    (3),
+                       dead     (4)
+                   }
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "Shows the state of the server. It takes one of the following values:
+                        Disabled  - The selected server is disabled.
+                        Not Ready - The server is enabled, but IP communication is not yet
+                                    up and running.
+                        Ready     - The server is enabled, IP communication is up and running,
+                                    and the module is ready to accept accounting or access attempts.
+                        Dead      - Accounting or access attempts were made to this server,
+                                     but it did not reply within the configured timeout.
+                    The server has temporarily been disabled, but will get re-enabled when the 
+                    dead-time expires. The number of seconds left before this occurs is displayed
+                    in parentheses. This state is only reachable when more than one server is enabled.
+                   "
+    ::= { tnStatisticsEntry 12 }
+
+tnRoundTripTime OBJECT-TYPE
+    SYNTAX         Counter32
+    UNITS          "millisecond"
+    MAX-ACCESS     read-only
+    STATUS         current
+    DESCRIPTION    "The time interval (measured in milliseconds) between the most recent Response
+                    and the Request that matched it from the server.
+                    The granularity of this measurement is 100 ms. A value of 0 ms indicates
+                    that there hasn't been round-trip communication with the server yet.
+                   "
+    ::= { tnStatisticsEntry 13 }
+
+END

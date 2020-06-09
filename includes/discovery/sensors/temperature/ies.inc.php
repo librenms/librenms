@@ -2,7 +2,7 @@
 
 echo 'ZyXEL IES ';
 
-$oids = array();
+$oids = [];
 
 $oids = snmpwalk_cache_multi_oid($device, 'accessSwitchSysTempCurValue', $oids, 'ZYXEL-AS-MIB');
 $oids = snmpwalk_cache_multi_oid($device, 'accessSwitchSysTempHighThresh', $oids, 'ZYXEL-AS-MIB');

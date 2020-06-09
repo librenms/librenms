@@ -1,0 +1,71 @@
+mib:  WebGraph-Thermo-Hygrometer-MIB:WebGraph-Thermo-Hygro-Barometer-MIB:WebGraph-Thermo-Hygrometer-US-MIB
+modules:
+    sensors:
+        temperature:
+            options:
+                    divisor: 10
+            data:
+                -
+                    oid: wtWebGraphThermHygro
+                    value: wtWebGraphThermHygroBinaryTempValue
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
+                    descr: wtWebGraphThermHygroPortName
+                    index: wtWebGraphThermHygroSensorNo.{{ $index }}
+                    skip_values:
+                    -
+                        oid: wtWebGraphThermHygroPortName
+                        op: 'not_contains'
+                        value: 'Temp'
+                -
+                    oid: wtWebGraphThermoHygro
+                    value: wtWebGraphThermoHygroBinaryTempValue
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.42.1.4.1.1.{{ $index }}'
+                    descr: wtWebGraphThermoHygroPortName
+                    index: wtWebGraphThermoHygroSensorNo.{{ $index }}
+                    skip_values:
+                    -
+                        oid: wtWebGraphThermoHygroPortName
+                        op: 'not_contains'
+                        value: 'Temp'
+        humidity:
+            options:
+                    divisor: 10
+            data:
+                -
+                    oid: wtWebGraphThermHygro
+                    value: wtWebGraphThermHygroBinaryTempValue
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
+                    descr: wtWebGraphThermHygroPortName
+                    index: wtWebGraphThermHygroSensorNo.{{ $index }}
+                    skip_values:
+                    -
+                        oid: wtWebGraphThermHygroPortName
+                        op: 'not_contains'
+                        value: 'Feucht'
+                -
+                    oid: wtWebGraphThermoHygro
+                    value: wtWebGraphThermoHygroBinaryTempValue
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.9.1.4.1.1.{{ $index }}'
+                    descr: wtWebGraphThermoHygroPortName
+                    index: wtWebGraphThermoHygroSensorNo.{{ $index }}
+                    skip_values:
+                    -
+                        oid: wtWebGraphThermoHygroPortName
+                        op: 'not_contains'
+                        value: 'Feucht'
+        pressure:
+            options:
+                    divisor: 100
+            data:
+                -
+                    oid: wtWebGraphThermoBaro
+                    value: wtWebGraphThermoBaroBinaryTempValue
+                    num_oid: '.1.3.6.1.4.1.5040.1.2.16.1.4.1.1.{{ $index }}'
+                    descr: wtWebGraphThermoBaroPortName
+                    index: wtWebGraphThermoBaroSensorNo.{{ $index }}
+                    skip_values:
+                    -
+                        oid: wtWebGraphThermoBaroPortName
+                        op: 'not_contains'
+                        value: 'druck'
+

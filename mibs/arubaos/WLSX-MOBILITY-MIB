@@ -1,4 +1,4 @@
---- ArubaOS 6.5.2.0_59123
+--- ArubaOS 8.5.0.0_70258
 -- vim:set ts=4 sw=4:
 WLSX-MOBILITY-MIB DEFINITIONS ::= BEGIN
 

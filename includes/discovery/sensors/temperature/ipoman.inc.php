@@ -3,7 +3,7 @@
 // FIXME: EMD "stack" support?
 // FIXME: What to do with IPOMANII-MIB::ipmEnvEmdConfigTempOffset.0 ?
 echo ' IPOMANII-MIB ';
-$emd_installed = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdStatusEmdType.0', ' -Oqv');
+$emd_installed = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdStatusEmdType.0', '-Oqv');
 
 if ($emd_installed != 'disabled') {
     $descr      = snmp_get($device, 'IPOMANII-MIB::ipmEnvEmdConfigTempName.0', '-Oqv');

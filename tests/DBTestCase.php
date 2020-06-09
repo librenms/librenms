@@ -27,18 +27,12 @@ namespace LibreNMS\Tests;
 
 abstract class DBTestCase extends TestCase
 {
-    protected $db_name;
-
-    public function setUp()
+    public static function setUpBeforeClass(): void
     {
-        parent::setUp();
-        $this->dbSetUp();
-        $this->db_name = dbFetchCell('SELECT DATABASE()');
-    }
+        if (!getenv('DBTEST')) {
+            static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
 
-    public function tearDown()
-    {
-        $this->dbTearDown();
-        parent::tearDown();
+        parent::setUpBeforeClass();
     }
 }

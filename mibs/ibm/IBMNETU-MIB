@@ -1,0 +1,332 @@
+IBMNETU-MIB DEFINITIONS ::= BEGIN
+
+------------------------------------------------------------------
+-- IBM Network Utility Enterprise MIB (SNMP Version 1 Format)
+------------------------------------------------------------------
+--
+--    This MIB defines the enterprise specific management
+--    objects for the Network Utility family of products.
+--
+--    This MIB is defined in the SNMP version 1 SMI format.
+--
+--    May 06, 1998
+--
+--    Contact Information:
+--
+--            Randy Worzella
+--            IBM Corp.
+--            G420/664
+--            Research Triangle Park, NC 27709
+--
+--            phone:    919-254-2202
+--            email:    worzella@us.ibm.com
+--
+------------------------------------------------------------------
+
+IMPORTS
+         enterprises
+                  FROM RFC1155-SMI
+         OBJECT-TYPE
+                  FROM RFC-1212;
+
+-- Path to ibmnetu product
+
+ibm      OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd  OBJECT IDENTIFIER ::= { ibm 6 }
+ibmnetu  OBJECT IDENTIFIER ::= { ibmProd 150 }
+
+------------------------------------------------------------------
+-- IBM Network Utility Anchor
+------------------------------------------------------------------
+ibmnetuadmin     OBJECT IDENTIFIER ::= { ibmnetu 1 }
+ibmnetusystem    OBJECT IDENTIFIER ::= { ibmnetu 2 }
+ibmnetuhardware  OBJECT IDENTIFIER ::= { ibmnetu 3 }
+ibmneturouting   OBJECT IDENTIFIER ::= { ibmnetu 4 }
+ibmnetuswitching OBJECT IDENTIFIER ::= { ibmnetu 5 }
+
+------------------------------------------------------------------
+-- IBM Network Utility Administrative
+------------------------------------------------------------------
+ibmnetuadminproducts   OBJECT IDENTIFIER ::= { ibmnetuadmin 1 }
+
+ibmnetumod400    OBJECT IDENTIFIER ::= { ibmnetuadminproducts 1 }
+
+ibmnetuadminOID   OBJECT IDENTIFIER ::= { ibmnetuadmin 2 }
+
+ibmnetuadminDebug OBJECT IDENTIFIER ::= { ibmnetuadmin 3 }
+
+------------------------------------------------------------------
+-- IBM Network Utility System
+------------------------------------------------------------------
+ibmnetusystemInfo    OBJECT IDENTIFIER ::= { ibmnetusystem 1 }
+ibmnetucfgInfo       OBJECT IDENTIFIER ::= { ibmnetusystem 2 }
+
+------------------------------------------------------------------
+-- IBM Network Utility Hardware
+------------------------------------------------------------------
+ibmnetuhardwareGeneral     OBJECT IDENTIFIER ::= { ibmnetuhardware 1 }
+ibmnetuhardware400Specific OBJECT IDENTIFIER ::= { ibmnetuhardware 2 }
+
+------------------------------------------------------------------
+-- IBM Network Utility Routing
+------------------------------------------------------------------
+
+-- Nothing defined yet !!
+
+------------------------------------------------------------------
+-- IBM Network Utility Switching
+------------------------------------------------------------------
+
+-- Nothing defined yet !!
+
+------------------------------------------------------------------
+-- Hardware Information
+------------------------------------------------------------------
+------------------------------------------------------------------
+-- Hardware Chip Set Information
+------------------------------------------------------------------
+
+ibmnetuEnetChipSet  OBJECT IDENTIFIER ::= { ibmnetuadminOID 1 }
+
+------------------------------------------------------------------
+-- The Network Utility 10 Megabit Ethernet LAN adapters use an Ethernet
+-- chipset comprised of the following:
+--
+--   MultiProtocolChip     MPC-1 ASIC        Toshiba
+--
+--   10BaseT               PE65428           Pulse Engineering
+--                         DP83912           National
+--                         SF1012            Valor
+--
+--   10Base2               S553-10060AE      Belfuse
+--                         DP8392CV-1        National
+--
+-- For the Ethernet MIB, however, the OID identifying the chipset
+-- will simply be enetChipSetToshiba.
+--
+-- The Network Utility 10/100 Megabit Fast Ethernet LAN adapters use an
+-- Ethernet chipset comprised of the following:
+--
+--   Controller            AM79C971          Advanced Micro Devices
+--
+--   Physical Layer        DP83840A          National Semi
+--
+--   Content Addressable   MU9C4480A         Music Semi
+--   Memory
+--
+--   TB Filter PLA         Xilinx PLA        Xilinx
+--
+-- For the Ethernet MIB, however, the OID identifying the chipset
+-- will simply be enetChipSetAMD.
+--
+------------------------------------------------------------------
+enetChipSetToshiba  OBJECT IDENTIFIER ::= { ibmnetuEnetChipSet 1 }
+enetChipSetAMD      OBJECT IDENTIFIER ::= { ibmnetuEnetChipSet 2 }
+
+
+------------------------------------------------------------------
+-- Hardware PCI Adapter Information
+------------------------------------------------------------------
+
+ibmnetuPCIAdapTable  OBJECT-TYPE
+   SYNTAX  SEQUENCE OF IbmnetuPCIAdapEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "A table of information about PCI adapters in this box."
+   ::= { ibmnetuhardwareGeneral 1 }
+
+ibmnetuPCIAdapEntry  OBJECT-TYPE
+   SYNTAX  IbmnetuPCIAdapEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "An entry containing objects to describe the adapter
+         in a given slot."
+   INDEX  { ibmnetuPCIAdapSlotNum }
+   ::= { ibmnetuPCIAdapTable 1 }
+
+IbmnetuPCIAdapEntry  ::=
+   SEQUENCE {
+        ibmnetuPCIAdapSlotNum
+           INTEGER,
+        ibmnetuPCIAdapType
+           INTEGER,
+        ibmnetuPCIAdapOperStatus
+           INTEGER
+   }
+
+ibmnetuPCIAdapSlotNum  OBJECT-TYPE
+   SYNTAX  INTEGER (1..65535)
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a slot location where an adapter
+         can be inserted."
+   ::= { ibmnetuPCIAdapEntry 1 }
+
+ibmnetuPCIAdapType  OBJECT-TYPE
+   SYNTAX  INTEGER {
+           unknown                       (1),
+           not-present                   (2),
+           atm-mmf-lic294                (3),
+           reserved1                     (4),
+           atm-smf-lic295                (5),
+           reserved2                     (6),
+           token-ring-lic280             (7),
+           escon-lic287                  (8),
+           reserved3                     (9),
+           reserved4                     (10),
+           serial-rs232-lic282           (11),
+           serial-v35-lic290             (12),
+           serial-x21-lic291             (13),
+           ethernet-lic281               (14),
+           ethernet-fast-lic288          (15),
+           serial-hssi-lic289            (16),
+           fddi-lic286                   (17),
+           reserved5                     (18),
+           reserved6                     (19),
+           parallel-channel-lic299       (20)}
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The type of adapter that is inserted into this slot.
+         If no adapter is present, the variable will take the value
+         not-present(2). The enumerations marked reserved# are saved
+         for future enhancements."
+   ::= { ibmnetuPCIAdapEntry 2 }
+
+ibmnetuPCIAdapOperStatus  OBJECT-TYPE
+   SYNTAX  INTEGER {
+           unknown         (1),
+           not-configured  (2),
+           not-present     (3),
+           does-not-apply  (4),
+           enable-pending  (5),
+           enabled         (6),
+           disable-pending (7),
+           disabled        (8),
+           not-initialized (9),
+           unknown-device  (10),
+           hardware-error  (11),
+           not-powered     (12),
+           diagnostics     (13),
+           wrs-available   (14),
+           mis-configured  (15)}
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The operational status of this PCI adapter.
+
+         unknown (1) : If there was problem determining the operational
+                       status of the adapter.
+
+         not-configured (2) : If the adapter inserted in the slot is
+                              recognized but no router configuration exists.
+
+         not-present (3) : If no adapter is currently inserted.
+
+         does-not-apply (4) : If this adapter does not contain an
+                              operational state.
+
+         enable-pending (5) : If commands have been issued to enable the
+                              adapter but have not been completed.
+
+         enabled (6) : If commands have been successfully issued
+                       to enable the adapter.
+
+         disable-pending (7) : If commands have been issued to disable the
+                               adapter but have not been completed.
+
+         disabled (8) : If commands have been successfully issued
+                        to disable the adapter.
+
+         not-initialized (9) : If the adapter has not completed its
+                               initialization.
+
+         unknown-device (10) : If the adapter inserted in the slot can not be
+                               recognized.
+
+         hardware-error (11) : If the adapter can not be used nor made
+                               ready to be used.
+
+         not-powered (12) : If the adapter has had a problem obtaining
+                            power from its slot.
+
+         diagnostics (13) : If the adapter is currently undergoing diagnostics.
+
+         wrs-available (14) : If the adapter is currently configured and
+                              available for WAN restoral.
+
+         mis-configured (15) : If the adapter is inserted in the slot but the
+                               router configuration is of a different type."
+
+   ::= { ibmnetuPCIAdapEntry 3 }
+
+
+
+------------------------------------------------------------------
+-- Management application graphic accelerator table
+------------------------------------------------------------------
+
+ibmnetuGraphicTable  OBJECT-TYPE
+   SYNTAX  SEQUENCE OF IbmnetuGraphicEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "A table of information mapping a slot and port to
+         an interface table ifIndex. An entry exists
+         in this table only if the ifConnectorPresent
+         object is true"
+   ::= { ibmnetuhardwareGeneral 2 }
+
+ibmnetuGraphicEntry  OBJECT-TYPE
+   SYNTAX  IbmnetuGraphicEntry
+   ACCESS  not-accessible
+   STATUS  mandatory
+   DESCRIPTION
+        "An entry mapping slot and port to an interface
+         table ifIndex."
+   INDEX  { ibmnetuGraphicSlotNum, ibmnetuGraphicPortNum }
+   ::= { ibmnetuGraphicTable 1 }
+
+IbmnetuGraphicEntry  ::=
+   SEQUENCE {
+        ibmnetuGraphicSlotNum
+           INTEGER,
+        ibmnetuGraphicPortNum
+           INTEGER,
+        ibmnetuGraphicifIndex
+           INTEGER
+   }
+
+ibmnetuGraphicSlotNum  OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a slot location where an adapter
+         can be inserted."
+   ::= { ibmnetuGraphicEntry 1 }
+
+ibmnetuGraphicPortNum  OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The number identifying a port on a given adapter. A port
+         implies a physical connector is associated with it."
+   ::= { ibmnetuGraphicEntry 2 }
+
+ibmnetuGraphicifIndex  OBJECT-TYPE
+   SYNTAX  INTEGER
+   ACCESS  read-only
+   STATUS  mandatory
+   DESCRIPTION
+        "The ifIndex of the interface table entry associated with this
+         port on an adapter. By definition, the ifEntry has
+         ifConnectorPresent = true."
+   ::= { ibmnetuGraphicEntry 3 }
+
+
+END

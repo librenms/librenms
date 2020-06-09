@@ -13,7 +13,7 @@
 d_echo('Quanta Temperatures');
 $sensor_type = 'quanta_temp';
 $sensors_id_oid = 'boxServicesTempSensorState';
-$sensors_values = snmpwalk_cache_multi_oid($device, $sensors_id_oid, array(), 'NETGEAR-BOXSERVICES-PRIVATE-MIB');
+$sensors_values = snmpwalk_cache_multi_oid($device, $sensors_id_oid, [], 'NETGEAR-BOXSERVICES-PRIVATE-MIB');
 $numeric_oid_base = '.1.3.6.1.4.1.4413.1.1.43.1.8.1.4';
 
 foreach ($sensors_values as $index => $entry) {

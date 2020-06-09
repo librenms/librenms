@@ -58,7 +58,7 @@ foreach (explode("\n", $temps) as $i => $t) {
 // F10-S-SERIES-CHASSIS-MIB::chStackUnitModelID.1 = STRING: S25-01-GE-24V
 echo 'FTOS C-Series ';
 
-$oids = snmpwalk_cache_oid($device, 'chStackUnitTemp', array(), 'F10-S-SERIES-CHASSIS-MIB', 'ftos');
+$oids = snmpwalk_cache_oid($device, 'chStackUnitTemp', [], 'F10-S-SERIES-CHASSIS-MIB', 'ftos');
 $oids = snmpwalk_cache_oid($device, 'chStackUnitSysType', $oids, 'F10-S-SERIES-CHASSIS-MIB', 'ftos');
 
 if (is_array($oids)) {

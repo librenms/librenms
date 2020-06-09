@@ -1,0 +1,12 @@
+os: audiocodes
+group: audiocodes
+text: 'Audiocodes'
+type: network
+icon: audiocodes
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+mib_dir:
+    - audiocodes
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.5003.8.1.1

@@ -42,7 +42,6 @@ class ObjectCache implements ArrayAccess
      */
     public function __construct($obj)
     {
-        global $config;
         $this->obj = $obj;
         if (isset($GLOBALS['_ObjCache'][$obj])) {
             $this->data = $GLOBALS['_ObjCacheSkell'][$obj];
@@ -55,9 +54,9 @@ class ObjectCache implements ArrayAccess
                 $GLOBALS['_ObjCache'] = array();
             }
 
-            if (file_exists($config['install_dir'].'/includes/caches/'.$obj.'.inc.php')) {
+            if (file_exists(\LibreNMS\Config::get('install_dir') . '/includes/caches/' . $obj . '.inc.php')) {
                 $data = array();
-                include $config['install_dir'].'/includes/caches/'.$obj.'.inc.php';
+                include \LibreNMS\Config::get('install_dir') . '/includes/caches/' . $obj . '.inc.php';
                 $this->data = $data;
                 $GLOBALS['_ObjCacheSkell'][$obj] = $this->data;
                 if (!(isset($GLOBALS['_ObjCache'][$obj]) && is_array($GLOBALS['_ObjCache'][$obj]))) {

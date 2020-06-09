@@ -1,0 +1,92 @@
+-- ************************************************************
+-- SILVERPEAK-PRODUCTS-MIB.txt:   Silver Peak Systems, Inc.
+--                       Product Object Identifier Assignments
+--
+-- Copyright (c) 2011 Silver Peak Systems, Inc.
+-- All rights reserved.
+--
+-- ************************************************************
+--
+
+SILVERPEAK-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    silverpeakModules,
+    silverpeakProducts
+        FROM SILVERPEAK-SMI;
+
+silverpeakProductsMIB MODULE-IDENTITY
+    LAST-UPDATED    "201101240000Z"
+    ORGANIZATION    "Silver Peak Systems, Inc."
+    CONTACT-INFO
+            "  URL: http://www.silver-peak.com/contact
+            E-mail: support@silver-peak.com "
+    DESCRIPTION
+        "This module defines the object identifiers that are
+        assigned to various hardware platforms, and hence are
+        returned as values for sysObjectID."
+    ::= { silverpeakProducts 2 }
+
+
+spsNX2500 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 1 }
+spsNX3500 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 2 }
+spsNX5500 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 3 }
+spsNX7500 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 4 }
+spsNX8500 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 5 }
+spsNX1700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 6 }
+spsNX2600 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 7 }
+spsNX2610 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 8 }
+spsNX2700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 9 }
+spsNX3600 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 10 }
+spsNX3700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 11 }
+spsNX5504 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 12 }
+spsNX5600 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 13 }
+spsNX5700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 14 }
+spsNX7504 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 15 }
+spsNX7600 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 16 }
+spsNX7700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 17 }
+spsNX8504 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 18 }
+spsNX8600 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 19 }
+spsNX8700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 20 }
+spsNX9610 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 21 }
+spsNX9700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 22 }
+spsVX0100 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 23 }
+spsVX2000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 24 }
+spsVX5000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 25 }
+spsVX1000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 26 }
+spsVX3000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 27 }
+spsNX10700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 28 }
+spsVRX8   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 29 }
+spsVXXpress OBJECT IDENTIFIER ::= { silverpeakProductsMIB 30 }
+spsVXUnlicensed OBJECT IDENTIFIER ::= { silverpeakProductsMIB 31 }
+spsVX500 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 32 }
+spsVX6000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 33 }
+spsVX7000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 34 }
+spsVX8000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 35 }
+spsVX9000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 36 }
+spsNX11700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 37 }
+spsVRX2   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 38 }
+spsVRX4   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 39 }
+spsNX6700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 40 }
+spsVRX6   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 41 }
+spsNX700  OBJECT IDENTIFIER ::= { silverpeakProductsMIB 42 }
+spsNX12700 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 43 }
+spsVX0000 OBJECT IDENTIFIER ::= { silverpeakProductsMIB 44 }
+spsCPX    OBJECT IDENTIFIER ::= { silverpeakProductsMIB 45 }
+spsECV    OBJECT IDENTIFIER ::= { silverpeakProductsMIB 46 }
+spsECXS   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 47 }
+spsECS    OBJECT IDENTIFIER ::= { silverpeakProductsMIB 48 }
+spsECM    OBJECT IDENTIFIER ::= { silverpeakProductsMIB 49 }
+spsECL    OBJECT IDENTIFIER ::= { silverpeakProductsMIB 50 }
+spsECXL   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 51 }
+spsECUS   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 52 }
+spsECMB   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 53 }
+spsECMP   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 54 }
+spsECLB   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 55 }
+spsECLP   OBJECT IDENTIFIER ::= { silverpeakProductsMIB 56 }
+spsECXLB  OBJECT IDENTIFIER ::= { silverpeakProductsMIB 57 }
+spsECXLP  OBJECT IDENTIFIER ::= { silverpeakProductsMIB 58 }
+
+END

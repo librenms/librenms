@@ -23,29 +23,17 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Slack extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
+        $slack_opts = $this->parseUserOptions($this->config['slack-options']);
         $slack_opts['url'] = $this->config['slack-url'];
-        foreach (explode(PHP_EOL, $this->config['slack-options']) as $option) {
-            list($k,$v) = explode('=', $option);
-            $slack_opts[$k] = $v;
-        }
-        return $this->contactSlack($obj, $slack_opts);
-    }
 
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $tmp_api) {
-            $this->contactSlack($obj, $tmp_api);
-        }
-        return true;
+        return $this->contactSlack($obj, $slack_opts);
     }
 
     public static function contactSlack($obj, $api)
@@ -53,7 +41,7 @@ class Slack extends Transport
         $host          = $api['url'];
         $curl          = curl_init();
         $slack_msg     = strip_tags($obj['msg']);
-        $color         = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
+        $color         = self::getColorForState($obj['state']);
         $data          = [
             'attachments' => [
                 0 => [
@@ -66,6 +54,8 @@ class Slack extends Transport
                 ],
             ],
             'channel' => $api['channel'],
+            'username' => $api['username'],
+            'icon_emoji' => ':' .$api['icon_emoji'].':',
         ];
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

@@ -1,0 +1,28 @@
+os: rutos
+type: network
+group: unix
+text: 'teltonika rutos'
+icon: teltonika
+ifXmcbc: true
+ifname: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_ucd_memory, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+poller_modules:
+    bgp-peers: false
+    ospf: false
+    stp: false
+discovery_modules:
+    applications: false
+    bgp-peers: false
+    stp: false
+    vmware-vminfo: false
+    libvirt-vminfo: false
+processor_stacked: true
+discovery:
+    -
+      sysObjectID:
+            - .1.3.6.1.4.1.8072.3.2.10
+      sysDescr_regex:
+            - '/ Teltonika/'

@@ -1,0 +1,1642 @@
+DKT-RMON-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+    Counter32                   FROM SNMPv2-SMI
+    OBJECT-GROUP				FROM SNMPv2-CONF
+    dkt                         FROM DKT-MIB;
+
+rmonMIB MODULE-IDENTITY
+    LAST-UPDATED  "200812170000Z"
+    ORGANIZATION "DKT A/S"
+    CONTACT-INFO
+        "postal:  DKT A/S
+                  Fanoevej 6                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+                  DK-4060 Kirke Saaby
+                  Denmark
+
+         email:   info@dktcomega.com"
+    DESCRIPTION   "DKT RMON Ethernet statistics MIB."
+    ::= { dkt 13 }
+
+
+rmonHistogramMode OBJECT-TYPE
+    SYNTAX	INTEGER (0..2)
+    MAX-ACCESS	read-write
+    STATUS	current
+    DESCRIPTION
+	"Sets the mode of statistics capture. 0 = Rx only, 1 = Tx only, 2 = Sum of Rx and Tx."
+    ::= { rmonMIB 1 }
+
+rmonFlushAllCounter OBJECT-TYPE
+    SYNTAX	INTEGER (1)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Set to 1 for clearing all counters on all ports"
+    ::= { rmonMIB 2 }
+
+rmonFlushPortCounter OBJECT-TYPE
+    SYNTAX	INTEGER (1)
+    MAX-ACCESS	write-only
+    STATUS	current
+    DESCRIPTION
+	"Set to 1 for clearing all counters on a ports, input parameter is port number"
+    ::= { rmonMIB 3 }
+
+rmonPorts OBJECT IDENTIFIER ::= { rmonMIB 4 }
+
+rmonCPUPort OBJECT IDENTIFIER ::= { rmonPorts 1 }
+
+rmonCPUPortGetInGoodOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, low size, that is frames that are not bad."
+    ::= { rmonCPUPort 1 }
+
+rmonCPUPortGetInGoodOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, high size, that is frames that are not bad."
+    ::= { rmonCPUPort 2 }
+
+rmonCPUPortGetInBadOctets OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of lengths of all bad Ethernet frames received not counting Preamble"
+    ::= { rmonCPUPort 3 }
+		
+rmonCPUPortGetOutFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames transmitted incorrectly due to an internal MAC transmit error, for example, bad CRC detected when the frame was read from memory"
+    ::= { rmonCPUPort 4 }
+		
+rmonCPUPortGetInUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Unicast destination address"
+    ::= { rmonCPUPort 5 }
+
+rmonCPUPortGetDeferred OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of succesfully transmitted frames that were delayed because the medium was busy during the first attempt and when the frame was transmitted without any collisions (the counter is valid in half-duplex mode only)"
+    ::= { rmonCPUPort 6 }
+
+rmonCPUPortGetInBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Broadcast destination MAC address"
+    ::= { rmonCPUPort 7 }
+
+rmonCPUPortGetInMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Multicast destination MAC address"
+    ::= { rmonCPUPort 8 }
+
+rmonCPUPortGetOctets64 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of exactly 64 octets, including those with errors"
+    ::= { rmonCPUPort 9 }
+
+rmonCPUPortGetOctets127 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 65 and 127 octets inclusive, including those with errors"
+    ::= { rmonCPUPort 10 }
+
+rmonCPUPortGetOctets255 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 128 and 255 octets inclusive, including those with errors"
+    ::= { rmonCPUPort 11 }
+
+rmonCPUPortGetOctets511 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 256 and 511 octets inclusive, including those with errors"
+    ::= { rmonCPUPort 12 }
+
+rmonCPUPortGetOctets1023 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 512 and 1023 octets inclusive, including those with errors"
+    ::= { rmonCPUPort 13 }
+
+rmonCPUPortGetOctetsMax OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 1024 and MaxSize octets inclusive, including those with errors"
+    ::= { rmonCPUPort 14 }
+
+rmonCPUPortGetOutOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, low size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonCPUPort 15 }
+
+rmonCPUPortGetOutOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, high size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonCPUPort 16 }
+
+rmonCPUPortGetOutUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Unicast destination MAC address"
+    ::= { rmonCPUPort 17 }
+
+rmonCPUPortGetExcessive OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames dropped in the transmit MAC due to excessive collision condition. The counter is application in half-duplex mode only"
+    ::= { rmonCPUPort 18 }
+
+rmonCPUPortGetOutMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Multicast destination MAC address"
+    ::= { rmonCPUPort 19 }
+
+rmonCPUPortGetOutBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Broadcast destination MAC address"
+    ::= { rmonCPUPort 20 }
+
+rmonCPUPortGetSingle OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced exactly one collision. The counter is application in half-duplex mode only"
+    ::= { rmonCPUPort 21 }
+
+rmonCPUPortGetOutPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames sent"
+    ::= { rmonCPUPort 22 }
+
+rmonCPUPortGetInPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames received"
+    ::= { rmonCPUPort 23 }
+
+rmonCPUPortGetMultiple OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced multiple collisions. The counter is application in half-duplex mode only"
+    ::= { rmonCPUPort 24 }
+
+rmonCPUPortGetUndersize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets but with a valid FCS"
+    ::= { rmonCPUPort 25 }
+
+rmonCPUPortGetFragments OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets and an invalid FCS"
+    ::= { rmonCPUPort 26 }
+
+rmonCPUPortGetOversize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets but with a valid FCS"
+    ::= { rmonCPUPort 27 }
+
+rmonCPUPortGetJabber OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets and an invalid FCS"
+    ::= { rmonCPUPort 28 }
+
+rmonCPUPortGetInMACRcvErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with an Rx_Error event seen by the receive side of the MAC"
+    ::= { rmonCPUPort 29 }
+
+rmonCPUPortGetInFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a CRC error not counted in InFragments, InnJabber"
+    ::= { rmonCPUPort 30 }
+
+rmonCPUPortGetCollisions OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of collision events seen by the MAC not including those counted in Late and Excessive"
+    ::= { rmonCPUPort 31 }
+
+rmonCPUPortGetLate OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of Late collision events seen by the MAC"
+    ::= { rmonCPUPort 32 }
+
+
+rmonWANPort OBJECT IDENTIFIER ::= { rmonPorts 2 }
+
+rmonWANPortGetInGoodOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, low size, that is frames that are not bad."
+    ::= { rmonWANPort 1 }
+
+rmonWANPortGetInGoodOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, high size, that is frames that are not bad."
+    ::= { rmonWANPort 2 }
+
+rmonWANPortGetInBadOctets OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of lengths of all bad Ethernet frames received not counting Preamble"
+    ::= { rmonWANPort 3 }
+		
+rmonWANPortGetOutFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames transmitted incorrectly due to an internal MAC transmit error, for example, bad CRC detected when the frame was read from memory"
+    ::= { rmonWANPort 4 }
+		
+rmonWANPortGetInUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Unicast destination address"
+    ::= { rmonWANPort 5 }
+
+rmonWANPortGetDeferred OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of succesfully transmitted frames that were delayed because the medium was busy during the first attempt and when the frame was transmitted without any collisions (the counter is valid in half-duplex mode only)"
+    ::= { rmonWANPort 6 }
+
+rmonWANPortGetInBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Broadcast destination MAC address"
+    ::= { rmonWANPort 7 }
+
+rmonWANPortGetInMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Multicast destination MAC address"
+    ::= { rmonWANPort 8 }
+
+rmonWANPortGetOctets64 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of exactly 64 octets, including those with errors"
+    ::= { rmonWANPort 9 }
+
+rmonWANPortGetOctets127 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 65 and 127 octets inclusive, including those with errors"
+    ::= { rmonWANPort 10 }
+
+rmonWANPortGetOctets255 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 128 and 255 octets inclusive, including those with errors"
+    ::= { rmonWANPort 11 }
+
+rmonWANPortGetOctets511 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 256 and 511 octets inclusive, including those with errors"
+    ::= { rmonWANPort 12 }
+
+rmonWANPortGetOctets1023 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 512 and 1023 octets inclusive, including those with errors"
+    ::= { rmonWANPort 13 }
+
+rmonWANPortGetOctetsMax OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 1024 and MaxSize octets inclusive, including those with errors"
+    ::= { rmonWANPort 14 }
+
+rmonWANPortGetOutOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, low size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonWANPort 15 }
+
+rmonWANPortGetOutOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, high size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonWANPort 16 }
+
+rmonWANPortGetOutUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Unicast destination MAC address"
+    ::= { rmonWANPort 17 }
+
+rmonWANPortGetExcessive OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames dropped in the transmit MAC due to excessive collision condition. The counter is application in half-duplex mode only"
+    ::= { rmonWANPort 18 }
+
+rmonWANPortGetOutMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Multicast destination MAC address"
+    ::= { rmonWANPort 19 }
+
+rmonWANPortGetOutBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Broadcast destination MAC address"
+    ::= { rmonWANPort 20 }
+
+rmonWANPortGetSingle OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced exactly one collision. The counter is application in half-duplex mode only"
+    ::= { rmonWANPort 21 }
+
+rmonWANPortGetOutPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames sent"
+    ::= { rmonWANPort 22 }
+
+rmonWANPortGetInPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames received"
+    ::= { rmonWANPort 23 }
+
+rmonWANPortGetMultiple OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced multiple collisions. The counter is application in half-duplex mode only"
+    ::= { rmonWANPort 24 }
+
+rmonWANPortGetUndersize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets but with a valid FCS"
+    ::= { rmonWANPort 25 }
+
+rmonWANPortGetFragments OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets and an invalid FCS"
+    ::= { rmonWANPort 26 }
+
+rmonWANPortGetOversize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets but with a valid FCS"
+    ::= { rmonWANPort 27 }
+
+rmonWANPortGetJabber OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets and an invalid FCS"
+    ::= { rmonWANPort 28 }
+
+rmonWANPortGetInMACRcvErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with an Rx_Error event seen by the receive side of the MAC"
+    ::= { rmonWANPort 29 }
+
+rmonWANPortGetInFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a CRC error not counted in InFragments, InnJabber"
+    ::= { rmonWANPort 30 }
+
+rmonWANPortGetCollisions OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of collision events seen by the MAC not including those counted in Late and Excessive"
+    ::= { rmonWANPort 31 }
+
+rmonWANPortGetLate OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of Late collision events seen by the MAC"
+    ::= { rmonWANPort 32 }
+
+
+rmonLAN1Port OBJECT IDENTIFIER ::= { rmonPorts 3 }
+
+rmonLAN1PortGetInGoodOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, low size, that is frames that are not bad."
+    ::= { rmonLAN1Port 1 }
+
+rmonLAN1PortGetInGoodOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, high size, that is frames that are not bad."
+    ::= { rmonLAN1Port 2 }
+
+rmonLAN1PortGetInBadOctets OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of lengths of all bad Ethernet frames received not counting Preamble"
+    ::= { rmonLAN1Port 3 }
+		
+rmonLAN1PortGetOutFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames transmitted incorrectly due to an internal MAC transmit error, for example, bad CRC detected when the frame was read from memory"
+    ::= { rmonLAN1Port 4 }
+		
+rmonLAN1PortGetInUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Unicast destination address"
+    ::= { rmonLAN1Port 5 }
+
+rmonLAN1PortGetDeferred OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of succesfully transmitted frames that were delayed because the medium was busy during the first attempt and when the frame was transmitted without any collisions (the counter is valid in half-duplex mode only)"
+    ::= { rmonLAN1Port 6 }
+
+rmonLAN1PortGetInBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Broadcast destination MAC address"
+    ::= { rmonLAN1Port 7 }
+
+rmonLAN1PortGetInMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Multicast destination MAC address"
+    ::= { rmonLAN1Port 8 }
+
+rmonLAN1PortGetOctets64 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of exactly 64 octets, including those with errors"
+    ::= { rmonLAN1Port 9 }
+
+rmonLAN1PortGetOctets127 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 65 and 127 octets inclusive, including those with errors"
+    ::= { rmonLAN1Port 10 }
+
+rmonLAN1PortGetOctets255 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 128 and 255 octets inclusive, including those with errors"
+    ::= { rmonLAN1Port 11 }
+
+rmonLAN1PortGetOctets511 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 256 and 511 octets inclusive, including those with errors"
+    ::= { rmonLAN1Port 12 }
+
+rmonLAN1PortGetOctets1023 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 512 and 1023 octets inclusive, including those with errors"
+    ::= { rmonLAN1Port 13 }
+
+rmonLAN1PortGetOctetsMax OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 1024 and MaxSize octets inclusive, including those with errors"
+    ::= { rmonLAN1Port 14 }
+
+rmonLAN1PortGetOutOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, low size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonLAN1Port 15 }
+
+rmonLAN1PortGetOutOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, high size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonLAN1Port 16 }
+
+rmonLAN1PortGetOutUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Unicast destination MAC address"
+    ::= { rmonLAN1Port 17 }
+
+rmonLAN1PortGetExcessive OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames dropped in the transmit MAC due to excessive collision condition. The counter is application in half-duplex mode only"
+    ::= { rmonLAN1Port 18 }
+
+rmonLAN1PortGetOutMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Multicast destination MAC address"
+    ::= { rmonLAN1Port 19 }
+
+rmonLAN1PortGetOutBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Broadcast destination MAC address"
+    ::= { rmonLAN1Port 20 }
+
+rmonLAN1PortGetSingle OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced exactly one collision. The counter is application in half-duplex mode only"
+    ::= { rmonLAN1Port 21 }
+
+rmonLAN1PortGetOutPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames sent"
+    ::= { rmonLAN1Port 22 }
+
+rmonLAN1PortGetInPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames received"
+    ::= { rmonLAN1Port 23 }
+
+rmonLAN1PortGetMultiple OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced multiple collisions. The counter is application in half-duplex mode only"
+    ::= { rmonLAN1Port 24 }
+
+rmonLAN1PortGetUndersize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets but with a valid FCS"
+    ::= { rmonLAN1Port 25 }
+
+rmonLAN1PortGetFragments OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets and an invalid FCS"
+    ::= { rmonLAN1Port 26 }
+
+rmonLAN1PortGetOversize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets but with a valid FCS"
+    ::= { rmonLAN1Port 27 }
+
+rmonLAN1PortGetJabber OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets and an invalid FCS"
+    ::= { rmonLAN1Port 28 }
+
+rmonLAN1PortGetInMACRcvErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with an Rx_Error event seen by the receive side of the MAC"
+    ::= { rmonLAN1Port 29 }
+
+rmonLAN1PortGetInFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a CRC error not counted in InFragments, InnJabber"
+    ::= { rmonLAN1Port 30 }
+
+rmonLAN1PortGetCollisions OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of collision events seen by the MAC not including those counted in Late and Excessive"
+    ::= { rmonLAN1Port 31 }
+
+rmonLAN1PortGetLate OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of Late collision events seen by the MAC"
+    ::= { rmonLAN1Port 32 }
+
+
+rmonLAN2Port OBJECT IDENTIFIER ::= { rmonPorts 4 }
+
+rmonLAN2PortGetInGoodOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, low size, that is frames that are not bad."
+    ::= { rmonLAN2Port 1 }
+
+rmonLAN2PortGetInGoodOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, high size, that is frames that are not bad."
+    ::= { rmonLAN2Port 2 }
+
+rmonLAN2PortGetInBadOctets OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of lengths of all bad Ethernet frames received not counting Preamble"
+    ::= { rmonLAN2Port 3 }
+		
+rmonLAN2PortGetOutFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames transmitted incorrectly due to an internal MAC transmit error, for example, bad CRC detected when the frame was read from memory"
+    ::= { rmonLAN2Port 4 }
+		
+rmonLAN2PortGetInUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Unicast destination address"
+    ::= { rmonLAN2Port 5 }
+
+rmonLAN2PortGetDeferred OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of succesfully transmitted frames that were delayed because the medium was busy during the first attempt and when the frame was transmitted without any collisions (the counter is valid in half-duplex mode only)"
+    ::= { rmonLAN2Port 6 }
+
+rmonLAN2PortGetInBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Broadcast destination MAC address"
+    ::= { rmonLAN2Port 7 }
+
+rmonLAN2PortGetInMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Multicast destination MAC address"
+    ::= { rmonLAN2Port 8 }
+
+rmonLAN2PortGetOctets64 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of exactly 64 octets, including those with errors"
+    ::= { rmonLAN2Port 9 }
+
+rmonLAN2PortGetOctets127 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 65 and 127 octets inclusive, including those with errors"
+    ::= { rmonLAN2Port 10 }
+
+rmonLAN2PortGetOctets255 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 128 and 255 octets inclusive, including those with errors"
+    ::= { rmonLAN2Port 11 }
+
+rmonLAN2PortGetOctets511 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 256 and 511 octets inclusive, including those with errors"
+    ::= { rmonLAN2Port 12 }
+
+rmonLAN2PortGetOctets1023 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 512 and 1023 octets inclusive, including those with errors"
+    ::= { rmonLAN2Port 13 }
+
+rmonLAN2PortGetOctetsMax OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 1024 and MaxSize octets inclusive, including those with errors"
+    ::= { rmonLAN2Port 14 }
+
+rmonLAN2PortGetOutOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, low size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonLAN2Port 15 }
+
+rmonLAN2PortGetOutOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, high size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonLAN2Port 16 }
+
+rmonLAN2PortGetOutUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Unicast destination MAC address"
+    ::= { rmonLAN2Port 17 }
+
+rmonLAN2PortGetExcessive OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames dropped in the transmit MAC due to excessive collision condition. The counter is application in half-duplex mode only"
+    ::= { rmonLAN2Port 18 }
+
+rmonLAN2PortGetOutMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Multicast destination MAC address"
+    ::= { rmonLAN2Port 19 }
+
+rmonLAN2PortGetOutBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Broadcast destination MAC address"
+    ::= { rmonLAN2Port 20 }
+
+rmonLAN2PortGetSingle OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced exactly one collision. The counter is application in half-duplex mode only"
+    ::= { rmonLAN2Port 21 }
+
+rmonLAN2PortGetOutPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames sent"
+    ::= { rmonLAN2Port 22 }
+
+rmonLAN2PortGetInPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames received"
+    ::= { rmonLAN2Port 23 }
+
+rmonLAN2PortGetMultiple OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced multiple collisions. The counter is application in half-duplex mode only"
+    ::= { rmonLAN2Port 24 }
+
+rmonLAN2PortGetUndersize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets but with a valid FCS"
+    ::= { rmonLAN2Port 25 }
+
+rmonLAN2PortGetFragments OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets and an invalid FCS"
+    ::= { rmonLAN2Port 26 }
+
+rmonLAN2PortGetOversize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets but with a valid FCS"
+    ::= { rmonLAN2Port 27 }
+
+rmonLAN2PortGetJabber OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets and an invalid FCS"
+    ::= { rmonLAN2Port 28 }
+
+rmonLAN2PortGetInMACRcvErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with an Rx_Error event seen by the receive side of the MAC"
+    ::= { rmonLAN2Port 29 }
+
+rmonLAN2PortGetInFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a CRC error not counted in InFragments, InnJabber"
+    ::= { rmonLAN2Port 30 }
+
+rmonLAN2PortGetCollisions OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of collision events seen by the MAC not including those counted in Late and Excessive"
+    ::= { rmonLAN2Port 31 }
+
+rmonLAN2PortGetLate OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of Late collision events seen by the MAC"
+    ::= { rmonLAN2Port 32 }
+
+
+rmonLAN3Port OBJECT IDENTIFIER ::= { rmonPorts 5 }
+
+rmonLAN3PortGetInGoodOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, low size, that is frames that are not bad."
+    ::= { rmonLAN3Port 1 }
+
+rmonLAN3PortGetInGoodOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, high size, that is frames that are not bad."
+    ::= { rmonLAN3Port 2 }
+
+rmonLAN3PortGetInBadOctets OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of lengths of all bad Ethernet frames received not counting Preamble"
+    ::= { rmonLAN3Port 3 }
+		
+rmonLAN3PortGetOutFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames transmitted incorrectly due to an internal MAC transmit error, for example, bad CRC detected when the frame was read from memory"
+    ::= { rmonLAN3Port 4 }
+		
+rmonLAN3PortGetInUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Unicast destination address"
+    ::= { rmonLAN3Port 5 }
+
+rmonLAN3PortGetDeferred OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of succesfully transmitted frames that were delayed because the medium was busy during the first attempt and when the frame was transmitted without any collisions (the counter is valid in half-duplex mode only)"
+    ::= { rmonLAN3Port 6 }
+
+rmonLAN3PortGetInBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Broadcast destination MAC address"
+    ::= { rmonLAN3Port 7 }
+
+rmonLAN3PortGetInMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Multicast destination MAC address"
+    ::= { rmonLAN3Port 8 }
+
+rmonLAN3PortGetOctets64 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of exactly 64 octets, including those with errors"
+    ::= { rmonLAN3Port 9 }
+
+rmonLAN3PortGetOctets127 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 65 and 127 octets inclusive, including those with errors"
+    ::= { rmonLAN3Port 10 }
+
+rmonLAN3PortGetOctets255 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 128 and 255 octets inclusive, including those with errors"
+    ::= { rmonLAN3Port 11 }
+
+rmonLAN3PortGetOctets511 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 256 and 511 octets inclusive, including those with errors"
+    ::= { rmonLAN3Port 12 }
+
+rmonLAN3PortGetOctets1023 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 512 and 1023 octets inclusive, including those with errors"
+    ::= { rmonLAN3Port 13 }
+
+rmonLAN3PortGetOctetsMax OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 1024 and MaxSize octets inclusive, including those with errors"
+    ::= { rmonLAN3Port 14 }
+
+rmonLAN3PortGetOutOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, low size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonLAN3Port 15 }
+
+rmonLAN3PortGetOutOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, high size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonLAN3Port 16 }
+
+rmonLAN3PortGetOutUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Unicast destination MAC address"
+    ::= { rmonLAN3Port 17 }
+
+rmonLAN3PortGetExcessive OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames dropped in the transmit MAC due to excessive collision condition. The counter is application in half-duplex mode only"
+    ::= { rmonLAN3Port 18 }
+
+rmonLAN3PortGetOutMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Multicast destination MAC address"
+    ::= { rmonLAN3Port 19 }
+
+rmonLAN3PortGetOutBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Broadcast destination MAC address"
+    ::= { rmonLAN3Port 20 }
+
+rmonLAN3PortGetSingle OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced exactly one collision. The counter is application in half-duplex mode only"
+    ::= { rmonLAN3Port 21 }
+
+rmonLAN3PortGetOutPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames sent"
+    ::= { rmonLAN3Port 22 }
+
+rmonLAN3PortGetInPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames received"
+    ::= { rmonLAN3Port 23 }
+
+rmonLAN3PortGetMultiple OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced multiple collisions. The counter is application in half-duplex mode only"
+    ::= { rmonLAN3Port 24 }
+
+rmonLAN3PortGetUndersize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets but with a valid FCS"
+    ::= { rmonLAN3Port 25 }
+
+rmonLAN3PortGetFragments OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets and an invalid FCS"
+    ::= { rmonLAN3Port 26 }
+
+rmonLAN3PortGetOversize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets but with a valid FCS"
+    ::= { rmonLAN3Port 27 }
+
+rmonLAN3PortGetJabber OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets and an invalid FCS"
+    ::= { rmonLAN3Port 28 }
+
+rmonLAN3PortGetInMACRcvErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with an Rx_Error event seen by the receive side of the MAC"
+    ::= { rmonLAN3Port 29 }
+
+rmonLAN3PortGetInFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a CRC error not counted in InFragments, InnJabber"
+    ::= { rmonLAN3Port 30 }
+
+rmonLAN3PortGetCollisions OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of collision events seen by the MAC not including those counted in Late and Excessive"
+    ::= { rmonLAN3Port 31 }
+
+rmonLAN3PortGetLate OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of Late collision events seen by the MAC"
+    ::= { rmonLAN3Port 32 }
+
+
+rmonLAN4Port OBJECT IDENTIFIER ::= { rmonPorts 6 }
+
+rmonLAN4PortGetInGoodOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, low size, that is frames that are not bad."
+    ::= { rmonLAN4Port 1 }
+
+rmonLAN4PortGetInGoodOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of the lengths of all good Ethernet frames received, high size, that is frames that are not bad."
+    ::= { rmonLAN4Port 2 }
+
+rmonLAN4PortGetInBadOctets OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of lengths of all bad Ethernet frames received not counting Preamble"
+    ::= { rmonLAN4Port 3 }
+		
+rmonLAN4PortGetOutFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames transmitted incorrectly due to an internal MAC transmit error, for example, bad CRC detected when the frame was read from memory"
+    ::= { rmonLAN4Port 4 }
+		
+rmonLAN4PortGetInUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Unicast destination address"
+    ::= { rmonLAN4Port 5 }
+
+rmonLAN4PortGetDeferred OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of succesfully transmitted frames that were delayed because the medium was busy during the first attempt and when the frame was transmitted without any collisions (the counter is valid in half-duplex mode only)"
+    ::= { rmonLAN4Port 6 }
+
+rmonLAN4PortGetInBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Broadcast destination MAC address"
+    ::= { rmonLAN4Port 7 }
+
+rmonLAN4PortGetInMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of good frames received that have a Multicast destination MAC address"
+    ::= { rmonLAN4Port 8 }
+
+rmonLAN4PortGetOctets64 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of exactly 64 octets, including those with errors"
+    ::= { rmonLAN4Port 9 }
+
+rmonLAN4PortGetOctets127 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 65 and 127 octets inclusive, including those with errors"
+    ::= { rmonLAN4Port 10 }
+
+rmonLAN4PortGetOctets255 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 128 and 255 octets inclusive, including those with errors"
+    ::= { rmonLAN4Port 11 }
+
+rmonLAN4PortGetOctets511 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 256 and 511 octets inclusive, including those with errors"
+    ::= { rmonLAN4Port 12 }
+
+rmonLAN4PortGetOctets1023 OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 512 and 1023 octets inclusive, including those with errors"
+    ::= { rmonLAN4Port 13 }
+
+rmonLAN4PortGetOctetsMax OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received (and/or transmitted) with a length of between 1024 and MaxSize octets inclusive, including those with errors"
+    ::= { rmonLAN4Port 14 }
+
+rmonLAN4PortGetOutOctetsLo OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, low size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonLAN4Port 15 }
+
+rmonLAN4PortGetOutOctetsHi OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The sum of all Ethernet frames sent from this MAC, high size, including flow control frames and partially frames transmitted due to collisions."
+    ::= { rmonLAN4Port 16 }
+
+rmonLAN4PortGetOutUnicasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Unicast destination MAC address"
+    ::= { rmonLAN4Port 17 }
+
+rmonLAN4PortGetExcessive OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames dropped in the transmit MAC due to excessive collision condition. The counter is application in half-duplex mode only"
+    ::= { rmonLAN4Port 18 }
+
+rmonLAN4PortGetOutMulticasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Multicast destination MAC address"
+    ::= { rmonLAN4Port 19 }
+
+rmonLAN4PortGetOutBroadcasts OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of frames sent that have a Broadcast destination MAC address"
+    ::= { rmonLAN4Port 20 }
+
+rmonLAN4PortGetSingle OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced exactly one collision. The counter is application in half-duplex mode only"
+    ::= { rmonLAN4Port 21 }
+
+rmonLAN4PortGetOutPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames sent"
+    ::= { rmonLAN4Port 22 }
+
+rmonLAN4PortGetInPause OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of flow control Pause frames received"
+    ::= { rmonLAN4Port 23 }
+
+rmonLAN4PortGetMultiple OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The total number of successfully transmitted frames that experienced multiple collisions. The counter is application in half-duplex mode only"
+    ::= { rmonLAN4Port 24 }
+
+rmonLAN4PortGetUndersize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets but with a valid FCS"
+    ::= { rmonLAN4Port 25 }
+
+rmonLAN4PortGetFragments OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length of less than 64 octets and an invalid FCS"
+    ::= { rmonLAN4Port 26 }
+
+rmonLAN4PortGetOversize OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets but with a valid FCS"
+    ::= { rmonLAN4Port 27 }
+
+rmonLAN4PortGetJabber OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a length more than MaxSize octets and an invalid FCS"
+    ::= { rmonLAN4Port 28 }
+
+rmonLAN4PortGetInMACRcvErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with an Rx_Error event seen by the receive side of the MAC"
+    ::= { rmonLAN4Port 29 }
+
+rmonLAN4PortGetInFCSErr OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Total frames received with a CRC error not counted in InFragments, InnJabber"
+    ::= { rmonLAN4Port 30 }
+
+rmonLAN4PortGetCollisions OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of collision events seen by the MAC not including those counted in Late and Excessive"
+    ::= { rmonLAN4Port 31 }
+
+rmonLAN4PortGetLate OBJECT-TYPE
+    SYNTAX	INTEGER32
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The number of Late collision events seen by the MAC"
+    ::= { rmonLAN4Port 32 }
+
+
+
+
+rmonModuleGroup OBJECT-GROUP
+	OBJECTS {
+		rmonHistogramMode, 
+		rmonFlushAllCounter, 
+		rmonFlushPortCounter, 
+		rmonPorts, 
+		rmonCPUPort, 
+		rmonCPUPortGetInGoodOctetsLo, rmonCPUPortGetInGoodOctetsHi, rmonCPUPortGetInBadOctets, rmonCPUPortGetOutFCSErr, rmonCPUPortGetInUnicasts, rmonCPUPortGetDeferred, rmonCPUPortGetInBroadcasts, rmonCPUPortGetInMulticasts, rmonCPUPortGetOctets64, rmonCPUPortGetOctets127, rmonCPUPortGetOctets255, rmonCPUPortGetOctets511, rmonCPUPortGetOctets1023, rmonCPUPortGetOctetsMax, rmonCPUPortGetOutOctetsLo, rmonCPUPortGetOutOctetsHi, rmonCPUPortGetOutUnicasts, rmonCPUPortGetExcessive, rmonCPUPortGetOutMulticasts, rmonCPUPortGetOutBroadcasts, rmonCPUPortGetSingle, rmonCPUPortGetOutPause, rmonCPUPortGetInPause, rmonCPUPortGetMultiple, rmonCPUPortGetUndersize, rmonCPUPortGetFragments, rmonCPUPortGetOversize, rmonCPUPortGetJabber, rmonCPUPortGetInMACRcvErr, rmonCPUPortGetInFCSErr, rmonCPUPortGetCollisions, rmonCPUPortGetLate, 
+		rmonWANPort, 
+		rmonWANPortGetInGoodOctetsLo, rmonWANPortGetInGoodOctetsHi, rmonWANPortGetInBadOctets, rmonWANPortGetOutFCSErr, rmonWANPortGetInUnicasts, rmonWANPortGetDeferred, rmonWANPortGetInBroadcasts, rmonWANPortGetInMulticasts, rmonWANPortGetOctets64, rmonWANPortGetOctets127, rmonWANPortGetOctets255, rmonWANPortGetOctets511, rmonWANPortGetOctets1023, rmonWANPortGetOctetsMax, rmonWANPortGetOutOctetsLo, rmonWANPortGetOutOctetsHi, rmonWANPortGetOutUnicasts, rmonWANPortGetExcessive, rmonWANPortGetOutMulticasts, rmonWANPortGetOutBroadcasts, rmonWANPortGetSingle, rmonWANPortGetOutPause, rmonWANPortGetInPause, rmonWANPortGetMultiple, rmonWANPortGetUndersize, rmonWANPortGetFragments, rmonWANPortGetOversize, rmonWANPortGetJabber, rmonWANPortGetInMACRcvErr, rmonWANPortGetInFCSErr, rmonWANPortGetCollisions, rmonWANPortGetLate, 
+		rmonLAN1Port, 
+		rmonLAN1PortGetInGoodOctetsLo, rmonLAN1PortGetInGoodOctetsHi, rmonLAN1PortGetInBadOctets, rmonLAN1PortGetOutFCSErr, rmonLAN1PortGetInUnicasts, rmonLAN1PortGetDeferred, rmonLAN1PortGetInBroadcasts, rmonLAN1PortGetInMulticasts, rmonLAN1PortGetOctets64, rmonLAN1PortGetOctets127, rmonLAN1PortGetOctets255, rmonLAN1PortGetOctets511, rmonLAN1PortGetOctets1023, rmonLAN1PortGetOctetsMax, rmonLAN1PortGetOutOctetsLo, rmonLAN1PortGetOutOctetsHi, rmonLAN1PortGetOutUnicasts, rmonLAN1PortGetExcessive, rmonLAN1PortGetOutMulticasts, rmonLAN1PortGetOutBroadcasts, rmonLAN1PortGetSingle, rmonLAN1PortGetOutPause, rmonLAN1PortGetInPause, rmonLAN1PortGetMultiple, rmonLAN1PortGetUndersize, rmonLAN1PortGetFragments, rmonLAN1PortGetOversize, rmonLAN1PortGetJabber, rmonLAN1PortGetInMACRcvErr, rmonLAN1PortGetInFCSErr, rmonLAN1PortGetCollisions, rmonLAN1PortGetLate, 
+		rmonLAN2Port, 
+		rmonLAN2PortGetInGoodOctetsLo, rmonLAN2PortGetInGoodOctetsHi, rmonLAN2PortGetInBadOctets, rmonLAN2PortGetOutFCSErr, rmonLAN2PortGetInUnicasts, rmonLAN2PortGetDeferred, rmonLAN2PortGetInBroadcasts, rmonLAN2PortGetInMulticasts, rmonLAN2PortGetOctets64, rmonLAN2PortGetOctets127, rmonLAN2PortGetOctets255, rmonLAN2PortGetOctets511, rmonLAN2PortGetOctets1023, rmonLAN2PortGetOctetsMax, rmonLAN2PortGetOutOctetsLo, rmonLAN2PortGetOutOctetsHi, rmonLAN2PortGetOutUnicasts, rmonLAN2PortGetExcessive, rmonLAN2PortGetOutMulticasts, rmonLAN2PortGetOutBroadcasts, rmonLAN2PortGetSingle, rmonLAN2PortGetOutPause, rmonLAN2PortGetInPause, rmonLAN2PortGetMultiple, rmonLAN2PortGetUndersize, rmonLAN2PortGetFragments, rmonLAN2PortGetOversize, rmonLAN2PortGetJabber, rmonLAN2PortGetInMACRcvErr, rmonLAN2PortGetInFCSErr, rmonLAN2PortGetCollisions, rmonLAN2PortGetLate, 
+		rmonLAN3Port, 
+		rmonLAN3PortGetInGoodOctetsLo, rmonLAN3PortGetInGoodOctetsHi, rmonLAN3PortGetInBadOctets, rmonLAN3PortGetOutFCSErr, rmonLAN3PortGetInUnicasts, rmonLAN3PortGetDeferred, rmonLAN3PortGetInBroadcasts, rmonLAN3PortGetInMulticasts, rmonLAN3PortGetOctets64, rmonLAN3PortGetOctets127, rmonLAN3PortGetOctets255, rmonLAN3PortGetOctets511, rmonLAN3PortGetOctets1023, rmonLAN3PortGetOctetsMax, rmonLAN3PortGetOutOctetsLo, rmonLAN3PortGetOutOctetsHi, rmonLAN3PortGetOutUnicasts, rmonLAN3PortGetExcessive, rmonLAN3PortGetOutMulticasts, rmonLAN3PortGetOutBroadcasts, rmonLAN3PortGetSingle, rmonLAN3PortGetOutPause, rmonLAN3PortGetInPause, rmonLAN3PortGetMultiple, rmonLAN3PortGetUndersize, rmonLAN3PortGetFragments, rmonLAN3PortGetOversize, rmonLAN3PortGetJabber, rmonLAN3PortGetInMACRcvErr, rmonLAN3PortGetInFCSErr, rmonLAN3PortGetCollisions, rmonLAN3PortGetLate, 
+		rmonLAN4Port, 
+		rmonLAN4PortGetInGoodOctetsLo, rmonLAN4PortGetInGoodOctetsHi, rmonLAN4PortGetInBadOctets, rmonLAN4PortGetOutFCSErr, rmonLAN4PortGetInUnicasts, rmonLAN4PortGetDeferred, rmonLAN4PortGetInBroadcasts, rmonLAN4PortGetInMulticasts, rmonLAN4PortGetOctets64, rmonLAN4PortGetOctets127, rmonLAN4PortGetOctets255, rmonLAN4PortGetOctets511, rmonLAN4PortGetOctets1023, rmonLAN4PortGetOctetsMax, rmonLAN4PortGetOutOctetsLo, rmonLAN4PortGetOutOctetsHi, rmonLAN4PortGetOutUnicasts, rmonLAN4PortGetExcessive, rmonLAN4PortGetOutMulticasts, rmonLAN4PortGetOutBroadcasts, rmonLAN4PortGetSingle, rmonLAN4PortGetOutPause, rmonLAN4PortGetInPause, rmonLAN4PortGetMultiple, rmonLAN4PortGetUndersize, rmonLAN4PortGetFragments, rmonLAN4PortGetOversize, rmonLAN4PortGetJabber, rmonLAN4PortGetInMACRcvErr, rmonLAN4PortGetInFCSErr, rmonLAN4PortGetCollisions, rmonLAN4PortGetLate 
+	}
+    STATUS current
+    DESCRIPTION
+        "The objects are related to the DKTCOMEGA Fast Ethernet module, MIB rev 02_00."
+    ::= { rmonMIB 5 }
+
+
+END
+
+
+
+
+
+
+
+
+
+
+
+

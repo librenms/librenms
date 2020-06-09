@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
@@ -139,31 +140,71 @@ class Pmp extends OS implements
      */
     public function discoverWirelessUtilization()
     {
-        $downlink = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; //WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
-        $uplink = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; //WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
+        $lowdownlink  = '.1.3.6.1.4.1.161.19.3.1.12.1.1.0'; // WHISP-APS-MIB::frUtlLowTotalDownlinkUtilization
+        $lowuplink    = '.1.3.6.1.4.1.161.19.3.1.12.1.2.0'; // WHISP-APS-MIB::frUtlLowTotalUplinkUtilization
+        $meddownlink  = '.1.3.6.1.4.1.161.19.3.1.12.2.1.0'; // WHISP-APS-MIB::frUtlMedTotalDownlinkUtilization
+        $meduplink    = '.1.3.6.1.4.1.161.19.3.1.12.2.2.0'; // WHISP-APS-MIB::frUtlMedTotalUplinkUtilization
+        $highdownlink = '.1.3.6.1.4.1.161.19.3.1.12.3.1.0'; // WHISP-APS-MIB::frUtlHighTotalDownlinkUtilization
+        $highuplink   = '.1.3.6.1.4.1.161.19.3.1.12.3.2.0'; // WHISP-APS-MIB::frUtlHighTotalUplinkUtilization
 
         // 450M Specific Utilizations
-        $muSectorDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.29.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkSectorUtilization
-        $muDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.30.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkMumimoUtilization
-        $suDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.31.0'; //WHISP-APS-MIB::frUtlMedMumimoDownlinkSumimoUtilization
+        $muSectorDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.29.0'; // WHISP-APS-MIB::frUtlMedMumimoDownlinkSectorUtilization
+        $muDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.30.0'; // WHISP-APS-MIB::frUtlMedMumimoDownlinkMumimoUtilization
+        $suDownlink = '.1.3.6.1.4.1.161.19.3.1.12.2.31.0'; // WHISP-APS-MIB::frUtlMedMumimoDownlinkSumimoUtilization
 
         return array(
             new WirelessSensor(
                 'utilization',
                 $this->getDeviceId(),
-                $downlink,
+                $lowdownlink,
                 'pmp-downlink',
                 0,
-                'Downlink Utilization',
+                '1m Downlink Utilization',
                 null
             ),
             new WirelessSensor(
                 'utilization',
                 $this->getDeviceId(),
-                $uplink,
+                $lowuplink,
                 'pmp-uplink',
                 0,
-                'Uplink Utilization',
+                '1m Uplink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $meddownlink,
+                'pmp-downlink',
+                1,
+                '5m Downlink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $meduplink,
+                'pmp-uplink',
+                1,
+                '5m Uplink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $highdownlink,
+                'pmp-downlink',
+                2,
+                '15m Downlink Utilization',
+                null
+            ),
+            new WirelessSensor(
+                'utilization',
+                $this->getDeviceId(),
+                $highuplink,
+                'pmp-uplink',
+                2,
+                '15m Uplink Utilization',
                 null
             ),
             new WirelessSensor(
@@ -230,7 +271,7 @@ class Pmp extends OS implements
     private function isAp()
     {
         $device = $this->getDevice();
-        return str_contains($device['hardware'], 'AP') || str_contains($device['hardware'], 'Master');
+        return Str::contains($device['hardware'], 'AP') || Str::contains($device['hardware'], 'Master');
     }
 
     /**
@@ -256,7 +297,7 @@ class Pmp extends OS implements
         $boxType = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
 
         foreach ($types as $key => $value) {
-            if (str_contains($boxType, $key)) {
+            if (Str::contains($boxType, $key)) {
                 return $value;
             }
         }

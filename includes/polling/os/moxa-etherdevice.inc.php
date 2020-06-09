@@ -15,7 +15,7 @@ $oids = array(
     'version' => $device['sysObjectID'].'.1.4.0',
     'serial' => $device['sysObjectID'].'.1.78.0',
 );
-  
+
 $os_data = snmp_get_multi_oid($device, $oids);
 
 foreach ($oids as $var => $oid) {

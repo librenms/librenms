@@ -21,4 +21,9 @@ if (is_numeric($perc)) {
     $mempool['used']  = $perc;
     $mempool['total'] = 100;
     $mempool['free']  = 100 - $perc;
+} else {
+    $dlink_mempools = snmp_get_multi_oid($device, "dEntityExtMemUtilTotal.$mempool_index dEntityExtMemUtilUsed.$mempool_index dEntityExtMemUtilFree.$mempool_index", '-OUQs', 'DLINKSW-ENTITY-EXT-MIB');
+    $mempool['total'] = $dlink_mempools["dEntityExtMemUtilTotal.$mempool_index"];
+    $mempool['used'] = $dlink_mempools["dEntityExtMemUtilUsed.$mempool_index"];
+    $mempool['free'] = $dlink_mempools["dEntityExtMemUtilFree.$mempool_index"];
 }

@@ -1,0 +1,153 @@
+------------------------------------------------------------------------------
+--
+--  File              : gbnPlatformOAMTelnet-MIB.mi2
+--  Description       : Telnet configuration MIB 
+--  Version           : 1.0  
+--  Date              : April 16, 2013     
+--  Author            : tangrenxiang
+--  Copyright (c) 2001-2008 admin Co. Ltd.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+
+    GBNPlatformOAMTelnet-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Counter32, Gauge32,
+        Unsigned32, Integer32,
+        IpAddress, NOTIFICATION-TYPE            FROM SNMPv2-SMI
+        
+        RowStatus, TruthValue, 
+        DisplayString, MacAddress               FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        snmpTraps                               FROM SNMPv2-MIB
+        
+        gbnPlatformOAM                          FROM GBNPlatformOAM-MIB;
+    
+    gbnPlatformOAMTelnet  MODULE-IDENTITY
+        LAST-UPDATED    "1304160000Z"  -- April 16, 2013
+        ORGANIZATION    "admin Co. Ltd"
+        CONTACT-INFO    "admin Co. Ltd
+                         E-mail: service@admin.com.cn"
+
+        DESCRIPTION     "Telnet mib definition."
+
+        REVISION        "1304160000Z"  -- April 16, 2013
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnPlatformOAM 15 }
+        
+	telnetState OBJECT-TYPE
+        SYNTAX INTEGER {
+            enable(1),
+            disable(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "enable or disable telnet."
+            --打开或关闭telnet功能。
+        ::= { gbnPlatformOAMTelnet 1 } 
+
+  telnetUserLimit OBJECT-TYPE
+        SYNTAX Integer32 (0..5)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The max user limit of telnet"
+            --允许telnet登录的最大用户数目
+        ::= { gbnPlatformOAMTelnet 2 }               
+   
+  telnetLoginUsers  OBJECT-TYPE
+        SYNTAX Counter32 
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Current login users of telnet"
+            --当前telnet登录的用户数目
+        ::= { gbnPlatformOAMTelnet 3 }
+  
+  telnetUserTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF TelnetUserEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table of  login user information"
+            --登录用户信息表
+        ::= { gbnPlatformOAMTelnet 4 }
+
+  telnetUserEntry OBJECT-TYPE
+        SYNTAX TelnetUserEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A list of login user information"
+            --登录用户信息列表
+        INDEX { telnetUserTerminal }
+        ::= { telnetUserTable 1 }
+
+  TelnetUserEntry ::= SEQUENCE {
+            telnetUserTerminal     Counter32,
+            telnetUserAddrIp       DisplayString,
+            telnetUserName         DisplayString,
+            telnetUserLoginTime    DisplayString,
+            telnetUserTransport    DisplayString,
+            telnetUserRowStatus    RowStatus
+        } 
+  
+  telnetUserTerminal OBJECT-TYPE
+        SYNTAX Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "login terminal number"
+            --登录终端号
+        ::= { telnetUserEntry 1 }
+ 
+  telnetUserAddrIp OBJECT-TYPE
+        SYNTAX DisplayString(SIZE(1..64))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "login ip address"
+            -- 登录ip地址,包括IPV4和IPV6.
+        ::= { telnetUserEntry 2 }
+
+  telnetUserName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "login user name"
+            --登录用户名称
+        ::= { telnetUserEntry 3 }
+
+  telnetUserLoginTime OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..100))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "login time"
+            --登录时间
+        ::= { telnetUserEntry 4 } 
+        
+  telnetUserTransport OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..20))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "transport type"
+            --登录类型, telnet或ssh
+        ::= { telnetUserEntry 5 }
+        
+  telnetUserRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "login user rowstatus"
+            --登录用户行状态，用来剔除用户
+        ::= { telnetUserEntry 6 }                                        
+   END

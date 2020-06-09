@@ -8,7 +8,7 @@ foreach (dbFetchRows('SELECT * FROM mempools WHERE device_id = ?', array($device
     $mempool_type = $mempool['mempool_type'];
     $mempool_index = $mempool['mempool_index'];
 
-    $file = $config['install_dir'].'/includes/polling/mempools/'. $mempool_type .'.inc.php';
+    $file = \LibreNMS\Config::get('install_dir') . '/includes/polling/mempools/' . $mempool_type . '.inc.php';
     if (is_file($file)) {
         include $file;
     }

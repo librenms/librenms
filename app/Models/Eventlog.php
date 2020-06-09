@@ -25,29 +25,46 @@
 
 namespace App\Models;
 
-class Eventlog extends BaseModel
+use Carbon\Carbon;
+use LibreNMS\Enum\Alert;
+
+class Eventlog extends DeviceRelatedModel
 {
     protected $table = 'eventlog';
     protected $primaryKey = 'event_id';
     public $timestamps = false;
+    protected $fillable = ['datetime', 'device_id', 'message', 'type', 'reference', 'username', 'severity'];
 
-    // ---- Query scopes ----
+    // ---- Helper Functions ----
 
-    public function scopeHasAccess($query, User $user)
+    /**
+     * Log events to the event table
+     *
+     * @param string $text message describing the event
+     * @param Device $device related device
+     * @param string $type brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+     * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+     * @param int $reference the id of the referenced entity.  Supported types: interface
+     */
+    public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null)
     {
-        return $this->hasDeviceAccess($query, $user);
+        $log = new static([
+            'reference' => $reference,
+            'type' => $type,
+            'datetime' => Carbon::now(),
+            'severity' => $severity,
+            'message' => $text,
+            'username'  => (class_exists('\Auth') && \Auth::check()) ? \Auth::user()->username : '',
+        ]);
+
+        if ($device instanceof Device) {
+            $device->eventlogs()->save($log);
+        } else {
+            $log->save();
+        }
     }
 
     // ---- Define Relationships ----
-
-    /**
-     * Returns the device this entry belongs to.
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function device()
-    {
-        return $this->belongsTo('App\Models\Device', 'device_id');
-    }
 
     public function related()
     {

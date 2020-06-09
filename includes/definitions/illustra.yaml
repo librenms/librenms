@@ -1,0 +1,8 @@
+os: illustra
+text: 'Illustra Network Camera'
+type: network
+icon: illustra
+group: illustra
+discovery:
+    - sysDescr:
+        - 'illustra'

@@ -1,0 +1,3940 @@
+
+AC-CONTROL-MIB DEFINITIONS ::= BEGIN
+
+
+    IMPORTS
+       
+
+        OBJECT-TYPE, 
+        MODULE-IDENTITY                             FROM SNMPv2-SMI
+        TAddress, 
+        DisplayString, 
+        DateAndTime, TEXTUAL-CONVENTION, 
+		RowPointer									FROM SNMPv2-TC
+        IpAddress                                   FROM RFC1155-SMI
+        Unsigned32,
+		Integer32,
+        enterprises                                 FROM SNMPv2-SMI
+	RowStatus      				    FROM SNMPv2-TC
+
+		SnmpAdminString								FROM SNMP-FRAMEWORK-MIB
+		audioCodes,       
+        acRegistrations,
+        acGeneric, 
+        acProducts,acBoardMibs						FROM AUDIOCODES-TYPES-MIB;
+
+       
+acControl  MODULE-IDENTITY       
+    LAST-UPDATED "201301141127Z"          --Monday, January 14 2013
+    ORGANIZATION "AudioCodes Ltd"
+    CONTACT-INFO
+    "Postal: Support
+	     AudioCodes LTD
+             1 Hayarden Street
+             Airport City 
+	     Lod, ISRAEL 70151
+     Tel:    972-3-9764000
+     Fax:    972-3-9764040
+     Email:  support@audiocodes.com
+     Web:    www.audiocodes.com"		
+
+    DESCRIPTION       
+    ""
+
+
+
+    ::= {acBoardMibs 5}  
+
+
+
+
+
+
+
+
+     acControlConfiguration OBJECT IDENTIFIER ::= {acControl 1}
+
+
+     acControlCommonConfig OBJECT IDENTIFIER ::= {acControlConfiguration 1}
+
+
+     acCPLink OBJECT IDENTIFIER ::= {acControlCommonConfig 1}
+
+
+     acCPKeepAlive OBJECT IDENTIFIER ::= {acCPLink 1}
+
+
+     acCPKeepAliveEnabled OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables a proprietary keep-alive mechanism, in which a serviceChange
+is send with UNDEFINED as the termination ID and restart
+method.
+ 0 = disable
+>0 = enable.
+Access: Instant.
+AC INI-Param: KEEPALIVEENABLED"
+       ::= {acCPKeepAlive 1}
+
+
+
+     acCPKeepAliveInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (1..300)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter is used to define the interval in seconds of
+a KeepAlive message.
+Access: Instant.
+AC INI-Param: KEEPALIVEINTERVAL"
+       ::= {acCPKeepAlive 2}
+
+
+
+     acCPTransport OBJECT IDENTIFIER ::= {acCPLink 2}
+
+
+     acCPTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  acCPTransport-UDP-IP(0)
+,
+                  acCPTransport-TCP-IP(1)
+,
+                  acCPTransport-SCTP-IP(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the transport type for the control protocol: 
+
+0 = UDP
+1 = TCP
+2 = SCTP.
+Access: Offline.
+AC INI-Param: CPTRANSPORTTYPE "
+       ::= {acCPTransport 1}
+
+
+
+     acCPTransportRetransmitionTimeOut OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls protocols retransmission timeout. Sets the initial
+time (in msec) for the first retransmission. The retransmission
+intervals thereafter increase exponentially.
+Access: Instant.
+AC INI-Param: MGCPRETRANSMISSIONTIMEOUT"
+       ::= {acCPTransport 2}
+
+
+
+     acCPTransportControlDiffServ OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the value of the field 'DiffServ' in the IP header for
+control traffic.
+
+Range: 0 to 63.
+Access: Offline.
+AC INI-Param: CONTROLDIFFSERV"
+       ::= {acCPTransport 3}
+
+
+
+     acCPTransaction OBJECT IDENTIFIER ::= {acCPLink 3}
+
+
+     acCPTransactionIDRange OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the range for the transaction ID. 
+
+Default = 999997999.
+Access: Instant.
+AC INI-Param: TRANSACTIONIDRANGE"
+       ::= {acCPTransaction 1}
+
+
+
+     acCPTransactionIDBase OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the minimum number for the transaction ID. 
+
+Default = 2000.
+Access: Instant.
+AC INI-Param: TRANSACTIONIDBASE"
+       ::= {acCPTransaction 2}
+
+
+
+     acCPTransactionRandomizeID OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines if the transactions produced by the board start with
+a fixed or random number. 
+
+1 = Randomize On
+Refer also to the parameters defining Transaction Id Range
+and Transaction Id Base.
+Access: Offline.
+AC INI-Param: RANDOMIZETRANSACTIONID"
+       ::= {acCPTransaction 3}
+
+
+
+     acCPTransactionCommunicationLayerTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (0..999)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Assumed delay of the communication layer. It is used in retransmission.
+This parameter defines the maximal time to wait
+for a response before declaring a disconnection (in seconds).
+Access: Instant.
+AC INI-Param: MGCPCOMMUNICATIONLAYERTIMEOUT"
+       ::= {acCPTransaction 4}
+
+
+
+     acCPDigitCollect OBJECT IDENTIFIER ::= {acControlCommonConfig 2}
+
+
+     acCPDigitCollectUseEndOfDTMF OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines if the detection of DTMF events is notified at the end
+of DTMF or at the start of DTMF.
+
+0 = at start of DTMF
+1 = at the end of DTMF.
+Access: Instant.
+AC INI-Param: MGCPDTMFDETECTIONPOINT"
+       ::= {acCPDigitCollect 1}
+
+
+
+     acCPDigitCollectDTMFLength OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the time to play DTMF (in msec).
+
+Range: 0 to 65535.
+Access: Instant.
+AC INI-Param: DTMFDIGITLENGTH"
+       ::= {acCPDigitCollect 2}
+
+
+
+     acCPDigitCollectDTMFInterInterval OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the time between DTMFs played (in msec).
+
+Range: 0 to 65535.
+Access: Instant.
+AC INI-Param: DTMFINTERDIGITINTERVAL"
+       ::= {acCPDigitCollect 3}
+
+
+
+     acCPDigitCollectMapTimeOutTimer OBJECT-TYPE
+       SYNTAX Integer32 (-1..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the timeout value (T symbol) in a digit map, in increments
+of 10. For MEGACO, it's the start timer. For the others,
+it's the end timer.
+
+When the value is -1, it means the hardcoded value (16000).
+Access: Instant.
+AC INI-Param: DIGITMAPTIMEOUTTIMER"
+       ::= {acCPDigitCollect 4}
+
+
+
+     acCPDigitCollectMapShortTimer OBJECT-TYPE
+       SYNTAX Integer32 (-1..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the short timer (S Symbol) value in millisecond, in
+a digit map.This timer is typically activated when the repetition
+symbol '.' exists.
+
+When the value is -1, it means the hardcoded value (3000).
+Access: Instant.
+AC INI-Param: cpDIGITMAPSHORTTIMER"
+       ::= {acCPDigitCollect 5}
+
+
+
+     acCPDigitCollectMapLongTimer OBJECT-TYPE
+       SYNTAX Integer32 (-1..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the inter-digit long timer (L Symbol) value in millisecond,
+in a digit map.This timer is typically activated between
+collected digit when the end of the pattern is not reached
+yet.
+
+When the value is -1, it means the hardcoded value (16000).
+Access: Instant.
+AC INI-Param: cpDIGITMAPLONGTIMER"
+       ::= {acCPDigitCollect 6}
+
+
+
+     acCPDigitMap OBJECT IDENTIFIER ::= {acControlCommonConfig 3}
+
+
+     acCPDigitMapDefaultName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..30))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Name of the provisioned digit map.
+
+Range: String[30].
+Access: Offline.
+AC INI-Param: DIGITMAPNAME"
+       ::= {acCPDigitMap 1}
+
+
+
+     acCPDigitMapPatterns OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..500))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The digit map patterns separated by a vertical bar (|), as defined
+in the MEGACO RFC. 
+
+Range = String[500].
+Access: Offline.
+AC INI-Param: DIGITMAPPING"
+       ::= {acCPDigitMap 2}
+
+
+
+     acCPDigitMapDialedStringPrefix OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..8))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines a prefix to add to the dialed string.
+
+Range = String[8].
+Access: Instant.
+AC INI-Param: DialedStringPrefix"
+       ::= {acCPDigitMap 3}
+
+
+
+     acCPNaming OBJECT IDENTIFIER ::= {acControlCommonConfig 4}
+
+
+     acCPNamingGateWay OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..63))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the media gateway's identification name.
+
+MGCP: Gateway's identification name towards the MGCP Call Agent.
+If undefined, the gateway name holds the IP address of
+the device.
+Range: String[63].
+Access: Offline.
+AC INI-Param: GATEWAYNAME"
+       ::= {acCPNaming 1}
+
+
+
+     acCPNamingEndPoint OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..19))
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "MGCP: Gateway's endpoint name. This is a prefix used to identify
+the endpoint, i.e., 'ACgw' in the following example: 
+'ACgw5@acl.com'. 
+
+MEGACO: Prefix of the endpoint part of the termination name
+
+Range: String[19] 
+
+Default: 
+MGCP: 'Acgw'
+MEGACO: 'line' for analog board and '/c' for trunking boards.
+Access: Offline.
+AC INI-Param: ENDPOINTNAME"
+       ::= {acCPNaming 2}
+
+
+
+     acCPNamingTrunk OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..19))
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "(MGCP) This parameter generates (together with the parameter
+defining the Endpoint Prefix) a local endpoint name on trunk-enabled
+media gateways.
+
+(MEGACO) Prefix of the trunk part of the termination name.
+
+Range: String[19]
+
+Default:
+MGCP = ' ' (empty string)
+MEGACO = ' ' for analog boards and 's' for trunking boards.
+Access: Offline.
+AC INI-Param: TRUNKNAME"
+       ::= {acCPNaming 3}
+
+
+
+     acCPNamingEndpointPrefix OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..19))
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "(MGCP) This parameter generates (together with parameter Trunk
+Name) a local endpoint name on trunk-enabled media gateways.
+
+Range: String[19].
+Access: Offline.
+AC INI-Param: ENDPOINTPREFIX"
+       ::= {acCPNaming 4}
+
+
+
+     acCPNamingCallAgentDomain OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..63))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines a domain name to be used to connect with the Call Agent.
+The parameter takes precedence over the Call Agent IP and
+the provisioned Call Agent parameters.
+
+Range = String[63]
+Deprecated in MEGACO.
+Access: Offline.
+AC INI-Param: CALLAGENTDOMAINNAME"
+       ::= {acCPNaming 5}
+
+
+
+     acCPNamingCoderTblFileName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..47))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter defines the name of an external coders table.
+In this table, the user can decide which coders will be used
+in the system. The original file is a text file, and it is
+converted by DCONVERT to a bynary file.
+Access: Offline.
+AC INI-Param: CODERTBLFILENAME"
+       ::= {acCPNaming 6}
+
+
+
+     acCPNamingSessionOwner OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..31))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the owner/creator of the session
+Range = String[31].
+Access: Instant.
+AC INI-Param: CPSDPSESSIONOWNER"
+       ::= {acCPNaming 7}
+
+
+
+     acCPConference OBJECT IDENTIFIER ::= {acControlCommonConfig 5}
+
+
+     acCPConferenceMaxUsers OBJECT-TYPE
+       SYNTAX Unsigned32 (3..64)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the maximal number of users to reserve for a new conference.
+The actual conference size can be more than this, but
+never less.
+
+Range: 3 to 64.
+Access: Instant.
+AC INI-Param: CONFERENCEMAXUSERS"
+       ::= {acCPConference 1}
+
+
+
+     acCPConferenceMaxSimultaneousSpeakers OBJECT-TYPE
+       SYNTAX Unsigned32 (1..3)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the maximum number of users that can speak simultaneously
+in a conference.
+
+Range: 1 to 3.
+Access: Instant.
+AC INI-Param: CONFERENCEMAXSIMULTANEOUSSPEAKERS"
+       ::= {acCPConference 2}
+
+
+
+     acCPConferenceSignalGenerationEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  no(0)
+,
+                  yes(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Generates a beep when a participant enters or exits the conference.
+
+0 = Do not generate
+1 = Generate.
+Access: Instant.
+AC INI-Param: CONFERENCESIGNALGENERATIONENABLE"
+       ::= {acCPConference 3}
+
+
+
+     acCPMedia OBJECT IDENTIFIER ::= {acControlCommonConfig 6}
+
+
+     acCPMediaRTCPInterval OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the time interval between the adjacent RTCP reports
+(in msec).
+
+Range: 0 to 65535.
+Access: Instant.
+AC INI-Param: RTCPINTERVAL"
+       ::= {acCPMedia 1}
+
+
+
+     acCPMediaDefaultCoder OBJECT-TYPE
+       SYNTAX INTEGER {
+                  non-Initialized(0)
+,
+                  g711Mulaw(1)
+,
+                  g711Alaw-64(2)
+,
+                  g726-16(3)
+,
+                  g726-24(4)
+,
+                  g726-32(5)
+,
+                  g726-40(6)
+,
+                  g727-16(7)
+,
+                  g727-24-16(8)
+,
+                  g727-24(9)
+,
+                  g727-32-16(10)
+,
+                  g727-32-24(11)
+,
+                  g727-32(12)
+,
+                  g727-40-16(13)
+,
+                  g727-40-24(14)
+,
+                  g727-40-32(15)
+,
+                  g723High-(16)
+,
+                  g723Low(17)
+,
+                  g729(18)
+,
+                  g728(19)
+,
+                  gSM(20)
+,
+                  transparent(21)
+,
+                  netCoder-4-8(22)
+,
+                  netCoder-5-6(23)
+,
+                  netCoder-6-4(24)
+,
+                  netCoder-7-2(25)
+,
+                  netCoder-8(26)
+,
+                  netCoder-8-8(27)
+,
+                  netCoder-9-6(28)
+,
+                  eVRC0(29)
+,
+                  eVRC-TFO(30)
+,
+                  eVRC-TTY(31)
+,
+                  qCELP-8(32)
+,
+                  qCELP-8-TFO(33)
+,
+                  qCELP-13(34)
+,
+                  qCELP-13-TFO(35)
+,
+                  g729E(36)
+,
+                  aMR-4-75(37)
+,
+                  aMR-5-15(38)
+,
+                  aMR-5-9(39)
+,
+                  aMR-6-7(40)
+,
+                  aMR-7-4(41)
+,
+                  aMR-7-95(42)
+,
+                  aMR-10-2(43)
+,
+                  aMR-12-2(44)
+,
+                  gSM-EFR(45)
+,
+                  iLBC13(46)
+,
+                  iLBC15(47)
+,
+                  bV16(48)
+,
+                  eVRC(49)
+,
+                  telepone-Event-RFC2833(50)
+,
+                  redundency-RTP-RFC2198(51)
+,
+                  mODEM-Relay(52)
+,
+                  comfortNoise-Coder(53)
+,
+                  iMAGET38(54)
+,
+                  nOOP(55)
+,
+                  g722(56)
+,
+                  eVRCB(57)
+,
+                  eVRC1(58)
+,
+                  eVRCB1(59)
+,
+                  aMR-WB(60)
+,
+                  eVRCB0(61)
+,
+                  g7291(62)
+,
+                  eg711A(63)
+,
+                  eg711U(64)
+,
+                  g729B(65)
+,
+                  h263(67)
+,
+                  h263-1998(68)
+,
+                  mP4V-ES(69)
+,
+                  h264(70)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter can be used to set a default coder for channel
+opening. For the legal coder names, refer to the product's
+User Manual.
+
+Default = cpDPT_G711Mulaw_Coder.
+Access: Instant.
+AC INI-Param: MGCPDEFAULTCODER"
+       ::= {acCPMedia 2}
+
+
+
+     acCPMediaPacketizationPeriod OBJECT-TYPE
+       SYNTAX Unsigned32 (5..120)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the default packetization period (Frame Size).
+
+Default = 20 msec (for G.723 30)
+
+Range: 5 to 80.
+Access: Instant.
+AC INI-Param: DEFAULTPACKETIZATIONPERIOD"
+       ::= {acCPMedia 3}
+
+
+
+     acCPMediaRecordCoder OBJECT-TYPE
+       SYNTAX INTEGER {
+                  g711Mulaw(1)
+,
+                  g711Alaw-64(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the coder used for recording to a file.
+Access: Instant.
+AC INI-Param: cpRecordCoder"
+       ::= {acCPMedia 4}
+
+
+
+     acCPMediaPlayCoder OBJECT-TYPE
+       SYNTAX INTEGER {
+                  g711Mulaw(1)
+,
+                  g711Alaw-64(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines the coder type to be used when playing a file of
+type .raw.
+Access: Instant.
+AC INI-Param: cpPlayCoder"
+       ::= {acCPMedia 5}
+
+
+
+     acCPMediaDefaultRealmName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..39))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "By default, the default CP media realm is the first realm appearing
+in the CP media realm table.
+The parameter enables the user to set any of the realms appearing
+in the table as the default realm.
+Access: Offline.
+AC INI-Param: cpDefaultMediaRealmName"
+       ::= {acCPMedia 6}
+
+
+
+     acCPMediaDspAllocationMethod OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disableSingleDSPAllocation(0)
+,
+                  enableSingleDSPAllocation(1)
+,
+                  enforceFullDSPAllocation(2) 
+
+                  }
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "determines dsp allocation method in IP to IP call.
+If this parameter is set to DISABLE_SINGLE_DSP_ALLOCATION (0)
+, then two IP terminations with the same configuration will
+not  allocate DSPs at all and two terminations with different
+configuration will cause an allocation of 2 DSPs.
+
+If this parameteris set to ENABLE_SINGLE_DSP_ALLOCATION (1),
+ then two IP terminations with the same configuration will
+not allocate   DSPs at all, transcoding with allocation of
+one DSP will be used if possible, and two terminations with
+different configuration will cause allocation of 2 DSPs.
+
+If this parameter is set to  ENFORCE_FULL_DSP_ALLOCATION (2)
+then two IP terminations with any configuration will cause
+allocation of two DSPs.
+Access: Instant.
+AC INI-Param: CPMEDIARESOURCEOPTIMIZATION"
+       ::= {acCPMedia 7}
+
+
+
+     -- ****************************************
+     -- acCPMediaRealm table declaration
+     -- ****************************************
+     acCPMediaRealmTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPMediaRealmEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Control Protocol media realm configuration table."
+       ::= {acCPMedia 21}
+
+
+
+     -- ****************************************
+     -- acCPMediaRealm table entry
+     -- ****************************************
+     acCPMediaRealmEntry OBJECT-TYPE
+       SYNTAX AcCPMediaRealmEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPMediaRealmIndex}
+       ::= {acCPMediaRealmTable 1}
+
+
+
+     -- ****************************************
+     -- acCPMediaRealm TABLE
+     -- ****************************************
+     AcCPMediaRealmEntry ::= SEQUENCE {
+       acCPMediaRealmIndex                             Unsigned32,
+       acCPMediaRealmRowStatus                         RowStatus,
+       acCPMediaRealmAction                            INTEGER,
+       acCPMediaRealmActionRes                         INTEGER,
+       acCPMediaRealmName                              SnmpAdminString,
+       acCPMediaRealmIPv4If                            RowPointer,
+       acCPMediaRealmIPv6If                            RowPointer,
+       acCPMediaRealmPortRangeStart                    Integer32,
+       acCPMediaRealmMediaSessionLeg                   Integer32,
+       acCPMediaRealmPortRangeEnd                      Integer32,
+       acCPMediaRealmTransRateRatio                    Unsigned32,
+       acCPMediaRealmIsDefault                         INTEGER
+     }
+
+
+
+     acCPMediaRealmIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..15)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line. Internal parameter.
+AC INI-Param: CpMediaRealm_Index"
+       ::= {acCPMediaRealmEntry 1}
+
+
+
+     acCPMediaRealmRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS field for line. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acCPMediaRealmEntry 2}
+
+
+
+     acCPMediaRealmAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acCPMediaRealmEntry 3}
+
+
+
+     acCPMediaRealmActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT. Internal parameter.
+AC INI-Param: N/A"
+       ::= {acCPMediaRealmEntry 4}
+
+
+
+     acCPMediaRealmName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..38))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "A string representing the name of the media realm.
+Access: Offline.
+AC INI-Param: CpMediaRealm_MediaRealmName"
+       ::= {acCPMediaRealmEntry 5}
+
+
+
+     acCPMediaRealmIPv4If OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Select the OID of the IPv4 interface name corresponding to the
+one appearing in the interface table.
+The OID should be 1.3.6.1.4.1.5003.9.10.10.1.3.1.30.22.1.11.
+acSysInterfaceIndex
+Note: when ignore a default value will be SET: 0.0.
+Access: Offline.
+AC INI-Param: CpMediaRealm_IPv4IF"
+       ::= {acCPMediaRealmEntry 6}
+
+
+
+     acCPMediaRealmIPv6If OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Select the OID of the IPv6interface name corresponding to the
+one appearing in the interface table.
+The OID should be 1.3.6.1.4.1.5003.9.10.10.1.3.1.30.22.1.11.
+acSysInterfaceIndex
+Note: when ignore a default value will be SET: 0.0.
+Access: Offline.
+AC INI-Param: CpMediaRealm_IPv6IF"
+       ::= {acCPMediaRealmEntry 7}
+
+
+
+     acCPMediaRealmPortRangeStart OBJECT-TYPE
+       SYNTAX Integer32 (-1..60000)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The starting port for the range of media ports.
+Access: Offline.
+AC INI-Param: CpMediaRealm_PortRangeStart"
+       ::= {acCPMediaRealmEntry 8}
+
+
+
+     acCPMediaRealmMediaSessionLeg OBJECT-TYPE
+       SYNTAX Integer32 (-1..6000)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           " The number of media sessions associated with the range of ports.
+Access: Offline.
+AC INI-Param: CpMediaRealm_MediaSessionLeg"
+       ::= {acCPMediaRealmEntry 9}
+
+
+
+     acCPMediaRealmPortRangeEnd OBJECT-TYPE
+       SYNTAX Integer32 (-1..60000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The ending port for the range of media ports.
+AC INI-Param: CpMediaRealm_PortRangeEnd"
+       ::= {acCPMediaRealmEntry 10}
+
+
+
+     acCPMediaRealmTransRateRatio OBJECT-TYPE
+       SYNTAX Unsigned32 (1..4294967295)
+       MAX-ACCESS read-create
+       STATUS obsolete
+       DESCRIPTION
+           "In case of trans-rating the ptime will be multiplied.
+Access: Offline.
+AC INI-Param: CpMediaRealm_TransRateRatio"
+       ::= {acCPMediaRealmEntry 11}
+
+
+
+     acCPMediaRealmIsDefault OBJECT-TYPE
+       SYNTAX INTEGER {
+                  false(0)
+,
+                  true(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Determines whether this is the default media realm or not.
+Access: Offline.
+AC INI-Param: CpMediaRealm_IsDefault"
+       ::= {acCPMediaRealmEntry 12}
+
+
+
+     acCPMisc OBJECT IDENTIFIER ::= {acControlCommonConfig 7}
+
+
+     acCPMiscDialToneDuration OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the timeout (in seconds) for the dial tone signal.
+
+Range: 1 to 65535.
+Access: Instant.
+AC INI-Param: DIALTONEDURATION"
+       ::= {acCPMisc 1}
+
+
+
+     acCPMiscTrunkIDOffset OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the offset to the trunk numbering. 
+e.g., Offset = 2 causes the first trunk number to be 2. 
+
+Note: This parameter was replaced by the parameter 'EP_NUM'.
+
+Range: 0 to 4294967295.
+Access: Offline.
+AC INI-Param: MEGACOTRUNKIDOFFSET"
+       ::= {acCPMisc 2}
+
+
+
+     acCPMiscCompatibilityProfile OBJECT-TYPE
+       SYNTAX Unsigned32 (0..131071)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "ControlS MGCP/MEGACO functioning for vendor-specific compatibility.
+Refer to the product's User's Manual.
+
+Range: Integer > 0
+
+Refer to the product's User's Manual or the enumerator mgTMGCPProfile
+for possible values.
+Access: Offline.
+AC INI-Param: MGCPCOMPATIBILITYPROFILE"
+       ::= {acCPMisc 3}
+
+
+
+     acCPMiscSDPProfile OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls MGCP/MEGACO functioning for SDP negotiation. The parameter
+is bitwise.
+Every new RFC support should be turned on or off with this
+parameter. 
+Each bit function is described in the control protocol chapter.
+Access: Instant.
+AC INI-Param: CPSDPPROFILE"
+       ::= {acCPMisc 4}
+
+
+
+     acCPVxml OBJECT IDENTIFIER ::= {acControlCommonConfig 8}
+
+
+     acCPVxmlEnableVXML OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Enables/disables the VXML stack. 
+
+0=Disable
+1=Enable.
+Access: Offline.
+AC INI-Param: EnableVXML"
+       ::= {acCPVxml 1}
+
+
+
+     acCPQualityOfExperience OBJECT IDENTIFIER ::= {acControlCommonConfig 9}
+
+
+     acCPQualityOfExperienceConnectionMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  vQMServer(0)
+,
+                  vQMClient(1)
+,
+                  vQMNone(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Defines whether the module will connect to the VQMS (client)
+or receive connection from the server (server).
+Access: Instant.
+AC INI-Param: QOEConnectionMode"
+       ::= {acCPQualityOfExperience 1}
+
+
+
+     acCPQualityOfExperienceInformationLevel OBJECT-TYPE
+       SYNTAX INTEGER {
+                  standard(0)
+,
+                  enahance(1)
+,
+                  debug(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "Defines the quantity of VQ information sent the the serverl.
+Access: Instant.
+AC INI-Param: QOEInformationLevel"
+       ::= {acCPQualityOfExperience 2}
+
+
+
+     acCPQualityOfExperienceUseMosLQ OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS obsolete
+       DESCRIPTION
+           "If it is enabled the moss_lq will be used by the board to calculate
+the moss status instead of the moss_cq'.
+Access: Instant.
+AC INI-Param: QOEUseMosLQ"
+       ::= {acCPQualityOfExperience 3}
+
+
+
+     acCPQualityOfExperienceSendBufferSize OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the sending buffer size of the socket.
+Access: Instant.
+AC INI-Param: QOESendBufferSize"
+       ::= {acCPQualityOfExperience 4}
+
+
+
+     acCPQualityOfExperienceEnableTLS OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines a domain name to be used to connect with the Call Agent.
+Access: Offline.
+AC INI-Param: QOEEnableTLS"
+       ::= {acCPQualityOfExperience 5}
+
+
+
+     acCPQualityOfExperienceServerIp OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "in case VQM is at client configuration, this parameter defines
+the server ip.
+Access: Offline.
+AC INI-Param: QOEServerIp"
+       ::= {acCPQualityOfExperience 6}
+
+
+
+     acCPQualityOfExperiencePort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65534)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Quality Of Experience Port.
+Access: Instant.
+AC INI-Param: QOEPort"
+       ::= {acCPQualityOfExperience 7}
+
+
+
+     acCPQualityOfExperienceInterfaceName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "the interface to wait on in case of server (default is the default
+control interface).
+Access: Offline.
+AC INI-Param: QOEInterfaceName"
+       ::= {acCPQualityOfExperience 8}
+
+
+
+     acCPQualityOfExperienceMOSCalculationAlgorithm OBJECT-TYPE
+       SYNTAX INTEGER {
+                  conversationalQuality-CQ(0)
+,
+                  listeningQuality-LQ(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Reporting of MOS-LQ (listening quality) or MOS-CQ (conversational
+quality).
+Access: Offline.
+AC INI-Param: QOEUseMosLQ"
+       ::= {acCPQualityOfExperience 9}
+
+
+
+     -- ****************************************
+     -- acCPQOERules table declaration
+     -- ****************************************
+     acCPQOERulesTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCPQOERulesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCPQualityOfExperience 21}
+
+
+
+     -- ****************************************
+     -- acCPQOERules table entry
+     -- ****************************************
+     acCPQOERulesEntry OBJECT-TYPE
+       SYNTAX AcCPQOERulesEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCPQOERulesMediaRealmIndex,acCPQOERulesRuleIndex}
+       ::= {acCPQOERulesTable 1}
+
+
+
+     -- ****************************************
+     -- acCPQOERules TABLE
+     -- ****************************************
+     AcCPQOERulesEntry ::= SEQUENCE {
+       acCPQOERulesMediaRealmIndex                     Unsigned32,
+       acCPQOERulesRuleIndex                           Unsigned32,
+       acCPQOERulesRowStatus                           RowStatus,
+       acCPQOERulesAction                              INTEGER,
+       acCPQOERulesActionRes                           INTEGER,
+       acCPQOERulesMonitoredParam                      INTEGER,
+       acCPQOERulesGreenYellowThreshold                Unsigned32,
+       acCPQOERulesGreenYellowHystersis                Unsigned32,
+       acCPQOERulesYellowRedThreshold                  Unsigned32,
+       acCPQOERulesYellowRedHystersis                  Unsigned32,
+       acCPQOERulesProfile                             INTEGER,
+       acCPQOERulesGreenYellowOperation                INTEGER,
+       acCPQOERulesGreenYellowOperationDetails         Unsigned32,
+       acCPQOERulesYellowRedOperation                  INTEGER,
+       acCPQOERulesYellowRedOperationDetails           Unsigned32,
+       acCPQOERulesDirection                           INTEGER
+     }
+
+
+
+     acCPQOERulesMediaRealmIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The Media Realm Name index at acCPMediaRealmTable.
+AC INI-Param: QOERules_MediaRealmIndex"
+       ::= {acCPQOERulesEntry 1}
+
+
+
+     acCPQOERulesRuleIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..9)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Rule Index.
+AC INI-Param: QOERules_RuleIndex"
+       ::= {acCPQOERulesEntry 2}
+
+
+
+     acCPQOERulesRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+AC INI-Param: QOERules_RowStatus"
+       ::= {acCPQOERulesEntry 3}
+
+
+
+     acCPQOERulesAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+AC INI-Param: QOERules_Action"
+       ::= {acCPQOERulesEntry 4}
+
+
+
+     acCPQOERulesActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: QOERules_ActionRes"
+       ::= {acCPQOERulesEntry 5}
+
+
+
+     acCPQOERulesMonitoredParam OBJECT-TYPE
+       SYNTAX INTEGER {
+                  mos(0)
+,
+                  delay(1)
+,
+                  packetLoss(2)
+,
+                  jitter(3)
+,
+                  rerl(4)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "MonitoredParam.
+Access: Online.
+AC INI-Param: QOERules_MonitoredParam"
+       ::= {acCPQOERulesEntry 6}
+
+
+
+     acCPQOERulesGreenYellowThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "GreenYellowThreshold.
+Access: Online.
+AC INI-Param: QOERules_GreenYellowThreshold"
+       ::= {acCPQOERulesEntry 7}
+
+
+
+     acCPQOERulesGreenYellowHystersis OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "GreenYellowHystersis.
+Access: Online.
+AC INI-Param: QOERules_GreenYellowHysteresis"
+       ::= {acCPQOERulesEntry 8}
+
+
+
+     acCPQOERulesYellowRedThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "YellowRedThreshold.
+Access: Online.
+AC INI-Param: QOERules_YellowRedThreshold"
+       ::= {acCPQOERulesEntry 9}
+
+
+
+     acCPQOERulesYellowRedHystersis OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "YellowRedHystersis.
+Access: Online.
+AC INI-Param: QOERules_YellowRedHysteresis"
+       ::= {acCPQOERulesEntry 10}
+
+
+
+     acCPQOERulesProfile OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noProfile(0)
+,
+                  lowSensitivity(1)
+,
+                  defaultSensitivity(2)
+,
+                  highSensitivity(3)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Profile.
+Access: Online.
+AC INI-Param: QOERules_Profile"
+       ::= {acCPQOERulesEntry 11}
+
+
+
+     acCPQOERulesGreenYellowOperation OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notify(1)
+,
+                  activate2198(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The operation upon crossing green to yellow threshold.
+Access: Online.
+AC INI-Param: QOERules_GreenYellowOperation"
+       ::= {acCPQOERulesEntry 12}
+
+
+
+     acCPQOERulesGreenYellowOperationDetails OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The specific details for the operation (relevant to Activate2198
+only).
+Access: Online.
+AC INI-Param: QOERules_GreenYellowOperationDetails"
+       ::= {acCPQOERulesEntry 13}
+
+
+
+     acCPQOERulesYellowRedOperation OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notify(1)
+,
+                  activate2198(2)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The operation upon crossing yellow to red threshold.
+Access: Online.
+AC INI-Param: QOERules_YellowRedOperation"
+       ::= {acCPQOERulesEntry 14}
+
+
+
+     acCPQOERulesYellowRedOperationDetails OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "The specific details for the operation (relevant to Activate2198
+only).
+Access: Online.
+AC INI-Param: QOERules_YellowRedOperationDetails"
+       ::= {acCPQOERulesEntry 15}
+
+
+
+     acCPQOERulesDirection OBJECT-TYPE
+       SYNTAX INTEGER {
+                  deviceSide(0)
+,
+                  remoteSide(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Whether the paramter is monitored on the remote or local side.
+Access: Online.
+AC INI-Param: QOERules_Direction"
+       ::= {acCPQOERulesEntry 16}
+
+
+
+     acBandwidth OBJECT IDENTIFIER ::= {acControlCommonConfig 10}
+
+
+     -- ****************************************
+     -- acBandwidthManagement table declaration
+     -- ****************************************
+     acBandwidthManagementTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcBandwidthManagementEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acBandwidth 21}
+
+
+
+     -- ****************************************
+     -- acBandwidthManagement table entry
+     -- ****************************************
+     acBandwidthManagementEntry OBJECT-TYPE
+       SYNTAX AcBandwidthManagementEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acBandwidthManagementMediaRealmIndex,acBandwidthManagementThresholdIndex}
+       ::= {acBandwidthManagementTable 1}
+
+
+
+     -- ****************************************
+     -- acBandwidthManagement TABLE
+     -- ****************************************
+     AcBandwidthManagementEntry ::= SEQUENCE {
+       acBandwidthManagementMediaRealmIndex            Unsigned32,
+       acBandwidthManagementThresholdIndex             Unsigned32,
+       acBandwidthManagementRowStatus                  RowStatus,
+       acBandwidthManagementAction                     INTEGER,
+       acBandwidthManagementActionRes                  INTEGER,
+       acBandwidthManagementRuleAction                 INTEGER,
+       acBandwidthManagementThreshold                  Unsigned32,
+       acBandwidthManagementHysteresis                 Unsigned32
+     }
+
+
+
+     acBandwidthManagementMediaRealmIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..63)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The Media Realm Name index at acCPMediaRealmTable.
+AC INI-Param: BWManagement_MediaRealmIndex"
+       ::= {acBandwidthManagementEntry 1}
+
+
+
+     acBandwidthManagementThresholdIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Rule Index.
+AC INI-Param: BWManagement_ThresholdIndex"
+       ::= {acBandwidthManagementEntry 2}
+
+
+
+     acBandwidthManagementRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+Access: Offline.
+AC INI-Param: BWManagement_RowStatus"
+       ::= {acBandwidthManagementEntry 3}
+
+
+
+     acBandwidthManagementAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+Access: Offline.
+AC INI-Param: BWManagement_Action"
+       ::= {acBandwidthManagementEntry 4}
+
+
+
+     acBandwidthManagementActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: BWManagement_ActionRes"
+       ::= {acBandwidthManagementEntry 5}
+
+
+
+     acBandwidthManagementRuleAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  reportOnly(0)
+,
+                  noMoreCalls(1)
+,
+                  lbrCalls(2)
+,
+                  ptimeMul2(3)
+,
+                  ptimeMul4(4)
+,
+                  noAction(5)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Rule Action.
+Access: Offline.
+AC INI-Param: BWManagement_RuleAction"
+       ::= {acBandwidthManagementEntry 6}
+
+
+
+     acBandwidthManagementThreshold OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Threshold.
+Access: Offline.
+AC INI-Param: BWManagement_Threshold"
+       ::= {acBandwidthManagementEntry 7}
+
+
+
+     acBandwidthManagementHysteresis OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4294967295)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Hysteresis.
+Access: Offline.
+AC INI-Param: BWManagement_Hysteresis"
+       ::= {acBandwidthManagementEntry 8}
+
+
+
+     acProvisionedCallAgent OBJECT IDENTIFIER ::= {acControlConfiguration 2}
+
+
+     -- ****************************************
+     -- acProvisionedCallAgent table declaration
+     -- ****************************************
+     acProvisionedCallAgentTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcProvisionedCallAgentEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Magaco Call agents Table.;The table defines the IP and port of each call agent.;The Row Status in this table is currently degenerated. It is permanently set to 'active(1)'. Also, changing other values in the table can be done freely (no need to set the Row Status to other values)."
+       ::= {acProvisionedCallAgent 1}
+
+
+
+     -- ****************************************
+     -- acProvisionedCallAgent table entry
+     -- ****************************************
+     acProvisionedCallAgentEntry OBJECT-TYPE
+       SYNTAX AcProvisionedCallAgentEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acProvisionedCallAgentIndex}
+       ::= {acProvisionedCallAgentTable 1}
+
+
+
+     -- ****************************************
+     -- acProvisionedCallAgent TABLE
+     -- ****************************************
+     AcProvisionedCallAgentEntry ::= SEQUENCE {
+       acProvisionedCallAgentRowStatus                 Unsigned32,
+       acProvisionedCallAgentAction                    Unsigned32,
+       acProvisionedCallAgentActionResult              Unsigned32,
+       acProvisionedCallAgentIndex                     Unsigned32,
+       acProvisionedCallAgentIp                        SnmpAdminString,
+       acProvisionedCallAgentPort                      Unsigned32
+     }
+
+
+
+     acProvisionedCallAgentRowStatus OBJECT-TYPE
+       SYNTAX Unsigned32 (1..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provisioned call agent table row-status.
+AC INI-Param: N/A"
+       ::= {acProvisionedCallAgentEntry 1}
+
+
+
+     acProvisionedCallAgentAction OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provisioned call agent table action.
+AC INI-Param: N/A"
+       ::= {acProvisionedCallAgentEntry 2}
+
+
+
+     acProvisionedCallAgentActionResult OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Provisioned call agent table result.
+AC INI-Param: N/A"
+       ::= {acProvisionedCallAgentEntry 3}
+
+
+
+     acProvisionedCallAgentIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..9)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Megaco Call Agent Id.
+AC INI-Param: N/A"
+       ::= {acProvisionedCallAgentEntry 4}
+
+
+
+     acProvisionedCallAgentIp OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Use this parameter to define a list of up to 10 legal IP addresses
+separated by ',' or ';'  for the ServiceChange command.
+The gateway starts connecting with the first and in case
+of failure, attempts the others.
+Deprecated in MEGACO.
+Access: Offline.
+AC INI-Param: PROVISIONEDCALLAGENTS"
+       ::= {acProvisionedCallAgentEntry 5}
+
+
+
+     acProvisionedCallAgentPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Use this parameter to define a list of up to 10 Call Agent UDP
+ports separated by , or ; for each Call Agent defined
+by the parameter used to specify the Allowed Call Agent Address.
+Deprecated in MEGACO.
+Access: Offline.
+AC INI-Param: PROVISIONEDCALLAGENTSPORTS"
+       ::= {acProvisionedCallAgentEntry 6}
+
+
+
+     -- ****************************************
+     -- acCallManagerGroups table declaration
+     -- ****************************************
+     acCallManagerGroupsTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCallManagerGroupsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "List the trunks in the group. Comma and range can be used"
+       ::= {acProvisionedCallAgent 2}
+
+
+
+     -- ****************************************
+     -- acCallManagerGroups table entry
+     -- ****************************************
+     acCallManagerGroupsEntry OBJECT-TYPE
+       SYNTAX AcCallManagerGroupsEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCallManagerGroupsIndex}
+       ::= {acCallManagerGroupsTable 1}
+
+
+
+     -- ****************************************
+     -- acCallManagerGroups TABLE
+     -- ****************************************
+     AcCallManagerGroupsEntry ::= SEQUENCE {
+       acCallManagerGroupsIndex                        Unsigned32,
+       acCallManagerGroupsRowStatus                    RowStatus,
+       acCallManagerGroupsAction                       Unsigned32,
+       acCallManagerGroupsActionResult                 Unsigned32,
+       acCallManagerGroupsList                         SnmpAdminString,
+       acCallManagerGroupsMGCType                      INTEGER,
+       acCallManagerGroupsPrimaryMGCIndx               Unsigned32,
+       acCallManagerGroupsSecondaryMGCIndx             Unsigned32
+     }
+
+
+
+     acCallManagerGroupsIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (1..10)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Call Manager Groups index.
+AC INI-Param: CPCallManagerGroups_Index"
+       ::= {acCallManagerGroupsEntry 1}
+
+
+
+     acCallManagerGroupsRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Call Manager Groups table row-status.
+AC INI-Param: CPCallManagerGroups_RowStatus"
+       ::= {acCallManagerGroupsEntry 2}
+
+
+
+     acCallManagerGroupsAction OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Call Manager Groups table action.
+AC INI-Param: CPCallManagerGroups_Action"
+       ::= {acCallManagerGroupsEntry 3}
+
+
+
+     acCallManagerGroupsActionResult OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Call Manager Groups table result.
+AC INI-Param: CPCallManagerGroups_ActionRes"
+       ::= {acCallManagerGroupsEntry 4}
+
+
+
+     acCallManagerGroupsList OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..63))
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "List the trunks in the group. Comma and range can be used.
+Access: Offline.
+AC INI-Param: CPCallManagerGroups_GroupMembersList"
+       ::= {acCallManagerGroupsEntry 5}
+
+
+
+     acCallManagerGroupsMGCType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  ip4(0)
+,
+                  dns(1)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "0- IP4 CA, 1- DNS (MGCPCallAgentDomainName).
+Access: Offline.
+AC INI-Param: CPCallManagerGroups_MGCType"
+       ::= {acCallManagerGroupsEntry 6}
+
+
+
+     acCallManagerGroupsPrimaryMGCIndx OBJECT-TYPE
+       SYNTAX Unsigned32 (0..10)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Index of primary MGC in the call agents list. The value 0 means
+there is no IP.
+Access: Offline.
+AC INI-Param: CPCallManagerGroups_PrimaryMGCIndx"
+       ::= {acCallManagerGroupsEntry 7}
+
+
+
+     acCallManagerGroupsSecondaryMGCIndx OBJECT-TYPE
+       SYNTAX Unsigned32 (0..10)
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Index of secondary MGC in the call agents list. If none - set
+to 10.
+Access: Offline.
+AC INI-Param: CPCallManagerGroups_SecondaryMGCIndx"
+       ::= {acCallManagerGroupsEntry 8}
+
+
+
+     acMGCPConfig OBJECT IDENTIFIER ::= {acControlConfiguration 3}
+
+
+     acMGCallAgent OBJECT IDENTIFIER ::= {acMGCPConfig 1}
+
+
+     acMGCallAgentIP OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The Call Agent IP address, in dotted notation, to be used for
+the initial Restart in Progress (RSIP) message. Set to 0.0.0.0
+to avoid sending RSIP. This parameter overrides the BootP
+server's Call Agent IP address, if provided.
+Range:  Legal IP address.
+Access: Offline.
+AC INI-Param: CALLAGENTIP"
+       ::= {acMGCallAgent 1}
+
+
+
+     acMGCallAgentPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65534)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the Call Agent port number. Defaults to the MGCP default
+port number of 2427.
+
+Range: 0 to 65534.
+Access: Offline.
+AC INI-Param: CALLAGENTPORT"
+       ::= {acMGCallAgent 2}
+
+
+
+     acMGCallAgentRedundantIP OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the redundant Call Agent IP address to be used for the
+initial Restart in Progress message (RSIP). Set to 0.0.0.0
+to avoid sending RSIP.
+Range = IP address in dotted format notation.
+Access: Offline.
+AC INI-Param: REDUNDANTAGENTIP"
+       ::= {acMGCallAgent 3}
+
+
+
+     acMGCallAgentRedundantPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65534)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the redundant Call Agent port number. Defaults to the
+MGCP default port number of 2427.
+Access: Offline.
+AC INI-Param: REDUNDANTAGENTPORT"
+       ::= {acMGCallAgent 4}
+
+
+
+     acMGCallAgentRedundantDomainName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the redundant MGCP Call Agent domain name. 
+
+Range = String[63]
+Default = ' ' (empty string).
+Access: Instant.
+AC INI-Param: REDUNDANTCALLAGENTDOMAINNAME"
+       ::= {acMGCallAgent 5}
+
+
+
+     -- ****************************************
+     -- acMGCallAgentRedundantIP table declaration
+     -- ****************************************
+     acMGCallAgentRedundantIPTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcMGCallAgentRedundantIPEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Defines the redundant Call Agent IP address to be used for the initial Restart in Progress message (RSIP).{@} Set to 0.0.0.0 to avoid sending RSIP.{@}Range = IP address in dotted format notation"
+       ::= {acMGCallAgent 21}
+
+
+
+     -- ****************************************
+     -- acMGCallAgentRedundantIP table entry
+     -- ****************************************
+     acMGCallAgentRedundantIPEntry OBJECT-TYPE
+       SYNTAX AcMGCallAgentRedundantIPEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acMGCallAgentRedundantIPIndex}
+       ::= {acMGCallAgentRedundantIPTable 1}
+
+
+
+     -- ****************************************
+     -- acMGCallAgentRedundantIP TABLE
+     -- ****************************************
+     AcMGCallAgentRedundantIPEntry ::= SEQUENCE {
+       acMGCallAgentRedundantIPIndex                   Unsigned32,
+       acMGCallAgentRedundantIPAddress                 IpAddress
+     }
+
+
+
+     acMGCallAgentRedundantIPIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Call Agent number starting at 0.
+AC INI-Param: N/A"
+       ::= {acMGCallAgentRedundantIPEntry 1}
+
+
+
+     acMGCallAgentRedundantIPAddress OBJECT-TYPE
+       SYNTAX IpAddress
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "
+Access: Offline.
+AC INI-Param: RedundantAgentIP"
+       ::= {acMGCallAgentRedundantIPEntry 2}
+
+
+
+     -- ****************************************
+     -- acMGCallAgentRedundantPort table declaration
+     -- ****************************************
+     acMGCallAgentRedundantPortTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcMGCallAgentRedundantPortEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Defines the redundant Call Agent port number.{@}Defaults to the MGCP default port number of 2427."
+       ::= {acMGCallAgent 22}
+
+
+
+     -- ****************************************
+     -- acMGCallAgentRedundantPort table entry
+     -- ****************************************
+     acMGCallAgentRedundantPortEntry OBJECT-TYPE
+       SYNTAX AcMGCallAgentRedundantPortEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acMGCallAgentRedundantPortIndex}
+       ::= {acMGCallAgentRedundantPortTable 1}
+
+
+
+     -- ****************************************
+     -- acMGCallAgentRedundantPort TABLE
+     -- ****************************************
+     AcMGCallAgentRedundantPortEntry ::= SEQUENCE {
+       acMGCallAgentRedundantPortIndex                 Unsigned32,
+       acMGCallAgentRedundantPortNumber                Unsigned32
+     }
+
+
+
+     acMGCallAgentRedundantPortIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Call Agent number starting at 0.
+AC INI-Param: N/A"
+       ::= {acMGCallAgentRedundantPortEntry 1}
+
+
+
+     acMGCallAgentRedundantPortNumber OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65534)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "
+Access: Offline.
+AC INI-Param: RedundantAgentPort"
+       ::= {acMGCallAgentRedundantPortEntry 2}
+
+
+
+     acMGCommunication OBJECT IDENTIFIER ::= {acMGCPConfig 2}
+
+
+     acMGCommunicationConnectionIDBase OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the lowest number for the Connection ID values assigned
+by the media gateway.
+Access: Offline.
+AC INI-Param: CONNECTIONIDBASE"
+       ::= {acMGCommunication 1}
+
+
+
+     acMGCommunicationConnectionIDRange OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the range for the Connection ID values assigned by the
+gateway.
+Default = 999999999.
+Access: Offline.
+AC INI-Param: CONNECTIONIDRANGE"
+       ::= {acMGCommunication 2}
+
+
+
+     acMGCommunicationGateWayPort OBJECT-TYPE
+       SYNTAX Integer32 (-2147483647..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Users can use this parameter to force the media gateway to listen
+to another UDP port instead of to the original 2427, as
+defined in RFC 2705.
+
+Range = 0 to 65535.
+Access: Offline.
+AC INI-Param: GATEWAYMGCPPORT"
+       ::= {acMGCommunication 3}
+
+
+
+     acMGMisc OBJECT IDENTIFIER ::= {acMGCPConfig 3}
+
+
+     acMGMiscDigitmapMismatchNotification OBJECT-TYPE
+       SYNTAX INTEGER {
+                  doNotSend(0)
+,
+                  send(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The MGCP standard defines that if a number does not match the
+digitmap definition, a notification is not sent.
+
+One of the following values: 
+
+1 = Send mismatch notification
+ a digital mismatch notification is sent 
+
+or 
+
+0 = Do NOT send mismatch notification
+ a digital mismatch notification is not sent. In the same way,
+you can enable MGCP to send notifications upon matching
+digitmap.
+Access: Instant.
+AC INI-Param: MGCPSendDigitmapMismatchNotification"
+       ::= {acMGMisc 1}
+
+
+
+     acMGMiscPiggyBackingEnable OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter configures the option to send piggy backed commands
+while RSIPS are sent. For example, if the event is triggered
+by the board and RSIP was not sent yet, RSIP will be
+sent and piggy back the event along with it, the call manager
+will face endpoint restart and than the event.
+
+Default = 1 (piggy back on)
+
+0 = commands sent by gateway will not be piggy backed. 
+1 =  commands sent by gateway will be piggy backed.
+.
+Access: Offline.
+AC INI-Param: EnablePiggyBacking"
+       ::= {acMGMisc 2}
+
+
+
+     acMGMiscUseWildCardWithRSIP OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "When wildcard is used RSIPs turn in a single message on EndPoint
+Naming configuration and Single message for each trunk
+in Trunk Naming configuration. If Off and number of channels
+is less than 64 RSIP message sent for each Endpoint. 0 = Do
+not use
+1 = Use.
+Access: Offline.
+AC INI-Param: UseWildCardWithRSIP"
+       ::= {acMGMisc 3}
+
+
+
+     acMGMiscSDPProfile OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls MGCP functioning for SDP negotiation. The parameter
+is bitwise.
+Every new RFC support should be turned on or off with this
+parameter. 
+Each bit function is described in the control protocol chapter.
+Access: Instant.
+AC INI-Param: CPSDPPROFILE"
+       ::= {acMGMisc 4}
+
+
+
+     acMGMiscClearRequestBuffer OBJECT-TYPE
+       SYNTAX INTEGER {
+                  notClear(0)
+,
+                  clearOnXOnly(1)
+,
+                  clearOnXorDLCX(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines when signals and events are cleared.
+0 = only an empty R: clears the event list and only an empty
+S: clears and stops the current signals list.
+Signals and events will be cleared only when new signals/events
+are requested or an empty signals/events request is mentioned
+in the command.
+1 = if an encapsulated Request identifier (X:) is present in
+the command, all TO signals and all events are cleared.
+2 = same as value 1 , in addition If receive DLCX then all
+signals are cleared (even if no (X:) is present in the command).
+Access: Instant.
+AC INI-Param: ClearRequestBuffer"
+       ::= {acMGMisc 5}
+
+
+
+     acMGNamePattern OBJECT IDENTIFIER ::= {acMGCPConfig 4}
+
+
+     acMGNamePatternEndpoint OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..63))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the endpoint naming pattern for a gateway. The ‘*’ signs
+will be replaced with an actual endpoint number or with
+a wild-card sign. The string will contain up to 63 characters.
+
+Default value will be “ACgw*”.
+.
+Access: Offline.
+AC INI-Param: MGCPEndpointNamingPattern"
+       ::= {acMGNamePattern 1}
+
+
+
+     acMGNamePatternTrunk OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..63))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the trunk and B-channel naming pattern used by the gateway.
+The ‘*’ signs will be replaced with a trunk or B-channel
+number or with a wild-card sign. The string will contain
+up to 63 characters. 
+
+Default value will be “ds*/tr*”.
+.
+Access: Offline.
+AC INI-Param: MGCPTrunkNamingPattern"
+       ::= {acMGNamePattern 2}
+
+
+
+     acMegacoConfig OBJECT IDENTIFIER ::= {acControlConfiguration 4}
+
+
+     acLocalSwitching OBJECT IDENTIFIER ::= {acControlConfiguration 5}
+
+
+     -- ****************************************
+     -- acLocalSwitching table declaration
+     -- ****************************************
+     acLocalSwitchingTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcLocalSwitchingEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Local Switching definitions for analog ports"
+       ::= {acLocalSwitching 1}
+
+
+
+     -- ****************************************
+     -- acLocalSwitching table entry
+     -- ****************************************
+     acLocalSwitchingEntry OBJECT-TYPE
+       SYNTAX AcLocalSwitchingEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acLocalSwitchingIndex}
+       ::= {acLocalSwitchingTable 1}
+
+
+
+     -- ****************************************
+     -- acLocalSwitching TABLE
+     -- ****************************************
+     AcLocalSwitchingEntry ::= SEQUENCE {
+       acLocalSwitchingIndex                           Unsigned32,
+       acLocalSwitchingRowStatus                       RowStatus,
+       acLocalSwitchingPhoneNumber                     Unsigned32
+     }
+
+
+
+     acLocalSwitchingIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..23)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: LocalSwitchingPorts_Index"
+       ::= {acLocalSwitchingEntry 1}
+
+
+
+     acLocalSwitchingRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "
+AC INI-Param: LocalSwitchingPorts_RowStatus"
+       ::= {acLocalSwitchingEntry 2}
+
+
+
+     acLocalSwitchingPhoneNumber OBJECT-TYPE
+       SYNTAX Unsigned32
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Local Switching definitions for analog ports.
+Access: Offline.
+AC INI-Param: LocalSwitchingPorts_PhoneNumber"
+       ::= {acLocalSwitchingEntry 3}
+
+
+
+     acMCLink OBJECT IDENTIFIER ::= {acMegacoConfig 1}
+
+
+     acMCCommunication OBJECT IDENTIFIER ::= {acMCLink 1}
+
+
+     acMCCommunicationCheckLegalityOfMGC OBJECT-TYPE
+       SYNTAX INTEGER {
+                  disable(0)
+,
+                  enable(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "This parameter specifies if MEGACO rejects commands from an
+MGC not in the provisioned list.
+
+0 = Don't reject unknown MGCs
+1 = Reject unknown MGC.
+Access: Instant.
+AC INI-Param: MEGACOCHECKLEGALITYOFMGC "
+       ::= {acMCCommunication 1}
+
+
+
+     acMCCommunicationGateWayMID OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the media gateway's MID towards the MEGACO Call Agent.
+If empty or illegal, the MID holds the IP address of the
+board.
+Range: String[64].
+Access: Offline.
+AC INI-Param: MEGACO_MID"
+       ::= {acMCCommunication 2}
+
+
+
+     acMCCommunicationServiceChangeProfile OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..63))
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Specifies the Profile that will be displayed in the MEGACO serviceChange
+command.
+
+At this stage, the profile will not determine the features
+supported.
+Range = String[63].
+Access: Offline.
+AC INI-Param: CPSERVICECHANGEPROFILE"
+       ::= {acMCCommunication 3}
+
+
+
+     acMCCommunicationTimer OBJECT IDENTIFIER ::= {acMCLink 2}
+
+
+     acMCCommunicationTimerMGProvisionalResponse OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the provisional response timer for the media gateway
+(in msec).
+
+Range: 0 to 20000.
+Access: Instant.
+AC INI-Param: MGPROVISIONALRESPONSETIME"
+       ::= {acMCCommunicationTimer 1}
+
+
+
+     acMCCommunicationTimerMGCProvisionalResponse OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the provisional response timer for the MGC (in msec).
+
+Range: 0 to 20000.
+Access: Instant.
+AC INI-Param: MGCPROVISIONALRESPONSETIME"
+       ::= {acMCCommunicationTimer 2}
+
+
+
+     acMCCommunicationTimerMGExecutionTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the estimated execution time of the media gateway (in
+msec).
+
+Range: 0 to 2000.
+Access: Instant.
+AC INI-Param: MGEXECUTIONTIME"
+       ::= {acMCCommunicationTimer 3}
+
+
+
+     acMCCommunicationTimerMGCExecutionTime OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the estimated execution time of the MGC (in msec).
+
+Range: 0 to 2000.
+Access: Instant.
+AC INI-Param: MGCEXECUTIONTIME"
+       ::= {acMCCommunicationTimer 4}
+
+
+
+     acMCCommunicationTimerHangTermTimeout OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Default timeout (in seconds) for sending Hanging Termination
+event, when a request for Hanging Termination is sent without
+parameters.
+
+Range - 0 -65535.
+Access: Instant.
+AC INI-Param: MEGACOHangTermTimeout"
+       ::= {acMCCommunicationTimer 5}
+
+
+
+     acMCCommunicationTimerRestartMaxWaitingDelay OBJECT-TYPE
+       SYNTAX Unsigned32 (0..600000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the Maximum Waiting Delay (in milliseconds) before restart
+service change when the Media Gateway is powered on.
+Access: Instant.
+AC INI-Param: RestartMaximumWaitingDelay"
+       ::= {acMCCommunicationTimer 6}
+
+
+
+     acMCCommunicationTimerTargetMgResponseTime OBJECT-TYPE
+       SYNTAX Unsigned32 (100..1000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The response time is defined as the time from the arrival of
+a call set-up request until the response (in msec).
+
+Range = 100-1000 in resolutions of 50 (i.e. 100, 150, 200,
+250...).
+Access: Instant.
+AC INI-Param: TargetMG_ResponseTime"
+       ::= {acMCCommunicationTimer 7}
+
+
+
+     acMCNaming OBJECT IDENTIFIER ::= {acMegacoConfig 2}
+
+
+     acMCNamePattern OBJECT IDENTIFIER ::= {acMCNaming 1}
+
+
+     acMCNamePatternPhys OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..30))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the name pattern of a physical termination. 
+For Example: 'tgw/t*/c*'. The '*' sign stands for the actual
+numbers of the trunk and bchannel.
+
+Range: String [30].
+Access: Offline.
+AC INI-Param: PHYSTERMNAMEPATTERN"
+       ::= {acMCNamePattern 1}
+
+
+
+     acMCNamePatternLogicalRTP OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..30))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the name pattern of an RTP termination.
+
+For example: 'gw/rtp/*'. The '*' sign stands for the actual
+number of the RTP termination.
+
+Range: String [30].
+Access: Offline.
+AC INI-Param: LOGICALRTPTERMPATTERN"
+       ::= {acMCNamePattern 2}
+
+
+
+     acMCNamePatternLogicalATM OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..30))
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the name pattern of an ATM termination.
+
+Range: String [30].
+Access: Offline.
+AC INI-Param: LOGICALATMTERMPATTERN"
+       ::= {acMCNamePattern 3}
+
+
+
+     acMCNamePatternConf OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..32))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the name pattern of a conference termination.
+
+Applicable to IPM-1610 and TP-6310 only.
+
+Range: String[32].
+Access: Offline.
+AC INI-Param: CONFERENCETERMPATTERN"
+       ::= {acMCNamePattern 4}
+
+
+
+     acMCNamePatternBCTN OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..32))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the name pattern of a BCT termination.
+
+Applicable to IPM-1610 and TP-6310 only.
+
+Range: String[32].
+Access: Offline.
+AC INI-Param: BCTTERMPATTERN"
+       ::= {acMCNamePattern 5}
+
+
+
+     acMCNamePatternAudio OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..32))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the name pattern of an audio termination.
+
+Applicable to IPM-1610 and TP-6310 only.
+
+Range: String[32].
+Access: Offline.
+AC INI-Param: AUDIOTERMPATTERN"
+       ::= {acMCNamePattern 6}
+
+
+
+     acMCNamePatternTrunkTest OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..32))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the name pattern of a trunk test termination.
+
+Applicable to IPM-1610 and TP-6310 only.
+
+Range: String[32].
+Access: Offline.
+AC INI-Param: TRUNKTESTTERMPATTERN"
+       ::= {acMCNamePattern 7}
+
+
+
+     acMCNameNumber OBJECT IDENTIFIER ::= {acMCNaming 2}
+
+
+     acMCNameNumberEphemeralIDOffset OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Offset for the ephemeral termination IDs in the gateway.
+ e.g., offset = 100 causes the first ephemeral termination
+ID to be 101. 
+Note: This parameter was replaced by the parameter 'RTP_Num'.
+
+Range = 0 to 4294967295.
+Access: Instant.
+AC INI-Param: MEGACOTERMINATIONIDOFFSET"
+       ::= {acMCNameNumber 1}
+
+
+
+     -- ****************************************
+     -- acMCNameNumberPhysicalEndpoint table declaration
+     -- ****************************************
+     acMCNameNumberPhysicalEndpointTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcMCNameNumberPhysicalEndpointEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Magaco physical endpoint's numbering Table.;The table defines per level (e.g. trunk and channel) the numbering starting point and range.;The Row Status in this table is currently degenerated. It is permanently set to 'active(1)'. Also, changing other values in the table can be done freely (no need to set the Row Status to other values)."
+       ::= {acMCNameNumber 21}
+
+
+
+     -- ****************************************
+     -- acMCNameNumberPhysicalEndpoint table entry
+     -- ****************************************
+     acMCNameNumberPhysicalEndpointEntry OBJECT-TYPE
+       SYNTAX AcMCNameNumberPhysicalEndpointEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acMCNameNumberPhysicalEndpointIndex}
+       ::= {acMCNameNumberPhysicalEndpointTable 1}
+
+
+
+     -- ****************************************
+     -- acMCNameNumberPhysicalEndpoint TABLE
+     -- ****************************************
+     AcMCNameNumberPhysicalEndpointEntry ::= SEQUENCE {
+       acMCNameNumberPhysicalEndpointRowStatus         Unsigned32,
+       acMCNameNumberPhysicalEndpointAction            Unsigned32,
+       acMCNameNumberPhysicalEndpointActionResult      Unsigned32,
+       acMCNameNumberPhysicalEndpointIndex             Unsigned32,
+       acMCNameNumberPhysicalEndpointStart             Integer32,
+       acMCNameNumberPhysicalEndpointMin               Unsigned32,
+       acMCNameNumberPhysicalEndpointMax               Unsigned32
+     }
+
+
+
+     acMCNameNumberPhysicalEndpointRowStatus OBJECT-TYPE
+       SYNTAX Unsigned32 (1..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Physical endpoint table row-status.
+AC INI-Param: N/A"
+       ::= {acMCNameNumberPhysicalEndpointEntry 1}
+
+
+
+     acMCNameNumberPhysicalEndpointAction OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Physical endpoint table action.
+AC INI-Param: N/A"
+       ::= {acMCNameNumberPhysicalEndpointEntry 2}
+
+
+
+     acMCNameNumberPhysicalEndpointActionResult OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Physical endpoint table result.
+AC INI-Param: N/A"
+       ::= {acMCNameNumberPhysicalEndpointEntry 3}
+
+
+
+     acMCNameNumberPhysicalEndpointIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..4)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Index for table use.
+AC INI-Param: N/A"
+       ::= {acMCNameNumberPhysicalEndpointEntry 4}
+
+
+
+     acMCNameNumberPhysicalEndpointStart OBJECT-TYPE
+       SYNTAX Integer32 (-1..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the starting number for each name level (level 0 is
+the left one when looking at the parameter defining Phys Term
+Name Pattern). Thus, to start trunk numbering from 1, set
+EP_NUM_0 to 1.
+
+Range: Any positive number.
+Access: Offline.
+AC INI-Param: EP_NUM"
+       ::= {acMCNameNumberPhysicalEndpointEntry 5}
+
+
+
+     acMCNameNumberPhysicalEndpointMin OBJECT-TYPE
+       SYNTAX Unsigned32 (0..255)
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the minimum number for each name level (level 0 is the
+left one, i.e., the trunk number).
+Access: Offline.
+AC INI-Param: EP_MIN"
+       ::= {acMCNameNumberPhysicalEndpointEntry 6}
+
+
+
+     acMCNameNumberPhysicalEndpointMax OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the maximum number for each name level (level 0 is the
+left one, i.e., the trunk number).
+Access: Offline.
+AC INI-Param: EP_MAX"
+       ::= {acMCNameNumberPhysicalEndpointEntry 7}
+
+
+
+     -- ****************************************
+     -- acMCNameNumberStreamEndpoint table declaration
+     -- ****************************************
+     acMCNameNumberStreamEndpointTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcMCNameNumberStreamEndpointEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Magaco stream endpoint's numbering Table.;The table defines per level the numbering starting point and range.;The Row Status in this table is currently degenerated. It is permanently set to 'active(1)'. Also, changing other values in the table can be done freely (no need to set the Row Status to other values)."
+       ::= {acMCNameNumber 22}
+
+
+
+     -- ****************************************
+     -- acMCNameNumberStreamEndpoint table entry
+     -- ****************************************
+     acMCNameNumberStreamEndpointEntry OBJECT-TYPE
+       SYNTAX AcMCNameNumberStreamEndpointEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acMCNameNumberStreamEndpointIndex}
+       ::= {acMCNameNumberStreamEndpointTable 1}
+
+
+
+     -- ****************************************
+     -- acMCNameNumberStreamEndpoint TABLE
+     -- ****************************************
+     AcMCNameNumberStreamEndpointEntry ::= SEQUENCE {
+       acMCNameNumberStreamEndpointRowStatus           Unsigned32,
+       acMCNameNumberStreamEndpointAction              Unsigned32,
+       acMCNameNumberStreamEndpointActionResult        Unsigned32,
+       acMCNameNumberStreamEndpointIndex               Unsigned32,
+       acMCNameNumberStreamEndpointRTPStart            Integer32,
+       acMCNameNumberStreamEndpointATMStart            Integer32
+     }
+
+
+
+     acMCNameNumberStreamEndpointRowStatus OBJECT-TYPE
+       SYNTAX Unsigned32 (1..1)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Stream endpoint table row-status.
+AC INI-Param: N/A"
+       ::= {acMCNameNumberStreamEndpointEntry 1}
+
+
+
+     acMCNameNumberStreamEndpointAction OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Stream endpoint table action.
+AC INI-Param: N/A"
+       ::= {acMCNameNumberStreamEndpointEntry 2}
+
+
+
+     acMCNameNumberStreamEndpointActionResult OBJECT-TYPE
+       SYNTAX Unsigned32 (0..0)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Stream endpoint table result.
+AC INI-Param: N/A"
+       ::= {acMCNameNumberStreamEndpointEntry 3}
+
+
+
+     acMCNameNumberStreamEndpointIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..1)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Index for table use.
+AC INI-Param: N/A"
+       ::= {acMCNameNumberStreamEndpointEntry 4}
+
+
+
+     acMCNameNumberStreamEndpointRTPStart OBJECT-TYPE
+       SYNTAX Integer32 (-1..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the starting number for each name's RTP termination
+level.
+Access: Instant.
+AC INI-Param: RTP_NUM"
+       ::= {acMCNameNumberStreamEndpointEntry 5}
+
+
+
+     acMCNameNumberStreamEndpointATMStart OBJECT-TYPE
+       SYNTAX Integer32 (-1..65535)
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Defines the starting number for each ATM termination level name.
+
+Range: Any positive number.
+Access: Instant.
+AC INI-Param: ATM_NUM"
+       ::= {acMCNameNumberStreamEndpointEntry 6}
+
+
+
+     acMCPoolSize OBJECT IDENTIFIER ::= {acMegacoConfig 3}
+
+
+     acMCPoolSizeProvisionedConf OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provisioned conference size indicated by parameter X-PtEngr.
+
+Applicable to IPM-1610 and TP-6310 only.
+
+The value is dynamically limited according to the number of
+DSP channels and the used feature key.
+
+Range: 1 to 65535.
+Access: Instant.
+AC INI-Param: MEGACOPROVISIONEDCONFSIZE"
+       ::= {acMCPoolSize 1}
+
+
+
+     acMCPoolSizeProvisionedBCT OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Provisioned BCT size indicated by parameter X-PtEngr. 
+
+Applicable to IPM-1610 and TP-6310 only.
+
+Range: 1 to 65535.
+Access: Instant.
+AC INI-Param: MEGACOPROVISIONEDBCTSIZE"
+       ::= {acMCPoolSize 2}
+
+
+
+     acMCPoolSizeProvisionedAudio OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the provisioned audio size indicated by parameter X-PtEngr.
+
+Applicable to IPM-1610 and TP-6310 only.
+
+Range: 1 to 65535.
+Access: Instant.
+AC INI-Param: MEGACOPROVISIONEDAUDIOSIZE"
+       ::= {acMCPoolSize 3}
+
+
+
+     acMCPoolSizeNumOfTestTrunkPorts OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the provisioned TT (trunk testing) size indicated by
+the parameter X-PtEngr.
+
+Applicable to IPM-1610 and TP-6310 only.
+
+Range: 1 to 65535.
+Access: Instant.
+AC INI-Param: MEGACOPROVISIONEDTRUNKTESTINGSIZE"
+       ::= {acMCPoolSize 4}
+
+
+
+     acMCProfile OBJECT IDENTIFIER ::= {acMegacoConfig 4}
+
+
+     acMCProfileBinary OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Used to profile the binary ASN.1 encoding. 
+
+Range: Integer >0
+Refer to the product's User's Manual for possible values.
+Access: Instant.
+AC INI-Param: MEGACOASN1PROFILE"
+       ::= {acMCProfile 1}
+
+
+
+     acMCProfileAASPackages OBJECT-TYPE
+       SYNTAX INTEGER {
+                  tD-51standard(0)
+,
+                  h-248-9standard(1)
+,
+                  mGCP-Packet-Cable(2)
+,
+                  sIP-MSCML(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Selects the profile for the Advanced Audio Syntax specification.
+
+
+0 = TD-51 standard
+1 = H.248.9 standard
+2 = MGCP Packet Cable
+3 = SIP MSCML.
+Access: Offline.
+AC INI-Param: AASPACKAGESPROFILE"
+       ::= {acMCProfile 2}
+
+
+
+     acMCProfileTdmHairPinningMode OBJECT-TYPE
+       SYNTAX INTEGER {
+                  loopback(0)
+,
+                  pstn(1)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "determinewhich Hair-pinning mode is to be used:
+
+mode 0 - will create TDM to TDM connection through IP software
+Loopback 
+
+mode 1 - will create “pure” hair-pinning i.e. TDM to TDM connection
+through PSTN .
+Access: Offline.
+AC INI-Param: MegacoTdmHairPinningMode"
+       ::= {acMCProfile 3}
+
+
+
+     acMCMisc OBJECT IDENTIFIER ::= {acMegacoConfig 5}
+
+
+     acMCMiscEncodingMethod OBJECT-TYPE
+       SYNTAX INTEGER {
+                   textEncoding(0)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Sets the MEGACO coding method. 
+
+0 = Text mode.
+Access: Offline.
+AC INI-Param: MEGACOENCODING"
+       ::= {acMCMisc 1}
+
+
+
+     acMCMiscContextIDOffset OBJECT-TYPE
+       SYNTAX Unsigned32 (0..20000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Offset for the context ID generated by the gateway.
+e.g., offset = 100 causes the first context to be 101.
+
+Range = 0 to 20000.
+Access: Instant.
+AC INI-Param: MEGACOCONTEXTIDOFFSET"
+       ::= {acMCMisc 2}
+
+
+
+     acMCMiscDisconnectBehavior OBJECT-TYPE
+       SYNTAX INTEGER {
+                  noActionOnDisconnect(1)
+,
+                  disableTrunksOnDisconnect(2)
+,
+                  resetBoardOnDisconnect(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Determines PBX behavior upon losing connectivity with H.248
+Call agent or TPNCP.
+1 = No Action -  keep routing traffic
+2 = Disable Trunks - stop routing trafic BUT RTP remains active
+3 = Reset Board - Stop all.
+Access: Offline.
+AC INI-Param: DisconnectBehavior"
+       ::= {acMCMisc 3}
+
+
+
+     acMCMiscMegacoVersion OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..10))
+       MAX-ACCESS read-write
+       STATUS deprecated
+       DESCRIPTION
+           "Determines the maximum Megaco Version number that is supported
+by the device.
+Access: Offline.
+AC INI-Param: MegacoVersion"
+       ::= {acMCMisc 4}
+
+
+
+     acMCMiscSDPProfile OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2147483647)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Controls MEGACO functioning for SDP negotiation. The parameter
+is bitwise.
+Every new RFC support should be turned on or off with this
+parameter. 
+Each bit function is described in the control protocol chapter.
+Access: Instant.
+AC INI-Param: CPSDPPROFILE"
+       ::= {acMCMisc 5}
+
+
+
+     acMCAMS OBJECT IDENTIFIER ::= {acMegacoConfig 6}
+
+
+     acMCAMSNumOfConferencePorts OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Number Of Conference ports.  How many ports on the TPM are allocated
+to the conferencing service.
+Access: Instant.
+AC INI-Param: MEGACOPROVISIONEDCONFSIZE"
+       ::= {acMCAMS 1}
+
+
+
+     acMCAMSNumOfTestTrunkPorts OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Number Of Test Trunk ports.  How many ports on the TPM are allocated
+to the Test Trunk service.
+Access: Instant.
+AC INI-Param: MEGACOPROVISIONEDTRUNKTESTINGSIZE"
+       ::= {acMCAMS 2}
+
+
+
+     acMCAMSNumOfLawfulInterceptPorts OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Number Of Test Trunk ports.  How many ports on the TPM are allocated
+to the Lawful Intercept service.
+Access: Instant.
+AC INI-Param: MEGACOPROVISIONEDBCTSIZE"
+       ::= {acMCAMS 3}
+
+
+
+     acMCAMSNumOfAnnouncementPorts OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Number Of Test Trunk ports.  How many ports on the TPM are allocated
+to the Announcement service.
+Access: Instant.
+AC INI-Param: MEGACOPROVISIONEDAUDIOSIZE"
+       ::= {acMCAMS 4}
+
+
+
+     acMCVGW OBJECT IDENTIFIER ::= {acMegacoConfig 7}
+
+
+     -- ****************************************
+     -- acVGWConfiguration table declaration
+     -- ****************************************
+     acVGWConfigurationTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcVGWConfigurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Table provides the list of the gateway in the device and their configuration.{@}Virtual GW is represented as separate row in this table. "
+       ::= {acMCVGW 21}
+
+
+
+     -- ****************************************
+     -- acVGWConfiguration table entry
+     -- ****************************************
+     acVGWConfigurationEntry OBJECT-TYPE
+       SYNTAX AcVGWConfigurationEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acVGWConfigurationIndex}
+       ::= {acVGWConfigurationTable 1}
+
+
+
+     -- ****************************************
+     -- acVGWConfiguration TABLE
+     -- ****************************************
+     AcVGWConfigurationEntry ::= SEQUENCE {
+       acVGWConfigurationIndex                         Unsigned32,
+       acVGWConfigurationRowStatus                     RowStatus,
+       acVGWConfigurationAction                        INTEGER,
+       acVGWConfigurationActionRes                     INTEGER,
+       acVGWConfigurationVirtualGWName                 SnmpAdminString,
+       acVGWConfigurationIPv4InterfaceName             SnmpAdminString,
+       acVGWConfigurationIPv6InterfaceName             SnmpAdminString,
+       acVGWConfigurationLocalPort                     Unsigned32,
+       acVGWConfigurationAssociatedMembersList         SnmpAdminString,
+       acVGWConfigurationServiceChangeProfile          SnmpAdminString,
+       acVGWConfigurationMegacoVersion                 INTEGER,
+       acVGWConfigurationMID                           SnmpAdminString,
+       acVGWConfigurationMediaRealmName                SnmpAdminString,
+       acVGWConfigurationLoadWeight                    Unsigned32
+     }
+
+
+
+     acVGWConfigurationIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Index Field for line.
+AC INI-Param: MegacoGtwConfigurationTable_Index"
+       ::= {acVGWConfigurationEntry 1}
+
+
+
+     acVGWConfigurationRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+AC INI-Param: MegacoGtwConfigutationTable_RowStatus"
+       ::= {acVGWConfigurationEntry 2}
+
+
+
+     acVGWConfigurationAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+AC INI-Param: MegacoGtwConfigutationTable_Action"
+       ::= {acVGWConfigurationEntry 3}
+
+
+
+     acVGWConfigurationActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: MegacoGtwConfigutationTable_ActionRes"
+       ::= {acVGWConfigurationEntry 4}
+
+
+
+     acVGWConfigurationVirtualGWName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..17))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The descriptive name of the Virtual GW.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_VirtualGWName"
+       ::= {acVGWConfigurationEntry 5}
+
+
+
+     acVGWConfigurationIPv4InterfaceName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..15))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the pointer (Interface Name) to network Interface Table
+for IP version 4 address interface name.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_IPv4InterfaceName"
+       ::= {acVGWConfigurationEntry 6}
+
+
+
+     acVGWConfigurationIPv6InterfaceName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..15))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the pointer (Interface name) to network Interface Table
+for IP version 6 address interface name.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_IPv6InterfaceName"
+       ::= {acVGWConfigurationEntry 7}
+
+
+
+     acVGWConfigurationLocalPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the port to be used by the Media Gateway Controller to
+communicate with this Virtual GW. The value 0 mean select
+default port according to encoding method.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_LocalPort"
+       ::= {acVGWConfigurationEntry 8}
+
+
+
+     acVGWConfigurationAssociatedMembersList OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Defines the list of the Trunks/Interfaces. coma and range can
+be used.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_AssociatedMembersList"
+       ::= {acVGWConfigurationEntry 9}
+
+
+
+     acVGWConfigurationServiceChangeProfile OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the service change profile.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_ServiceChangeProfile"
+       ::= {acVGWConfigurationEntry 10}
+
+
+
+     acVGWConfigurationMegacoVersion OBJECT-TYPE
+       SYNTAX INTEGER {
+                  megacoVersion1(1)
+,
+                  megacoVersion2(2)
+,
+                  megacoVersion3(3)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Megaco Version.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_MegacoVersion"
+       ::= {acVGWConfigurationEntry 11}
+
+
+
+     acVGWConfigurationMID OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..68))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the Virtual GW Message Identifier.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_MID"
+       ::= {acVGWConfigurationEntry 12}
+
+
+
+     acVGWConfigurationMediaRealmName OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..38))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the default media realm name (pointer to media realm
+table).
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_MediaRealmName"
+       ::= {acVGWConfigurationEntry 13}
+
+
+
+     acVGWConfigurationLoadWeight OBJECT-TYPE
+       SYNTAX Unsigned32 (1..5)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the weight of the VGW out of the total load.
+VGW with higher values process more messages.
+Access: Offline.
+AC INI-Param: MegacoGtwConfigurationTable_LoadWeight"
+       ::= {acVGWConfigurationEntry 14}
+
+
+
+     -- ****************************************
+     -- acVGWControllerLink table declaration
+     -- ****************************************
+     acVGWControllerLinkTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcVGWControllerLinkEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Table provides the list of the gateway controllers in the network and their configuration.{@}Each row represents link between Virtual Media GW and Media GW Controller."
+       ::= {acMCVGW 22}
+
+
+
+     -- ****************************************
+     -- acVGWControllerLink table entry
+     -- ****************************************
+     acVGWControllerLinkEntry OBJECT-TYPE
+       SYNTAX AcVGWControllerLinkEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acVGWControllerLinkVGWIndex,acVGWControllerLinkActivityOrder}
+       ::= {acVGWControllerLinkTable 1}
+
+
+
+     -- ****************************************
+     -- acVGWControllerLink TABLE
+     -- ****************************************
+     AcVGWControllerLinkEntry ::= SEQUENCE {
+       acVGWControllerLinkVGWIndex                     Unsigned32,
+       acVGWControllerLinkActivityOrder                Unsigned32,
+       acVGWControllerLinkRowStatus                    RowStatus,
+       acVGWControllerLinkAction                       INTEGER,
+       acVGWControllerLinkActionRes                    INTEGER,
+       acVGWControllerLinkMGCAddressFormat             INTEGER,
+       acVGWControllerLinkMGControllerAddress          SnmpAdminString,
+       acVGWControllerLinkMGControllerPort             Unsigned32,
+       acVGWControllerLinkTransportType                INTEGER
+     }
+
+
+
+     acVGWControllerLinkVGWIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..2)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The virtual GW index at MegacoGtwConfigutationTable.
+AC INI-Param: MegacoGtwControllerLinkTable_VirtualGWIndex"
+       ::= {acVGWControllerLinkEntry 1}
+
+
+
+     acVGWControllerLinkActivityOrder OBJECT-TYPE
+       SYNTAX Unsigned32 (1..10)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "This parameter define the order of redundancy call agents (1
+is the active CA).
+AC INI-Param: MegacoGtwControllerLinkTable_ActivityOrder"
+       ::= {acVGWControllerLinkEntry 2}
+
+
+
+     acVGWControllerLinkRowStatus OBJECT-TYPE
+       SYNTAX RowStatus
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "ROWSTATUS Field for line.
+AC INI-Param: MegacoGtwControllerLinkTable_RowStatus"
+       ::= {acVGWControllerLinkEntry 3}
+
+
+
+     acVGWControllerLinkAction OBJECT-TYPE
+       SYNTAX INTEGER {
+                  none(0)
+
+                  }
+       MAX-ACCESS read-create
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS.
+AC INI-Param: MegacoGtwControllerLinkTable_Action"
+       ::= {acVGWControllerLinkEntry 4}
+
+
+
+     acVGWControllerLinkActionRes OBJECT-TYPE
+       SYNTAX INTEGER {
+                  succeeded(0)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Mangement Field for ACTIONS RESULT.
+AC INI-Param: MegacoGtwControllerLinkTable_ActionRes"
+       ::= {acVGWControllerLinkEntry 5}
+
+
+
+     acVGWControllerLinkMGCAddressFormat OBJECT-TYPE
+       SYNTAX INTEGER {
+                  iPv4(0)
+,
+                  iPv6(1)
+,
+                  dNS(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the Define the format of the MGC address (IPv4, IPv6,
+DNS).
+Access: Offline.
+AC INI-Param: MegacoGtwControllerLinkTable_MGCAddressFormat"
+       ::= {acVGWControllerLinkEntry 6}
+
+
+
+     acVGWControllerLinkMGControllerAddress OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The domain name or IP address of the MG Controller.
+If a domain name is provided, then a DNS server must be configured.
+Access: Offline.
+AC INI-Param: MegacoGtwControllerLinkTable_MGControllerAddress"
+       ::= {acVGWControllerLinkEntry 7}
+
+
+
+     acVGWControllerLinkMGControllerPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..65535)
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "The port number MG Controller is listening for.
+0 mean select default port according to encoding method.
+Access: Offline.
+AC INI-Param: MegacoGtwControllerLinkTable_MGControllerPort"
+       ::= {acVGWControllerLinkEntry 8}
+
+
+
+     acVGWControllerLinkTransportType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  udpIP(0)
+,
+                  tcpIP(1)
+,
+                  sctpIP(2)
+
+                  }
+       MAX-ACCESS read-write
+       STATUS current
+       DESCRIPTION
+           "Define the signaling transport type to be used for communication
+with this MGC.
+Access: Offline.
+AC INI-Param: MegacoGtwControllerLinkTable_TransportType"
+       ::= {acVGWControllerLinkEntry 9}
+
+
+
+     acControlStatus OBJECT IDENTIFIER ::= {acControl 2}
+
+
+     acActiveCallAgent OBJECT IDENTIFIER ::= {acControlStatus 1}
+
+
+     acActiveCallAgentIp OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..20))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Megaco Active Call Agent.
+AC INI-Param: N/A"
+       ::= {acActiveCallAgent 1}
+
+
+
+     acActiveCallAgentPort OBJECT-TYPE
+       SYNTAX Unsigned32 (0..32767)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Megaco Active Port.
+AC INI-Param: N/A"
+       ::= {acActiveCallAgent 2}
+
+
+
+     acCurrentCalls OBJECT IDENTIFIER ::= {acControlStatus 2}
+
+
+     acCallInfo OBJECT IDENTIFIER ::= {acCurrentCalls 1}
+
+
+     -- ****************************************
+     -- acCallInfo table declaration
+     -- ****************************************
+     acCallInfoTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCallInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCallInfo 1}
+
+
+
+     -- ****************************************
+     -- acCallInfo table entry
+     -- ****************************************
+     acCallInfoEntry OBJECT-TYPE
+       SYNTAX AcCallInfoEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCallInfoCallIndex}
+       ::= {acCallInfoTable 1}
+
+
+
+     -- ****************************************
+     -- acCallInfo TABLE
+     -- ****************************************
+     AcCallInfoEntry ::= SEQUENCE {
+       acCallInfoCallIndex                             Unsigned32,
+       acCallInfoCallId                                SnmpAdminString,
+       acCallInfoMediaType                             INTEGER,
+       acCallInfoControlProtocol                       INTEGER,
+       acCallInfoDuration                              Integer32
+     }
+
+
+
+     acCallInfoCallIndex OBJECT-TYPE
+       SYNTAX Unsigned32 (0..5000)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The Index of a call.
+AC INI-Param: N/A"
+       ::= {acCallInfoEntry 1}
+
+
+
+     acCallInfoCallId OBJECT-TYPE
+       SYNTAX SnmpAdminString (SIZE (0..64))
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "Describes the Call ID in the control protocol.For mgcp, string,
+For megaco asci.
+AC INI-Param: N/A"
+       ::= {acCallInfoEntry 2}
+
+
+
+     acCallInfoMediaType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  voice(1)
+,
+                  fax(2)
+,
+                  modem(3)
+,
+                  video(4)
+,
+                  transparent(5)
+,
+                  conference(6)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The type of the media transforming.
+AC INI-Param: N/A"
+       ::= {acCallInfoEntry 3}
+
+
+
+     acCallInfoControlProtocol OBJECT-TYPE
+       SYNTAX INTEGER {
+                  mgcp(1)
+,
+                  megaco(2)
+,
+                  sip(3)
+,
+                  h323(4)
+
+                  }
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The name of the control protocol active now.
+AC INI-Param: N/A"
+       ::= {acCallInfoEntry 4}
+
+
+
+     acCallInfoDuration OBJECT-TYPE
+       SYNTAX Integer32 (-1..31536000)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "the duration of a call from the momet it started.
+AC INI-Param: N/A"
+       ::= {acCallInfoEntry 5}
+
+
+
+     acCallHierarchy OBJECT IDENTIFIER ::= {acCurrentCalls 2}
+
+
+     -- ****************************************
+     -- acCallHierarchy table declaration
+     -- ****************************************
+     acCallHierarchyTable OBJECT-TYPE
+       SYNTAX SEQUENCE OF AcCallHierarchyEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       ::= {acCallHierarchy 1}
+
+
+
+     -- ****************************************
+     -- acCallHierarchy table entry
+     -- ****************************************
+     acCallHierarchyEntry OBJECT-TYPE
+       SYNTAX AcCallHierarchyEntry
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           ""
+       INDEX {acCallHierarchyCallIndex,acCallHierarchyLegType,acCallHierarchyLegID}
+       ::= {acCallHierarchyTable 1}
+
+
+
+     -- ****************************************
+     -- acCallHierarchy TABLE
+     -- ****************************************
+     AcCallHierarchyEntry ::= SEQUENCE {
+       acCallHierarchyCallIndex                        Integer32,
+       acCallHierarchyLegType                          INTEGER,
+       acCallHierarchyLegID                            Integer32,
+       acCallHierarchyRowPointer                       RowPointer
+     }
+
+
+
+     acCallHierarchyCallIndex OBJECT-TYPE
+       SYNTAX Integer32
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "The Index of a call.
+AC INI-Param: N/A"
+       ::= {acCallHierarchyEntry 1}
+
+
+
+     acCallHierarchyLegType OBJECT-TYPE
+       SYNTAX INTEGER {
+                  analog(1)
+,
+                  digital(2)
+,
+                  ip(3)
+,
+                  atm(4)
+,
+                  h110(5)
+,
+                  pci(6)
+
+                  }
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Describes the Type of an end poit.
+AC INI-Param: N/A"
+       ::= {acCallHierarchyEntry 2}
+
+
+
+     acCallHierarchyLegID OBJECT-TYPE
+       SYNTAX Integer32 (0..20)
+       MAX-ACCESS not-accessible
+       STATUS current
+       DESCRIPTION
+           "Describes the end point of a call by index.
+AC INI-Param: N/A"
+       ::= {acCallHierarchyEntry 3}
+
+
+
+     acCallHierarchyRowPointer OBJECT-TYPE
+       SYNTAX RowPointer
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "A pointer to the right instance in the current Leg table.
+AC INI-Param: N/A"
+       ::= {acCallHierarchyEntry 4}
+
+
+
+     acMegacoStatus OBJECT IDENTIFIER ::= {acControlStatus 3}
+
+
+     acMegacoStatusCurrentVersion OBJECT-TYPE
+       SYNTAX Unsigned32 (1..3)
+       MAX-ACCESS read-only
+       STATUS current
+       DESCRIPTION
+           "The Megaco version currently being used.
+AC INI-Param: N/A"
+       ::= {acMegacoStatus 1}
+
+
+
+
+
+END

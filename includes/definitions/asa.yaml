@@ -7,6 +7,7 @@ icon: cisco
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_asa_conns, text: 'Connections' }
 poller_modules:
     applications: false
     bgp-peers: false

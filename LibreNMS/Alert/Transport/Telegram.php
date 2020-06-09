@@ -24,27 +24,17 @@
 */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Telegram extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
-        if (empty($this->config)) {
-            return $this->deliverAlertOld($obj, $opts);
-        }
         $telegram_opts['chat_id'] = $this->config['telegram-chat-id'];
         $telegram_opts['token'] = $this->config['telegram-token'];
         $telegram_opts['format'] = $this->config['telegram-format'];
         return $this->contactTelegram($obj, $telegram_opts);
-    }
-
-    public function deliverAlertOld($obj, $opts)
-    {
-        foreach ($opts as $chat_id => $data) {
-            $this->contactTelegram($obj, $data);
-        }
-        return true;
     }
 
     public static function contactTelegram($obj, $data)
@@ -55,6 +45,9 @@ class Telegram extends Transport
         $format="";
         if ($data['format']) {
                 $format="&parse_mode=" . $data['format'];
+            if ($data['format'] == 'Markdown') {
+                $text = urlencode(preg_replace("/([a-z0-9]+)_([a-z0-9]+)/", "$1\_$2", $obj['msg']));
+            }
         }
         curl_setopt($curl, CURLOPT_URL, ("https://api.telegram.org/bot{$data['token']}/sendMessage?chat_id={$data['chat_id']}&text=$text{$format}"));
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

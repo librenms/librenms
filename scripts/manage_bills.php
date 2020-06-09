@@ -27,7 +27,7 @@ function list_bills($bill_name)
     return $bill[0]['bill_id'];
 }
 
-// Create a new bill. 
+// Create a new bill.
 function create_bill($bill_name, $bill_type, $bill_cdr, $bill_day)
 {
 /** create_bill

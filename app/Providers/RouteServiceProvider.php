@@ -17,6 +17,13 @@ class RouteServiceProvider extends ServiceProvider
     protected $namespace = 'App\Http\Controllers';
 
     /**
+     * The path to the "home" route for your application.
+     *
+     * @var string
+     */
+    public const HOME = '/';
+
+    /**
      * Define your route model bindings, pattern filters, etc.
      *
      * @return void
@@ -35,24 +42,11 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map()
     {
-        $this->mapLegacyRoutes();
-
         $this->mapApiRoutes();
 
         $this->mapWebRoutes();
 
         //
-    }
-
-    /**
-     * Define legacy routes for the application.
-     * Only initializing minimal middleware: Cookies and Session.
-     */
-    protected function mapLegacyRoutes()
-    {
-        Route::middleware('minimal')
-            ->namespace($this->namespace)
-            ->group(base_path('routes/legacy.php'));
     }
 
     /**

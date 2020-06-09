@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Alerting;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Schema;
 use Symfony\Component\Yaml\Yaml;
@@ -65,7 +66,11 @@ class QueryBuilderFilter implements \JsonSerializable
         foreach ($macros as $key => $value) {
             $field = 'macros.' . $key;
 
-            if (ends_with($key, '_usage_perc')) {
+            if (preg_match('/^past_\d+m$/', $key)) {
+                continue; // don't include the time based macros, they don't work like that
+            }
+
+            if ((Str::endsWith($key, '_usage_perc')) || (Str::startsWith($key, 'packet_loss_'))) {
                 $this->filter[$field] = [
                     'id' => $field,
                     'type' => 'integer',
@@ -110,7 +115,7 @@ class QueryBuilderFilter implements \JsonSerializable
 
                 $field = "$table.$column";
 
-                if (ends_with($column, ['_perc', '_current', '_usage', '_perc_warn'])) {
+                if (Str::endsWith($column, ['_perc', '_current', '_usage', '_perc_warn'])) {
                     $this->filter[$field] = [
                         'id' => $field,
                         'type' => 'string',
@@ -141,20 +146,20 @@ class QueryBuilderFilter implements \JsonSerializable
 
     private function getColumnType($type)
     {
-        if (starts_with($type, ['varchar', 'text', 'double', 'float'])) {
+        if (Str::startsWith($type, ['varchar', 'text', 'double', 'float'])) {
             return 'string';
-        } elseif (starts_with($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
-            return 'integer';
-        } elseif (starts_with($type, ['timestamp', 'datetime'])) {
+        } elseif (Str::startsWith($type, ['int', 'tinyint', 'smallint', 'mediumint', 'bigint'])) {
+            //TODO implement field selection and change back to integer
+            return 'string';
+        } elseif (Str::startsWith($type, ['timestamp', 'datetime'])) {
             return 'datetime';
-        } elseif (starts_with($type, 'enum')) {
+        } elseif (Str::startsWith($type, 'enum')) {
             return 'enum';
         }
 
         // binary, blob
         return null;
     }
-
 
     /**
      * Specify data which should be serialized to JSON
@@ -165,7 +170,9 @@ class QueryBuilderFilter implements \JsonSerializable
      */
     public function jsonSerialize()
     {
-        return array_values($this->filter);
+        $filter = $this->filter;
+        asort($filter);
+        return array_values($filter);
     }
 
     /**

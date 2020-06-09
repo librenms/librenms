@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-$temp_data = snmp_get_multi_oid($device, 'switchMemorySize.0 switchMemoryBusy.0', '-OUQs', 'DCN-MIB');
+$temp_data = snmp_get_multi_oid($device, ['switchMemorySize.0', 'switchMemoryBusy.0'], '-OUQs', 'DCN-MIB');
 $mempool['total'] = $temp_data['switchMemorySize.0'];
 $mempool['used'] = $temp_data['switchMemoryBusy.0'];
 $mempool['free'] = $mempool['total'] - $mempool['used'];

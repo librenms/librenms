@@ -7,7 +7,7 @@ $divisor = 100;
 foreach ($pre_cache['datacom_oids'] as $index => $entry) {
     if (is_numeric(str_replace('dBm', '', $entry['ddTransceiversRxPower']))) {
         $oid = '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.4.' . $index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Rx Power';
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Rx Power';
         /* Basic default values */
         $limit_low = -30;
         $warn_limit_low = -12.3;
@@ -21,7 +21,7 @@ foreach ($pre_cache['datacom_oids'] as $index => $entry) {
 
     if (is_numeric(str_replace('dBm', '', $entry['ddTransceiversTxPower']))) {
         $oid = '.1.3.6.1.4.1.3709.3.5.201.1.28.1.1.5.' . $index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Tx Power';
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Tx Power';
         /* Basic default values */
         $limit_low = -30;
         $warn_limit_low = -12.3;

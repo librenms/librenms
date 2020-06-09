@@ -33,9 +33,15 @@ use LibreNMS\RRD\RrdDefinition;
 // CISCO-REMOTE-ACCESS-MONITOR-MIB::crasWebvpnCumulateSessions.0 = Counter32: 29 Sessions
 // CISCO-REMOTE-ACCESS-MONITOR-MIB::crasWebvpnPeakConcurrentSessions.0 = Gauge32: 9 Sessions
 if ($device['os_group'] == 'cisco') {
-    $oid_list = 'crasEmailNumSessions.0 crasIPSecNumSessions.0 crasL2LNumSessions.0 crasLBNumSessions.0 crasSVCNumSessions.0 crasWebvpnNumSessions.0';
+    $oid_list = ['crasEmailNumSessions.0', 'crasIPSecNumSessions.0', 'crasL2LNumSessions.0', 'crasLBNumSessions.0', 'crasSVCNumSessions.0', 'crasWebvpnNumSessions.0'];
     $data     = snmp_get_multi($device, $oid_list, '-OUQs', 'CISCO-REMOTE-ACCESS-MONITOR-MIB');
     $data     = $data[0];
+
+    // Some ASAs return 'No Such Object available on this agent at this OID'
+    // for crasEmailNumSessions.0. Clamp this to 0.
+    if (!is_numeric($data['crasEmailNumSessions'])) {
+        $data['crasEmailNumSessions'] = 0;
+    }
 
     if (is_numeric($data['crasEmailNumSessions']) && is_numeric($data['crasIPSecNumSessions']) && is_numeric($data['crasL2LNumSessions']) && is_numeric($data['crasLBNumSessions']) && is_numeric($data['crasSVCNumSessions']) && is_numeric($data['crasWebvpnNumSessions'])) {
         $rrd_def = RrdDefinition::make()

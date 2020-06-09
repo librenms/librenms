@@ -24,6 +24,7 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Victorops extends Transport
@@ -41,17 +42,17 @@ class Victorops extends Transport
         $url = $opts['url'];
 
         $protocol = array(
-            'entity_id' => ($obj['id'] ? $obj['id'] : $obj['uid']),
+            'entity_id' => strval($obj['id'] ? $obj['id'] : $obj['uid']),
             'state_start_time' => strtotime($obj['timestamp']),
             'entity_display_name' => $obj['title'],
             'state_message' => $obj['msg'],
             'monitoring_tool' => 'librenms',
         );
-        if ($obj['state'] == 0) {
+        if ($obj['state'] == AlertState::RECOVERED) {
             $protocol['message_type'] = 'recovery';
-        } elseif ($obj['state'] == 2) {
+        } elseif ($obj['state'] == AlertState::ACKNOWLEDGED) {
             $protocol['message_type'] = 'acknowledgement';
-        } elseif ($obj['state'] == 1) {
+        } elseif ($obj['state'] == AlertState::ACTIVE) {
             $protocol['message_type'] = 'critical';
         }
 

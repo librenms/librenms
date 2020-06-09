@@ -23,6 +23,7 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Dummy extends Transport
@@ -40,6 +41,9 @@ class Dummy extends Transport
 
     public static function configTemplate()
     {
-        return [];
+        return [
+            'validation' => [],
+            'config' => [],
+        ];
     }
 }

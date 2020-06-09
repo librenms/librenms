@@ -17,7 +17,7 @@ $divisor    = 100;
 foreach ($pre_cache['junos_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxDomCurrentRxLaserPower']) && $entry['jnxDomCurrentRxLaserPower'] != 0 && $entry['jnxDomCurrentTxLaserOutputPower'] != 0) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.5.'.$index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Rx Power';
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Rx Power';
         $limit_low = $entry['jnxDomCurrentRxLaserPowerLowAlarmThreshold']/$divisor;
         $warn_limit_low = $entry['jnxDomCurrentRxLaserPowerLowWarningThreshold']/$divisor;
         $limit = $entry['jnxDomCurrentRxLaserPowerHighAlarmThreshold']/$divisor;
@@ -30,7 +30,7 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
 
     if (is_numeric($entry['jnxDomCurrentTxLaserOutputPower']) && $entry['jnxDomCurrentTxLaserOutputPower'] && $entry['jnxDomCurrentRxLaserPower']) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.7.'.$index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Tx Power';
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Tx Power';
         $limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold']/$divisor;
         $warn_limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowWarningThreshold']/$divisor;
         $limit = $entry['jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold']/$divisor;
@@ -45,7 +45,7 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
             $lane = $pre_cache['junos_multilane_oids'][$index.'.'.$x];
             if (is_numeric($lane['jnxDomCurrentLaneRxLaserPower']) && $lane['jnxDomCurrentLaneRxLaserPower'] != 0 && $lane['jnxDomCurrentLaneTxLaserOutputPower'] != 0) {
                 $oid = '.1.3.6.1.4.1.2636.3.60.1.2.1.1.6.'.$index.'.'.$x;
-                $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' lane ' . $x . ' Rx Power';
+                $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' lane ' . $x . ' Rx Power';
                 $limit_low = $entry['jnxDomCurrentRxLaserPowerLowAlarmThreshold']/$divisor;
                 $warn_limit_low = $entry['jnxDomCurrentRxLaserPowerLowWarningThreshold']/$divisor;
                 $limit = $entry['jnxDomCurrentRxLaserPowerHighAlarmThreshold']/$divisor;
@@ -57,7 +57,7 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
             }
             if (is_numeric($lane['jnxDomCurrentLaneTxLaserOutputPower']) && $lane['jnxDomCurrentLaneTxLaserOutputPower'] && $lane['jnxDomCurrentLaneRxLaserPower']) {
                 $oid = '.1.3.6.1.4.1.2636.3.60.1.2.1.1.8.'.$index.'.'.$x;
-                $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' lane ' . $x . ' Tx Power';
+                $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' lane ' . $x . ' Tx Power';
                 $limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold']/$divisor;
                 $warn_limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowWarningThreshold']/$divisor;
                 $limit = $entry['jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold']/$divisor;

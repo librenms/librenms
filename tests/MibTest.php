@@ -26,6 +26,8 @@
 namespace LibreNMS\Tests;
 
 use Exception;
+use Illuminate\Support\Str;
+use LibreNMS\Config;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use SplFileInfo;
@@ -49,9 +51,7 @@ class MibTest extends TestCase
      */
     public function testMibDirectory($dir)
     {
-        global $config;
-
-        $output = shell_exec("snmptranslate -M +{$config['mib_dir']}:$dir -m +ALL SNMPv2-MIB::system 2>&1");
+        $output = shell_exec("snmptranslate -M +" . Config::get('mib_dir') . ":$dir -m +ALL SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
         $this->assertEmpty($errors, "MIBs in $dir have errors!\n$errors");
@@ -117,11 +117,11 @@ class MibTest extends TestCase
      */
     public function testMibContents($path, $file, $mib_name)
     {
-        global $config, $console_color;
+        global $console_color;
         $file_path = "$path/$file";
         $highlighted_file = $console_color->convert("%r$file_path%n");
 
-        $output = shell_exec("snmptranslate -M +{$config['mib_dir']}:$path -m +$mib_name SNMPv2-MIB::system 2>&1");
+        $output = shell_exec("snmptranslate -M +" . Config::get('mib_dir') . ":$path -m +$mib_name SNMPv2-MIB::system 2>&1");
         $errors = str_replace("SNMPv2-MIB::system\n", '', $output);
 
         $this->assertEmpty($errors, "$highlighted_file has errors!\n$errors");
@@ -134,17 +134,15 @@ class MibTest extends TestCase
      */
     public function mibFiles()
     {
-        global $config;
-
         $file_list = array();
-        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator($config['mib_dir'])) as $file) {
+        foreach (new RecursiveIteratorIterator(new RecursiveDirectoryIterator(Config::get('mib_dir'))) as $file) {
             /** @var SplFileInfo $file */
             if ($file->isDir()) {
                 continue;
             }
-            $mib_path = str_replace($config['mib_dir'].'/', '', $file->getPathName());
+            $mib_path = str_replace(Config::get('mib_dir') . '/', '', $file->getPathName());
             $file_list[$mib_path] = array(
-                str_replace($config['install_dir'], '.', $file->getPath()),
+                str_replace(Config::get('install_dir'), '.', $file->getPath()),
                 $file->getFilename(),
                 $this->extractMibName($file->getPathname())
             );
@@ -159,14 +157,12 @@ class MibTest extends TestCase
      */
     public function mibDirs()
     {
-        global $config;
-
-        $dirs = glob($config['mib_dir'] . '/*', GLOB_ONLYDIR);
-        array_unshift($dirs, $config['mib_dir']);
+        $dirs = glob(Config::get('mib_dir') . '/*', GLOB_ONLYDIR);
+        array_unshift($dirs, Config::get('mib_dir'));
 
         $final_list = array();
         foreach ($dirs as $dir) {
-            $relative_dir = str_replace($config['mib_dir'].'/', '', $dir);
+            $relative_dir = str_replace(Config::get('mib_dir') . '/', '', $dir);
             $final_list[$relative_dir] = array($dir);
         }
         return $final_list;
@@ -188,12 +184,12 @@ class MibTest extends TestCase
             while (($line = fgets($handle)) !== false) {
                 $trimmed = trim($line);
 
-                if (empty($trimmed) || starts_with($trimmed, '--')) {
+                if (empty($trimmed) || Str::startsWith($trimmed, '--')) {
                     continue;
                 }
 
                 $header .= " $trimmed";
-                if (str_contains($trimmed, 'DEFINITIONS')) {
+                if (Str::contains($trimmed, 'DEFINITIONS')) {
                     preg_match('/(\S+)\s+(?=DEFINITIONS)/', $header, $matches);
                     fclose($handle);
                     return $matches[1];

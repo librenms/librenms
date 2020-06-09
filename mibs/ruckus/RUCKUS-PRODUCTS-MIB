@@ -1,5 +1,5 @@
 --
--- Copyright 2010-2013 Ruckus Wireless, Inc. All rights reserved.
+-- Copyright 2010-2014 Ruckus Wireless, Inc. All rights reserved.
 --
 -- RUCKUS WIRELESS, INC. CONFIDENTIAL - 
 -- This is an unpublished, proprietary work of Ruckus Wireless, Inc., and is 
@@ -26,19 +26,19 @@ IMPORTS
 
 
 ruckusProductsMIB MODULE-IDENTITY
-    LAST-UPDATED "201010150800Z"
+    LAST-UPDATED "201405191100Z"
     ORGANIZATION "Ruckus Wireless, Inc."
     CONTACT-INFO
         "Ruckus Wireless, Inc.
 
-        Postal:
         350 West Java Dr.
         Sunnyvale, CA 94089
         USA
 
-        EMail: support@ruckuswireless.com
-
-        Phone: +1-650-265-4200"
+        T: +1 (650) 265-4200
+        F: +1 (408) 738-2065
+        EMail: info@ruckuswireless.com
+        Web: www.ruckuswireless.com"
     DESCRIPTION
         "Ruckus product OID registration mib."
     ::= { ruckusProducts 1 }
@@ -56,6 +56,10 @@ ruckusWirelessMetroProducts   OBJECT IDENTIFIER ::= { ruckusProductsMIB 3 }
 ruckusWirelessHotzoneProducts OBJECT IDENTIFIER ::= { ruckusProductsMIB 4 }
 
 ruckusWirelessControllerProducts OBJECT IDENTIFIER ::= { ruckusProductsMIB 5 }
+
+ruckusWirelessSmartCellGatewayProducts OBJECT IDENTIFIER ::= { ruckusProductsMIB 10 }
+
+ruckusWirelessSmartZoneProducts OBJECT IDENTIFIER ::= { ruckusProductsMIB 11 }
 
 --
 -- Wireless Router Products
@@ -237,6 +241,12 @@ ruckusR300 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 67 }
 -- R700 -
 ruckusR700 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 68 }
 
+-- R710 -
+ruckusR710 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 69 }
+
+-- R500E -
+ruckusR500E OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 70 }
+
 -- R500 -
 ruckusR500 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 71 }
 
@@ -255,9 +265,53 @@ ruckusT301N OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 76 }
 -- T301S -
 ruckusT301S OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 77 }
 
--- H500 –
+-- H500 -
 ruckusH500 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 78 }
 
+-- C500 -
+ruckusC500 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 79 }
+
+-- T504 -
+ruckusT504 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 80 }
+
+-- P300 -
+ruckusP300 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 81 }
+
+-- fzm300 -
+ruckusFZM300 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 85 }
+
+-- fzp300 -
+ruckusFZP300 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 86 }
+
+-- R310
+ruckusR310 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 88 }
+
+-- T710
+ruckusT710 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 90 }
+
+-- R510 -
+ruckusR510 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 91 }
+
+-- H510 -
+ruckusH510 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 92 }
+
+-- H320
+ruckusH320 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 93 }
+
+-- C110
+ruckusC110 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 95 }
+
+-- T610S
+ruckusT610S OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 99 }
+
+-- R610
+ruckusR610 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 100 }
+
+-- T610
+ruckusT610 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 101 }
+
+-- R720
+ruckusR720 OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 102 }
 
 -- ZF7761CM - 802.11n Dual-Band Outdoor AP with CableModem, 2 Ethernet ports, 16MB Flash, 32MB DRAM
 ruckusZF7761CM OBJECT IDENTIFIER  ::= { ruckusWirelessHotzoneProducts 7 }
@@ -398,9 +452,6 @@ ruckusZD5000 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 8 }
 
 -- ZD6000 - Access Controller, 
 --ruckusZD6000 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 9 }
-
--- ZD1200 - Access Controller, 2 Ethernet ports, 2048MB Flash, 2048MB DRAM
-ruckusZD1200 OBJECT IDENTIFIER  ::= { ruckusWirelessControllerProducts 15 }
 
 ruckusZD1000SystemName OBJECT-TYPE
     SYNTAX  DisplayString
@@ -694,76 +745,18 @@ ruckusZD5000CountryCode OBJECT-TYPE
         "Country code"
     ::= { ruckusZD5000 9 }
 
-ruckusZD1200SystemName OBJECT-TYPE
-    SYNTAX  DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "System name"
-    ::= { ruckusZD1200 1 }
+--
+-- Wireless SmartCell Gateway Products
+--
+-- SCG200
+ruckusSCG200 OBJECT IDENTIFIER  ::= { ruckusWirelessSmartCellGatewayProducts 1 }
 
-ruckusZD1200SystemIPAddr OBJECT-TYPE
-    SYNTAX  IpAddress
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "IP Address"
-    ::= { ruckusZD1200 2 }
+--
+-- Wireless SmartZone Products
+--
+-- SZ100
+ruckusSZ100 OBJECT IDENTIFIER  ::= { ruckusWirelessSmartZoneProducts 1 }
 
-ruckusZD1200SystemMacAddr OBJECT-TYPE
-    SYNTAX  MacAddress
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "MAC Address"
-    ::= { ruckusZD1200 3 }
-
-ruckusZD1200SystemUptime OBJECT-TYPE
-    SYNTAX  TimeTicks
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Up time"
-    ::= { ruckusZD1200 4 }
-
-ruckusZD1200SystemModel OBJECT-TYPE
-    SYNTAX  DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Model"
-    ::= { ruckusZD1200 5 }
-
-ruckusZD1200SystemLicensedAPs OBJECT-TYPE
-    SYNTAX  Unsigned32
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Licensed APs"
-    ::= { ruckusZD1200 6 }
-
-ruckusZD1200SystemSerialNumber OBJECT-TYPE
-    SYNTAX  DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Serial number"
-    ::= { ruckusZD1200 7 }
-
-ruckusZD1200SystemVersion OBJECT-TYPE
-    SYNTAX  DisplayString
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Software version"
-    ::= { ruckusZD1200 8 }
-
-ruckusZD1200CountryCode OBJECT-TYPE
-    SYNTAX  RuckusCountryCode
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        "Country code"
-    ::= { ruckusZD1200 9 }
+ruckusSZ50 OBJECT IDENTIFIER  ::= { ruckusWirelessSmartZoneProducts 2 }
 
 END

@@ -25,7 +25,10 @@
 
 namespace LibreNMS\Validations;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Env;
+use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -59,6 +62,15 @@ class User extends BaseValidation
             }
         }
 
+        // skip if docker image
+        if (Env::librenmsDocker()) {
+            return;
+        }
+
+        # if no git, then we probably have different permissions by design
+        if (!Git::repoPresent()) {
+            return;
+        }
 
         // Let's test the user configured if we have it
         if (Config::has('user')) {
@@ -88,7 +100,7 @@ class User extends BaseValidation
                 );
 
                 $files = array_filter(explode(PHP_EOL, $find_result), function ($file) use ($ignore_files) {
-                    if (starts_with($file, $ignore_files)) {
+                    if (Str::startsWith($file, $ignore_files)) {
                         return false;
                     }
 

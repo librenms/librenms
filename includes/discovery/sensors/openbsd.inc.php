@@ -4,7 +4,7 @@ echo ' OPENBSD-SENSORS-MIB: ';
 
 echo 'Caching OIDs:';
 
-$oids = array();
+$oids = [];
 echo ' sensorDevice';
 $oids = snmpwalk_cache_multi_oid($device, 'sensorDevice', $oids, 'OPENBSD-SENSORS-MIB');
 echo ' sensorDescr';

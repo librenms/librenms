@@ -25,12 +25,13 @@
 
 namespace LibreNMS\Alerting;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Schema;
 
 class QueryBuilderParser implements \JsonSerializable
 {
-    private static $legacy_operators = [
+    protected static $legacy_operators = [
         '=' => 'equal',
         '!=' => 'not_equal',
         '~' => 'regex',
@@ -40,7 +41,7 @@ class QueryBuilderParser implements \JsonSerializable
         '<=' => 'less_or_equal',
         '>=' => 'greater_or_equal',
     ];
-    private static $operators = [
+    protected static $operators = [
         'equal' => "=",
         'not_equal' => "!=",
         'less' => "<",
@@ -61,9 +62,11 @@ class QueryBuilderParser implements \JsonSerializable
         'is_not_null' => "IS NOT NULL",
         'regex' => 'REGEXP',
         'not_regex' => 'NOT REGEXP',
+        'in' => 'IN',
+        'not_in' => 'NOT IN',
     ];
 
-    private static $values = [
+    protected static $values = [
         'between' => "? AND ?",
         'not_between' => "? AND ?",
         'begins_with' => "'?%'",
@@ -78,8 +81,8 @@ class QueryBuilderParser implements \JsonSerializable
         'is_not_empty' => "''",
     ];
 
-    private $builder;
-    private $schema;
+    protected $builder;
+    protected $schema;
 
     private function __construct(array $builder)
     {
@@ -107,14 +110,14 @@ class QueryBuilderParser implements \JsonSerializable
      * @param array $rules
      * @return array List of tables found in rules
      */
-    private function findTablesRecursive($rules)
+    protected function findTablesRecursive($rules)
     {
         $tables = [];
 
         foreach ($rules['rules'] as $rule) {
             if (array_key_exists('rules', $rule)) {
                 $tables = array_merge($this->findTablesRecursive($rule), $tables);
-            } elseif (str_contains($rule['field'], '.')) {
+            } elseif (Str::contains($rule['field'], '.')) {
                 list($table, $column) = explode('.', $rule['field']);
 
                 if ($table == 'macros') {
@@ -167,13 +170,17 @@ class QueryBuilderParser implements \JsonSerializable
         $split = array_chunk(preg_split('/(&&|\|\|)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE), 2);
 
         foreach ($split as $chunk) {
-            list($rule_text, $rule_operator) = $chunk;
+            if (count($chunk) < 2 && empty($chunk[0])) {
+                continue; // likely the ending && or ||
+            }
+
+            @list($rule_text, $rule_operator) = $chunk;
             if (!isset($condition)) {
                 // only allow one condition.  Since old rules had no grouping, this should hold logically
                 $condition = ($rule_operator == '||' ? 'OR' : 'AND');
             }
 
-            list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
+            @list($field, $op, $value) = preg_split('/ *([!=<>~]{1,2}) */', trim($rule_text), 2, PREG_SPLIT_DELIM_CAPTURE);
             $field = ltrim($field, '%');
 
             // for rules missing values just use '= 1'
@@ -181,11 +188,12 @@ class QueryBuilderParser implements \JsonSerializable
             if (is_null($value)) {
                 $value = '1';
             } else {
-                $value = trim($value, '"');
-
                 // value is a field, mark it with backticks
-                if (starts_with($value, '%')) {
+                if (Str::startsWith($value, '%')) {
                     $value = '`' . ltrim($value, '%') . '`';
+                } else {
+                    // but if it has quotes just remove the %
+                    $value = ltrim(trim($value, '"'), '%');
                 }
 
                 // replace regex placeholder, don't think we can safely convert to like operators
@@ -236,7 +244,7 @@ class QueryBuilderParser implements \JsonSerializable
 
         if ($expand) {
             $sql = 'SELECT * FROM ' .implode(',', $this->getTables());
-            $sql .= ' WHERE ' . $this->generateGlue() . ' AND ';
+            $sql .= ' WHERE (' . implode(' AND ', $this->generateGlue()) . ') AND ';
 
             // only wrap in ( ) if the condition is OR and there is more than one rule
             $wrap = $this->builder['condition'] == 'OR' && count($this->builder['rules']) > 1;
@@ -281,14 +289,14 @@ class QueryBuilderParser implements \JsonSerializable
      * @param bool $expand Expand macros?
      * @return string
      */
-    private function parseRule($rule, $expand = false)
+    protected function parseRule($rule, $expand = false)
     {
         $field = $rule['field'];
         $builder_op = $rule['operator'];
         $op = self::$operators[$builder_op];
         $value = $rule['value'];
 
-        if (is_string($value) && starts_with($value, '`') && ends_with($value, '`')) {
+        if (is_string($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
             // pass through value such as field
             $value = trim($value, '`');
             if ($expand) {
@@ -320,16 +328,16 @@ class QueryBuilderParser implements \JsonSerializable
      * @param int $depth_limit
      * @return string|array
      */
-    private function expandMacro($subject, $tables_only = false, $depth_limit = 20)
+    protected function expandMacro($subject, $tables_only = false, $depth_limit = 20)
     {
-        if (!str_contains($subject, 'macros.')) {
+        if (!Str::contains($subject, 'macros.')) {
             return $subject;
         }
 
         $macros = Config::get('alert.macros.rule');
 
         $count = 0;
-        while ($count++ < $depth_limit && str_contains($subject, 'macros.')) {
+        while ($count++ < $depth_limit && Str::contains($subject, 'macros.')) {
             $subject = preg_replace_callback('/%?macros.([^ =()]+)/', function ($matches) use ($macros) {
                 $name = $matches[1];
                 if (isset($macros[$name])) {
@@ -349,7 +357,7 @@ class QueryBuilderParser implements \JsonSerializable
         $subject = preg_replace('/%([^%.]+)\./', '$1.', $subject);
 
         // wrap entire macro result in parenthesis if needed
-        if (!(starts_with($subject, '(') && ends_with($subject, ')'))) {
+        if (!(Str::startsWith($subject, '(') && Str::endsWith($subject, ')'))) {
             $subject = "($subject)";
         }
 
@@ -361,9 +369,9 @@ class QueryBuilderParser implements \JsonSerializable
      * Generate glue and first part of sql query for this rule
      *
      * @param string $target the name of the table to target, for alerting, this should be devices
-     * @return string
+     * @return array
      */
-    private function generateGlue($target = 'devices')
+    protected function generateGlue($target = 'devices')
     {
         $tables = $this->getTables();  // get all tables in query
 
@@ -382,9 +390,7 @@ class QueryBuilderParser implements \JsonSerializable
         }
 
         // remove duplicates
-        $glue = array_unique($glue);
-
-        return '(' . implode(' AND ', $glue) . ')';
+        return array_unique($glue);
     }
 
     /**
@@ -401,7 +407,7 @@ class QueryBuilderParser implements \JsonSerializable
             $this->schema->getColumns($parent),
             $this->schema->getColumns($child)
         ), function ($table) {
-            return ends_with($table, '_id');
+            return Str::endsWith($table, '_id');
         });
 
         if (count($shared_keys) === 1) {
@@ -420,14 +426,15 @@ class QueryBuilderParser implements \JsonSerializable
 
         if (!$this->schema->columnExists($child, $child_key)) {
             // if they don't match, guess the column name from the parent
-            if (ends_with($parent, 'xes')) {
+            if (Str::endsWith($parent, 'xes')) {
                 $child_key = substr($parent, 0, -2) . '_id';
             } else {
                 $child_key = preg_replace('/s$/', '_id', $parent);
             }
 
             if (!$this->schema->columnExists($child, $child_key)) {
-                echo"FIXME: Could not make glue from $child to $parent\n";
+                $child_key = $this->schema->getPrimaryKey($child);
+                \Log::warning("QueryBuilderParser: Warning, guessing glue from $child.$child_key to $parent.$parent_key");
             }
         }
 

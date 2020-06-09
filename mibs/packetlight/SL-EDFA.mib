@@ -1,0 +1,541 @@
+-- *****************************************************************
+-- SiteLight EDFA MIB
+-- *****************************************************************
+
+SL-EDFA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, Integer32, TimeTicks
+					 			     	FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	TimeStamp					  		FROM SNMPv2-TC
+    SnmpAdminString						FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+	sitelight				      		FROM SL-NE-MIB;
+
+slEdfa MODULE-IDENTITY
+	LAST-UPDATED "200202040000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the EDFA Cards"
+	::= { sitelight 9 }
+
+--	The EDFA MIB consists of the following groups:
+--	EDFA Configuration Table
+--	EDFA Traps
+
+edfaConfig	 OBJECT IDENTIFIER ::= { slEdfa 1 }
+edfaTraps	 OBJECT IDENTIFIER ::= { slEdfa 2 }
+edfaTraps0	 OBJECT IDENTIFIER ::= { edfaTraps 0 }
+
+-- ----------------------------------------------------
+--
+-- The Edfa Configuration Table
+--
+-- ----------------------------------------------------
+
+edfaConfigTable	 OBJECT-TYPE
+	SYNTAX  SEQUENCE OF EdfaConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current          -- deprecated
+	DESCRIPTION
+		"The EDFA configuration table."
+	::= { edfaConfig 1 }
+
+edfaConfigEntry OBJECT-TYPE
+	SYNTAX  EdfaConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the EDFA interface configuration table.
+		The index to this table is the same as the
+		an ifIndex."
+	INDEX   { edfaIfIndex }
+	::= { edfaConfigTable 1 }
+
+EdfaConfigEntry ::=
+	SEQUENCE {
+		edfaIfIndex					InterfaceIndex,  
+		edfaPumpTemp				Integer32,
+		edfaRxPower					INTEGER,
+		edfaPumpAdminStatus			INTEGER,
+		edfaPumpOperStatus			INTEGER,
+		edfaStatus					INTEGER,
+		edfaVoa     				INTEGER,
+		edfaAutomaticMode			TruthValue,
+		edfaAdminControlMode		INTEGER,
+		edfaOperControlMode			INTEGER,
+		edfaAdminGain				INTEGER,
+		edfaOperGain				INTEGER,
+		edfaAdminOutputPower		INTEGER,
+		edfaOperOutputPower			INTEGER,
+		edfaChannelsNumber			INTEGER,
+		edfaTotalChannelsNumber		INTEGER,
+		edfaEyeSafetyMode			TruthValue,
+		edfaShutDownLipEnable		TruthValue,
+		edfaAutoPowerUpLipEnable	TruthValue,
+		edfaMaxGain					INTEGER,
+		-- Gain In Range from-to
+		edfaGainInFrom				INTEGER,
+		edfaGainInTo				INTEGER,
+		-- Gain Out Range from-to
+		edfaGainOutFrom				INTEGER,
+		edfaGainOutTo				INTEGER,
+		-- Power In Range from-to
+		edfaPowerInFrom				INTEGER,
+		edfaPowerInTo				INTEGER,
+		-- Power Out Range from-to
+		edfaPowerOutFrom			INTEGER,
+		edfaPowerOutTo				INTEGER,
+		-- Channel information
+		edfaFromChannel				INTEGER,
+		edfaToChannel				INTEGER,
+		edfaOscChannel				INTEGER,
+		edfaRedBlueType				INTEGER,
+		edfaRole					INTEGER,
+		-- A description string
+		edfaFreeDescription			DisplayString,
+		edfaConfigSafetyThreshold	INTEGER 
+	}
+
+edfaIfIndex OBJECT-TYPE
+	SYNTAX  	InterfaceIndex
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The amplifier interface index."
+	::= { edfaConfigEntry 1 }
+
+edfaPumpTemp OBJECT-TYPE
+	SYNTAX  	Integer32
+	MAX-ACCESS 	read-only
+	STATUS  	current
+	DESCRIPTION
+		"The pump temperture (in Kelvin)."
+	::= { edfaConfigEntry 2 }
+
+edfaRxPower OBJECT-TYPE
+	SYNTAX  INTEGER 
+	MAX-ACCESS  	read-only
+	STATUS  		current
+	DESCRIPTION
+		"The measured Rx Power.
+		The value is specified in ten'th of Dbm units increments, starting 
+		from -30.0 dbm (e.g. value 0 means -30.0 dbm)."
+	::= { edfaConfigEntry 3 }
+
+edfaPumpAdminStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                   up(1),       -- ready 
+                   down(2),
+                   restart(3)   -- 
+               }
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+               "The desired state of the laser.  The restart(3)
+               state indicates that the edfa pump should be restarted.
+               The restart(3) is not a state, thus it is not kept
+               in the configuration file."
+	::= { edfaConfigEntry 4 }
+
+edfaPumpOperStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                   up(1),        -- ready to pass packets
+                   down(2),
+                   restart(3),   -- 
+                   unknown(4)    -- status can not be determined
+               }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+               "The current operational state of the laser.  
+               If edfaPumpAdminStatus is down(2) then
+               edfaPumpOperStatus should be down(2).  
+               If edfaPumpAdminStatus is changed to up(1) then 
+               edfaPumpOperStatus should change to
+               up(1) if the interface is ready to transmit and
+               receive network traffic; it should remain in the down(2) state if
+               and only if there is a fault that prevents it from
+               going to the up(1) state.
+               The operational status is equal to restart(3) if the edfa pump
+               is still in restart process."
+	::= { edfaConfigEntry 5 }
+
+edfaStatus OBJECT-TYPE
+	SYNTAX  INTEGER (1..8191)
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+		"This variable indicates the Line Status of the
+		Edfa module.  
+
+		The edfaStatus is a bit map represented as a
+		sum, therefore, it can represent multiple failures (alarms) 
+		simultaneously.
+
+		edfaNoAlarm must be set if and only if no other
+		flag is set.
+
+	    The various bit positions are:
+	       1    edfaNoAlarm           No alarm present
+	       2    edfaPumpTemperuture   Pump temperatur is out-of-bound
+	       4    edfaPumpWavelength    Pump wavelength is out-of-bound
+	       8    edfaHwFail            Pump HW failure
+	      16    edfaRvcSignalDetect   Loss of input signal
+	      32    edfaPumpPower         Pump power is out-of-bound
+	      64    edfaRcvPower          Rx Power is out-of-bound
+	     128    edfaTemprature        Edfa temperature is out-of-bound
+	     256	edfaEyeSafty		  Eye safety alarm (available only in eye-safety mode)
+	     512	edafGainFlatness	  Gain flatness alarm
+	    1024    edfaXmtPower          Tx Power is out-of-bound
+	    2048    edfaGain              Edfa Gain is out-of-bound
+	    4096    edfaEol               Pump End Of Life"
+     ::= { edfaConfigEntry 6 }
+
+edfaVoa  		OBJECT-TYPE
+	SYNTAX      INTEGER
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The computed VOA output attenuation specified in 
+		0.1 dB units. From 0.0 to +15.0 dB."
+	::= { edfaConfigEntry 7 }
+
+edfaAutomaticMode OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS 	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Defines the Edfa automatic mode. If equals TRUE,
+		the Edfa control mode should selected automaticaly.
+		Otherwise it should be selected manualy."
+	::= { edfaConfigEntry 8 }
+
+edfaAdminControlMode OBJECT-TYPE
+	SYNTAX  	INTEGER {
+		apc(1), -- automatic power control (the default)
+		agc(2)  -- automatic gain control
+	}
+	MAX-ACCESS 	read-write
+	STATUS  	current
+	DESCRIPTION
+		"Configure the Edfa control mode. This object
+		may be set only when edfaAtomaticMode is FALSE."
+	::= { edfaConfigEntry 9 }
+
+edfaOperControlMode OBJECT-TYPE
+	SYNTAX  	INTEGER {
+		apc(1), -- automatic power control (the default)
+		agc(2)  -- automatic gain control
+	}
+	MAX-ACCESS 	read-only
+	STATUS  	current
+	DESCRIPTION
+		"The current Edfa control mode. Initialy the Edfa
+		starts in APC mode. The AGC mode is used only when
+		selected manualy or after transient input power change."
+	::= { edfaConfigEntry 10 }
+
+edfaAdminGain OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS 	read-write
+	STATUS  	current
+	DESCRIPTION
+		"The required Edfa Gain value given in 0.1 dB units. This value
+		may be configured only when the edfa automatic mode is FALSE
+		and the edfa control mode is Agc."
+	::= { edfaConfigEntry 11 }
+
+edfaOperGain OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS 	read-only
+	STATUS  	current
+	DESCRIPTION
+		"The actual Edfa Gain value given in 0.1 dB units.
+		Value range starts with 0.0 dbm"
+	::= { edfaConfigEntry 12 }
+
+edfaAdminOutputPower OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS 	read-write
+	STATUS  	current
+	DESCRIPTION
+		"The required Edfa output power value given in 0.1 dBm units.
+		The range starts with -30.0 dBm. This value
+		may be configured only when the edfa control mode is Apc."
+	::= { edfaConfigEntry 13 }
+
+edfaOperOutputPower OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS 	read-only
+	STATUS  	current
+	DESCRIPTION
+		"The actual Edfa output power value specified in 0.1 dBm units.
+		Valid valuse are in the range of 0.0 dBm upto +15.0 dBm."
+	::= { edfaConfigEntry 14 }
+
+edfaChannelsNumber OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The number of optical channels on this signal."
+	::= { edfaConfigEntry 15 }
+
+edfaTotalChannelsNumber OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The total number of optical channels on this fiber."
+	::= { edfaConfigEntry 16 }
+
+edfaEyeSafetyMode OBJECT-TYPE
+	SYNTAX  	TruthValue 
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"When in Eye-Safety mode the edfa reduces the laser 
+		power budget down to safe level upon detection of an
+		output fiber cut."
+	::= { edfaConfigEntry 17 }
+
+edfaShutDownLipEnable OBJECT-TYPE
+	SYNTAX  	TruthValue 
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"EDFA shout-down on LIP (Loss of signal) - 
+		enable/disable."
+	::= { edfaConfigEntry 18 }
+
+edfaAutoPowerUpLipEnable OBJECT-TYPE
+	SYNTAX  	TruthValue 
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"EDFA automatic power up (after signal returns) - 
+		enable/disable."
+	::= { edfaConfigEntry 19 }
+
+edfaMaxGain OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The EDFA max gain is determined by the result of the VER command.
+		Legal values:
+		gainUnknown(1)
+		gain14dbm(2) - Booster/Inline, (-2)-14dBm output power, gain (-5)-22dB 
+		gain17dbm(3) - Booster/Inline, (-2)-17dBm output power, gain (-5)-22dB
+		gain20dbm(4) - Booster/Inline, (-2)-20dBm output power, gain (-5)-22dB  
+		gain23dbm(5) - Booster/Inline, 5-23dBm output power, gain (-5)-22dB, 16 channels 
+		gain18dbmPreAmp8Ch(6)     - Preamp (-18)-5dBm output power, fixed gain 18dB 
+		gain18dbmPreAmp16ChRed(7) - Preamp (-18)-5dBm output power, fixed gain 18dB  
+		gain18dbmPreAmp16ChBlue(8)- Preamp (-18)-0dBm output power, fixed gain 18dB
+		gain23dbmGain10(9)        - Booster/Inline, 23dBm output power with fixed gain of 10dB, 32 channels
+		"
+	::= { edfaConfigEntry 20 }
+
+	-- Gain In Range from-to
+
+edfaGainInFrom OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lower input gain range of the edfa in units of 0.1 db."
+	::= { edfaConfigEntry 21 }
+
+edfaGainInTo OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Upper input gain range of the edfa in units of 0.1 db."
+	::= { edfaConfigEntry 22 } 
+	
+	-- Gain Out Range from-to
+
+edfaGainOutFrom OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lower output gain range of the edfa in units of 0.1 db."
+	::= { edfaConfigEntry 23 }
+
+edfaGainOutTo OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Upper output gain range of the edfa in units of 0.1 db."
+	::= { edfaConfigEntry 24 }  
+	
+	-- Power In Range from-to
+
+edfaPowerInFrom OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lower input power range of the edfa in units of 0.1 dbm."
+	::= { edfaConfigEntry 25 }
+
+edfaPowerInTo OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Upper input power range of the edfa in units of 0.1 dbm."
+	::= { edfaConfigEntry 26 } 
+	
+	-- Power Out Range from-to
+
+edfaPowerOutFrom OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Lower output power range of the edfa in units of 0.1 dbm."
+	::= { edfaConfigEntry 27 }
+
+edfaPowerOutTo OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Upper output power range of the edfa in units of 0.1 dbm."
+	::= { edfaConfigEntry 28 }
+
+	-- Channel information
+
+edfaFromChannel OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The first channel number supported by the edfa; 0 to ignore."
+	::= { edfaConfigEntry 29 }
+
+edfaToChannel OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The last channel number supported by the edfa; 0 to ignore."
+	::= { edfaConfigEntry 30 }
+
+edfaOscChannel OBJECT-TYPE
+	SYNTAX  	INTEGER 
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The wavelenght of the optical supervisory channel e.g. 1510, 1490."
+	::= { edfaConfigEntry 31 }
+
+edfaRedBlueType OBJECT-TYPE
+	SYNTAX  	INTEGER {
+                   red(1),       
+                   blue(2),
+                   none(3)     
+    }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The type of the edaf."
+	::= { edfaConfigEntry 32 }  
+
+edfaRole OBJECT-TYPE
+	SYNTAX  	INTEGER {
+                   booster(1),       
+                   boosterInline(2),       
+                   preamp(3),
+                   inline(4),     
+                   raman(5),     
+                   other(6)     
+    }
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"The role of the edaf."
+	::= { edfaConfigEntry 33 }  
+	
+	-- A description string
+
+edfaFreeDescription OBJECT-TYPE
+	SYNTAX  	DisplayString
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"A free text with additional edfa information."
+	::= { edfaConfigEntry 34 }
+
+edfaConfigSafetyThreshold OBJECT-TYPE
+    SYNTAX      INTEGER 
+	MAX-ACCESS 	read-write
+	STATUS  	current
+	DESCRIPTION
+		"The Eye Safety threshold level specified in dBm units.
+		The value given in 0.1 dBm units. The range starts with -50.0 dBm."
+	::= { edfaConfigEntry 35 }
+
+
+-- ----------------------------------------------------
+--
+-- The Edfa Traps
+--
+-- ----------------------------------------------------
+
+edfaStatusChange NOTIFICATION-TYPE
+	OBJECTS { edfaIfIndex,
+			  edfaStatus }
+	STATUS  current
+	DESCRIPTION
+		"A edfaStatusChange trap is sent when the
+		value of an instance edfaStatus changes. It
+		can be utilized by an NMS to trigger polls."
+	::= { edfaTraps 1 }
+
+edfaControlModeChange NOTIFICATION-TYPE
+	OBJECTS { edfaIfIndex,
+			  edfaOperControlMode }
+	STATUS  current
+	DESCRIPTION
+		"A edfaControlModeChange trap is sent when the
+		value of an instance edfaOperControlMode when going 
+		from APC to AGC (both directions) in automatic mode."
+	::= { edfaTraps 2 } 
+	
+edfaStatusChange0 NOTIFICATION-TYPE
+	OBJECTS { edfaIfIndex,
+			  edfaStatus }
+	STATUS  current
+	DESCRIPTION
+		"A edfaStatusChange trap is sent when the
+		value of an instance edfaStatus changes. It
+		can be utilized by an NMS to trigger polls.
+		It is defined to support browsers that don't recognize RFC 2576."
+	::= { edfaTraps0 1 }
+
+edfaControlModeChange0 NOTIFICATION-TYPE
+	OBJECTS { edfaIfIndex,
+			  edfaOperControlMode }
+	STATUS  current
+	DESCRIPTION
+		"A edfaControlModeChange trap is sent when the
+		value of an instance edfaOperControlMode when going 
+		from APC to AGC (both directions) in automatic mode.
+		It is defined to support browsers that don't recognize RFC 2576."
+	::= { edfaTraps0 2 }
+
+END

@@ -48,16 +48,16 @@ function get_cache($host, $value)
 
 function process_syslog($entry, $update)
 {
-    global $config, $dev_cache;
+    global $dev_cache;
 
-    foreach ($config['syslog_filter'] as $bi) {
+    foreach (Config::get('syslog_filter') as $bi) {
         if (strpos($entry['msg'], $bi) !== false) {
             return $entry;
         }
     }
 
     $entry['host'] = preg_replace("/^::ffff:/", "", $entry['host']);
-    if ($new_host = Config::get('syslog_xlate.' . $entry['host'])) {
+    if ($new_host = Config::get("syslog_xlate.{$entry['host']}")) {
         $entry['host'] = $new_host;
     }
     $entry['device_id'] = get_cache($entry['host'], 'device_id');
@@ -65,8 +65,8 @@ function process_syslog($entry, $update)
         $os = get_cache($entry['host'], 'os');
         $hostname = get_cache($entry['host'], 'hostname');
 
-        if ((isset($config['enable_syslog_hooks'])) && ($config['enable_syslog_hooks']) && (isset($config['os'][$os]['syslog_hook'])) && (is_array($config['os'][$os]['syslog_hook']))) {
-            foreach ($config['os'][$os]['syslog_hook'] as $k => $v) {
+        if (Config::get('enable_syslog_hooks') && is_array(Config::getOsSetting($os, 'syslog_hook'))) {
+            foreach (Config::getOsSetting($os, 'syslog_hook') as $k => $v) {
                 $syslogprogmsg = $entry['program'].": ".$entry['msg'];
                 if ((isset($v['script'])) && (isset($v['regex'])) && ((preg_match($v['regex'], $syslogprogmsg)))) {
                     shell_exec(escapeshellcmd($v['script']).' '.escapeshellarg($hostname).' '.escapeshellarg($os).' '.escapeshellarg($syslogprogmsg).' >/dev/null 2>&1 &');
@@ -109,16 +109,16 @@ function process_syslog($entry, $update)
             if (empty($entry['program']) and preg_match('#^(?P<program>([^(:]+\([^)]+\)|[^\[:]+\[[^\]]+\])) ?: ?(?P<msg>.*)$#', $entry['msg'], $matches)) {
                 $entry['msg']     = $matches['msg'];
                 $entry['program'] = $matches['program'];
-            } // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
-            // pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
-            // Disabled because broke this:
-            // diskio.c: don't know how to handle 10 request
-            // elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')) {
-            // $entry['program'] = substr($entry['msg'], 0, $pos);
-            // $entry['msg'] = substr($entry['msg'], $pos+1);
-            // }
-            // fallback, better than nothing...
-            elseif (empty($entry['program']) and !empty($entry['facility'])) {
+            } elseif (empty($entry['program']) and !empty($entry['facility'])) {
+                // SYSLOG CONNECTION BROKEN; FD='6', SERVER='AF_INET(123.213.132.231:514)', time_reopen='60'
+                // pam_krb5: authentication failure; logname=root uid=0 euid=0 tty=ssh ruser= rhost=123.213.132.231
+                // Disabled because broke this:
+                // diskio.c: don't know how to handle 10 request
+                // elseif($pos = strpos($entry['msg'], ';') or $pos = strpos($entry['msg'], ':')) {
+                // $entry['program'] = substr($entry['msg'], 0, $pos);
+                // $entry['msg'] = substr($entry['msg'], $pos+1);
+                // }
+                // fallback, better than nothing...
                 $entry['program'] = $entry['facility'];
             }
 

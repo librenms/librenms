@@ -1,0 +1,2034 @@
+--*****************************************************************
+-- CISCO-DMN-DSG-TUNING.mib : Mib file for Tuning.
+--
+-- October 2010, Hemant Kumar R
+--
+-- Copyright (c) 1999-2010 by Cisco Systems, Inc.
+-- All rights reserved.
+--*****************************************************************
+
+CISCO-DMN-DSG-TUNING-MIB
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    MODULE-IDENTITY, Integer32
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    ciscoDSGUtilities
+        FROM CISCO-DMN-DSG-ROOT-MIB;
+
+
+ciscoDSGTuning MODULE-IDENTITY
+    LAST-UPDATED    "201211190800Z"
+    ORGANIZATION    "Cisco Systems, Inc."
+    CONTACT-INFO
+       "Cisco Systems, Inc.
+        Customer Service
+        Postal: 170 W Tasman Drive
+        San Jose, CA 95134
+        USA
+        Tel: +1 800 553 NETS
+
+        E-mail: cs-ipsla@cisco.com"
+    DESCRIPTION     "Cisco DSG Tuning MIB."
+
+    REVISION        "201211190800Z"
+    DESCRIPTION     "V01.00.10 2012-11-19
+                    Updated to support MOIP Input."
+
+    REVISION        "201010130800Z"
+    DESCRIPTION     "V01.00.09 2010-10-13
+                    Updated for migrating D985X/D9865 MIB to generic
+                    logic."
+
+    REVISION        "201008030900Z"
+    DESCRIPTION     "V01.00.08 2010-08-03
+                    New items   inputStatusAsiLock,
+                    inputStatusAsiLinkError and
+                    inputStatusAsiPacketSize added in Input Status
+                    Table."
+
+    REVISION        "201006170600Z"
+    DESCRIPTION     "V01.00.07 2010-06-17
+                    The enum options of satSignalFecRate,
+                    satSignalPolar and siInfoRxType
+                    and the description of satSignalAFC are updated."
+
+    REVISION        "201005031100Z"
+    DESCRIPTION     "V01.00.06 2010-05-03
+                    Packet Error Count item name updated."
+
+    REVISION        "201004120900Z"
+    DESCRIPTION     "V01.00.05 2010-04-12
+                    New MIB objects are added."
+
+    REVISION        "201003220500Z"
+    DESCRIPTION     "V01.00.04 2010-03-22
+                    The Syntax of Unsigned32 MIB objects whose
+                    range is within the range of Integer32, is
+                    updated to Integer32."
+
+    REVISION        "201002121500Z"
+    DESCRIPTION     "V01.00.03 2010-02-12
+                    The Syntax of read-only objects is updated to
+                    DisplayString."
+
+    REVISION        "201001181500Z"
+    DESCRIPTION     "V01.00.02 2010-01-18
+                    Changed the enumerated value of object
+                    siRcvOptionStatusFreqSel from preset(2) to
+                    userCfg(2)."
+
+    REVISION        "200912201500Z"
+    DESCRIPTION     "V01.00.01 2009-12-20
+                    Added new object, activeTuningValidateOrbPos
+                    under activeTuning Group."
+
+    REVISION        "200911221500Z"
+    DESCRIPTION     "V01.00.00 2009-11-22
+                    Initial Version."
+
+    ::= { ciscoDSGUtilities 5 }
+
+activeTuning              OBJECT IDENTIFIER ::= { ciscoDSGTuning 1  }
+activeTuningTable         OBJECT IDENTIFIER ::= { ciscoDSGTuning 2  }
+tuningStatusTable         OBJECT IDENTIFIER ::= { ciscoDSGTuning 3  }
+siRcvTable                OBJECT IDENTIFIER ::= { ciscoDSGTuning 4  }
+
+-- *************************************
+-- Active Tuning Branch
+-- *************************************
+
+activeTuningInput OBJECT-TYPE
+    SYNTAX  INTEGER {
+                asi(1),
+                rf1(2),
+                rf2(3),
+                rf3(4),
+                rf4(5),
+                ipi(6),
+                none(255)
+            }
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+         "Select Input for tuning."
+     ::= { activeTuning 1 }
+
+activeTuningValidateOrbPos OBJECT-TYPE
+    SYNTAX   INTEGER {
+                writeOnly(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Command used to validate orbital position.
+        Set this object to yes( 2 ) to validate Orbital position."
+    ::= { activeTuning 2 }
+
+activeTuningChScan  OBJECT-TYPE
+    SYNTAX   INTEGER {
+                scan(1),
+                writeOnly(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Channel Scan command.
+            Setting scan( 1 ) triggers the channel scanning process. "
+    ::= { activeTuning 3 }
+
+
+-- *************************************
+-- Active Tuning Table Branch
+-- *************************************
+
+-- *************************************
+-- Active Tuner Table Branch
+-- *************************************
+
+activeTunerTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF ActiveTunerEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Active Tuner Table."
+    ::= { activeTuningTable 1 }
+
+activeTunerEntry OBJECT-TYPE
+    SYNTAX  ActiveTunerEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Active Tuner Table."
+    INDEX { activeTunerIndex }
+        ::= { activeTunerTable 1 }
+
+ActiveTunerEntry ::= SEQUENCE
+{
+    activeTunerIndex        Integer32,
+    activeTunerRFInput      INTEGER,
+    activeTunerFreq         Integer32,
+    activeTunerSymbolRate   Integer32,
+    activeTunerDVBSFEC      INTEGER,
+    activeTunerModulation   INTEGER,
+    activeTunerRollOff      INTEGER,
+    activeTunerIQ           INTEGER
+}
+
+activeTunerIndex OBJECT-TYPE
+    SYNTAX    Integer32(1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Active Tuner Index."
+    ::= { activeTunerEntry  1 }
+
+activeTunerRFInput OBJECT-TYPE
+    SYNTAX    INTEGER {
+                rf1(2),
+                rf2(3),
+                rf3(4),
+                rf4(5),
+                none(255)
+          }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Active Tuner RF Input."
+    ::= { activeTunerEntry 2 }
+
+activeTunerFreq OBJECT-TYPE
+    SYNTAX    Integer32 (0..15000000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The Satellite Downlink frequency in the range of
+        0 to 15000000 KHz in steps of 1 KHz."
+    ::= { activeTunerEntry 3 }
+
+activeTunerSymbolRate OBJECT-TYPE
+    SYNTAX    Integer32 (10000..450000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Data rate on the transport stream in millions of symbols per
+        second.
+        Range is from 10000 to 450000 hectoSym/second in steps
+        of 1 hectoSym/second.
+        ( 1 hecto = 10^2 )."
+    ::= { activeTunerEntry 4 }
+
+activeTunerDVBSFEC OBJECT-TYPE
+     SYNTAX  INTEGER {
+                oneHalf(1),
+                twoThirds(3),
+                threeQuarters(4),
+                fiveSixths(6),
+                sevenEigths(7),
+                auto(10)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Forward Error Correction Rate.
+        For DVB-S2 modulation only auto is applicable.
+        For DVB-S modulation all options are applicable."
+     ::= { activeTunerEntry 5 }
+
+activeTunerModulation OBJECT-TYPE
+    SYNTAX    INTEGER {
+                dvbs(1),
+                dvbs2(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Signal Modulation type."
+    ::= { activeTunerEntry 6 }
+
+activeTunerRollOff OBJECT-TYPE
+    SYNTAX  INTEGER {
+                f35(1),
+                f25(2),
+                f20(3)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Alpha filtering - for DVB-S: 0.20/0.35,
+        for DVB-S2: 0.20/0.25/0.35. Roll off with scaling factor
+        of 1/100."
+    ::= { activeTunerEntry  7 }
+
+activeTunerIQ OBJECT-TYPE
+    SYNTAX    INTEGER {
+                inverted(1),
+                nonInverted(2),
+                auto(3)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Spectrum Inversion."
+    ::= { activeTunerEntry  8 }
+
+
+-- *************************************
+-- Active Input Table Branch
+-- *************************************
+
+activeInputTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF ActiveInputEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Active Input Table."
+   ::= { activeTuningTable 2 }
+
+activeInputEntry OBJECT-TYPE
+    SYNTAX  ActiveInputEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Active Input Table."
+    INDEX { activeInputRFIndex }
+    ::= { activeInputTable 1 }
+
+ActiveInputEntry ::=  SEQUENCE
+{
+    activeInputRFIndex          INTEGER,
+    activeInputLNBType          INTEGER,
+    activeInputLNBTrim          Integer32,
+    activeInputLNBTrim2         Integer32,
+    activeInputLocalOscFreq1    Integer32,
+    activeInputLocalOscFreq2    Integer32,
+    activeInputCrossOver        Integer32,
+    activeInputLocalOscControl  INTEGER,
+    activeInputOrbitalPos       Integer32,
+    activeInputEastWestFlag     INTEGER,
+    activeInputPolarization     INTEGER,
+    activeInputSatName          DisplayString,
+    activeInputLastLNBConfig    Integer32,
+    activeInputDiSeqCEnable     INTEGER,
+    activeInputDiSeqCSwitch     INTEGER
+}
+
+activeInputRFIndex OBJECT-TYPE
+    SYNTAX    INTEGER {
+                rf1(1),
+                rf2(2),
+                rf3(3),
+                rf4(4)
+            }
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Selection of RF Input."
+    ::= { activeInputEntry  1 }
+
+activeInputLNBType OBJECT-TYPE
+    SYNTAX    INTEGER {
+                cBand(1),
+                singleKuBand(2),
+                dualKuBand(3),
+                advanced(4)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "LNB Type: C-Band/Single Ku/Dual Ku/Advanced.
+        For simplified setup select C-Band or Ku-Band.
+        If there is a need to configure LO, select Advanced."
+    ::= { activeInputEntry  2 }
+
+activeInputLNBTrim OBJECT-TYPE
+    SYNTAX    Integer32(0..15000000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Low Noise Block Trim Level 1 when type is not advanced.
+        It has a range of 0 to 15000000 KHz in steps of 1KHz."
+    ::= { activeInputEntry  3 }
+
+activeInputLNBTrim2 OBJECT-TYPE
+    SYNTAX    Integer32(0..15000000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Low Noise Block Trim Level 2 when type is not advanced.
+        It has a range of 0 to 15000000 KHz in steps of 1KHz."
+    ::= { activeInputEntry  4 }
+
+activeInputLocalOscFreq1 OBJECT-TYPE
+    SYNTAX    Integer32 (0..15000000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "RW, only when LNB Type is Advanced.
+        Local Oscillator #1 Frequency when type is advanced.
+        It has a range of 0 to 15000000 KHz in steps of 1KHz."
+    ::= { activeInputEntry  5 }
+
+activeInputLocalOscFreq2 OBJECT-TYPE
+    SYNTAX    Integer32 (0..15000000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "RW, only when LNB Type is Advanced.
+        Local Oscillator #2 Frequency when type is advanced.
+        It has a range of 0 to 15000000 KHz in steps of 1KHz."
+    ::= { activeInputEntry  6 }
+
+activeInputCrossOver OBJECT-TYPE
+    SYNTAX    Integer32 (0..15000000)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Crossover Frequency for Local Oscillator.
+        It has a range of 0 to 15000000 KHz in steps of 1KHz."
+    ::= { activeInputEntry  7 }
+
+activeInputLocalOscControl OBJECT-TYPE
+    SYNTAX    INTEGER {
+                off(1),
+                on(2),
+                auto(3)
+            }
+     MAX-ACCESS  read-write
+     STATUS  current
+     DESCRIPTION
+         "22KHz Local Osillator Control."
+     ::= { activeInputEntry  8 }
+
+activeInputOrbitalPos OBJECT-TYPE
+    SYNTAX    Integer32 (0..3600)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Orbital location Azimuth.The range is from 0 to 3600
+        in steps of 1.
+        The scaling factor is 1/10th of a degree."
+    ::= { activeInputEntry  9 }
+
+activeInputEastWestFlag OBJECT-TYPE
+    SYNTAX    INTEGER {
+                east(1),
+                west(2),
+                notApplicable(3)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "RF Mapping Location East/West Flag."
+    ::= { activeInputEntry  10 }
+
+activeInputPolarization OBJECT-TYPE
+    SYNTAX  INTEGER {
+                horizontal(1),
+                vertical(2),
+                automatic(3)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "RF Mapping Polarization."
+    ::= { activeInputEntry  11 }
+
+activeInputSatName OBJECT-TYPE
+    SYNTAX    DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Satellite Name Matching the Orbital Position + E/W Flag.
+        Enter Satellite/Transponder Name to fill in Azimuth and
+        E/W Flag automatically."
+    ::= { activeInputEntry  12 }
+
+activeInputLastLNBConfig OBJECT-TYPE
+    SYNTAX  Integer32(1..10)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "LNB configuration last applied."
+    ::= { activeInputEntry   13 }
+
+activeInputDiSeqCEnable OBJECT-TYPE
+    SYNTAX  INTEGER {
+                disable(1),
+                enable(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "DiSeqC On/Off."
+    ::= { activeInputEntry   14 }
+
+activeInputDiSeqCSwitch OBJECT-TYPE
+    SYNTAX  INTEGER {
+                off(1),
+                a(2),
+                b(3),
+                c(4),
+                d(5),
+                e(6),
+                f(7),
+                g(8),
+                h(9),
+                i(10),
+                j(11),
+                k(12),
+                l(13),
+                m(14),
+                n(15),
+                o(16),
+                p(17)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "DiSeqC switch selection."
+    ::= { activeInputEntry   15 }
+
+
+-- *************************************
+-- LNB Power Table Branch
+-- *************************************
+
+lnbPowerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LnbPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "LNB power Table."
+     ::= { activeTuningTable 3 }
+
+lnbPowerEntry OBJECT-TYPE
+    SYNTAX  LnbPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for LNB power Table."
+    INDEX { lnbPowerIndex }
+    ::= { lnbPowerTable 1 }
+
+LnbPowerEntry  ::= SEQUENCE
+{
+    lnbPowerIndex     Integer32,
+    lnbPowerInput     INTEGER,
+    lnbPowerControl   INTEGER,
+    lnbPowerStatus    INTEGER
+}
+
+lnbPowerIndex OBJECT-TYPE
+    SYNTAX  Integer32(1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Low Noise Block Power Index."
+    ::= { lnbPowerEntry 1 }
+
+lnbPowerInput OBJECT-TYPE
+    SYNTAX  INTEGER {
+                rf1(2),
+                rf2(3),
+                rf3(4),
+                rf4(5),
+                none(255)
+            }
+     MAX-ACCESS read-write
+     STATUS  current
+     DESCRIPTION
+        "Low Noise Block Power Input."
+    ::= { lnbPowerEntry 2 }
+
+lnbPowerControl OBJECT-TYPE
+    SYNTAX INTEGER {
+            off(1),
+            thirteenV(2),
+            eighteenH(3),
+            hNIT(4),
+            vNIT(5)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Active LNB Power setting.13/18V is to control dual polarity LNB.
+    The convention is: Horizontal-18V; Vertical-13V.
+    Valid settings are,
+    Off
+    13V          ( 13V always, ignore polarity in NIT )
+    18V          ( 18V always, ignore polarity in NIT )
+    13V-NIT      ( 13V initially, over-ride by polarity in NIT )
+    18V-NIT      ( 18V initially, over-ride by polarity in NIT )."
+    ::= { lnbPowerEntry 3 }
+
+lnbPowerStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                notApplicable(1),
+                normal(2),
+                noLoad(3),
+                overTemperature(4),
+                overLoad(5),
+                shortCircuit(6),
+                disabled(7)
+          }
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+        "Low Noise Block Power Supply Status."
+    ::= { lnbPowerEntry 4 }
+
+-- *************************************
+-- Tuning Status Table Branch
+-- *************************************
+
+-- *************************************
+-- Satellite Signal Table Branch
+-- *************************************
+
+satSignalTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SatSignalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Satellite Signal Table."
+    ::= { tuningStatusTable 1 }
+
+satSignalEntry OBJECT-TYPE
+    SYNTAX  SatSignalEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Satellite Signal Table."
+    INDEX { satSignalIndex }
+    ::= { satSignalTable 1 }
+
+SatSignalEntry  ::= SEQUENCE
+{
+    satSignalIndex               Integer32,
+    satSignalPvBer               DisplayString,
+    satSignalQPSKBer             DisplayString,
+    satSignalLdpCber             DisplayString,
+    satSignalCndisp              DisplayString,
+    satSignalCnMargin            DisplayString,
+    satSignalLevel               DisplayString,
+    satSignalSatDishCnMargin     DisplayString,
+    satSignalSatDishSigLevel     DisplayString,
+    satSignalPerDisp             DisplayString,
+    satSignalAfc                 DisplayString,
+    satSignalUncorErrCnt         DisplayString,
+    satSignalCorErrCnt           DisplayString,
+    satSignalRfLock              INTEGER,
+    satSignalDnLkFreq            DisplayString,
+    satSignalLbandFreq           DisplayString,
+    satSignalSymbolRate          DisplayString,
+    satSignalFecRate             INTEGER,
+    satSignalPolarization        INTEGER,
+    satSignalModulation          INTEGER,
+    satSignalIQ                  INTEGER,
+    satSignalLnbPsStatus         INTEGER,
+    satSignalPilots              INTEGER,
+    satSignalLoSelect            INTEGER,
+    satSignalPolar               INTEGER,
+    satSignalClearSigErrCnt      INTEGER,
+    satSignalValidateOrbPosDate  DisplayString,
+    satSignalValidateOrbPosStat  DisplayString,
+    satSignalChScanStatus        INTEGER,
+    satSignalSigLevelRaw         DisplayString,
+    satSignalP1DStatus           DisplayString,
+    satSignalDvbS2FrameLen       INTEGER,
+    satSignalCnMarginRaw         DisplayString,
+    satSignalDvbSQpskErrCount    DisplayString,
+    satSignalDvbS2LdpcErrCount   DisplayString,
+    satSignalPvErrCount          DisplayString,
+    satSignalFecSyncStatus       INTEGER,
+    satSignalPktErrCount         DisplayString
+}
+
+satSignalIndex OBJECT-TYPE
+    SYNTAX  Integer32(1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Satellite Signal Table Index."
+    ::= { satSignalEntry  1 }
+
+satSignalPvBer OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: DVB-S Post-Viterbi Bit Error Rate."
+    ::= { satSignalEntry  2 }
+
+satSignalQPSKBer OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Quadrature phase-shift keying ( QPSK ) Bit 
+        error rate."
+    ::= { satSignalEntry  3 }
+
+satSignalLdpCber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: DVB-S2 Low Density Parity Check Bit Error Rate."
+    ::= { satSignalEntry  4 }
+
+satSignalCndisp OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Carrier to Noise Ratio."
+    ::= { satSignalEntry  5 }
+
+satSignalCnMargin OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Carrier to Noise Ratio Link Margin."
+    ::= { satSignalEntry  6 }
+
+satSignalLevel OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Signal Level."
+    ::= { satSignalEntry  7 }
+
+satSignalSatDishCnMargin OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..40))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: SatDish CN Margin in dB
+        Displays the margin in dB to a threshold level at
+        which failure occurs. The range is 0dB to 10dB."
+    ::= { satSignalEntry  8 }
+
+satSignalSatDishSigLevel OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..40))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: SatDish Signal level( in dBm ) plus some kind of
+        graphical signal level meter on the LCD
+        (the range is -75 dBm to +-20 dBm)."
+    ::= { satSignalEntry  9 }
+
+satSignalPerDisp OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: DVB-S2 Packet Error Rate."
+    ::= { satSignalEntry  10 }
+
+satSignalAfc OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Tuner Frequency Offset.
+        The range is from -51.0 to 51.0 in steps of 0.1 MHz."
+     ::= { satSignalEntry  11 }
+
+satSignalUncorErrCnt OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Uncorrected Error Counter. The range is from 0 to
+        4294967295."
+    ::= { satSignalEntry  12 }
+
+satSignalCorErrCnt OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: DVB-S Reed-Solomon Corrected Error Counter."
+    ::= { satSignalEntry  13 }
+
+satSignalRfLock OBJECT-TYPE
+   SYNTAX  INTEGER {
+                noLock(1),
+                lock(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: RF Lock Status."
+    ::= { satSignalEntry  14 }
+
+satSignalDnLkFreq OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Downlink Frequency in the range of 0.000000 to
+        15.000000 GHz in steps of 0.000001 GHz."
+    ::= { satSignalEntry  15 }
+
+satSignalLbandFreq OBJECT-TYPE
+    SYNTAX   DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: L-Band Frequency in the range of 950.000 to
+        2150.000 MHz in steps of 0.001 MHz."
+    ::= { satSignalEntry  16 }
+
+satSignalSymbolRate OBJECT-TYPE
+    SYNTAX   DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Symbol Rate in the Range of 1.0000 to
+        45.0000 MegaSym/second in steps of 0.0001 MegaSym/second."
+    ::= { satSignalEntry  17 }
+
+satSignalFecRate OBJECT-TYPE
+    SYNTAX  INTEGER {
+                notApplicable(1),
+                half(2),
+                threeFifth(3),
+                twoThird(4),
+                threeQuater(5),
+                fourFifth(6),
+                fiveSixth(7),
+                sevenEight(8),
+                eightNinth(9),
+                nineTenth(10),
+                auto(11)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Forward Error Correction Rate."
+    ::= { satSignalEntry  18 }
+
+satSignalPolarization OBJECT-TYPE
+    SYNTAX  INTEGER {
+                horizontal(1),
+                vertical(2),
+                leftCircular(3),
+                rightCircular(4),
+                auto(5)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Signal Polarization."
+    ::= { satSignalEntry  19 }
+
+satSignalModulation OBJECT-TYPE
+    SYNTAX  INTEGER {
+                notApplicable(1),
+                qpskDvbs(2),
+                qpskDvbs2(3),
+                eightPskDvbs2(4),
+                sixteenQamDvbs2(5)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Signal Modulation Type."
+    ::= { satSignalEntry  20 }
+
+satSignalIQ OBJECT-TYPE
+    SYNTAX  INTEGER {
+                inverted(1),
+                nonlnverted(2),
+                auto(3),
+                notApplicable(4)
+          }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Spectrum Inversion."
+    ::= { satSignalEntry  21 }
+
+satSignalLnbPsStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                notApplicable(1),
+                normal(2),
+                noLoad(3),
+                overTemperature(4),
+                overLoad(5),
+                shortCircuit(6),
+                disabled(7)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Low Noise Block Power Supply Status."
+    ::= { satSignalEntry  22 }
+
+satSignalPilots OBJECT-TYPE
+    SYNTAX  INTEGER {
+                no(1),
+                yes(2),
+                notApplicable(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Presence of Pilot Symbols."
+    ::= { satSignalEntry  23 }
+
+satSignalLoSelect OBJECT-TYPE
+    SYNTAX  INTEGER {
+                off(1),
+                on(2),
+                auto(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status:  LO Select."
+    ::= { satSignalEntry  24 }
+
+satSignalPolar OBJECT-TYPE
+    SYNTAX  INTEGER {
+            horizontal(1),
+            vertical(2),
+            leftCircular(3),
+            rightCircular(4),
+            auto(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Polarization."
+    ::= { satSignalEntry  25 }
+
+satSignalClearSigErrCnt OBJECT-TYPE
+    SYNTAX  INTEGER {
+               writeOnly(1),
+                 yes(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Set this variable to yes( 2 ) to clear signal error counter."
+    ::= { satSignalEntry  26 }
+
+satSignalValidateOrbPosDate  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Last Orbital Position Validate Date."
+    ::= { satSignalEntry 27 }
+
+satSignalValidateOrbPosStat  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Orbital Position Validation Status."
+    ::= { satSignalEntry 28 }
+
+satSignalChScanStatus  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                off(1),
+                scanning(2),
+                done(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        " Channel Scanning Status :Off/Scanning/Done."
+    ::= { satSignalEntry 29 }
+
+satSignalSigLevelRaw  OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE(0..5))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "Signal Level - RAW Register Value."
+    ::= { satSignalEntry 30 }
+
+satSignalP1DStatus  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..3))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "P1 DSTATUS."
+    ::= { satSignalEntry 31 }
+
+satSignalDvbS2FrameLen  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                shortFrame(1),
+                longFrame(2),
+                notApplicable(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "DVB-S2 Frame Length."
+    ::= { satSignalEntry 32 }
+
+satSignalCnMarginRaw  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..17))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "C/N Margin - RAW Register Value."
+    ::= { satSignalEntry 33 }
+
+satSignalDvbSQpskErrCount  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "DVB-S QPSK Error Count."
+    ::= { satSignalEntry 34 }
+
+satSignalDvbS2LdpcErrCount  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "DVB-S2 LPDC Error Count."
+    ::= { satSignalEntry 35 }
+
+satSignalPvErrCount  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..8))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "DVB-S PV Error Count."
+    ::= { satSignalEntry 36 }
+
+satSignalFecSyncStatus  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                no(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "FEC SYNC Status for DVB-S PV Decoder."
+    ::= { satSignalEntry 37 }
+
+satSignalPktErrCount  OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..10))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    " DVB-S/DVB-S2 Packet Error Count."
+    ::= { satSignalEntry 38 }
+
+-- *************************************
+-- Input Status Table Branch
+-- *************************************
+
+inputStatusTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF InputStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Input Status Table."
+    ::= { tuningStatusTable 2 }
+
+inputStatusEntry OBJECT-TYPE
+    SYNTAX  InputStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Input Status Table."
+    INDEX { inputStatusIndex }
+        ::= { inputStatusTable 1 }
+
+InputStatusEntry  ::= SEQUENCE
+{
+    inputStatusIndex          Integer32,
+    inputStatusCurInput       INTEGER,
+    inputStatusSatLock        INTEGER,
+    inputStatusMpgIpLock      INTEGER,
+    inputStatusInputRate      DisplayString,
+    inputStatusNetworkName    DisplayString,
+    inputStatusNetworkId      DisplayString,
+    inputStatusTransportId    DisplayString,
+    inputStatusScramblingMode INTEGER,
+    inputStatusTransportError INTEGER,
+    inputStatusAsiLock        INTEGER,
+    inputStatusAsiLinkError   INTEGER,
+    inputStatusAsiPacketSize  INTEGER,
+    inputStatusLastTuneReason DisplayString,
+    inputStatusCurD985xInput  DisplayString,
+    inputStatusIpiLinkStatus  DisplayString,
+    inputStatusIpiSignal      DisplayString,
+    inputStatusIpiFecLock     DisplayString,
+    inputStatusIpiPcrLock     DisplayString,
+    inputStatusIpiDelLatency  DisplayString,
+    inputStatusIpiData1SrcIP  IpAddress,
+    inputStatusIpiData2SrcIP  IpAddress,
+    inputStatusIpiData1TsType DisplayString,
+    inputStatusIpiData2TsType DisplayString    
+}
+
+inputStatusIndex OBJECT-TYPE
+    SYNTAX    Integer32(1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Status: Index for inputStatus Table."
+    ::= { inputStatusEntry 1 }
+
+inputStatusCurInput OBJECT-TYPE
+    SYNTAX  INTEGER {
+                rf(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Current Input for D9865 only."
+    ::= { inputStatusEntry 2 }
+
+inputStatusSatLock OBJECT-TYPE
+    SYNTAX  INTEGER {
+                nolock(1),
+                lockminussignal(2),
+                lockplussignal(3)
+           }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Satellite Lock: No Lock/Lock+Sig/Lock-Sig."
+    ::= { inputStatusEntry 3 }
+
+inputStatusMpgIpLock OBJECT-TYPE
+    SYNTAX  INTEGER {
+                nolock(1),
+                lock(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Signal Validity.MPEG over IP Lock."
+    ::= { inputStatusEntry 4 }
+
+inputStatusInputRate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Input Rate in Mega bauds per second ( Mbps ).
+        The range is from 0.000000 to 4294.967295 Mbps in steps of
+        0.000001 Mbps."
+    ::= { inputStatusEntry 5 }
+
+inputStatusNetworkName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..64))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Network Name."
+    ::= { inputStatusEntry 6 }
+
+inputStatusNetworkId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Network ID."
+    ::= { inputStatusEntry 7 }
+
+inputStatusTransportId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Transport ID."
+    ::= { inputStatusEntry 8 }
+
+inputStatusScramblingMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                unknown(1),
+                des(2),
+                dvb(3),
+                biss1(4),
+                biss2(5),
+                biss3(6)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Scrambling mode."
+    ::= { inputStatusEntry 9 }
+
+inputStatusTransportError OBJECT-TYPE
+    SYNTAX  INTEGER {
+                notApplicable(1),
+                ok(2),
+                error(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Transport Error."
+    ::= { inputStatusEntry 10 }
+
+inputStatusAsiLock OBJECT-TYPE
+    SYNTAX  INTEGER {
+                nolock(1),
+                lock(2)
+            }
+    MAX-ACCESS read-only
+    STATUS  current
+    DESCRIPTION
+    "Status: ASI Lock."
+    ::= { inputStatusEntry 11 }
+
+inputStatusAsiLinkError OBJECT-TYPE
+    SYNTAX  INTEGER {
+                notApplicable(1),
+                ok(2),
+                error(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "Status: ASI Link Error."
+    ::= { inputStatusEntry 12}
+
+inputStatusAsiPacketSize OBJECT-TYPE
+    SYNTAX  INTEGER {
+                notApplicable(1),
+                oneHundredAndEightyEight(2),
+                twoHundredAndFour(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    "Status: ASI Packet Size."
+    ::= { inputStatusEntry 13}
+
+inputStatusLastTuneReason OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Reason for the last tune."
+    ::= { inputStatusEntry 14 }
+
+inputStatusCurD985xInput OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Current Input for all IRD models."
+    ::= { inputStatusEntry 15 }
+
+inputStatusIpiLinkStatus OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: IPI Ethernet Link Status."
+    ::= { inputStatusEntry 16 }
+
+inputStatusIpiSignal OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: IPI Signal Encapsulation Lock Status."
+    ::= { inputStatusEntry 17 }
+
+inputStatusIpiFecLock OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: FEC Lock Status."
+    ::= { inputStatusEntry 18 }
+
+inputStatusIpiPcrLock OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Indicates if PCR is received without 
+         errors or not."
+    ::= { inputStatusEntry 19 }
+
+inputStatusIpiDelLatency OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: Dejitter Buffer Latency."
+    ::= { inputStatusEntry 20 }
+
+inputStatusIpiData1SrcIP OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: DATA1 Source IP Selected."
+    ::= { inputStatusEntry 21 }
+
+inputStatusIpiData2SrcIP OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: DATA2 Source IP Selected."
+    ::= { inputStatusEntry 22 }
+
+inputStatusIpiData1TsType OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: DATA1 Source Transport Type."
+    ::= { inputStatusEntry 23 }
+
+inputStatusIpiData2TsType OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status: DATA2 Source Transport Type."
+    ::= { inputStatusEntry 24 }
+
+
+-- *************************************
+-- Service Info Receive Table Branch
+-- *************************************
+
+-- ****************************************
+-- Service Info Receive Option Table Branch
+-- ****************************************
+
+siRcvOptionTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF SiRcvOptionEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Rcv Option Table."
+    ::= { siRcvTable 1 }
+
+siRcvOptionEntry OBJECT-TYPE
+    SYNTAX   SiRcvOptionEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Rcv Option Table."
+    INDEX {siRcvOptionInstance }
+        ::= { siRcvOptionTable 1 }
+
+SiRcvOptionEntry  ::= SEQUENCE
+ {
+    siRcvOptionInstance        Integer32,
+    siRcvOptionAcqMode         INTEGER,
+    siRcvOptionReacq           INTEGER,
+    siRcvOptionNetID           Integer32,
+    siRcvOptionInputSel        INTEGER,
+    siRcvOptionFreqSel         INTEGER,
+    siRcvOptionServListMode    INTEGER,
+    siRcvOptionUseBAT          INTEGER,
+    siRcvOptionUseNIT          INTEGER,
+    siRcvOptionUseSDT          INTEGER,
+    siRcvOptionUsePAT          INTEGER
+ }
+
+siRcvOptionInstance OBJECT-TYPE
+    SYNTAX  Integer32(1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Instance for siRcvOptionTable."
+    ::= { siRcvOptionEntry 1 }
+
+
+siRcvOptionAcqMode OBJECT-TYPE
+    SYNTAX    INTEGER {
+                basic(1),
+                auto(2),
+                custom(3)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Custom Tuning Mode: Acquisition Mode."
+    ::= { siRcvOptionEntry 2 }
+
+siRcvOptionReacq OBJECT-TYPE
+    SYNTAX    INTEGER {
+                writeOnly(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Set this variable to yes( 2 ) to reacquire signal."
+    ::= { siRcvOptionEntry 3 }
+
+siRcvOptionNetID OBJECT-TYPE
+    SYNTAX    Integer32 (0..65535)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Network ID."
+    ::= { siRcvOptionEntry 4 }
+
+siRcvOptionInputSel OBJECT-TYPE
+    SYNTAX    INTEGER {
+                userCfg(1),
+                swMap(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "UserCfg locks to RF input set by the user and SW Map uses
+        Orbital Position settings to select RF input.
+        It is recommended to set Validate Orbital Position to 'Yes' for
+        SW Mapped option."
+    ::= { siRcvOptionEntry 5 }
+
+siRcvOptionFreqSel OBJECT-TYPE
+    SYNTAX    INTEGER {
+                nit(1),
+                userCfg(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Custom Tuning Mode: Frequency Tuning Mode: NIT/Preset."
+    ::= { siRcvOptionEntry 6 }
+
+siRcvOptionServListMode OBJECT-TYPE
+    SYNTAX    INTEGER {
+                rigorous(1),
+                degraded(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Custom Tuning Mode: Service List Mode: Rigorous/Degraded."
+    ::= { siRcvOptionEntry 7 }
+
+siRcvOptionUseBAT OBJECT-TYPE
+    SYNTAX    INTEGER {
+                no(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Custom Tuning Mode:Bouquet Association Table in Service List."
+    ::= { siRcvOptionEntry 8 }
+
+siRcvOptionUseNIT OBJECT-TYPE
+    SYNTAX    INTEGER {
+                no(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Custom Tuning Mode:Network Information Table in Service List."
+    ::= { siRcvOptionEntry 9 }
+
+siRcvOptionUseSDT OBJECT-TYPE
+    SYNTAX    INTEGER {
+                no(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Custom Tuning Mode:Service Description Table in Service List."
+    ::= { siRcvOptionEntry 10 }
+
+siRcvOptionUsePAT OBJECT-TYPE
+    SYNTAX    INTEGER {
+                no(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "Custom Tuning Mode:Program Association Table in Service List."
+    ::= { siRcvOptionEntry 11 }
+
+-- ****************************************
+-- Service Info Receive Status Table Branch
+-- ****************************************
+
+siRcvOptionStatusTable OBJECT-TYPE
+    SYNTAX    SEQUENCE OF SiRcvOptionStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Rcv Option Status Table."
+    ::= { siRcvTable 2 }
+
+siRcvOptionStatusEntry OBJECT-TYPE
+    SYNTAX   SiRcvOptionStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Rcv Option Status Table."
+    INDEX { siRcvOptionStatusInstance }
+    ::= { siRcvOptionStatusTable  1 }
+
+SiRcvOptionStatusEntry  ::= SEQUENCE
+ {
+    siRcvOptionStatusInstance        Integer32,
+    siRcvOptionLastChanReas          INTEGER,
+    siRcvOptionLastActivated         DisplayString,
+    siRcvOptionStatusFreqSel         INTEGER,
+    siRcvOptionStatusServListMode    INTEGER,
+    siRcvOptionStatusUseBAT          INTEGER,
+    siRcvOptionStatusUseNIT          INTEGER,
+    siRcvOptionStatusUseSDT          INTEGER,
+    siRcvOptionStatusUsePAT          INTEGER
+ }
+
+siRcvOptionStatusInstance OBJECT-TYPE
+    SYNTAX    Integer32 (1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Instance of siRcv Option Status Table."
+    ::= { siRcvOptionStatusEntry 1 }
+
+siRcvOptionLastChanReas OBJECT-TYPE
+    SYNTAX    INTEGER {
+                nit(1),
+                uplinkForceRetune(2),
+                userEntry(3),
+                preset(4)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Source of the last tuning."
+    ::= { siRcvOptionStatusEntry 2 }
+
+siRcvOptionLastActivated OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Last Preset Activated number.The range is from 0 to 64."
+    ::= { siRcvOptionStatusEntry 3 }
+
+
+siRcvOptionStatusFreqSel OBJECT-TYPE
+    SYNTAX    INTEGER {
+                nit(1),
+               userCfg(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status of Frequency tuning mode."
+    ::= { siRcvOptionStatusEntry 4 }
+
+siRcvOptionStatusServListMode OBJECT-TYPE
+    SYNTAX    INTEGER {
+                rigorous(1),
+                degraded(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status of Service list mode."
+    ::= { siRcvOptionStatusEntry 5 }
+
+
+siRcvOptionStatusUseBAT OBJECT-TYPE
+    SYNTAX    INTEGER {
+                no(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status of Bouquet Association Table in Service List."
+    ::= { siRcvOptionStatusEntry 6 }
+
+siRcvOptionStatusUseNIT OBJECT-TYPE
+    SYNTAX    INTEGER {
+                no(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status of Network Information Table in Service List."
+    ::= { siRcvOptionStatusEntry 7 }
+
+siRcvOptionStatusUseSDT OBJECT-TYPE
+    SYNTAX    INTEGER {
+                no(1),
+                yes(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status of Service Description Table in Service List."
+    ::= { siRcvOptionStatusEntry 8 }
+
+siRcvOptionStatusUsePAT OBJECT-TYPE
+    SYNTAX    INTEGER {
+                no(1),
+                yes(2)
+         }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Status of Program Association Table in Service List."
+    ::= { siRcvOptionStatusEntry 9 }
+
+
+-- *************************************
+-- Service Info Rx Table Branch
+-- *************************************
+
+siInfoRxTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SiInfoRxEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Service information Receive table."
+    ::= { siRcvTable 3 }
+
+siInfoRxEntry OBJECT-TYPE
+    SYNTAX  SiInfoRxEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Service Information Received."
+    INDEX { siInfoRxInstance, siInfoRxIdx }
+    ::= { siInfoRxTable 1 }
+
+SiInfoRxEntry ::=  SEQUENCE
+{
+    siInfoRxInstance      Integer32,
+    siInfoRxIdx           Integer32,
+    siInfoRxType          INTEGER,
+    siInfoRxIDExt         DisplayString,
+    siInfoRxUid           DisplayString,
+    siInfoRxStatus        INTEGER,
+    siInfoRxVer           DisplayString,
+    siInfoRxPID           DisplayString,
+    siInfoRxSections      DisplayString
+}
+
+siInfoRxInstance OBJECT-TYPE
+    SYNTAX  Integer32(1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Instance of SI Info Receive table."
+    ::= { siInfoRxEntry 1 }
+
+siInfoRxIdx OBJECT-TYPE
+    SYNTAX  Integer32(1..65535)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Service Information Receive Table Index."
+    ::= { siInfoRxEntry  2 }
+
+siInfoRxType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                pat(1),
+                cat(2),
+                pmt(3),
+                tsdt(4),
+                nit(5),
+                nitother(6),
+                sdt(7),
+                sdtother(8),
+                bat(9),
+                aeitpf(10),
+                oeitpf(11),
+                aeitES0(12),
+                aeitES1(13),
+                oeitES(14),
+                tdt(15),
+                rst(16),
+                st(17),
+                tot(18),
+                dit(19),
+                sit(20),
+                ecmodd(21),
+                ecmeven(22),
+                emm(23),
+                mpe(24),
+                dpi(25),
+                drt(26),
+                cdt(27),
+                mct(28),
+                mat(29),
+                mit(30),
+                ect(31),
+                invalidtableid(32)
+          }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information Receive Table Type."
+    ::= { siInfoRxEntry  3 }
+
+siInfoRxIDExt OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information Receive Table ID Extension. The range is
+        from 0 to 4294967295."
+    ::= { siInfoRxEntry  4 }
+
+siInfoRxUid OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information Receive Unique ID. The range is
+        from 1 to 32."
+    ::= { siInfoRxEntry  5 }
+
+siInfoRxStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                none(1),
+                partial(2),
+                full(3),
+                update(4),
+                timeout(5),
+                lost(6)
+          }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information Receive Status."
+    ::= { siInfoRxEntry  6 }
+
+siInfoRxVer OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information Version. The range is from 0 to
+        4294967295."
+    ::= { siInfoRxEntry  7 }
+
+siInfoRxPID OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information Program ID. The range is from 0 to 8192."
+    ::= { siInfoRxEntry  8 }
+
+siInfoRxSections OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information Number of Sections. The range is from 0 to
+        4294967295."
+    ::= { siInfoRxEntry  9 }
+
+
+-- *************************************
+-- Service Info TS Table Branch
+-- *************************************
+
+siInfoTsTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SiInfoTsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Transport Stream table."
+    ::= { siRcvTable 4 }
+
+siInfoTsEntry OBJECT-TYPE
+    SYNTAX  SiInfoTsEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for Transport stream table."
+    INDEX { siInfoTsInstance,siInfoTsIdx }
+    ::= { siInfoTsTable 1 }
+
+SiInfoTsEntry ::=  SEQUENCE
+{
+    siInfoTsInstance          Integer32,
+    siInfoTsIdx               Integer32,
+    siInfoTsId                DisplayString,
+    siInfoTsFreq              DisplayString,
+    siInfoTsSymRate           DisplayString,
+    siInfoTsOrbPosn           DisplayString,
+    siInfoTsPolar             INTEGER,
+    siInfoTsFEC               INTEGER,
+    siInfoTsModulation        INTEGER,
+    siInfoTsOrgNetID          DisplayString,
+    siInfoTsEastWestFlag      INTEGER
+}
+
+
+siInfoTsInstance OBJECT-TYPE
+    SYNTAX  Integer32(1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " Transport Stream Table Instance."
+    ::= { siInfoTsEntry 1 }
+
+siInfoTsIdx OBJECT-TYPE
+    SYNTAX  Integer32(1..256)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        " Service Information Transport Stream Index."
+    ::= { siInfoTsEntry 2 }
+
+siInfoTsId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information Transport Stream ID.
+        The range is from 0 to 4294967295."
+    ::= { siInfoTsEntry 3 }
+
+siInfoTsFreq OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information Frequency
+        The range is from 0.000000 to 15.000000 GHz in steps of
+        0.000001 GHz."
+    ::= { siInfoTsEntry 4 }
+
+siInfoTsSymRate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information Symbol Rate.
+        The range is from 1.0000 to 45.0000 Megasym/second in steps
+        of 0.0001 Megasym."
+    ::= { siInfoTsEntry 5 }
+
+siInfoTsOrbPosn OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information Orbital Position.
+        The range is from 0.0 to 360.0 ."
+    ::= { siInfoTsEntry 6 }
+
+siInfoTsPolar OBJECT-TYPE
+    SYNTAX  INTEGER {
+                horizontal(1),
+                vertical(2),
+                leftCircular(3),
+                rightCircular(4),
+                auto(5)
+          }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information Polarization."
+    ::= { siInfoTsEntry 7 }
+
+siInfoTsFEC OBJECT-TYPE
+    SYNTAX  INTEGER {
+            notApplicable(1),
+            half(2),
+            threeFifth(3),
+            twoThird(4),
+            threeQuarter(5),
+            fourFifth(6),
+            fiveSixth(7),
+            sevenEighth(8),
+            eightNinth(9),
+            nineTenth(10),
+            auto(11)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information Forward Error Correction
+        Rate."
+    ::= { siInfoTsEntry 8 }
+
+siInfoTsModulation OBJECT-TYPE
+    SYNTAX  INTEGER {
+            notapplicable(1),
+            qpskDvbS(2),
+            qpskDvbS2(3),
+            eightPskDvbS2(4),
+            sixteenQamDvbsS2(5)
+         }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information Modulation."
+    ::= { siInfoTsEntry 9 }
+
+siInfoTsOrgNetID OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information Original Network ID.
+         The range is from 0 to 4294967295."
+    ::= { siInfoTsEntry 10 }
+
+siInfoTsEastWestFlag OBJECT-TYPE
+    SYNTAX  INTEGER {
+            east(1),
+            west(2),
+            notApplicable(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Frequency Plan: Service Information East West flag."
+    ::= { siInfoTsEntry 11 }
+
+
+-- *************************************
+-- Service Info VCInfo Table Branch
+-- *************************************
+
+siInfoVCInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SiInfoVCInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "VC table."
+    ::= { siRcvTable 5 }
+
+
+siInfoVCInfoEntry OBJECT-TYPE
+    SYNTAX  SiInfoVCInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Entry for VC information."
+    INDEX { siInfoVCInfoInstance, siInfoVCInfoIdx }
+         ::= { siInfoVCInfoTable 1 }
+
+SiInfoVCInfoEntry ::=  SEQUENCE
+{
+    siInfoVCInfoInstance      Integer32,
+    siInfoVCInfoIdx           Integer32,
+    siInfoVCInfoId            DisplayString,
+    siInfoVCInfoTxID          DisplayString,
+    siInfoVCInfoProgName      DisplayString,
+    siInfoVCInfoPMTPID        DisplayString,
+    siInfoVCInfoCHType        INTEGER,
+    siInfoVCInfoECMPID        DisplayString,
+    siInfoVCInfoAuthorized    INTEGER
+}
+
+siInfoVCInfoInstance OBJECT-TYPE
+    SYNTAX  Integer32(1..1)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Virtual Channel Info table Instance."
+    ::= { siInfoVCInfoEntry 1 }
+
+siInfoVCInfoIdx OBJECT-TYPE
+    SYNTAX  Integer32(1..262144)
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+        "Virtual Channel Info table Index."
+    ::= { siInfoVCInfoEntry 2 }
+
+siInfoVCInfoId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information VC Service ID. The range is from 0 to
+        4294967295."
+    ::= { siInfoVCInfoEntry 3 }
+
+siInfoVCInfoTxID OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information VC Transport Stream ID. The range is from
+        0 to 4294967295."
+    ::= { siInfoVCInfoEntry 4 }
+
+siInfoVCInfoProgName OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(0..63))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information VC Programme Name."
+    ::= { siInfoVCInfoEntry 5 }
+
+siInfoVCInfoPMTPID OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information VC Program Map Table Program ID."
+        ::= { siInfoVCInfoEntry 6 }
+
+siInfoVCInfoCHType OBJECT-TYPE
+    SYNTAX  INTEGER {
+            tv(1),
+            radio(2),
+            other(3)
+           }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Type:TV service/ Radio service."
+    ::= { siInfoVCInfoEntry 7 }
+
+siInfoVCInfoECMPID OBJECT-TYPE
+    SYNTAX  DisplayString(SIZE(0..32))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Service Information VC Entitlement Control Message Program ID."
+    ::= { siInfoVCInfoEntry 8 }
+
+siInfoVCInfoAuthorized  OBJECT-TYPE
+    SYNTAX  INTEGER {
+            no(1),
+            yes(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+       "Service List: Channel Authorized: Yes/No."
+    ::= { siInfoVCInfoEntry 9 }
+
+END

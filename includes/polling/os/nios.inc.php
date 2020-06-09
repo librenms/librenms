@@ -10,11 +10,12 @@ $hardware = trim(snmp_get($device, "ibHardwareType.0", "-OQv", "IB-PLATFORMONE-M
 # Create ddns update rrd
 ##############
 $mibs = 'IB-DNSONE-MIB';
-$oids =
-    'ibDDNSUpdateSuccess.0 ' .
-    'ibDDNSUpdateFailure.0 ' .
-    'ibDDNSUpdatePrerequisiteReject.0 ' .
-    'ibDDNSUpdateReject.0';
+$oids = [
+    'ibDDNSUpdateSuccess.0',
+    'ibDDNSUpdateFailure.0',
+    'ibDDNSUpdatePrerequisiteReject.0',
+    'ibDDNSUpdateReject.0',
+];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
@@ -41,9 +42,10 @@ $graphs['ib_dns_dyn_updates'] = true;
 # Create dns performance graph (latency)
 ##################
 $mibs = 'IB-PLATFORMONE-MIB';
-$oids =
-    'ibNetworkMonitorDNSNonAAT1AvgLatency.0 ' .
-    'ibNetworkMonitorDNSAAT1AvgLatency.0';
+$oids = [
+    'ibNetworkMonitorDNSNonAAT1AvgLatency.0',
+    'ibNetworkMonitorDNSAAT1AvgLatency.0',
+];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
@@ -64,11 +66,12 @@ $graphs['ib_dns_performance'] = true;
 # Create dns request return code graph
 ##################
 $mibs = 'IB-DNSONE-MIB';
-$oids =
-    'ibBindZoneFailure.\"summary\" ' .
-    'ibBindZoneNxDomain.\"summary\" ' .
-    'ibBindZoneNxRRset.\"summary\" ' .
-    'ibBindZoneSuccess.\"summary\"';
+$oids = [
+    'ibBindZoneFailure."summary"',
+    'ibBindZoneNxDomain."summary"',
+    'ibBindZoneNxRRset."summary"',
+    'ibBindZoneSuccess."summary"',
+];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 
@@ -94,16 +97,17 @@ $graphs['ib_dns_request_return_codes'] = true;
 # Create dhcp messages graph
 ##################
 $mibs = 'IB-DHCPONE-MIB';
-$oids =
-    'ibDhcpTotalNoOfAcks.0 ' .
-    'ibDhcpTotalNoOfDeclines.0 ' .
-    'ibDhcpTotalNoOfDiscovers.0 ' .
-    'ibDhcpTotalNoOfInforms.0 ' .
-    'ibDhcpTotalNoOfNacks.0 ' .
-    'ibDhcpTotalNoOfOffers.0 ' .
-    'ibDhcpTotalNoOfOthers.0 ' .
-    'ibDhcpTotalNoOfReleases.0 ' .
-    'ibDhcpTotalNoOfRequests.0';
+$oids = [
+    'ibDhcpTotalNoOfAcks.0',
+    'ibDhcpTotalNoOfDeclines.0',
+    'ibDhcpTotalNoOfDiscovers.0',
+    'ibDhcpTotalNoOfInforms.0',
+    'ibDhcpTotalNoOfNacks.0',
+    'ibDhcpTotalNoOfOffers.0',
+    'ibDhcpTotalNoOfOthers.0',
+    'ibDhcpTotalNoOfReleases.0',
+    'ibDhcpTotalNoOfRequests.0',
+];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', $mibs);
 

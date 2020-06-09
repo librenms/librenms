@@ -4,7 +4,7 @@ echo 'MGE UPS External ';
 
 // Environmental monitoring on UPSes etc
 // FIXME upsmgConfigEnvironmentTable and upsmgEnvironmentSensorTable are used but there are others ...
-$mge_env_data = snmpwalk_cache_oid($device, 'upsmgConfigEnvironmentTable', array(), 'MG-SNMP-UPS-MIB');
+$mge_env_data = snmpwalk_cache_oid($device, 'upsmgConfigEnvironmentTable', [], 'MG-SNMP-UPS-MIB');
 $mge_env_data = snmpwalk_cache_oid($device, 'upsmgEnvironmentSensorTable', $mge_env_data, 'MG-SNMP-UPS-MIB');
 
 /**

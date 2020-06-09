@@ -17,7 +17,7 @@ $divisor    = 1000000;
 foreach ($pre_cache['junos_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxDomCurrentTxLaserBiasCurrent']) && $entry['jnxDomCurrentTxLaserBiasCurrent'] != 0 && $entry['jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold'] != 0) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.6.' . $index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Tx Current';
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Tx Current';
         $limit_low = $entry['jnxDomCurrentTxLaserBiasCurrentLowAlarmThreshold'] / $divisor;
         $warn_limit_low = $entry['jnxDomCurrentTxLaserBiasCurrentLowWarningThreshold'] / $divisor;
         $limit = $entry['jnxDomCurrentTxLaserBiasCurrentHighAlarmThreshold'] / $divisor;

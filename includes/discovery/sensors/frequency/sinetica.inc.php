@@ -49,7 +49,7 @@ if (!empty($bypass_current) || $bypass_current == 0) {
     discover_sensor($valid['sensor'], 'frequency', $device, $bypass_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
-$oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.3.3.1.2', array());
+$oids = snmpwalk_cache_oid_num($device, '.1.3.6.1.4.1.13891.101.3.3.1.2', []);
 
 foreach ($oids as $oid => $data) {
     $current_id = substr($oid, strrpos($oid, '.') + 1);

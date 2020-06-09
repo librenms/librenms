@@ -1,0 +1,2477 @@
+-- *****************************************************************
+-- UBIQUOSS-10GEPON-PM-GROUP-MIB.my
+--
+-- Jun 2013, Hangil Won   
+--
+-- Copyright (c) 2006 by Ubiquoss, Corp.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+
+	UBIQUOSS-10GEPON-PM-GROUP-MIB DEFINITIONS ::= BEGIN
+ 
+		IMPORTS
+			Counter32, OBJECT-TYPE, MODULE-IDENTITY			
+				FROM SNMPv2-SMI	
+			ubi10GEponGroupMIB		
+				FROM UBQS-SMI 			
+			ubiPortIndex
+				FROM UBQS-INTERFACE-MIB;				
+	
+		ubi10gPmMIB MODULE-IDENTITY 
+			LAST-UPDATED "201601072200Z"		
+			ORGANIZATION 
+				"Ubiquoss Inc."
+			CONTACT-INFO 
+				"Chair		: Hangil Won
+							  Ubiquoss Inc.
+				 Postal:	: 8F Ubiquoss B/D, 68, Pangyo-ro
+				 			  255beon-gil, Bundang-gu, Seongnam-si,
+				 			  Gyeonggi-do, 463-400, Republic of Korea							  
+				 EMail: 	: hg88pro@ubiquoss.com"
+			  
+			DESCRIPTION 
+				"This MIB module defines 10g epon pm information"
+			::= { ubi10GEponGroupMIB 5 }
+		
+	
+--
+-- Node definitions
+--                     
+
+	   ubi10gPmMIBObjects	OBJECT IDENTIFIER ::= { ubi10gPmMIB 1 } 
+               
+-- ***********************************************************
+-- portAvgOltCounterResetTable
+-- ***********************************************************
+	
+--		portAvgOltCounterResetTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF PortAvgOltCounterResetEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				" PORT counter reset Table"
+--			::= { ubiPmMIBObjects 1 }
+--		
+--		portAvgOltCounterResetEntry OBJECT-TYPE
+--			SYNTAX PortAvgOltCounterResetEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }
+--			::= { portAvgOltCounterResetTable 1 }
+--		
+--		PortAvgOltCounterResetEntry ::=
+--			SEQUENCE { 
+--				portAvgOltCounterReset
+--					INTEGER
+--			 }
+--
+--		portAvgOltCounterReset OBJECT-TYPE
+--			SYNTAX INTEGER 
+--				{    
+--				normal (0),
+--				reset(1) 
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				" Reset port counter register by interface index"
+--			::= { portAvgOltCounterResetEntry 1 }             
+
+-- ***********************************************************
+-- portAvgOnuCounterResetTable
+-- ***********************************************************
+			
+--		portAvgOnuCounterResetTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF PortAvgOnuCounterResetEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				" PORT counter reset Table"
+--			::= { ubiPmMIBObjects 2 }
+--
+--		portAvgOnuCounterResetEntry OBJECT-TYPE
+--			SYNTAX PortAvgOnuCounterResetEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex, onuId }
+--			::= { portAvgOnuCounterResetTable 1 }
+--		
+--		PortAvgOnuCounterResetEntry ::=
+--			SEQUENCE { 
+--				portAvgOnuCounterReset
+--					INTEGER
+--			 }
+--
+--		portAvgOnuCounterReset OBJECT-TYPE
+--			SYNTAX INTEGER 
+--				{ 
+--				normal (0), 
+--				reset(1) 
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				" Reset port counter register by interface index"
+--			::= { portAvgOnuCounterResetEntry 1 }
+
+		
+--		statisticsMonitoring OBJECT-TYPE
+--			SYNTAX INTEGER
+--				{
+--				disable(0),
+--				enable(1)
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				" enable or disable monitoring of statistics"
+--			::= { pmGroup 2 }
+--		
+--		statisticsCollectionEnableTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF StatisticsCollectionEnableEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				" enable or disable collet statistics of each port"
+--			::= { pmGroup 3 }
+--		
+--		statisticsCollectionEnableEntry OBJECT-TYPE
+--			SYNTAX StatisticsCollectionEnableEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }
+--			::= { statisticsCollectionEnableTable 1 }
+--		
+--		StatisticsCollectionEnableEntry ::=
+--			SEQUENCE { 
+--				statisticsCollectionEnable
+--					INTEGER
+--			 }
+--
+--		statisticsCollectionEnable OBJECT-TYPE
+--			SYNTAX INTEGER
+--				{
+--				disable(0),
+--				enable(1)
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				" Reset port counter register by interface index"
+--			::= { statisticsCollectionEnableEntry 1 }
+--
+		
+-- ***********************************************************
+-- pm10gCur1minTable
+-- ***********************************************************
+
+		pm10gCur1minTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gCur1minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 3 }
+		
+		pm10gCur1minEntry OBJECT-TYPE
+			SYNTAX Pm10gCur1minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId }
+			::= { pm10gCur1minTable 1 }
+		
+		Pm10gCur1minEntry ::=
+			SEQUENCE {
+				pm10gCur1minRxBits
+					Counter64,
+				pm10gCur1minRxBytes
+					Counter64,
+				pm10gCur1minRxPkts
+					Counter64,
+				pm10gCur1minTxBits
+					Counter64,
+				pm10gCur1minTxBytes
+					Counter64,
+				pm10gCur1minTxPkts
+					Counter64
+			 }      
+			 
+		pm10gCur1minRxBits OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx bits"
+			::= { pm10gCur1minEntry 1 }
+
+		pm10gCur1minRxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx bytes"
+			::= { pm10gCur1minEntry 2 }
+		
+		pm10gCur1minRxPkts OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx packets"
+			::= { pm10gCur1minEntry 3 }
+		
+		pm10gCur1minTxBits OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx bits"
+			::= { pm10gCur1minEntry 4 }
+		
+		pm10gCur1minTxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx bytes"
+			::= { pm10gCur1minEntry 5 }
+		
+		pm10gCur1minTxPkts OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx pkts"
+			::= { pm10gCur1minEntry 6 }
+
+-- ***********************************************************
+-- pm10gCur5minTable
+-- ***********************************************************
+		
+		pm10gCur5minTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gCur5minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 4 }
+		
+		pm10gCur5minEntry OBJECT-TYPE
+			SYNTAX Pm10gCur5minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId  }
+			::= { pm10gCur5minTable 1 }
+		
+		Pm10gCur5minEntry ::=
+			SEQUENCE { 
+				pm10gCur5minRxBits
+					Counter64,
+				pm10gCur5minRxBytes
+					Counter64,
+				pm10gCur5minRxPkts
+					Counter64,
+				pm10gCur5minTxBits
+					Counter64,
+				pm10gCur5minTxBytes
+					Counter64,
+				pm10gCur5minTxPkts
+					Counter64
+			 }
+
+		pm10gCur5minRxBits OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx bits"
+			::= { pm10gCur5minEntry 1 }
+		
+		pm10gCur5minRxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx bytes"
+			::= { pm10gCur5minEntry 2 }
+		
+		pm10gCur5minRxPkts OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx packets"
+			::= { pm10gCur5minEntry 3 }
+		
+		pm10gCur5minTxBits OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx bits"
+			::= { pm10gCur5minEntry 4 }
+		
+		pm10gCur5minTxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx bytes"
+			::= { pm10gCur5minEntry 5 }
+		
+		pm10gCur5minTxPkts OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx pkts"
+			::= { pm10gCur5minEntry 6 }
+		
+-- ***********************************************************
+-- pm10gCur15minTable
+-- ***********************************************************
+		pm10gCur15minTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gCur15minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 5 }
+		
+		pm10gCur15minEntry OBJECT-TYPE
+			SYNTAX Pm10gCur15minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId  }
+			::= { pm10gCur15minTable 1 }
+		
+		Pm10gCur15minEntry ::=
+			SEQUENCE { 
+				pm10gCur15minRxBits
+					Counter64,
+				pm10gCur15minRxBytes
+					Counter64,
+				pm10gCur15minRxPkts
+					Counter64,
+				pm10gCur15minTxBits
+					Counter64,
+				pm10gCur15minTxBytes
+					Counter64,
+				pm10gCur15minTxPkts
+					Counter64
+			 }
+
+		pm10gCur15minRxBits OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx bits"
+			::= { pm10gCur15minEntry 1 }
+		
+		pm10gCur15minRxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx bytes"
+			::= { pm10gCur15minEntry 2 }
+		
+		pm10gCur15minRxPkts OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx packets"
+			::= { pm10gCur15minEntry 3 }
+		
+		pm10gCur15minTxBits OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx bits"
+			::= { pm10gCur15minEntry 4 }
+		
+		pm10gCur15minTxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx bytes"
+			::= { pm10gCur15minEntry 5 }
+		
+		pm10gCur15minTxPkts OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx pkts"
+			::= { pm10gCur15minEntry 6 }
+		                              
+		                 
+-- ***********************************************************
+-- pmTrafficMonitoringTable
+-- ***********************************************************    
+	
+--		pmCRC32Monitoring	OBJECT IDENTIFIER ::= { ubiPmMIBObjects 6 } 
+--
+--		pmCRC32MonitoringEnable OBJECT-TYPE
+--			SYNTAX INTEGER
+--			{
+--				disable(0),
+--				enable(1)
+--			}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"CRC32 Monitoring Enable or Disable"
+--			::= { pmCRC32Monitoring 1 }
+--
+--		pmCRC32MonitoringOltThreshold OBJECT-TYPE
+--			SYNTAX Counter64
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"CRC32 Monitoring Olt Threshold"
+--			::= { pmCRC32Monitoring 2 }                            
+--			
+--		pmCRC32MonitoringOnuThreshold OBJECT-TYPE
+--			SYNTAX Counter64
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"CRC32 Monitoring Onu Threshold"
+--			::= { pmCRC32Monitoring 3 }
+--
+--		pmCRC32TCAStatusTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF PmCRC32TCAStatusEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { pmCRC32Monitoring 4 }
+--		
+--		pmCRC32TCAStatusEntry OBJECT-TYPE
+--			SYNTAX PmCRC32TCAStatusEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }
+--			::= { pmCRC32TCAStatusTable 1 }
+--		
+--		PmCRC32TCAStatusEntry ::=
+--			SEQUENCE { 
+--				pmCRC32TCAStatusCurValue
+--					Counter64	
+--			 }
+--
+--		pmCRC32TCAStatusCurValue OBJECT-TYPE
+--			SYNTAX Counter64
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Current CRC statistics Value"
+--			::= { pmCRC32TCAStatusEntry 1 }
+--
+--
+--		pmOntCRC32ValueTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF PmOntCRC32ValueEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			::= { pmCRC32Monitoring 5 }
+--		
+--		pmOntCRC32ValueEntry OBJECT-TYPE
+--			SYNTAX PmOntCRC32ValueEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex, onuId }
+--			::= { pmOntCRC32ValueTable 1 }
+--		
+--		PmOntCRC32ValueEntry ::=
+--			SEQUENCE { 
+--				pmOntCRC32Value
+--					Counter64	
+--			 }
+--
+--		pmOntCRC32Value OBJECT-TYPE
+--			SYNTAX Counter64
+--			MAX-ACCESS read-only
+--			STATUS current
+--			DESCRIPTION
+--				"Current ONT CRC statistics Value"
+--			::= { pmOntCRC32ValueEntry 1 }
+		                                          
+		
+-- ***********************************************************
+-- pmSetCollectionMonitoringStatusTable
+-- ***********************************************************    
+--	
+--		pmSetCollectionMonitoring	OBJECT IDENTIFIER ::= { ubiPmMIBObjects 7 } 
+--
+--		pmAverageMonitoringEnable OBJECT-TYPE
+--			SYNTAX INTEGER
+--			{
+--				disable(0),
+--				enable(1)
+--			}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Set a status of average statistics"
+--			::= { pmSetCollectionMonitoring 1 }
+--
+--
+--		pmSetCollectionStatusTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF PmSetCollectionStatusEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"table for status of accumulative statistics"
+--			::= { pmSetCollectionMonitoring 2 }
+--		
+--		pmSetCollectionStatusEntry OBJECT-TYPE
+--			SYNTAX PmSetCollectionStatusEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }
+--			::= { pmSetCollectionStatusTable 1 }
+--		
+--		PmSetCollectionStatusEntry ::=
+--			SEQUENCE { 
+--				pmCollectionEnable
+--					INTEGER	
+--			 }
+--
+--		pmCollectionEnable OBJECT-TYPE
+--			SYNTAX INTEGER
+--			{
+--				disable(0),
+--				enable(1)
+--			}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Set a status of accumulative statistics"
+--			::= { pmSetCollectionStatusEntry 1 }
+--
+               
+               
+-- ***********************************************************
+-- pm10gOltPortStatsTable
+-- ***********************************************************
+		pm10gOltPortStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gOltPortStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 8 }  
+		
+		pm10gOltPortStatsEntry OBJECT-TYPE
+			SYNTAX Pm10gOltPortStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex  }
+			::= { pm10gOltPortStatsTable 1 }
+		
+		Pm10gOltPortStatsEntry ::=
+			SEQUENCE { 
+				pm10gOltPortRxBytes
+					Counter64,
+				pm10gOltPortRxFrames
+					Counter64,
+				pm10gOltPortRxUnicastFrames
+					Counter64,
+				pm10gOltPortRxBroadcastFrames
+					Counter64,
+				pm10gOltPortRxMulticastFrames
+					Counter64,
+				pm10gOltPortRxUndersizeFrames
+					Counter64,
+				pm10gOltPortRxOversizeFrames
+					Counter64,
+				pm10gOltPortRxCrc32Frames 
+					Counter64,
+				pm10gOltPortTxBytes
+					Counter64,
+				pm10gOltPortTxFrames
+					Counter64,
+				pm10gOltPortTxLinkcastFrames
+					Counter64,
+				pm10gOltPortTxBroadcastFrames
+					Counter64,
+				pm10gOltPortTxMulticastFrames
+					Counter64
+			 }
+
+		pm10gOltPortRxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 1 }
+		
+		pm10gOltPortRxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 2 }
+		
+		pm10gOltPortRxUnicastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 3 }
+		
+		pm10gOltPortRxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 4 }
+		
+		pm10gOltPortRxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 5 }
+		
+		pm10gOltPortRxUndersizeFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 6 }
+
+		pm10gOltPortRxOversizeFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 7 }
+
+        pm10gOltPortRxCrc32Frames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 8 }
+		
+		pm10gOltPortTxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 9 }
+		
+		pm10gOltPortTxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 10 }
+		
+		pm10gOltPortTxLinkcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 11 }
+		
+		pm10gOltPortTxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 12 }
+		
+		pm10gOltPortTxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltPortStatsEntry 13 }
+
+-- ***********************************************************
+-- pm10gOltLinkStatsTable
+-- ***********************************************************
+		pm10gOltLinkStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gOltLinkStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 9 }  
+		
+		pm10gOltLinkStatsEntry OBJECT-TYPE
+			SYNTAX Pm10gOltLinkStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId  }
+			::= { pm10gOltLinkStatsTable 1 }
+		
+		Pm10gOltLinkStatsEntry ::=
+			SEQUENCE { 
+                pm10gOltLinkRxBytes   
+                	Counter64,
+				pm10gOltLinkRxFrames      
+				    Counter64,
+				pm10gOltLinkRxLinkcastFrames   
+				    Counter64,
+				pm10gOltLinkRxMulticastFrames  
+				    Counter64,
+				pm10gOltLinkRxBroadcastFrames  
+				    Counter64,
+				pm10gOltLinkRxRx64ByteFrames  
+				    Counter64,
+				pm10gOltLinkRxRx65127ByteFrames  
+				    Counter64,
+				pm10gOltLinkRxRx128255ByteFrames  
+				    Counter64,
+				pm10gOltLinkRxRx256511ByteFrames  
+				    Counter64,
+				pm10gOltLinkRxRx5111023ByteFrames 
+				    Counter64,
+				pm10gOltLinkRxRx10241518ByteFrames 
+				    Counter64,
+				pm10gOltLinkRxGreater1518ByteFrames 
+				    Counter64,
+				pm10gOltLinkRxUndersizeFrames     
+				    Counter64,
+				pm10gOltLinkRxOversizeFrames   
+				    Counter64,
+				pm10gOltLinkRxFcsErrors     
+				    Counter64,
+				pm10gOltLinkTxBytes    
+				    Counter64,
+				pm10gOltLinkTxFrames    
+				    Counter64,
+				pm10gOltLinkTxLinkcastFrames  
+				    Counter64,
+				pm10gOltLinkTxMulticastFrames             
+				    Counter64,
+				pm10gOltLinkTxBroadcastFrames      
+				    Counter64,
+				pm10gOltLinkTxTx64ByteFrames        
+				    Counter64,
+				pm10gOltLinkTxTx65127ByteFrames    
+				    Counter64,
+				pm10gOltLinkTxTx128255ByteFrames  
+				    Counter64,
+				pm10gOltLinkTxTx256511ByteFrames   
+				    Counter64,
+				pm10gOltLinkTxTx5111023ByteFrames  
+				    Counter64,
+				pm10gOltLinkTxTx10241518ByteFrames  
+				    Counter64,
+				pm10gOltLinkTxGreater1518ByteFrames  
+				    Counter64,
+				pm10gOltLinkTxFcsErrors
+				    Counter64
+			 }
+
+		pm10gOltLinkRxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 1 }
+		
+		pm10gOltLinkRxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 2 }
+		
+		pm10gOltLinkRxLinkcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 3 }
+		
+		pm10gOltLinkRxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 4 }
+		
+		pm10gOltLinkRxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 5 }
+       
+		pm10gOltLinkRxRx64ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 6 }
+		
+		pm10gOltLinkRxRx65127ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 7 }
+		
+		pm10gOltLinkRxRx128255ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 8 }
+		
+		pm10gOltLinkRxRx256511ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 9 }
+		
+		pm10gOltLinkRxRx5111023ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 10 }                                                      
+                                                      
+		pm10gOltLinkRxRx10241518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 11 }
+		
+		pm10gOltLinkRxGreater1518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 12 }
+		
+		pm10gOltLinkRxUndersizeFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 13 }
+		
+		pm10gOltLinkRxOversizeFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 14 }
+		
+		pm10gOltLinkRxFcsErrors OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 15 }                                                      
+                                                      
+		pm10gOltLinkTxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 16 }
+		
+		pm10gOltLinkTxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 17 }
+		
+		pm10gOltLinkTxLinkcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 18 }
+		
+		pm10gOltLinkTxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 19 }
+		
+		pm10gOltLinkTxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 20 }                                                      
+
+		pm10gOltLinkTxTx64ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 21 }
+		
+		pm10gOltLinkTxTx65127ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 22 }
+		
+		pm10gOltLinkTxTx128255ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 23 }
+		
+		pm10gOltLinkTxTx256511ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 24 }
+		
+		pm10gOltLinkTxTx5111023ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 25 }
+
+		pm10gOltLinkTxTx10241518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 26 }
+		
+		pm10gOltLinkTxGreater1518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 27 }
+		
+		pm10gOltLinkTxFcsErrors OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOltLinkStatsEntry 28 }
+                                                   
+-- ***********************************************************
+-- pm10gOnuPortStatsTable
+-- ***********************************************************
+		pm10gOnuPortStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gOnuPortStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 10 }  
+		
+		pm10gOnuPortStatsEntry OBJECT-TYPE
+			SYNTAX Pm10gOnuPortStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId  }
+			::= { pm10gOnuPortStatsTable 1 }
+		
+		Pm10gOnuPortStatsEntry ::=
+			SEQUENCE { 
+				pm10gOnuEponRxBytes
+				    Counter64,
+				pm10gOnuEponRxFrames
+				    Counter64,
+				pm10gOnuEponRxLinkcastFrames
+				    Counter64, 
+				pm10gOnuEponRxMulticastFrames
+				    Counter64, 
+				pm10gOnuEponRxBroadcastFrame
+				    Counter64, 
+				pm10gOnuEponRxRx64ByteFrames
+				    Counter64, 
+				pm10gOnuEponRxRx65127ByteFrames
+				    Counter64, 
+				pm10gOnuEponRxRx128255ByteFrames
+				    Counter64, 
+				pm10gOnuEponRxRx256511ByteFrames 
+				    Counter64,
+				pm10gOnuEponRxRx5111023ByteFrames 
+				    Counter64,
+				pm10gOnuEponRxRx10241518ByteFrames     
+				    Counter64,
+				pm10gOnuEponRxGreater1518ByteFrames    
+				    Counter64,
+				pm10gOnuEponRxUndersizeFrames      
+				    Counter64,
+				pm10gOnuEponRxFcsErrors     
+				    Counter64,
+				pm10gOnuEponRxCrc8Errors     
+				    Counter64,
+				pm10gOnuEponRxDroppedBytes   
+				    Counter64,
+				pm10gOnuEponRxDroppedFrames   
+				    Counter64,
+				pm10gOnuEponTxBytes    
+				    Counter64,
+				pm10gOnuEponTxFrames    
+				    Counter64,
+				pm10gOnuEponTxLinkcastFrames 
+				    Counter64,
+				pm10gOnuEponTxMulticastFrames  
+				    Counter64,
+				pm10gOnuEponTxBroadcastFrames 
+				    Counter64,
+				pm10gOnuEponTxTx64ByteFrames   
+				    Counter64,
+				pm10gOnuEponTxTx65127ByteFrames 
+				    Counter64,
+				pm10gOnuEponTxTx128255ByteFrames  
+				    Counter64,
+				pm10gOnuEponTxTx256511ByteFrames 
+				    Counter64,
+				pm10gOnuEponTxTx5111023ByteFrames 
+				    Counter64,
+				pm10gOnuEponTxTx10241518ByteFrames  
+				    Counter64,
+				pm10gOnuEponTxGreater1518ByteFrames  
+				    Counter64,
+				pm10gOnuEponTxDroppedBytes
+				    Counter64,
+				pm10gOnuEponTxDroppedFrames
+                    Counter64
+			 }
+
+		pm10gOnuEponRxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 1 }
+		
+		pm10gOnuEponRxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 2 }
+		
+		pm10gOnuEponRxLinkcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 3 }
+		
+		pm10gOnuEponRxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 4 }
+		
+		pm10gOnuEponRxBroadcastFrame OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 5 }
+                           
+		pm10gOnuEponRxRx64ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 6 }
+		
+		pm10gOnuEponRxRx65127ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 7 }
+		
+		pm10gOnuEponRxRx128255ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 8 }
+		
+		pm10gOnuEponRxRx256511ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 9 }
+		
+		pm10gOnuEponRxRx5111023ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 10 }
+                           
+		pm10gOnuEponRxRx10241518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 11 }
+		
+		pm10gOnuEponRxGreater1518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 12 }
+		
+		pm10gOnuEponRxUndersizeFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 13 }
+		
+		pm10gOnuEponRxFcsErrors OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 14 }
+		
+		pm10gOnuEponRxCrc8Errors OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 15 }
+                           
+		pm10gOnuEponRxDroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 16 }
+		
+		pm10gOnuEponRxDroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 17 }
+		
+		pm10gOnuEponTxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 18 }
+		
+		pm10gOnuEponTxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 19 }
+		
+		pm10gOnuEponTxLinkcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 20 }
+                           
+		pm10gOnuEponTxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 21 }
+		
+		pm10gOnuEponTxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 22 }
+		
+		pm10gOnuEponTxTx64ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 23 }
+		
+		pm10gOnuEponTxTx65127ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 24 }
+		
+		pm10gOnuEponTxTx128255ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 25 }
+                           
+		pm10gOnuEponTxTx256511ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 26 }
+		
+		pm10gOnuEponTxTx5111023ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 27 }
+		
+		pm10gOnuEponTxTx10241518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 28 }
+		
+		pm10gOnuEponTxGreater1518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 29 }
+		
+		pm10gOnuEponTxDroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 30 }
+                           
+		pm10gOnuEponTxDroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuPortStatsEntry 31 }    
+			
+-- ***********************************************************
+-- pm10gOnuUniStatsTable
+-- ***********************************************************
+		pm10gOnuUniStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gOnuUniStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 11 }  
+		
+		pm10gOnuUniStatsEntry OBJECT-TYPE
+			SYNTAX Pm10gOnuUniStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, subsPort  }
+			::= { pm10gOnuUniStatsTable 1 }
+		
+		Pm10gOnuUniStatsEntry ::=
+			SEQUENCE { 
+				pm10gOnuUniRxBytes   
+				    Counter64,
+				pm10gOnuUniRxFrames       
+				    Counter64,
+				pm10gOnuUniRxUnicastFrames    
+				    Counter64,
+				pm10gOnuUniRxMulticastFrames    
+				    Counter64,
+				pm10gOnuUniRxBroadcastFrames    
+				    Counter64,
+				pm10gOnuUniRxPauseFrames     
+				    Counter64,
+				pm10gOnuUniRxLengthErr      
+				    Counter64,
+				pm10gOnuUniRxAlignmentErr   
+				    Counter64,
+				pm10gOnuUniRxCrc32Err  
+				    Counter64,
+				pm10gOnuUniTxBytes
+				    Counter64,
+				pm10gOnuUniTxFrames        
+				    Counter64,
+				pm10gOnuUniTxUnicastFrames  
+				    Counter64,
+				pm10gOnuUniTxMulticastFrames   
+				    Counter64,
+				pm10gOnuUniTxBroadcastFrames   
+				    Counter64,
+				pm10gOnuUniTxPauseFrames    
+				    Counter64,
+				pm10gOnuUniTxDroppedBytes   
+				    Counter64,
+				pm10gOnuUniTxDroppedFrames
+				    Counter64
+			 }
+
+		pm10gOnuUniRxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 1 }
+		
+		pm10gOnuUniRxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 2 }
+		
+		pm10gOnuUniRxUnicastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 3 }
+		
+		pm10gOnuUniRxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 4 }
+		
+		pm10gOnuUniRxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 5 }
+
+		pm10gOnuUniRxPauseFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 6 }
+		
+		pm10gOnuUniRxLengthErr OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 7 }
+		
+		pm10gOnuUniRxAlignmentErr OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 8 }
+		
+		pm10gOnuUniRxCrc32Err OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 9 }
+		
+		pm10gOnuUniTxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 10 }
+			
+		pm10gOnuUniTxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 11 }
+		
+		pm10gOnuUniTxUnicastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 12 }
+		
+		pm10gOnuUniTxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 13 }
+		
+		pm10gOnuUniTxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 14 }
+		
+		pm10gOnuUniTxPauseFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 15 }
+			
+		pm10gOnuUniTxDroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 16 }
+		
+		pm10gOnuUniTxDroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuUniStatsEntry 17 }    
+			
+-- ***********************************************************
+-- pm10gOnuLinkStatsTable
+-- ***********************************************************
+		pm10gOnuLinkStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gOnuLinkStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 12 }  
+		
+		pm10gOnuLinkStatsEntry OBJECT-TYPE
+			SYNTAX Pm10gOnuLinkStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId  }
+			::= { pm10gOnuLinkStatsTable 1 }
+		
+		Pm10gOnuLinkStatsEntry ::=
+			SEQUENCE { 
+				pm10gOnuLinkRxBytes                   
+				    Counter64,
+				pm10gOnuLinkRxFrames                
+				    Counter64,
+				pm10gOnuLinkRxUnicastFrames        
+				    Counter64,
+				pm10gOnuLinkRxMulticastFrames     
+				    Counter64,
+				pm10gOnuLinkRxBroadcastFrames               
+				    Counter64,
+				pm10gOnuLinkRxRx64ByteFrames               
+				    Counter64,
+				pm10gOnuLinkRxRx65127ByteFrames        
+				    Counter64,
+				pm10gOnuLinkRxRx128255ByteFrames     
+				    Counter64,
+				pm10gOnuLinkRxRx256511ByteFrames    
+				    Counter64,
+				pm10gOnuLinkRxRx5111023ByteFrames   
+				    Counter64,
+				pm10gOnuLinkRxRx10241518ByteFrames 
+				    Counter64,
+				pm10gOnuLinkRxGreater1518ByteFrames   
+				    Counter64,
+				pm10gOnuLinkRxUndersizeFrames         
+				    Counter64,
+				pm10gOnuLinkRxFcsErrors   
+				    Counter64,
+				pm10gOnuLinkRxDroppedBytes        
+				    Counter64,
+				pm10gOnuLinkRxDroppedFrames      
+				    Counter64,
+				pm10gOnuLinkTxBytes      
+				    Counter64,
+				pm10gOnuLinkTxFrames    
+				    Counter64,
+				pm10gOnuLinkTxUnicastFrames  
+				    Counter64,
+				pm10gOnuLinkTxMulticastFrames  
+				    Counter64,
+				pm10gOnuLinkTxBroadcastFrames  
+				    Counter64,
+				pm10gOnuLinkTxTx64ByteFrames   
+				    Counter64,
+				pm10gOnuLinkTxTx65127ByteFrames   
+				    Counter64,
+				pm10gOnuLinkTxTx128255ByteFrames  
+				    Counter64,
+				pm10gOnuLinkTxTx256511ByteFrames  
+				    Counter64,
+				pm10gOnuLinkTxTx5111023ByteFrames 
+				    Counter64,
+				pm10gOnuLinkTxTx10241518ByteFrames  
+				    Counter64,
+			    pm10gOnuLinkTxGreater1518ByteFrames  
+			        Counter64,
+				pm10gOnuLinkTxDroppedBytes    
+				    Counter64,
+				pm10gOnuLinkTxDroppedFrames 
+				    Counter64
+			 }
+
+		pm10gOnuLinkRxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 1 }
+		
+		pm10gOnuLinkRxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 2 }
+		
+		pm10gOnuLinkRxUnicastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 3 }
+		
+		pm10gOnuLinkRxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 4 }
+		
+		pm10gOnuLinkRxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 5 }
+
+		pm10gOnuLinkRxRx64ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 6 }
+		
+		pm10gOnuLinkRxRx65127ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 7 }
+		
+		 pm10gOnuLinkRxRx128255ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 8 }
+		
+		pm10gOnuLinkRxRx256511ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 9 }
+		
+		pm10gOnuLinkRxRx5111023ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 10 }
+			
+		pm10gOnuLinkRxRx10241518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 11 }
+		
+		pm10gOnuLinkRxGreater1518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 12 }
+		
+		 pm10gOnuLinkRxUndersizeFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 13 }
+		
+		pm10gOnuLinkRxFcsErrors OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 14 }
+		
+		pm10gOnuLinkRxDroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 15 }
+			
+		pm10gOnuLinkRxDroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 16 }
+		
+		pm10gOnuLinkTxBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 17 }
+			
+		pm10gOnuLinkTxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 18 }
+			
+		pm10gOnuLinkTxUnicastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 19 }
+			
+		pm10gOnuLinkTxMulticastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 20 }			
+
+		pm10gOnuLinkTxBroadcastFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 21 }
+		
+		pm10gOnuLinkTxTx64ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 22 }
+		
+		 pm10gOnuLinkTxTx65127ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 23 }
+		
+		 pm10gOnuLinkTxTx128255ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 24 }
+		
+		pm10gOnuLinkTxTx256511ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 25 }
+			
+		pm10gOnuLinkTxTx5111023ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 26 }
+		
+		pm10gOnuLinkTxTx10241518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 27 }
+			
+		pm10gOnuLinkTxGreater1518ByteFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 28 }
+			
+		pm10gOnuLinkTxDroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 29 }
+			
+		pm10gOnuLinkTxDroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description"
+			::= { pm10gOnuLinkStatsEntry 30 }
+    
+-- ***********************************************************
+-- pmOltCurrentCounterResetTable
+-- ***********************************************************
+--	
+--		pmOltCurrentCounterResetTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF PmOltCurrentCounterResetEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"OLT current counter reset Table"
+--			::= { ubiPmMIBObjects 13 }
+--		
+--		pmOltCurrentCounterResetEntry OBJECT-TYPE
+--			SYNTAX PmOltCurrentCounterResetEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex }
+--			::= { pmOltCurrentCounterResetTable 1 }
+--		
+--		PmOltCurrentCounterResetEntry ::=
+--			SEQUENCE { 
+--				pmOltCurrentCounterReset
+--					INTEGER
+--			 }
+--
+--		pmOltCurrentCounterReset OBJECT-TYPE
+--			SYNTAX INTEGER 
+--				{    
+--				normal (0),
+--				reset(1) 
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Reset olt current counter"
+--			::= { pmOltCurrentCounterResetEntry 1 }             
+
+-- ***********************************************************
+-- pmOnuCurrentCounterResetTable
+-- ***********************************************************
+-- 	
+--		pmOnuCurrentCounterResetTable OBJECT-TYPE
+--			SYNTAX SEQUENCE OF PmOnuCurrentCounterResetEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"ONU current counter reset Table"
+--			::= { ubiPmMIBObjects 14 }
+--		
+--		pmOnuCurrentCounterResetEntry OBJECT-TYPE
+--			SYNTAX PmOnuCurrentCounterResetEntry
+--			MAX-ACCESS not-accessible
+--			STATUS current
+--			DESCRIPTION
+--				"Description."
+--			INDEX { ubiPortIndex, onuId }
+--			::= { pmOnuCurrentCounterResetTable 1 }
+--		
+--		PmOnuCurrentCounterResetEntry ::=
+--			SEQUENCE { 
+--				pmOnuCurrentCounterReset
+--					INTEGER
+--			 }
+--
+--		pmOnuCurrentCounterReset OBJECT-TYPE
+--			SYNTAX INTEGER 
+--				{    
+--				normal (0),
+--				reset(1) 
+--				}
+--			MAX-ACCESS read-write
+--			STATUS current
+--			DESCRIPTION
+--				"Reset onu current counter"
+--			::= { pmOnuCurrentCounterResetEntry 1 }    
+--			                                              
+
+-- ***********************************************************
+-- pm10gPktTypeCur1minTable
+-- *********************************************************** 
+
+		pm10gPktTypeCur1minTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gPktTypeCur1minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 15 }
+		
+		pm10gPktTypeCur1minEntry OBJECT-TYPE
+			SYNTAX Pm10gPktTypeCur1minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId }
+			::= { pm10gPktTypeCur1minTable 1 }
+		
+		Pm10gPktTypeCur1minEntry ::=
+			SEQUENCE {
+				pm10gPktTypeCur1minRxUcast
+					Counter64,
+				pm10gPktTypeCur1minRxMcast
+					Counter64,
+				pm10gPktTypeCur1minRxBcast
+					Counter64,
+				pm10gPktTypeCur1minTxUcast
+					Counter64,
+				pm10gPktTypeCur1minTxMcast
+					Counter64,
+				pm10gPktTypeCur1minTxBcast
+					Counter64
+			 }      
+			 
+		pm10gPktTypeCur1minRxUcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Unicast"
+			::= { pm10gPktTypeCur1minEntry 1 }
+
+		pm10gPktTypeCur1minRxMcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Multicast"
+			::= { pm10gPktTypeCur1minEntry 2 }
+		
+		pm10gPktTypeCur1minRxBcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Broadcast"
+			::= { pm10gPktTypeCur1minEntry 3 }
+		
+		pm10gPktTypeCur1minTxUcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Unicast"
+			::= { pm10gPktTypeCur1minEntry 4 }
+		
+		pm10gPktTypeCur1minTxMcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Multicast"
+			::= { pm10gPktTypeCur1minEntry 5 }
+		
+		pm10gPktTypeCur1minTxBcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Broadcast"
+			::= { pm10gPktTypeCur1minEntry 6 }
+		                              
+-- ***********************************************************
+-- pm10gPktTypeCur5minTable
+-- ***********************************************************
+
+		pm10gPktTypeCur5minTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gPktTypeCur5minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 16 }
+		
+		pm10gPktTypeCur5minEntry OBJECT-TYPE
+			SYNTAX Pm10gPktTypeCur5minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId }
+			::= { pm10gPktTypeCur5minTable 1 }
+		
+		Pm10gPktTypeCur5minEntry ::=
+			SEQUENCE {
+				pm10gPktTypeCur5minRxUcast
+					Counter64,
+				pm10gPktTypeCur5minRxMcast
+					Counter64,
+				pm10gPktTypeCur5minRxBcast
+					Counter64,
+				pm10gPktTypeCur5minTxUcast
+					Counter64,
+				pm10gPktTypeCur5minTxMcast
+					Counter64,
+				pm10gPktTypeCur5minTxBcast
+					Counter64
+			 }      
+			 
+		pm10gPktTypeCur5minRxUcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Unicast"
+			::= { pm10gPktTypeCur5minEntry 1 }
+
+		pm10gPktTypeCur5minRxMcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Multicast"
+			::= { pm10gPktTypeCur5minEntry 2 }
+		
+		pm10gPktTypeCur5minRxBcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Broadcast"
+			::= { pm10gPktTypeCur5minEntry 3 }
+		
+		pm10gPktTypeCur5minTxUcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Unicast"
+			::= { pm10gPktTypeCur5minEntry 4 }
+		
+		pm10gPktTypeCur5minTxMcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Multicast"
+			::= { pm10gPktTypeCur5minEntry 5 }
+		
+		pm10gPktTypeCur5minTxBcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Broadcast"
+			::= { pm10gPktTypeCur5minEntry 6 }
+
+-- ***********************************************************
+-- pm10gPktTypeCur15minTable
+-- ***********************************************************
+
+		pm10gPktTypeCur15minTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gPktTypeCur15minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 17 }
+		
+		pm10gPktTypeCur15minEntry OBJECT-TYPE
+			SYNTAX Pm10gPktTypeCur15minEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId }
+			::= { pm10gPktTypeCur15minTable 1 }
+		
+		Pm10gPktTypeCur15minEntry ::=
+			SEQUENCE {
+				pm10gPktTypeCur15minRxUcast
+					Counter64,
+				pm10gPktTypeCur15minRxMcast
+					Counter64,
+				pm10gPktTypeCur15minRxBcast
+					Counter64,
+				pm10gPktTypeCur15minTxUcast
+					Counter64,
+				pm10gPktTypeCur15minTxMcast
+					Counter64,
+				pm10gPktTypeCur15minTxBcast
+					Counter64
+			 }      
+			 
+		pm10gPktTypeCur15minRxUcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Unicast"
+			::= { pm10gPktTypeCur15minEntry 1 }
+
+		pm10gPktTypeCur15minRxMcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Multicast"
+			::= { pm10gPktTypeCur15minEntry 2 }
+		
+		pm10gPktTypeCur15minRxBcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"rx Broadcast"
+			::= { pm10gPktTypeCur15minEntry 3 }
+		
+		pm10gPktTypeCur15minTxUcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Unicast"
+			::= { pm10gPktTypeCur15minEntry 4 }
+		
+		pm10gPktTypeCur15minTxMcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Multicast"
+			::= { pm10gPktTypeCur15minEntry 5 }
+		
+		pm10gPktTypeCur15minTxBcast OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"tx Broadcast"
+			::= { pm10gPktTypeCur15minEntry 6 }
+
+-- ***********************************************************
+-- pm10gOltQueueStatsTable
+-- ***********************************************************
+
+		pm10gOltQueueStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gOltQueueStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { ubi10gPmMIBObjects 18 }
+		
+		pm10gOltQueueStatsEntry OBJECT-TYPE
+			SYNTAX Pm10gOltQueueStatsEntry 
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { ubiPortIndex, onu10gId, linkId, queueId }
+			::= { pm10gOltQueueStatsTable 1 }
+		
+		Pm10gOltQueueStatsEntry ::=
+			SEQUENCE {
+				pm10gOltQueueStatsRxOctets
+					Counter64,
+				pm10gOltQueueStatsRxFrames
+					Counter64,
+				pm10gOltQueueStatsDroppedBytes
+					Counter64,
+				pm10gOltQueueStatsDroppedFrames
+					Counter64,
+			 }      
+			 
+		pm10gOltQueueStatsRxOctets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Rx Octets"
+			::= { pm10gOltQueueStatsEntry 1 }
+
+		pm10gOltQueueStatsRxFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Rx Frames"
+			::= { pm10gOltQueueStatsEntry 2 }
+		
+		pm10gOltQueueStatsDroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dropped Bytes "
+			::= { pm10gOltQueueStatsEntry 3 }
+		
+		pm10gOltQueueStatsDroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Dropped Frames"
+			::= { pm10gOltQueueStatsEntry 4 }
+		                                           
+			                     
+-- ***********************************************************
+-- pm10gHQosQueueStatsTable
+-- ***********************************************************
+		pm10gHqosQueueStatsTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF Pm10gHqosQueueStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue Stats Info Table"
+			::= { ubi10gPmMIBObjects 19 }  
+		
+		pm10gHqosQueueStatsEntry OBJECT-TYPE
+			SYNTAX Pm10gHqosQueueStatsEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue Stats Info Entry"
+			INDEX { ubiPortIndex, onu10gId, linkId, cvlan, dir }
+			::= { pm10gHqosQueueStatsTable 1 }
+		
+		Pm10gHqosQueueStatsEntry ::=
+			SEQUENCE { 
+                pm10gHqosQueue0Bytes   
+                	Counter64,
+				pm10gHqosQueue0Frames      
+				    Counter64,
+				pm10gHqosQueue0DroppedBytes   
+				    Counter64,
+				pm10gHqosQueue0DroppedFrames  
+				    Counter64,
+				pm10gHqosQueue1Bytes   
+                	Counter64,
+				pm10gHqosQueue1Frames      
+				    Counter64,
+				pm10gHqosQueue1DroppedBytes   
+				    Counter64,
+				pm10gHqosQueue1DroppedFrames  
+				    Counter64,
+				pm10gHqosQueue2Bytes   
+                	Counter64,
+				pm10gHqosQueue2Frames      
+				    Counter64,
+				pm10gHqosQueue2DroppedBytes   
+				    Counter64,
+				pm10gHqosQueue2DroppedFrames  
+				    Counter64,
+				pm10gHqosQueue3Bytes   
+                	Counter64,
+				pm10gHqosQueue3Frames      
+				    Counter64,
+				pm10gHqosQueue3DroppedBytes   
+				    Counter64,
+				pm10gHqosQueue3DroppedFrames  
+				    Counter64
+				    }
+
+		pm10gHqosQueue0Bytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue0 Stats : Bytes"
+			::= { pm10gHqosQueueStatsEntry 1 }
+		
+		pm10gHqosQueue0Frames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue0 Stats : Frames"
+			::= { pm10gHqosQueueStatsEntry 2 }
+		
+        pm10gHqosQueue0DroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue0 Stats : Dropped Bytes"
+			::= { pm10gHqosQueueStatsEntry 3 }
+		
+		pm10gHqosQueue0DroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue0 Stats : Dropped Frames"
+			::= { pm10gHqosQueueStatsEntry 4 }
+
+        pm10gHqosQueue0Bytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue0 Stats : Bytes"
+			::= { pm10gHqosQueueStatsEntry 5 }
+		
+		pm10gHqosQueue1Frames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue1 Stats : Frames"
+			::= { pm10gHqosQueueStatsEntry 6 }
+		
+        pm10gHqosQueue1DroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue1 Stats : Dropped Bytes"
+			::= { pm10gHqosQueueStatsEntry 7 }
+		
+		pm10gHqosQueue1DroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue1 Stats : Dropped Frames"
+			::= { pm10gHqosQueueStatsEntry 8 }
+
+        pm10gHqosQueue2Bytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue2 Stats : Bytes"
+			::= { pm10gHqosQueueStatsEntry 9 }
+		
+		pm10gHqosQueue2Frames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue2 Stats : Frames"
+			::= { pm10gHqosQueueStatsEntry 10 }
+		
+        pm10gHqosQueue2DroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue2 Stats : Dropped Bytes"
+			::= { pm10gHqosQueueStatsEntry 11 }
+		
+		pm10gHqosQueue2DroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue2 Stats : Dropped Frames"
+			::= { pm10gHqosQueueStatsEntry 12 }
+
+        pm10gHqosQueue3Bytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue3 Stats : Bytes"
+			::= { pm10gHqosQueueStatsEntry 13 }
+		
+		pm10gHqosQueue3Frames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue3 Stats : Frames"
+			::= { pm10gHqosQueueStatsEntry 14 }
+		
+        pm10gHqosQueue3DroppedBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue3 Stats : Dropped Bytes"
+			::= { pm10gHqosQueueStatsEntry 15 }
+		
+		pm10gHqosQueue3DroppedFrames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"10G HQOS Queue3 Stats : Dropped Frames"
+			::= { pm10gHqosQueueStatsEntry 16 }
+
+                                              
+                    
+	END
+

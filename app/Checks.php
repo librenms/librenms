@@ -31,21 +31,22 @@ use Auth;
 use Cache;
 use Carbon\Carbon;
 use LibreNMS\Config;
+use LibreNMS\Exceptions\FilePermissionsException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Toastr;
 
 class Checks
 {
-    public static function preBoot()
+    public static function preAutoload()
     {
-        // check php extensions
-        if ($missing = self::missingPhpExtensions()) {
+        // Check PHP version otherwise it will just say server error
+        if (version_compare('7.2.5', PHP_VERSION, '>=')) {
             self::printMessage(
-                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
-                $missing,
+                'PHP version 7.2.5 or newer is required to run LibreNMS',
+                null,
                 true
             );
-        }
+        };
     }
 
     /**
@@ -62,6 +63,18 @@ class Checks
         }
     }
 
+    public static function preBoot()
+    {
+        // check php extensions
+        if ($missing = self::missingPhpExtensions()) {
+            self::printMessage(
+                "Missing PHP extensions.  Please install and enable them on your LibreNMS server.",
+                $missing,
+                true
+            );
+        }
+    }
+
     /**
      * Post boot Toast messages
      */
@@ -72,12 +85,12 @@ class Checks
             return;
         }
 
-        Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5));
+        Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5) * 60);
 
         $user = Auth::user();
 
         if ($user->isAdmin()) {
-            $notifications = Notification::isUnread($user)->where('severity', '>', 1)->get();
+            $notifications = Notification::isUnread($user)->where('severity', '>', \LibreNMS\Enum\Alert::OK)->get();
             foreach ($notifications as $notification) {
                 Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
             }
@@ -85,7 +98,7 @@ class Checks
             $warn_sec = Config::get('rrd.step', 300) * 3;
             if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($warn_sec))->exists()) {
                 $warn_min = $warn_sec / 60;
-                Toastr::warning('<a href="poll-log/filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
+                Toastr::warning('<a href="poller/log?filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
             }
 
             // Directory access checks
@@ -100,6 +113,20 @@ class Checks
             } elseif (!is_writable($temp_dir)) {
                 Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
             }
+        }
+    }
+
+    /**
+     * Check the script is running as the right user (works before config is available)
+     */
+    public static function runningUser()
+    {
+        if (function_exists('posix_getpwuid') && posix_getpwuid(posix_geteuid())['name'] !== get_current_user()) {
+            self::printMessage(
+                'Error: You must run lnms as the user ' . get_current_user(),
+                null,
+                true
+            );
         }
     }
 
@@ -137,100 +164,5 @@ class Checks
         return array_filter($required_modules, function ($module) {
             return !extension_loaded($module);
         });
-    }
-
-    /**
-     * Check exception for errors related to not being able to write to the filesystem
-     *
-     * @param \Exception $e
-     * @return bool|SymfonyResponse
-     */
-    public static function filePermissionsException($e)
-    {
-        if ($e instanceof \ErrorException) {
-            // cannot write to storage directory
-            if (starts_with($e->getMessage(), 'file_put_contents(') && str_contains($e->getMessage(), '/storage/')) {
-                return self::filePermissionsResponse();
-            }
-        }
-
-        if ($e instanceof \Exception) {
-            // cannot write to bootstrap directory
-            if ($e->getMessage() == 'The bootstrap/cache directory must be present and writable.') {
-                return self::filePermissionsResponse();
-            }
-        }
-
-        if ($e instanceof \UnexpectedValueException) {
-            // monolog cannot init log file
-            if (str_contains($e->getFile(), 'Monolog/Handler/StreamHandler.php')) {
-                return self::filePermissionsResponse();
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Generate a semi generic list of commands for the user to run to fix file permissions
-     * and render it to a nice html response
-     *
-     * @return SymfonyResponse
-     */
-    private static function filePermissionsResponse()
-    {
-        $user = config('librenms.user');
-        $group = config('librenms.group');
-        $install_dir = base_path();
-        $commands = [];
-        $dirs = [
-            base_path('bootstrap/cache'),
-            base_path('storage'),
-            Config::get('log_dir', base_path('logs')),
-            Config::get('rrd_dir', base_path('rrd')),
-        ];
-
-        // check if folders are missing
-        $mkdirs = [
-            base_path('bootstrap/cache'),
-            base_path('storage/framework/sessions'),
-            base_path('storage/framework/views'),
-            base_path('storage/framework/cache'),
-            Config::get('log_dir', base_path('logs')),
-            Config::get('rrd_dir', base_path('rrd')),
-        ];
-
-        $mk_dirs = array_filter($mkdirs, function ($file) {
-            return !file_exists($file);
-        });
-
-        if (!empty($mk_dirs)) {
-            $commands[] = 'sudo mkdir -p ' . implode(' ', $mk_dirs);
-        }
-
-        // always print chwon/setfacl/chmod commands
-        $commands[] = "sudo chown -R $user:$group $install_dir";
-        $commands[] = 'sudo setfacl -d -m g::rwx ' . implode(' ', $dirs);
-        $commands[] = 'sudo chmod -R ug=rwX ' . implode(' ', $dirs);
-
-        // check if webserver is in the librenms group
-        $current_groups = explode(' ', trim(exec('groups')));
-        if (!in_array($group, $current_groups)) {
-            $current_user = trim(exec('whoami'));
-            $commands[] = "usermod -a -G $group $current_user";
-        }
-
-        // selinux:
-        $commands[] = '<h4>If using SELinux you may also need:</h4>';
-        foreach ($dirs as $dir) {
-            $commands[] = "semanage fcontext -a -t httpd_sys_rw_content_t '$dir(/.*)?'";
-        }
-        $commands[] = "restorecon -RFv $install_dir";
-
-        // use pre-compiled template because we probably can't compile it.
-        $template = file_get_contents(base_path('resources/views/errors/static/file_permissions.html'));
-        $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
-
-        return SymfonyResponse::create($content);
     }
 }

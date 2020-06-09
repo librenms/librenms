@@ -34,7 +34,7 @@ class EventlogController extends SelectController
      *
      * @return array
      */
-    public function rules()
+    protected function rules()
     {
         return [
             'field' => 'required|in:type',
@@ -48,7 +48,7 @@ class EventlogController extends SelectController
      * @param \Illuminate\Http\Request $request
      * @return array
      */
-    public function searchFields($request)
+    protected function searchFields($request)
     {
         return [$request->get('field')];
     }
@@ -59,7 +59,7 @@ class EventlogController extends SelectController
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
-    public function baseQuery($request)
+    protected function baseQuery($request)
     {
         /** @var \Illuminate\Database\Eloquent\Builder $query */
         $query = Eventlog::hasAccess($request->user())

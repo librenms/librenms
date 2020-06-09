@@ -10,17 +10,14 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Authentication\LegacyAuth;
-
 $init_modules = array('web', 'auth');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-set_debug($_REQUEST['debug']);
-
-if (!LegacyAuth::check()) {
-    echo 'unauthenticated';
-    exit;
+if (!Auth::check()) {
+    die('Unauthorized');
 }
+
+set_debug($_REQUEST['debug']);
 
 if (is_numeric($_GET['device_id'])) {
     foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', array($_GET['device_id'])) as $interface) {

@@ -23,6 +23,6 @@
  * @author     Mikael Sipilainen <mikael.sipilainen@gmail.com>
  */
 
-$oid = snmp_get_multi($device, '.1.3.6.1.2.1.33.1.1.4.0 .1.3.6.1.2.1.33.1.1.1.0', '-OQU');
+$oid = snmp_get_multi($device, ['.1.3.6.1.2.1.33.1.1.4.0', '.1.3.6.1.2.1.33.1.1.1.0'], '-OQU');
 $version  = $oid[0]['.1.3.6.1.2.1.33.1.1.4.0'];
 $hardware = $oid[0]['.1.3.6.1.2.1.33.1.1.1.0'];

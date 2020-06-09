@@ -1,0 +1,125 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.27304.3.2.10",
+                    "sysDescr": "This is a DKTCOMEGA CPE FTTH gateway (GbE)",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "dkt",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "dkt.png",
+                    "location": null
+                }
+            ]
+        },
+        "poller": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.27304.3.2.10",
+                    "sysDescr": "This is a DKTCOMEGA CPE FTTH gateway (GbE)",
+                    "sysContact": "<private>",
+                    "version": "DKT_F2_Firmware_v05_29",
+                    "hardware": "DKT F2_1 1",
+                    "features": null,
+                    "os": "dkt",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "dkt.png",
+                    "location": "<private>"
+                }
+            ]
+        }
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.27304.11.3.0",
+                    "sensor_index": "0",
+                    "sensor_type": "catvSignalDetect",
+                    "sensor_descr": "CATV Signal Detect",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "catvSignalDetect"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.27304.11.2.0",
+                    "sensor_index": "0",
+                    "sensor_type": "catvSwitch",
+                    "sensor_descr": "CATV Module",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "catvSwitch"
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "catvSignalDetect",
+                    "state_descr": "No Signal",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "catvSignalDetect",
+                    "state_descr": "Signal Ok",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "catvSwitch",
+                    "state_descr": "Not powered",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "catvSwitch",
+                    "state_descr": "Powered",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

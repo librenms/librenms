@@ -8,14 +8,13 @@
 
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2018 ACL
+ * @copyright  2019 ACL
  * @author     Abel Laura <abel.laura@gmail.com>
 */
 
 $ddos_storage = snmpwalk_cache_oid($device, 'fileSystemSpaceTable', null, 'DATA-DOMAIN-MIB', 'datadomain');
 if (is_array($ddos_storage)) {
-    foreach ($ddos_storage as $storage) {
-        $index = $storage['fileSystemResourceIndex'];
+    foreach ($ddos_storage as $index => $storage) {
         $fstype = $storage['fileSystemResourceTier'];
         $descr = $storage['fileSystemResourceName'];
         $units = 1073741824;

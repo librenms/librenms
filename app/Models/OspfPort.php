@@ -25,7 +25,7 @@
 
 namespace App\Models;
 
-class OspfPort extends BaseModel
+class OspfPort extends PortRelatedModel
 {
     public $timestamps = false;
     protected $fillable = [
@@ -55,17 +55,10 @@ class OspfPort extends BaseModel
         'ospfIfAuthType',
     ];
 
-    // ---- Query Scopes ----
-
-    public function scopeHasAccess($query, User $user)
-    {
-        return $this->hasDeviceAccess($query, $user);
-    }
-
     // ---- Define Relationships ----
 
     public function device()
     {
-        return $this->belongsTo('App\Models\Device', 'device_id');
+        return $this->belongsTo(\App\Models\Device::class, 'device_id');
     }
 }

@@ -11,8 +11,8 @@
 |
 */
 
-$app = new Illuminate\Foundation\Application(
-    realpath(__DIR__.'/../')
+$app = new App\Application(
+    $_ENV['APP_BASE_PATH'] ?? dirname(__DIR__)
 );
 
 /*
@@ -40,11 +40,6 @@ $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
     App\Exceptions\Handler::class
 );
-
-$app->configureMonologUsing(function (Monolog\Logger $logger) use ($app) {
-    $path = $app->basePath(config('app.log'));
-    $logger->pushHandler(new \Monolog\Handler\StreamHandler($path));
-});
 
 /*
 |--------------------------------------------------------------------------

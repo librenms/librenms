@@ -79,7 +79,7 @@ if (is_numeric($sysNetworkEntryAttempt) && is_numeric($sysNetworkEntrySuccess) &
 }
 
 
-$multi_get_array = snmp_get_multi($device, "ulWLanTotalAvailableFrameTimePerSecond.0 ulWLanTotalUsedFrameTimePerSecond.0 dlWLanTotalAvailableFrameTimePerSecond.0 dlWLanTotalUsedFrameTimePerSecond.0", "-OQU", "CAMBIUM-PMP80211-MIB");
+$multi_get_array = snmp_get_multi($device, ['ulWLanTotalAvailableFrameTimePerSecond.0', 'ulWLanTotalUsedFrameTimePerSecond.0', 'dlWLanTotalAvailableFrameTimePerSecond.0', 'dlWLanTotalUsedFrameTimePerSecond.0'], "-OQU", "CAMBIUM-PMP80211-MIB");
 
 $ulWLanTotalAvailableFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::ulWLanTotalAvailableFrameTimePerSecond"];
 $ulWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]["CAMBIUM-PMP80211-MIB::ulWLanTotalUsedFrameTimePerSecond"];

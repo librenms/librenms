@@ -16,27 +16,14 @@ list($oid, $value) = explode(' ', $state);
 if (is_numeric($value)) {
     $descr = "Global Status";
     $state_name = "shadowStatusGlobalStatus";
-    $state_index_id = create_state_index($state_name);
-
-    if ($state_index_id !== null) {
-        $states = array(
-            array($state_index_id, 'other',           0, 1, 2),
-            array($state_index_id, 'unknown',         1, 2, 3),
-            array($state_index_id, 'ok',              1, 3, 0),
-            array($state_index_id, 'critical',        1, 4, 2),
-            array($state_index_id, 'non-Recoverable', 1, 5, 2),
-        );
-        foreach ($states as $value) {
-            $insert = array(
-                'state_index_id' => $value[0],
-                'state_descr' => $value[1],
-                'state_draw_graph' => $value[2],
-                'state_value' => $value[3],
-                'state_generic_value' => $value[4]
-            );
-            dbInsert($insert, 'state_translations');
-        }
-    }
+    $states = [
+        ['value' => 1, 'generic' => 0, 'graph' => 2, 'descr' => 'other'],
+        ['value' => 2, 'generic' => 0, 'graph' => 3, 'descr' => 'unknown'],
+        ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'ok'],
+        ['value' => 4, 'generic' => 0, 'graph' => 2, 'descr' => 'critical'],
+        ['value' => 5, 'generic' => 0, 'graph' => 2, 'descr' => 'non-Recoverable'],
+    ];
+    create_state_index($state_name, $states);
 
     discover_sensor($valid['sensor'], 'state', $device, $oid, 1, $state_name, $descr, 1, 1);
     create_sensor_to_state_index($device, $state_name, 1);

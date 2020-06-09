@@ -7,10 +7,13 @@
  */
 
 use App\Models\Device;
+use App\Models\DeviceGroup;
 use Illuminate\Database\Eloquent\Collection;
+use LibreNMS\Alert\AlertDB;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\LockException;
 use LibreNMS\Util\MemcacheLock;
+use LibreNMS\Validations\Php;
 
 $init_modules = array('alerts');
 require __DIR__ . '/includes/init.php';
@@ -24,13 +27,13 @@ if (isset($options['d'])) {
 }
 
 if ($options['f'] === 'update') {
-    if (!$config['update']) {
+    if (!Config::get('update')) {
         exit(0);
     }
 
-    if ($config['update_channel'] == 'master') {
+    if (Config::get('update_channel') == 'master') {
         exit(1);
-    } elseif ($config['update_channel'] == 'release') {
+    } elseif (Config::get('update_channel') == 'release') {
         exit(3);
     }
     exit(0);
@@ -68,21 +71,24 @@ if ($options['f'] === 'syslog') {
 
         if (is_numeric($syslog_purge)) {
             $rows = (int)dbFetchCell('SELECT MIN(seq) FROM syslog');
+            $initial_rows = $rows;
             while (true) {
-                $limit = dbFetchRow('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
+                $limit = dbFetchCell('SELECT seq FROM syslog WHERE seq >= ? ORDER BY seq LIMIT 1000,1', array($rows));
                 if (empty($limit)) {
                     break;
                 }
 
+                # Deletes are done in blocks of 1000 to avoid a single very large operation.
                 if (dbDelete('syslog', 'seq >= ? AND seq < ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $limit, $syslog_purge)) > 0) {
                     $rows = $limit;
-                    echo "Syslog cleared for entries over $syslog_purge days 1000 limit\n";
                 } else {
                     break;
                 }
             }
 
             dbDelete('syslog', 'seq >= ? AND timestamp < DATE_SUB(NOW(), INTERVAL ? DAY)', array($rows, $syslog_purge));
+            $final_rows = $rows - $initial_rows;
+            echo "Syslog cleared for entries over $syslog_purge days (about $final_rows rows)\n";
         }
     } catch (LockException $e) {
         echo $e->getMessage() . PHP_EOL;
@@ -90,6 +96,14 @@ if ($options['f'] === 'syslog') {
     }
 }
 
+if ($options['f'] === 'ports_fdb') {
+    $ret = lock_and_purge('ports_fdb', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
+}
+if ($options['f'] === 'route') {
+    $ret = lock_and_purge('route', 'updated_at < DATE_SUB(NOW(), INTERVAL ? DAY)');
+    exit($ret);
+}
 if ($options['f'] === 'eventlog') {
     $ret = lock_and_purge('eventlog', 'datetime < DATE_SUB(NOW(), INTERVAL ? DAY)');
     exit($ret);
@@ -122,10 +136,13 @@ if ($options['f'] === 'ports_purge') {
         $ports_purge = Config::get('ports_purge');
 
         if ($ports_purge) {
-            $interfaces = dbFetchRows('SELECT * from `ports` AS P, `devices` AS D WHERE `deleted` = 1 AND D.device_id = P.device_id');
-            foreach ($interfaces as $interface) {
-                delete_port($interface['port_id']);
-            }
+            \App\Models\Port::query()->with(['device' => function ($query) {
+                $query->select('device_id', 'hostname');
+            }])->isDeleted()->chunk(100, function ($ports) {
+                foreach ($ports as $port) {
+                    $port->delete();
+                }
+            });
             echo "All deleted ports now purged\n";
         }
     } catch (LockException $e) {
@@ -155,18 +172,51 @@ if ($options['f'] === 'handle_notifiable') {
         }
     } elseif ($options['t'] === 'phpver') {
         $error_title = 'Error: PHP version too low';
-        $warn_title = 'Warning: PHP version too low';
-        remove_notification($warn_title); // remove warning
 
         // if update is not set to false and version is min or newer
         if (Config::get('update') && $options['r']) {
-            new_notification(
-                $error_title,
-                'PHP version 5.6.4 is the minimum supported version as of January 10, 2018.  We recommend you update to PHP a supported version of PHP (7.1 suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.',
-                2,
-                'daily.sh'
-            );
-            exit(1);
+            if ($options['r'] === 'php53') {
+                $phpver   = '5.6.4';
+                $eol_date = 'January 10th, 2018';
+            } elseif ($options['r'] === 'php56' || $options['r'] === 'php71') {
+                $phpver   = Php::PHP_MIN_VERSION;
+                $eol_date = Php::PHP_MIN_VERSION_DATE;
+            }
+            if (isset($phpver)) {
+                new_notification(
+                    $error_title,
+                    "PHP version $phpver is the minimum supported version as of $eol_date.  We recommend you update to PHP a supported version of PHP (" . Php::PHP_RECOMMENDED_VERSION . " suggested) to continue to receive updates.  If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    2,
+                    'daily.sh'
+                );
+                exit(1);
+            }
+        }
+
+        remove_notification($error_title);
+        exit(0);
+    } elseif ($options['t'] === 'pythonver') {
+        $error_title = 'Error: Python requirements not met';
+
+        // if update is not set to false and version is min or newer
+        if (Config::get('update') && $options['r']) {
+            if ($options['r'] === 'python3-missing') {
+                new_notification(
+                    $error_title,
+                    "Python 3 is required to run LibreNMS as of May, 2020. You need to install Python 3 to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    2,
+                    'daily.sh'
+                );
+                exit(1);
+            } elseif ($options['r'] === 'python3-deps') {
+                new_notification(
+                    $error_title,
+                    "Python 3 dependencies are missing. You need to install them via pip3 install -r requirements.txt or system packages to continue to receive updates.  If you do not install Python 3 and required packages, LibreNMS will continue to function but stop receiving bug fixes and updates.",
+                    2,
+                    'daily.sh'
+                );
+                exit(1);
+            }
         }
 
         remove_notification($error_title);
@@ -188,38 +238,64 @@ if ($options['f'] === 'notifications') {
 }
 
 if ($options['f'] === 'bill_data') {
-    try {
-        if (Config::get('distributed_poller')) {
-            MemcacheLock::lock('syslog_purge', 0, 86000);
-        }
-        $billing_data_purge = Config::get('billing_data_purge');
-        if (is_numeric($billing_data_purge) && $billing_data_purge > 0) {
-            # Deletes data older than XX months before the start of the last complete billing period
-            echo "Deleting billing data more than $billing_data_purge month before the last completed billing cycle\n";
-            $sql = "DELETE bill_data
-                    FROM bill_data
-                        INNER JOIN (SELECT bill_id, 
-                            SUBDATE(
-                                SUBDATE(
-                                    ADDDATE(
-                                        subdate(curdate(), (day(curdate())-1)),             # Start of this month
-                                        bill_day - 1),                                      # Billing anniversary
-                                    INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
-                                INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
-                    FROM bills) q
-                    ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
-            dbQuery($sql, array($billing_data_purge));
-        }
-    } catch (LockException $e) {
-        echo $e->getMessage() . PHP_EOL;
-        exit(-1);
-    }
+    # Deletes data older than XX months before the start of the last complete billing period
+    $msg = "Deleting billing data more than %d month before the last completed billing cycle\n";
+    $table = 'bill_data';
+    $sql = "DELETE bill_data
+            FROM bill_data
+                INNER JOIN (SELECT bill_id,
+                    SUBDATE(
+                        SUBDATE(
+                            ADDDATE(
+                                subdate(curdate(), (day(curdate())-1)),             # Start of this month
+                                bill_day - 1),                                      # Billing anniversary
+                            INTERVAL IF(bill_day > DAY(curdate()), 1, 0) MONTH),    # Deal with anniversary not yet happened this month
+                        INTERVAL ? MONTH) AS threshold                              # Adjust based on config threshold
+            FROM bills) q
+            ON bill_data.bill_id = q.bill_id AND bill_data.timestamp < q.threshold;";
+    lock_and_purge_query($table, $sql, $msg);
 }
 
 if ($options['f'] === 'alert_log') {
-    $ret = lock_and_purge('alert_log', 'time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)');
-    exit($ret);
+    $msg = "Deleting alert_logs more than %d days that are not active\n";
+    $table = 'alert_log';
+    $sql = "DELETE alert_log
+                FROM alert_log
+                INNER JOIN alerts
+                ON alerts.device_id=alert_log.device_id AND alerts.rule_id=alert_log.rule_id
+                WHERE alerts.state=0 AND alert_log.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                ";
+    lock_and_purge_query($table, $sql, $msg);
+
+    # alert_log older than $config['alert_log_purge'] days match now only the alert_log of active alerts
+    # in case of flapping of an alert, many entries are kept in alert_log
+    # we want only to keep the last alert_log that contains the alert details
+
+    $msg = "Deleting history of active alert_logs more than %d days\n";
+    $sql = "DELETE
+                    FROM alert_log
+                    WHERE id IN(
+                        SELECT id FROM(
+                            SELECT id
+                            FROM alert_log a1
+                            WHERE
+                                time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                                AND (device_id, rule_id, time_logged) NOT IN (
+                                    SELECT device_id, rule_id, max(time_logged)
+                                    FROM alert_log a2 WHERE a1.device_id = a2.device_id AND a1.rule_id = a2.rule_id
+                                    AND a2.time_logged < DATE_SUB(NOW(),INTERVAL ? DAY)
+                                )
+                        ) as c
+                    )
+                ";
+    $purge_duration = Config::get('alert_log_purge');
+    if (!(is_numeric($purge_duration) && $purge_duration > 0)) {
+        return -2;
+    }
+    $sql = str_replace("?", strval($purge_duration), $sql);
+    lock_and_purge_query($table, $sql, $msg);
 }
+
 
 if ($options['f'] === 'purgeusers') {
     try {
@@ -228,11 +304,11 @@ if ($options['f'] === 'purgeusers') {
         }
 
         $purge = 0;
-        if (is_numeric($config['radius']['users_purge']) && $config['auth_mechanism'] === 'radius') {
-            $purge = $config['radius']['users_purge'];
+        if (is_numeric(\LibreNMS\Config::get('radius.users_purge')) && Config::get('auth_mechanism') === 'radius') {
+            $purge = \LibreNMS\Config::get('radius.users_purge');
         }
-        if (is_numeric($config['active_directory']['users_purge']) && $config['auth_mechanism'] === 'active_directory') {
-            $purge = $config['active_directory']['users_purge'];
+        if (is_numeric(\LibreNMS\Config::get('active_directory.users_purge')) && Config::get('auth_mechanism') === 'active_directory') {
+            $purge = \LibreNMS\Config::get('active_directory.users_purge');
         }
         if ($purge > 0) {
             foreach (dbFetchRows("SELECT DISTINCT(`user`) FROM `authlog` WHERE `datetime` >= DATE_SUB(NOW(), INTERVAL ? DAY)", array($purge)) as $user) {
@@ -260,7 +336,7 @@ if ($options['f'] === 'refresh_alert_rules') {
         foreach ($rules as $rule) {
             $rule_options = json_decode($rule['extra'], true);
             if ($rule_options['options']['override_query'] !== 'on') {
-                $data['query'] = GenSQL($rule['rule'], $rule['builder']);
+                $data['query'] = AlertDB::genSQL($rule['rule'], $rule['builder']);
                 if (!empty($data['query'])) {
                     dbUpdate($data, 'alert_rules', 'id=?', array($rule['id']));
                     unset($data);
@@ -273,10 +349,30 @@ if ($options['f'] === 'refresh_alert_rules') {
     }
 }
 
+if ($options['f'] === 'refresh_device_groups') {
+    try {
+        if (Config::get('distributed_poller')) {
+            MemcacheLock::lock('refresh_device_groups', 0, 86000);
+        }
+
+        echo 'Refreshing device group table relationships' . PHP_EOL;
+        DeviceGroup::all()->each(function ($deviceGroup) {
+            if ($deviceGroup->type == 'dynamic') {
+                /** @var DeviceGroup $deviceGroup */
+                $deviceGroup->rules = $deviceGroup->getParser()->generateJoins()->toArray();
+                $deviceGroup->save();
+            }
+        });
+    } catch (LockException $e) {
+        echo $e->getMessage() . PHP_EOL;
+        exit(-1);
+    }
+}
+
 if ($options['f'] === 'notify') {
-    if (isset($config['alert']['default_mail'])) {
+    if (\LibreNMS\Config::has('alert.default_mail')) {
         send_mail(
-            $config['alert']['default_mail'],
+            \LibreNMS\Config::get('alert.default_mail'),
             '[LibreNMS] Auto update has failed for ' . Config::get('distributed_poller_name'),
             "We just attempted to update your install but failed. The information below should help you fix this.\r\n\r\n" . $options['o']
         );

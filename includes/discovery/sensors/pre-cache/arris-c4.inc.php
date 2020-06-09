@@ -25,10 +25,10 @@
  */
 
 echo 'ifName ';
-$pre_cache['ar-c4_ifName'] = snmpwalk_cache_oid($device, 'ifName', array(), 'DOCS-IF-MIB');
+$pre_cache['ar-c4_ifName'] = snmpwalk_cache_oid($device, 'ifName', [], 'DOCS-IF-MIB');
 
 echo 'ifAlias ';
-$pre_cache['ar-c4_ifAlias'] = snmpwalk_cache_oid($device, 'ifAlias', array(), 'DOCS-IF-MIB');
+$pre_cache['ar-c4_ifAlias'] = snmpwalk_cache_oid($device, 'ifAlias', [], 'DOCS-IF-MIB');
 
 echo 'docsIfSignalQualityTable ';
-$pre_cache['ar-c4_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', array(), 'DOCS-IF-MIB');
+$pre_cache['ar-c4_docsIfSignalQualityTable'] = snmpwalk_cache_oid($device, 'docsIfSignalQualityTable', [], 'DOCS-IF-MIB');

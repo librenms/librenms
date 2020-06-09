@@ -5,7 +5,7 @@ echo 'RC-VLAN-MIB VLANs: ';
 if ($device['os'] == 'boss') {
     $vtpdomain_id = '1';
     $vlans        = snmpwalk_cache_oid($device, 'rcVlanName', array(), 'RC-VLAN-MIB');
-    $tagoruntag   = snmpwalk_cache_oid($device, 'rcVlanPortMembers', array(), 'RC-VLAN-MIB', null, '-OQUs --hexOutputLength=0');
+    $tagoruntag   = snmpwalk_cache_oid($device, 'rcVlanPortMembers', array(), 'RC-VLAN-MIB', null, ['-OQUs', '--hexOutputLength=0']);
     $port_pvids   = snmpwalk_cache_oid($device, 'rcVlanPortDefaultVlanId', array(), 'RC-VLAN-MIB');
     $port_mode    = snmpwalk_cache_oid($device, 'rcVlanPortPerformTagging', array(), 'RC-VLAN-MIB');
     

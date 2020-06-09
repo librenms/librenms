@@ -19,7 +19,7 @@
 if ($device['os'] == 'bdcom') {
     echo 'BDCOM: ';
 
-    $memory_pool = snmp_get_multi_oid($device, 'bdcomMemoryPoolUsed.0 bdcomMemoryPoolFree.0', '-OQUs', 'BDCOM-MEMORY-POOL-MIB');
+    $memory_pool = snmp_get_multi_oid($device, ['bdcomMemoryPoolUsed.0', 'bdcomMemoryPoolFree.0'], '-OQUs', 'BDCOM-MEMORY-POOL-MIB');
 
     if (is_numeric($memory_pool['bdcomMemoryPoolUsed.0']) && is_numeric($memory_pool['bdcomMemoryPoolFree.0'])) {
         discover_mempool($valid_mempool, $device, 0, 'bdcom', 'Memory', '1', null, null);

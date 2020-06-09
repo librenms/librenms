@@ -149,6 +149,9 @@ if (empty($ports_keys)) {
         $portsc = $component->createComponent($device_id, 'portsactivity');
     }
 
+    // Make sure we don't readd it, just in a different order.
+    sort($ports_keys);
+
     $id = $component->getFirstComponentID($portsc);
     $portsc[$id]['label'] = 'Portsactivity';
     $portsc[$id]['ports'] = json_encode($ports_keys);

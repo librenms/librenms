@@ -9,10 +9,11 @@ Route: `/api/v0/services`
 
 Input:
 
-  - state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
-  - type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
+- state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
+- type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?state=2
@@ -20,6 +21,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services?st
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -61,20 +63,23 @@ Output:
     ]
 }
 ```
+
 ### `get_service_for_host`
 
 Retrieve services for device
 
 Route: `/api/v0/services/:hostname`
 
-  - id or hostname is the specific device
+- id or hostname is the specific device
 
 Input:
 
-  - state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
-  - type: service type, used sql LIKE to find services, so for tcp, use type=tcp for http use type=http
+- state: only which have a certain state (valid options are 0=Ok, 1=Warning, 2=Critical).
+- type: service type, used sql LIKE to find services, so for tcp, use
+  type=tcp for http use type=http
 
 Example:
+
 ```curl
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname
 curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:hostname?state=2
@@ -82,6 +87,7 @@ curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/:h
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
@@ -107,31 +113,89 @@ Output:
     ]
 }
 ```
+
 ### `add_service_for_host`
 
 Add a service for device
 
 Route: `/api/v0/services/:hostname`
 
-  - id or hostname is the specific device
+- id or hostname is the specific device
 
 Input:
 
-  - type: service type
-  - ip: ip of the service
-  - desc: description for the service
-  - param: parameters for the service
-  - ignore: ignore the service for checks
+- type: service type
+- ip: ip of the service
+- desc: description for the service
+- param: parameters for the service
+- ignore: ignore the service for checks
 
 Example:
+
 ```curl
 curl -X POST -d '{"type":"ping","ip": "192.168.1.10","desc":"test ping","param": "-t 10 -c 5"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/services/192.168.1.10
 ```
 
 Output:
+
 ```json
 {
     "status": "ok",
     "message": "Service ping has been added to device 192.168.1.10 (#10)"
+}
+```
+
+### `edit_service_from_host`
+
+Edits a service
+
+Route: `/api/v0/services/:service_id`
+
+- service id
+
+Input:
+
+- id: service id
+
+Example:
+
+```curl
+curl -X PATCH -d '{"service_disabled":"1"}' 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/services/5
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Service updated successfully"
+
+}
+```
+
+### `delete_service_from_host`
+
+Deletes service from device
+
+Route: `/api/v0/services/:service_id`
+
+- service id
+
+Input:
+
+- id: service id
+
+Example:
+
+```curl
+curl -X DELETE -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/services/35
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Service has been deleted successfully"
 }
 ```

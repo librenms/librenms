@@ -25,17 +25,19 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\OS;
 use LibreNMS\OS\Shared\Cisco;
+use LibreNMS\OS\Traits\CiscoCellular;
 
 class Ios extends Cisco implements
     WirelessClientsDiscovery,
     WirelessRssiDiscovery
 {
+    use CiscoCellular;
+
     /**
      * @return array Sensors
      */
@@ -43,7 +45,7 @@ class Ios extends Cisco implements
     {
         $device = $this->getDevice();
 
-        if (!starts_with($device['hardware'], 'AIR-') && !str_contains($device['hardware'], 'ciscoAIR')) {
+        if (!Str::startsWith($device['hardware'], 'AIR-') && !Str::contains($device['hardware'], 'ciscoAIR')) {
             // unsupported IOS hardware
             return array();
         }
@@ -57,7 +59,7 @@ class Ios extends Cisco implements
                 $descr = $ent['entPhysicalDescr'];
                 unset($entPhys[$entIndex]); // only use each one once
 
-                if (ends_with($descr, 'Radio')) {
+                if (Str::endsWith($descr, 'Radio')) {
                     d_echo("Mapping entPhysicalIndex $entIndex to ifIndex $index\n");
                     $data[$index]['entPhysicalIndex'] = $entIndex;
                     $data[$index]['entPhysicalDescr'] = $descr;
@@ -87,32 +89,6 @@ class Ios extends Cisco implements
                 'ports'
             );
         }
-        return $sensors;
-    }
-
-    /**
-     * Discover wireless RSSI (Received Signal Strength Indicator). This is in dBm. Type is rssi.
-     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
-     *
-     * @return array
-     */
-    public function discoverWirelessRssi()
-    {
-        $sensors = array();
-
-        $data = snmpwalk_cache_oid($this->getDevice(), 'c3gCurrentGsmRssi', array(), 'CISCO-WAN-3G-MIB');
-        foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'rssi',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.9.9.661.1.3.4.1.1.1.' . $index,
-                'ios',
-                $index,
-                'RSSI: Chain ' . str_replace('1.', '', $index),
-                $entry['c3gCurrentGsmRssi.1']
-            );
-        }
-
         return $sensors;
     }
 }

@@ -4,7 +4,7 @@
 // Generic System Statistics
 use LibreNMS\RRD\RrdDefinition;
 
-$oid_list = 'hrSystemProcesses.0 hrSystemNumUsers.0';
+$oid_list = ['hrSystemProcesses.0', 'hrSystemNumUsers.0'];
 $hrSystem = snmp_get_multi($device, $oid_list, '-OUQs', 'HOST-RESOURCES-MIB');
 
 if (is_numeric($hrSystem[0]['hrSystemProcesses'])) {

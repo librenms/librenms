@@ -1,14 +1,16 @@
 <?php
 
+use App\Models\DeviceGraph;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Exceptions\JsonAppException;
-use LibreNMS\Exceptions\JsonAppPollingFailedException;
-use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
-use LibreNMS\Exceptions\JsonAppMissingKeysException;
-use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppPollingFailedException;
+use LibreNMS\Exceptions\JsonAppWrongVersionException;
+use LibreNMS\RRD\RrdDefinition;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -42,7 +44,7 @@ function sensor_precache($device, $type)
 
 function poll_sensor($device, $class)
 {
-    global $config, $memcache, $agent_sensors;
+    global $agent_sensors;
 
     $sensors = array();
     $misc_sensors = array();
@@ -72,6 +74,8 @@ function poll_sensor($device, $class)
 
             if (file_exists('includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php')) {
                 require 'includes/polling/sensors/'. $class .'/'. $device['os'] .'.inc.php';
+            } elseif (file_exists('includes/polling/sensors/'. $class .'/'. $device['os_group'] .'.inc.php')) {
+                require 'includes/polling/sensors/'. $class .'/'. $device['os_group'] .'.inc.php';
             }
 
             if ($class == 'temperature') {
@@ -169,7 +173,7 @@ function record_sensor_data($device, $all_sensors)
             $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
         }
 
-        if (isset($sensor['user_func']) && function_exists($sensor['user_func'])) {
+        if (isset($sensor['user_func']) && is_callable($sensor['user_func'])) {
             $sensor_value = $sensor['user_func']($sensor_value);
         }
 
@@ -196,10 +200,10 @@ function record_sensor_data($device, $all_sensors)
         // FIXME also warn when crossing WARN level!
         if ($sensor['sensor_limit_low'] != '' && $prev_sensor_value > $sensor['sensor_limit_low'] && $sensor_value < $sensor['sensor_limit_low'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event("$class {$sensor['sensor_descr']} under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device, $class, 4, $sensor['sensor_id']);
+            log_event("$class under threshold: $sensor_value $unit (< {$sensor['sensor_limit_low']} $unit)", $device, $sensor['sensor_class'], 4, $sensor['sensor_id']);
         } elseif ($sensor['sensor_limit'] != '' && $prev_sensor_value < $sensor['sensor_limit'] && $sensor_value > $sensor['sensor_limit'] && $sensor['sensor_alert'] == 1) {
             echo 'Alerting for '.$device['hostname'].' '.$sensor['sensor_descr']."\n";
-            log_event("$class {$sensor['sensor_descr']} above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device, $class, 4, $sensor['sensor_id']);
+            log_event("$class above threshold: $sensor_value $unit (> {$sensor['sensor_limit']} $unit)", $device, $sensor['sensor_class'], 4, $sensor['sensor_id']);
         }
         if ($sensor['sensor_class'] == 'state' && $prev_sensor_value != $sensor_value) {
             $trans = array_column(
@@ -226,35 +230,46 @@ function record_sensor_data($device, $all_sensors)
  */
 function poll_device($device, $force_module = false)
 {
-    global $config, $device;
+    global $device, $graphs;
 
     $device_start = microtime(true);
 
-    $attribs = get_dev_attribs($device['device_id']);
+    $graphs = [];
+    $attribs = DeviceCache::getPrimary()->getAttribs();
     $device['attribs'] = $attribs;
 
     load_os($device);
 
-    $device['snmp_max_repeaters'] = $attribs['snmp_max_repeaters'];
-    $device['snmp_max_oid'] = $attribs['snmp_max_oid'];
-
     unset($array);
 
     // Start counting device poll time
-    echo 'Hostname: ' . $device['hostname'] . PHP_EOL;
-    echo 'Device ID: ' . $device['device_id'] . PHP_EOL;
-    echo 'OS: ' . $device['os'];
-    $ip = dnslookup($device);
+    echo 'Hostname:    ' . $device['hostname'] . PHP_EOL;
+    echo 'Device ID:   ' . $device['device_id'] . PHP_EOL;
+    echo 'OS:          ' . $device['os'] . PHP_EOL;
 
-    $db_ip = isset($ip) ? inet_pton($ip) : null;
+    if (empty($device['overwrite_ip'])) {
+        $ip = dnslookup($device);
+    } else {
+        $ip = $device['overwrite_ip'];
+    }
+
+    $db_ip = null;
+    if (!empty($ip)) {
+        if (empty($device['overwrite_ip'])) {
+            echo 'Resolved IP: '.$ip.PHP_EOL;
+        } else {
+            echo 'Assigned IP: '.$ip.PHP_EOL;
+        }
+        $db_ip = inet_pton($ip);
+    }
 
     if (!empty($db_ip) && inet6_ntop($db_ip) != inet6_ntop($device['ip'])) {
         log_event('Device IP changed to ' . $ip, $device, 'system', 3);
         dbUpdate(array('ip' => $db_ip), 'devices', 'device_id=?', array($device['device_id']));
     }
 
-    if ($config['os'][$device['os']]['group']) {
-        $device['os_group'] = $config['os'][$device['os']]['group'];
+    if ($os_group = Config::get("os.{$device['os']}.group")) {
+        $device['os_group'] = $os_group;
         echo ' ('.$device['os_group'].')';
     }
 
@@ -267,7 +282,7 @@ function poll_device($device, $force_module = false)
     $update_array = array();
 
     $host_rrd = rrd_name($device['hostname'], '', '');
-    if ($config['norrd'] !== true && !is_dir($host_rrd)) {
+    if (Config::get('norrd') !== true && !is_dir($host_rrd)) {
         mkdir($host_rrd);
         echo "Created directory : $host_rrd\n";
     }
@@ -275,19 +290,16 @@ function poll_device($device, $force_module = false)
     $response = device_is_up($device, true);
 
     if ($response['status'] == '1') {
-        $graphs    = array();
-        $oldgraphs = array();
-
         if ($device['snmp_disable']) {
-            $config['poller_modules'] = array();
+            Config::set('poller_modules', []);
         } else {
             // we always want the core module to be included, prepend it
-            $config['poller_modules'] = array('core' => true) + $config['poller_modules'];
+            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
         }
 
         printChangedStats(true); // don't count previous stats
-        foreach ($config['poller_modules'] as $module => $module_status) {
-            $os_module_status = $config['os'][$device['os']]['poller_modules'][$module];
+        foreach (Config::get('poller_modules') as $module => $module_status) {
+            $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
             d_echo("Modules status: Global" . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
             d_echo("OS" . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
             d_echo("Device" . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
@@ -339,34 +351,18 @@ function poll_device($device, $force_module = false)
                 echo "Module [ $module ] disabled globally.\n\n";
             }
         }
-
-        // Update device_groups
-        UpdateGroupsForDevice($device['device_id']);
-
+        
         if (!$force_module && !empty($graphs)) {
             echo "Enabling graphs: ";
-            // FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
-            // This code cycles through the graphs already known in the database and the ones we've defined as being polled here
-            // If there any don't match, they're added/deleted from the database.
-            // Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
-            foreach (dbFetch('SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?', array($device['device_id'])) as $graph) {
-                if (isset($graphs[$graph['graph']])) {
-                    $oldgraphs[$graph['graph']] = true;
-                } else {
-                    dbDelete('device_graphs', '`device_id` = ? AND `graph` = ?', array($device['device_id'], $graph['graph']));
-                }
-            }
-
-            foreach ($graphs as $graph => $value) {
-                if (!isset($oldgraphs[$graph])) {
+            $graphs = collect($graphs)->keys();
+            DeviceCache::getPrimary()->graphs->keyBy('graph')->collect()->except($graphs)->each->delete(); // delete extra graphs
+            DeviceCache::getPrimary()->graphs() // create missing graphs
+                ->saveMany($graphs->diff(DeviceCache::getPrimary()->graphs->pluck('graph'))->map(function ($graph) {
                     echo '+';
-                    dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph), 'device_graphs');
-                }
-
-                echo $graph.' ';
-            }
+                    return new DeviceGraph(['graph' => $graph]);
+                }));
             echo PHP_EOL;
-        }//end if
+        }
 
         // Ping response
         if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
@@ -412,8 +408,8 @@ function poll_device($device, $force_module = false)
         echo "\nPolled in $device_time seconds\n";
 
         // check if the poll took to long and log an event
-        if ($device_time > $config['rrd']['step']) {
-            log_event("Polling took longer than " . round($config['rrd']['step'] / 60, 2) .
+        if ($device_time > Config::get('rrd.step')) {
+            log_event("Polling took longer than " . round(Config::get('rrd.step') / 60, 2) .
                 ' minutes!  This will cause gaps in graphs.', $device, 'system', 5);
         }
 
@@ -514,7 +510,7 @@ function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_gra
 function get_main_serial($device)
 {
     if ($device['os_group'] == 'cisco') {
-        $serial_output = snmp_get_multi($device, 'entPhysicalSerialNum.1 entPhysicalSerialNum.1001', '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
+        $serial_output = snmp_get_multi($device, ['entPhysicalSerialNum.1', 'entPhysicalSerialNum.1001'], '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
         if (!empty($serial_output[1]['entPhysicalSerialNum'])) {
             return $serial_output[1]['entPhysicalSerialNum'];
         } elseif (!empty($serial_output[1000]['entPhysicalSerialNum'])) {
@@ -534,7 +530,7 @@ function get_main_serial($device)
  * The special group "none" will not be prefixed.
  *
  * @param array $app app from the db, including app_id
- * @param string $response This should be the full output
+ * @param string $response This should be the return state of Application polling
  * @param array $metrics an array of additional metrics to store in the database for alerting
  * @param string $status This is the current value for alerting
  */
@@ -552,17 +548,48 @@ function update_application($app, $response, $metrics = array(), $status = '')
     );
 
     if ($response != '' && $response !== false) {
-        if (str_contains($response, array(
+        if (Str::contains($response, array(
             'Traceback (most recent call last):',
         ))) {
             $data['app_state'] = 'ERROR';
+        } elseif (in_array($response, ['OK', 'ERROR', 'LEGACY', 'UNSUPPORTED'])) {
+            $data['app_state'] = $response;
         } else {
+            # should maybe be 'unknown' as state
             $data['app_state'] = 'OK';
         }
     }
 
     if ($data['app_state'] != $app['app_state']) {
         $data['app_state_prev'] = $app['app_state'];
+
+        $device = dbFetchRow('SELECT * FROM devices LEFT JOIN applications ON devices.device_id=applications.device_id WHERE applications.app_id=?', array($app['app_id']));
+
+        $app_name = \LibreNMS\Util\StringHelpers::nicecase($app['app_type']);
+
+        switch ($data['app_state']) {
+            case 'OK':
+                $severity = Alert::OK;
+                $event_msg = "changed to OK";
+                break;
+            case 'ERROR':
+                $severity = Alert::ERROR;
+                $event_msg = "ends with ERROR";
+                break;
+            case 'LEGACY':
+                $severity = Alert::WARNING;
+                $event_msg = "Client Agent is deprecated";
+                break;
+            case 'UNSUPPORTED':
+                $severity = Alert::ERROR;
+                $event_msg = "Client Agent Version is not supported";
+                break;
+            default:
+                $severity = Alert::UNKNOWN;
+                $event_msg = "has UNKNOWN state";
+                break;
+        }
+        log_event("Application ".$app_name." ".$event_msg, $device, 'application', $severity);
     }
     dbUpdate($data, 'applications', '`app_id` = ?', array($app['app_id']));
 

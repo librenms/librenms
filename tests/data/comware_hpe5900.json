@@ -28,11 +28,11 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "comware",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg"
+                    "icon": "hpe.svg",
+                    "location": null
                 }
             ]
         },
@@ -46,11 +46,11 @@
                     "version": "7.1.045",
                     "hardware": "5900AF-48G-4XG-2QSFP+ Switch\r",
                     "features": "2422P01",
-                    "location": "<private>",
                     "os": "comware",
                     "type": "network",
                     "serial": null,
-                    "icon": "hpe.svg"
+                    "icon": "hpe.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -66,10 +66,11 @@
                     "sensor_index": "hh3cEntityExtCurrentPower.2",
                     "sensor_type": "comware",
                     "sensor_descr": "5900AF Power Usage",
+                    "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
                     "sensor_current": 101,
-                    "sensor_limit": 151.5,
+                    "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
                     "sensor_limit_low_warn": null,
@@ -89,6 +90,7 @@
                     "sensor_index": "1",
                     "sensor_type": "hh3cdevMFanStatusTable",
                     "sensor_descr": "Fan 1",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -112,6 +114,7 @@
                     "sensor_index": "2",
                     "sensor_type": "hh3cdevMFanStatusTable",
                     "sensor_descr": "Fan 2",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -135,6 +138,7 @@
                     "sensor_index": "1",
                     "sensor_type": "hh3cdevMPowerStatusTable",
                     "sensor_descr": "Power Supply 1",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -158,6 +162,7 @@
                     "sensor_index": "2",
                     "sensor_type": "hh3cdevMPowerStatusTable",
                     "sensor_descr": "Power Supply 2",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 3,

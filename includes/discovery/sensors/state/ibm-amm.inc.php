@@ -13,12 +13,12 @@
 $index = 1;
 $state_name = 'ibm-amm_BlowerState';
 $state_descr = 'Blower ';
-$oids = array(
+$oids = [
     '.1.3.6.1.4.1.2.3.51.2.2.3.10.0', // BLADE-MIB::blower1State.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.11.0', // BLADE-MIB::blower2State.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.12.0', // BLADE-MIB::blower3State.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.13.0', // BLADE-MIB::blower4State.0
-);
+];
 /* BLADE-MIB: blower1State
  *  unknown(0),
  *  good(1),
@@ -31,29 +31,15 @@ foreach ($oids as $oid) {
     $descr = $state_descr . $index;
 
     if (!empty($state)) {
-        $state_index_id = create_state_index($state_name);
-            
-        if ($state_index_id) {
-            $states = array(
-                array($state_index_id, 'unknown', 0, 0, 3),
-                array($state_index_id, 'good', 1, 1, 0),
-                array($state_index_id, 'warning', 1, 2, 1),
-                array($state_index_id, 'bad', 1, 3, 2),
-            );
- 
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }//end foreach
-        }//end if
+        $states = [
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
+            ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+            ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'bad'],
+        ];
+        create_state_index($state_name, $states);
 
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;
@@ -63,12 +49,12 @@ foreach ($oids as $oid) {
 $index = 1;
 $state_name = 'ibm-amm_BlowerControllerState';
 $state_descr = 'Blower Controller ';
-$oids = array(
+$oids = [
     '.1.3.6.1.4.1.2.3.51.2.2.3.30.0', // BLADE-MIB::blower1ControllerState.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.31.0', // BLADE-MIB::blower2ControllerState.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.32.0', // BLADE-MIB::blower3ControllerState.0
     '.1.3.6.1.4.1.2.3.51.2.2.3.33.0', // BLADE-MIB::blower4ControllerState.0
-);
+];
 
 /* BLADE-MIB: blower1ControllerState
  *  operational(0),
@@ -82,30 +68,16 @@ foreach ($oids as $oid) {
     $descr = $state_descr . $index;
 
     if (is_numeric($state) && $state != 2) {
-        $state_index_id = create_state_index($state_name);
+        $states = [
+            ['value' => 0, 'generic' => 0, 'graph' => 1, 'descr' => 'operational'],
+            ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'flashing'],
+            ['value' => 2, 'generic' => -1, 'graph' => 1, 'descr' => 'notPresent'],
+            ['value' => 3, 'generic' => 2, 'graph' => 1, 'descr' => 'communicationError'],
+            ['value' => 255, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+        ];
+        create_state_index($state_name, $states);
 
-        if ($state_index_id) {
-            $states = array(
-                array($state_index_id, 'operational', 1, 0, 0),
-                array($state_index_id, 'flashing', 1, 1, 1),
-                array($state_index_id, 'notPresent', 1, 2, -1),
-                array($state_index_id, 'communicationError', 1, 3, 2),
-                array($state_index_id, 'unknown', 0, 255, 3),
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }//end foreach
-        }//end if
-
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;
@@ -116,7 +88,7 @@ $index = 1;
 $state_name = 'ibm-amm_PowerModuleState';
 $state_descr = 'Power Module ';
 $powerModuleStateOid= '.1.3.6.1.4.1.2.3.51.2.2.4.1.1.3'; // BLADE-MIB::powerModuleState
-$data = snmpwalk_cache_oid_num($device, $powerModuleStateOid, array());
+$data = snmpwalk_cache_oid_num($device, $powerModuleStateOid, []);
 
 /*  BLADE-MIB: powerModuleState
  *   unknown(0),
@@ -130,30 +102,16 @@ foreach ($data as $oid => $array) {
     $descr = $state_descr . $index;
 
     if (is_numeric($state) && $state != 3) {
-        $state_index_id = create_state_index($state_name);
+        $states = [
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+            ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'good'],
+            ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'warning'],
+            ['value' => 3, 'generic' => -1, 'graph' => 1, 'descr' => 'notAvailable'],
+            ['value' => 4, 'generic' => 2, 'graph' => 1, 'descr' => 'critical'],
+        ];
+        create_state_index($state_name, $states);
 
-        if ($state_index_id) {
-            $states = array(
-                array($state_index_id, 'unknown', 0, 0, 3),
-                array($state_index_id, 'good', 1, 1, 0),
-                array($state_index_id, 'warning', 1, 2, 1),
-                array($state_index_id, 'notAvailable', 1, 3, -1),
-                array($state_index_id, 'critical', 1, 4, 2),
-            );
-
-            foreach ($states as $value) {
-                $insert = array(
-                    'state_index_id' => $value[0],
-                    'state_descr' => $value[1],
-                    'state_draw_graph' => $value[2],
-                    'state_value' => $value[3],
-                    'state_generic_value' => $value[4]
-                );
-                dbInsert($insert, 'state_translations');
-            }//end foreach
-        }//end if
-
-        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, '1', '1', null, null, null, null, $state, 'snmp', $index);
+        discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $state, 'snmp', $index);
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
         $index++;

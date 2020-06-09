@@ -11,6 +11,7 @@
  */
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Msteams extends Transport
@@ -20,18 +21,17 @@ class Msteams extends Transport
         if (!empty($this->config)) {
             $opts['url'] = $this->config['msteam-url'];
         }
-        
+
         return $this->contactMsteams($obj, $opts);
     }
 
     public function contactMsteams($obj, $opts)
     {
         $url   = $opts['url'];
-        $color = ($obj['state'] == 0 ? '#00FF00' : '#FF0000');
         $data  = array(
-            'title' => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
-            'themeColor' => $color,
-            'text' => strip_tags($obj['msg'])
+            'title' => $obj['title'],
+            'themeColor' => self::getColorForState($obj['state']),
+            'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>')
         );
         $curl  = curl_init();
         set_curl_proxy($curl);
@@ -42,9 +42,11 @@ class Msteams extends Transport
             'Expect:'
         ));
         curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data));
+        if ($this->config['use-json'] === 'on' && $obj['uid'] !== '000') {
+            curl_setopt($curl, CURLOPT_POSTFIELDS, $obj['msg']);
+        }
         $ret  = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-
         if ($code != 200) {
             var_dump("Microsoft Teams returned Error, retry later");
             return false;
@@ -61,6 +63,13 @@ class Msteams extends Transport
                     'name' => 'msteam-url',
                     'descr' => 'Microsoft Teams Webhook URL',
                     'type' => 'text',
+                ],
+                [
+                    'title' => 'Use JSON?',
+                    'name' => 'use-json',
+                    'descr' => 'Compose MessageCard with JSON rather than Markdown',
+                    'type' => 'checkbox',
+                    'default' => false,
                 ]
             ],
             'validation' => [

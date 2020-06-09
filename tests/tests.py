@@ -81,7 +81,7 @@ class TestLocks(unittest.TestCase):
         else:
             rc = redis.Redis()
             rc.delete('queue:testing')  # make sure no previous data exists
-            qm = LibreNMS.RedisQueue('testing', namespace='queue')
+            qm = LibreNMS.RedisUniqueQueue('testing', namespace='queue')
 
             thread = threading.Thread(target=self.queue_thread, args=(qm, None, False))
             thread.daemon = True

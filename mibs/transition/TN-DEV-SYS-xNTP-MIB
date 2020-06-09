@@ -1,0 +1,257 @@
+-- ************************************************************************************
+-- TN-DEV-SYS-xNTP-MIB.my:  Transition Networks Enterprise MIB for NTP/SNTP management
+--
+-- Copyright (c) 2012 by Transition Networks, Inc.
+-- All rights reserved.
+-- ************************************************************************************
+
+TN-DEV-SYS-XNTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        DisplayString, RowStatus, TruthValue
+                FROM SNMPv2-TC
+        InetAddressType, InetAddress
+                FROM INET-ADDRESS-MIB
+    MODULE-IDENTITY,
+    OBJECT-IDENTITY,
+    enterprises FROM SNMPv2-SMI
+    TimeStamp, TruthValue FROM SNMPv2-TC
+    entPhysicalIndex FROM ENTITY-MIB
+    tnDevMgmt FROM TN-MGMT-MIB;
+
+tnDevSysxNTP            OBJECT IDENTIFIER ::= { tnDevMgmt 11 }
+
+tnxNTPClientMgmtTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnxNTPClientMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table to manage the NTP/SNTP client."
+    ::= { tnDevSysxNTP 1 }
+
+tnxNTPClientMgmtEntry OBJECT-TYPE
+    SYNTAX      TnxNTPClientMgmtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table, containing inforamtion
+                 to manage the NTP/SNTP cilent of a device."
+    INDEX       { entPhysicalIndex }
+    ::= { tnxNTPClientMgmtTable 1 }
+
+TnxNTPClientMgmtEntry ::= SEQUENCE
+{
+    tnxNTPClientStatus                 INTEGER,
+    tnxNTPDaylightSavingTime           INTEGER,
+    tnxNTPUTCTimezone                  INTEGER,
+    tnxNTPDeviceTimer                  DisplayString,
+    tnxNTPDaylightSavingPeriodStart    DisplayString,
+    tnxNTPDaylightSavingPeriodEnd      DisplayString,
+    tnxNTPDaylightSavingOffset         Integer32,
+    tnxNTPDaylightSavingTimeMode       INTEGER
+}
+
+tnxNTPClientStatus OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    notApplicable(0),
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The status of SNTP client. The value of
+                 notApplicable(0) indicating the device don't support NTP/SNTP client,
+                 set this value to enabled(1) to enable NTP/SNTP client,
+                 set this value to disabled(2) to disable NTP/SNTP client."
+    ::= { tnxNTPClientMgmtEntry 1 }
+
+tnxNTPDaylightSavingTime OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    enabled(1),
+                    disabled(2)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "(1)Enable Daylight Saving Time.
+                 (2)Disable Daylight Saving Time.
+                 Daylight Saving Time:
+                 Use this OID to Enable/Disable Daylight Saving Time."
+    ::= { tnxNTPClientMgmtEntry 2 }
+
+tnxNTPUTCTimezone OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    none(0),
+                    gmt-negative-12-00-Eniwetok-Kwajalein(1),
+                    gmt-negative-11-00-Midway-Island-Samoa(2),
+                    gmt-negative-10-00-Hawaii(3),
+                    gmt-negative-09-00-Alaska(4),
+                    gmt-negative-08-00-Pacific-Time-US-and-Canada-Tijuana(5),
+                    gmt-negative-07-00-Arizona(6),
+                    gmt-negative-07-00-Mountain-Time-US-and-Canada(7),
+                    gmt-negative-06-00-Central-Time-US-and-Canada(8),
+                    gmt-negative-06-00-Mexico-City-Tegucigalpa(9),
+                    gmt-negative-06-00-Saskatchewan(10),
+                    gmt-negative-05-00-Bogota-Lima-Quito(11),
+                    gmt-negative-05-00-Eastern-Time-US-and-Canada(12),
+                    gmt-negative-05-00-Indiana-East(13),
+                    gmt-negative-04-00-Atlantic-Time-Canada(14),
+                    gmt-negative-04-00-Caracas-La-Paz(15),
+                    gmt-negative-04-00-Santiago(16),
+                    gmt-negative-03-30-Newfoundland(17),
+                    gmt-negative-03-00-Brasilia(18),
+                    gmt-negative-03-00-Buenos-Aires-Georgetown(19),
+                    gmt-negative-02-00-Mid-Atlantic(20),
+                    gmt-negative-01-00-Azores-Cape-Verde-Is(21),
+                    gmt-Casablanca-Monrovia(22),
+                    gmt-Greenwich-Mean-Time-Dublin-Edinburgh-Lisbon-London(23),
+                    gmt-positive-01-00-Amsterdam-Berlin-Bern-Rome-Stockholm-Vienna(24),
+                    gmt-positive-01-00-Belgrade-Bratislava-Budapest-Ljubljana-Prague(25),
+                    gmt-positive-01-00-Brussels-Copenhagen-Madrid-Paris-Vilnius(26),
+                    gmt-positive-01-00-Sarajevo-Skopje-Sofija-Warsaw-Zagreb(27),
+                    gmt-positive-02-00-Athens-Istanbul-Minsk(28),
+                    gmt-positive-02-00-Bucharest(29),
+                    gmt-positive-02-00-Cairo(30),
+                    gmt-positive-02-00-Harare-Pretoria(31),
+                    gmt-positive-02-00-Helsinki-Riga-Tallinn(32),
+                    gmt-positive-02-00-Jerusalem(33),
+                    gmt-positive-03-00-Baghdad-Kuwait-Riyadh(34),
+                    gmt-positive-03-00-Moscow-St-Petersburg-Volgograd(35),
+                    gmt-positive-03-00-Mairobi(36),
+                    gmt-positive-03-30-Tehran(37),
+                    gmt-positive-04-00-Abu-Dhabi-Muscat(38),
+                    gmt-positive-04-00-Baku-Tbilisi(39),
+                    gmt-positive-04-30-Kabul(40),
+                    gmt-positive-05-00-Ekaterinburg(41),
+                    gmt-positive-05-00-Islamabad-Karachi-Tashkent(42),
+                    gmt-positive-05-30-Bombay-Calcutta-Madras-New-Delhi(43),
+                    gmt-positive-06-00-Astana-Almaty-Dhaka(44),
+                    gmt-positive-06-00-Colombo(45),
+                    gmt-positive-07-00-Bangkok-Hanoi-Jakarta(46),
+                    gmt-positive-08-00-Beijing-Chongqing-Hong-Kong-Urumqi(47),
+                    gmt-positive-08-00-Perth(48),
+                    gmt-positive-08-00-Singapore(49),
+                    gmt-positive-08-00-Taipei(50),
+                    gmt-positive-09-00-Osaka-Sapporo-Tokyo(51),
+                    gmt-positive-09-00-Seoul(52),
+                    gmt-positive-09-00-Yakutsk(53),
+                    gmt-positive-09-30-Adelaide(54),
+                    gmt-positive-09-30-Darwin(55),
+                    gmt-positive-10-00-Brisbane(56),
+                    gmt-positive-10-00-Canberra-Melbourne-Sydney(57),
+                    gmt-positive-10-00-Guam-Port-Moresby(58),
+                    gmt-positive-10-00-Hobart(59),
+                    gmt-positive-10-00-Vladivostok(60),
+                    gmt-positive-11-00-Magadan-Solomon-Is-New-Caledonia(61),
+                    gmt-positive-12-00-Auckland-Wllington(62),
+                    gmt-positive-12-00-Fiji-Kamchatka-Marshall-Is(63)
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "UTC Timezone."
+    ::= { tnxNTPClientMgmtEntry 3 }
+
+tnxNTPDeviceTimer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The current local time of a device."
+    ::= { tnxNTPClientMgmtEntry 4 }
+
+tnxNTPDaylightSavingPeriodStart OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The start-time of daylight saving period,
+                 non-recurring mode format: yyyymmdd hh:mm.
+                 recurring mode format: w(1-5)d(1-7)mm(1-12) hh:mm."
+    ::= { tnxNTPClientMgmtEntry 5 }
+
+tnxNTPDaylightSavingPeriodEnd OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The end-time of daylight saving period,
+                 non-recurring mode format: yyyymmdd hh:mm.
+                 recurring mode format: w(1-5)d(1-7)mm(1-12) hh:mm."
+    ::= { tnxNTPClientMgmtEntry 6 }
+
+tnxNTPDaylightSavingOffset OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Daylight Saving Offset(Usually is 60 mins).
+                 When Enable and current time at Daylight Saving Period,
+                 the current time of the switch will be offseted by
+                 Daylight Saving Offset."
+    ::= { tnxNTPClientMgmtEntry 7 }
+
+tnxNTPDaylightSavingTimeMode OBJECT-TYPE
+    SYNTAX      INTEGER
+                {
+                    recurring(1),
+                    nonrecurring(2),
+                }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Daylight Saving Time Mode if it is set to reccuring it will show
+    week, day, month, hour, and minute.  In non-recuring mode it will show
+    month, date, year, hour, and minute."
+    ::= { tnxNTPClientMgmtEntry 8 }
+
+tnxNTPServerTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TnxNTPServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "Table of NTP/SNTP server."
+    ::= { tnDevSysxNTP 2 }
+
+tnxNTPServerEntry OBJECT-TYPE
+    SYNTAX      TnxNTPServerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION "An entry in the table, containing inforamtion
+                 about a SNTP server."
+    INDEX       { entPhysicalIndex, tnxNTPServerIndex }
+    ::= { tnxNTPServerTable 1 }
+
+TnxNTPServerEntry ::= SEQUENCE
+{
+    tnxNTPServerIndex       Integer32,
+    tnxNTPServerIPAddrType  InetAddressType,
+    tnxNTPServerIPAddr      InetAddress,
+    tnxNTPServerStatus      RowStatus
+}
+
+tnxNTPServerIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Index of NTP/SNTP server table."
+    ::= { tnxNTPServerEntry 1 }
+
+tnxNTPServerIPAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP address type(v4 or v6) of the NTP/SNTP server address.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnxNTPServerEntry 2 }
+
+tnxNTPServerIPAddr  OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IPv4 or IPv6 address of a NTP/SNTP server.
+                 For a detailed description of this type, please refer to INET-ADDRESS-MIB."
+    ::= { tnxNTPServerEntry 3 }
+
+tnxNTPServerStatus  OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION "For a detailed description of this object, please refer to
+                 SNMPv2-TC MIB."
+    ::= { tnxNTPServerEntry 4 }
+
+END

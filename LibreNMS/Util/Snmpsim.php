@@ -75,7 +75,11 @@ class Snmpsim
             // if starting failed, run snmpsim again and output to the console and validate the data
             passthru($this->getCmd(false) . ' --validate-data');
 
-            echo "\nFailed to start Snmpsim. Scroll up for error.\n";
+            if (!is_executable($this->findSnmpsimd())) {
+                echo "\nCould not find snmpsim, you can install it with 'pip install snmpsim'.  If it is already installed, make sure snmpsimd or snmpsimd.py is in PATH\n";
+            } else {
+                echo "\nFailed to start Snmpsim. Scroll up for error.\n";
+            }
             exit;
         }
     }
@@ -151,10 +155,7 @@ class Snmpsim
      */
     private function getCmd($with_log = true)
     {
-        $cmd = Config::locateBinary('snmpsimd');
-        if (!is_executable($cmd)) {
-            $cmd = Config::locateBinary('snmpsimd.py');
-        }
+        $cmd = $this->findSnmpsimd();
 
         $cmd .= " --data-dir={$this->snmprec_dir} --agent-udpv4-endpoint={$this->ip}:{$this->port}";
 
@@ -171,5 +172,14 @@ class Snmpsim
     {
         // unset $this->proc to make sure it isn't referenced
         unset($this->proc);
+    }
+
+    private function findSnmpsimd()
+    {
+        $cmd = Config::locateBinary('snmpsimd');
+        if (!is_executable($cmd)) {
+            $cmd = Config::locateBinary('snmpsimd.py');
+        }
+        return $cmd;
     }
 }

@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$extendair_data = snmp_get_multi_oid($device, 'serialNumber.0 firmwareVersion.0', '-OQs', 'ExaltComProducts');
+$extendair_data = snmp_get_multi_oid($device, ['serialNumber.0', 'firmwareVersion.0'], '-OQs', 'ExaltComProducts');
 
 $serial  = $extendair_data['serialNumber.0'];
 $version = $extendair_data['firmwareVersion.0'];

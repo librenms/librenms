@@ -1,0 +1,12 @@
+os: fibernet-xmux4-plus
+text: 'Fibernet XMUX 4+'
+type: network
+icon: fibernet
+discovery:
+    - sysObjectID:
+        - .1.3.6.1.4.1.29003.2.44.1
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+mib_dir:
+    - fibernet

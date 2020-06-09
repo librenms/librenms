@@ -1,0 +1,48 @@
+-- PT-MIB 
+-- This is the root MIB file of PT.
+--
+
+PT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MODULE-IDENTITY, enterprises
+                FROM SNMPv2-SMI;
+
+pt MODULE-IDENTITY
+        LAST-UPDATED "201408081200Z"
+        ORGANIZATION "Protelevision Technologies, Denmark"
+        CONTACT-INFO
+                "Contact:
+
+                Web: http://www.protelevision.com
+
+                Address: Valhoejs Alle 176, DK-2610 Roedovre, Denmark
+                Telephone: +45 44700000
+                Fax:       +45 44700001"
+
+        DESCRIPTION
+                "This is the root MIB module for PT with OID of
+                {iso org dod internet private enterprises 18086}.
+
+                Copyright (c) 2004 Protelevision Technologies A/S. All rights reserved.
+                Reproduction of this document is authorized on the condition
+                that the foregoing copyright notice is included.
+
+                IANA allocated this enterprise OID (object identifier) for the
+                exclusive use of Protelevision Technologies A/S (PT). 
+                Other than internet network equipment
+                distributed or licensed by PT, no other party has any right
+                what-so-ever to distribute or license internet network equipment
+                which responds to the PT enterprise OID or its subsidiary
+                branches. PT reserves the right to criminally prosecute and/or
+                to seek civil damages from anyone fraudently using the PT
+                enterprise OID to the full extent of the law."
+
+        REVISION
+          "201408081200Z"
+
+	DESCRIPTION
+		"PTT General Device MIB File"
+		
+        ::= {enterprises 18086}
+END

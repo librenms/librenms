@@ -1,0 +1,861 @@
+--*******************************************************************
+--*    SAGEM SA			 							  				*
+--*******************************************************************
+--*******************************************************************
+
+--  Filename: shelf
+--  File type: .mib    
+-- 
+--  Description:	SNMPc source Mib file.
+--			The MIB module defines structure for ADR equipement family            
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Version: MIB-P0-301199	Date: 30 11 1999 
+-- 
+--		Name: F.Bonnevialle	
+--		Date: 12 12 2000 
+--		Desc: original
+--
+--		Name: S.LAURENT 	
+--		Date: 08 02 2001 
+--		Desc: * Change the MIB number: {Sagem 25} -> {Sagem 150}
+--            * Add 7 equipment modification counters
+--			  * Add a specific index to the table "laserTable"
+--			  * Remove the configAction Object
+--
+--		Name: S.LAURENT 	
+--		Date: 18 04 2001 
+--		Desc: * Move the 7 equipment modification counters in the Equip Mib
+--			   
+--		Name: S.LAURENT 	
+--		Date: 01 06 2001 
+--		Desc: * Replace the BoardIndex Type by INTEGER and BoardFamily Type by a DisplayString.
+--			  * Add slotName object in the BoardTable
+--	      These modifications allow the MIB to be more independent of the equipment.
+--    
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+
+
+SHELF-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+   sagemDr								FROM SAGEM-DR-MIB
+   SagemBoolean, Severity				FROM EQUIPMENT-MIB
+   MODULE-IDENTITY,OBJECT-TYPE, 
+   					Counter32      		FROM SNMPv2-SMI
+   DisplayString                    	FROM SNMPv2-TC;
+   --spiIndex								FROM SDH-ETS-MIB;
+   
+ 
+   shelf	MODULE-IDENTITY
+      LAST-UPDATED "0012060000Z"
+      ORGANIZATION "SAGEM-Tolbiac drd/ddp/tmhd"
+      CONTACT-INFO
+	  ""
+      DESCRIPTION    
+      "The MIB module specific for ADR equipment"
+   ::= { sagemDr 150 }
+
+   -- led
+   led		OBJECT IDENTIFIER ::= { shelf 2 }
+
+   -- hold Time
+   holdTime		OBJECT IDENTIFIER ::= { shelf 3 }
+ 
+   -- slot and board
+   board 		OBJECT IDENTIFIER ::= { shelf 20 }
+    
+   -- board table
+   boardList 	OBJECT IDENTIFIER ::= { shelf 30 }
+
+   -- Software inventory
+   softInv		OBJECT IDENTIFIER ::= { shelf 40 }
+   
+   -- Harware inventory
+   hardInv		OBJECT IDENTIFIER ::= { shelf 50 }
+      
+   -- laser data
+   laser		OBJECT IDENTIFIER ::= { shelf 100 }
+      
+   -- engineering order wire
+   eow			OBJECT IDENTIFIER ::= { shelf 120 }
+
+      
+        
+--*******************************************************************
+--*   Slot and  Board
+--*******************************************************************
+   boardNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of board in equipment."  
+      ::= { board 1 } 
+   
+   boardTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF BoardEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of board in equipment."  
+      ::= { board 2 } 
+   
+   boardEntry   OBJECT-TYPE
+      SYNTAX       BoardEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular board of the equipment." 
+      INDEX        { boardIndex } 
+      ::= { boardTable 1 } 
+  
+
+   ProtectionType ::= INTEGER 
+   {
+    	none(0), 
+    	cardp(1)
+   }
+
+   BoardFailure ::= INTEGER 
+   {
+    	none(0), 
+    	missing(1), 
+    	mismatch(2), 
+    	defective(3) 
+   }
+   
+   BoardEntry ::= SEQUENCE 
+   { 
+   		boardIndex          INTEGER, 
+   		boardSlotName       DisplayString, 
+   		boardExpectType     INTEGER,                    -- 0 or boardListIndex
+   		boardInsertType     INTEGER,                    -- 0 or boardListIndex
+   		boardExpectFamily   DisplayString,
+   		boardInsertFamily   DisplayString,
+   		boardActive         SagemBoolean,
+   		boardFirstPortIndex INTEGER,
+   		boardProtectionType	ProtectionType,
+   		boardMonitor        SagemBoolean,
+   		boardFailure        BoardFailure,
+   		boardSeverity 	    Severity,  
+   		boardMissingSev     Severity,
+   		boardMismatchSev    Severity,
+   		boardDefectiveSev   Severity
+   }
+
+   boardIndex      OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular slot.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to hardware.
+	Each equipment maintain its own pool of values:
+	ex ADR155c : A = 1, B = 2, ... M = 5, Fan = 6
+	ex ADR2500c: Fan = 1, PSU1 = 2, ...Trib1 = 8, Trib6= 13, Line1 = 14,... 
+					Switch2 = 17, Shelf = 18"   
+      ::= { boardEntry 1 } 
+
+   boardSlotName     OBJECT-TYPE
+      SYNTAX       DisplayString                                 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "A DisplayString which identify the name of a particular slot.
+   Its value is fixed at equipment design time. 
+   It is usualy related to hardware
+   ex ADR155c : A, B, ... Fan
+   ex ADR2500c: Fan, CCU, CTRL, PSU1, ... TRIB5, .... SWITCH1, ..."
+      ::= { boardEntry 2 }
+    
+   boardExpectType     OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)                         
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+  "A value which configure the expected type. If used, this one must be
+  equal to one of existent boardListIndex for the considerated board. Otherwise,
+  the value is set to 0.   
+  Known types are readable in boardListTable
+  "
+      ::= { boardEntry 3 }
+
+   boardInsertType     OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)                        
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "When the inserted board doesn't match with the expexted board
+   the boardMismatch failure is generated.
+   The type of the card could be found in hardware inventory."
+      ::= { boardEntry 4 }
+
+   boardExpectFamily     OBJECT-TYPE
+      SYNTAX       DisplayString                                 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "Board Family corresponding to the specified expected kind. This value is send by the equipment.
+   ex ADR155c  : 
+   ex ADR2500c : CTRL, FAN, AUX, CCU, PSU, STM1 OPT, STM1 ERE, STM4 OPT, STM16 OPT, GBETH, SWITCH
+   "
+      ::= { boardEntry 5 }
+ 
+   boardInsertFamily     OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "Board Family corresponding to the type of inserted board.
+   ex ADR155c  : 
+   ex ADR2500c : CTRL, FAN, AUX, CCU, PSU, STM1 OPT, STM1 ERE, STM4 OPT, STM16 OPT, GBETH, SWITCH
+   "
+      ::= { boardEntry 6 }
+
+   boardActive    OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+   "When the value of this field is set to false, the transmission of 
+   this board stop and the board could properly be extracted"
+      ::= { boardEntry 7 }  
+
+   boardFirstPortIndex OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "If the card is a card with physical ports, then the value is 
+    the first index of a physical interface (SPI, PPI) in the mib 
+    SDH-ETS. Else, the value is 0."
+      ::= { boardEntry 8 }    
+
+   boardProtectionType OBJECT-TYPE
+      SYNTAX       ProtectionType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "The value of this field indicates the kind of wanted card protection.
+    The default value is NONE.
+    if value is changed in cardP(1)then an entry is created in cardpTable. But this table
+    has to be completed (by setting the cardpReliefIndex,...) to obtain a configured protection. 
+    if value is changed in None(0)then the associated entry in cardpTable is deleted.
+    Some cards don't accept any protection. In that case, the value of this field will remain to NONE"
+      ::= { boardEntry 9 }    
+
+   boardMonitor    OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "When the value of this field is set to false, the failure detection
+   is stopped for this board."
+      ::= { boardEntry 10 }
+
+   boardFailure   OBJECT-TYPE
+      SYNTAX       BoardFailure
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "Active failures on board"
+      ::= { boardEntry 11 }            
+    
+   boardSeverity   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+        "A reference to failure severity for boards."
+      ::= { boardEntry 12 }
+         
+         
+   boardMissingSev   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "A reference to failure severity for boards."
+      ::= { boardEntry 13 } 
+      
+   boardMismatchSev   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "A reference to failure severity for boards."
+      ::= { boardEntry 14 }
+      
+   boardDefectiveSev   OBJECT-TYPE
+      SYNTAX       Severity
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+        "A reference to failure severity for boards."
+      ::= { boardEntry 15 }          
+      
+--*******************************************************************
+--*   board list
+--*******************************************************************    
+   boardListNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of entry of the boardList Table"
+      ::= { boardList 1 } 
+    
+   boardListTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF BoardlistEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of board type able to be managed by this equipment .
+    In order to manage a new type, just insert the board and if
+    the family match with a known family, this table will be
+    expand automaticaly with the new type inserted
+    
+    The XX fist value defined ( with boardSlotName = Shelf = 18 for ADR2500c)
+    is a list all possible type of boardInsertedType. 
+     "  
+      ::= { boardList 2 } 
+   
+   boardListEntry   OBJECT-TYPE
+      SYNTAX       BoardlistEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular boardList of the equipment." 
+      INDEX        { boardListIndex } 
+      ::= { boardListTable 1 } 
+
+   BoardlistEntry ::= SEQUENCE 
+   { 
+   		boardListIndex          INTEGER,
+   		boardListSlot           INTEGER,
+   		boardListType           DisplayString
+   }
+
+   boardListIndex  OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value."
+      ::= { boardListEntry 1 } 
+
+   boardListSlot  OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the corresponding Slot."
+      ::= { boardListEntry 2 } 
+   
+   boardListType     OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+    "In order to manage a new type, just insert the board and if
+    the family match with a known family, this table will be
+    expand automaticaly with the new type inserted.
+    ex ADR155c :
+    ex ADR2500c: 4S1.1, S4.1, L16.2, SWITCH, ..."
+      ::= { boardListEntry 3 }
+
+
+--*******************************************************************
+--*   Software inventory
+--*******************************************************************     
+
+   softInventoryNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of entry of the softInventory Table"
+      ::= { softInv 1 } 
+    
+   softInventoryTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF SoftInventoryEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of software inventory used "  
+      ::= { softInv 2 } 
+   
+   softInventoryEntry   OBJECT-TYPE
+      SYNTAX       SoftInventoryEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular boardList of the equipment." 
+      INDEX        { softInventoryIndex } 
+      ::= { softInventoryTable 1 } 
+
+   SoftInventoryEntry ::= SEQUENCE 
+   { 
+   		softInventoryIndex          INTEGER, 
+   		softInventoryBoard			INTEGER,        -- boardIndex
+   		softInventoryType           DisplayString,
+   		softInventoryCode           DisplayString,
+   		softInventoryExt            DisplayString
+   }
+
+   softInventoryIndex  OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value."
+      ::= { softInventoryEntry 1 } 
+
+   softInventoryBoard  OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the corresponding Slot. This variable is needed because some
+	 boards have their owns Applicative and Boot codes.  "
+      ::= { softInventoryEntry 2 } 
+   
+   softInventoryType     OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+    "Indication of type software"
+      ::= { softInventoryEntry 3 }
+   
+   softInventoryCode     OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+    "Indication of version code"
+      ::= { softInventoryEntry 4 }    
+   
+   softInventoryExt     OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+    "Indication of extension code. This one is not mandatory."
+      ::= { softInventoryEntry 5 }  
+     
+     
+      
+ --*******************************************************************
+--*   Hardware inventory
+--*******************************************************************     
+           
+   hardInventoryNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of different hardware inventory in equipment."  
+      ::= { hardInv 1 } 
+   
+   hardInventoryTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF HardInventoryEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of hardware inventory in equipment. 
+	 A hardware inventory is a description associed to a 
+	 particular card"  
+      ::= { hardInv 2 } 
+   
+   hardInventoryEntry   OBJECT-TYPE
+      SYNTAX       HardInventoryEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular tInv of the equipment." 
+      INDEX        { hardInventoryIndex } 
+      ::= { hardInventoryTable 1 } 
+
+   HardInventoryEntry ::= SEQUENCE {
+       hardInventoryIndex	 INTEGER,	-- boardIndex
+       hardInventoryBoard	 DisplayString,
+       hardInventoryDescr    DisplayString
+     }
+     
+   hardInventoryIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+		"Index of the inventory entry that corresponds to a particular slot"  
+      ::= { hardInventoryEntry 1 } 
+    
+   hardInventoryBoard   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+		"Family of card inserted in the slot"  
+      ::= { hardInventoryEntry 2 }       
+      
+   hardInventoryDescr   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+		"The content of the inventory: a textual description"  
+      ::= { hardInventoryEntry 3 }
+      
+--*******************************************************************
+--*   laser 
+--*******************************************************************     
+   laserNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of optical interface in equipment."  
+      ::= { laser 1 } 
+   
+   laserTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF LaserEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of synchronous physical interface in equipment."  
+      ::= { laser 2 } 
+   
+   laserEntry   OBJECT-TYPE
+      SYNTAX       LaserEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular synchronous physical interface of the equipment." 
+--      INDEX        { spiIndex }      
+      INDEX        { laserIndex } 
+
+      ::= { laserTable 1 } 
+      
+   LaserEntry ::= SEQUENCE 
+   {
+--		spiIndex			INTEGER,     
+		laserIndex			INTEGER,            -- =spiIndex
+		laserTxEnable		SagemBoolean,
+		laserALSEnable		SagemBoolean,
+		laserALSRestart2s	SagemBoolean,
+		laserALSRestart90s	SagemBoolean
+   }
+                
+   laserIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	" "  
+      ::= { laserEntry 1 }  
+                
+   laserTxEnable   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Enable(true) or disable(false) the laser output of the interface."  
+      ::= { laserEntry 2 } 
+   
+   laserALSEnable   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Automatic Laser Shutdown enable(true) or disable(false).
+	When enabled, this function cuts the laser output when a los is
+	detected on input signal."  
+      ::= { laserEntry 3 }   
+
+   laserALSRestart2s OBJECT-TYPE
+      SYNTAX       SagemBoolean  
+      MAX-ACCESS   read-write
+      STATUS       current  
+      DESCRIPTION 
+   "Operator command to start a one shot emission during 2s."
+      ::= { laserEntry 4 }    
+
+   laserALSRestart90s OBJECT-TYPE 
+      SYNTAX       SagemBoolean   
+      MAX-ACCESS   read-write 
+      STATUS       current   
+      DESCRIPTION  
+   "Operator command to start a one shot emission during 90s." 
+      ::= { laserEntry 5 }           
+   -- end laser data   
+    
+    
+--*******************************************************************
+--*   Shelf
+--*******************************************************************
+   adrHotReset   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Software hot reset when this variable is set to TRUE"  
+      ::= { shelf 1 }  
+      
+--*******************************************************************
+--*   led
+--*******************************************************************    
+  LedStatus		::= INTEGER 
+   {
+    unknown (1), 
+    green (2), 
+    yellow (3),
+    orange (4),
+    red (5) 
+   }
+
+  LedType		::= INTEGER 
+   {    
+    status1(1),
+    status2(2), 
+    online (3),
+    traffic(4),
+    major  (5),
+    minor  (6),
+    ether  (7),
+    halfFull (8) 
+   }
+ 
+   ledNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of led in equipment."  
+      ::= { led 1 } 
+   
+   ledTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF LedEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of led in equipment."  
+      ::= { led 2 } 
+   
+   ledEntry   OBJECT-TYPE
+      SYNTAX       LedEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular led of the equipment." 
+      INDEX        { ledIndex } 
+      ::= { ledTable 1 }                             
+                             
+   LedEntry ::= SEQUENCE 
+   { 
+   		ledIndex			INTEGER,
+   		ledPosition         INTEGER,   -- boardIndex 
+   		ledType				LedType,
+   		ledStatus			LedStatus
+   }
+   
+   ledIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular led."  
+      ::= { ledEntry 1 }  
+      
+   ledPosition   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the associated Board on the equipment."  
+      ::= { ledEntry 2 } 
+      
+   ledType   OBJECT-TYPE
+      SYNTAX       LedType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Type of the Led."  
+      ::= { ledEntry 3 }  
+      
+   ledStatus   OBJECT-TYPE
+      SYNTAX       LedStatus
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Status of this Led."  
+      ::= { ledEntry 4 }   
+      
+--*******************************************************************
+--* hold time  
+--*******************************************************************   
+   HoldTime    ::= INTEGER 
+   { 
+    hold01sec(1), 
+    hold03sec(3), 
+    hold10sec(10),							 
+	hold30sec(30) 
+   }  
+   
+   adrFailHoldOffTime   OBJECT-TYPE
+      SYNTAX       HoldTime
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Failure hold off time : the time interval during which the
+	defect is present and the failure is not raised"  
+      ::= { holdTime 1 } 
+   
+   adrFailHoldOnTime   OBJECT-TYPE
+      SYNTAX       HoldTime
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Failure hold on time : the time interval during which the
+	defect is cleared and the failure is not"  
+      ::= { holdTime 2 } 
+
+
+
+--*******************************************************************
+--*   EOW
+--*******************************************************************     
+   EOWClockMode    ::= INTEGER
+   {
+   		codirectionnal (0),
+   		contradirSlave(1),
+   		contradirMaster(2) 
+   }     
+   
+   EOWType    ::= INTEGER
+   {
+		rsE1 (1), 
+		rsF1 (2),
+		rsOther(3),
+		msE2 (4),
+		aux  (5)
+   }      
+   
+   eowNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of EOW port in equipment."  
+      ::= {eow 1 } 
+   
+   eowTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF EowEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of EOW port in equipment."  
+      ::= { eow 2 } 
+   
+   eowEntry   OBJECT-TYPE
+      SYNTAX       EowEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular EOW port of the equipment." 
+      INDEX        { eowIndex } 
+      ::= { eowTable 1 } 
+
+
+   EowEntry ::= SEQUENCE 
+   {
+	eowIndex         	INTEGER,
+	eowName          	DisplayString,
+    eowSrcType			EOWType,
+    eowSrcPtr       	INTEGER, 
+    eowSinkType			EOWType,
+    eowSinkPtr       	INTEGER,
+	eowClockMode     	EOWClockMode
+   }
+   
+   
+   eowIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A unique value which identify a particular
+	EOW port.
+	The value of index is a constant assigned to an entry at
+	equipment design time. It is usualy related to harware."  
+      ::= { eowEntry 1 } 
+   
+   eowName   OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the particular entry among the
+	EOW port entries. "  
+      ::= { eowEntry 2 } 
+   
+   eowSrcType   OBJECT-TYPE
+      SYNTAX       EOWType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	interface. Usually the value is the oid of a vc12 or a connection."  
+      ::= { eowEntry 6 } 
+     
+   eowSrcPtr   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	interface. Usually the value is the oid of a vc12 or a connection."  
+      ::= { eowEntry 7 } 
+   
+   eowSinkType   OBJECT-TYPE
+      SYNTAX       EOWType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	interface. Usually the value is the oid of a vc12 or a connection."  
+      ::= { eowEntry 8 } 
+     
+   eowSinkPtr   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A reference to the object which sends the data flow to this
+	interface. Usually the value is the oid of a vc12 or a connection."  
+      ::= { eowEntry 9 } 
+   
+   eowClockMode   OBJECT-TYPE
+      SYNTAX       EOWClockMode
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Select the direction of the two external synchronisation lines."  
+      ::= { eowEntry 10 } 
+                                  
+END

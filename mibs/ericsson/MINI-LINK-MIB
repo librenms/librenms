@@ -1,0 +1,37 @@
+MINI-LINK-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,
+        enterprises              FROM SNMPv2-SMI;
+     
+     
+    miniLink MODULE-IDENTITY
+        LAST-UPDATED "201603091230Z"
+        ORGANIZATION "Ericsson"
+        CONTACT-INFO
+            "Anders Ekvall
+             Postal: Ericsson AB,
+             E-Mail: anders.ekvall@ericsson.com"
+
+        DESCRIPTION
+            "This is the top MIB for Ericsson MINI-LINK"
+        REVISION      "201603091230Z"
+
+        DESCRIPTION
+            "Validated."
+
+        REVISION      "201602101230Z"
+        DESCRIPTION
+            "The initial version of this MIB module
+                            with OID for mini link types."
+
+        ::= { ericsson 223 }
+
+
+    -- *************
+    -- * MINI LINK *
+    -- *************
+    ericsson OBJECT IDENTIFIER ::= { enterprises 193 }    
+ 
+
+END

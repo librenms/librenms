@@ -60,20 +60,10 @@ if (is_file($install_dir . '/composer.phar')) {
     // self-update
     passthru("$exec self-update -q" . $extra_args);
 } else {
-    if ($proxy) {
-        $stream_default_opts = array(
-            ($use_https ? 'https' : 'http') => array(
-                'proxy' => str_replace(array('http://', 'https://'), 'tcp://', $proxy),
-                'request_fulluri' => true,
-            )
-        );
-
-        stream_context_set_default($stream_default_opts);
-    }
+    $sig_url = ($use_https ? 'https' : 'http') . '://composer.github.io/installer.sig';
 
     // Download installer signature from github
-    $sig_url = ($use_https ? 'https' : 'http') . '://composer.github.io/installer.sig';
-    $good_sha = trim(@file_get_contents($sig_url));
+    $good_sha = trim(curl_fetch($sig_url, $proxy, $use_https));
 
     if (empty($good_sha)) {
         echo "Error: Failed to download installer signature from $sig_url\n";
@@ -81,7 +71,7 @@ if (is_file($install_dir . '/composer.phar')) {
         // Download composer.phar (code from the composer web site)
         $dest = 'composer-setup.php';
         $installer_url = ($use_https ? 'https' : 'http') . '://getcomposer.org/installer';
-        @copy($installer_url, $dest);
+        curl_fetch($installer_url, $proxy, $use_https, $dest);
 
         if (!is_file($dest)) {
             echo "Error: Failed to download $installer_url\n";
@@ -108,4 +98,35 @@ if ($exec) {
     passthru("$exec " . implode(' ', array_splice($argv, 1)) . "$extra_args 2>&1");
 } else {
     echo "Composer not available, please manually install composer.\n";
+}
+
+
+function curl_fetch($url, $proxy, $use_https, $output = false)
+{
+    $curl = curl_init();
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+
+    if ($output) {
+        $fp = fopen($output, 'w+');
+        curl_setopt($curl, CURLOPT_FILE, $fp);
+    }
+
+    if ($proxy) {
+        curl_setopt($curl, CURLOPT_PROXY, rtrim(str_replace(['http://', 'https://'], '', $proxy), '/'));
+        if ($use_https) {
+            curl_setopt($curl, CURLOPT_HTTPPROXYTUNNEL, 1);
+        }
+    }
+
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_FOLLOWLOCATION, 1);
+    curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 300);
+    $ret = @curl_exec($curl);
+
+    curl_close($curl);
+    if (isset($fp)) {
+        fclose($fp);
+    }
+
+    return $ret;
 }

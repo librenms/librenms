@@ -32,16 +32,17 @@ use Illuminate\Http\Request;
 
 abstract class TableController extends PaginatedAjaxController
 {
+    protected $default_sort = [];
+
     final protected function baseRules()
     {
-        return [
-            'current' => 'int',
-            'rowCount' => 'int',
-            'searchPhrase' => 'nullable|string',
-            'sort.*' => 'in:asc,desc',
-        ];
+        return SimpleTableController::$base_rules;
     }
 
+    /**
+     * @param Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function __invoke(Request $request)
     {
         $this->validate($request, $this->rules());
@@ -50,11 +51,8 @@ abstract class TableController extends PaginatedAjaxController
         $query = $this->baseQuery($request);
 
         $this->search($request->get('searchPhrase'), $query, $this->searchFields($request));
-
-        $sort = $request->get('sort', []);
-        foreach ($sort as $column => $direction) {
-            $query->orderBy($column, $direction);
-        }
+        $this->filter($request, $query, $this->filterFields($request));
+        $this->sort($request, $query);
 
         $limit = $request->get('rowCount', 25);
         $page = $request->get('current', 1);

@@ -58,7 +58,7 @@ class RrdCheck extends BaseValidation
         $screenpad = 0;
 
         foreach ($rrd_iterator as $filename => $file) {
-            $rrd_test_result = rrdtest($filename, $output, $error);
+            $rrd_test_result = $this->test($filename, $output, $error);
 
             $loopcount++;
             if (($loopcount % 50) == 0) {
@@ -79,5 +79,45 @@ class RrdCheck extends BaseValidation
 
         echo "\033[" . $screenpad . "D";
         echo "Status: " . $loopcount . "/" . $rrd_total . " - Complete\n";
+    }
+
+    /**
+     * Run rrdtool info on a file path
+     *
+     * @param string $path Path to pass to rrdtool info
+     * @param string $stdOutput Variable to recieve the output of STDOUT
+     * @param string $stdError Variable to recieve the output of STDERR
+     *
+     * @return int exit code
+     *
+     **/
+    private function test($path, &$stdOutput, &$stdError)
+    {
+        //rrdtool info <escaped rrd path>
+        $command = Config::get('rrdtool') . ' info ' . escapeshellarg($path);
+        $process = proc_open(
+            $command,
+            array (
+                0 => array('pipe', 'r'),
+                1 => array('pipe', 'w'),
+                2 => array('pipe', 'w'),
+            ),
+            $pipes
+        );
+
+        if (!is_resource($process)) {
+            throw new \RuntimeException('Could not create a valid process');
+        }
+
+        $status = proc_get_status($process);
+        while ($status['running']) {
+            usleep(2000); // Sleep 2000 microseconds or 2 milliseconds
+            $status = proc_get_status($process);
+        }
+
+        $stdOutput = stream_get_contents($pipes[1]);
+        $stdError  = stream_get_contents($pipes[2]);
+        proc_close($process);
+        return $status['exitcode'];
     }
 }

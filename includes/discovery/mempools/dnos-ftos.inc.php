@@ -1,6 +1,6 @@
 <?php
 
-// Code borrowed and modified from 'powerconnect-cpu.inc.php' 
+// Code borrowed and modified from 'powerconnect-cpu.inc.php'
 
 if ($device['os'] == 'dnos' || $device['os'] == 'ftos') {
     echo 'DNOS-MEMORY-POOL:  ';

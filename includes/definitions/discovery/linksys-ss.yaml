@@ -1,0 +1,8 @@
+mib: LINKSYS-rndMng
+modules:
+    processors:
+          data:
+              -
+                  oid: rlCpuUtilDuringLast5Minutes
+                  num_oid: '.1.3.6.1.4.1.3955.1000.201.1.9.{{ $index }}'
+                  descr: CPU

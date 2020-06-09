@@ -1,0 +1,1223 @@
+-- 
+-- file : RV.mib
+-- 
+RAD-MIB	DEFINITIONS ::= BEGIN
+
+--
+-- Copyright 1993 RAD Data Communications, Ltd.
+-- All Rights Reserved.  
+
+-- It is RAD's intent to encourage the widespread use of
+-- this Specification in connection with the management of
+-- RAD products. RAD grants vendors, end-users,
+-- and other interested parties a non-exclusive license to
+-- use this Specification in connection with the management
+-- of RAD products.
+
+-- This Specification is supplied "as is," and RAD makes
+-- no warranty, either express or implied, as to the use,
+-- operation, condition, or performance of the Specification.
+
+IMPORTS
+      TimeTicks, enterprises, IpAddress, OBJECT-TYPE, Integer32, Counter32,
+      Gauge32, OBJECT-IDENTITY, NOTIFICATION-TYPE, Unsigned32,Counter64		            FROM SNMPv2-SMI
+      RowStatus, TimeStamp, DisplayString, TruthValue,TEXTUAL-CONVENTION,RowPointer     FROM SNMPv2-TC
+	  PerfCurrentCount, PerfIntervalCount, PerfTotalCount								FROM PerfHist-TC-MIB
+      ifAlias, ifIndex                                     						    	FROM IF-MIB
+      SnmpAdminString																	FROM SNMP-FRAMEWORK-MIB 
+      IANAifType																		FROM IANAifType-MIB
+	  InetAddressType,InetAddress														FROM INET-ADDRESS-MIB;
+--      
+-- Some MIB compilers need those two lines:
+-- enterprises OBJECT IDENTIFIER ::=
+--		     { iso org(3) dod(6) internet(1) private(4) 1 }
+
+ MacAddress ::= OCTET STRING (SIZE(6))
+
+rad           OBJECT IDENTIFIER ::= { enterprises 164 }
+radGen        OBJECT IDENTIFIER ::= { rad 6 } -- General information
+
+-- 
+-- 
+--Last update: 06-Jan-2008 by Smadar Tauber
+
+systems OBJECT IDENTIFIER ::= { radGen 1}  --  list of RAD products
+
+--agnt OBJECT IDENTIFIER ::= { radGen 2}  agent general tree
+--services OBJECT IDENTIFIER ::= { radGen 3}  See services.txt
+
+
+agnt OBJECT IDENTIFIER ::= { radGen 2} 
+-- agent general tree
+-- Agent General  
+agnHwVersion OBJECT-TYPE
+      SYNTAX  DisplayString
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "ASCII string for description and display of the agent hardware version,
+      as it is known by the agent software.The user can update the version
+       upon request when he changes   components in the agent's module  "
+      ::= { agnt 1 }
+
+agnTrapMask OBJECT-TYPE   
+      SYNTAX  Integer32 
+      MAX-ACCESS  read-write    
+      STATUS  current
+      DESCRIPTION
+      "The value of this attribute determines the type of traps the 
+       agent should mask and not send to the management console. The 
+       value is differently determined for different products. There are 
+       mainly two methods:
+       - an integer number, specifying the traps' severity.
+       - a sum of 2**n, where n is a bit assigned to a certain 
+         masked trap group.
+       User should consult the product specification, to find out 
+       the method employed."
+      ::= { agnt 2 }
+
+agnTrapValue OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (100))
+	MAX-ACCESS  read-only
+	STATUS deprecated
+	DESCRIPTION
+	"The value of the trap decoded in internal RAD format. Full description is given
+	  in the Trap definition file"
+	::= {agnt 3}
+
+agnChangeCnt OBJECT-TYPE
+	SYNTAX  Counter32
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	"The number of changes in system configuration that were  reported to the 
+	manager since last cold start"
+	::= {agnt 4 }
+
+agnSpecific OBJECT-TYPE
+      SYNTAX  OBJECT IDENTIFIER
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      " Object identifier of entity containing additional information 
+      regarding this instance."
+      ::= { agnt 5}
+
+agnConfigMsg OBJECT-TYPE   
+      SYNTAX  OCTET STRING (SIZE (1))
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "Full configuration message  coded in internal RAD application format.
+       This entry describes agent's configuration.
+
+       For MP-2200 R3, this object describes agent's support of the V5.1
+       feature: 1 octet ; bit 0 (LSB). 
+       '1' - V5.1 feature is supported
+       '0' - V5.1 feature is not supported."
+      ::= { agnt 6 }
+
+-- Manager table to record all IP addresses
+
+mngTrapIpTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF MngEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+	"This table indicates  the destination address of the traps.
+	  Internally it will be limited to ten addresses. "
+	::= { agnt 7 }
+
+mngEntry OBJECT-TYPE
+	SYNTAX  MngEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION  "An entry in table."
+	INDEX {  mngID }
+	::= { mngTrapIpTable 1 }
+
+
+MngEntry  ::=
+	    SEQUENCE {
+	mngID
+	  Integer32,
+	mngIP
+	  IpAddress,
+	mngIPMask
+	  IpAddress,
+    mngTrapMask
+      Integer32,
+    mngAlarmTrapMask
+      OCTET STRING,
+    mngSnmpTrapUdpPort
+      Unsigned32	
+    }
+
+mngID OBJECT-TYPE
+	SYNTAX  Integer32 
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	" This value indicates an index of a specific IP address"
+	::= { mngEntry 1 }
+
+mngIP OBJECT-TYPE
+	SYNTAX  IpAddress 
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+	"This value indicates  the  destination address of the traps. IP 0.0.0.0 removes the entry. "
+	::= { mngEntry 2 }
+
+mngIPMask OBJECT-TYPE
+	SYNTAX  IpAddress 
+	MAX-ACCESS  read-write
+	STATUS deprecated
+	DESCRIPTION
+	"This value indicates  the  mask of the destination addresses of the traps. "
+	::= { mngEntry 3 }
+
+mngTrapMask OBJECT-TYPE
+	SYNTAX  Integer32 
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+      "The value of this attribute determines the type of traps the 
+       agent should mask and not send to this NMS. The 
+       value is differently determined for different products. There are 
+       mainly two methods:
+       - an integer number, specifying the traps' severity.
+       - a sum of 2**n, where n is a bit assigned to a certain 
+         masked trap group.
+       User should consult the product specification, to find out 
+       the method employed."
+	::= { mngEntry 4 }
+
+mngAlarmTrapMask OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (1))
+     MAX-ACCESS  read-write
+     STATUS current
+     DESCRIPTION
+     "The value of this object determines the alarm traps that the 
+      agent should mask (not send to this manager).
+      The value is an Octet String, where each bit 
+      is assigned to a certain trap.
+        If the bit = 1, the trap will be masked.
+        If the bit = 0, the trap will not be masked.
+      For more details on the specific alarm traps masked, 
+      see product specification."
+    ::= { mngEntry 5 }
+
+mngSnmpTrapUdpPort OBJECT-TYPE
+	SYNTAX  Unsigned32 
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"This variable enables to set the UDP port (socket) used for SNMP traps."
+	::= { mngEntry 6 }
+
+agnIndication OBJECT-TYPE   
+      SYNTAX  INTEGER {
+		 faulty  (1), -- =major
+		 warning (2),
+		 normal  (3), -- off
+		 minor   (4),
+		 major   (5),
+		 event   (6),
+		 critical(7)
+		}
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "Attribute describing the state of the entity the agent is responsible for.
+       In case of a modular entity, the value of this attribute will be according
+       to the component which is in the worst state.
+       The order of severity (from top to bottom) is:
+       critical-> major (or faulty)-> minor-> event-> warning-> normal (off)."   
+      ::= { agnt 8 }
+
+agnMonitorModeCmd OBJECT-TYPE
+	SYNTAX  INTEGER {
+	notApplicable(1),
+	off(2),
+	on(3)
+	}
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+	"Setting this attribute to ON, will enforce the agent to change its mode of operation to
+	 Monitor Mode"
+	::= {agnt 9}
+
+agnLed OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (1))
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	"This entry specifies  the LEDs status of the agent module . Each led will be represented by 4 
+	 bits  where the first 2 bits (left) will specify  the status :
+	 (00=NA, 01=OFF, 10=ON, 11=BLINK),
+     and the next two bits (right) will specify the color :
+     (00=GREEN, 01=RED, 10=YELLOW, 11=GRAY)"
+	::= {agnt 10}
+
+trapTable  OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TrapEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION
+	"This table includes the last few traps generated by the agent, for future retrieval. The table
+	 has a limited capacity. If traps are not retrieved in proper time, they will be
+	 over-written by new traps "
+	::= {agnt 11}
+
+trapEntry OBJECT-TYPE
+	SYNTAX  TrapEntry
+	MAX-ACCESS  not-accessible
+	STATUS current
+	DESCRIPTION  "An entry in table."
+	INDEX {  trapID }
+	::= { trapTable 1 }
+
+TrapEntry  ::=
+	    SEQUENCE {
+	trapID
+	  Integer32,
+	trapVal
+	  DisplayString,
+	 trapTimeSinceOccurrence
+	   TimeTicks
+	}
+
+trapID OBJECT-TYPE
+	SYNTAX  Integer32 
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	" This value indicates an index of a specific trap "
+	::= { trapEntry 1 }
+
+trapVal OBJECT-TYPE
+	SYNTAX  DisplayString 
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	"This value is the actual ASCII description  of the trap. "
+	::= { trapEntry 2 }
+
+trapTimeSinceOccurrence OBJECT-TYPE
+	 SYNTAX    TimeTicks
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	"This value indicates the amount of  time passed since the occurrence of the event that
+	   trigger this trap. "
+	::= { trapEntry 3 }
+
+
+--
+--
+--    File Transfer
+--
+--
+
+fileTransfer  OBJECT IDENTIFIER ::= { agnt 12 }
+
+fileServerIP  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The IP address of the server from which the file is loaded "
+	::= { fileTransfer 1 }
+
+fileName  OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The name of the file to be loaded. For protection, read returns
+	 NULL. "
+	::= { fileTransfer 2 }
+
+fileTransCmd  OBJECT-TYPE
+	SYNTAX  INTEGER {
+	                 swDwnLoad         (1),
+					 configDwnLoad     (2),
+					 configUpLoad      (3),
+					 coProcDwnLoad     (4),
+					 stateUpLoad       (5),
+					 dwnLoadUserFile   (6),
+					 upLoadUserFile    (7), 
+					 swDwnLoadAndReset (8),
+					 swUpLoad          (9),
+					 swDwnLoad2BkupStorage(10),
+					 bootDwnLoad      (11),
+					 bootUpLoad       (12), 
+					 swUpLoadFromBkupStorage(13),
+					 licenseDwnLoad   (14),
+					 configDwnLoadToDefaultFile(15),
+					 noOp            (255)
+					}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The command to be executed on fileName at fileServerIP."
+	::= { fileTransfer 3 }
+ 
+-- tftp  group  
+
+tftpRetryTimeOut OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " General Retransmission time-out value (seconds) "
+    -- DEFVAL  { 15 }
+    ::= { fileTransfer 4 }
+
+tftpTotalTimeOut OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        " Total Retransmission time-out value (seconds) "
+    -- DEFVAL  { 60 }
+    ::= { fileTransfer 5 }
+
+tftpStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+		noOp(2),
+		connecting(3),
+		transferringData(4),
+		endedTimeOut(5),
+		endedOk(6),
+		error(7)
+	}
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Status of tftp session. When a session ended with success,
+    the tftpStatus should be endedOk(6). Before restarting a
+    tftp session, the NMS should set the tftpStatus to noOp(2).
+    That's the reason of MAX-ACCESS read-write to this field."
+    DEFVAL  { noOp}
+    ::= { fileTransfer 6 }
+
+tftpError OBJECT-TYPE
+    SYNTAX  OCTET STRING ( SIZE(2) )
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+    " The MSB represents the standard error code.
+    The LSB represents the private error code.
+    0x0000 is No Error
+    0x0100 is File Not Found
+	0x0200 is Access violation
+	0x0300 is Disk full or allocation exceeded
+    0x0400 is Illegal TFTP operation
+    0x0500 is Unknown transfer ID
+	0x0600 is File already exists
+	0x0700 is No such user
+    0x0001 is Server Overflow
+    0x0002 is No empty UDP port
+    0x0003 is No empty connection
+    0x0004 is Illegal File Mode
+    0x0007 is Illegal PDU size
+	0x0008 is TFTP Server does not exist 
+	0x0009 is Incorrect File
+	0x000A is Wrong License format
+	0x000B is License ID already used "
+    DEFVAL  { '0000'h }
+    ::= { fileTransfer 7 }
+
+fileTransferToSubSystems OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (1))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    " This object represents the sub-systems the fileTransCmd 
+      refers to. It should be used when a system is divided 
+      to sub-systems and each sub-system (or part of them) can 
+	  have a different SW/Configuration.
+
+	  Each bit of this object will represent one of the sub-systems.
+	  Bit='1' - APPLY to respective sub-system
+	  Bit='0' - DO NOT APPLY to respective sub-system
+
+	  For the meaning of each bit, see product's specification.
+	  User will select the sub-systems envolved by filling-in the bits
+      that represent these sub-systems.
+      In this case, the file represented by 'fileName' will 
+	  include several parts, each representing one of the sub-systems.
+	  The agent will refer only to the part/s indicated by this object.
+
+      0 Octet Strings = not applicable  
+      DEFVAL = 0h	for  the products that support this object."
+    ::= { fileTransfer 8 }
+
+fileNameWithinProduct  OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"The file name used by the product within the product file system."
+	::= { fileTransfer 9 }
+
+--Internal SW Download table
+
+intSwdlTable  OBJECT-TYPE 
+      SYNTAX SEQUENCE OF IntSwdlEntry
+      MAX-ACCESS not-accessible
+      STATUS  current
+      DESCRIPTION
+      "This parameters table is for 
+       internal Software down load. It also includes data 
+       about all files contained in the Object from which 
+       down-load is performed."
+      ::= { fileTransfer 10 }
+
+intSwdlEntry OBJECT-TYPE
+      SYNTAX IntSwdlEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+	DESCRIPTION  "An entry in table."
+	INDEX {intSwdlObjIdx, intSwdlFileIdx }
+      ::= { intSwdlTable 1}
+
+IntSwdlEntry ::=
+      SEQUENCE {
+      intSwdlObjIdx            Integer32,
+	  intSwdlFileIdx           Integer32,
+	  intSwdlFileName		   DisplayString,
+	  intSwdlFileSwVer		   DisplayString,
+	  intSwdlSwDate			   DisplayString,
+	  intSwdlSize			   DisplayString,
+	  intSwdlCmd			   INTEGER,
+	  intSwdlToSubSystem	   OCTET STRING,
+	  intSwdlCardType		   INTEGER,
+	  intSwdlFlashIdx	   	   Integer32
+      }
+
+intSwdlObjIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The index of the object from which down-load is performed."
+      ::= {intSwdlEntry 1}
+
+intSwdlFileIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The index of the files included in intSwdlObjIdx.
+       One of these files can be selected to be internally 
+       downloaded."
+      ::= {intSwdlEntry 2}
+
+intSwdlFileName OBJECT-TYPE
+      SYNTAX  	 DisplayString
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The name of the file."
+      ::= {intSwdlEntry 3}
+
+intSwdlFileSwVer OBJECT-TYPE
+      SYNTAX  	 DisplayString
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The software version of the file."
+      ::= {intSwdlEntry 4}
+
+intSwdlSwDate OBJECT-TYPE
+      SYNTAX  	 DisplayString
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The software version date of the file."
+      ::= {intSwdlEntry 5}
+
+intSwdlSize OBJECT-TYPE
+      SYNTAX  	 DisplayString
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The size of the file."
+      ::= {intSwdlEntry 6}
+
+intSwdlCmd OBJECT-TYPE
+      SYNTAX  	  INTEGER
+	  				{
+					notApplicable		(1),
+					off		(2),
+					on		(3)
+					}
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      "The command to down-load a SW file to an object.
+       The Agent will change the value of this MIB object to off(2) 
+	  automatically, after accepting the command."
+      ::= {intSwdlEntry 7}
+
+intSwdlToSubSystem	OBJECT-TYPE   
+      SYNTAX  OCTET STRING (SIZE (1))
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+      " This object defines the subsystem for download.
+       Bit='1'- APPLY to respective sub system.
+       Bit='0'- DO NOT APPLY to respective sub system.
+       For more details see product specification. 
+       For every octet bit0=LSB, bit7=MSB"
+      ::= { intSwdlEntry  8 }
+
+intSwdlCardType OBJECT-TYPE
+      SYNTAX  	  INTEGER
+	  				{
+  unknown        (1),  
+  gstm1		 	 (220),   -- GMUX-2000 STM1 card
+  goc3		 	 (221),   -- GMUX-2000 OC3 card
+  gstm1D		 (222),   -- GMUX-2000 STM1 card with 2 ports
+  goc3D 		 (223),   -- GMUX-2000 OC3 card	with 2 ports
+  serverE1       (270),	  -- GMUX-2000 Server E1 Card
+  serverT1       (271),	  -- GMUX-2000 Server T1 Card
+  serverE1Pw     (272),   -- Gmux2000 Server E1 PW Card
+  serverT1Pw     (273),   -- Gmux2000 Server T1 PW Card
+  gigabitEth     (280),	  -- GMUX-2000 Gigabit ETH Card
+  channelizedT3Pw1 (290),	 -- Gmux2000 Channelized T3 PW Card
+  cesT128		 (300),	 -- Gmux-2000 CES T1 28 ports (external T1 ports) card.
+  cesE128		 (301),	 -- Gmux-2000 CES E1 28 ports (external E1 ports) card.
+  cesT1Pw28      (302),	 -- Gmux2000 CES T1 PW ports (external T1 ports) card.
+  cesE1Pw28      (303),    -- Gmux2000 CES E1 PW ports (external E1 ports) card.
+  vmxE1VeDe		 (310),	  -- Gmux-2000 Vmux E1 card with 16 external voice + 2 external Data ports.
+  vmxE1VeDi		 (311),	  -- Gmux-2000 Vmux E1 card with 16 external voice + 2 internal Data ports.
+  vmxE1ViDe		 (312),	  -- Gmux-2000 Vmux E1 card with 16 internal voice + 2 external Data ports.
+  vmxE1ViDi		 (313),	  -- Gmux-2000 Vmux E1 card with 16 internal voice + 2 internal Data ports.
+  vmxT1VeDe		 (314),	  -- Gmux-2000 Vmux T1 card with 16 external voice + 2 external Data ports.
+  vmxT1VeDi		 (315),	  -- Gmux-2000 Vmux T1 card with 16 external voice + 2 internal Data ports.
+  vmxT1ViDe		 (316),	  -- Gmux-2000 Vmux T1 card with 16 internal voice + 2 external Data ports.
+  vmxT1ViDi		 (317),	  -- Gmux-2000 Vmux T1 card with 16 internal voice + 2 internal Data ports.
+  vc12E1UeNe  (318),   -- Gmux-2000 Vmux E1 card with 12 external User (voice) + 2 external Network (Data) ports.
+  vc12E1UeNi  (319),   -- Gmux-2000 Vmux E1 card with 12 external User (voice) + 2 internal Network (Data) ports.
+  vc12E1UiNe  (320),   -- Gmux-2000 Vmux E1 card with 12 internal User (voice) + 2 external Network (Data) ports.
+  vc12E1UiNi  (321),   -- Gmux-2000 Vmux E1 card with 12 internal User (voice) + 2 internal Network (Data) ports.
+  vc12T1UeNe  (322),   -- Gmux-2000 Vmux T1 card with 12 external User (voice) + 2 external Network (Data) ports.
+  vc12T1UeNi  (323),   -- Gmux-2000 Vmux T1 card with 12 external User (voice) + 2 internal Network (Data) ports.
+  vc12T1UiNe  (324),   -- Gmux-2000 Vmux T1 card with 12 internal User (voice) + 2 external Network (Data) ports.
+  vc12T1UiNi  (325)	   -- Gmux-2000 Vmux T1 card with 12 internal User (voice) + 2 internal Network (Data) ports.
+ }
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "This object defines the Card type that this file is relevant for."
+      ::= {intSwdlEntry 9}
+
+intSwdlFlashIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The index of the flash memory this file is stored in (1 or 2)
+      (Example: 1= The file is stored in flash No.1).
+      ASMi52 file will always be stored in Flash No.2 (intSwdlFlashIdx=2)."
+      ::= {intSwdlEntry 10}
+
+--SW Download Status table
+
+swdlStatusTable  OBJECT-TYPE 
+      SYNTAX SEQUENCE OF SwdlStatusEntry
+      MAX-ACCESS not-accessible
+      STATUS  current
+      DESCRIPTION
+      "This parameters table is for software download status. 
+       It also includes data about the files down-loaded or 
+       attempted to be down-loaded."
+      ::= { fileTransfer 11 }
+
+swdlStatusEntry OBJECT-TYPE
+      SYNTAX SwdlStatusEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+	DESCRIPTION  "An entry in table."
+	INDEX {swdlStatusTypeIdx, swdlStatusIdx }
+      ::= { swdlStatusTable 1}
+
+SwdlStatusEntry ::=
+      SEQUENCE {
+      swdlStatusTypeIdx            Integer32,
+	  swdlStatusIdx       		   Integer32,
+	  swdlStatusFileName		   DisplayString,
+	  swdlStatusSlot			   DisplayString,
+	  swdlStatusSubSystem		   DisplayString,
+	  swdlStatusStatus			   Integer32,
+	  swdlStatusTime			   DisplayString
+	       }
+
+swdlStatusTypeIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The index of the down-load type (e.g. external (1) or internal (2))."
+      ::= {swdlStatusEntry 1}
+
+swdlStatusIdx OBJECT-TYPE
+      SYNTAX  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The index of the status rows."
+      ::= {swdlStatusEntry 2}
+
+swdlStatusFileName OBJECT-TYPE
+      SYNTAX  	 DisplayString
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The name of the file."
+      ::= {swdlStatusEntry 3}
+
+swdlStatusSlot OBJECT-TYPE
+      SYNTAX  	 DisplayString
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The slot of the updated (or attempted to be updated) object."
+      ::= {swdlStatusEntry 4}
+
+ swdlStatusSubSystem OBJECT-TYPE
+      SYNTAX  	 DisplayString
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The subsystem that updated (or attempted to be updated)."
+      ::= {swdlStatusEntry 5}
+
+swdlStatusStatus  OBJECT-TYPE
+      SYNTAX  	  Integer32
+      MAX-ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+      "The status of the down load process.
+	  Value:  Fail (2), OK (3), InProcess (4)."
+      ::= {swdlStatusEntry 6}
+
+swdlStatusTime	   OBJECT-TYPE
+          SYNTAX   DisplayString
+          MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+          "This MIB parameter indicates the time SW download was finished.
+           The format shuld be YYYY-MM-DD, hh:mm:ss"
+          ::= {swdlStatusEntry 7}
+
+clearDwldStatusLog  OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"This object clears the status log.
+	  Value: off(2), external(3), internal(4)
+	  The Agent will change the value of this MIB object to off(2) 
+	  automatically, after accepting the command ."
+	::= { fileTransfer 12 }
+									
+autoFileTransfer  OBJECT IDENTIFIER ::= { fileTransfer 13}
+
+-- Agent initiated auto file transfer.
+									
+autoFileTransferTable  OBJECT-TYPE 
+      SYNTAX SEQUENCE OF AutoFileTransferEntry
+      MAX-ACCESS not-accessible
+      STATUS  current
+      DESCRIPTION
+      "Scheduling configuration table for 
+       Agent initiated file transfer."
+      ::= { autoFileTransfer 1 }
+
+autoFileTransferEntry OBJECT-TYPE
+      SYNTAX AutoFileTransferEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION  "An entry in the table."
+      INDEX { autoFileTransferType}
+      ::= { autoFileTransferTable 1}
+
+AutoFileTransferEntry ::=
+      SEQUENCE {
+                autoFileTransferType 
+                  INTEGER,
+                autoFileTransferServerIp
+                  IpAddress,
+                autoFileTransferFileName
+                  SnmpAdminString,		
+                autoFileTransferScheduling
+                  INTEGER,
+                autoFileTransferTimeRecurrence
+                  Integer32,
+                autoFileTransferOccurrenceRecurrence
+                  Integer32 
+               }
+
+autoFileTransferType  OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+	alarmsBuffer    (1)
+	}
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+	"This object defines the type of file to be transferred 
+	 by agent. "
+	::= { autoFileTransferEntry 1 }
+
+autoFileTransferServerIp  OBJECT-TYPE
+	SYNTAX  IpAddress
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"This object defines the IP Address of the
+	 server to which the file is uploaded."
+	::= { autoFileTransferEntry 2 }
+
+autoFileTransferFileName  OBJECT-TYPE
+	SYNTAX  SnmpAdminString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"This object defines the name of 
+	 the file to be uploaded."
+	::= { autoFileTransferEntry 3 }
+
+autoFileTransferScheduling  OBJECT-TYPE
+	SYNTAX INTEGER
+	{
+	notApplicable  (1),
+	now            (2),
+	recurrence     (3)	
+	}
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"This object defines schedule for TFTP Automatic session(s) 
+	 initiated by Agent, according to the value selected:
+     now          -  initiate immediate single session.
+
+     recurrence- initiate single session 'every M time units'. 
+                 or 'every N occurrences' or upon both, (earliest event).
+                 Time reccurence period (M) is defined by
+				 fileTransferTimeRecurrence.
+				 Occurrence reccurence (N) is defined by 
+				 fileTransferOccurrenceRecurrence.
+                 Zero value means that the object is not relevant (not
+                 taken into account for the recurrence). It is invalid 
+                 that both will have zero values in our case (recurrence).
+				 When both are non zero, file is transferred
+				 upon earliest event"
+	::= { autoFileTransferEntry 4 }
+
+autoFileTransferTimeRecurrence  OBJECT-TYPE
+	SYNTAX      Integer32 
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION										   
+	"This object defines time reccurence interval, 
+	 e.g. M can be 'every M days', 'every M hours' etc.
+	 Zero is used to indicate 
+	 there's no time reccurence (0= notApplicable).
+	 This object is taken into account only 
+	 if autoFileTransferScheduling = recurrence
+	 For LA-110 time units are days."
+	::= { autoFileTransferEntry 5 }
+
+autoFileTransferOccurrenceRecurrence   OBJECT-TYPE
+	SYNTAX      Integer32 
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+	"This object defines Occurrence reccurence interval, 
+	 e.g N can be in 'every N alarms', 'every N log entries' etc.
+	 zero is used to indicate 
+	 There's no Event Reccurence. (0= notApplicable) 
+ 	 This object is taken into account only 
+	 if autoFileTransferScheduling = recurrence
+	 Occurence Type (Alarms, etc.) is according
+	 to autoFileTransferType."
+	::= { autoFileTransferEntry 6 }
+
+fileTransferServerPort OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Server Port number used for File Transfer. 
+     Applicable for SFTP.
+     Valid values: 0..65535."
+    -- DEFVAL  { 22 }
+    ::= { fileTransfer 14 }
+
+fileTransferProtocol OBJECT-TYPE
+    SYNTAX  INTEGER
+	{
+	 tftp (1),	--default
+	 sftp (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "File Transfer protocol used."
+    ::= { fileTransfer 15 }
+
+
+systemReset  OBJECT-TYPE
+	SYNTAX  INTEGER	{
+	                 off          (2),
+					 on           (3), --HW
+					 resetConfig  (4),
+					 resetMapping (5),
+					 resetStandby (6) 
+				    }
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+	"Reset action to be performed on the system.
+	 - resetMapping - reset SDH/SONET mapping to 
+	   default for all SDH/SONET links.
+	 - resetStandby(6) - can be used only by devices with redundancy on MAIN/CL."
+	::= { agnt 13 }
+
+systemTiming  OBJECT IDENTIFIER ::= { agnt 14 }
+
+systemDate OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+           "System date."
+        ::= { systemTiming 1 }
+        
+systemTime OBJECT-TYPE
+        SYNTAX  DisplayString
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+           "System time."
+        ::= { systemTiming 2 }
+
+systemTimeElapsed OBJECT-TYPE
+       SYNTAX  Integer32 (0..899)
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+       "The number of seconds that have elapsed since the
+        beginning of the current error-measurement
+        period. Same for all ports of the device."
+       ::= { systemTiming 3 }
+
+systemResetAllStatsCmd OBJECT-TYPE
+      SYNTAX   INTEGER
+	      {
+    		off(2),
+	    	on (3)
+	      }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+       "Reset statistics of all ports and connections of the device."
+      ::= { agnt 16 }
+
+systemClearTablesCmd OBJECT-TYPE
+      SYNTAX   INTEGER
+	      {
+    		off(2),
+	    	tempCnfgTables (3)
+	      }
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+       "tempCnfgTables - Set *RowStatus = destroy for all entries of 
+                         some tables having *RowStatus object, for 
+                         temporary configuration only! (255).
+                         For the relevant tables, see product's specification.
+                         This object should be used by WAN product applications 
+                         before performing the Update operation, in order to clear 
+                         old entries of these tables.
+                         For MP-104/204 the entries will be destroyed for cnfg=1. 
+        off - agent will automatically change to this value, after performing the 
+              command. "
+      ::= { agnt 17 }
+
+systemParameter OBJECT-TYPE
+      SYNTAX   Integer32
+      MAX-ACCESS  read-write
+      STATUS  current
+      DESCRIPTION
+       "This parameter can be used for different purposes: 
+        - TELNET session time-out in seconds.
+	   	- Ace20: when trying to create row in a table that already
+				 has row with the same values, if set of values has to be unique
+				 in table, this attribute is set to the index of the existing row.
+		- Optimux-T3: when CH interfaces are RJ-45, user can select via this
+		         object, the interface type for each Group of channels: T1 or E1:
+		         The selection will be a sum of the following Bits.
+		         '0' = T1
+		         '1' = E1
+		         Bit    Group               Value for each Bit having '1'
+				  1		  1 (CH-1..CH-8)        	  1
+				  2		  2 (CH-9..CH-12)       	  2
+				  3		  3 (CH-13..CH-20)	          4
+				  4		  4 (CH-21..CH-28)	          8
+				 Examples:
+				 15 = all Groups are selected to be E1
+				  6 = Group 2 and Group 3 are selected to be E1 
+				     (Group 1 and Group 4 are T1).
+		- FCD-A, FCD-M: user can select via this object the configuration
+		         used for Get values of MSDSL parameters that don't have
+		         configuration index.
+		         1  =active configuration
+		         255=temporary configuration.
+		         Set of this object should be done before Getting the MSDSL 
+		         RW parameters.
+		- Ace2002: This parameter indicates the number of intervals that
+		         were successfully uploaded upon statistics collection session.        
+		- FCD-IP, WR, FCD-IPD, LA-240:
+		         This parameter indicates whether Telnet Access is enabled/disabled:
+		         Values:
+				 2 - Telnet Access is Disabled.
+				 3 - Telnet Access is Enabled. 				 
+        -Vmux-110: This parameter value equals to maximum number of bundles.
+		-Optimux-155: Simmilar usage to Optimux T3. user can select via this
+		         object, interface type T1 or E1 for each Group of 
+		         channels (LIU):  LIU group consists of 7 channels. 
+		         Up to 12 LIUs are represented (84 T1 Channels).
+                 The selection will be a sum of the 2**n
+                 For each bit:'0' = T1 ,'1' = E1
+		         Bit    Group              
+				  1		  1 (CH-1 ..  CH-7)   
+				  2		  2 (CH-8 .. CH-14)  
+				  3		  3 (CH-15 ..CH-21) 
+                   ...
+				  9		  9 (CH-56.. CH-63) 
+                   ...
+				  10	  10 (CH-64..CH-70) 
+				  11	  11 (CH-71..CH-77) 
+				  12	  12 (CH-78..CH-84) "
+       ::= { agnt 18 }
+ 
+agnGlobalAlarmMask OBJECT-TYPE   
+      SYNTAX  OCTET STRING (SIZE (100))
+      MAX-ACCESS  read-write    
+      STATUS  current
+      DESCRIPTION
+      "The value of this attribute determines the alarm traps the 
+       agent should mask and not send to the managers.
+       Each bit from a certain octet represents a certain alarm."
+      ::= { agnt 19 }
+
+alarmSeverity   OBJECT-TYPE
+      	SYNTAX   INTEGER
+	      	{
+			event		(3),
+			minor		(4),
+			major		(5),
+	    	warning		(6),
+			critical	(7)
+	  		}
+      	MAX-ACCESS  read-only
+      	STATUS  current
+      	DESCRIPTION
+       	"This object specifies the severity of the alarms."
+      ::= { agnt 20 }
+
+alarmState   OBJECT-TYPE
+      	SYNTAX   INTEGER
+	      	{
+			off (2), 	-- End, 
+			on  (3) 	-- Start.
+	  		}
+      	MAX-ACCESS  read-only
+      	STATUS  current
+      	DESCRIPTION
+       "."
+      ::= { agnt 21 }
+
+agnTestStatus OBJECT-TYPE
+	SYNTAX	INTEGER
+		{
+		 off			(2),
+		 on 			(3)
+		}
+
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+	"Indicates the current test status (for all levels: system,
+	   card, port).
+       This attribute will be set to: 
+         on(3): when there is at least one test	in progress on the
+                system/card/port
+		 off(2): when there is NO test in progress on the
+    	         system/card/port" 
+      ::= {agnt 22  }
+
+systemSaveAndResetAllStatsCmd OBJECT-TYPE
+      SYNTAX   INTEGER
+	      {
+    		off(2),
+	    	on (3)
+	      }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "on  - a command to Save data of Current Period in Last Period
+           data-set and start a new counting period for Current Period.
+     off - agent will automatically change to this value, after performing the 
+           command."
+      ::= { agnt 23 }
+
+systemDefaultGateway OBJECT-TYPE
+      SYNTAX   IpAddress
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+    "Default Gateway's IP Address."
+      ::= { agnt 24 }
+
+agnSendTrapParameter OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+	"This object specifies if the agent will attach a specific
+	parameter to a trap.
+	
+	For ACE2002 the agent will attach or not the openViewSeverity 
+	parameter according to the value of this parameter:
+	1 - will attach openViewSeverity.
+	0 - will not attach openViewSeverity."
+     ::= { agnt 27 }
+
+agnDeviceCapabilities OBJECT-TYPE
+      SYNTAX  OCTET STRING (SIZE (2))
+	MAX-ACCESS  read-only
+	STATUS current
+	DESCRIPTION
+	"Indicates the optional capabilities that are implemented by this device
+     and are manageable through this MIB. 
+
+	 For each capability 1 BIT is allocated in each Octet starting from the LSB.
+	 If the value of the BIT = 1, the capability is Enabled.
+	 If the value of the BIT = 0, the capability is Disabled.
+     For bit assignment, refer to device specification.	 
+	 Capabilities example:
+	 Router - BIT 0 (0000 0001 = 01 Hex = 1 Decimal).
+	 
+	 The 2nd octet (MSB) will represent the maximum number of intervals that
+	 the Agent can keep in its DB (same for all ports).
+	 
+     For Vmux, this object describes agent's support of LBRAD coder feature:
+     1 octet ; bit 0 (LSB).
+     '1' - LBRAD feature is supported
+     '0' - LBRAD feature is not supported."
+	::= {agnt 42}
+
+
+agnStoreCmd OBJECT-TYPE
+	SYNTAX  INTEGER
+	{
+	 off				(2),
+	 inFlash			(3),
+	 asDefConfigFile	(4)
+	 	 }
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+	"Store command.
+	 inFlash(3)			= store the current Agent configuration in Flash memory.
+	 asDefConfigFile(4)	= store the current Agent configuration as
+	                      Default Configuration file (e.g. 'DefConfig.cfg').
+	 Agent will perform the required command and change automatically 
+	 the value of this object to off(2)."
+     ::= { agnt 44 }
+
+
+agnSwVersionSwapCmd OBJECT-TYPE
+	SYNTAX  INTEGER
+	{
+	 off  (2),
+	 mainAndBackup  (3)
+	 	 }
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+	"SW switch command.
+	 mainAndBackup (3) = Swap between Main SW and the backup one.
+	 Agent will perform the required command and change automatically 
+	 the value of this object to off(2)."
+     ::= { agnt 51 }
+
+
+agnTrapDelay OBJECT-TYPE
+	SYNTAX  Unsigned32
+	MAX-ACCESS  read-write
+	STATUS current
+	DESCRIPTION
+	"This variable enables the user to set a delay (in seconds) before a trap is sent.
+	 This delay will be used only for traps that need to be sent during device initialization.
+	 It is needed because the device connected to our device starts transmitting traps later.
+	 The delay starts from the end of the Boot process. The device will keep the init traps
+	 in the correct order, and cancel those which clear former ones in the list.
+	 After this init delay, traps will be sent without a delay."
+	 	::= { agnt 60 }
+
+
+-- SYSTEM TRAPS
+
+--NOTIFICATIONS
+
+systemsEvents OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION
+     "The events for RAD products."
+     ::= { systems 0 }
+
+tftpStatusChangeTrap  NOTIFICATION-TYPE
+     OBJECTS       { tftpStatus }
+     STATUS current
+     DESCRIPTION     
+     "This trap is sent whenever the status of tftp changed."
+     ::= { systemsEvents 1 }
+
+agnStatusChangeTrap  NOTIFICATION-TYPE
+	OBJECTS		{agnIndication }
+    STATUS current
+	DESCRIPTION
+	"This trap is sent whenever the state of the entity the agent is
+	 responsible for changed.
+	 TDM devices will send agnTestStatus variable to indicate the current test status."
+	::= { systemsEvents 2 }
+
+swdlStatusResult	    NOTIFICATION-TYPE
+	OBJECTS			{swdlStatusFileName}
+    STATUS  current
+	DESCRIPTION
+	"This notification is sent when Software Down Load is finished.
+	 The attached object indicates the File Name."
+	::= { systemsEvents 4 }
+
+intSwdlSlotFileMismatch	    NOTIFICATION-TYPE
+	OBJECTS			{intSwdlFileName}
+    STATUS  current
+	DESCRIPTION
+	"This notification is sent when the card in the chosen slot doesn't match 
+	 the chosen file.
+	 The attached object indicates the File Name."
+	::= { systemsEvents 5 }
+
+END
+

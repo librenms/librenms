@@ -2,23 +2,34 @@
 
 namespace App\Models;
 
+use App\Events\UserCreated;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use LibreNMS\Authentication\LegacyAuth;
+use Permissions;
 
 class User extends Authenticatable
 {
     use Notifiable;
 
     protected $primaryKey = 'user_id';
-    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id'];
+    protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
     protected $hidden = ['password', 'remember_token', 'pivot'];
     protected $attributes = [ // default values
         'descr' => '',
         'realname' => '',
         'email' => '',
-        'can_modify_passwd' => 0,
+    ];
+    protected $dispatchesEvents = [
+        'created' => UserCreated::class,
+    ];
+
+    protected $casts = [
+        'realname' => 'string',
+        'descr' => 'string',
+        'email' => 'string',
+        'can_modify_passwd' => 'integer',
     ];
 
     // ---- Helper Functions ----
@@ -73,7 +84,36 @@ class User extends Authenticatable
      */
     public function canAccessDevice($device)
     {
-        return $this->hasGlobalRead() || $this->devices->contains($device);
+        return $this->hasGlobalRead() || Permissions::canAccessDevice($device, $this->user_id);
+    }
+
+    /**
+     * Helper function to hash passwords before setting
+     *
+     * @param string $password
+     */
+    public function setPassword($password)
+    {
+        $this->attributes['password'] = $password ? password_hash($password, PASSWORD_DEFAULT) : null;
+    }
+
+    /**
+     * Check if the given user can set the password for this user
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function canSetPassword($user)
+    {
+        if ($user && LegacyAuth::get()->canUpdatePasswords()) {
+            if ($user->isAdmin()) {
+                return true;
+            }
+
+            return $user->is($this) && $this->can_modify_passwd;
+        }
+
+        return false;
     }
 
     // ---- Query scopes ----
@@ -97,17 +137,60 @@ class User extends Authenticatable
         });
     }
 
+    // ---- Accessors/Mutators ----
+
+    public function setRealnameAttribute($realname)
+    {
+        $this->attributes['realname'] = (string)$realname;
+    }
+
+    public function setDescrAttribute($descr)
+    {
+        $this->attributes['descr'] = (string)$descr;
+    }
+
+    public function setEmailAttribute($email)
+    {
+        $this->attributes['email'] = (string)$email;
+    }
+
+    public function setCanModifyPasswdAttribute($modify)
+    {
+        $this->attributes['can_modify_passwd'] = $modify ? 1 : 0;
+    }
+
+    public function setEnabledAttribute($enable)
+    {
+        $this->attributes['enabled'] = $enable ? 1 : 0;
+    }
+
+    public function getDevicesAttribute()
+    {
+        // pseudo relation
+        if (!array_key_exists('devices', $this->relations)) {
+            $this->setRelation('devices', $this->devices()->get());
+        }
+        return $this->getRelation('devices');
+    }
+
     // ---- Define Relationships ----
+
+    public function apiToken()
+    {
+        return $this->hasOne(\App\Models\ApiToken::class, 'user_id', 'user_id');
+    }
 
     public function devices()
     {
-        if ($this->hasGlobalRead()) {
-//            $instance = $this->newRelatedInstance('App\Models\Device');
-//            return new HasAll($instance);
-            return Device::query();
-        } else {
-            return $this->belongsToMany('App\Models\Device', 'devices_perms', 'user_id', 'device_id');
-        }
+        // pseudo relation
+        return Device::query()->when(!$this->hasGlobalRead(), function ($query) {
+            return $query->whereIn('device_id', Permissions::devicesForUser($this));
+        });
+    }
+
+    public function deviceGroups()
+    {
+        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'devices_group_perms', 'user_id', 'device_group_id');
     }
 
     public function ports()
@@ -116,22 +199,22 @@ class User extends Authenticatable
             return Port::query();
         } else {
             //FIXME we should return all ports for a device if the user has been given access to the whole device.
-            return $this->belongsToMany('App\Models\Port', 'ports_perms', 'user_id', 'port_id');
+            return $this->belongsToMany(\App\Models\Port::class, 'ports_perms', 'user_id', 'port_id');
         }
     }
 
     public function dashboards()
     {
-        return $this->hasMany('App\Models\Dashboard', 'user_id');
+        return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
     }
 
     public function preferences()
     {
-        return $this->hasMany('App\Models\UserPref', 'user_id');
+        return $this->hasMany(\App\Models\UserPref::class, 'user_id');
     }
 
     public function widgets()
     {
-        return $this->hasMany('App\Models\UserWidget', 'user_id');
+        return $this->hasMany(\App\Models\UserWidget::class, 'user_id');
     }
 }

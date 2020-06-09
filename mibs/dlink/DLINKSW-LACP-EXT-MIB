@@ -1,0 +1,207 @@
+-- *****************************************************************
+-- DLINKSW-LACP-EXT-MIB.mib : D-Link Link Aggregation Control Extenstions MIB
+--
+-- Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+-- *****************************************************************    
+
+DLINKSW-LACP-EXT-MIB DEFINITIONS ::= BEGIN    
+
+	IMPORTS
+        MODULE-IDENTITY , OBJECT-TYPE, Integer32	
+        	FROM SNMPv2-SMI    	
+       	RowStatus           
+       		FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+		    FROM SNMPv2-CONF
+       	InterfaceIndex
+            FROM IF-MIB  
+       	PortList
+            FROM Q-BRIDGE-MIB	
+	    dlinkIndustrialCommon
+        	FROM DLINK-ID-REC-MIB;    
+        	
+	dlinkSwLacpExtMIB MODULE-IDENTITY
+        LAST-UPDATED "201301180000Z"
+        ORGANIZATION "D-Link Corp."
+        CONTACT-INFO
+            "        D-Link Corporation
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+             Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+        DESCRIPTION
+            "The MIB module for managing D-Link LACP extensions which are
+            not covered by standard MIBs."
+        REVISION	"201301180000Z"
+        DESCRIPTION
+        	"Initial revision of this MIB module."
+    ::= { dlinkIndustrialCommon 4 }
+ 
+    dLacpExtMIBNotifications 	OBJECT IDENTIFIER ::= { dlinkSwLacpExtMIB 0 }	
+    dLacpExtMIBObjects 		    OBJECT IDENTIFIER ::= { dlinkSwLacpExtMIB 1 }	 
+    dLacpExtMIBConformance 		OBJECT IDENTIFIER ::= { dlinkSwLacpExtMIB 2 }
+       
+
+-----------------------------------------------
+--	Lacp Objects
+-----------------------------------------------
+    dLacpExtLoadBalanceAlgorithm OBJECT-TYPE
+        SYNTAX  INTEGER {
+                dstIp(1),
+                dstMac(2),
+                srcDstIp(3),
+                srcDstMac(4),
+                srcIp(5),
+                srcMac(6)
+            }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object configures load balance algorithm that the switch uses
+            to distribute packets across ports in the same channel.
+            dstIp(1)  -	Specify that the switch should examine the destination
+                        IP address.
+            dstMac(2) -	Specify that the switch should examine the destination
+                        MAC address.
+            srcDstIp(3) - Specify that the switch should examine the source 
+                       and destination IP address.
+            srcDstMac(4) - Specify that the switch should examine the source and
+                       destination MAC address.
+            srcIp(5) - Specify that the switch should examine the source IP 
+                       address.
+            srcMac(6) -	Specify that the switch should examine the source MAC
+                       address.            
+            "
+        ::= { dLacpExtMIBObjects 1 }
+
+    dLacpExtGroupTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DLacpExtGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table consists of a list of channel group information."
+        ::= { dLacpExtMIBObjects 2 }
+
+    dLacpExtGroupEntry OBJECT-TYPE
+        SYNTAX          DLacpExtGroupEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry presents a channel group information, which is not 
+            covered by standard MIB(s)."
+        INDEX  { dLacpExtGroupChannelNo }
+        ::= { dLacpExtGroupTable 1 }
+
+    DLacpExtGroupEntry ::=
+        SEQUENCE {
+            dLacpExtGroupChannelNo          Integer32,
+            dLacpExtGroupIfIndex            InterfaceIndex,
+            dLacpExtGroupType               INTEGER,
+            dLacpExtGroupMemberPorts        PortList,            
+            dLacpExtGroupActiveMemberPorts  PortList,
+            dLacpExtGroupRowStatus          RowStatus
+        }
+
+    dLacpExtGroupChannelNo OBJECT-TYPE
+        SYNTAX          Integer32 (1 .. 255)  
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the channel group ID. "
+        ::= { dLacpExtGroupEntry 1 }
+        
+    dLacpExtGroupIfIndex OBJECT-TYPE
+        SYNTAX          InterfaceIndex  
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "The ifIndex of the channel group."
+        ::= { dLacpExtGroupEntry 2 }
+    
+    dLacpExtGroupType OBJECT-TYPE
+        SYNTAX  INTEGER {              
+            static(1),
+            lacp(2)
+        }
+       	MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "This object indicates the type of channel group.
+            "
+        ::= { dLacpExtGroupEntry 3 }    
+
+    dLacpExtGroupMemberPorts OBJECT-TYPE
+        SYNTAX          PortList
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ports which are grouped into this
+            channel group.
+	        "
+        ::= { dLacpExtGroupEntry 4 }
+     
+    dLacpExtGroupActiveMemberPorts OBJECT-TYPE
+        SYNTAX          PortList
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the operational bundled ports in this
+            channel group.
+            "	
+        ::= { dLacpExtGroupEntry 5 }
+        
+    dLacpExtGroupRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the status of this entry."
+        ::= { dLacpExtGroupEntry 6 }
+                              
+-----------------------------------------------
+--	Lacp Conformance
+-----------------------------------------------
+    dLacpExtCompliances   	OBJECT IDENTIFIER ::= { dLacpExtMIBConformance 1 }
+	 
+	
+    dLacpExtCompliance MODULE-COMPLIANCE
+    	STATUS current
+    	DESCRIPTION
+        	"The compliance statement for entities which implement the 
+			DLINKSW-LACP-EXT-MIB."      		 
+        MODULE
+	    MANDATORY-GROUPS {
+		    dLacpExtAlgGroup,
+		    dLacpExtChannelGrpInfoGroup
+		}
+	    ::= { dLacpExtCompliances 1 }
+	
+	dLacpExtGroups   		OBJECT IDENTIFIER ::= { dLacpExtMIBConformance 2 }      
+	       
+    dLacpExtAlgGroup OBJECT-GROUP
+  		OBJECTS {
+	         dLacpExtLoadBalanceAlgorithm
+            }
+	    STATUS          current
+	    DESCRIPTION
+	        "A collection of objects providing information about the algorithm of
+	        link aggregation load sharing."
+	    ::= { dLacpExtGroups 1 }
+
+    dLacpExtChannelGrpInfoGroup OBJECT-GROUP
+  		OBJECTS {	   
+  		    dLacpExtGroupIfIndex,     
+            dLacpExtGroupType,        
+            dLacpExtGroupMemberPorts,
+            dLacpExtGroupActiveMemberPorts,
+            dLacpExtGroupRowStatus   
+        }
+	    STATUS current
+	    DESCRIPTION
+	        "A collection of objects providing configuration of channel groups."
+	    ::= { dLacpExtGroups 2 }
+
+            
+END

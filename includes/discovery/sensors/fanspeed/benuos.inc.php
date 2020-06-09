@@ -3,7 +3,7 @@
 // Adapated from Bluecoat sgos discovery
 echo 'Benu Sensors ';
 
-$data = snmp_get_multi($device, 'benuSensorName.1.4 benuSensorName.1.5 benuSensorName.1.6 benuSensorName.1.7 benuSensorName.1.8 benuSensorName.1.9 benuSensorValue.1.4 benuSensorValue.1.5 benuSensorValue.1.6 benuSensorValue.1.7 benuSensorValue.1.8 benuSensorValue.1.9', '-OQUs', 'BENU-CHASSIS-MIB');
+$data = snmp_get_multi($device, ['benuSensorName.1.4', 'benuSensorName.1.5', 'benuSensorName.1.6', 'benuSensorName.1.7', 'benuSensorName.1.8', 'benuSensorName.1.9', 'benuSensorValue.1.4', 'benuSensorValue.1.5', 'benuSensorValue.1.6', 'benuSensorValue.1.7', 'benuSensorValue.1.8', 'benuSensorValue.1.9'], '-OQUs', 'BENU-CHASSIS-MIB');
 
 $sensor_index = 0;
 for ($index = 4; $index <= 9; $index++) { //Benu Fans are index 4 thru 9

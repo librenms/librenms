@@ -1,0 +1,2071 @@
+NBS-SFF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    InterfaceIndex
+        FROM IF-MIB
+    NbsCmmcChannelBand
+        FROM NBS-CMMCENUM-MIB
+    nbs, NbsTcMHz
+        FROM NBS-MIB;
+
+nbsSffMib  MODULE-IDENTITY
+    LAST-UPDATED "201706060000Z" -- June 6, 2017
+    ORGANIZATION  "NBS"
+    CONTACT-INFO
+        "For technical support, please contact your service channel"
+
+    DESCRIPTION
+        "MIB for representing SFF MSA standards"
+
+    ::= { nbs 204 }
+
+-- *******************************************************************
+-- NBS-SFF-MIB Objects Identifier Definition
+-- *******************************************************************
+nbsSffObjects  OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "all MIB objects in nbsSFF MIB."
+::= { nbsSffMib 1 }
+
+-- *******************************************************************
+-- Groups in NBS-SFF-MIB - all under nbsSffObjects
+-- *******************************************************************
+
+ nbsSffMsaGrp  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "All SFF MSA objects."
+ ::= { nbsSffObjects 1 }
+
+ nbsSffWdmGrp  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "All DWDM MSA objects."
+ ::= { nbsSffObjects 2 }
+
+ nbsSffDiagnosticsGrp  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "All Diagnostics objects."
+ ::= { nbsSffObjects 3 }
+
+ nbsSffMsxGrp  OBJECT-IDENTITY
+    STATUS  current
+    DESCRIPTION
+        "All SFF MSA Extension objects."
+ ::= { nbsSffObjects 4 }
+
+-- *******************************************************************
+-- Objects in the nbsSffMsaGrp Group.
+-- *******************************************************************
+
+nbsSffMsaTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSffMsaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operations, Administration, and Management information"
+    ::= { nbsSffMsaGrp 1 }
+
+nbsSffMsaEntry      OBJECT-TYPE
+    SYNTAX  NbsSffMsaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents a SFF MSA details of a port."
+    INDEX { nbsSffMsaPhysicalIfIndex }
+    ::= { nbsSffMsaTable 1 }
+
+NbsSffMsaEntry ::= SEQUENCE {
+    nbsSffMsaPhysicalIfIndex            InterfaceIndex,
+    nbsSffMsaIdentifier                 INTEGER,
+    nbsSffMsaExtIdentifier              INTEGER,
+    nbsSffMsaOpticalConnector           INTEGER,
+    nbsSffMsaTransceiverCodes           OCTET STRING,
+    nbsSffMsaSerialEncoding             INTEGER,
+    nbsSffMsaNominalBitRate             INTEGER,
+    nbsSffMsaLinkLengthSmfKm            INTEGER,
+    nbsSffMsaLinkLengthSmf100m          INTEGER,
+    nbsSffMsaLinkLengthMmf10m           INTEGER,
+    nbsSffMsaLinkLength625Mmf10m        INTEGER,
+    nbsSffMsaCopperLinkLength           INTEGER,
+    nbsSffMsaVendorName                 DisplayString,
+    nbsSffMsaVendorOUI                  OCTET STRING,
+    nbsSffMsaVendorPartNumber           DisplayString,
+    nbsSffMsaVendorRevision             DisplayString,
+    nbsSffMsaBaseChecksumMatch          INTEGER,
+    nbsSffMsaLossOfSignalImplemented    INTEGER,
+    nbsSffMsaLossOfSignalInverted       INTEGER,
+    nbsSffMsaTxFault                    INTEGER,
+    nbsSffMsaTxDisable                  INTEGER,
+    nbsSffMsaRateSelectImplemented      INTEGER,
+    nbsSffMsaMaxBitRate                 INTEGER,
+    nbsSffMsaMinBitRate                 INTEGER,
+    nbsSffMsaVendorSerialNumber         DisplayString,
+    nbsSffMsaVendorDateCode             DisplayString,
+    nbsSffMsaExtChecksumMatch           INTEGER
+}
+
+nbsSffMsaPhysicalIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "ifIndex from MIB2"
+
+    REFERENCE   "rfc1213 (MIB-II)"
+
+    ::= { nbsSffMsaEntry 1 }
+
+nbsSffMsaIdentifier  OBJECT-TYPE
+    SYNTAX      INTEGER {
+      unknown               (1),
+      gbic                  (2),
+      moduleSolderedToBoard (3),
+      sfpTransceiver        (4),
+      threeHundredPinXBI    (5),
+      xenpak                (6),
+      xfp                   (7),
+      xff                   (8),
+      xfpe                  (9),
+      xpak                  (10),
+      x2                    (11),
+      dwdm                  (12),
+      qsfp                  (13),
+      qsfpPlus              (14),
+      cfp                   (15),
+      cxp                   (16),
+      mrvCxp                (130) -- 0x81 vendor-specific pre-MSA
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The MSA Identifier as reported in the MSA memory map, +1.
+
+         Some of these MSA Identifiers are also represented in
+         nbsCmmcPortType from the NBS-CMMC-MIB:
+
+         nbsSffMsaIdentifier  nbsCmmcPortType
+         -------------------  ---------------
+                  gbic   (2)  gbic (147)
+        sfpTransceiver   (4)  sfp  (125)
+                   xfp   (7)  xfp  (197)
+                  qsfp  (13)  qsfp (219)
+                 qsfp+  (14)  qsfp (219)
+                   cfp  (15)  cfp  (221)
+                   cxp  (16)  cxp  (220)
+                mrvCxp (130)  cxp  (220)"
+
+    REFERENCE
+        "Specification for SFP MSA, Table 3.2
+         Specification for XFP MSA v4.5 section 5.2 & table 32
+         InfiniBand Architecture Specification Annex A6, section 7.6.3
+         CFP MSA Hardware Specification, Table 14 CFP NVR 1"
+
+    ::= { nbsSffMsaEntry 2 }
+
+nbsSffMsaExtIdentifier  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The field should be set to 04h for all SFP modules indicating
+         serial ID module definition.
+
+         Not supported value: 0"
+
+    REFERENCE   "Specification for SFP MSA"
+
+    ::= { nbsSffMsaEntry 3 }
+
+nbsSffMsaOpticalConnector OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Optical Connector as reported in the MSA memory map, +1.
+
+         Here is the list of values:
+         1 - unknown
+         2 - SC
+         3 - Fiber Channel Style 1 copper connector
+         4 - Fiber Channel Style 2 copper connector
+         5 - BNC/TNC
+         6 - Fiber Channel coaxial headers
+         7 - Fiberjack
+         8 - LC
+         9 - MT-RJ
+        10 - MU
+        11 - SG
+        12 - Optical pigtail
+        13 - MPO Parllel Optic
+        14 to 32 - Reserved
+        33 - HSSDC II
+        34 - Copper pigtail
+        35 - RJ45
+        36 to 128 - Reserved
+        -- start InfiniBand Annex A6 (CXP)
+        48 (30h: Passive Copper Cable Assembly)
+        49 (31h: Active Copper Cable Assembly (ref. Byte 147))
+        50 (32h: Active Optical Cable Assembly)
+        51 (33h: Optical Transceiver w/ optical connector)
+        -- end InfiniBand Annex A6 (CXP)
+        129 - firewireA (MRV Specific)
+        130 - cuRJ45 (MRV Specific)
+        131 - cuRJ45 with LEDs (MRV Specific)
+        132 - coaxBNC (MRV Specific)
+        133 - sataDevicePlug (MRV Specific)
+        134 - sataHostPlug (MRV Specific)
+        135 - miniCoax (MRV Specific)
+        136 to 256 - Vendor specific"
+
+    REFERENCE
+        "Specification for SFP MSA, Table 3.3, and
+         InfiniBand Architecture Specification Annex A6, section 7.6.3"
+
+    ::= { nbsSffMsaEntry 4 }
+
+nbsSffMsaTransceiverCodes  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(8..11))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The following bit significant indicators define the
+         electronic or optical interfaces that are supported by the
+         SFP transceiver. At least one bit shall be set in this field.
+         For Fibre Channel SFPs, the Fibre Channel speed, transmission
+         media, transmitter technology, and distance capability shall
+         all be indicated.
+
+           Reserved Standard Compliance Codes
+
+          BitIndex  Byte  Bit  Description
+                     3    0-7  Reserved
+                     4    4-7  Reserved
+
+           SONET Compliance codes
+
+             12      4     3 - Reserved
+             13      4     2 - OC48 Long reach
+             14      4     1 - OC48 Intermediate reach
+             15      4     0 - OC48 Short reach
+
+             16      5     7 - Reserved
+             17      5     6 - OC 12 Single mode long reach
+             18      5     5 - OC 12 Single mode inter reach
+             19      5     4 - OC 12 Multi-mode short reach
+             20      5     3 - Reserved
+             21      5     2 - OC 3 Single mode long reach
+             22      5     1 - OC 3 Single mode inter reach
+             23      5     0 - OC 3 Multi-mode short reach
+
+           Gigabit Ethernet Compliance codes
+            24-27    6    4-7 - Reserved
+             28      6    3 - 1000BASE-T
+             29      6    2 - 1000BASE-CX
+             30      6    1 - 1000BASE-LX
+             31      6    0 - 1000BASE-SX
+
+           Fiber Channel link length
+             32      7    7 - Very long distance
+             33      7    6 - Short distance
+             34      7    5 - Intermediate distance
+             35      7    4 - Long distance
+
+           Fibre Channel transmitter technology
+            36-37    7    2 to 3 - Reserved
+             38      7    1 - Longwave laser
+             39      7    0 - Electrical inter-enclosure
+
+             40      8    7 - Electrical intra-enclosure
+             41      8    6 - Shortwave laster without OFC
+             42      8    5 - Shortwave laster with OFC
+             43      8    4 - Longwave laser
+            44-47    8    0 to 3 - Reserved
+
+           Fiber channel transmission media
+             48      9    7 - Twin Axial pair
+             49      9    6 - Shielded Twisted Pair
+             50      9    5 - Miniature coax
+             51      9    4 - Video coax
+             52      9    3 - Multi-mode, 62.5m
+             53      9    2 - Multi-mode, 50 m
+             54      9    1 - Reserved
+             55      9    0 - Single Mode
+
+          Fiber channel speed
+            56-58   10    5-7 - Reserved
+             59     10    4 - 400 MBps
+             60     10    3 - Reserved
+             61     10    2 - 200 MBps
+             62     10    1 - Reserved
+             63     10    0 - 100 MBps"
+
+    REFERENCE  "Specification for SFP MSA, Table 3.4"
+
+    ::= {nbsSffMsaEntry  5 }
+
+nbsSffMsaSerialEncoding OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported   (1),
+        lineCode8To10  (2),
+        lineCode4To5   (3),
+        nrz            (4),
+        manchester     (5),
+        sonetScrambled (6),
+        unspecified    (7)  -- This was missing from Table 3.5 of
+    }                       -- SFP MSA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The encoding value indicates the serial encoding mechanism
+         that is the nominal design target of the particular
+         transceiver. The value shall be contained in the serial data.
+         For XFPs this object must return notSupported, and user should
+         refer to these MIB objects
+               nbsXfpSerialEncodingRZ
+               nbsXfpSerialEncodingNRZ
+               nbsXfpSerialEncodingSonetScrm
+               nbsXfpSerialEncoding8B10B
+               nbsXfpSerialEncoding64B"
+
+    REFERENCE   "Specification for SFP MSA, Table 3.5"
+
+    ::= { nbsSffMsaEntry 6 }
+
+nbsSffMsaNominalBitRate OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The nominal bit rate (BR, nominal) is specified in units of
+         100 Megabits per second, rounded off to the nearest 100
+         Megabits per second. The bit rate includes those bits
+         necessary to encode and delimit the signal as well as those
+         bits carrying data information. A value of 0 indicates that
+         the bit rate is not specified and must be determined from the
+         transceiver technology. The actual information transfer rate
+         will depend on the encoding of the data, as defined by the
+         encoding value."
+    REFERENCE   "Specification for SFP MSA, BR, Nominal"
+
+    ::= { nbsSffMsaEntry 7 }
+
+nbsSffMsaLinkLengthSmfKm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value specifies the link length that is supported by the
+         transceiver while operating in compliance with the applicable
+         standards using single mode fiber. The value is in units of
+         kilometers. A value of 255 means that the transceiver supports
+         a link length greater than 254 km. A value of zero means that
+         the transceiver does not support single mode fiber or that the
+         length information must be determined from the transceiver
+         technology. XFP uses this object for the same purpose."
+    REFERENCE   "Specification for SFP MSA, Length (9m) - Km and
+                  section 5.22 of XFP MSA INF_8077i"
+
+    ::= { nbsSffMsaEntry 8 }
+
+nbsSffMsaLinkLengthSmf100m OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value specifies the link length that is supported by the
+         transceiver while operating in compliance with the applicable
+         standards using single mode fiber. The value is in units of
+         100 meters. A value of 255 means that the transceiver supports
+         a link length greater than 25.4 km. A value of zero means that
+         the transceiver does not support single mode fiber or that the
+         length information must be determined from the transceiver
+         technology."
+    REFERENCE   "Specification for SFP MSA, Length (9m) and section
+                 5.22 of XFP MSA INF_8077i"
+
+
+    ::= { nbsSffMsaEntry 9 }
+
+nbsSffMsaLinkLengthMmf10m OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value specifies link length that is supported by the
+         transceiver while operating in compliance with applicable
+         standards using 50 micron multimode OM2 [500MHz*km at 850nm,]
+         fiber. The value is in units of 10 meters. A value of 255
+         means that the transceiver supports a link length greater
+         than 2.54 km. A value of zero means that the transceiver
+         does not support 50 micron multimode fiber or that the
+         length information must be determined from the transceiver
+         technology."
+    REFERENCE   "Specification for SFP MSA, Length (50m)"
+
+    ::= { nbsSffMsaEntry 10 }
+
+nbsSffMsaLinkLength625Mmf10m OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value specifies link length that is supported by the
+         transceiver while operating in compliance with applicable
+         standards using 62.5 micron multimode OM1 [200 MHz*km at
+         850nm, 500 MHz*km at 1310nm] fiber. The value is in units
+         of 10 meters. A value of 255 means that the transceiver
+         supports a link length greater than 2.54 km. A value of zero
+         means that the transceiver does not support 62.5 micron
+         multimode fiber or that the length information must determined
+         from the transceiver technology. It is common for a multimode
+         transceiver to support OM1, OM2 and OM3 fiber."
+
+    REFERENCE   "Specification for SFP MSA, Length (62.5m) and
+                section 5.22 of XFP MSA INF_8077i"
+
+    ::= { nbsSffMsaEntry 11 }
+
+nbsSffMsaCopperLinkLength OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value specifies the minimum link length that is supported
+         by the transceiver while operating in compliance with the
+         applicable standards using copper cable. The value is in units
+         of 1 meter. A value of 255 means that the transceiver supports
+         a link length greater than 254 meters. A value of zero means
+         that the transceiver does not support copper cables or that
+         the length information must be determined from the transceiver
+         technology. Further information about the cable design,
+         equalization, and connectors is usually required to guarantee
+         meeting a particular length requirement."
+    REFERENCE   "Specification for SFP MSA, Length Copper & section
+                 5.22 of XFP MSA INF_8077i"
+
+    ::= { nbsSffMsaEntry 12 }
+
+nbsSffMsaVendorName OBJECT-TYPE
+    SYNTAX       DisplayString(SIZE(0..16))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The vendor name is a 16 character field that contains ASCII
+         characters, The vendor name shall be the full name of the
+         corporation, a commonly accepted abbreviation of the name of
+         the corporation, the SCSI company code for the corporation,
+         or the stock exchange code for the corporation. At least one
+         of the vendor name or the vendor OUI fields shall contain
+         valid serial data."
+    REFERENCE  "Specification for SFP MSA, Vendor name"
+
+    ::= { nbsSffMsaEntry 13 }
+
+nbsSffMsaVendorOUI OBJECT-TYPE
+    SYNTAX       OCTET STRING (SIZE(3))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The vendor organizationally unique identifier field (vendor
+         OUI) is a 3-byte field that contains the IEEE Company
+         Identifier for the vendor. A value of all zero in the 3-byte
+         field indicates that the Vendor OUI is unspecified."
+    REFERENCE  "Specification for SFP MSA, Vendor OUI"
+
+    ::= { nbsSffMsaEntry 14 }
+
+nbsSffMsaVendorPartNumber OBJECT-TYPE
+    SYNTAX       DisplayString(SIZE(0..16))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The vendor part number (vendor PN) is a 16-byte field that
+         contains ASCII characters, left-aligned, defining the vendor
+         part number or product name.
+
+         Unlike the MSA standard, agent returns size 0 string if the
+         part number is unspecified and there will be no white space
+         padding."
+    REFERENCE  "Specification for SFP MSA, Vendor PN"
+
+    ::= { nbsSffMsaEntry 15 }
+
+nbsSffMsaVendorRevision OBJECT-TYPE
+    SYNTAX       DisplayString(SIZE(0..4))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The vendor revision number (vendor rev) is a 4-byte field that
+         contains ASCII characters, defining the vendor's product
+         revision number.
+
+         Unlike the MSA standard, agent returns size 0 string if the
+         part number is unspecified and there will be no white space
+         padding.
+
+         This is a two byte string for XFP, four bytes for others."
+
+    REFERENCE  "Specification for SFP MSA, Vendor Rev and XFP for MSA
+                INF8077i section 5.32"
+
+    ::= { nbsSffMsaEntry 16 }
+
+nbsSffMsaBaseChecksumMatch OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no             (1),
+        yes            (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The check code is a one byte code that can be used to verify
+         that the first 64 (0-63) bytes of serial information in the
+         SFP transceiver is valid.Returns yes if checksum matches, no
+         if checksum doesn't match. For XFPs, The check code shall be
+         the low order 8 bits of the sum of the contents of all the
+         bytes from byte 128 to byte 190, inclusive."
+    REFERENCE  "Specification for SFP MSA, CC_BASE and Specification
+                for XFP for MSA INF8077i section 5.36"
+
+    ::= {nbsSffMsaEntry  17  }
+
+nbsSffMsaLossOfSignalImplemented OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Byte 65 Bit 1. Signal as defined in the specification"
+    REFERENCE  "Specification for SFP MSA Table 3.6"
+
+    ::= { nbsSffMsaEntry 18 }
+
+nbsSffMsaLossOfSignalInverted OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Byte 65 Bit 2. Signal as defined in the specification"
+    REFERENCE  "Specification for SFP MSA Table 3.6"
+
+    ::= { nbsSffMsaEntry 19 }
+
+nbsSffMsaTxFault OBJECT-TYPE
+    SYNTAX      INTEGER {
+        off  (1),
+        on   (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 65 Bit 3.TX_FAULT signal implemented. Reset definition
+          in Section III and Laser Fault condition, Generated by laser
+          safety system."
+    REFERENCE   "Specification for SFP MSA Table 3.6 and
+                Specification for XFP MSA INF8077i, section 5.11 &
+                table 39"
+
+    ::= { nbsSffMsaEntry 20 }
+
+nbsSffMsaTxDisable OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 65 Bit 4.TX_DISABLE is implemented and disables the
+          serial output."
+    REFERENCE   "Specification for SFP MSA Table 3.6"
+
+    ::= { nbsSffMsaEntry 21 }
+
+nbsSffMsaRateSelectImplemented OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no      (1),
+        yes     (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 65 Bit 5.If this bit is set then active control of the
+          rate select pin is required to change rates. If bit is not
+          set, no control of pin is required. In all cases, compliance
+          with multiple rate standards should be determined by
+          Transceiver codes in bytes 4,5,6, and 10. See table 3.4"
+    REFERENCE   "Specification for SFP MSA Table 3.6"
+
+    ::= { nbsSffMsaEntry 22 }
+
+nbsSffMsaMaxBitRate OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The upper bit rate limit at which the SFP transceiver will
+         still meet its specifications (BR, max) is specified in units
+         of 1% above the nominal bit rate. A value of zero indicates
+         that this field is not specified."
+    REFERENCE  "Specification for SFP MSA  BR,max"
+
+    ::= { nbsSffMsaEntry 23 }
+
+nbsSffMsaMinBitRate OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The lower bit rate limit at which the SFP transceiver will
+         still meet its specifications (BR, min) is specified in units
+         of 1% below the nominal bit rate. A value of zero indicates
+         that this field is not specified."
+    REFERENCE  "Specification for SFP MSA  BR,min"
+
+    ::= { nbsSffMsaEntry 24 }
+
+nbsSffMsaVendorSerialNumber OBJECT-TYPE
+    SYNTAX       DisplayString(SIZE(0..16))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The vendor serial number (vendor SN) is a 16 character field
+         that contains ASCII characters, left-aligned and padded on
+         the right with ASCII spaces (20h), defining the vendor's
+         serial number for the SFP transceiver. A value of all zero
+         in the 16-byte field indicates that the vendor SN is
+         unspecified."
+
+    REFERENCE  "Specification for SFP MSA  Vendor SN and XFP for MSA
+                INF8077i section 5.38"
+
+    ::= { nbsSffMsaEntry 25 }
+
+nbsSffMsaVendorDateCode OBJECT-TYPE
+    SYNTAX       DisplayString(SIZE(6..8))
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "The date code is an 8-byte field that contains the vendor's
+         date code in ASCII characters. The date code is mandatory."
+    REFERENCE  "Specification for SFP MSA Table 3.7 and XFP for MSA
+                INF8077i section 5.39"
+
+    ::= { nbsSffMsaEntry 26 }
+
+nbsSffMsaExtChecksumMatch OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no             (1),
+        yes            (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The check code is a one byte code that can be used to verify
+         that the first 32 bytes of extended serial information in the
+         SFP transceiver is valid. The check code shall be the low
+         order 8 bits of the sum of the contents of all the bytes from
+         byte 64 to byte 94, inclusive."
+    REFERENCE  "Specification for SFP MSA, CC_BASE"
+
+    ::= {nbsSffMsaEntry  27  }
+
+
+-- **********************************************************
+-- nbsSffWdmGrp DWDM objects
+-- **********************************************************
+
+nbsSffWdmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSffWdmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operations, Administration, and Management information"
+    ::= { nbsSffWdmGrp 1 }
+
+nbsSffWdmEntry OBJECT-TYPE
+    SYNTAX  NbsSffWdmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents WDM properties of a port."
+    INDEX { nbsSffMsaPhysicalIfIndex }
+    ::= { nbsSffWdmTable 1 }
+
+NbsSffWdmEntry ::= SEQUENCE {
+    nbsSffWdmClassOfPower               INTEGER,
+    nbsSffWdmClassOfTemperature         INTEGER,
+    nbsSffWdmClassOfWdm                 INTEGER,
+    nbsSffWdmOpticalReach               INTEGER,
+    nbsSffWdmMaxCaseTemperature         INTEGER,
+    nbsSffWdmMinCaseTemperature         INTEGER,
+    nbsSffWdmMaxSupplyCurrent           INTEGER,
+    nbsSffWdmNumberOfChannels           INTEGER,
+    nbsSffWdmChannelSpacing             INTEGER,
+    nbsSffWdmVariableDecisionThreshold  INTEGER,
+    nbsSffWdmWavelengthMonitorType      INTEGER,
+    nbsSffWdmExtTransmitPowerType       INTEGER,
+    nbsSffWdmVariableOpticalAttenuator  INTEGER,
+    nbsSffWdmPilotToneFunctionality     INTEGER,
+    nbsSffWdmOptionalInterruptPin       INTEGER,
+    nbsSffWdmLaserWavelength            DisplayString,
+    nbsSffWdmFrequency                  NbsTcMHz,
+    nbsSffWdmChannelBand                NbsCmmcChannelBand,
+    nbsSffWdmChannelNumber              INTEGER
+}
+
+nbsSffWdmClassOfPower OBJECT-TYPE
+    SYNTAX      INTEGER {
+        under1W          (1),
+        oneToOneAndHalfW (2),
+        overOneAndHalfW  (3),
+        reserved         (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended identifier of class of Power."
+    REFERENCE   "Specification for DWDM SFP Transceiver, section 2.2.3"
+
+    ::= {nbsSffWdmEntry  1 }
+
+nbsSffWdmClassOfTemperature OBJECT-TYPE
+    SYNTAX      INTEGER {
+        class0           (1),
+        class1           (2),
+        class2           (3),
+        class3           (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended identifier of class of Temperature.
+         class0 - Temperature in [-5, 70C]
+         class1 - Temperature in [-40, 85C]
+         class2 - reserved
+         class3 - defined by MIB objects nbsSffDwdmMaxCaseTemperature &
+                  nbsSffDwdmMinCaseTemperature"
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.3"
+
+    ::= {nbsSffWdmEntry  2 }
+
+nbsSffWdmClassOfWdm OBJECT-TYPE
+    SYNTAX      INTEGER {
+        noWdm           (1),
+        cwdm            (2),
+        dwdm            (3),
+        reserved        (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Extended identifier of class of WDM.
+         1 - No WDM
+         2 - CWDM
+         3 - DWDM
+         4 - Reserved"
+    REFERENCE   "Specification for DWDM SFP Transceiver, section 2.2.3"
+
+    ::= {nbsSffWdmEntry  3 }
+
+nbsSffWdmOpticalReach OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value specifies the link length in kilometers that is
+         supported by the transceiver while operating in compliance
+         with the applicable standards using single mode fiber."
+    REFERENCE   "Specification for DWDM SFP Transceiver, section 2.2.8"
+
+    ::= { nbsSffWdmEntry 4 }
+
+nbsSffWdmMaxCaseTemperature OBJECT-TYPE
+    SYNTAX      INTEGER (-2147483647..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This field defines the maximum operating case temperature in
+         Celsius. For WDMs, this value is in byte 15 in A0h, For XFPs,
+         this value is in byte 190."
+    REFERENCE   "Specification for DWDM SFP Transceiver, section 2.2.9
+                and Specification for XFP MSA, INF8077i section 5.35"
+    DEFVAL { 70 }
+    ::= { nbsSffWdmEntry 5 }
+
+nbsSffWdmMinCaseTemperature OBJECT-TYPE
+    SYNTAX      INTEGER (-2147483647..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This field defines the minimum operating case temperature
+         in Celsius."
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.10"
+
+    ::= { nbsSffWdmEntry 6 }
+
+nbsSffWdmMaxSupplyCurrent OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This field defines the maximum supply current, in milli Amps,
+         which the module will consume under worst case conditions."
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.11"
+
+    ::= { nbsSffWdmEntry 7 }
+
+nbsSffWdmNumberOfChannels OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This specifies the tuning range from 1 to 63, where 1
+         indicates this module is not tunable by user commands."
+    REFERENCE   "Specification for DWDM SFP Transceiver, section 2.2.12"
+
+    ::= { nbsSffWdmEntry 8 }
+
+nbsSffWdmChannelSpacing OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notTunable    (1),
+        ghz50         (2),
+        ghz100        (3),
+        ghz200        (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This field identifies the densest channel spacing the module
+         is compatible with and the number of channels over which the
+         module may be tuned by user command."
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.12"
+
+    ::= { nbsSffWdmEntry 9 }
+
+nbsSffWdmVariableDecisionThreshold  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported    (1),
+        supported       (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DWDM Variable Decission Threshold."
+
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.14"
+
+    ::= {nbsSffWdmEntry  10 }
+
+nbsSffWdmWavelengthMonitorType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        wavelength       (1),
+        laserTemperature (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DWDM Wavelength monitor type in A2 byte."
+
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.14"
+
+    ::= {nbsSffWdmEntry  11 }
+
+nbsSffWdmExtTransmitPowerType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pwrDefault      (1),
+        pwrExtended     (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DWDM Extended Transmit Power Type."
+
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.14"
+
+    ::= {nbsSffWdmEntry  12 }
+
+nbsSffWdmVariableOpticalAttenuator  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notImplemented (1),
+        implemented    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DWDM Variable Optical Atttenuator."
+
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.14"
+
+    ::= {nbsSffWdmEntry  13 }
+
+nbsSffWdmPilotToneFunctionality  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pilotToneNone               (1),
+        pilotToneDetection          (2),
+        pilotToneInjection          (3),
+        pilotToneInjectionDetection (4),
+        pilotToneEnhanced           (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DWDM Pilot Tone Functionality."
+
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.14"
+
+    ::= {nbsSffWdmEntry  14 }
+
+nbsSffWdmOptionalInterruptPin  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported   (1),
+        supported      (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "DWDM Optional Interrupt Pin."
+
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.14"
+
+    ::= {nbsSffWdmEntry  15 }
+
+nbsSffWdmLaserWavelength OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..150))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Nominal transmitter output wavelength.
+
+         For SFPs, per Specification for DWDM SFP Transceiver,
+         section 2.2.1, The laser wavelength
+         is equal to the 16 bit integer value in nm (16 bit value with
+         byte 60 as high order byte and byte 61 as low order byte) and
+         with the fractional part of the wavelength in units of 0.01nm
+         (byte 62).
+
+         For XFPs,per specification for INF8077i, see section 5.33"
+
+    REFERENCE  "Specification for DWDM SFP Transceiver, section 2.2.18"
+
+    ::= { nbsSffWdmEntry 16 }
+
+nbsSffWdmFrequency  OBJECT-TYPE
+    SYNTAX      NbsTcMHz
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Nominal transmitter frequency, in MHz"
+
+    ::= {nbsSffWdmEntry  17 }
+
+nbsSffWdmChannelBand  OBJECT-TYPE
+    SYNTAX      NbsCmmcChannelBand
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ITU Channel Band"
+    ::= {nbsSffWdmEntry  18 }
+
+nbsSffWdmChannelNumber  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "ITU Channel Number"
+
+    ::= {nbsSffWdmEntry  19 }
+
+
+-- ************************
+-- Diagnostics objects ****
+-- ************************
+
+nbsSffDiagsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSffDiagsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Operations, Administration, and Management information"
+    ::= { nbsSffDiagnosticsGrp 1 }
+
+nbsSffDiagsEntry  OBJECT-TYPE
+    SYNTAX  NbsSffDiagsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents Digital Diagnostics of a port."
+    INDEX { nbsSffMsaPhysicalIfIndex }
+    ::= { nbsSffDiagsTable 1 }
+
+NbsSffDiagsEntry ::= SEQUENCE {
+    nbsSffDiagsRateIdentifier             INTEGER,
+    nbsSffDiagsLinkLengthOm3              INTEGER,
+    nbsSffDiagsLaserWavelength            INTEGER,
+    nbsSffDiagsLROutputImplemented        INTEGER,
+    nbsSffDiagsPowerLevelDeclaration      INTEGER,
+    nbsSffDiagsCooledTranDeclaration      INTEGER,
+    nbsSffDiagsAddressChangeRequired      INTEGER,
+    nbsSffDiagsPowerMeasurementType       INTEGER,
+    nbsSffDiagsExternallyCalibrated       INTEGER,
+    nbsSffDiagsInternallyCalibrated       INTEGER,
+    nbsSffDiagsDDMonitoringImplemented    INTEGER,
+    nbsSffDiagsOptRateSelectControl       INTEGER,
+    nbsSffDiagsOptAppSelectControl        INTEGER,
+    nbsSffDiagsOptSoftRSControlMon        INTEGER,
+    nbsSffDiagsOptSoftRxLoSMonitoring     INTEGER,
+    nbsSffDiagsOptSoftTxFaultMonitoring   INTEGER,
+    nbsSffDiagsOptSoftTxDisable           INTEGER,
+    nbsSffDiagsOptAlarmWarningFlags       INTEGER,
+    nbsSffDiags8472Compliance             INTEGER,
+    nbsSffDiagsTemperature                INTEGER,
+    nbsSffDiagsTempLowAlarm               INTEGER,
+    nbsSffDiagsTempLowWarn                INTEGER,
+    nbsSffDiagsTempHighWarn               INTEGER,
+    nbsSffDiagsTempHighAlarm              INTEGER,
+    nbsSffDiagsVoltage                    DisplayString,
+    nbsSffDiagsVoltLowAlarm               INTEGER,
+    nbsSffDiagsVoltLowWarn                INTEGER,
+    nbsSffDiagsVoltHighWarn               INTEGER,
+    nbsSffDiagsVoltHighAlarm              INTEGER,
+    nbsSffDiagsBiasCurrent                DisplayString,
+    nbsSffDiagsBiasLowAlarm               INTEGER,
+    nbsSffDiagsBiasLowWarn                INTEGER,
+    nbsSffDiagsBiasHighWarn               INTEGER,
+    nbsSffDiagsBiasHighAlarm              INTEGER,
+    nbsSffDiagsTxPower                    DisplayString,
+    nbsSffDiagsTxPowerLowAlarm            INTEGER,
+    nbsSffDiagsTxPowerLowWarn             INTEGER,
+    nbsSffDiagsTxPowerHighWarn            INTEGER,
+    nbsSffDiagsTxPowerHighAlarm           INTEGER,
+    nbsSffDiagsRxPower                    DisplayString,
+    nbsSffDiagsRxPowerLowAlarm            INTEGER,
+    nbsSffDiagsRxPowerLowWarn             INTEGER,
+    nbsSffDiagsRxPowerHighWarn            INTEGER,
+    nbsSffDiagsRxPowerHighAlarm           INTEGER,
+    nbsSffDiagsDataReadyBarState          INTEGER,
+    nbsSffDiagsRxLosState                 INTEGER,
+    nbsSffDiagsTxFaultState               INTEGER,
+    nbsSffDiagsSoftRateSelect             INTEGER,
+    nbsSffDiagsRateSelectState0           INTEGER,
+    nbsSffDiagsRS1State                   INTEGER,
+    nbsSffDiagsSoftTxDisableSelect        INTEGER,
+    nbsSffDiagsTxDisableState             INTEGER,
+--  Calibration constants
+    nbsSffDiagsBiasCurrentSlope           DisplayString,
+    nbsSffDiagsBiasCurrentOffset          INTEGER,
+    nbsSffDiagsTxPowerSlope               DisplayString,
+    nbsSffDiagsTxPowerOffset              INTEGER,
+    nbsSffDiagsTemperatureSlope           DisplayString,
+    nbsSffDiagsTemperatureOffset          INTEGER,
+    nbsSffDiagsVoltageSlope               DisplayString,
+    nbsSffDiagsVoltageOffset              INTEGER,
+
+--  Extended module control
+    nbsSffDiagsPowerLevelSelect           INTEGER,
+    nbsSffDiagsPowerLevelOpState          INTEGER,
+    nbsSffDiagsSoftRSSelect               INTEGER
+}
+
+nbsSffDiagsRateIdentifier  OBJECT-TYPE
+    SYNTAX      INTEGER {
+       notSupported (1),
+       rate421G     (2),
+       rate842GRx   (3),
+       rate842GRxTx (4),
+       rate842GTx   (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The rate identifier byte refers to several (optional) industry
+         standard definitions of Rate_Select or Application_Select
+         control behaviors, intended to manage transceiver optimization
+         for multiple operating rates."
+
+    REFERENCE   "Table 3.6a of SFF-8472 Rev 10.3 Diagnostic monitoring
+                 interface for optical transceiver"
+
+    ::= { nbsSffDiagsEntry 1 }
+
+nbsSffDiagsLinkLengthOm3 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This value specifies link length that is supported by the
+         transceiver while operating in compliance with applicable
+         standards using 50 micron multimode OM3 [2000 MHz*km] fiber.
+         The value is in units of 10 meters. A value of 255 means that
+         the transceiver supports a link length greater than 2.54 km.
+         A value of zero means that the transceiver does not support
+         50 micron multimode fiber or that the length information must
+         be determined from the transceiver technology."
+    REFERENCE   "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3)"
+
+    ::= { nbsSffDiagsEntry 2 }
+
+nbsSffDiagsLaserWavelength OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Nominal transmitter output wavelength at room temperature. 16
+         bit value with byte 60 as high order byte and byte 61 as low
+         order byte. The laser wavelength is equal to the the 16 bit
+         integer value in nm. This field allows the user to read the
+         laser wavelength directly, so it is not necessary to infer
+         it from the transceiver Code for Electronic Compatibility
+         (bytes 3 to 10). This also allows specification of wavelengths
+         not covered in bytes 3 to 10, such as those used in coarse WDM
+         systems."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3)"
+
+    ::= { nbsSffDiagsEntry 3 }
+
+nbsSffDiagsLROutputImplemented OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no            (1),
+        yes           (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 64, bit 0. Value of 1 identifies a conventional
+          limiting (or unspecified) receiver output. Value of 2
+          identifies a linear receiver output."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.7"
+
+    ::= { nbsSffDiagsEntry 4 }
+
+nbsSffDiagsPowerLevelDeclaration OBJECT-TYPE
+    SYNTAX      INTEGER {
+        level1        (1),
+        level2        (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 64, bit 1. Value 1 identifies Power Level 1 (or
+          unspecified) requirements. Value 2 identifies a Power
+          Level2 requirements."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.7"
+
+    ::= { nbsSffDiagsEntry 5 }
+
+nbsSffDiagsCooledTranDeclaration OBJECT-TYPE
+    SYNTAX      INTEGER {
+        uncooled      (1),
+        cooled        (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         " Byte 64, bit 2. Value 1 identifies a conventional
+           uncooled (or unspecified) laser implementation. Value 2
+           identifies a cooled laser transmitter implementation."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.7"
+
+    ::= { nbsSffDiagsEntry 6 }
+
+nbsSffDiagsAddressChangeRequired OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no            (1),
+        yes           (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 92, bit 2 indicates whether or not it is necessary for
+          the host to perform an address change sequence before
+          accessing information at 2-wire serial address A2h. If this
+          bit is not set, the host may simply read from either address,
+          A0h or A2h, by using that value in the address byte during
+          the 2-wire communication sequence. If the bit is set, the
+          defined sequence must be executed prior to accessing
+          information at address A2h."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.9"
+
+    ::= { nbsSffDiagsEntry 7 }
+
+nbsSffDiagsPowerMeasurementType OBJECT-TYPE
+    SYNTAX      INTEGER {
+        oma           (1),
+        averagePower  (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 92, bit 3 indicates whether the received power
+          measurement represents average input optical power or OMA.
+          If the bit is set, average power is monitored. If it is not,
+          OMA is monitored. For XFPs, the address location would be
+          byte 220, bit 3"
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                optical transceiver (SFF-8472 rev 10.3), Table 3.9
+                Specification for XFP for MSA, INF8077i, section 5.40
+                table 56"
+
+    ::= { nbsSffDiagsEntry 8 }
+
+nbsSffDiagsExternallyCalibrated OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no            (1),
+        yes           (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 92, bit 4 Externally Calibrated
+          Two calibration options are possible if bit 6 has been set
+          indicating that digital diagnostic monitoring has been
+          implemented. If bit 4 is set, the reported values are A/D
+          counts which must be converted to real world units using
+          calibration values read using 2 wire serial address
+          1010001X (A2h) from bytes 56 to 95."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.9"
+
+    ::= { nbsSffDiagsEntry 9 }
+
+nbsSffDiagsInternallyCalibrated OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no            (1),
+        yes           (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 92, bit 5 Internally Calibrated.
+          Two calibration options are possible if bit 6 has been set
+          indicating that digital diagnostic monitoring has been
+          implemented. If bit 5, Internally calibrated is set, the
+          transceiver directly reports calibrated values in units of
+          current, power etc."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.9"
+
+    ::= { nbsSffDiagsEntry 10 }
+
+nbsSffDiagsDDMonitoringImplemented OBJECT-TYPE
+    SYNTAX      INTEGER {
+        no            (1),
+        yes           (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 92, bit 6. If this bit is set indicating that digital
+          diagnostic monitoring has been implemented, received power
+          monitoring, transmitted power monitoring, bias current
+          monitoring, supply voltage monitoring and temperature
+          monitoring must all be implemented. Additionally, alarm and
+          warning thresholds must be written as specified in this
+          document at locations 00 to 55 on 2 wire serial address
+          1010001X (A2h)"
+
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.9"
+
+    ::= { nbsSffDiagsEntry 11 }
+
+nbsSffDiagsOptRateSelectControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notImplemented (1),
+        implemented    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Byte 93 bit 1. Optional Rate Select control implemented per
+          SFF-8431. Sets to 1 if not implemented, 2 if implemented."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.10"
+
+    ::= { nbsSffDiagsEntry 12 }
+
+nbsSffDiagsOptAppSelectControl OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notImplemented (1),
+        implemented    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Based on byte 93 bit 2. Optional Application Select control
+          implemented per SFF-8079. Sets to 1 if not
+          implemented, 2 if implemented."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.10"
+
+    ::= { nbsSffDiagsEntry 13 }
+
+nbsSffDiagsOptSoftRSControlMon OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notImplemented (1),
+        implemented    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Based on byte 93 bit 3. Optional soft RATE_SELECT control and
+          monitoring implemented. Sets to 1 if not implemented,
+          2 if implemented."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                optical transceiver (SFF-8472 rev 10.3), Table 3.10
+                and Table 3.11"
+
+    ::= { nbsSffDiagsEntry 14 }
+
+nbsSffDiagsOptSoftRxLoSMonitoring OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notImplemented (1),
+        implemented    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Based on byte 93 bit 4. Optional soft RX_LOS monitoring
+          implemented. Sets to 1 if not implemented, 2 if implemented."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                optical transceiver (SFF-8472 rev 10.3), Table 3.10
+                and Table 3.11"
+
+    ::= { nbsSffDiagsEntry 15 }
+
+nbsSffDiagsOptSoftTxFaultMonitoring OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notImplemented (1),
+        implemented    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Based on byte 93 bit 5. Optional soft TX_FAULT monitoring
+          implemented. Sets to 1 if not implemented, 2 if implemented."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                optical transceiver (SFF-8472 rev 10.3), Table 3.10
+                and Table 3.11"
+
+    ::= { nbsSffDiagsEntry 16 }
+
+nbsSffDiagsOptSoftTxDisable OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notImplemented (1),
+        implemented    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Based on byte 93 bit 6. Optional soft TX_DISABLE control and
+          monitoring implemented.Sets to 1 if not implemented, 2 if
+          implemented."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                optical transceiver (SFF-8472 rev 10.3), Table 3.10
+                and Table 3.11"
+
+    ::= { nbsSffDiagsEntry 17 }
+
+nbsSffDiagsOptAlarmWarningFlags OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notImplemented (1),
+        implemented    (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Based on byte 93 bit 7. Optional Alarm/warning flags
+          implemented for all monitored quantities.Sets to 1 if
+          not implemented, 2 if implemented. See Table 3.18"
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.10"
+
+    ::= { nbsSffDiagsEntry 18 }
+
+nbsSffDiags8472Compliance  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported    (1),
+        rev9dot3of8472  (2),
+        rev9dot5of8472  (3),
+        rev10dot2of8472 (4),
+        rev10dot4of8472 (5),
+        rev11dot0of8472 (6),
+        rev11dot3of8472 (7),
+        rev11dot4of8472 (8),
+        rev12dot0of8472 (9),
+        unallocated   (256)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Byte 94 contains an unsigned integer that indicates which
+         feature set(s) are implemented in the transceiver."
+    REFERENCE  "Specification for Diagnostic monitoring interface for
+                 optical transceiver (SFF-8472 rev 10.3), Table 3.12"
+
+    ::= {nbsSffDiagsEntry  19 }
+
+nbsSffDiagsTemperature OBJECT-TYPE
+    SYNTAX      INTEGER  (-2147483647..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Module temperature in centigradese."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 20 }
+
+nbsSffDiagsTempLowAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined temperature for low alarm threshold in
+         Centigrades."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15 and
+                 XFP for MSA INF8077i table 35."
+
+    ::= { nbsSffDiagsEntry 21 }
+
+nbsSffDiagsTempLowWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined temperature for low warning threshold in
+         Centigrades"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF8077i table 35."
+
+    ::= { nbsSffDiagsEntry 22 }
+
+nbsSffDiagsTempHighWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined temperature for high warning threshold in
+         Centigrades"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF8077i table 35."
+
+    ::= { nbsSffDiagsEntry 23 }
+
+nbsSffDiagsTempHighAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined temperature for high alarm threshold in
+         Centigrades"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 24 }
+
+nbsSffDiagsVoltage OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Internally measured supply voltage in transceiver in the
+         units of Volts. Bytes 98 & 99 of Address A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 25 }
+
+nbsSffDiagsVoltLowAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined voltage for low alarm threshold in the
+         units of Volts."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15"
+
+    ::= { nbsSffDiagsEntry 26 }
+
+nbsSffDiagsVoltLowWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined voltage for low warning threshold in the
+         units of Volts."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15"
+
+    ::= { nbsSffDiagsEntry 27 }
+
+nbsSffDiagsVoltHighWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined voltage for high warning threshold in the
+         units of Volts."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15"
+
+    ::= { nbsSffDiagsEntry 28 }
+
+nbsSffDiagsVoltHighAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined voltage for high alarm threshold in the
+         units of Volts."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15"
+
+    ::= { nbsSffDiagsEntry 29 }
+
+nbsSffDiagsBiasCurrent OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Internally measured TX Bias Current in the units of mA.
+         Bytes 100 & 101 of Address A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 30 }
+
+nbsSffDiagsBiasLowAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined bias current for low alarm threshold in the
+         units of mA"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 31 }
+
+nbsSffDiagsBiasLowWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined bias current for low warning threshold in
+         the units of mA"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 32 }
+
+nbsSffDiagsBiasHighWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined bias current for high warning threshold in the
+         units of mA"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 33 }
+
+nbsSffDiagsBiasHighAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined bias current for high alarm threshold in the
+         units of mA"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 34 }
+
+nbsSffDiagsTxPower OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Measured TX output power in the units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 35 }
+
+nbsSffDiagsTxPowerLowAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined Tx output power for low alarm threshold in the
+         units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 36 }
+
+nbsSffDiagsTxPowerLowWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined Tx output power for low warning threshold in the
+         units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 37 }
+
+nbsSffDiagsTxPowerHighWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined Tx output power for high warning threshold in the
+         units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 38 }
+
+nbsSffDiagsTxPowerHighAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined Tx output power for high alarm threshold in
+         the units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 39 }
+
+nbsSffDiagsRxPower OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Measured received optical power.
+          Received power, RX_PWR, is given in uW by the
+          following equation:
+          Rx_PWR (uW) = Rx_PWR(4) * Rx_PWR AD
+          4 (16 bit unsigned integer) +
+          Rx_PWR(3) * Rx_PWR AD
+          3 (16 bit unsigned integer) +
+          Rx_PWR(2) * Rx_PWR AD
+          2 (16 bit unsigned integer) +
+          Rx_PWR(1) * Rx_PWR AD (16 bit unsigned integer) +
+          Rx_PWR(0)"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 40 }
+
+nbsSffDiagsRxPowerLowAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined Rx input power for low alarm threshold in
+         the units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 41 }
+
+nbsSffDiagsRxPowerLowWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined Rx input power for low warning threshold in
+         the units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 42 }
+
+nbsSffDiagsRxPowerHighWarn OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined Rx input power for high warning threshold in the
+         units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 43 }
+
+nbsSffDiagsRxPowerHighAlarm OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Predefined Rx input power for high alarm threshold in
+         the units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.15  and
+                 XFP for MSA INF 8077i table 35."
+
+    ::= { nbsSffDiagsEntry 44 }
+
+nbsSffDiagsDataReadyBarState OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates transceiver has achieved power up and data is ready.
+         Bit remains high until data is ready to be read at which time
+         the device sets the bit low. Byte 110, bit 0 of A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 45 }
+
+nbsSffDiagsRxLosState OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Digital state of the RX_LOS Output Pin. Updated within 100ms
+         of change on pin. Byte 110, bit 1 of A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 46 }
+
+nbsSffDiagsTxFaultState OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Digital state of the TX Fault Output Pin. Updated within
+         100ms of change on pin. Byte 110, bit 2 of A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 47 }
+
+nbsSffDiagsSoftRateSelect OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Read/write bit that allows software rate select control.
+         Writing 1 selects full bandwidth operation. This bit is
+         OR'd with the hard Rate_Select, AS(0) or RS(0) pin value.
+         See Table 3.11 for timing requirements. Default at power
+         up is logic zero/low. If Soft Rate Select is not implemented,
+         the transceiver ignores the value of this bit. Note: Specific
+         transceiver behaviors of this bit are identified in Table 3.6a
+         and referenced documents. See Table 3.18a, byte 118, bit 3 for
+         Soft RS(1) Select. Byte 110, bit 3 of A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 48 }
+
+nbsSffDiagsRateSelectState0 OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Digital state of the SFP Rate_Select Input Pin. Updated within
+         100ms of change on pin. Note: This pin is also known as AS(0)
+         in SFF-8079 and RS(0) in SFF-8431. Byte 110, bit 4 of A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 49 }
+
+nbsSffDiagsRS1State OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reserved for digital state of input pin AS(1) per SFF-8079 and
+         RS(1) per SFF-8431. Updated within 100ms of change on pin. See
+         A2h Byte 118, Bit 3 for Soft RS(1) Select control information.
+         Byte 110, bit 5 of A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 50 }
+
+nbsSffDiagsSoftTxDisableSelect OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Read/write bit that allows software disable of laser.
+         Writing 1 disables laser. See Table 3.11 for enable/
+         disable timing requirements. This bit is OR d with the hard
+         TX_DISABLE pin value. Note, per SFP MSA TX_DISABLE pin is
+         default enabled unless pulled low by hardware. If Soft TX
+         Disable is not implemented, the transceiver ignores the value
+         of this bit. Default power up value is zero/low.
+         Byte 110, bit 6 of A2h"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 51 }
+
+nbsSffDiagsTxDisableState OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Digital state of the TX Disable Input Pin. Updated within
+          100ms of change on pin."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.17"
+
+    ::= { nbsSffDiagsEntry 52 }
+
+nbsSffDiagsBiasCurrentSlope OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fixed decimal (unsigned) calibration data, laser bias
+          current measured in mA."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 53 }
+
+nbsSffDiagsBiasCurrentOffset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fixed decimal (signed two's complement) calibration data,
+          laser bias current measured in mA."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 54 }
+
+nbsSffDiagsTxPowerSlope OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fixed decimal (unsigned) calibration data, transmitter
+          coupled output power in the units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 55 }
+
+nbsSffDiagsTxPowerOffset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fixed decimal (signed two's complement) calibration data,
+          transmitter coupled output power in the units of dBm."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 56 }
+
+nbsSffDiagsTemperatureSlope OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fixed decimal (unsigned) calibration data, internal module
+          temperature in C"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 57 }
+
+nbsSffDiagsTemperatureOffset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fixed decimal (signed two's complement) calibration data,
+          internal module temperature in C"
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 58 }
+
+nbsSffDiagsVoltageSlope OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fixed decimal (unsigned) calibration data, internal module
+          supply voltage in Volts."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 59 }
+
+nbsSffDiagsVoltageOffset OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Fixed decimal (signed two's complement) calibration data,
+          internal module supply voltage in Volts."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.16"
+
+    ::= { nbsSffDiagsEntry 60 }
+
+nbsSffDiagsPowerLevelSelect OBJECT-TYPE
+    SYNTAX      INTEGER {
+        off        (1),
+        on         (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Reserved for SFF-8431 Power Level (maximum power dissipation)
+          enable.
+          Value of zero disables Power Level 2 (1.0 Watt max).
+          Value of one enables Power Level 2 (1.5 Watt max).
+          Refer to Table 3.7 for Power Level declaration.
+          Refer to Table 3.11 for timing."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.18a of A2h"
+
+    ::= { nbsSffDiagsEntry 61 }
+
+nbsSffDiagsPowerLevelOpState OBJECT-TYPE
+    SYNTAX      INTEGER {
+        off        (1),
+        on         (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Reserved for SFF-8431 Power Level (maximum power dissipation)
+          status.Value of zero indicates Power Level 1 operation
+         (1.0 Watt max) Value of one indicates Power Level 2 operation
+         (1.5 Watt max).Refer to Table 3.7 for Power Level declaration.
+         Refer to Table 3.11 for timing."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.18a of A2h"
+
+    ::= { nbsSffDiagsEntry 62 }
+
+nbsSffDiagsSoftRSSelect OBJECT-TYPE
+    SYNTAX      INTEGER {
+        off        (1),
+        on         (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Read/write bit that allows software Tx rate control. Writing
+          1 selects full speed Tx operation. This bit is OR d with the
+          hard RS(1) pin value.See Table 3.11 for timing requirements.
+          Default at power up is logic zero/low. If Soft RS(1) is not
+          implemented, the transceiver ignores the value of this bit.
+          Note: Specific transceiver behaviors of this bit are
+          identified in Table 3.6a and referenced documents. See
+          Table 3.17, byte 110, bit 3 for Soft RS(0) Select."
+    REFERENCE   "Diagnostic Monitoring Interface for Optical
+                 Transceivers, SFF-8472 Rev 10.3 Table 3.18a of A2h"
+
+    ::= { nbsSffDiagsEntry 63 }
+
+
+--
+-- the MSA Extensions table
+--
+
+nbsSffMsxTableSize OBJECT-TYPE
+        SYNTAX      Unsigned32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+          "The number of entries in nbsSffMsxTable"
+        ::= { nbsSffMsxGrp 1 }
+
+nbsSffMsxTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF NbsSffMsxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Non-standardized extensions to the Multi-Source Agreement"
+    ::= { nbsSffMsxGrp 2 }
+
+nbsSffMsxEntry      OBJECT-TYPE
+    SYNTAX  NbsSffMsxEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Pluggable Transceiver information and settings yet to be
+         standardized"
+    INDEX { nbsSffMsxPhysicalIfIndex }
+    ::= { nbsSffMsxTable 1 }
+
+NbsSffMsxEntry ::= SEQUENCE {
+    nbsSffMsxPhysicalIfIndex   InterfaceIndex,
+    nbsSffMsxHasSgmiiPhy       INTEGER
+}
+
+nbsSffMsxPhysicalIfIndex  OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "MIB2 ifIndex of this port"
+    ::= { nbsSffMsxEntry 1 }
+
+nbsSffMsxHasSgmiiPhy OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notSupported (1),
+        no           (2),
+        yes          (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Some Gigabit Ethernet compatible SFP transeivers, such as
+         SFP-FDSGMII-M and SFP-FDSGMII-LR, have a built-in SGMII PHY.
+         Those that do require special autonegotiation processing,
+         without which autonegotiation will fail and the port will be
+         unable to pass traffic.
+
+         If the SFP has a built-in SGMII PHY, the user should set this
+         to yes(3)."
+    DEFVAL { no }
+    ::= { nbsSffMsxEntry 2 }
+
+END

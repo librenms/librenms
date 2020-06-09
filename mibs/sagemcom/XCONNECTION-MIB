@@ -1,0 +1,439 @@
+--*******************************************************************
+--*    SAGEM SA			 							  				*
+--*******************************************************************
+--*******************************************************************
+
+--  Filename: connection
+--  File type: .mib    
+-- 
+--  Description:	SNMPc source Mib file.         
+--
+--  Version:  19 11 2002
+--	
+--  Date(DD MM YYYY): 15 11 02 last update for IONOS NMS 
+--     
+--  Contact: D. Mobuchon, F. Bonnevialle
+--
+--  History: 
+--		Name: F.Bonnevialle	
+--		Date: 12 12 2000 
+--		Desc: original
+--
+--		Name: S.LAURENT	
+--		Date: 22 02 2001 
+--		Desc:   * Access right Modifications (from "Read-write" to "Read-Only") of some
+--          LinkTable variables .   
+--          Use the Xcon vector to add or delete TableLink elements.
+--  			* Modification of the LinkDirection enum in order to 
+--         	match up its values with those of the ADR equipment.
+--				* Modification of Xcon vector in order to add the new variable xconAction,
+--			which indicates the kind of the action (Creation(1) or Deletion(2))  
+--				* The linkImplementation variable, which should allow to reserve a 
+--          connection without physical implementation, is maintained (for a next use)
+--          but is not implemented in the SNMP Agent (its value is always set to TRUE)
+--   			* The 6 subelements of the name of the connexion have been replaced by
+--   		a unique variable: xconName (which matches to M1400 format)
+-- 
+--		Name: S.LAURENT	
+--		Date: 19 04 2001 
+--		Desc:   * Modification of the CTPType values 
+--
+--		Name: S.LAURENT	
+--		Date: 25 04 2001 
+--		Desc:   * Change the MIB number: {Sagem 120} -> {Sagem 108}
+--
+--		Name: S.LAURENT	
+--		Date: 10 08 2001 
+--		Desc:   * LinkImplementation Access right Modification
+--				 (from "Read-Only" to "Read-Write")
+--
+--		Name: S.LAURENT	
+--		Date: 22 05 2002 
+--		Desc:   * Add a new CTPType Value: nspi(100)
+--    
+--		Name: F.Bonnevialle 	
+--		Date: 15 11 2002 		
+--		Desc: Modification for SilverCreek Compiler
+--			 
+--*******************************************************************
+--*******************************************************************
+--*   Copyright (c) 2002, SAGEM , All rights reserved.              *
+--*******************************************************************
+                                                                     
+                                                                     
+--*******************************************************************
+-- MIB: XCONNECTION-MIB
+--*******************************************************************
+XCONNECTION-MIB DEFINITIONS ::= BEGIN
+
+--*******************************************************************
+-- IMPORTS
+--*******************************************************************
+
+   IMPORTS
+   sagemDr								FROM SAGEM-DR-MIB
+   SagemBoolean							FROM EQUIPMENT-MIB
+   MODULE-IDENTITY,OBJECT-TYPE      	FROM SNMPv2-SMI
+   DisplayString                    	FROM SNMPv2-TC; --RFC1213-MIB;
+
+
+   
+   xconnection	MODULE-IDENTITY
+      LAST-UPDATED "0205220000Z"
+      ORGANIZATION "SAGEM-Tolbiac drd/ddp/tmhd"
+      CONTACT-INFO
+	"    "
+      DESCRIPTION 
+	"The MIB module describes connection in physical layer
+	of transmission equipements such as pdh/sdh mux and cross connect.
+	This mib assumes that terminaison point are provided by other mibs,
+	such as sdh.mib.
+	xconnection is a particular case of SubNetworkConnection defined 
+	in ETS 300 653"
+      ::= { sagemDr 108}
+     
+   -- linkTable
+   link		  	OBJECT IDENTIFIER ::= { xconnection 10 } 
+
+   -- create/delete connection
+   xcon			OBJECT IDENTIFIER ::= { xconnection 30 }   
+   
+--*******************************************************************
+-- Link
+--*******************************************************************
+   TrafficStatus ::= INTEGER
+   { 
+   	none(0),             -- Future case of a non-implemented link 
+   	working(1),
+   	protection(2)
+   }       
+   
+   ProtectionType ::= INTEGER
+   { 
+   	none(0),
+   	snc(1)
+   }   
+
+   ProtectionStatus ::= INTEGER
+   { 
+   	none(0),
+   	used(1)
+   }   
+   
+   LinkDirection ::= INTEGER 
+   {
+   	unidirectional(1), 
+   	bidirectional(2)
+   }                                        
+   
+   CTPType      ::= INTEGER
+   {          
+   	unknown(0),
+   	au(1),
+   	au4c(2), 
+   	au16c(3),
+   	tu3(10),
+   	tu12(20),
+   	pdh2M (50),
+   	pdh34M (51),
+   	pdh45M (52),
+   	pdh140M (53),
+   	eth10M(60),
+   	eth100M(61),
+   	eth1G(62),
+   	nspi(100)
+   }
+   
+   linkNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Number of cross connections in equipment."  
+      ::= { link 1 } 
+   
+   linkTable   OBJECT-TYPE
+      SYNTAX       SEQUENCE OF LinkEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"List of link in equipment. For example, a bidirectionnal 
+    connection is composed of 2 links. A SNC protected bidirectionnal
+    connection is composed of 3 permanent links ."
+      ::= { link 2 } 
+
+    linkEntry   OBJECT-TYPE
+      SYNTAX       LinkEntry
+      MAX-ACCESS   not-accessible
+      STATUS       current
+      DESCRIPTION 
+	"A particular synchronous physical interface of the equipment." 
+      INDEX        { linkIndex } 
+      ::= { linkTable 1 } 
+   
+   LinkEntry ::= SEQUENCE 
+   {
+      linkIndex 					INTEGER,
+      linkSinkType					CTPType,
+      linkSrcType					CTPType,
+      linkCTPSink 					INTEGER,
+      linkCTPSource		       		INTEGER,
+      linkName 						DisplayString,
+      linkGroupId            		INTEGER,
+      linkDirection         		LinkDirection,      
+      linkProtectionType		    ProtectionType,
+      linkProtectionStatus			ProtectionStatus,
+      linkTrafficStatus				TrafficStatus,
+      linkImplementation			SagemBoolean
+   }
+   
+   linkIndex OBJECT-TYPE
+      SYNTAX 	   INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"linkIndex = number of the CTP Output
+			   = sncIndex "  
+      ::= { linkEntry 1 } 
+   
+   linkSinkType OBJECT-TYPE
+      SYNTAX 	    CTPType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Kind of CTP table from which the connection is issued"  
+      ::= { linkEntry 2 }
+   
+   linkSrcType OBJECT-TYPE
+      SYNTAX 	    CTPType
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"Kind of CTP table from which the connection is issued"  
+      ::= { linkEntry 3 }
+      
+   linkCTPSink OBJECT-TYPE
+      SYNTAX 	   INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The value of this field indicates the Ouput 
+	Connection Point  which composes the unidirectionnal 
+	link.It's an index in considerated TTP table
+	linkCTPSink = linkIndex"  
+      ::= { linkEntry 4 } 
+   
+   linkCTPSource   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "The value of this field indicates the Input 
+	Connection Point  which composes the unidirectionnal 
+	link. It's an index in considerated TTP table "
+      ::= { linkEntry 5 }
+   
+   linkName        OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the name of this link.
+    Links names of a bidirectionnal link must have different name.
+    Same direction SNC protected links have an identical name.
+    M1400 UIT-T specifies the field's format "
+      ::= { linkEntry 6 }
+
+   linkGroupId     OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "A group identifier is used to group links by community."
+      ::= { linkEntry 7 }
+  
+   linkDirection   OBJECT-TYPE
+      SYNTAX       LinkDirection
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION
+   "Unidirectional or Bidirectionnal connections."
+      ::= { linkEntry 8 }
+   
+   linkProtectionType   OBJECT-TYPE
+      SYNTAX       ProtectionType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "The value of this field indicates the kind of wanted link protection.
+    The default value is NONE.
+    if value is changed in Snc(1)then an entry is created in Snc table with the same index. But this table
+    has to be completed (by setting the PIC,...) to obtain a configured protection. 
+    if value is changed in None(0)then the associated entry in Snc table is deleted.
+    When the value is set to Snc for a particular entry of LinkTable, other links which are in relation (of
+    direction or protection) with this main link remain setting to None for this field. But all links are set to the USED(1) value
+    in the next field (linkProtectionStatus)"
+      ::= { linkEntry 9 }
+
+  linkProtectionStatus      OBJECT-TYPE
+	  SYNTAX       ProtectionStatus
+	  MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The value of this field indicates if the link is used directly or not in a Snc protection.
+	For a non-protected link, this field is mandatory set to None.
+	The field value particulary allow to know the hability of link deletion."
+      ::= { linkEntry 10 }
+
+  linkTrafficStatus      OBJECT-TYPE
+	  SYNTAX       TrafficStatus
+	  MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"The value of this field indicates where is the traffic.
+	For a non-protected link, this field is mandatory set to working"
+      ::= { linkEntry 11 }
+  
+  linkImplementation      OBJECT-TYPE
+	  SYNTAX       SagemBoolean
+	  MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Actually, this variable is not implemented (always set to TRUE).
+	 But it could be used to allow to reserve a connection without physical implementation"
+      ::= { linkEntry 12 }     
+     
+     
+      
+    
+--*******************************************************************
+-- xcon : creation/deletion of Xconnection    
+-- This vector has been created to allow to:
+--     * create or delete Xconnection in an atomic way (no need to use Set All command)
+--     * keep critical variable of linkTable (such as linkIndex) in a Read-Only Access 
+--     * get back a special message in case of trouble.
+--*******************************************************************      
+   XconDir ::= INTEGER 
+   {
+   	unknown(0),                     -- Future case of a non-implemented link 
+   	unidirectional(1),
+   	bidirectional(2)
+   }
+
+   ActionType ::= INTEGER 
+   {
+   	unknown(0),
+   	creation(1),
+   	deletion(2)
+   }
+
+  
+   xconNumber   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Number of connection to process."  
+      ::= { xcon 1 }
+            
+   xconSinkType   OBJECT-TYPE
+      SYNTAX       CTPType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Type of CTP"  
+      ::= { xcon 2 } 
+   
+   xconSinkIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Output CTP"  
+      ::= { xcon 3 } 
+   
+   xconSrcType   OBJECT-TYPE
+      SYNTAX       CTPType
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Type of CTP"  
+      ::= { xcon 4 } 
+   
+   xconSrcIndex   OBJECT-TYPE
+      SYNTAX       INTEGER(0..2147483647)
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"Input CTP"  
+      ::= { xcon 5 }  
+
+   xconDirection   OBJECT-TYPE
+      SYNTAX       XconDir 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION
+   "Bidirectionnal connections are composed of two unidirectional xcon
+    and therefore 2 link entries."
+      ::= { xcon 6 }
+      
+   xconName        OBJECT-TYPE
+      SYNTAX       DisplayString 
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"A text string which identifies the name of this cross-connection.
+    M1400 UIT-T specifies the field's format like this:
+     	NameTownA/NameSuffixA-NameTownB/NameSuffixB NameFunctionSNameSerial
+     		* NameTownX field accepts alpha-numeric and space characters. 
+     			NameTownB is preceded by a '-' character.
+     			Maximum length is 12 charracters.
+     			Not mandatory fields.
+     		* NameSuffixX field accepts alpha-numeric characters. 
+     		    It's preceded by a '/' character.
+     		    Maximum length is 3 characters.
+     		    Not mandatory fields.
+     		* NameFunction field accepts alpha-numeric characters.
+     		    It's followed by a 'S' character.
+     		    Maximum length is 3 characters.
+     		    Mandatory field.
+     		    It represents the function code.
+     		* NameSerial field accepts 4-figure number.
+     		    Not mandatory field.
+     		    It represents the serial number and will be incremented
+    			automatically from the base serial number provided.
+    For ADR2500 equipments:
+    	Links names of a bidirectionnal link must have different name.
+    	Same direction SNC protected links have an identical name."    		    
+      ::= { xcon 7 }
+
+ 
+    xconAction   OBJECT-TYPE  
+   	  SYNTAX 		ActionType
+   	  MAX-ACCESS    read-write
+   	  STATUS		current
+   	  DESCRIPTION	
+   	  "Type of action: Unknown(0) or Creation(1) or deletion(2)"
+      ::= { xcon 8 } 
+   	                         
+    xconProceed   OBJECT-TYPE
+      SYNTAX       SagemBoolean
+      MAX-ACCESS   read-write
+      STATUS       current
+      DESCRIPTION 
+	"
+	This entry is use to create (set to `true').
+	The value of the field remains to `true' until creation is 
+	completed or has been aborted. 
+	"  
+      ::= { xcon 20 } 
+   
+   xconDiagnostic   OBJECT-TYPE
+      SYNTAX       DisplayString
+      MAX-ACCESS   read-only
+      STATUS       current
+      DESCRIPTION 
+	"A string used to help in case of trouble."  
+      ::= { xcon 21 }  
+   
+END

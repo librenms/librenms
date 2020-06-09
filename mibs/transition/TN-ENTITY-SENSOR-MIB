@@ -1,0 +1,360 @@
+-- *****************************************************************
+-- TN-ENTITY-SENSOR-MIB
+--
+-- Copyright (c) 2011, Transition Networks Inc.
+-- All rights reserved.
+-- *****************************************************************
+--
+TN-ENTITY-SENSOR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE, 
+    NOTIFICATION-TYPE, 
+    Integer32   FROM SNMPv2-SMI
+    NOTIFICATION-GROUP  FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue  FROM SNMPv2-TC
+    entPhysicalIndex  FROM ENTITY-MIB
+    entPhySensorValue, EntitySensorValue FROM ENTITY-SENSOR-MIB
+    tnProducts FROM TRANSITION-SMI;
+
+tnEntitySensorMIB MODULE-IDENTITY
+        LAST-UPDATED "201101080000Z"
+	ORGANIZATION "Transition Networks, Inc."
+	CONTACT-INFO
+		"	Transition Networks
+			Technical Support
+
+			10900 Red Circle Drive
+			Minnetonka, MN 55343 USA
+			Tel: +1-800-526-9267
+			
+		    E-mail: techsupport@transition.com"
+	DESCRIPTION
+		"The mib module for managing all powersupply and fan modules."                           
+		
+	REVISION      "200901080000Z"
+		DESCRIPTION  
+		"Initial Revision of this module"
+	::= { tnProducts 6 }
+
+tnEntitySensorMIBNotifications
+        OBJECT IDENTIFIER ::= { tnEntitySensorMIB 0 }
+
+tnEntitySensorMIBObjects
+        OBJECT IDENTIFIER ::= { tnEntitySensorMIB 1 }
+
+tnEntitySensorMIBConformance
+        OBJECT IDENTIFIER ::= { tnEntitySensorMIB 2 }
+
+-- Textual Conventions
+TnSensorThresholdSeverity ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "sensor threshold severity.  Valid values are:
+
+        other(1)    : a severity other than those listed below.
+        minor(10)   : Minor Problem threshold.
+        major(20)   : Major Problem threshold.
+        critical(30): Critical problem threshold. A system might shut
+                      down the sensor associated FRU automatically if
+                      the sensor value reach the critical problem
+                      threshold."
+    SYNTAX INTEGER {
+        other(1),
+        minor(10),
+        major(20),
+        critical(30)
+    }
+
+TnSensorThresholdRelation ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "sensor threshold relational operator types.  valid values are:
+
+        lessThan(1):        if the sensor value is less than
+                            the threshold value
+        lessOrEqual(2):     if the sensor value is less than or equal to
+                            the threshold value
+        greaterThan(3):     if the sensor value is greater than 
+                            the threshold value
+        greaterOrEqual(4):  if the sensor value is greater than or equal
+                            to the threshold value
+        equalTo(5):         if the sensor value is equal to
+                            the threshold value
+        notEqualTo(6):      if the sensor value is not equal to
+                            the threshold value
+        "
+    SYNTAX INTEGER {
+        lessThan(1),
+        lessOrEqual(2),
+        greaterThan(3),
+        greaterOrEqual(4),
+        equalTo(5),
+        notEqualTo(6)
+    }
+
+--
+-- MIB variables
+-- 
+
+tnEntSensorValues
+    OBJECT IDENTIFIER ::= { tnEntitySensorMIBObjects 1 }
+
+tnEntSensorThresholds
+    OBJECT IDENTIFIER ::= { tnEntitySensorMIBObjects 2 }
+    
+tnEntSensorGlobalObjects
+    OBJECT IDENTIFIER ::= { tnEntitySensorMIBObjects 3 }
+           
+--
+-- tnEntValueExtTable
+--           
+tnEntSensorExtTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnEntSensorExtEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION                                   
+        "This table is an private extension of the public 
+        ENTITY-SENSOR-MIB  entPhySensorTable."
+    ::= { tnEntSensorValues 1 }
+ 
+tnEntSensorExtEntry OBJECT-TYPE
+    SYNTAX        TnEntSensorExtEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION                       
+        "The entries list the unique properties of the
+        ION Power supply module."   
+    INDEX { entPhysicalIndex }
+    ::= { tnEntSensorExtTable 1 }
+                               
+TnEntSensorExtEntry ::= SEQUENCE {
+    tnEntSensorExtRelayInstalled   TruthValue,
+    tnEntSensorExtRelayEnabled     TruthValue,
+    tnEntSensorExtModuleType       INTEGER,
+    tnEntSensorExtOperMode         INTEGER
+    }
+
+tnEntSensorExtRelayInstalled OBJECT-TYPE
+    SYNTAX        TruthValue 
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates if the relay contact is installed
+        on the power supply module or not."
+    ::= { tnEntSensorExtEntry 1 }
+
+tnEntSensorExtRelayEnabled OBJECT-TYPE
+    SYNTAX        TruthValue 
+    MAX-ACCESS    read-write
+    STATUS        current 
+    DESCRIPTION
+        "This variable enables or disables the relay contact if
+        it is installed (tnEntSensorExtRelayInstalled) in the power supply.
+        This relay contact is used to trigger an event to the user by attaching
+        an external indicator."
+    ::= { tnEntSensorExtEntry 2 }
+ 
+tnEntSensorExtModuleType OBJECT-TYPE
+    SYNTAX        INTEGER { acModule(1), dcModule(2) } 
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates if the power supply is
+        AC or DC module."
+    ::= { tnEntSensorExtEntry 3 }
+      
+tnEntSensorExtOperMode OBJECT-TYPE
+    SYNTAX        INTEGER { master(1), slave(2) } 
+    MAX-ACCESS    read-only
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates operational mode of the
+        power supply when redundant modules exists."
+    ::= { tnEntSensorExtEntry 4 }
+      
+--
+-- tnEntSensorThresholdTable 
+-- 
+
+tnEntSensorThresholdTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF TnEntSensorThresholdEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION
+        "This table lists the threshold severity, relation, and
+        comparison value, for a sensor listed in the Entity-MIB 
+        EntPhysicalTable."
+    ::= { tnEntSensorThresholds 1 }
+
+tnEntSensorThresholdEntry OBJECT-TYPE
+    SYNTAX        TnEntSensorThresholdEntry 
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION   
+         "An tnEntSensorThresholdTable Entry describes the 
+         thresholds for a sensor: the threshold severity,
+         the threshold value, the relation, and the 
+         evaluation of the threshold.
+
+         Only Entities of type sensor(8) are listed in this table.
+         Only pre-configured thresholds are listed in this table.
+
+         Users can create sensor-value monitoring instrumionEnts
+         in differionEnt ways, such as RMON alarms, Expression-MIB, etc.
+
+         Entries are created by the agionEnt at system startup and
+         FRU insertion.  Entries are deleted by the agionEnt at
+         FRU removal."
+    INDEX         { entPhysicalIndex, tnEntSensorThresholdIndex }
+    ::= { tnEntSensorThresholdTable 1 }
+
+TnEntSensorThresholdEntry ::= SEQUENCE {
+    tnEntSensorThresholdIndex               Integer32,
+    tnEntSensorThresholdSeverity            TnSensorThresholdSeverity,
+    tnEntSensorThresholdRelation            TnSensorThresholdRelation,
+    tnEntSensorThresholdValue               EntitySensorValue,
+    tnEntSensorThresholdEvaluation          TruthValue,
+    tnEntSensorThresholdNotificationEnable  TruthValue
+    }
+
+tnEntSensorThresholdIndex OBJECT-TYPE
+    SYNTAX        Integer32 (1..99999999)
+    MAX-ACCESS    not-accessible
+    STATUS        current 
+    DESCRIPTION
+        "An index that uniquely identifies an entry
+        in the tnEntSensorThresholdTable. This index
+        permits the same sensor to have several 
+        different thresholds."
+    ::= { tnEntSensorThresholdEntry 1 }
+
+tnEntSensorThresholdSeverity OBJECT-TYPE
+    SYNTAX        TnSensorThresholdSeverity 
+    MAX-ACCESS    read-write
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the severity of this threshold."
+    ::= { tnEntSensorThresholdEntry 2 }
+
+tnEntSensorThresholdRelation OBJECT-TYPE
+    SYNTAX        TnSensorThresholdRelation 
+    MAX-ACCESS    read-write
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the relation between sensor value 
+        (entSensorValue) and threshold value (tnEntSensorThresholdValue), 
+        required to trigger the alarm.  when evaluating the relation, 
+        entSensorValue is on the left of tnEntSensorThresholdRelation, 
+        tnEntSensorThresholdValue is on the right. 
+
+        in pseudo-code, the evaluation-alarm mechanism is:
+ 
+        ...
+        if (entSensorStatus == ok) then
+            if (evaluate(entSensorValue, tnEntSensorThresholdRelation,  
+                tnEntSensorThresholdValue)) 
+            then
+                if (tnEntSensorThresholdNotificationEnable == true)) 
+                then
+                    raise_alarm(sensor's entPhysicalIndex);
+                endif
+            endif
+        endif
+        ...
+        "
+    ::= { tnEntSensorThresholdEntry 3 }
+
+tnEntSensorThresholdValue OBJECT-TYPE
+    SYNTAX        EntitySensorValue 
+    MAX-ACCESS    read-write
+    STATUS        current 
+    DESCRIPTION
+        "This variable indicates the value of the threshold.
+
+        To correctly display or interpret this variable's value, 
+        you must also know entSensorType, entSensorScale, and 
+        entSensorPrecision.
+
+        However, you can directly compare entSensorValue 
+        with the threshold values given in tnEntSensorThresholdTable 
+        without any semantic knowledge.
+        "
+    ::= { tnEntSensorThresholdEntry 4 }
+
+tnEntSensorThresholdEvaluation  OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "This variable indicates the result of the most
+        recent evaluation of the threshold.  If the threshold
+        condition is true, tnEntSensorThresholdEvaluation 
+        is true(1).  If the threshold condition is false, 
+        tnEntSensorThresholdEvaluation is false(2).
+
+        Thresholds are evaluated at the rate indicated by 
+        entSensorValueUpdateRate.        
+        "
+    ::= { tnEntSensorThresholdEntry 5 }
+
+tnEntSensorThresholdNotificationEnable OBJECT-TYPE
+    SYNTAX        TruthValue
+    MAX-ACCESS    read-write
+    STATUS        current
+    DESCRIPTION
+        "This variable controls generation of 
+        tnEntSensorThresholdNotification for this threshold.
+
+        When this variable is 'true', generation of 
+        tnEntSensorThresholdNotification is enabled for this
+        threshold. When this variable is 'false', 
+        generation of tnEntSensorThresholdNotification is
+        disabled for this threshold.
+        "      
+    ::= { tnEntSensorThresholdEntry 6 }
+
+--
+-- Entity Sensor Global Objects
+--
+
+ tnEntSensorThreshNotifGlobalEnable  OBJECT-TYPE
+     SYNTAX        TruthValue
+     MAX-ACCESS    read-write
+     STATUS        current
+     DESCRIPTION
+         "This variable enables the generation of
+          tnEntSensorThresholdNotification globally
+          on the device. If this object value is
+          'false', then no tnEntSensorThresholdNotification
+          will be generated on this device. If this object
+          value is 'true', then whether a 
+          tnEntSensorThresholdNotification for a threshold will
+          be generated or not depends on the instance value of
+          tnEntSensorThresholdNotificationEnable for that
+          threshold.
+         "         
+     ::= { tnEntSensorGlobalObjects 1}
+     
+--
+-- notifications
+--
+tnEntSensorThresholdNotification NOTIFICATION-TYPE
+    OBJECTS { entPhySensorValue, tnEntSensorThresholdValue, tnEntSensorThresholdSeverity }
+    STATUS current
+    DESCRIPTION
+        "The sensor value crossed the threshold 
+        listed in tnEntSensorThresholdTable.
+
+        This notification is generated once each time
+        the sensor value crosses the threshold.
+        
+        The agent implementation guarantees prompt, timely
+        evaluation of threshold and generation of this
+        notification.
+        "
+    ::= { tnEntitySensorMIBNotifications 1 }
+         
+END

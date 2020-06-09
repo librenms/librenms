@@ -1,10 +1,13 @@
 <?php
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 session_start();
+$librenms_dir = realpath(__DIR__ . '/..');
+
 if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
     $_POST = $_SESSION;
-} elseif (!file_exists("../config.php")) {
+} elseif (!file_exists("{$librenms_dir}/config.php")) {
     $allowed_vars = array('stage','build-ok','dbhost','dbuser','dbpass','dbname','dbport','dbsocket','add_user','add_pass','add_email');
     foreach ($allowed_vars as $allowed) {
         if (isset($_POST[$allowed])) {
@@ -16,7 +19,7 @@ if (empty($_POST) && !empty($_SESSION) && !isset($_REQUEST['stage'])) {
 $stage = isset($_POST['stage']) ? $_POST['stage'] : 0;
 
 // Before we do anything, if we see config.php, redirect back to the homepage.
-if (file_exists('../config.php') && $stage != 6) {
+if (file_exists("{$librenms_dir}/config.php") && $stage != 6) {
     unset($_SESSION['stage']);
     header("Location: /");
     exit;
@@ -27,7 +30,7 @@ $init_modules = array('web', 'nodb');
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 // List of php modules we expect to see
-$modules = array('gd','mysqlnd');
+$modules = array('gd','mysqlnd', 'pdo_mysql');
 
 $dbhost = @$_POST['dbhost'] ?: 'localhost';
 $dbuser = @$_POST['dbuser'] ?: 'librenms';
@@ -78,7 +81,7 @@ if ($stage == 4) {
     }
 } elseif ($stage == 6) {
     // If we get here then let's do some final checks.
-    if (!file_exists("../config.php")) {
+    if (!file_exists("{$librenms_dir}/config.php")) {
         // config.php file doesn't exist. go back to that stage
         $msg = "config.php still doesn't exist";
         $stage = 5;
@@ -103,12 +106,12 @@ $complete = 1;
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-  <title><?php echo($config['page_title_prefix']); ?></title>
+    <title><?php echo(Config::get('page_title_prefix')); ?></title>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-  <link href="<?php echo($config['stylesheet']);  ?>" rel="stylesheet" type="text/css" />
+    <link href="<?php echo(Config::get('stylesheet')); ?>" rel="stylesheet" type="text/css"/>
   <script src="js/jquery.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/bootstrap-hover-dropdown.min.js"></script>
@@ -118,7 +121,7 @@ $complete = 1;
   <div class="container">
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
-        <h2 class="text-center">Welcome to the <?php echo($config['project_name']); ?> install</h2>
+          <h2 class="text-center">Welcome to the <?php echo(Config::get('project_name')); ?> install</h2>
       </div>
     </div>
     <div class="row">
@@ -129,14 +132,14 @@ $complete = 1;
 <?php
 
 if (!empty($msg)) {
-?>
+    ?>
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
         <div class="alert alert-danger"><?php echo $msg; ?></div>
       </div>
     </div>
 
-<?php
+    <?php
 }
 ?>
 
@@ -154,7 +157,7 @@ if (!empty($msg)) {
 <?php
 
 if ($stage == 0) {
-?>
+    ?>
 
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
@@ -169,51 +172,75 @@ if ($stage == 0) {
             <th>Status</th>
             <th>Comments</th>
           </tr>
-<?php
+    <?php
 
-$complete = true;
-foreach ($modules as $extension) {
-    if (extension_loaded("$extension")) {
-        $status = 'installed';
+    $complete = true;
+    foreach ($modules as $extension) {
+        if (extension_loaded("$extension")) {
+            $status = 'installed';
+            $row_class = 'success';
+        } else {
+            $status = 'missing';
+            $row_class = 'danger';
+            $complete = false;
+        }
+
+        echo "<tr class='$row_class'><td>PHP module <strong>$extension</strong></td><td>$status</td><td></td></tr>";
+    }
+
+    if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
+        $status = 'yes';
         $row_class = 'success';
     } else {
-        $status = 'missing';
+        $status = 'no';
         $row_class = 'danger';
         $complete = false;
     }
 
-    echo "<tr class='$row_class'><td>PHP module <strong>$extension</strong></td><td>$status</td><td></td></tr>";
-}
-
-if (is_writable(session_save_path() === '' ? '/tmp' : session_save_path())) {
-    $status = 'yes';
-    $row_class = 'success';
-} else {
-    $status = 'no';
-    $row_class = 'danger';
-    $complete = false;
-}
-
-echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
-if ($status == 'no') {
-    echo session_save_path() . " is not writable";
-    if (function_exists('posix_getgrgid')) {
-        $group_info = posix_getgrgid(filegroup(session_save_path()));
-        if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
-            $group = $group_info['name'];
-            $user = get_current_user();
-            echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+    echo "<tr class='$row_class'><td>Session directory writable</td><td>$status</td><td>";
+    if ($status == 'no') {
+        echo session_save_path() . " is not writable";
+        if (function_exists('posix_getgrgid')) {
+            $group_info = posix_getgrgid(filegroup(session_save_path()));
+            if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+                $group = $group_info['name'];
+                $user = get_current_user();
+                echo ", suggested fix <strong>usermod -a -G $group $user</strong>";
+            }
         }
     }
-}
-echo "</td></tr>";
-?>
+    echo "</td></tr>";
+    
+    if (is_writable(Config::get('temp_dir'))) {
+        $status = 'yes';
+        $row_class = 'success';
+    } else {
+        $status = 'no';
+        $row_class = 'danger';
+        $complete = false;
+    }
+
+    echo "<tr class='$row_class'><td>Temporary directory writable</td><td>$status</td><td>";
+    if ($status == 'no') {
+        echo Config::get('temp_dir') . ' is not writable';
+        if (function_exists('posix_getgrgid')) {
+            $group_info = posix_getgrgid(filegroup(session_save_path()));
+            if ($group_info['gid'] !== 0) {  // don't suggest adding users to the root group
+                $group = $group_info['name'];
+                $user = get_current_user();
+                echo ", suggested fix <strong>chown $user:$group $php_temp_dir</strong>";
+            }
+        }
+    }
+    echo "</td></tr>";
+    ?>
         </table>
       </div>
     </div>
     <div class="row">
       <div class="col-md-6 col-md-offset-3">
         <form class="form-inline" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="1">
           <button type="submit" class="btn btn-success pull-right"
             <?php
@@ -225,15 +252,16 @@ echo "</td></tr>";
       </div>
     </div>
 
-<?php
+    <?php
 } elseif ($stage == 1) {
-?>
+    ?>
 
     <div class="row">
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="2">
           <div class="form-group">
             <label for="dbhost" class="col-sm-4" control-label">DB Host: </label>
@@ -278,9 +306,9 @@ echo "</td></tr>";
       </div>
     </div>
 
-<?php
+    <?php
 } elseif ($stage == "2") {
-?>
+    ?>
     <div class="row">
      <div class="col-md-3">
      </div>
@@ -297,6 +325,7 @@ echo "</td></tr>";
       <div class="col-md-6">
         If you don't see any errors or messages above then the database setup has been successful.<br />
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="3">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -318,6 +347,10 @@ echo "</td></tr>";
         xhr.onprogress = function (e) {
             output.innerHTML = e.currentTarget.responseText;
             output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
+            if (output.innerHTML.indexOf('Error!') !== -1) {
+                // if error word in output, show the retry button
+                $("#retry-btn").css("display", "");
+            }
         };
         xhr.timeout = 90000; // if no response for 90s, allow the user to retry
         xhr.ontimeout = function (e) {
@@ -335,17 +368,17 @@ echo "</td></tr>";
         xhr.send();
         $('#install-progress').addClass('active')
     </script>
-<?php
+    <?php
 } elseif ($stage == "5") {
-?>
+    ?>
     <div class="row">
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-<?php
+    <?php
 
 // Create the config file we will write or display
-$config_file = <<<"EOD"
+    $config_file = <<<"EOD"
 ## Have a look in defaults.inc.php for examples of settings you can set here. DO NOT EDIT defaults.inc.php!
 
 ### Database config
@@ -388,24 +421,25 @@ $config_file = <<<"EOD"
 #\$config\['update'\] = 0;  # uncomment to completely disable updates
 EOD;
 
-if (!file_exists("../config.php")) {
-    $conf = fopen("../config.php", 'w');
-    if ($conf != false) {
-        if (fwrite($conf, "<?php\n") === false) {
+    if (!file_exists("{$librenms_dir}/config.php")) {
+        $conf = fopen("config.php", 'w');
+        if ($conf != false) {
+            if (fwrite($conf, "<?php\n") === false) {
+                echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
+                echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
+            } else {
+                $config_file = stripslashes($config_file);
+                fwrite($conf, $config_file);
+                echo("<div class='alert alert-success'>The config file has been created</div>");
+            }
+        } else {
             echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
             echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
-        } else {
-            $config_file = stripslashes($config_file);
-            fwrite($conf, $config_file);
-            echo("<div class='alert alert-success'>The config file has been created</div>");
         }
-    } else {
-        echo("<div class='alert alert-danger'>We couldn't create the config.php file, please create this manually before continuing by copying the below into a config.php in the root directory of your install (typically /opt/librenms/)</div>");
-        echo("<pre>&lt;?php\n".stripslashes($config_file)."</pre>");
     }
-}
-?>
+    ?>
       <form class="form-horizontal" role="form" method="post">
+        <?php echo csrf_field() ?>
         <input type="hidden" name="stage" value="6">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -414,21 +448,22 @@ if (!file_exists("../config.php")) {
           <input type="hidden" name="dbsocket" value="<?php echo $dbsocket; ?>">
         <button type="submit" class="btn btn-success pull-right">Finish install</button>
       </form>
-<?php
+    <?php
 
-?>
+    ?>
       </div>
       <div class="col-md-3">
       </div>
     </div>
-<?php
+    <?php
 } elseif ($stage == "3") {
-?>
+    ?>
     <div class="row">
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="4">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -459,32 +494,33 @@ if (!file_exists("../config.php")) {
       <div class="col-md-3">
       </div>
     </div>
-<?php
+    <?php
 } elseif ($stage == "4") {
     $proceed = 1;
-?>
+    ?>
     <div class="row">
       <div class="col-md-3">
       </div>
       <div class="col-md-6">
-<?php
-if (LegacyAuth::get()->canManageUsers()) {
-    if (!LegacyAuth::get()->userExists($add_user)) {
-        if (LegacyAuth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
-            echo("<div class='alert alert-success'>User has been added successfully</div>");
-            $proceed = 0;
+    <?php
+    if (LegacyAuth::get()->canManageUsers()) {
+        if (!LegacyAuth::get()->userExists($add_user)) {
+            if (LegacyAuth::get()->addUser($add_user, $add_pass, '10', $add_email)) {
+                echo("<div class='alert alert-success'>User has been added successfully</div>");
+                $proceed = 0;
+            } else {
+                echo("<div class='alert alert-danger'>User hasn't been added, please try again</div>");
+            }
         } else {
-            echo("<div class='alert alert-danger'>User hasn't been added, please try again</div>");
+            echo("<div class='alert alert-danger'>User $add_user already exists!</div>");
         }
     } else {
-        echo("<div class='alert alert-danger'>User $add_user already exists!</div>");
+        echo("<div class='alert alert-danger'>Auth module isn't loaded</div>");
     }
-} else {
-    echo("<div class='alert alert-danger'>Auth module isn't loaded</div>");
-}
 
-?>
+    ?>
         <form class="form-horizontal" role="form" method="post">
+            <?php echo csrf_field() ?>
           <input type="hidden" name="stage" value="5">
           <input type="hidden" name="dbhost" value="<?php echo $dbhost; ?>">
           <input type="hidden" name="dbuser" value="<?php echo $dbuser; ?>">
@@ -502,9 +538,9 @@ if (LegacyAuth::get()->canManageUsers()) {
       <div class="col-md-3">
       </div>
     </div>
-<?php
+    <?php
 } elseif ($stage == "6") {
-?>
+    ?>
     <div class="row">
         <div class="col-md-offset-3 col-md-6">
             <div class="alert alert-danger">
@@ -523,7 +559,7 @@ if (LegacyAuth::get()->canManageUsers()) {
       </div>
       <div class="col-md-3">
       </div>
-<?php
+    <?php
 }
 ?>
 

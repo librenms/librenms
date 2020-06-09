@@ -9,7 +9,7 @@
  * the source code distribution for details.
  */
 
-$cnpilot_data = snmp_get_multi_oid($device, 'serialNumber.0 productName.0 hardwareVersion.0', '-OUQs', 'CAMBIUM-MIB');
+$cnpilot_data = snmp_get_multi_oid($device, ['serialNumber.0', 'productName.0', 'hardwareVersion.0'], '-OUQs', 'CAMBIUM-MIB');
 
 $version  = $cnpilot_data['hardwareVersion.0'];
 $hardware = $cnpilot_data['productName.0'];

@@ -28,6 +28,9 @@ use LibreNMS\RRD\RrdDefinition;
 // UCD-SNMP-MIB::ssCpuRawSoftIRQ.0 = Counter32: 2605010
 // UCD-SNMP-MIB::ssRawSwapIn.0 = Counter32: 602002
 // UCD-SNMP-MIB::ssRawSwapOut.0 = Counter32: 937422
+// UCD-SNMP-MIB::ssCpuRawWait.0
+// UCD-SNMP-MIB::ssCpuRawSteal.0
+
 $ss = snmpwalk_cache_oid($device, 'systemStats', array(), 'UCD-SNMP-MIB');
 $ss = $ss[0];
 
@@ -67,6 +70,8 @@ $collect_oids = array(
     'ssRawContexts',
     'ssRawSwapIn',
     'ssRawSwapOut',
+    'ssCpuRawWait',
+    'ssCpuRawSteal',
 );
 
 foreach ($collect_oids as $oid) {
@@ -102,6 +107,14 @@ if (is_numeric($ss['ssRawInterrupts'])) {
     $graphs['ucd_interrupts'] = true;
 }
 
+if (is_numeric($ss['ssCpuRawWait'])) {
+    $graphs['ucd_io_wait'] = true;
+}
+
+if (is_numeric($ss['ssCpuRawSteal'])) {
+    $graphs['ucd_cpu_steal'] = true;
+}
+
 // #
 // Poll mem for load memory utilisation stats on UNIX-like hosts running UCD/Net-SNMPd
 // UCD-SNMP-MIB::memIndex.0 = INTEGER: 0
@@ -117,7 +130,7 @@ if (is_numeric($ss['ssRawInterrupts'])) {
 // UCD-SNMP-MIB::memSwapError.0 = INTEGER: noError(0)
 // UCD-SNMP-MIB::memSwapErrorMsg.0 = STRING:
 
-$snmpdata = snmp_get_multi($device, 'memTotalSwap.0 memAvailSwap.0 memTotalReal.0 memAvailReal.0 memTotalFree.0 memShared.0 memBuffer.0 memCached.0', '-OQUs', 'UCD-SNMP-MIB');
+$snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memAvailReal.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
 if (is_array($snmpdata[0])) {
     list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $snmpdata[0];
     foreach (array_keys($snmpdata[0]) as $key) {
@@ -160,7 +173,7 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
 // UCD-SNMP-MIB::laLoadInt.1 = INTEGER: 206
 // UCD-SNMP-MIB::laLoadInt.2 = INTEGER: 429
 // UCD-SNMP-MIB::laLoadInt.3 = INTEGER: 479
-$load_raw = snmp_get_multi($device, 'laLoadInt.1 laLoadInt.2 laLoadInt.3', '-OQUs', 'UCD-SNMP-MIB');
+$load_raw = snmp_get_multi($device, ['laLoadInt.1', 'laLoadInt.2', 'laLoadInt.3'], '-OQUs', 'UCD-SNMP-MIB');
 
 // Check to see that the 5-min OID is actually populated before we make the rrd
 if (is_numeric($load_raw[2]['laLoadInt'])) {

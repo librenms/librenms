@@ -1,4 +1,4 @@
---- ArubaOS 6.5.2.0_59123
+--- ArubaOS 8.5.0.0_70258
 -- vim:set ts=4 sw=4:
 WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
 
@@ -436,7 +436,8 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
 		 sysExtCardSwitchChip				DisplayString,
 		 sysExtCardStatus					ArubaActiveState,
 		 sysExtCardUserSlot					Integer32,
-		 sysExtCardServiceTag				DisplayString
+		 sysExtCardServiceTag				DisplayString,
+		 sysExtCardPartNumber				DisplayString
    }
 
    sysExtCardSlot OBJECT-TYPE
@@ -585,6 +586,16 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
 			Service Tag of the card.
             "
         ::= { wlsxSysExtCardEntry 14 }
+
+   sysExtCardPartNumber OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+         MAX-ACCESS   read-only
+         STATUS       current
+         DESCRIPTION
+            "
+			Service Tag of the card.
+            "
+        ::= { wlsxSysExtCardEntry 15 }
 
 -- This table lists the Fans in the controller.
 
@@ -1127,6 +1138,60 @@ WLSX-SYSTEMEXT-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
                         "Switch is powered using POE power."
         ::= { wlsxSystemExtGroup 33 }
+
+   wlsxSysVMHostType OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION           
+                         "Host type is KVM/ HyperV/ VMware."
+        ::= { wlsxSystemExtGroup 34 }
+
+   wlsxSysExtProcessorModel OBJECT-TYPE
+        SYNTAX       DisplayString (SIZE(1..64))
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION           
+                         "Processor Model Name."
+        ::= { wlsxSystemExtGroup 35 } 
+
+   wlsxSysExtTotalCpu OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "Total number of Control path and datapath CPUs
+                         in the controller."
+
+        ::= { wlsxSystemExtGroup 36 }
+
+   wlsxSysExtTotalSocket  OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                        "Total sockets present in the VM."
+
+        ::= { wlsxSystemExtGroup 37 }
+
+    wlsxAuthFailIp OBJECT-TYPE
+        SYNTAX       IpAddress
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                  "This variable contains the last SNMP
+                   authorization failure IP address."
+        ::= { wlsxSystemExtGroup 38 }
+	
+    wlsxSysExtDiskSize  OBJECT-TYPE
+        SYNTAX       Integer32
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+                  "Supervisor Card Flash Memory in MB."
+
+        ::= { wlsxSystemExtGroup 39 }
+
 
 END
 

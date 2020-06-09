@@ -25,14 +25,17 @@
 
 namespace LibreNMS\Tests;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
-use PHPUnit_Framework_ExpectationFailedException as PHPUnitException;
+use LibreNMS\Util\OS;
+use const false;
+use const true;
 
 class OSDiscoveryTest extends TestCase
 {
     private static $unchecked_files;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         parent::setUpBeforeClass();
 
@@ -65,11 +68,11 @@ class OSDiscoveryTest extends TestCase
             return basename($file, '.snmprec');
         }, glob($glob));
         $files = array_filter($files, function ($file) use ($os_name) {
-            return $file == $os_name || starts_with($file, $os_name . '_');
+            return $file == $os_name || Str::startsWith($file, $os_name . '_');
         });
 
         if (empty($files)) {
-            throw new PHPUnitException("No snmprec files found for $os_name!");
+            $this->fail("No snmprec files found for $os_name!");
         }
 
         foreach ($files as $file) {
@@ -122,15 +125,16 @@ class OSDiscoveryTest extends TestCase
     {
         return [
             'device_id' => 1,
-            'hostname' => $this->snmpsim->getIP(),
+            'hostname' => $this->getSnmpsim()->getIP(),
             'snmpver' => 'v2c',
-            'port' => $this->snmpsim->getPort(),
+            'port' => $this->getSnmpsim()->getPort(),
             'timeout' => 3,
             'retries' => 0,
             'snmp_max_repeaters' => 10,
             'community' => $community,
             'os' => 'generic',
             'os_group' => '',
+            'attribs' => [],
         ];
     }
 
@@ -144,7 +148,7 @@ class OSDiscoveryTest extends TestCase
         // make sure all OS are loaded
         $config_os = array_keys(Config::get('os'));
         if (count($config_os) < count(glob(Config::get('install_dir').'/includes/definitions/*.yaml'))) {
-            load_all_os();
+            OS::loadAllDefinitions(false, true);
             $config_os = array_keys(Config::get('os'));
         }
 

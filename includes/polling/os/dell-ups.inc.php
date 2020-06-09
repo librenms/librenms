@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-$data = snmp_get_multi($device, 'productIDDisplayName.0 productIDBuildNumber.0 productIDVersion.0 physicalIdentSerialNumber.0', '-OQUs', 'DELL-SNMP-UPS-MIB');
+$data = snmp_get_multi($device, ['productIDDisplayName.0', 'productIDBuildNumber.0', 'productIDVersion.0', 'physicalIdentSerialNumber.0'], '-OQUs', 'DELL-SNMP-UPS-MIB');
 
 $hardware = $data[0]['productIDDisplayName'];
 $serial = $data[0]['physicalIdentSerialNumber'];

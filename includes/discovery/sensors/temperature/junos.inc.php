@@ -29,7 +29,7 @@ $divisor    = 1;
 foreach ($pre_cache['junos_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxDomCurrentModuleTemperature']) && $entry['jnxDomCurrentModuleTemperature'] != 0 && $entry['jnxDomCurrentModuleTemperatureLowAlarmThreshold']) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.8.'.$index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', array($index, $device['device_id'])) . ' Temperature';
+        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Temperature';
         $limit_low = $entry['jnxDomCurrentModuleTemperatureLowAlarmThreshold']/$divisor;
         $warn_limit_low = $entry['jnxDomCurrentModuleTemperatureLowWarningThreshold']/$divisor;
         $limit = $entry['jnxDomCurrentModuleTemperatureHighAlarmThreshold']/$divisor;

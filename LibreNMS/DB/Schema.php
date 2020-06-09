@@ -25,8 +25,11 @@
 
 namespace LibreNMS\DB;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Version;
 use Symfony\Component\Yaml\Yaml;
+use \Schema as LaravelSchema;
 
 class Schema
 {
@@ -40,22 +43,61 @@ class Schema
     private $schema;
 
     /**
+     * Check the database to see if the migrations have all been run
+     *
+     * @return bool
+     */
+    public static function isCurrent()
+    {
+        if (LaravelSchema::hasTable('migrations')) {
+            return self::getMigrationFiles()->diff(self::getAppliedMigrations())->isEmpty();
+        }
+
+        return false;
+    }
+
+    /**
+     * Check for extra migrations and return them
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public static function getUnexpectedMigrations()
+    {
+        return self::getAppliedMigrations()->diff(self::getMigrationFiles());
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    private static function getMigrationFiles()
+    {
+        $migrations = collect(glob(base_path('database/migrations/') . '*.php'))
+            ->map(function ($migration_file) {
+                return basename($migration_file, '.php');
+            });
+        return $migrations;
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    private static function getAppliedMigrations()
+    {
+        return Eloquent::DB()->table('migrations')->pluck('migration');
+    }
+
+    /**
      * Get the primary key column(s) for a table
      *
      * @param string $table
-     * @return string|array if a single column just the name is returned, otherwise an array of column names
+     * @return string if a single column just the name is returned, otherwise the first column listed will be returned
      */
     public function getPrimaryKey($table)
     {
         $schema = $this->getSchema();
-
         $columns = $schema[$table]['Indexes']['PRIMARY']['Columns'];
 
-        if (count($columns) == 1) {
-            return reset($columns);
-        }
-
-        return $columns;
+        return reset($columns);
     }
 
     public function getSchema()
@@ -101,10 +143,11 @@ class Schema
     {
         $update_cache = true;
         $cache_file = Config::get('install_dir') . "/cache/{$base}_relationships.cache";
+        $db_version = Version::get()->database();
 
         if (is_file($cache_file)) {
             $cache = unserialize(file_get_contents($cache_file));
-            if ($cache['version'] == get_db_schema()) {
+            if ($cache['version'] == $db_version) {
                 $update_cache = false;  // cache is valid skip update
             }
         }
@@ -119,11 +162,15 @@ class Schema
             }
 
             $cache = [
-                'version' => get_db_schema(),
+                'version' => $db_version,
                 $base => $paths
             ];
 
-            file_put_contents($cache_file, serialize($cache));
+            if (is_writable($cache_file)) {
+                file_put_contents($cache_file, serialize($cache));
+            } else {
+                d_echo("Could not write cache file ($cache_file)!\n");
+            }
         }
 
         return $cache[$base];
@@ -167,7 +214,7 @@ class Schema
                 return [$table, $target];
             }
 
-            $table_relations = $relationships[$table];
+            $table_relations = $relationships[$table] ?? [];
             d_echo("Searching $table: " . json_encode($table_relations) . PHP_EOL);
 
             if (!empty($table_relations)) {
@@ -228,7 +275,7 @@ class Schema
 
     public function getTableFromKey($key)
     {
-        if (ends_with($key, '_id')) {
+        if (Str::endsWith($key, '_id')) {
             // hardcoded
             if ($key == 'app_id') {
                 return 'applications';
@@ -237,8 +284,8 @@ class Schema
             // try to guess assuming key_id = keys table
             $guessed_table = substr($key, 0, -3);
 
-            if (!ends_with($guessed_table, 's')) {
-                if (ends_with($guessed_table, 'x')) {
+            if (!Str::endsWith($guessed_table, 's')) {
+                if (Str::endsWith($guessed_table, 'x')) {
                     $guessed_table .= 'es';
                 } else {
                     $guessed_table .= 's';

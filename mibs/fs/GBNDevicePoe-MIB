@@ -1,0 +1,287 @@
+GBNDevicePoe-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        Integer32                    FROM SNMPv2-SMI                
+        gbnDevice                               FROM ADMIN-MASTER-MIB        
+        DisplayString         FROM SNMPv2-TC; 
+
+    gbnDevicePoe MODULE-IDENTITY
+        LAST-UPDATED    "0011020000Z"  -- November 2, 2000
+        ORGANIZATION    "admin Systems, Inc."
+        CONTACT-INFO    "admin Systems, Inc.
+                         E-mail: support@admin.com.cn"
+
+        DESCRIPTION     "Gbn Common Enterprise MIB definition."
+
+        REVISION        "0011020000Z"  -- November 2, 2000
+        DESCRIPTION     "Initial MIB creation."
+
+        ::= { gbnDevice 4 }           
+      
+poePowerSupplyTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PoePowerSupplyEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of power supply."
+       ::= { gbnDevicePoe 2 }
+
+   poePowerSupplyEntry OBJECT-TYPE
+       SYNTAX      PoePowerSupplyEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of power supply."
+       INDEX    { powerindex }
+       ::= { poePowerSupplyTable 1 }
+
+   PoePowerSupplyEntry ::= SEQUENCE {
+       powerindex             Integer32,
+       poeVersion             DisplayString,
+       powerstatus            DisplayString,
+       poeDevicePowerLimit    Integer32,
+       poeDevicePowerConsume  Integer32
+   }
+   
+     powerindex OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "unit index, start from 1 "
+       ::= { poePowerSupplyEntry 1 }
+
+	poeVersion OBJECT-TYPE
+		SYNTAX DisplayString
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"A string of poe firmware."
+		::= { poePowerSupplyEntry 2 }
+
+	powerstatus  OBJECT-TYPE
+       SYNTAX             DisplayString
+       MAX-ACCESS         read-only
+       STATUS             current
+       DESCRIPTION
+          "descriptions of power supply"
+       ::= { poePowerSupplyEntry 3 }
+
+	poeDevicePowerLimit OBJECT-TYPE
+		SYNTAX Integer32(37..806)
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"power limit of device.unit is Watt"
+		::= { poePowerSupplyEntry 4 }
+		
+	poeDevicePowerConsume OBJECT-TYPE
+		SYNTAX Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"power consumption of device.unit is Watt"
+		::= { poePowerSupplyEntry 5 }
+
+poePortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PoePortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of poe port."
+       ::= { gbnDevicePoe 4 }
+
+   poePortEntry OBJECT-TYPE
+       SYNTAX      PoePortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of poe port."
+       INDEX    { portIndex }
+       ::= { poePortTable 1 }
+
+   PoePortEntry ::= SEQUENCE {
+       portIndex
+           Integer32,
+       powerlimit
+           Integer32,
+       powerConsume
+           Integer32
+   }
+   
+     portIndex OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "port index, start from 1 "
+       ::= { poePortEntry 1 }
+
+      powerlimit  OBJECT-TYPE
+       SYNTAX             Integer32
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+        "power limit of port.unit is mW"
+       ::= { poePortEntry 2 }
+       
+      powerConsume  OBJECT-TYPE
+       SYNTAX             Integer32
+       MAX-ACCESS         read-only
+       STATUS             current
+       DESCRIPTION
+        "power consumption of port.unit is mW"
+       ::= { poePortEntry 3 }
+
+poePdPortTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PoePdPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of poe port."
+       ::= { gbnDevicePoe 5 }
+
+   poePdPortEntry OBJECT-TYPE
+       SYNTAX      PoePdPortEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of poe port."
+       INDEX    { portPdIndex }
+       ::= { poePdPortTable 1 }
+
+   PoePdPortEntry ::= SEQUENCE {
+       portPdIndex
+           Integer32,
+       portPoePdEnable
+           Integer32,
+       portPoePdConfig
+           Integer32
+}
+   
+     portPdIndex OBJECT-TYPE
+       SYNTAX      Integer32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+           "port index, start from 1 "
+       ::= { poePdPortEntry 1 }
+
+      portPoePdEnable  OBJECT-TYPE
+       SYNTAX             Integer32
+       MAX-ACCESS         read-only
+       STATUS             current
+       DESCRIPTION
+        "poe feedback real time port enable state.unit is mW"
+       ::= { poePdPortEntry 2 }
+       
+      portPoePdConfig  OBJECT-TYPE
+       SYNTAX             Integer32
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+        "poe feedback config port enable.unit is mW"
+       ::= { poePdPortEntry 3 }
+       
+poeFanControlTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF PoeFanControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of poe fan set."
+       ::= { gbnDevicePoe 6 }
+
+   poeFanControlEntry OBJECT-TYPE
+       SYNTAX      PoeFanControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+           "A table of poe fan set."
+       INDEX    { poeFandefault }
+       ::= { poeFanControlTable 1 }
+
+   PoeFanControlEntry ::= SEQUENCE {
+       poeFandefault
+           INTEGER,
+       poeFanlowVaule
+           Integer32,
+       poeFanmiddleVaule
+           Integer32,
+       poeFanhighVaule
+           Integer32,
+       poeFanModeSet
+           INTEGER,  
+       poeFan1Speed
+       		 Integer32,
+       poeFan2Speed	
+       		 Integer32,
+       poeTemperature
+       		 DisplayString	  
+   }  
+
+      poeFandefault  OBJECT-TYPE
+       SYNTAX             INTEGER {
+              default(1),
+              user-defined(0)
+          }
+       MAX-ACCESS         read-only
+       STATUS             current
+       DESCRIPTION
+        "poe fans' mode set or get."
+       ::= { poeFanControlEntry 1 }
+       
+      poeFanlowVaule  OBJECT-TYPE
+       SYNTAX             Integer32(0..25)
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+        "poe fan-control low-temperature"
+       ::= { poeFanControlEntry 2 }
+
+	  poeFanmiddleVaule  OBJECT-TYPE
+       SYNTAX             Integer32(26..60)
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+        "poe fan-control middle-temperature"
+       ::= { poeFanControlEntry 3 }
+
+      poeFanhighVaule  OBJECT-TYPE
+       SYNTAX             Integer32(61..70)
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+        "poe fan-control high-temperature"
+       ::= { poeFanControlEntry 4 } 
+
+      poeFanModeSet  OBJECT-TYPE
+       SYNTAX             INTEGER {
+              default(0),
+              user-defined(1)
+          }
+       MAX-ACCESS         read-write
+       STATUS             current
+       DESCRIPTION
+        "poe fan-control user defined set"
+       ::= { poeFanControlEntry 5 } 
+      poeFan1Speed  OBJECT-TYPE
+       SYNTAX             Integer32
+       MAX-ACCESS         read-only
+       STATUS             current
+       DESCRIPTION
+        "the fan1 speed of the switch"
+       ::= { poeFanControlEntry 6 } 
+     poeFan2Speed  OBJECT-TYPE
+       SYNTAX             Integer32
+       MAX-ACCESS         read-only
+       STATUS             current
+       DESCRIPTION
+        "the fan2 speed of the switch"
+       ::= { poeFanControlEntry 7 } 
+     poeTemperature  OBJECT-TYPE
+       SYNTAX             DisplayString
+       MAX-ACCESS         read-only
+       STATUS             current
+       DESCRIPTION
+        "the temperture of the switch"
+       ::= { poeFanControlEntry 8 } 
+END

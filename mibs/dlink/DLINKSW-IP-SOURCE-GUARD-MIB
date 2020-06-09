@@ -1,0 +1,464 @@
+--  *****************************************************************
+--  DLINKSW-IP-SOURCE-GUARD-MIB.mib : IP Source Guard MIB
+-- 
+--  Copyright (c) 2013 D-Link Corporation, all rights reserved.
+--   
+--  *****************************************************************
+
+DLINKSW-IP-SOURCE-GUARD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MacAddress,
+    RowStatus
+        FROM SNMPv2-TC
+    ifIndex,
+    InterfaceIndex
+        FROM IF-MIB
+    InetAddressIPv4
+        FROM INET-ADDRESS-MIB
+    VlanId
+        FROM Q-BRIDGE-MIB
+    Dlink2kVlanList                 
+        FROM DLINKSW-TC-MIB
+    dlinkIndustrialCommon
+        FROM DLINK-ID-REC-MIB;
+
+
+dlinkSwIpSourceGuardMIB MODULE-IDENTITY
+    LAST-UPDATED    "201307180000Z"
+    ORGANIZATION    "D-Link Corp."
+    CONTACT-INFO
+            "        D-Link Corporation
+
+             Postal: No. 289, Sinhu 3rd Rd., Neihu District,
+                     Taipei City 114, Taiwan, R.O.C
+             Tel:     +886-2-66000123
+             E-mail: tsd@dlink.com.tw
+            "
+    DESCRIPTION
+        "The MIB module is for configuration of IP Source Guard feature."
+    
+    REVISION        "201307180000Z"
+    DESCRIPTION
+        "Initial revision of this MIB module."
+    ::= { dlinkIndustrialCommon 132 }
+
+
+    dIpSourceGuardMIBNotifs  OBJECT IDENTIFIER    ::= { dlinkSwIpSourceGuardMIB 0 }
+    dIpSourceGuardMIBObjects  OBJECT IDENTIFIER   ::= { dlinkSwIpSourceGuardMIB 1 }
+    dIpSourceGuardMIBConformance  OBJECT IDENTIFIER   ::= { dlinkSwIpSourceGuardMIB 2 }
+
+-- -----------------------------------------------------------------------------
+    dIpsgBindings  OBJECT IDENTIFIER    ::= { dIpSourceGuardMIBObjects 1 }
+    dIpsgSrcGuard  OBJECT IDENTIFIER    ::= { dIpSourceGuardMIBObjects 2 }
+
+-- -----------------------------------------------------------------------------
+    dIpsgStaticBindingsTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DigStaticBindingsEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the manual bindings information.
+            e.g.
+            VLAN MAC Address       IP Address Interface
+            ---- ----------------- ---------- ---------
+            2000 00.01.02.03.04.05 172.18.1.1 8
+            3000 00.05.06.07.08.09 10.1.1.1   3
+            4094 00.10.20.30.40.55 1.1.1.1    5
+            4094 00.10.20.30.40.55 1.1.1.1    6
+            4094 00.10.20.30.40.55 1.1.1.1    8
+            "
+        ::= { dIpsgBindings 1 }
+
+    dIpsgStaticBindingsEntry OBJECT-TYPE
+        SYNTAX          DigStaticBindingsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+           "An entry defines a manual binding.
+           "
+        INDEX           {
+            dIpsgStaticBindingsVlan,
+            dIpsgStaticBindingsMacAddress,
+            dIpsgStaticBindingsIpAddress,
+            dIpsgStaticBindingsInterface
+        } 
+        ::= { dIpsgStaticBindingsTable 1 }
+
+    DigStaticBindingsEntry ::= SEQUENCE {
+        dIpsgStaticBindingsVlan           VlanId,
+        dIpsgStaticBindingsMacAddress     MacAddress,
+        dIpsgStaticBindingsIpAddress      InetAddressIPv4,
+        dIpsgStaticBindingsInterface      InterfaceIndex,
+        dIpsgStaticBindingsRowStatus         RowStatus
+    } 
+
+    dIpsgStaticBindingsVlan OBJECT-TYPE
+        SYNTAX          VlanId
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the VLAN to which a host belongs." 
+        ::= { dIpsgStaticBindingsEntry 1 }
+
+    dIpsgStaticBindingsMacAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of a host." 
+        ::= { dIpsgStaticBindingsEntry 2 }
+
+    dIpsgStaticBindingsIpAddress OBJECT-TYPE
+        SYNTAX          InetAddressIPv4
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the allocated IP address of host." 
+        ::= { dIpsgStaticBindingsEntry 3 }
+
+    dIpsgStaticBindingsInterface OBJECT-TYPE
+        SYNTAX          InterfaceIndex
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the ifIndex value of the interface
+            where a host connects to." 
+       ::= { dIpsgStaticBindingsEntry 4 }
+
+    dIpsgStaticBindingsRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is used to manage the creation and deletion
+            of rows in this table.
+            " 
+        ::= { dIpsgStaticBindingsEntry 99 }
+ 
+-- -----------------------------------------------------------------------------
+    dIpsgIfSrcGuardConfigTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DigIfSrcGuardConfigEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the mechanism to enable or disable
+            IP Source Guard at every interface capable of
+            this feature.
+
+            When DHCP Snooping is enabled at an interface, a list of
+            IP addresses is obtained through DHCP Snooping for this
+            particular interface. If IP Source Guard is enabled, only
+            traffic from these IP addresses is allowed to pass through
+            the interface."
+        ::= { dIpsgSrcGuard 1 }
+
+    dIpsgIfSrcGuardConfigEntry OBJECT-TYPE
+       SYNTAX          DigIfSrcGuardConfigEntry
+       MAX-ACCESS      not-accessible
+       STATUS          current
+       DESCRIPTION
+            "A row instance contains the configuration to enable
+            or disable IP Source Guard as well as the configuration
+            of the filter type at each interface capable
+            of IP Source Guard feature."
+       INDEX           { ifIndex } 
+       ::= { dIpsgIfSrcGuardConfigTable 1 }
+
+       DigIfSrcGuardConfigEntry ::= SEQUENCE {
+            dIpsgIfSrcGuardFilterType INTEGER
+       }
+
+    dIpsgIfSrcGuardFilterType OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            disable(1),
+            ip(2),
+            ipMac(3)
+        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the traffic filter type applied
+            at this interface.
+
+            'disable' - indicates that IP Source Guard feature is disabled.
+                      
+            'ip' - the validation is based on source IP address and VLAN only.
+
+            'ipMac' - the validation is based on the source MAC address, VLAN and IP address.
+            "
+        ::= { dIpsgIfSrcGuardConfigEntry 1 }
+ 
+
+-- -----------------------------------------------------------------------------
+    dIpsgIfSrcGuardAddrTable OBJECT-TYPE
+        SYNTAX          SEQUENCE OF DigIfSrcGuardAddrEntry 
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "A table provides the information on IP addresses used
+           for IP Source Guard purpose at every interface capable of this
+           feature."
+        ::= { dIpsgSrcGuard 2 }
+
+    dIpsgIfSrcGuardAddrEntry OBJECT-TYPE
+        SYNTAX          DigIfSrcGuardAddrEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "An entry defines a binding information that is used to guard the
+            IP traffic.
+            The binding entry may be either manually configured or 
+            automatically learned via DHCP snooping.
+            "
+        INDEX           {
+            ifIndex,
+            dIpsgIfSrcGuardIndex
+        } 
+        ::= { dIpsgIfSrcGuardAddrTable 1 }
+
+    DigIfSrcGuardAddrEntry ::= SEQUENCE {
+        dIpsgIfSrcGuardIndex              Unsigned32,
+        dIpsgIfSrcGuardFilterMode         INTEGER,
+        dIpsgIfSrcGuardIpAddress            InetAddressIPv4,
+        dIpsgIfSrcGuardIpFilterAction     INTEGER,        
+        dIpsgIfSrcGuardMacAddress         MacAddress,
+        dIpsgIfSrcGuardMacFilterAction    INTEGER,
+        dIpsgIfSrcGuardVlansFirst2K       Dlink2kVlanList,
+        dIpsgIfSrcGuardVlansSecond2K      Dlink2kVlanList
+    }
+
+    dIpsgIfSrcGuardIndex OBJECT-TYPE
+        SYNTAX          Unsigned32 ( 1 ..65535 )
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This object is used to index the dIpsgIfSrcGuardAddrTable.
+	        This index is for SNMP purposes only, and has no intrinsic meaning." 
+        ::= { dIpsgIfSrcGuardAddrEntry 1 }
+    
+    dIpsgIfSrcGuardFilterMode OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            active(1),
+            inactiveTrustPort(2),
+            inactiveNoSnoopingVlan(3)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Source Guard filter mode at
+            this interface.             
+
+            active(1) indicates that the Source Guard feature is
+            active at this interface.
+            
+            inactiveTrustPort(2) indicates that the Source Guard
+            feature is inactive because this interface is a DHCP
+            Snooping trust interface and all IP traffic is permitted. 
+            In this case, dIpsgIfSrcGuardIpFilterAction is 'permitAllIpAdress'.         
+
+            inactiveNoSnoopingVlan(3) indicates that the Source
+            Guard feature is inactive because this interface
+            does not have a VLAN which has DHCP Snooping enabled and 
+            no IP source verify entry is active. In this case, all IP traffic
+            is denied and dIpsgIfSrcGuardIpFilterAction is 'denyAllIpAddress'. 
+
+            If this object is not 'active', the entry is a special entry:
+            traffic from any VLANs on the interface has the same behavior
+            indicated by dIpsgIfSrcGuardIpFilterAction and both 
+            dIpsgIfSrcGuardVlansFirst2K and dIpsgIfSrcGuardVlansSecond2K
+            are empty.
+            " 
+       ::= { dIpsgIfSrcGuardAddrEntry 2 }
+  
+    dIpsgIfSrcGuardIpAddress OBJECT-TYPE
+        SYNTAX          InetAddressIPv4
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP address of the entry.
+            A special value of '0.0.0.0' indicates this object is meaningless.
+            " 
+        ::= { dIpsgIfSrcGuardAddrEntry 3 }
+
+    dIpsgIfSrcGuardIpFilterAction OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            permitIpAddress(1),
+            permitAllIpAdress(2),
+            denyAllIpAddress(3)
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the IP Source Guard action
+            applied at this interface with respect to IP traffic.
+           
+            permitIpAddress(1) - indicates that matching IP traffic will be allowed
+                to go through. What is matching traffic depends on the value of
+                dIpsgIfSrcGuardMacFilterAction.
+            
+            permitAllIpAdress(2) indicates that all IP traffic coming to this 
+                interface will be allowed. In this case, dIpsgIfSrcGuardIpAddress
+                is 0.0.0.0. 
+  
+            denyAllIpAdress(3) indicates that all IP traffic coming to this 
+                interface will be dropped. In this case, dIpsgIfSrcGuardIpAddress
+                is 0.0.0.0.
+             
+            When this object is not 'permitIpAddress', the value of 
+            dIpsgIfSrcGuardMacFilterAction is meaningless.
+            " 
+       ::= { dIpsgIfSrcGuardAddrEntry 4 }
+
+    dIpsgIfSrcGuardMacAddress OBJECT-TYPE
+        SYNTAX          MacAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the MAC address of the entry.
+            A special value of '000000000000'H indicates this object is 
+            meaningless.
+            " 
+        ::= { dIpsgIfSrcGuardAddrEntry 5 }
+
+    dIpsgIfSrcGuardMacFilterAction OBJECT-TYPE
+        SYNTAX          INTEGER  {
+            allowMacAddress(1),
+            permitAllMacAddresses(2)          
+        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the Source Guard action
+            applied when the traffic matching the entry:
+                        
+            allowMacAddress(1) - indicates that the IP traffic (compared
+                source IP and source MAC with dIpsgIfSrcGuardIpAddress and 
+                dIpsgIfSrcGuardMacAddress respectively) will be allowed
+                to go through.
+                
+            permitAllMacAddresses(2) - If dIpsgIfSrcGuardIpFilterAction is
+                'permitIpAddress', this value indicates that all the IP matching
+                traffic (compared source IP with dIpsgIfSrcGuardIpAddress only)
+                will be allowed to go through.
+            
+            When dIpsgIfSrcGuardIpFilterAction is 'permitAllIpAdress' or 
+            'denyAllIpAdress', this object is meaningless.
+
+            When dIpsgIfSrcGuardMacFilterAction is 'permitAllMacAddresses',
+            dIpsgIfSrcGuardMacAddress is meaningless and 
+            '000000000000'H is used to indicate it.
+            " 
+        ::= { dIpsgIfSrcGuardAddrEntry 6 }
+
+    dIpsgIfSrcGuardVlansFirst2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs the entry is applied to in a 
+            string of octets containing one bit per VLAN for VLANs 1 to 2048. 
+            If the bit is set to '1', then the IP Source Guard is enabled on
+            the VLAN.
+            "
+        ::= { dIpsgIfSrcGuardAddrEntry 7 }
+
+    dIpsgIfSrcGuardVlansSecond2K OBJECT-TYPE
+        SYNTAX          Dlink2kVlanList
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object specifies the VLANs the entry is applied to in a 
+            string of octets containing one bit per VLAN for VLANs 2049 to 4094. 
+            If the bit is set to '1', then the IP Source Guard is enabled on
+            the VLAN.
+            "
+       ::= { dIpsgIfSrcGuardAddrEntry 8 }
+ 
+
+-- Conformance
+
+    dIpsgMIBCompliances  OBJECT IDENTIFIER     ::= { dIpSourceGuardMIBConformance 1 }
+    dIpsgMIBGroups  OBJECT IDENTIFIER          ::= { dIpSourceGuardMIBConformance 2 }
+
+
+    dIpsgMIBCompliance MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION
+            "The compliance statement for the DLINKSW-IP-SOURCE-GUARD-MIB."
+        MODULE          -- this module
+        MANDATORY-GROUPS {
+            dIpsgIfSrcGuardTrafficFilterGroup,
+            dIpsgVerifySrcInfoGroup
+        }
+       
+    GROUP           dIpsgStaticBindingsGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        the DHCP bindings data statically configured by (local
+        or network) management."
+
+    
+    GROUP           dIpsgVerifySrcInfoExtGroup
+    DESCRIPTION
+        "This group is mandatory only for platforms which support
+        interface IP and MAC source guard feature."
+   
+    ::= { dIpsgMIBCompliances 1 }
+
+-- Units of Conformance
+
+    dIpsgStaticBindingsGroup OBJECT-GROUP
+        OBJECTS         {
+            dIpsgStaticBindingsRowStatus
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects which are used to configure
+            as well as show information regarding the static binding data
+            for IP Source Guard."
+        ::= { dIpsgMIBGroups 1 }
+
+    dIpsgVerifySrcInfoGroup OBJECT-GROUP
+        OBJECTS         {
+            dIpsgIfSrcGuardIpAddress,
+            dIpsgIfSrcGuardIpFilterAction,
+            dIpsgIfSrcGuardFilterMode
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects which are used to show information
+            regarding interface IP source guard purpose."
+        ::= { dIpsgMIBGroups 2 }
+
+    dIpsgVerifySrcInfoExtGroup OBJECT-GROUP
+        OBJECTS         {
+            dIpsgIfSrcGuardMacAddress,
+            dIpsgIfSrcGuardMacFilterAction,
+            dIpsgIfSrcGuardVlansFirst2K,
+            dIpsgIfSrcGuardVlansSecond2K
+        }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects which are used to indicate additional
+             information regarding the IP source guard feature."
+        ::= { dIpsgMIBGroups 3 }
+
+    dIpsgIfSrcGuardTrafficFilterGroup OBJECT-GROUP
+        OBJECTS         { dIpsgIfSrcGuardFilterType }
+        STATUS          current
+        DESCRIPTION
+            "A collection of objects which are used to configure the
+             type of traffic to be filtered by IP source guard feature."
+        ::= { dIpsgMIBGroups 4 }
+   
+END
+
+

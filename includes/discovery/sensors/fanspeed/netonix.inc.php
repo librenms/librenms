@@ -25,7 +25,7 @@
 
 echo 'Netonix: ';
 // NETONIX-SWITCH-MIB::fanTable .1.3.6.1.4.1.46242.2
-$oids = snmpwalk_cache_multi_oid($device, 'fanTable', array(), 'NETONIX-SWITCH-MIB', 'netonix');
+$oids = snmpwalk_cache_multi_oid($device, 'fanTable', [], 'NETONIX-SWITCH-MIB', 'netonix');
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
         if (is_numeric($entry['fanSpeed']) && is_numeric($index)) {

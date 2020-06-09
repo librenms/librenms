@@ -21,15 +21,19 @@
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ * @copyright  2018 Jose Augusto Cardoso
  */
 
 namespace LibreNMS\OS\Shared;
 
+use App\Models\PortsNac;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\OS;
+use LibreNMS\Util\IP;
 
-class Cisco extends OS implements ProcessorDiscovery
+class Cisco extends OS implements ProcessorDiscovery, NacPolling
 {
     /**
      * Discover processors.
@@ -110,6 +114,88 @@ class Cisco extends OS implements ProcessorDiscovery
             );
         }
 
+        // QFP processors (Forwarding Processors)
+        $qfp_data = snmpwalk_group($this->getDevice(), 'ceqfpUtilProcessingLoad', 'CISCO-ENTITY-QFP-MIB');
+
+        foreach ($qfp_data as $entQfpPhysicalIndex => $entry) {
+            /*
+             * .2 OID suffix is for 1 min SMA ('oneMinute')
+             * .3 OID suffix is for 5 min SMA ('fiveMinute')
+             * Could be dynamically changed to appropriate value if config had pol interval value
+             */
+            $qfp_usage_oid = '.1.3.6.1.4.1.9.9.715.1.1.6.1.14.' . $entQfpPhysicalIndex . '.3';
+            $qfp_usage = $entry['fiveMinute'];
+
+            if ($entQfpPhysicalIndex) {
+                if ($this->isCached('entPhysicalName')) {
+                    $entPhysicalName_array = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+                    $qfp_descr = $entPhysicalName_array[$entQfpPhysicalIndex];
+                }
+                if (empty($qfp_descr)) {
+                    $qfp_descr = snmp_get($this->getDevice(), 'entPhysicalName.'.$entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
+                }
+            }
+
+            if (empty($qfp_descr)) {
+                $qfp_desc = "QFP $entQfpPhysicalIndex";
+            }
+
+            $processors[] = Processor::discover(
+                'qfp',
+                $this->getDeviceId(),
+                $qfp_usage_oid,
+                $entQfpPhysicalIndex . '.3',
+                $qfp_descr,
+                1,
+                $qfp_usage,
+                null,
+                $entQfpPhysicalIndex
+            );
+        }
+
         return $processors;
+    }
+
+    public function pollNac()
+    {
+        $nac = collect();
+
+        $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
+        if (!empty($portAuthSessionEntry)) {
+            $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDevice(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
+                $key_parts = explode('.', $key);
+                $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
+                return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
+            });
+
+            // cache port ifIndex -> port_id map
+            $ifIndex_map = $this->getDeviceModel()->ports()->pluck('port_id', 'ifIndex');
+
+            // update the DB
+            foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
+                list($ifIndex, $auth_id) = explode('.', str_replace("'", '', $index));
+                $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
+                $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress']))));
+
+                $nac->put($mac_address, new PortsNac([
+                    'port_id' => $ifIndex_map->get($ifIndex, 0),
+                    'mac_address' => $mac_address,
+                    'auth_id' => $auth_id,
+                    'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
+                    'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
+                    'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
+                    'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
+                    'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
+                    'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],
+                    'timeout' => $portAuthSessionEntryParameters['cafSessionTimeout'],
+                    'time_left' => $portAuthSessionEntryParameters['cafSessionTimeLeft'],
+                    'vlan' => $portAuthSessionEntryParameters['cafSessionAuthVlan'],
+                    'authc_status' => $session_info['authc_status'],
+                    'method' => $session_info['method'],
+                ]));
+            }
+        }
+
+        return $nac;
     }
 }

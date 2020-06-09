@@ -1,0 +1,1654 @@
+GPFS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Unsigned32, enterprises
+	FROM SNMPv2-SMI;
+
+ibmGPFS MODULE-IDENTITY
+	LAST-UPDATED	"200707020000Z"
+	ORGANIZATION	"International Business Machines Corp."
+	CONTACT-INFO	"Jeff Riegel
+                         IBM Almaden Research Center
+                         San Jose, CA, USA
+                         E-mail: riegel@us.ibm.com"
+	DESCRIPTION	"Configuration and status monitoring for 
+                         IBM GPFS cluster file system."
+	::= { ibmProd 212 }
+
+ibm                   OBJECT IDENTIFIER ::= { enterprises 2 }
+ibmProd               OBJECT IDENTIFIER ::= { ibm 6 }
+gpfsMIBObjects        OBJECT IDENTIFIER ::= { ibmGPFS 1 }
+
+-- Global scalars
+
+gpfsGlobalMIBObjects OBJECT IDENTIFIER ::= { gpfsMIBObjects 1 }
+
+gpfsSubagentVersion OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The version of the subagent currently running."
+	::= { gpfsGlobalMIBObjects 1 }
+
+
+-- Tables
+
+-- Cluster tables
+
+gpfsClusterStatusTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsClusterStatusEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains cluster status information."
+	::= { gpfsMIBObjects 2 }
+
+gpfsClusterConfigTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsClusterConfigEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains cluster configuration information."
+	::= { gpfsMIBObjects 3 }
+
+-- Node tables
+
+gpfsNodeStatusTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsNodeEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains the list of nodes belonging to this cluster."
+	::= { gpfsMIBObjects 4 }
+
+gpfsNodeConfigTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsNodeEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains the list of nodes belonging to this cluster."
+	::= { gpfsMIBObjects 5 }
+
+-- File system tables
+
+gpfsFileSystemStatusTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsFileSystemStatusEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains the list of the file systems belonging to this cluster."
+	::= { gpfsMIBObjects 6 }
+
+gpfsFileSystemPerfTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsFileSystemPerfEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains performance data for each file system in the cluster."
+	::= { gpfsMIBObjects 7 }
+
+-- Storage pool table
+
+gpfsStgPoolTable OBJECT-TYPE
+	SYNTAX	        SEQUENCE OF GpfsStgPoolEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The list of storage pools belonging to the file systems in this cluster."
+	::= { gpfsMIBObjects 8 }
+
+-- Disk tables
+
+gpfsDiskStatusTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsDiskStatusEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains the list of disks associated with the storage pools in this cluster."
+	::= { gpfsMIBObjects 9 }
+
+gpfsDiskConfigTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsDiskConfigEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains the list of disks associated with the storage pools in this cluster."
+	::= { gpfsMIBObjects 10 }
+
+gpfsDiskPerfTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF GpfsDiskPerfEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"This table contains the list of disks associated with the storage pools in this cluster."
+	::= { gpfsMIBObjects 11 }
+
+
+
+-- Cluster Data
+-- ------------
+
+gpfsClusterStatusEntry OBJECT-TYPE
+	SYNTAX		GpfsClusterStatusEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsClusterTable containing information about a particular cluster."
+	INDEX		{
+				gpfsClusterName,
+			}
+	::= { gpfsClusterStatusTable 1 }
+
+GpfsClusterStatusEntry ::= SEQUENCE {
+-- From SDR:
+        gpfsClusterName               OCTET STRING,
+        gpfsClusterId                 OCTET STRING,
+--        gpfsClusterType               OCTET STRING,
+-- From EE get clusterinfo:
+        gpfsClusterMinReleaseLevel    OCTET STRING,
+-- Subordinate counts:
+        gpfsClusterNumNodes           Unsigned32,
+        gpfsClusterNumFileSystems     Unsigned32
+}
+
+gpfsClusterConfigEntry OBJECT-TYPE
+	SYNTAX		GpfsClusterConfigEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsClusterTable containing information about a particular cluster."
+	INDEX		{
+				gpfsClusterConfigName,
+			}
+	::= { gpfsClusterConfigTable 1 }
+
+GpfsClusterConfigEntry ::= SEQUENCE {
+-- From SDR:
+        gpfsClusterConfigName         OCTET STRING,
+        gpfsClusterUidDomain          OCTET STRING,
+        gpfsClusterPrimaryServer      OCTET STRING,
+        gpfsClusterSecondaryServer    OCTET STRING,
+        gpfsClusterRemoteShellCommand OCTET STRING,
+        gpfsClusterRemoteFileCopyCommand OCTET STRING,
+-- From EE get clusterinfo:
+        gpfsClusterMaxBlockSize       Unsigned32,
+        gpfsClusterDistributedTokenServer Unsigned32,
+        gpfsClusterFailureDetectionTime  Unsigned32,
+-- From SDR:
+	gpfsClusterTCPPort            Unsigned32,
+-- From EE get clusterinfo:
+        gpfsClusterMinMissedPingTimeout    Unsigned32,
+        gpfsClusterMaxMissedPingTimeout    Unsigned32
+}
+
+-- gpfsClusterStatusEntry fields
+--------------------------------
+
+gpfsClusterName OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The cluster name." 
+	::= { gpfsClusterStatusEntry 1 }
+
+gpfsClusterId OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The cluster ID." 
+	::= { gpfsClusterStatusEntry 2 }
+
+gpfsClusterMinReleaseLevel OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The currently enabled cluster functionality level."
+	::= { gpfsClusterStatusEntry 3 }
+
+gpfsClusterNumNodes OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of nodes that belong to the cluster." 
+	::= { gpfsClusterStatusEntry 4 }
+
+gpfsClusterNumFileSystems OBJECT-TYPE
+	SYNTAX  	Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of file systems that belong to the cluster."
+	::= { gpfsClusterStatusEntry 5 }
+
+
+-- gpfsClusterConfigEntry fields
+--------------------------------
+
+gpfsClusterConfigName OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The cluster name." 
+	::= { gpfsClusterConfigEntry 1 }
+
+gpfsClusterUidDomain OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The UID domain name for the cluster." 
+	::= { gpfsClusterConfigEntry 2 }
+
+gpfsClusterRemoteShellCommand OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The remote shell command being used." 
+	::= { gpfsClusterConfigEntry 3 }
+
+gpfsClusterRemoteFileCopyCommand OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The remote file copy command being used." 
+	::= { gpfsClusterConfigEntry 4 }
+
+gpfsClusterPrimaryServer OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The primary GPFS cluster configuration server." 
+	::= { gpfsClusterConfigEntry 5 }
+
+gpfsClusterSecondaryServer OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The secondary GPFS cluster configuration server." 
+	::= { gpfsClusterConfigEntry 6 }
+
+gpfsClusterMaxBlockSize OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The maximum file system block size." 
+	::= { gpfsClusterConfigEntry 7 }
+
+gpfsClusterDistributedTokenServer OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Indicates whether distributed token server is enabled."
+	::= { gpfsClusterConfigEntry 8 }
+
+gpfsClusterFailureDetectionTime OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Used for tuning heartbeats and pings when disk fencing (persistent reserve) is used."
+	::= { gpfsClusterConfigEntry 9 }
+
+gpfsClusterTCPPort OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The TCP port number."
+	::= { gpfsClusterConfigEntry 10 }
+
+gpfsClusterMinMissedPingTimeout OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The lower bound on missed ping timeout (seconds)."
+	::= { gpfsClusterConfigEntry 11 }
+
+gpfsClusterMaxMissedPingTimeout OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The upper bound on missed ping timeout (seconds)."
+	::= { gpfsClusterConfigEntry 12 }
+
+
+-- Node Data
+-- ----------
+
+-- Node name, ID, and type are from SDR file
+-- all other node data from EE "get nodes" command
+
+gpfsNodeStatusEntry OBJECT-TYPE
+	SYNTAX		GpfsNodeStatusEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsNodeTable containing information about a particular node currently associated with the cluster."
+	INDEX		{
+				gpfsNodeName,
+			}
+	::= { gpfsNodeStatusTable 1 }
+
+gpfsNodeConfigEntry OBJECT-TYPE
+	SYNTAX		GpfsNodeConfigEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsNodeTable containing information about a particular node currently associated with the cluster."
+	INDEX		{
+				gpfsNodeConfigName,
+			}
+	::= { gpfsNodeConfigTable 1 }
+
+GpfsNodeStatusEntry ::= SEQUENCE {
+-- From SDR:
+	gpfsNodeName		OCTET STRING,
+	gpfsNodeIP		OCTET STRING,
+	gpfsNodePlatform	OCTET STRING,
+--	gpfsNodeEndianess	OCTET STRING,
+-- From EE get nodes:
+	gpfsNodeStatus		OCTET STRING,
+	gpfsNodeFailureCount	Unsigned32,
+	gpfsNodeThreadWait	Unsigned32,
+	gpfsNodeHealthy		OCTET STRING,
+	gpfsNodeDiagnosis	OCTET STRING,
+-- From mmpmon nc:
+        gpfsNodeVersion         OCTET STRING
+}
+
+GpfsNodeConfigEntry ::= SEQUENCE {
+-- From SDR:
+	gpfsNodeConfigName	OCTET STRING,
+	gpfsNodeType		OCTET STRING,
+-- From EE get nodes:
+	gpfsNodeAdmin		OCTET STRING,
+--	gpfsNodePort		OCTET STRING,
+-- From mmpmon nc:
+        gpfsNodePagePoolL	Unsigned32,
+        gpfsNodePagePoolH	Unsigned32,
+        gpfsNodePrefetchThreads	Unsigned32,
+        gpfsNodeMaxMbps         Unsigned32,
+        gpfsNodeMaxFilesToCache	Unsigned32,
+        gpfsNodeMaxStatCache	Unsigned32,
+        gpfsNodeWorker1Threads Unsigned32,
+        gpfsNodeDmapiEventTimeout       Unsigned32,
+        gpfsNodeDmapiMountTimeout       Unsigned32,
+        gpfsNodeDmapiSessFailureTimeout Unsigned32,
+        gpfsNodeNsdServerWaitTimeWindowOnMount Unsigned32,
+        gpfsNodeNsdServerWaitTimeForMount  Unsigned32,
+        gpfsNodeUnmountOnDiskFail      OCTET STRING
+}
+
+-- gpfsNodeStatusEntry fields
+-- --------------------------
+
+gpfsNodeName OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The node name." 
+	::= { gpfsNodeStatusEntry 1 }
+
+gpfsNodeIP OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The node IP address." 
+	::= { gpfsNodeStatusEntry 2 }
+
+gpfsNodePlatform OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The operating system being used."
+	::= { gpfsNodeStatusEntry 3 }
+
+gpfsNodeStatus OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The node status (for example, up or down)."
+	::= { gpfsNodeStatusEntry 4 }
+
+gpfsNodeFailureCount OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of node failures."
+	::= { gpfsNodeStatusEntry 5 }
+
+gpfsNodeThreadWait OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The longest hung thread's wait time (milliseconds)."
+	::= { gpfsNodeStatusEntry 6 }
+
+gpfsNodeHealthy OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Indicates whether the node is healthy in terms of hung threads.  If there are hung threads, the value is 'no'."
+	::= { gpfsNodeStatusEntry 7 }
+
+gpfsNodeDiagnosis OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Shows the number of hung threads and detail on the longest hung thread."
+	::= { gpfsNodeStatusEntry 8 }
+
+gpfsNodeVersion OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The GPFS product version." 
+	::= { gpfsNodeStatusEntry 9 }
+
+-- gpfsNodeConfigEntry fields
+-- --------------------------
+
+gpfsNodeConfigName OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The node name." 
+	::= { gpfsNodeConfigEntry 1 }
+
+gpfsNodeType OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The node type (e.g., manager/client or quorum/nonquorum)." 
+	::= { gpfsNodeConfigEntry 2 }
+
+gpfsNodeAdmin OBJECT-TYPE
+	SYNTAX		OCTET STRING 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Indicates whether the node is one of the preferred admin nodes."
+	::= { gpfsNodeConfigEntry 3 }
+
+gpfsNodePagePoolL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The size of the cache (low 32 bits)."
+	::= { gpfsNodeConfigEntry 4 }
+
+gpfsNodePagePoolH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The size of the cache (high 32 bits)."
+	::= { gpfsNodeConfigEntry 5 }
+
+gpfsNodePrefetchThreads OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of prefetch threads." 
+	::= { gpfsNodeConfigEntry 6 }
+
+gpfsNodeMaxMbps OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"An estimate of how many megabytes of data can be transferred per second."
+	::= { gpfsNodeConfigEntry 7 }
+
+gpfsNodeMaxFilesToCache OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inodes to cache for recently-used files that have been closed."
+	::= { gpfsNodeConfigEntry 8 }
+
+gpfsNodeMaxStatCache OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inodes to keep in the stat cache."
+	::= { gpfsNodeConfigEntry 9 }
+
+gpfsNodeWorker1Threads OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The maximum number of worker threads that may be started."
+	::= { gpfsNodeConfigEntry 10 }
+
+gpfsNodeDmapiEventTimeout OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The maximum time the file operation threads will block while waiting for a DMAPI synchronous event (milliseconds)."
+	::= { gpfsNodeConfigEntry 11 }
+
+gpfsNodeDmapiMountTimeout OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The maximum time that the mount operation will wait for a disposition for the mount event to be set (seconds)."
+	::= { gpfsNodeConfigEntry 12 }
+
+gpfsNodeDmapiSessFailureTimeout OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The maximum time the file operation threads will wait for the recovery of the failed DMAPI session (seconds)."
+	::= { gpfsNodeConfigEntry 13 }
+
+gpfsNodeNsdServerWaitTimeWindowOnMount OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Specifies a window of time during which a mount can wait for NSD servers to come up (seconds)."
+	::= { gpfsNodeConfigEntry 14 }
+
+gpfsNodeNsdServerWaitTimeForMount OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The maximum time that the mount operation will wait for NSD servers to come up (seconds)."
+	::= { gpfsNodeConfigEntry 15 }
+
+gpfsNodeUnmountOnDiskFail OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Indicates how the GPFS daemon will respond when a disk failure is detected.  If it is 'true', any disk failure will cause only the local node to forcibly unmount the file system that contains the failed disk."
+	::= { gpfsNodeConfigEntry 16 }
+
+-- File System Data
+-- ----------------
+
+gpfsFileSystemStatusEntry OBJECT-TYPE
+	SYNTAX		GpfsFileSystemStatusEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsFileSystemStatusTable containing information about a particular file system currently associated with the cluster."
+	INDEX		{
+				gpfsFileSystemName,
+			}
+	::= { gpfsFileSystemStatusTable 1 }
+
+gpfsFileSystemPerfEntry OBJECT-TYPE
+	SYNTAX		GpfsFileSystemPerfEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsFileSystemPerfTable containing performance information about a particular file system currently associated with the cluster."
+	INDEX		{
+				gpfsFileSystemPerfName,
+			}
+	::= { gpfsFileSystemPerfTable 1 }
+
+GpfsFileSystemStatusEntry ::= SEQUENCE {
+-- Name: from SDR file
+	gpfsFileSystemName				OCTET STRING,
+
+-- Status info from EE "get fs -b" command
+	gpfsFileSystemStatus			OCTET STRING,
+	gpfsFileSystemXstatus			OCTET STRING,
+	gpfsFileSystemTotalSpaceL		Unsigned32,
+	gpfsFileSystemTotalSpaceH		Unsigned32,
+	gpfsFileSystemNumTotalInodesL		Unsigned32,
+	gpfsFileSystemNumTotalInodesH		Unsigned32,
+	gpfsFileSystemFreeSpaceL		Unsigned32,
+	gpfsFileSystemFreeSpaceH		Unsigned32,
+	gpfsFileSystemNumFreeInodesL		Unsigned32,
+	gpfsFileSystemNumFreeInodesH		Unsigned32,
+}
+
+gpfsFileSystemName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The file system name."
+	::= { gpfsFileSystemStatusEntry 1 }
+
+gpfsFileSystemStatus OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The status of the file system."
+	::= { gpfsFileSystemStatusEntry 2 }
+
+gpfsFileSystemXstatus OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The executable status of the file system."
+	::= { gpfsFileSystemStatusEntry 3 }
+
+gpfsFileSystemTotalSpaceL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total disk space of the filesystem in kilobytes
+(low 32 bits)."
+	::= { gpfsFileSystemStatusEntry 4 }
+
+gpfsFileSystemTotalSpaceH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total disk space of the filesystem in kilobytes (high 32 bits)."
+	::= { gpfsFileSystemStatusEntry 5 }
+
+gpfsFileSystemNumTotalInodesL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of file system inodes (low 32 bits)."
+	::= { gpfsFileSystemStatusEntry 6 }
+
+gpfsFileSystemNumTotalInodesH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total number of file system inodes (high 32 bits)."
+	::= { gpfsFileSystemStatusEntry 7 }
+
+gpfsFileSystemFreeSpaceL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The free disk space of the filesystem in kilobytes
+(low 32 bits)."
+	::= { gpfsFileSystemStatusEntry 8 }
+
+gpfsFileSystemFreeSpaceH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The free disk space of the filesystem in kilobytes
+(high 32 bits)."
+	::= { gpfsFileSystemStatusEntry 9 }
+
+gpfsFileSystemNumFreeInodesL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of free file system inodes (low 32 bits)."
+	::= { gpfsFileSystemStatusEntry 10 }
+
+gpfsFileSystemNumFreeInodesH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of free file system inodes (high 32 bits)."
+	::= { gpfsFileSystemStatusEntry 11 }
+
+-- Filesystem performance data
+
+GpfsFileSystemPerfEntry ::= SEQUENCE {
+-- Performance data from mmpmon "gfis" command
+	gpfsFileSystemPerfName			OCTET STRING,
+	gpfsFileSystemBytesReadL		Unsigned32,
+	gpfsFileSystemBytesReadH		Unsigned32,
+	gpfsFileSystemBytesCacheL		Unsigned32,
+	gpfsFileSystemBytesCacheH		Unsigned32,
+	gpfsFileSystemBytesWrittenL		Unsigned32,
+	gpfsFileSystemBytesWrittenH		Unsigned32,
+	gpfsFileSystemReads			Unsigned32,
+	gpfsFileSystemCaches			Unsigned32,
+	gpfsFileSystemWrites			Unsigned32,
+	gpfsFileSystemOpenCalls			Unsigned32, 
+	gpfsFileSystemCloseCalls		Unsigned32, 
+	gpfsFileSystemReadCalls			Unsigned32, 
+	gpfsFileSystemWriteCalls		Unsigned32, 
+	gpfsFileSystemReaddirCalls		Unsigned32, 
+	gpfsFileSystemInodesWritten		Unsigned32, 
+	gpfsFileSystemInodesRead		Unsigned32, 
+	gpfsFileSystemInodesDeleted		Unsigned32, 
+	gpfsFileSystemInodesCreated		Unsigned32, 
+	gpfsFileSystemStatCacheHit		Unsigned32, 
+	gpfsFileSystemStatCacheMiss		Unsigned32, 
+}
+
+gpfsFileSystemPerfName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The file system name."
+	::= { gpfsFileSystemPerfEntry 1 }
+
+gpfsFileSystemBytesReadL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes read from disk, not counting those read from cache (low 32 bits)."
+	::= { gpfsFileSystemPerfEntry 2 }
+
+gpfsFileSystemBytesReadH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes read from disk, not counting those read from cache (high 32 bits)."
+	::= { gpfsFileSystemPerfEntry 3 }
+
+gpfsFileSystemBytesCacheL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes read from the cache (low 32 bits)."
+	::= { gpfsFileSystemPerfEntry 4 }
+
+gpfsFileSystemBytesCacheH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes read from the cache (high 32 bits)."
+	::= { gpfsFileSystemPerfEntry 5 }
+
+gpfsFileSystemBytesWrittenL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes written, to both disk and cache
+(low 32 bits)."
+	::= { gpfsFileSystemPerfEntry 6 }
+
+gpfsFileSystemBytesWrittenH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes written, to both disk and cache
+(high 32 bits)."
+	::= { gpfsFileSystemPerfEntry 7 }
+
+gpfsFileSystemReads OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of read operations supplied from disk."
+	::= { gpfsFileSystemPerfEntry 8 }
+
+gpfsFileSystemCaches OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of read operations supplied from cache."
+	::= { gpfsFileSystemPerfEntry 9 }
+
+gpfsFileSystemWrites OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of write operations, to both disk and cache."
+	::= { gpfsFileSystemPerfEntry 10 }
+
+gpfsFileSystemOpenCalls OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of file system open() calls."
+	::= { gpfsFileSystemPerfEntry 11 }
+
+gpfsFileSystemCloseCalls OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of file system close() calls."
+	::= { gpfsFileSystemPerfEntry 12 }
+
+gpfsFileSystemReadCalls OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of file system read calls."
+	::= { gpfsFileSystemPerfEntry 13 }
+
+gpfsFileSystemWriteCalls OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of file system write calls."
+	::= { gpfsFileSystemPerfEntry 14 }
+
+gpfsFileSystemReaddirCalls OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of file system readdir() calls."
+	::= { gpfsFileSystemPerfEntry 15 }
+
+gpfsFileSystemInodesWritten OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inode updates to disk."
+	::= { gpfsFileSystemPerfEntry 16 }
+
+gpfsFileSystemInodesRead OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inode reads."
+	::= { gpfsFileSystemPerfEntry 17 }
+
+gpfsFileSystemInodesDeleted OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inode deletions."
+	::= { gpfsFileSystemPerfEntry 18 }
+
+gpfsFileSystemInodesCreated OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of inode creations."
+	::= { gpfsFileSystemPerfEntry 19 }
+
+gpfsFileSystemStatCacheHit OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of stat cache hits."
+	::= { gpfsFileSystemPerfEntry 20 }
+
+gpfsFileSystemStatCacheMiss OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of stat cache misses."
+	::= { gpfsFileSystemPerfEntry 21 }
+
+
+-- Storage pool table comes from EE "get pools" command
+
+-- Storage Pool data
+-- -----------------
+
+-- Storage pool data comes from SDR and EE "get pools" command
+
+GpfsStgPoolEntry ::= SEQUENCE {
+-- From SDR:
+        gpfsStgPoolName                     OCTET STRING,
+        gpfsStgPoolFSName                   OCTET STRING,
+-- From EE get pools:
+        gpfsStgPoolTotalSpaceL              Unsigned32,
+        gpfsStgPoolTotalSpaceH              Unsigned32,
+        gpfsStgPoolFreeSpaceL               Unsigned32,
+        gpfsStgPoolFreeSpaceH               Unsigned32,
+-- Subordinate disk count:
+        gpfsStgPoolNumDisks                 Unsigned32,
+}
+
+gpfsStgPoolEntry OBJECT-TYPE
+	SYNTAX		GpfsStgPoolEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsStgPoolTable containing information about a particular storage pool."
+	INDEX		{
+				gpfsStgPoolFSName,
+				gpfsStgPoolName,
+                         }
+	::= { gpfsStgPoolTable 1 }
+
+gpfsStgPoolName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the storage pool."
+	::= { gpfsStgPoolEntry 1 }
+
+gpfsStgPoolFSName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the file system to which the storage pool belongs."
+	::= { gpfsStgPoolEntry 2 }
+
+gpfsStgPoolTotalSpaceL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total disk space in the storage pool in kilobytes (low 32 bits)."
+	::= { gpfsStgPoolEntry 3 }
+
+gpfsStgPoolTotalSpaceH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total disk space in the storage pool in kilobytes (high 32 bits)."
+	::= { gpfsStgPoolEntry 4 }
+
+gpfsStgPoolFreeSpaceL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The free disk space in the storage pool in kilobytes (low 32 bits)."
+	::= { gpfsStgPoolEntry 5 }
+
+gpfsStgPoolFreeSpaceH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The free disk space in the storage pool in kilobytes (high 32 bits)."
+	::= { gpfsStgPoolEntry 6 }
+
+gpfsStgPoolNumDisks OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of disks in the storage pool."
+	::= { gpfsStgPoolEntry 7 }
+
+
+-- Disk Data
+-- ---------
+
+gpfsDiskStatusEntry OBJECT-TYPE
+	SYNTAX		GpfsDiskStatusEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsStgPoolDiskTable containing information about a particular disk currently associated."
+	INDEX		{
+				gpfsDiskFSName,
+				gpfsDiskStgPoolName,
+				gpfsDiskName,
+			}
+	::= { gpfsDiskStatusTable 1 }
+
+gpfsDiskConfigEntry OBJECT-TYPE
+	SYNTAX		GpfsDiskConfigEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsDiskTable containing information about a particular disk currently associated."
+	INDEX		{
+				gpfsDiskConfigFSName,
+				gpfsDiskConfigStgPoolName,
+				gpfsDiskConfigName,
+			}
+	::= { gpfsDiskConfigTable 1 }
+
+
+gpfsDiskPerfEntry OBJECT-TYPE
+	SYNTAX		GpfsDiskPerfEntry
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"A conceptual row of the gpfsDiskPerfTable containing information about a particular disk currently associated."
+	INDEX		{
+				gpfsDiskPerfFSName,
+				gpfsDiskPerfStgPoolName,
+				gpfsDiskPerfName,
+			}
+	::= { gpfsDiskPerfTable 1 }
+
+
+-- Disk status data
+
+GpfsDiskStatusEntry ::= SEQUENCE {
+-- From SDR:
+	gpfsDiskName			OCTET STRING,
+	gpfsDiskFSName			OCTET STRING,
+	gpfsDiskStgPoolName		OCTET STRING,
+-- Disk data from EE "get fs" command
+	gpfsDiskStatus			OCTET STRING,
+	gpfsDiskAvailability		OCTET STRING,
+--	gpfsDiskFailureGroupId		Unsigned32,
+
+	gpfsDiskTotalSpaceL		Unsigned32,
+	gpfsDiskTotalSpaceH		Unsigned32,
+	gpfsDiskFullBlockFreeSpaceL	Unsigned32,
+	gpfsDiskFullBlockFreeSpaceH	Unsigned32,
+	gpfsDiskSubBlockFreeSpaceL	Unsigned32,
+	gpfsDiskSubBlockFreeSpaceH	Unsigned32
+}
+
+gpfsDiskName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The disk name."
+	::= { gpfsDiskStatusEntry 1 }
+
+gpfsDiskFSName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the file system to which the disk belongs."
+	::= { gpfsDiskStatusEntry 2 }
+
+gpfsDiskStgPoolName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the storage pool to which the disk belongs."
+	::= { gpfsDiskStatusEntry 3 }
+
+gpfsDiskStatus OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The status of a disk (values: NotInUse, InUse, Suspended, BeingFormatted, BeingAdded, BeingEmptied, BeingDeleted, BeingDeleted-p, ReferencesBeingRemoved, BeingReplaced or Replacement)."
+	::= { gpfsDiskStatusEntry 4 }
+
+gpfsDiskAvailability OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The availability of the disk (Unchanged, OK, Unavailable, Recovering)."
+	::= { gpfsDiskStatusEntry 5 }
+
+--gpfsDiskFailureGroupId OBJECT-TYPE
+--	SYNTAX		Unsigned32
+--	MAX-ACCESS	read-only
+--	STATUS		current
+--	DESCRIPTION	"Failure group ID."
+--	::= { gpfsDiskStatusEntry 6 }
+
+gpfsDiskTotalSpaceL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total disk space (kilobytes)."
+	::= { gpfsDiskStatusEntry 6 }
+
+gpfsDiskTotalSpaceH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total disk space (kilobytes)."
+	::= { gpfsDiskStatusEntry 7 }
+
+gpfsDiskFullBlockFreeSpaceL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The full block (unfragmented) free space in kilobytes (low 32 bits)."
+	::= { gpfsDiskStatusEntry 8 }
+
+gpfsDiskFullBlockFreeSpaceH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The full block (unfragmented) free space in kilobytes (high 32 bits)."
+	::= { gpfsDiskStatusEntry 9 }
+
+gpfsDiskSubBlockFreeSpaceL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The subblock (fragmented) free space in kilobytes (low 32 bits)."
+	::= { gpfsDiskStatusEntry 10 }
+
+gpfsDiskSubBlockFreeSpaceH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The subblock (fragmented) free space in kilobytes (high 32 bits)."
+	::= { gpfsDiskStatusEntry 11 }
+
+
+-- Disk configuration data
+
+GpfsDiskConfigEntry ::= SEQUENCE {
+-- From SDR:
+	gpfsDiskConfigName			OCTET STRING,
+	gpfsDiskConfigFSName			OCTET STRING,
+	gpfsDiskConfigStgPoolName		OCTET STRING,
+	gpfsDiskMetadata		OCTET STRING,
+	gpfsDiskData			OCTET STRING,
+}
+
+gpfsDiskConfigName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The disk name."
+	::= { gpfsDiskConfigEntry 1 }
+
+gpfsDiskConfigFSName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the filesystem to which the disk belongs."
+	::= { gpfsDiskConfigEntry 2 }
+
+gpfsDiskConfigStgPoolName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the storage pool to which the disk belongs."
+	::= { gpfsDiskConfigEntry 3 }
+
+gpfsDiskMetadata OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Indicates whether the disk holds metadata."
+	::= { gpfsDiskConfigEntry 4 }
+
+gpfsDiskData OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"Indicates whether the disk holds data."
+	::= { gpfsDiskConfigEntry 5 }
+
+
+-- Disk performance data
+
+GpfsDiskPerfEntry ::= SEQUENCE {
+	gpfsDiskPerfName			OCTET STRING,
+	gpfsDiskPerfFSName			OCTET STRING,
+	gpfsDiskPerfStgPoolName			OCTET STRING,
+-- Disk performance data from mmpmon "ds" command:
+	gpfsDiskReadTimeL			Unsigned32,
+	gpfsDiskReadTimeH			Unsigned32,
+	gpfsDiskWriteTimeL			Unsigned32,
+	gpfsDiskWriteTimeH			Unsigned32,
+	gpfsDiskLongestReadTimeL		Unsigned32,
+	gpfsDiskLongestReadTimeH		Unsigned32,
+	gpfsDiskLongestWriteTimeL		Unsigned32,
+	gpfsDiskLongestWriteTimeH		Unsigned32,
+	gpfsDiskShortestReadTimeL		Unsigned32,
+	gpfsDiskShortestReadTimeH		Unsigned32,
+	gpfsDiskShortestWriteTimeL		Unsigned32,
+	gpfsDiskShortestWriteTimeH		Unsigned32,
+	gpfsDiskReadBytesL			Unsigned32,
+	gpfsDiskReadBytesH			Unsigned32,
+	gpfsDiskWriteBytesL			Unsigned32,
+	gpfsDiskWriteBytesH			Unsigned32,
+	gpfsDiskReadOps				Unsigned32,
+	gpfsDiskWriteOps			Unsigned32
+}
+
+gpfsDiskPerfName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The disk name."
+	::= { gpfsDiskPerfEntry 1 }
+
+gpfsDiskPerfFSName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the filesystem to which the disk belongs."
+	::= { gpfsDiskPerfEntry 2 }
+
+gpfsDiskPerfStgPoolName OBJECT-TYPE
+	SYNTAX		OCTET STRING
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The name of the storage pool to which the disk belongs."
+	::= { gpfsDiskPerfEntry 3 }
+
+gpfsDiskReadTimeL OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total time spent waiting for disk read operations (low 32 bits)."
+	::= { gpfsDiskPerfEntry 4 }
+
+gpfsDiskReadTimeH OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total time spent waiting for disk read operations (high 32 bits)."
+	::= { gpfsDiskPerfEntry 5 }
+
+gpfsDiskWriteTimeL OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total time spent waiting for disk write operations in microseconds (low 32 bits)."
+	::= { gpfsDiskPerfEntry 6 }
+
+gpfsDiskWriteTimeH OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The total time spent waiting for disk write operations  in microseconds (high 32 bits)."
+	::= { gpfsDiskPerfEntry 7 }
+
+gpfsDiskLongestReadTimeL OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The longest disk read time in microseconds (low 32 bits)."
+	::= { gpfsDiskPerfEntry 8 }
+
+gpfsDiskLongestReadTimeH OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The longest disk read time in microseconds (high 32 bits)."
+	::= { gpfsDiskPerfEntry 9 }
+
+gpfsDiskLongestWriteTimeL OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The longest disk write time in microseconds (low 32 bits)."
+	::= { gpfsDiskPerfEntry 10 }
+
+gpfsDiskLongestWriteTimeH OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The longest disk write time in microseconds (high 32 bits)."
+	::= { gpfsDiskPerfEntry 11 }
+
+gpfsDiskShortestReadTimeL OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The shortest disk read time in microseconds (low 32 bits)."
+	::= { gpfsDiskPerfEntry 12 }
+
+gpfsDiskShortestReadTimeH OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The shortest disk read time in microseconds (high 32 bits)."
+	::= { gpfsDiskPerfEntry 13 }
+
+gpfsDiskShortestWriteTimeL OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The shortest disk write time in microseconds (low 32 bits)."
+	::= { gpfsDiskPerfEntry 14 }
+
+gpfsDiskShortestWriteTimeH OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The shortest disk write time in microseconds (high 32 bits)."
+	::= { gpfsDiskPerfEntry 15 }
+
+gpfsDiskReadBytesL OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes read from the disk (low 32 bits)."
+	::= { gpfsDiskPerfEntry 16 }
+
+gpfsDiskReadBytesH OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes read from the disk (high 32 bits)."
+	::= { gpfsDiskPerfEntry 17 }
+
+gpfsDiskWriteBytesL OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes written to the disk (low 32 bits)."
+	::= { gpfsDiskPerfEntry 18 }
+
+gpfsDiskWriteBytesH OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of bytes written to the disk (high 32 bits)."
+	::= { gpfsDiskPerfEntry 19 }
+
+gpfsDiskReadOps OBJECT-TYPE
+	SYNTAX		Unsigned32
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of disk read operations."
+	::= { gpfsDiskPerfEntry 20 }
+
+gpfsDiskWriteOps OBJECT-TYPE
+	SYNTAX		Unsigned32 
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION	"The number of disk write operations."
+	::= { gpfsDiskPerfEntry 21 }
+
+
+-- Traps
+
+gpfsTraps OBJECT IDENTIFIER ::= { ibmGPFS 0 }
+gpfsTempObjs OBJECT IDENTIFIER ::= { ibmGPFS 2 }
+
+gpfsNodeIpAddress OBJECT-TYPE
+    SYNTAX	OCTET STRING 
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"A string that represents the IP address." 
+    ::= { gpfsTempObjs 1 }
+
+gpfsDiskName OBJECT-TYPE
+    SYNTAX	OCTET STRING 
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The disk name."
+    ::= { gpfsTempObjs 2 }
+
+gpfsDiskStatus OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The status of a disk (NotInUse, InUse, Suspended, BeingFormatted, BeingAdded, BeingEmptied, BeingDeleted, BeingDeleted-p, ReferencesBeingRemoved, BeingReplaced or Replacement)."
+    ::= { gpfsTempObjs 3 }
+
+gpfsDiskAvailability OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	"The availability of the disk (Unchanged, OK, Unavailable, Recovering)."
+    ::= { gpfsTempObjs 4 }
+
+gpfsDiskFailureGroupName OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The disk's failure group name."
+    ::= { gpfsTempObjs 5 }
+
+gpfsDiskMetadata OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	"Indicates whether the disk holds metadata."
+    ::= { gpfsTempObjs 6 }
+
+gpfsDiskData OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION	"Indicates whether the disk holds data."
+    ::= { gpfsTempObjs 7 }
+
+gpfsFileSystemName OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The file system name."
+    ::= { gpfsTempObjs 8 }
+
+
+gpfsSgmgrIpAddress OBJECT-TYPE
+    SYNTAX	OCTET STRING 
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The IP address of the stripe group manager." 
+    ::= { gpfsTempObjs 9 }
+
+gpfsPrevSgmgrIpAddress OBJECT-TYPE
+    SYNTAX	OCTET STRING 
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The IP address of the previous stripe group manager." 
+    ::= { gpfsTempObjs 10 }
+
+gpfsUserUnbalanced OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Can be all, some or none." 
+    ::= { gpfsTempObjs 11 }
+
+gpfsMetaUnbalanced OBJECT-TYPE
+    SYNTAX	OCTET STRING 
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Can be all, some or none." 
+    ::= { gpfsTempObjs 12 }
+
+gpfsUserIllReplicated OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Can be all, some or none." 
+    ::= { gpfsTempObjs 13 }
+
+gpfsMetaIllReplicated OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Can be all, some or none." 
+    ::= { gpfsTempObjs 14 }
+
+gpfsUserExposed OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Can be all, some or none." 
+    ::= { gpfsTempObjs 15 }
+
+gpfsMetaExposed OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"Can be all, some or none." 
+    ::= { gpfsTempObjs 16 }
+
+gpfsTotalMemoryUsed OBJECT-TYPE
+    SYNTAX	Unsigned32 
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The percentage of shared segment used by token manager for all stripe groups." 
+    ::= { gpfsTempObjs 17 }
+
+gpfsTotalTmRequestsPerSecond OBJECT-TYPE
+    SYNTAX	Unsigned32 
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The token manager requests per second for all stripe groups." 
+    ::= { gpfsTempObjs 18 }
+
+gpfsWaitTime OBJECT-TYPE
+    SYNTAX 		Unsigned32
+    MAX-ACCESS	read-only
+    STATUS		current
+    DESCRIPTION
+	"The time the hung thread has been waiting."
+    ::= { gpfsTempObjs 19 }
+
+gpfsDiagnosis OBJECT-TYPE
+    SYNTAX		OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS		current
+    DESCRIPTION
+	"Shows the number of hung threads and detail on the longest hung thread."
+    ::= { gpfsTempObjs 20 }
+
+gpfsStgPoolUtil OBJECT-TYPE
+    SYNTAX		Unsigned32
+    MAX-ACCESS	read-only
+    STATUS		current
+    DESCRIPTION
+	"The storage pool utilization by unit of percent."
+    ::= { gpfsTempObjs 21 }
+
+gpfsStgPoolName OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    MAX-ACCESS	read-only
+    STATUS	current
+    DESCRIPTION
+	"The storage pool name."
+    ::= { gpfsTempObjs 22 }
+
+
+gpfsMountTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress,
+	gpfsFileSystemName
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified file system has been mounted on the specified node.  The event is sent by the mounting node."
+    ::= { gpfsTraps 1 }
+
+gpfsUnmountTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress,
+	gpfsFileSystemName
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified file system has been unmounted on the specified node.  The event is sent by the unmounting node."
+    ::= { gpfsTraps 2 }
+
+gpfsAddDiskTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress,
+	gpfsFileSystemName,
+	gpfsDiskName
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified disk has been successfully added to the specified file system.  The event is sent by the specified node which is the stripe group manager for the file system."
+    ::= { gpfsTraps 3 }
+
+gpfsDeleteDiskTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress,
+	gpfsFileSystemName,
+	gpfsDiskName
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified disk has been successfully deleted from the specified file system.  The event is sent by the specified node which is the stripe group manager for the file system."
+    ::= { gpfsTraps 4 }
+
+gpfsChangeDiskTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress,
+	gpfsFileSystemName,
+	gpfsDiskName,
+	gpfsDiskStatus,
+	gpfsDiskAvailability,
+	gpfsDiskFailureGroupName,
+	gpfsDiskMetadata,
+	gpfsDiskData
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified disk has been successfully changed within the specified file system.  The event is sent by the specified node which is the stripe group manager for the file system."
+    ::= { gpfsTraps 5 }
+
+gpfsSgmgrTakeoverTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsSgmgrIpAddress,
+	gpfsPrevSgmgrIpAddress,
+	gpfsFileSystemName
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that a stripe group manager takeover has been successfully completed for the specified file system.  The event is sent by the new stripe group manager."
+    ::= { gpfsTraps 6 }
+
+gpfsNodeFailureTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified node has failed.  The event is sent by the configuration manager."
+    ::= { gpfsTraps 7 }
+
+gpfsNodeRecoveryTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified node has recovered normally.  The event is sent by the configuration manager."
+    ::= { gpfsTraps 8 }
+
+gpfsFileSystemCreationTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsSgmgrIpAddress,
+	gpfsFileSystemName
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified file system has been successfully created.  The event is sent by the file system's stripe group manager node."
+    ::= { gpfsTraps 9 }
+
+gpfsFileSystemDeletionTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsSgmgrIpAddress,
+	gpfsFileSystemName
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified file system has been successfully deleted.  The event is sent by the file system's stripe group manager node."
+    ::= { gpfsTraps 10 }
+
+gpfsFileSystemStateChangeTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsFileSystemName,
+	gpfsUserUnbalanced,
+	gpfsMetaUnbalanced,
+	gpfsUserIllReplicated,
+	gpfsMetaIllReplicated,
+	gpfsUserExposed,
+	gpfsMetaExposed
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the specified file system has been successfully changed.  The event is sent by the file system's stripe group manager node."
+    ::= { gpfsTraps 11 }
+
+gpfsNewConnectionTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that a new connection thread has been established between the events exporter and the management application.  The event is sent by the collector node."
+    ::= { gpfsTraps 12 }
+
+gpfsEventCollectionBufferOverflowTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsNodeIpAddress
+    }
+    STATUS	current
+    DESCRIPTION
+	"This trap indicates that the internal event collection buffer in the GPFS daemon has overflowed.  The event is sent by the collector node."
+    ::= { gpfsTraps 13 }
+
+gpfsTokenManagerStatusTrap NOTIFICATION-TYPE
+    OBJECTS {
+	gpfsFileSystemName,
+	gpfsTotalMemoryUsed,
+	gpfsTotalTmRequestsPerSecond
+    }
+    STATUS	current
+    DESCRIPTION
+        "This trap indicates the token manager status.  It is sent every time the performance monitor thread wakes up (approximately 30 seconds)."
+    ::= { gpfsTraps 14 }
+
+gpfsHungThreadTrap NOTIFICATION-TYPE
+	OBJECTS {
+	  gpfsNodeIpAddress,
+	  gpfsWaitTime,
+	  gpfsDiagnosis
+	}
+	STATUS current
+	DESCRIPTION
+	  "This trap indicates the presence of a hung thread on the specified node."
+	::= { gpfsTraps 15 }
+
+--gpfsFileSystemUtilizationTrap NOTIFICATION-TYPE
+--	OBJECTS {
+--	  gpfsFileSystemName,
+--	  gpfsFileSystemUsage
+--	}
+--	STATUS current
+--	DESCRIPTION
+--	  "This is the GPFS threshold trap for notifying the file system utilization."
+--	::= { gpfsTraps 16 }
+
+gpfsStgPoolUtilizationTrap NOTIFICATION-TYPE
+	OBJECTS {
+	  gpfsFileSystemName,
+	  gpfsStgPoolName,
+	  gpfsStgPoolUtil
+	}
+	STATUS current
+	DESCRIPTION
+	  "This trap indicates that utilization of the specified storage pool (within the specified file system) has crossed the threshold.  The StgPoolUtil indicates the current utilization of the storage pool as a percentage.  The event is sent by the file system's stripe group manager."
+	::= { gpfsTraps 16 }
+
+END

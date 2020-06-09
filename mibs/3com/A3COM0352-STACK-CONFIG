@@ -1,0 +1,678 @@
+--
+-- Name:	3Com SuperStack II Stack Configuration MIB
+-- 
+-- Description: 
+--  
+-- This is an updated version of 3Com RFC 0017.  Additional
+-- functionality added since 3Com RFC 0017 is as follows:
+-- (1) A notepad facility which allows the device to store a 512
+-- character DisplayString.
+-- (2) A column for the unit's product number.
+-- (3) A Unit Departure Trap.
+-- 
+--
+-- This MIB is used to publicise the units in the stack. The information
+-- is represented by two tables.  Both tables are indexed by a simple
+-- location index. The convention is that the lower numbered units are
+-- at the bottom of the stack. This index will generally NOT be sparse,
+-- but management applications CANNOT rely on this. Different
+-- technologies can be used to detect stack position and those
+-- technologies may or may not detect units that are not powered. Matrix
+-- technologies may allocate a fixed unit number to the cables that
+-- connect them to the units in the stack. Depending upon the wiring,
+-- the index for matrix inter-connected stacks may be sparse. The agents
+-- reporting this information are allowed to implement this index in a
+-- sparse fashion.
+-- 
+-- Note that the position in the stack, and hence the position in these
+-- tables can change as various units in the stack are switched on and
+-- off. Because a unit is indexed in this table as row 2, it should NOT
+-- be assumed that unit will continue to remain at location 2. If an
+-- application wishes to uniquely tag information for a particular unit
+-- in the stack, that unit should be identified by its MAC address.
+-- 
+-- Note also that not all values will be available for all units. In
+-- this case those objects that are not supported may return
+-- NO-SUCH-NAME or a default value. Management applications must be
+-- aware of this and take appropriate actions.  It should be noted that
+-- units which support the earlier RFC (0017) will not support the
+-- stackUnitNotepad object since it has been added by this MIB.
+-- 
+--
+-- History  Date        Reason for Change
+--
+-- 1.00     Jan 1999    Created from 3Com RFC 0017.
+--                      The stackUnitNotepad object has been added.
+--                      The stackAddressTable is read-only.
+-- 1.01     May 1999	Added missing import of TimeTicks.
+--                      Made stackUnitNotepad an OCTET STRING since 
+--                      DisplayStrings are not allowed to be greater
+--                      than 255 octets in length.
+-- 1.02     Dec 1999    Added stackUnitProductNumber column to the
+--                      stackConfigTable object
+-- 1.03     March 2000  Added Unit Departure Trap.
+-- 1.04     April 2001  Added latest stackUnitCapability enumerations.
+-- 2.01     May 2002    Added stackUnitAutoReboot and
+--                      stackBankSwapTable.
+-- 2.02	Oct 2002	Added unitAwaitReset to stackUnitState.
+-- 2.03     Jan 2003    Added latest stackUnitCapability enumerations:
+--                      PoE (0x31) and OSPF (0x32)
+-- 2.04     Mar 2003    Fixed format error
+-- 2.05     Apr 03,2003 Added stackUnitCapability enumerations:
+--                      Trusted IP(0x33),Secure Shell(0x34),
+--                      Configurable management VLAN(0x35)
+-- 2.06	Apr 16,2003 Added stackUnitCapability enumeration:
+--                      Manual L4 cache configuration
+-- 2.07     May 23,2003 Added stpIgnoreCapability
+-- 2.08   March  1,2004 Added for Hoover
+--                      MAC-address Based Network Access (56)  This indicates that the device supports MAC-address Based Network Access.
+--                      Simple Network Time Protocol Client (57)  This indicates that the device supports the Simple Network Time Protocol Client.
+--                      System Logger (58)  This indicates that the device supports System Log.
+--                      IGMP V3 (59) - This indicates that the device supports IGMP V3.
+-- *********************************************************************
+-- Copyright (c) 3Com Corporation. All Rights Reserved.
+-- *********************************************************************
+
+A3COM0352-STACK-CONFIG DEFINITIONS ::= BEGIN
+
+
+   IMPORTS
+      superStackIIconfig FROM A3COM0004-GENERIC
+      PhysAddress, DisplayString FROM RFC1213-MIB
+      OBJECT-TYPE FROM RFC-1212
+      TRAP-TYPE FROM RFC-1215
+      TimeTicks FROM SNMPv2-SMI
+      ;
+
+
+-- *********************************************************************
+-- This is the main configuration table.  It is indexed on the unit
+-- location within the stack.  Not all objects in this table will be 
+-- applicable to every device type and the table rows may be sparse.
+-- *********************************************************************
+stackConfiguration OBJECT IDENTIFIER ::= {superStackIIconfig 1}
+stackConfigTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF StackConfigEntry
+      ACCESS      not-accessible
+      STATUS      mandatory
+      DESCRIPTION "The main table of configuration data."
+      ::= {stackConfiguration 1}
+
+stackConfigEntry OBJECT-TYPE
+      SYNTAX      StackConfigEntry
+      ACCESS      not-accessible
+      STATUS      mandatory
+      DESCRIPTION "The configuration entry for a unit in the stack."
+      INDEX       {stackUnitLocation}
+      ::= {stackConfigTable 1}
+
+StackConfigEntry ::= SEQUENCE {
+            stackUnitLocation               INTEGER,
+            stackUnitAddress                PhysAddress,
+            stackUnitLastReset              TimeTicks,
+            stackUnitType                   INTEGER,
+            stackUnitDesc                   DisplayString,
+            stackUnitName                   DisplayString (SIZE(0..30)),
+            stackUnitState                  INTEGER,
+            stackUnitManagementType         INTEGER,
+            stackUnitCapabilities           OCTET STRING ,
+            stackUnitPromVersion            DisplayString,
+            stackUnitHWVersion              DisplayString,
+            stackUnitSWVersion              DisplayString,
+            stackUnitSerialNumber           DisplayString,
+            stackUnitAttention              INTEGER,
+            stackUnitMgmtInterface          INTEGER,
+            stackUnitSummary                OCTET STRING ,
+            stackUnitSlipMgmtInterface      INTEGER,
+            stackUnitNotepad                OCTET STRING (SIZE(0..512)),
+            stackUnitProductNumber          DisplayString
+            }
+
+stackUnitLocation OBJECT-TYPE
+      SYNTAX      INTEGER 
+      ACCESS      not-accessible
+      STATUS      mandatory
+      DESCRIPTION "Used to identify individual units in the stack. Note
+        that this value will usually be contiguous, but that gaps may be
+        present due, for example, to unpowered units."
+      ::= {stackConfigEntry 1}
+
+stackUnitAddress OBJECT-TYPE
+      SYNTAX      PhysAddress
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "Every conformant unit in the SuperStack II system
+        will have a unique physical (MAC) address by which it can be
+        recognised. Note that the location index on this table can
+        change if a unit is inserted into the stack and so the location
+        can not be used to uniquely identify a location. Instead an
+        application should refer to units by their physical address -
+        see stackUnitAddress below."
+      ::= {stackConfigEntry 2}
+
+stackUnitLastReset OBJECT-TYPE
+      SYNTAX      TimeTicks 
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This is the time in hundredths of a second, since
+        this unit last reset (ie the unit's concept of sysUpTime). Note
+        that if a unit is not operational then this object will report
+        zero (0)."
+      ::= {stackConfigEntry 3}
+
+stackUnitType OBJECT-TYPE
+      SYNTAX      INTEGER 
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This is an integer type identifier for this unit. The
+        values of this integer are administered by allocating a MIB
+        object identifier for each type of unit from a common branch.
+        The value of this object is then the last level in that
+        identifier. The values are defined in 3Com RFC 0025. Note that
+        the values are unlikely to be contiguous.
+
+        Note that if a type value is not available for this unit then
+        this object will return zero. There are several reasons why this
+        value may not be available through this view of the MIB. One
+        reason may be that the device is not currently active (dead) or
+        that the information is only available through the units own
+        agent (see stackUnitManagementType)."
+      ::= {stackConfigEntry 4}
+
+stackUnitDesc OBJECT-TYPE
+      SYNTAX      DisplayString
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This is a text string which describes this unit. If a
+        unit cannot provide a name then the value of this object will be
+        an empty string."
+      ::= {stackConfigEntry 5}
+
+stackUnitName OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE(0..30))
+      ACCESS      read-write
+      STATUS      mandatory
+      DESCRIPTION "This is a simple text string which can be used by an 
+        application to assign a text name to a unit. By default this
+        string is empty. If a management application writes a text
+        string to this object the device will store the string in
+        non-volatile storage."
+      ::= {stackConfigEntry 6}
+
+stackUnitState OBJECT-TYPE
+      SYNTAX      INTEGER  {
+                  unitStateUnknown (1),
+                  unitInactive (2),
+                  unitOperational (3),
+                  unitLoading (4),
+                  unitAwaitReset(5)
+      }
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This object represents the best known state of a unit
+        in the stack. The unknown state is not expected to be used, but
+        may exist because of loosely integrated components in the stack.
+        Management applications MUST EXPECT to see the 'unknown' value.
+        The other states are as follows:
+
+        unitInactive: The device appears to be in the stack but does not
+        appear to be in an operational state.
+
+        unitOperational: The unit is sending out periodic identification 
+        messages and indicates that it is operational, running its
+        complete image.
+
+        unitLoading: The unit is running in a special operational mode
+        which means that it is unmanaged while it loads a new
+        operational code image.
+
+        unitAwaitReset: The unit has accomplished a successful software
+        upgrade and is waiting for the remaining units in the stack to
+        successfully complete their upgrades and enter this state before
+        resetting the system.  If any unit transitions from unitLoading
+        to any other state than unitAwaitReset, then the units in the
+        unitAwaitReset state will not reset and will transition to 
+        unitOperational.  Implementations of this object that do not
+        synchronize stack-wide resets after software upgrades will reset
+        immediately after the unitLoading state is completed and never
+        transition to unitAwaitReset."
+      ::= {stackConfigEntry 7}
+
+stackUnitManagementType OBJECT-TYPE
+      SYNTAX      INTEGER  {
+                  unknown (1),
+                  distributed (2),
+                  intelligent (3)
+      }
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This object can be used to determine the management
+        method used to access the agent in this unit. The options are:
+
+          unknown:     The unit has not reported any management
+                       capability. It is either faulty or a
+                       non-conformant device.
+          distributed: This unit can be managed using the SuperStackII 
+                       distributed management architecture and so is
+                       managed through this agent. The unit may or may
+                       not have an active comms stack. If it has then
+                       the addresses for that agent can be determined
+                       from the address table.
+          intelligent: The unit has its own SNMP agent which is accessed 
+                       seperately. The agent is not part of the SSII 
+                       distributed management architecture."
+      ::= {stackConfigEntry 8}
+
+-- Aside: The SuperStack II Distributed Management Architecture allows a
+-- stack of units to be managed as though they formed a single unit.
+-- The MIBs of each unit in the stack are merged and amy be accessed
+-- through any unit in the stack that has an active comms stack.
+
+stackUnitCapabilities OBJECT-TYPE
+      SYNTAX      OCTET STRING 
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This object describes the capabilities of this
+          particular unit. This is used in conjunction with the upgrade
+          level of the stack to enable a management application to
+          correctly enable and disable the various features of the
+          application depending on the capabilities of the unit.
+
+          The object is an octet string, where each octet represents a
+          capability of the unit. Different capabilities will be added
+          to the list as required. The current list of values is:
+
+          0x01        Full RMON
+          0x02        3Com Proprietary Resilience MIB
+          0x03        3Com Repeater Security MIB
+          0x04        PSHub Port Switching
+          0x05        PSHub Capability Upgrade Facility
+          0x06        Dual Speed Hub Capability Upgrade Facility 
+          0x07        TelNet 
+          0x08        Web 
+          0x14        SMA Resource Allocator 
+          0x15        SMA Distributed SNMP
+          0x16        SMA Global Variables
+          0x17        SMA Licence Server 
+          0x18        PSHub Cascade Switch 
+          0x19        PSH Load Balancing
+          0x1a        RPC
+          0x1b        Internal SNMP
+          0x1c        Mapper
+          0x1d        Distributed RMON
+          0x1e        Lazy ACK
+          0x1f        Resilience switchback
+          0x20        Security II
+          0x21        RMON Email
+          0x22        Rapid Spanning Tree (RSTP)
+          0x23        Link Aggregation Control Protocol (LACP)
+          0x24        L4 Redirection (WEB cache)
+          0x25        Device IP Configuration (DHCP)
+          0x26        Revised Global Port Numbering
+          0x27        Local Trunk Forwarding
+          0x28        Improved TFTP Upgrade
+          0x29        802.1x Network Login
+          0x2a        RADIUS Client
+          0x2b        Layer 3 Stacking
+          0x2c        SW Variant
+          0x2d        Jag3 Mode
+          0x2e        Jag6 Mode
+          0x2f        QoS Support of RSTP Applications
+          0x30        Multiple Agent Images
+          0x31        Power over Ethernet
+          0x32        OSPF
+          0x33        Trusted IP
+          0x34        Secure Shell (SSH)
+          0x35        Configurable management VLAN
+          0x36        Manual L4 cache configuration
+          0x37        STP Ignore Mode
+          0x38        MAC-address Based Network Access 
+          0x39        Simple Network Time Protocol Client 
+          0x3a        System Logger 
+          0x3b        IGMP V3 
+
+          So, for example, if a unit has a value of '02 03' for this
+          object then it supports repeater resilience and security, but
+          no other features such as RMON."
+      ::= {stackConfigEntry 9}
+
+stackUnitPromVersion OBJECT-TYPE
+      SYNTAX      DisplayString
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This is the version number of the PROM on the unit.
+        If the unit has no PROM, does not correctly report the PROM
+        version or is currently non-operational then this object will
+        return an empty string."
+      ::= {stackConfigEntry 10}
+
+stackUnitHWVersion OBJECT-TYPE
+      SYNTAX      DisplayString
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This is the hardware version of this unit, expressed
+        as a string. Note that if the hardware version is not available
+        for this particular unit then the version string will be empty."
+      ::= {stackConfigEntry 11}
+
+stackUnitSWVersion OBJECT-TYPE
+      SYNTAX      DisplayString
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This is the software version number of this unit. The 
+        software version number is a string. Note that if a unit does
+        not make its version number information available, or the unit
+        has no software, then this object will report an empty string."
+      ::= {stackConfigEntry 12}
+
+stackUnitSerialNumber OBJECT-TYPE
+      SYNTAX      DisplayString
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This is the serial number for this unit. The number
+        is globally unique and expressed as a textual string."
+      ::= {stackConfigEntry 13}
+
+stackUnitAttention OBJECT-TYPE
+      SYNTAX      INTEGER  {
+                  noAttention (1),
+                  attention (2)
+      }
+      ACCESS      read-write
+      STATUS      mandatory
+      DESCRIPTION "Some of the units in the stack will contain a
+        mechanism for drawing attention to that unit. This is useful
+        for directing maintainance personnel. The method often employed
+        is for a special LED, or by placing some other LED into a
+        flashing state. This object gives access to the attention
+        mechanism for a unit.
+
+        Note that if a unit does not support this mechanism then reading
+        the value of this object will return 'no-such-name' error."
+      ::= {stackConfigEntry 14}
+
+stackUnitMgmtInterface OBJECT-TYPE
+      SYNTAX      INTEGER (0..65535)
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "If a unit in the stack participates in the
+        distributed SNMP stack (stackUnitManagementType = 'distributed')
+        then it will have an instance of this object. The object points
+        to the entry in the interface table which represents the
+        potential management interface for this unit. That is the index
+        to use in the ifTable for this device. Note that if the value of
+        this object is zero, or the result of reading this object is
+        NO-SUCH-NAME then there is no management interface available on
+        that unit."
+      ::= {stackConfigEntry 15}
+
+stackUnitSummary OBJECT-TYPE
+      SYNTAX      OCTET STRING 
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This object provides a summary of this units
+        configuration in order to improve the performance of the
+        management applications. The information in this object is
+        represented as a list of items, each item is a type-length-value
+        triplet which will have a basic encoding. The information
+        encoded in this string will be determined by the requirements of
+        the management applications.  The contents of this object is
+        separately defined for each device.
+
+        Note: This object has been replaced by 3Com RFCs 0341, 0342 and
+        0343 for some devices."
+      ::= {stackConfigEntry 16}
+
+stackUnitSlipMgmtInterface OBJECT-TYPE
+      SYNTAX      INTEGER (0..65535)
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "If a unit in the stack participates in the
+        distributed SNMP stack then it will have an instance of this
+        object(stackUnitManagementType = 'distributed'). The object
+        points to the entry in the interface table which represents the
+        potential SLIP (serial port) management interface for this unit.
+        That is the index to use in the ifTable for this device. Note
+        that if the value of this object is zero, or the result of
+        reading this object is NO-SUCH-NAME then there is no SLIP
+        access port available on that unit."
+      ::= {stackConfigEntry 17}
+
+stackUnitNotepad OBJECT-TYPE
+      SYNTAX      OCTET STRING (SIZE(0..512))
+      ACCESS      read-write
+      STATUS      mandatory
+      DESCRIPTION "This object is used to store user-specified data
+        regarding this unit.  The user may store any relevant data about
+        the unit.  This may include its floor location, history or other
+        details. The unit stores the data in non-volatile storage so
+        that the data is not lost over a normal reset.  The data will be
+        cleared if the unit is returned to factory defaults.  A maximum
+        of 512 characters of data may be stored in this object.
+        This object can be treated as a displayString.  In the MIB it is
+        defined as an OCTET STRING since displayStrings are not allowed
+        to be more than 255 characters in length."
+      ::= {stackConfigEntry 18}
+
+stackUnitProductNumber OBJECT-TYPE
+      SYNTAX      DisplayString
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This is a textual representation of the unit's
+        product number. Note that if a unit does not make its product
+        number information available then this object will report an
+        empty string."
+      ::= {stackConfigEntry 19}
+
+-- *********************************************************************
+-- The following definitions are part of the Bank Swap implementation.
+-- Bank Swap allows a user to select the agent that is to be used by the
+-- system after a reboot.
+-- The stackBankSwapTable shows the agent version string and status for 
+-- all agents that reside in flash. The status descriptions are shown in
+-- the description for stackUnitBankStatus.
+-- *********************************************************************
+
+stackBankSwapTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF StackBankSwapEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION "A table of the agent software versions and status for
+                   all agents stored in flash"
+      ::= {stackConfiguration 2}
+
+stackBankSwapEntry OBJECT-TYPE
+      SYNTAX StackBankSwapEntry
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION "A table entry showing the bank identifier, software
+                   version and status for each agent."
+      INDEX {stackUnitLocation, stackBankSwapId}
+	::= {stackBankSwapTable 1}
+
+StackBankSwapEntry ::= SEQUENCE {
+      stackBankSwapId            INTEGER,
+      stackBankSwapSWVersion     DisplayString,
+      stackBankSwapStatus        INTEGER,
+      stackBankSwapNextActive    INTEGER
+      }
+
+stackBankSwapId OBJECT-TYPE
+      SYNTAX INTEGER
+      ACCESS not-accessible
+      STATUS mandatory
+      DESCRIPTION "Identifier for an agent location in the system."
+      ::= {stackBankSwapEntry 1}
+
+stackBankSwapSWVersion OBJECT-TYPE
+      SYNTAX DisplayString
+      ACCESS read-only
+      STATUS mandatory
+      DESCRIPTION "Software version for the software in this bank.  If a
+                   valid agent is not present in the bank, then an empty
+                   string is returned."
+      ::= {stackBankSwapEntry 2}
+
+stackBankSwapStatus OBJECT-TYPE
+      SYNTAX INTEGER {
+                  active(1),
+                  activeOnLoad(2),
+                  inactiveOnLoad(3)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION "Status of a bank location. This object should be set
+                  prior to loading new software to indicate when that
+                  new software will become active. This object can only
+                  be written for banks not in the active(1) state as
+                  the software download process will always load into a
+                  bank not in the active(1) state.
+                  active(1) read-only - the agent is currently running.
+                            New software will not be loaded into a bank
+                            in this state.  An error will be returned if
+                            an attempt is made to set this value.
+                  activeOnLoad(2) read-write - the agent is currently
+                            inactive.  If new software is successfully
+                            loaded into a bank in this state, then the 
+                            stackBankSwapNextActive object is
+                            automatically set to nextActive(1) for this
+                            bank and an immediate reboot occurs, thereby
+                            making stackBankSwapStatus active(1) and
+                            stackBankNextActive nextActive(1) after the
+                            reboot.  This is the default state for a
+                            bank when it is not active(1).
+                  inactiveOnLoad(3) read-write - the agent is currently
+                            inactive.  If an attempt is made to load new
+                            software into this bank, then after the
+                            attempt, the box is not rebooted and the
+                            stackBankNextActive object is left
+                            unaffected."                 
+      ::= {stackBankSwapEntry 3}
+
+stackBankSwapNextActive OBJECT-TYPE
+      SYNTAX INTEGER {
+                  nextActive(1),
+                  nextActivePostLoad(2),
+                  notNextActive(3)
+      }
+      ACCESS read-write
+      STATUS mandatory
+      DESCRIPTION "This object indicates which bank contains the
+                   software that will be running after the next reboot.
+                   The supported values include:
+                   nextActive(1) read-write - If set, then the software
+                            contained in this bank will be running after
+                            the next reboot.  Only one bank may have
+                            nextActive(1) set.  When using this state,
+                            it is assumed that the software in this bank
+                            may become active at any time since a reboot
+                            may occur unexpectedly for many reasons.
+                   nextActivePostLoad(2) read-write - If set, then the
+                            software in this bank will be marked as
+                            active after the next reboot after the
+                            next successful software upgrade to this
+                            bank.  If the upgrade is successful, this 
+                            object will be automatically set to 
+                            nextActive(1) for this bank.  If the upgrade
+                            is unsuccessful, it will be automatically
+                            set to notNextActive(3).
+                   notNextActive(3) read-only - This bank does not
+                            contain the software that will be active
+                            after the next reboot.  An error will be
+                            returned if this value is written.  When
+                            nextActive(1) is written to a bank, the
+                            other banks are automatically set to
+                            notNextActive(3)."
+      ::= {stackBankSwapEntry 4}
+
+-- *********************************************************************
+-- The stack of units may be addressable through more than one unit in
+-- the stack. Some units may be manageable through more than one
+-- address. This table lists the addresses within the stack through
+-- which the stack (or just the unit) may be managed.  Devices for which
+-- the stackUnitManagementType is 'Intelligent'are not able to manage
+-- other devices in the stack.
+-- *********************************************************************
+stackAddressInformation OBJECT IDENTIFIER ::= {superStackIIconfig 2}
+
+stackAddressTable OBJECT-TYPE
+      SYNTAX      SEQUENCE OF StackAddressEntry
+      ACCESS      not-accessible
+      STATUS      mandatory
+      DESCRIPTION "This table contains entries for units in the stack
+        which have active inband communications stacks. The table
+        comprises of a set of entries for each unit, each entry
+        representing a single address. Note that the address information
+        in this table cannot be changed!
+
+        This table is required specifically for those units which
+        execute their own SNMP agents without taking part in the Arnie
+        co-operative agent. I.e., the only devices for which there will
+        be an entry in this table are those for which the
+        stackUnitManagementType is 'Intelligent'."
+      ::= {stackAddressInformation 1}
+
+stackAddressEntry OBJECT-TYPE
+      SYNTAX      StackAddressEntry
+      ACCESS      not-accessible
+      STATUS      mandatory
+      DESCRIPTION ""
+      INDEX       {stackUnitLocation, stackAddressNumber}
+      ::= {stackAddressTable 1}
+
+StackAddressEntry ::= SEQUENCE {
+                  stackAddressNumber              INTEGER,
+                  stackAddressType                INTEGER,
+                  stackAddress                    OCTET STRING 
+                  }
+
+stackAddressNumber OBJECT-TYPE
+      SYNTAX      INTEGER 
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This identifies one of a number of different
+        addresses for this unit. This is a second index column for this
+        table, the first being the unit number shared with the
+        stackConfigTable (stackUnitLocation)."
+      ::= {stackAddressEntry 1}
+
+stackAddressType OBJECT-TYPE
+      SYNTAX      INTEGER  {
+                  ipAddress (1),
+                  ipxAddress (2)
+      }
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "This identifies the type of address."
+      ::= {stackAddressEntry 2}
+
+stackAddress OBJECT-TYPE
+      SYNTAX      OCTET STRING 
+      ACCESS      read-only
+      STATUS      mandatory
+      DESCRIPTION "The address."
+      ::= {stackAddressEntry 3}
+
+-- Define all possible sysObjIdent values as a branch from this MIB.
+-- Note that because of the nature of the distributed SNMP architecture
+-- it is not possible to determine the function of the device from its
+-- sysObjId and so all distributed stack components will have the same
+-- value.
+--
+-- The OBJECT IDENTIFIERS and unit types are now defined in 3Com0025.
+--
+stackSysObjIdentities
+                  OBJECT IDENTIFIER ::= {superStackIIconfig 4}
+stackUnitTypes    OBJECT IDENTIFIER ::= {superStackIIconfig 5}
+
+--
+-- Trap Definitions
+--
+unitDeparture TRAP-TYPE
+      ENTERPRISE  a3Com
+      VARIABLES {stackUnitDesc, stackUnitSerialNumber}
+      DESCRIPTION "This trap is raised by the lowest numbered unit in a
+            stack when a communications loss is detected to another
+            unit. The raising of this trap is optional."
+      ::= 89
+END

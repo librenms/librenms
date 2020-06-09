@@ -25,6 +25,9 @@
 
 namespace LibreNMS;
 
+use App\Models\Device;
+use DeviceCache;
+use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -74,6 +77,16 @@ class OS implements ProcessorDiscovery
         return (int)$this->device['device_id'];
     }
 
+    /**
+     * Get the Eloquent Device Model for the current device
+     *
+     * @return Device
+     */
+    public function getDeviceModel()
+    {
+        return DeviceCache::get($this->getDeviceId());
+    }
+
     public function preCache()
     {
         if (is_null($this->pre_cache)) {
@@ -90,21 +103,22 @@ class OS implements ProcessorDiscovery
      *
      * @param string $oid textual oid
      * @param string $mib mib for this oid
+     * @param string $snmpflags snmpflags for this oid
      * @return array array indexed by the snmp index with the value as the data returned by snmp
      */
-    public function getCacheByIndex($oid, $mib = null)
+    public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
     {
-        if (str_contains($oid, '.')) {
+        if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
             return null;
         }
 
-        if (!isset($this->cache[$oid])) {
-            $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib);
-            $this->cache[$oid] = array_map('current', $data);
+        if (!isset($this->cache['cache_oid'][$oid])) {
+            $data = snmpwalk_cache_oid($this->getDevice(), $oid, array(), $mib, null, $snmpflags);
+            $this->cache['cache_oid'][$oid] = array_map('current', $data);
         }
 
-        return $this->cache[$oid];
+        return $this->cache['cache_oid'][$oid];
     }
 
     /**
@@ -113,21 +127,22 @@ class OS implements ProcessorDiscovery
      * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
      *
      * @param string $oid textual oid
-     * @param string $mib mib for this oid
+     * @param string $mib mib for this oid (optional)
+     * @param string $depth depth for snmpwalk_group (optional)
      * @return array array indexed by the snmp index with the value as the data returned by snmp
      */
-    public function getCacheTable($oid, $mib = null)
+    public function getCacheTable($oid, $mib = null, $depth = 1)
     {
-        if (str_contains($oid, '.')) {
+        if (Str::contains($oid, '.')) {
             echo "Error: don't use this with numeric oids!\n";
             return null;
         }
 
-        if (!isset($this->cache[$oid])) {
-            $this->cache[$oid] = snmpwalk_group($this->getDevice(), $oid, $mib);
+        if (!isset($this->cache['group'][$depth][$oid])) {
+            $this->cache['group'][$depth][$oid] = snmpwalk_group($this->getDevice(), $oid, $mib, $depth);
         }
 
-        return $this->cache[$oid];
+        return $this->cache['group'][$depth][$oid];
     }
 
     /**
@@ -138,7 +153,7 @@ class OS implements ProcessorDiscovery
      */
     public function isCached($oid)
     {
-        return isset($this->cache[$oid]);
+        return isset($this->cache['cache_oid'][$oid]);
     }
 
     /**
@@ -168,7 +183,7 @@ class OS implements ProcessorDiscovery
             }
         }
 
-        d_echo("OS initilized as Generic\n");
+        d_echo("OS initialized as Generic\n");
         return new Generic($device);
     }
 

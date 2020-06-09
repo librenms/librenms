@@ -23,7 +23,7 @@
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
 
-$oids = 'hpHttpMgDeviceProductName.1 hpHttpMgDeviceSerialNumber.1 hpHttpMgDeviceVersion.1';
+$oids = ['hpHttpMgDeviceProductName.1', 'hpHttpMgDeviceSerialNumber.1', 'hpHttpMgDeviceVersion.1'];
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'SEMI-MIB');
 d_echo($data);

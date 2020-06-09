@@ -4,17 +4,30 @@ namespace LibreNMS\Authentication;
 
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
+use LibreNMS\Exceptions\LdapMissingException;
 
 class LdapAuthorizer extends AuthorizerBase
 {
     protected $ldap_connection;
+    private $userloginname = "";
 
-    public function authenticate($username, $password)
+    public function authenticate($credentials)
     {
         $connection = $this->getLdapConnection(true);
 
-        if ($username) {
-            if ($password && ldap_bind($connection, $this->getFullDn($username), $password)) {
+        if (!empty($credentials['username'])) {
+            $username = $credentials['username'];
+            $this->userloginname = $username;
+            if (Config::get('auth_ldap_wildcard_ou', false)) {
+                $this->setAuthLdapSuffixOu($username);
+            }
+
+            if (!empty($credentials['password']) && ldap_bind($connection, $this->getFullDn($username), $credentials['password'])) {
+                // ldap_bind has done a bind with the user credentials. If binduser is configured, rebind with the auth_ldap_binduser
+                // normal user has restricted right to search in ldap. auth_ldap_binduser has full search rights
+                if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
+                    $this->bind();
+                }
                 $ldap_groups = $this->getGroupList();
                 if (empty($ldap_groups)) {
                     // no groups, don't check membership
@@ -43,7 +56,7 @@ class LdapAuthorizer extends AuthorizerBase
                 }
             }
 
-            if (!isset($password) || $password == '') {
+            if (empty($credentials['password'])) {
                 throw new AuthenticationException('A password is required');
             }
 
@@ -150,6 +163,9 @@ class LdapAuthorizer extends AuthorizerBase
             }
 
             $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
+            if (Config::get('auth_ldap_userlist_filter') != null) {
+                $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+            }
 
             // build group filter
             $group_filter = '';
@@ -193,10 +209,22 @@ class LdapAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        foreach ($this->getUserlist() as $user) {
-            if ((int)$user['user_id'] === (int)$user_id) {
-                return $user;
+        $connection = $this->getLdapConnection();
+
+        $filter = '(' . Config::get('auth_ldap_prefix') . $this->userloginname . ')';
+        if (Config::get('auth_ldap_userlist_filter') != null) {
+            $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+        }
+        
+        $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
+        $entries = ldap_get_entries($connection, $search);
+        foreach ($entries as $entry) {
+            $user = $this->ldapToUser($entry);
+            if ((int)$user['user_id'] !== (int)$user_id) {
+                continue;
             }
+            
+            return $user;
         }
         return 0;
     }
@@ -253,6 +281,32 @@ class LdapAuthorizer extends AuthorizerBase
     }
 
     /**
+     * Set auth_ldap_suffix ou according to $username dn
+     * useful if Config::get('auth_ldap_wildcard_ou) is set
+     * @internal
+     *
+     * @return false|true
+     */
+    protected function setAuthLdapSuffixOu($username)
+    {
+        $connection = $this->getLdapConnection();
+        $filter = '(' . Config::get('auth_ldap_attr.uid') . '=' . $username . ')';
+        $base_dn = preg_replace("/,ou=[^,]+,/", ",", Config::get('auth_ldap_suffix'));
+        $base_dn = trim($base_dn, ',');
+        $search = ldap_search($connection, $base_dn, $filter);
+        foreach (ldap_get_entries($connection, $search) as $entry) {
+            if ($entry['uid'][0] == $username) {
+                preg_match('~,ou=([^,]+),~', $entry['dn'], $matches);
+                $user_ou = $matches[1];
+                $new_auth_ldap_suffix = preg_replace("/,ou=[^,]+,/", ",ou=" . $user_ou . ",", Config::get('auth_ldap_suffix'));
+                Config::set('auth_ldap_suffix', $new_auth_ldap_suffix);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get the ldap connection. If it hasn't been established yet, connect and try to bind.
      * @internal
      *
@@ -299,7 +353,7 @@ class LdapAuthorizer extends AuthorizerBase
         }
 
         if (!function_exists('ldap_connect')) {
-            throw new AuthenticationException("PHP does not support LDAP, please install or enable the PHP LDAP extension.");
+            throw new LdapMissingException();
         }
 
         $this->ldap_connection = @ldap_connect(Config::get('auth_ldap_server'), Config::get('auth_ldap_port', 389));
@@ -320,7 +374,7 @@ class LdapAuthorizer extends AuthorizerBase
         }
     }
 
-    public function bind($username = null, $password = null)
+    public function bind($credentials = [])
     {
         if (Config::get('auth_ldap_debug')) {
             ldap_set_option(null, LDAP_OPT_DEBUG_LEVEL, 7);
@@ -328,11 +382,17 @@ class LdapAuthorizer extends AuthorizerBase
 
         $this->connect();
 
+        $username = $credentials['username'] ?? null;
+        $password = $credentials['password'] ?? null;
+
         if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
-            $username = Config::get('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
+            if (Config::get('auth_ldap_binddn') == null) {
+                Config::set('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
+            }
+            $username = Config::get('auth_ldap_binddn');
             $password = Config::get('auth_ldap_bindpassword');
-        } elseif ($username) {
-            $username = $this->getFullDn($username);
+        } elseif (!empty($credentials['username'])) {
+            $username = $this->getFullDn($credentials['username']);
         }
 
         // With specified bind user

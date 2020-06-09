@@ -2,7 +2,7 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-$oids = snmp_get_multi($device, 'pfStateTableCount.0 pfStateTableSearches.0 pfStateTableInserts.0 pfStateTableRemovals.0 pfCounterMatch.0 pfCounterBadOffset.0 pfCounterFragment.0 pfCounterShort.0 pfCounterNormalize.0 pfCounterMemDrop.0', '-OQUs', 'BEGEMOT-PF-MIB');
+$oids = snmp_get_multi($device, ['pfStateTableCount.0', 'pfStateTableSearches.0', 'pfStateTableInserts.0', 'pfStateTableRemovals.0', 'pfCounterMatch.0', 'pfCounterBadOffset.0', 'pfCounterFragment.0', 'pfCounterShort.0', 'pfCounterNormalize.0', 'pfCounterMemDrop.0'], '-OQUs', 'BEGEMOT-PF-MIB');
 
 $states = $oids[0]['pfStateTableCount'];
 $searches = $oids[0]['pfStateTableSearches'];

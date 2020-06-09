@@ -26,9 +26,9 @@
 
 namespace LibreNMS\Util;
 
+use Exception;
 use Requests;
-use DateTime;
-use SebastianBergmann\CodeCoverage\Report\PHP;
+use Requests_Response;
 
 class GitHub
 {
@@ -39,17 +39,47 @@ class GitHub
     protected $pr;
     protected $stop = false;
     protected $pull_requests = [];
-    protected $changelog = [];
+    protected $changelog = [
+        'feature' => [],
+        'enhancement' => [],
+        'breaking change' => [],
+        'security' => [],
+        'device' => [],
+        'webui' => [],
+        'authentication' => [],
+        'graphs' => [],
+        'snmp traps' => [],
+        'applications' => [],
+        'api' => [],
+        'alerting' => [],
+        'billing' => [],
+        'discovery' => [],
+        'polling' => [],
+        'rancid' => [],
+        'oxidized' => [],
+        'bug' => [],
+        'refactor' => [],
+        'cleanup' => [],
+        'documentation' => [],
+        'translation' => [],
+        'tests' => [],
+        'misc' => [],
+        'dependencies' => [],
+    ];
+    protected $changelog_users = [];
+    protected $changelog_mergers = [];
+    protected $profile_links = [];
+
     protected $markdown;
-    protected $labels = ['webui', 'api', 'documentation', 'security', 'feature', 'enhancement', 'device', 'bug', 'alerting','Breaking-Change'];
     protected $github = 'https://api.github.com/repos/librenms/librenms';
+    protected $graphql = 'https://api.github.com/graphql';
 
     public function __construct($tag, $from, $file, $token = null, $pr = null)
     {
-        $this->tag  = $tag;
+        $this->tag = $tag;
         $this->from = $from;
         $this->file = $file;
-        $this->pr   = $pr;
+        $this->pr = $pr;
         if (!is_null($token) || getenv('GH_TOKEN')) {
             $this->token = $token ?: getenv('GH_TOKEN');
         }
@@ -63,10 +93,14 @@ class GitHub
      */
     public function getHeaders()
     {
+        $headers = [
+            'Content-Type' => 'application/json'
+        ];
+
         if (!is_null($this->token)) {
-            return ['Authorization' => "token {$this->token}"];
+            $headers['Authorization'] = "token {$this->token}";
         }
-        return [];
+        return $headers;
     }
 
     /**
@@ -86,7 +120,6 @@ class GitHub
      *
      * Get a single pull request information
      *
-     * @return mixed
      */
     public function getPullRequest()
     {
@@ -99,35 +132,87 @@ class GitHub
      * Get all closed pull requests up to a certain date
      *
      * @param $date
-     * @param int $page
-     * @return bool
+     * @param string $after
      */
-    public function getPullRequests($date, $page = 1)
+    public function getPullRequests($date, $after = null)
     {
-        $prs = Requests::get($this->github . "/pulls?state=closed&sort=updated&direction=desc&page=$page", $this->getHeaders());
-        $prs = json_decode($prs->body, true);
-        foreach ($prs as $k => $pr) {
-            if ($pr['merged_at']) {
-                $created    = new DateTime($pr['created_at']);
-                $merged     = new DateTime($pr['merged_at']);
-                $updated    = new DateTime($pr['updated_at']);
-                $end_date   = new DateTime($date);
-                if (isset($this->pr['merged_at']) && $merged > new DateTime($this->pr['merged_at'])) {
-                    // If the date of this PR is newer than the final PR then skip over it
-                    continue;
-                } elseif ($created < $end_date && $merged < $end_date && $updated >= $end_date) {
-                    // If this PR was created and merged before the last tag but has been updated since then skip over
-                    continue;
-                } elseif ($created < $end_date && $merged < $end_date && $updated < $end_date) {
-                    // If the date of this PR is older than the last release we're done
-                    return true;
-                } else {
-                    // If not, assign this PR to the array
-                    $this->pull_requests[] = $pr;
-                }
-            }
+        if ($after) {
+            $after = ", after: \"$after\"";
         }
-        $this->getPullRequests($date, $page+1);
+
+        $query = <<<GRAPHQL
+{
+  search(query: "repo:librenms/librenms is:pr is:merged merged:>=$date", type: ISSUE, first: 100$after) {
+    edges {
+      node {
+        ... on PullRequest {
+          number
+          title
+          url
+          mergedAt
+          author {
+            login
+            url
+          }
+          mergedBy {
+            login
+            url
+          }
+          labels(first: 20) {
+            nodes {
+              name
+            }
+          }
+          reviews(first: 100) {
+            nodes {
+              author {
+                login
+                url
+              }
+            }
+          }
+        }
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+GRAPHQL;
+
+        $data = json_encode(['query' => $query]);
+        $prs = Requests::post($this->graphql, $this->getHeaders(), $data);
+        $prs = json_decode($prs->body, true);
+        if (!isset($prs['data'])) {
+            var_dump($prs);
+        }
+
+        foreach ($prs['data']['search']['edges'] as $edge) {
+            $pr = $edge['node'];
+            $pr['labels'] = $this->parseLabels($pr['labels']['nodes']);
+            $this->pull_requests[] = $pr;
+        }
+
+        // recurse through the pages
+        if ($prs['data']['search']['pageInfo']['hasNextPage']) {
+            $this->getPullRequests($date, $prs['data']['search']['pageInfo']['endCursor']);
+        }
+    }
+
+    /**
+     * Parse labels response into standardized names and remove emoji
+     *
+     * @param array $labels
+     * @return array
+     */
+    private function parseLabels($labels)
+    {
+        return array_map(function ($label) {
+            $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
+            return str_replace('-', ' ', $name);
+        }, $labels);
     }
 
     /**
@@ -137,25 +222,54 @@ class GitHub
      */
     public function buildChangeLog()
     {
-        $output = [];
-        $users  = [];
+        $valid_labels = array_keys($this->changelog);
+
         foreach ($this->pull_requests as $k => $pr) {
-            if (isset($users[$pr['user']['login']]) === false) {
-                $users[$pr['user']['login']] = 0;
-            }
-            if ($pr['merged_at']) {
-                foreach ($pr['labels'] as $key => $label) {
-                    $name = preg_replace('/ :[\S]+:/', '', strtolower($label['name']));
-                    $name = str_replace('-', ' ', $name);
-                    if (in_array($name, $this->labels)) {
-                        $title = ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title'])));
-                        $output[$name][] = "$title ([#{$pr['number']}]({$pr['html_url']})) - [{$pr['user']['login']}]({$pr['user']['html_url']})" . PHP_EOL;
-                    }
+            // check valid labels in order
+            $category = 'misc';
+            foreach ($valid_labels as $valid_label) {
+                if (in_array($valid_label, $pr['labels'])) {
+                    $category = $valid_label;
+                    break; // only put in the first found label
                 }
-                $users[$pr['user']['login']] += 1;
+            }
+
+            // only add the changelog if it isn't set to ignore
+            if (!in_array('ignore changelog', $pr['labels'])) {
+                $title = addcslashes(ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title']))), '<>');
+                $this->changelog[$category][] = "$title ([#{$pr['number']}]({$pr['url']})) - [{$pr['author']['login']}]({$pr['author']['url']})" . PHP_EOL;
+            }
+
+            $this->recordUserInfo($pr['author']);
+            $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
+
+            $ignore = [$pr['author']['login'], $pr['mergedBy']['login']];
+            foreach (array_unique($pr['reviews']['nodes'], SORT_REGULAR) as $reviewer) {
+                if (!in_array($reviewer['author']['login'], $ignore)) {
+                    $this->recordUserInfo($reviewer['author'], 'changelog_mergers');
+                }
             }
         }
-        $this->changelog = ['changelog' => $output, 'users' => $users];
+    }
+
+    /**
+     * Record user info and count into the specified array (default changelog_users)
+     * Record profile links too.
+     *
+     * @param array $user
+     * @param string $type
+     */
+    private function recordUserInfo($user, $type = 'changelog_users')
+    {
+        $user_count = &$this->$type;
+
+        $user_count[$user['login']] = isset($user_count[$user['login']])
+            ? $user_count[$user['login']] + 1
+            : 1;
+
+        if (!isset($this->profile_links[$user['login']])) {
+            $this->profile_links[$user['login']] = $user['url'];
+        }
     }
 
     /**
@@ -165,24 +279,44 @@ class GitHub
      */
     public function formatChangeLog()
     {
-        $tmp_markdown = "##$this->tag" . PHP_EOL;
+        $tmp_markdown = "## $this->tag" . PHP_EOL;
         $tmp_markdown .= '*(' . date('Y-m-d') . ')*' . PHP_EOL . PHP_EOL;
-        if (!empty($this->changelog['users'])) {
-            $tmp_markdown .= "A big thank you to the following " . count($this->changelog['users']) . " contributors this last month:" . PHP_EOL . PHP_EOL;
-            asort($this->changelog['users']);
-            foreach (array_reverse($this->changelog['users']) as $user => $count) {
-                $tmp_markdown .= "  - $user ($count)" . PHP_EOL;
-            }
+
+        if (!empty($this->changelog_users)) {
+            $tmp_markdown .= "A big thank you to the following " . count($this->changelog_users) . " contributors this last month:" . PHP_EOL . PHP_EOL;
+            $tmp_markdown .= $this->formatUserList($this->changelog_users);
         }
 
         $tmp_markdown .= PHP_EOL;
 
-        foreach ($this->changelog['changelog'] as $section => $items) {
-            $tmp_markdown .= "#### " . ucfirst($section) . PHP_EOL;
-            $tmp_markdown .= '* ' . implode('* ', $items) . PHP_EOL;
+        if (!empty($this->changelog_mergers)) {
+            $tmp_markdown .= "Thanks to maintainers that helped with pull requests this month:" . PHP_EOL . PHP_EOL;
+            $tmp_markdown .= $this->formatUserList($this->changelog_mergers) . PHP_EOL;
+        }
+
+        foreach ($this->changelog as $section => $items) {
+            if (!empty($items)) {
+                $tmp_markdown .= "#### " . ucwords($section) . PHP_EOL;
+                $tmp_markdown .= '* ' . implode('* ', $items) . PHP_EOL;
+            }
         }
 
         $this->markdown = $tmp_markdown;
+    }
+
+    /**
+     * Create a markdown list of users and link their github profile
+     * @param $users
+     * @return string
+     */
+    private function formatUserList($users)
+    {
+        $output = '';
+        arsort($users);
+        foreach ($users as $user => $count) {
+            $output .= "  - [$user]({$this->profile_links[$user]}) ($count)" . PHP_EOL;
+        }
+        return $output;
     }
 
     /**
@@ -215,19 +349,15 @@ class GitHub
         return $this->markdown;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
     public function createRelease()
     {
-        // push the changelog
-        $existing = \Requests::get($this->github . '/contents/' . $this->file, $this->getHeaders());
-        $existing_sha = json_decode($existing->body)->sha;
-
-        $updated = Requests::put($this->github . '/contents/' . $this->file, $this->getHeaders(), json_encode([
-            'message' => 'Changelog for ' . $this->tag,
-            'content' => base64_encode(file_get_contents($this->file)),
-            'sha' => $existing_sha,
-        ]));
-
-        $updated_sha = json_decode($updated->body)->commit->sha;
+        // push the changelog and version bump
+        $this->pushFileContents($this->file, file_get_contents($this->file), "Changelog for $this->tag");
+        $updated_sha = $this->pushVersionBump();
 
         // make sure the markdown is built
         if (empty($this->markdown)) {
@@ -247,7 +377,7 @@ class GitHub
     /**
      * Function to control the creation of creating a change log.
      * @param bool $write
-     * @throws \Exception
+     * @throws Exception
      */
     public function createChangelog($write = true)
     {
@@ -257,7 +387,10 @@ class GitHub
         }
 
         if (!isset($previous_release['published_at'])) {
-            throw new \Exception("Could not find previous release tag.");
+            throw new Exception(
+                $previous_release['message'] ??
+                "Could not find previous release tag. ($this->from)"
+            );
         }
 
         $this->getPullRequests($previous_release['published_at']);
@@ -267,5 +400,34 @@ class GitHub
         if ($write) {
             $this->writeChangeLog();
         }
+    }
+
+    private function pushVersionBump()
+    {
+        $version_file = 'LibreNMS/Util/Version.php';
+        $contents = file_get_contents(base_path($version_file));
+        $updated_contents = preg_replace("/const VERSION = '[^']+';/", "const VERSION = '$this->tag';", $contents);
+
+        return $this->pushFileContents($version_file, $updated_contents, "Bump version to $this->tag");
+    }
+
+    /**
+     * @param string $file Path in git repo
+     * @param string $contents new file contents
+     * @param string $message The commit message
+     * @return Requests_Response
+     */
+    private function pushFileContents($file, $contents, $message)
+    {
+        $existing = Requests::get($this->github . '/contents/' . $file, $this->getHeaders());
+        $existing_sha = json_decode($existing->body)->sha;
+
+        $updated = Requests::put($this->github . '/contents/' . $file, $this->getHeaders(), json_encode([
+            'message' => $message,
+            'content' => base64_encode($contents),
+            'sha' => $existing_sha,
+        ]));
+
+        return json_decode($updated->body)->commit->sha;
     }
 }

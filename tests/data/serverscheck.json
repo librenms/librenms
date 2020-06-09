@@ -8,13 +8,13 @@
                     "sysDescr": "Temperature & Sensor Gateway",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "serverscheck",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "serverscheck.svg",
+                    "location": null
                 }
             ]
         },
@@ -26,13 +26,13 @@
                     "sysDescr": "Temperature & Sensor Gateway",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": "<private>",
                     "os": "serverscheck",
                     "type": "network",
                     "serial": null,
-                    "icon": "generic.svg"
+                    "icon": "serverscheck.svg",
+                    "location": "<private>"
                 }
             ]
         }
@@ -48,6 +48,7 @@
                     "sensor_index": "sensor3name",
                     "sensor_type": "Serverscheck_FloodSensor",
                     "sensor_descr": "Flooding",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 1,
@@ -71,6 +72,7 @@
                     "sensor_index": "sensor1name",
                     "sensor_type": "serverscheck",
                     "sensor_descr": "Temperature",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27.53,
@@ -121,6 +123,7 @@
                     "sensor_index": "sensor3name",
                     "sensor_type": "Serverscheck_FloodSensor",
                     "sensor_descr": "Flooding",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 2,
@@ -144,6 +147,7 @@
                     "sensor_index": "sensor1name",
                     "sensor_type": "serverscheck",
                     "sensor_descr": "Temperature",
+                    "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 27.53,

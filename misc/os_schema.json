@@ -53,10 +53,16 @@
         "icon": {
             "type": "string"
         },
+        "config_highlighting": {
+            "type": "string"
+        },
         "poller_modules": {
             "type": "object",
             "properties": {
                 "cisco-cbqos": {
+                    "type": "boolean"
+                },
+                "cisco-qfp": {
                     "type": "boolean"
                 },
                 "cisco-cef": {
@@ -131,6 +137,9 @@
                 "ucd-diskio": {
                     "type": "boolean"
                 },
+                "sensors": {
+                    "type": "boolean"
+                },
                 "services": {
                     "type": "boolean"
                 },
@@ -191,6 +200,9 @@
                 "junose-atm-vp": {
                     "type": "boolean"
                 },
+                "mpls": {
+                    "type": "boolean"
+                },
                 "netscaler-vsvr": {
                     "type": "boolean"
                 }
@@ -200,6 +212,9 @@
         "discovery_modules": {
             "type": "object",
             "properties": {
+                "cisco-qfp": {
+                    "type": "boolean"
+                },
                 "cisco-cef": {
                     "type": "boolean"
                 },
@@ -320,6 +335,9 @@
                 "libvirt-vminfo": {
                     "type": "boolean"
                 },
+                "mpls": {
+                    "type": "boolean"
+                },
                 "ip6-addresses": {
                     "type": "boolean"
                 }
@@ -366,9 +384,22 @@
                 "type": "string"
             }
         },
+        "bad_iftype": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "bad_ifoperstatus": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
         "processor_stacked": {
             "type": "boolean"
         },
+        "bad_ifname_regexp": {"$ref": "#/definitions/regex_group"},
         "bad_if_regexp": {"$ref": "#/definitions/regex_group"},
         "bad_snmpEngineTime": {
             "type": "boolean"
@@ -496,7 +527,13 @@
                 "starts",
                 "ends",
                 "contains",
-                "regex"
+                "regex",
+                "not_starts",
+                "not_ends",
+                "not_contains",
+                "not_regex",
+                "in_array",
+                "not_in_array"
             ]
         }
     }

@@ -15,7 +15,7 @@
 
 $sysDescrPieces = explode(" ", $device['sysDescr']); //extract model from sysDescr
 
-$versions = snmp_get_multi_oid($device, 'msppDevHwVersion.0 msppDevSwVersion.0', '-OQs', 'WRI-DEVICE-MIB');
+$versions = snmp_get_multi_oid($device, ['msppDevHwVersion.0', 'msppDevSwVersion.0'], '-OQs', 'WRI-DEVICE-MIB');
 foreach ($versions as $key => $field) {
     if (preg_match("/\b 00 00 00 00 00 00\b/i", $field)) {  //convert potential hex reading to character
         $versions[$key] = str_replace(array("\r","\n"), '', $field);

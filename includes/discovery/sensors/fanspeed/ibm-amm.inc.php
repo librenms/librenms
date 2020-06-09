@@ -11,12 +11,12 @@
  */
 
 $descr_prefix = 'Blower ';
-$oids = array(
+$oids = [
     '.1.3.6.1.4.1.2.3.51.2.2.3.20.0', // BLADE-MIB:blower1speedRPM
     '.1.3.6.1.4.1.2.3.51.2.2.3.21.0', // BLADE-MIB:blower2speedRPM
     '.1.3.6.1.4.1.2.3.51.2.2.3.22.0', // BLADE-MIB:blower3speedRPM
     '.1.3.6.1.4.1.2.3.51.2.2.3.23.0', // BLADE-MIB:blower4speedRPM
-);
+];
 
 echo 'BLADE-MIB ';
 foreach ($oids as $index => $oid) {

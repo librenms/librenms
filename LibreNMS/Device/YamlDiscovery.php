@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Device;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
 
@@ -81,16 +83,16 @@ class YamlDiscovery
                     foreach ($data as $name => $value) {
                         if ($name == '$oid' || $name == 'skip_values') {
                             $current_data[$name] = $value;
-                        } elseif (str_contains($value, '{{')) {
+                        } elseif (Str::contains($value, '{{')) {
                             // replace embedded values
                             $current_data[$name] = static::replaceValues($name, $index, $count, $data, $pre_cache);
                         } else {
                             // replace references to data
-                            $current_data[$name] = dynamic_discovery_get_value($name, $index, $data, $pre_cache, $value);
+                            $current_data[$name] = static::getValueFromData($name, $index, $data, $pre_cache, $value);
                         }
                     }
 
-                    if (static::canSkipItem($current_data['value'], $current_data, $group_options, $snmp_data)) {
+                    if (static::canSkipItem($current_data['value'], $index, $current_data, $group_options, $snmp_data)) {
                         continue;
                     }
 
@@ -108,16 +110,32 @@ class YamlDiscovery
 
     public static function replaceValues($name, $index, $count, $data, $pre_cache)
     {
-        $value = dynamic_discovery_get_value($name, $index, $data, $pre_cache);
+        $value = static::getValueFromData($name, $index, $data, $pre_cache);
         if (is_null($value)) {
             // built in replacements
-            $value = str_replace(array('{{ $index }}', '{{ $count }}'), array($index, $count), $data[$name]);
+            $search = [
+                '{{ $index }}',
+                '{{ $count }}',
+            ];
+            $replace = [
+                $index,
+                $count,
+            ];
+
+            // prepare the $subindexX match variable replacement
+            foreach (explode('.', $index) as $pos => $subindex) {
+                $search[] = '{{ $subindex' . $pos . ' }}';
+                $replace[] = $subindex;
+            }
+
+            $value = str_replace($search, $replace, $data[$name]);
 
             // search discovery data for values
             $value = preg_replace_callback('/{{ \$([a-zA-Z0-9.]+) }}/', function ($matches) use ($index, $data, $pre_cache) {
-                $replace = dynamic_discovery_get_value($matches[1], $index, $data, $pre_cache, null);
+                $replace = static::getValueFromData($matches[1], $index, $data, $pre_cache, null);
                 if (is_null($replace)) {
-                    return $matches[0]; // do no replacement
+                    d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
+                    return ''; // remove the unavailable variable
                 }
                 return $replace;
             }, $value);
@@ -131,7 +149,7 @@ class YamlDiscovery
      * Helper function for dynamic discovery to search for data from pre_cached snmp data
      *
      * @param string $name The name of the field from the discovery data or just an oid
-     * @param int $index The index of the current sensor
+     * @param string $index The index of the current sensor
      * @param array $discovery_data The discovery data for the current sensor
      * @param array $pre_cache all pre-cached snmp data
      * @param mixed $default The default value to return if data is not found
@@ -139,6 +157,10 @@ class YamlDiscovery
      */
     public static function getValueFromData($name, $index, $discovery_data, $pre_cache, $default = null)
     {
+        //create the sub-index values in order to try to match them with precache
+        foreach (explode('.', $index) as $pos => $sindex) {
+            $subindex[$pos] = $sindex;
+        }
         if (isset($discovery_data[$name])) {
             $name = $discovery_data[$name];
         }
@@ -151,10 +173,14 @@ class YamlDiscovery
             if (is_array($pre_cache[$name])) {
                 if (isset($pre_cache[$name][$index][$name])) {
                     return $pre_cache[$name][$index][$name];
-                } elseif (isset($pre_cache[$index][$name])) {
-                    return $pre_cache[$index][$name];
+                } elseif (isset($pre_cache[$index][$name])) {   //probably makes no sense here
+                    return $pre_cache[$index][$name];           //same
+                } elseif (isset($pre_cache[$name][$index])) {
+                    return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1) {
                     return current($pre_cache[$name]);
+                } elseif (isset($pre_cache[$name][$subindex[0]][$name])) {
+                    return $pre_cache[$name][$subindex[0]][$name];
                 }
             } else {
                 return $pre_cache[$name];
@@ -199,11 +225,11 @@ class YamlDiscovery
                         foreach ((array)$data['oid'] as $oid) {
                             if (!array_key_exists($oid, $pre_cache)) {
                                 if (isset($data['snmp_flags'])) {
-                                    $snmp_flag = $data['snmp_flags'];
+                                    $snmp_flag = Arr::wrap($data['snmp_flags']);
                                 } else {
-                                    $snmp_flag = '-OteQUs';
+                                    $snmp_flag = ['-OteQUs'];
                                 }
-                                $snmp_flag .= ' -Ih';
+                                $snmp_flag[] = '-Ih';
 
                                 $mib = $device['dynamic_discovery']['mib'];
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid], $mib, null, $snmp_flag);
@@ -227,15 +253,19 @@ class YamlDiscovery
      * @param array $item_snmp_data The pre-cache data array
      * @return bool
      */
-    private static function canSkipItem($value, $yaml_item_data, $group_options, $item_snmp_data = array())
+    public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = array())
     {
         $skip_values = array_replace((array)$group_options['skip_values'], (array)$yaml_item_data['skip_values']);
 
         foreach ($skip_values as $skip_value) {
-            if (is_array($skip_value) && $item_snmp_data) {
+            if (is_array($skip_value) && $pre_cache) {
                 // Dynamic skipping of data
                 $op = isset($skip_value['op']) ? $skip_value['op'] : '!=';
-                $tmp_value = $item_snmp_data[$skip_value['oid']];
+                $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
+                if (Str::contains($skip_value['oid'], '.')) {
+                    list($skip_value['oid'], $targeted_index) = explode('.', $skip_value['oid'], 2);
+                    $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+                }
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }
@@ -252,7 +282,7 @@ class YamlDiscovery
             }
         }
 
-        $skip_value_gt = array_reduce((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
+        $skip_value_gt = array_replace((array)$group_options['skip_value_gt'], (array)$yaml_item_data['skip_value_gt']);
         foreach ($skip_value_gt as $skip_value) {
             if ($value > $skip_value) {
                 return true;
