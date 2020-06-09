@@ -13,7 +13,6 @@ foreach (dbFetchRows("select dg.id, dg.name from devices d, device_group_device 
 }
 
 if (!empty($device_groups)) {
-
     echo "<div class='row'>
         <div class='col-md-12'>
           <div class='panel panel-default panel-condensed device-overview'>
@@ -30,6 +29,5 @@ if (!empty($device_groups)) {
         </div>
       </div>
     </div>";
-
 }
 ?>

@@ -807,6 +807,10 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
   font-weight: 900;
 }
 
+.device_group:hover {
+  color: #30c030;
+}
+
 .interface, .interface-admindown, a.interface-admindown, a.interface-admindown:visited, .interface-updown, a.interface-updown, a.interface-updown:visited, .interface-upup, a.interface-upup {
   color: #555;
 }
