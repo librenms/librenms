@@ -230,7 +230,7 @@ echo "
     <div class='form-group'>
     <label for='sysName' class='col-sm-2 control-label'>sysName (optional)</label>
     <div class='col-sm-4'>
-    <input id='sysName' class='form-control' name='sysName' value='".htmspecialchars($device['sysName'])."'/>
+    <input id='sysName' class='form-control' name='sysName' value='".htmlspecialchars($device['sysName'])."'/>
     </div>
     </div>
     <div class='form-group'>
