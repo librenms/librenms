@@ -178,7 +178,7 @@ applications:
     applications_device_id_app_type_unique: { Name: applications_device_id_app_type_unique, Columns: [device_id, app_type], Unique: true, Type: BTREE }
 application_metrics:
   Columns:
-    - { Field: app_id, Type: 'int(10) unsigned', 'Null': false, Extra: '' }
+    - { Field: app_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: metric, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: value, Type: double, 'Null': true, Extra: '' }
     - { Field: value_prev, Type: double, 'Null': true, Extra: '' }
