@@ -2,7 +2,7 @@
 
 $device_groups="";
 foreach (dbFetchRows("select dg.id, dg.name from devices d, device_group_device g, device_groups dg where dg.id=g.device_group_id and g.device_id=d.device_id and d.hostname=? order by dg.name", array($device['hostname'])) as $groups) {
-    $device_groups .= (empty($device_groups) ? "" : str_repeat("&nbsp; ", 4)) . '<strong><a class="fa-col-info" href="/devices/group=' . $groups['id'] . '" target="_blank">' . $groups['name'] . '</a></strong>';
+    $device_groups .= (empty($device_groups) ? "" : str_repeat("&nbsp; ", 4)) . '<a class="list-device" href="/devices/group=' . $groups['id'] . '" target="_blank">' . $groups['name'] . '</a>';
 }
 
 if (!empty($device_groups)) {
