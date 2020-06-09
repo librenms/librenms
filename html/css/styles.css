@@ -802,6 +802,11 @@ p.vspace { padding-top: 3px; padding-bottom: 3px; }
 
 .nofloat { clear: left; }
 
+.device_group {
+  color: #00a000;
+  font-weight: 900;
+}
+
 .interface, .interface-admindown, a.interface-admindown, a.interface-admindown:visited, .interface-updown, a.interface-updown, a.interface-updown:visited, .interface-upup, a.interface-upup {
   color: #555;
 }
