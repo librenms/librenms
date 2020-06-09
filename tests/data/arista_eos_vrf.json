@@ -30,7 +30,7 @@
                     "features": null,
                     "os": "arista_eos",
                     "type": "network",
-                    "serial": null,
+                    "serial": "serial",
                     "icon": "arista.svg",
                     "location": "<private>"
                 }
