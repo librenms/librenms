@@ -2,7 +2,6 @@
 
 use App\Models\Location;
 use App\Models\Device;
-use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Time;
@@ -30,4 +29,3 @@ if (!empty($device_groups)) {
       </div>
     </div>";
 }
-?>
