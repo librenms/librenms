@@ -10,8 +10,8 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "os": "nxos",
-                    "type": "network",
+                    "os": "ucos",
+                    "type": "collaboration",
                     "serial": null,
                     "icon": "cisco.svg",
                     "location": null
