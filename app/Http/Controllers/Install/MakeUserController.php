@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Install;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class MakeUserController extends \App\Http\Controllers\Controller
 {
@@ -34,10 +35,6 @@ class MakeUserController extends \App\Http\Controllers\Controller
 
     public function __invoke(Request $request)
     {
-        if ($request->method() == 'POST') {
-            $this->create($request);
-        }
-
         if (session('install.database')) {
             $this->configureDatabase();
             $user = User::first();
@@ -50,7 +47,9 @@ class MakeUserController extends \App\Http\Controllers\Controller
             ]);
         }
 
-        return view('install.make-user');
+        return view('install.make-user', [
+            'messages' => Arr::wrap(session('message'))
+        ]);
     }
 
     public function create(Request $request)
@@ -63,6 +62,7 @@ class MakeUserController extends \App\Http\Controllers\Controller
         try {
             $this->configureDatabase();
             $user = new User($request->only(['username', 'password', 'email']));
+            $user->level = 10;
             $user->setPassword($request->get('password'));
             $res = $user->save();
             $message = $res ? trans('install.user.success') : trans('install.user.failure');
