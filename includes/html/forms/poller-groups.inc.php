@@ -1,5 +1,4 @@
 <?php
-
 /*
  * LibreNMS
  *
@@ -25,7 +24,6 @@ $group_name = mres($_POST['group_name']);
 $descr      = mres($_POST['descr']);
 $rules      = mres($_POST['rules']);
 if (!empty($group_name)) {
-
     $db_data = ['group_name' => $group_name,
                 'descr'      => $descr,
                 'rules'      => $rules];

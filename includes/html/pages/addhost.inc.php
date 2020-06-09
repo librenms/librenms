@@ -289,7 +289,6 @@ if (Config::get('distributed_poller') === true) {
         </div>
     </div>
     ';
-
 }//endif
 ?>
       <div class="form-group">
