@@ -657,7 +657,7 @@ function update_application($app, $response, $metrics = array(), $status = '')
                     'application_metrics'
                 );
                 echo '+';
-            } elseif ($value != $db_metrics[$metric_name]['value'] || Config::get('applications.always_update') == TRUE) {
+            } elseif ($value != $db_metrics[$metric_name]['value'] || Str::is(Config::get('applications.always_update'), $app['app_type']) || Str::is(Config::get('applications.metric.always_update'), $metric_name)) {
                 dbUpdate(
                     array(
                         'value' => $value,
