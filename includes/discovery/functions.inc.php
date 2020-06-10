@@ -1363,7 +1363,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
     $where = array();
     $params = array();
 
-    if ($name && is_valid_hostname($name)) {
+    if ($name) {
         $where[] = '`sysName`=?';
         $params[] = $name;
 
@@ -1375,6 +1375,13 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
             $params[] = "$name.$mydomain";
 
             $where[] = 'concat(`hostname`, \'.\', ?) =?';
+            $params[] = "$mydomain";
+            $params[] = "$name";
+
+            $where[] = '`sysName`=?';
+            $params[] = "$name.$mydomain";
+
+            $where[] = 'concat(`sysName`, \'.\', ?) =?';
             $params[] = "$mydomain";
             $params[] = "$name";
         }
