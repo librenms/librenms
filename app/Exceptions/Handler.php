@@ -48,9 +48,11 @@ class Handler extends ExceptionHandler
         }
 
         // try to upgrade generic exceptions to more specific ones
-        foreach ($this->upgradable as $class) {
-            if ($new = $class::upgrade($exception)) {
-                return parent::render($request, $new);
+        if (!config('app.debug')) {
+            foreach ($this->upgradable as $class) {
+                if ($new = $class::upgrade($exception)) {
+                    return parent::render($request, $new);
+                }
             }
         }
 

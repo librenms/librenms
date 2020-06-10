@@ -19,7 +19,7 @@ with the values we expect to see the data in:
 | errors      | count       | WirelessErrorsDiscovery      | The total bits of errored packets or bits, etc                                                  |
 | frequency   | MHz         | WirelessFrequencyDiscovery   | The frequency of the radio in MHz, channels can be converted                                    |
 | mse         | dB          | WirelessMseDiscovery         | The Mean Square Error                                                                           |
-| noise-floor | dBm/Hz      | WirelessNoiseFloorDiscovery  | The amount of noise received by the radio                                                       |
+| noise-floor | dBm      | WirelessNoiseFloorDiscovery  | The amount of noise received by the radio                                                       |
 | power       | dBm         | WirelessPowerDiscovery       | The power of transmit or receive, including signal level                                        |
 | quality     | %           | WirelessQualityDiscovery     | The % of quality of the link, 100% = perfect link                                               |
 | rate        | bps         | WirelessRateDiscovery        | The negotiated rate of the connection (not data transfer)                                       |
