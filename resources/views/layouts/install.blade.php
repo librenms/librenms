@@ -13,6 +13,7 @@
     <style type="text/css">
         .primary-panel {
             box-shadow: 0 0 25px #333;
+            min-height: 540px;
         }
 
         body {

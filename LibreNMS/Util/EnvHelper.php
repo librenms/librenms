@@ -50,11 +50,11 @@ class EnvHelper
      * Will only set non-empty unset variables
      *
      * @param array $settings KEY => value list of settings
-     * @param array $force
+     * @param array $unset Remove the given KEYS from the config
      * @param string $file
      * @return string
      */
-    public static function setEnv($settings, $force = [], $file = '.env')
+    public static function setEnv($settings, $unset = [], $file = '.env')
     {
         $original_content = $content = file_get_contents($file);
         // TODO implement force
@@ -62,6 +62,12 @@ class EnvHelper
         // ensure trailing line return
         if (substr($content, -1) !== PHP_EOL) {
             $content .= PHP_EOL;
+        }
+
+        // unset the given keys
+        if (!empty($unset)) {
+            $regex = '/^(' . implode('|', $unset) . ')=.*$\n/m';
+            $content = preg_replace($regex, '', $content);
         }
 
         foreach ($settings as $key => $value) {

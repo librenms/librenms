@@ -49,6 +49,10 @@ return [
         'failure' => 'Failed to create user'
     ],
     'finish' => [
-        'title' => 'Finish Install'
+        'title' => 'Finish Install',
+        'env_written' => '.env file written',
+        'config_exists' => 'config.php file exists',
+        'config_written' => 'config.php file written',
+        'config_not_written' => 'Could not write config.php',
     ]
 ];
