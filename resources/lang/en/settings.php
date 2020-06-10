@@ -1291,8 +1291,12 @@ return [
             'help' => 'Full URL to the smokeping gui'
         ],
         'applications.always_update' => [
-            'description' => 'Always update',
-            'help' => 'By default, value and value_prev only updates on change. With this enabled they will always update'
+            'description' => 'Always update app',
+            'help' => 'By default, value and value_prev only updates on change. Adding an application here will make it always update. NOTE: It must be the internal app_type'
+        ],
+        'applications.metric.always_update' => [
+            'description' => 'Always update metric',
+            'help' => 'By default, value and value_prev only updates on change. Adding a metric here will make it always update. NOTE: It must be the internal metric_name'
         ]
     ],
     'twofactor' => [
