@@ -4,8 +4,8 @@ $vlan_ports = array();
 $vlans_data = array();
 
 foreach (dbFetchRows('SELECT * FROM `vlans` WHERE `device_id` = ? GROUP BY `vlan_vlan` ORDER BY `vlan_vlan`', array($device['device_id'])) as $vlan) {
-    foreach($vlan as $k => $v) {
-        if($k != "vlan_vlan") {
+    foreach ($vlan as $k => $v) {
+        if ($k != "vlan_vlan") {
             $vlans_data[$vlan['vlan_vlan']][$k]=$v;
         }
     }
