@@ -11,7 +11,7 @@ if (!empty($device_groups)) {
           <div class='panel panel-default panel-condensed device-overview'>
             <div class='panel-heading'>";
 
-    echo '<i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> <a class="list-device" href="/device-groups">Device Group Membership</a>';
+    echo '<i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> <strong><a href="/device-groups">Device Group Membership</a></strong>';
     echo '</div><div class="panel-body">';
 
     echo '<div class="row">
