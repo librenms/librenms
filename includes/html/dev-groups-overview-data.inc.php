@@ -10,9 +10,9 @@ if (!empty($device_groups)) {
         <div class='col-md-12'>
           <div class='panel panel-default panel-condensed device-overview'>
             <div class='panel-heading'>";
-
-    echo '<i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> <a class="list-device" href="/device-groups">Device Group Membership</a>';
-    echo '</div><div class="panel-body">';
+    echo '<a href="/device-groups">';
+    echo '<i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i><strong>Device Group Membership</strong>';
+    echo '</a></div><div class="panel-body">';
 
     echo '<div class="row">
         <div class="col-sm-12">' . $device_groups . '</div>
