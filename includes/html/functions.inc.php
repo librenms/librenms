@@ -1551,6 +1551,9 @@ function get_sensor_label_color($sensor, $type = 'sensors')
         $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
         return "<span class='label $label_style'>".trim($sensor['sensor_current'])."</span>";
     }
+    if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
+        return "<span class='label $label_style'>".trim($sensor['sensor_current'])." ".$unit."</span>";
+    }
     return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
 }
 
