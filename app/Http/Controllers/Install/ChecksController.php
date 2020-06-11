@@ -62,7 +62,7 @@ class ChecksController extends InstallationController
         return $status;
     }
 
-    public static function enabled()
+    public static function enabled(): bool
     {
         return true;
     }

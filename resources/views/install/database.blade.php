@@ -80,13 +80,13 @@
                 success: function (response) {
                     if (response.result === 'ok') {
                         $('#database-status>i').attr('class', 'fa fa-2x fa-check-circle text-success');
-                        $('#install-migrate-button').removeClass('disabled');
                     } else {
                         $('#database-status>i').attr('class', 'fa fa-2x fa-times-circle text-danger')
                         if (response.message) {
                             $('#error-box').append($('<div class="alert alert-danger">' + response.message + '</div>'))
                         }
                     }
+                    checkStepStatus();
                 },
             });
         });

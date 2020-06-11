@@ -33,17 +33,18 @@ class DatabaseMigrationController extends InstallationController
 {
     public function index()
     {
-        return view('install.migrate-database', $this->formatData());
-    }
-
-    public function migrate(Request $request)
-    {
         if (!self::enabled()) {
             return redirect()->route('install.database');
         }
 
+        return view('install.migrate', $this->formatData());
+    }
+
+    public function migrate(Request $request)
+    {
         $response = new StreamedResponse(function () use ($request) {
             try {
+                $this->configureDatabase();
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));
                 echo "Starting Update...\n";
                 $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--database' => $this->connection], $output);
@@ -64,9 +65,9 @@ class DatabaseMigrationController extends InstallationController
         return $response;
     }
 
-    public static function enabled()
+    public static function enabled(): bool
     {
-        return session('install.database');
+        return (bool)session('install.database');
     }
 
     public static function icon(): string

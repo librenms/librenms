@@ -72,7 +72,7 @@ class DatabaseController extends InstallationController
         ]);
     }
 
-    public static function enabled()
+    public static function enabled(): bool
     {
         return true;
     }

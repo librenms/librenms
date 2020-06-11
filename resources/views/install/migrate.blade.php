@@ -20,7 +20,6 @@
 
 @section('scripts')
     <script type="text/javascript">
-        var migrate_error = false;
         var output = document.getElementById("db-update");
         var xhr = new XMLHttpRequest();
         xhr.open("GET", "{{ route('install.action.migrate') }}", true);
@@ -31,20 +30,18 @@
             output.scrollTop = output.scrollHeight - output.clientHeight; // scrolls the output area
             if (output.innerHTML.indexOf('Error!') !== -1) {
                 // if error word in output, show the retry button
-                migrate_error = true;
                 $("#retry-btn").css("display", "");
                 $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.error')</div>'))
             }
         };
         xhr.timeout = 240000; // if no response for 4m, allow the user to retry
         xhr.ontimeout = function (e) {
-            migrate_error = true;
             $("#retry-btn").css("display", "");
             $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.timeout')</div>'))
         };
         xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200 && !migrate_error) {
-                $('#install-user-button').removeClass('disabled');
+            if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                checkStepStatus();
             }
         };
         xhr.send();

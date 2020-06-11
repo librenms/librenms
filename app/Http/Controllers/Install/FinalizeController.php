@@ -62,9 +62,7 @@ class FinalizeController extends InstallationController
         }
 
         if ($success) {
-            // TODO clear session
-//            session()->forget('install');
-//            session()->forget('db');
+            session()->flush();
         }
 
         return view('install.finish', $this->formatData([
@@ -86,7 +84,7 @@ class FinalizeController extends InstallationController
             'DB_PASSWORD' => session('db.password'),
             'DB_DATABASE' => session('db.database'),
             'DB_SOCKET' => session('db.socket'),
-        ], [], base_path('.env')); // TODO unset INSTALL
+        ], ['INSTALL'], base_path('.env'));
     }
 
     private function writeConfigFile($config_contents, $config_file)

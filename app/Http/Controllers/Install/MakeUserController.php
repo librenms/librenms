@@ -73,9 +73,9 @@ class MakeUserController extends InstallationController
         return redirect()->back()->with('message', $message);
     }
 
-    public static function enabled()
+    public static function enabled(): bool
     {
-        return session('install.migrate');
+        return (bool)session('install.migrate');
     }
 
     public static function icon(): string

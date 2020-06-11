@@ -49,12 +49,20 @@ class InstallationController extends Controller
 
     public function baseIndex()
     {
-        return redirect()->route('install.checks');
+        $initial = key($this->steps) ?: 'checks';
+        return redirect()->route("install.$initial");
     }
 
     public function invalid()
     {
         abort(404);
+    }
+
+    public function stepsCompleted()
+    {
+        return response()->json(array_map(function ($controller) {
+            return $controller::enabled($this->steps);
+        }, $this->steps));
     }
 
     final protected function formatData($data = [])

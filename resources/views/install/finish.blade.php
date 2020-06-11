@@ -23,9 +23,9 @@
 </div>
 <div class="row">
     <div class="col-12">
-        <div class="alert alert-danger">
+        <div class="alert alert-warning">
             <p>@lang('install.finish.not_finished')</p>
-            <p>@lang('install.finish.validate', ['about' => '<a href="' . url('validate') . '">' . __('install.finish.validate_link') . '</a>'])</p>
+            <p>@lang('install.finish.validate', ['validate' => '<a href="' . url('validate') . '">' . __('install.finish.validate_link') . '</a>'])</p>
         </div>
     </div>
 </div>

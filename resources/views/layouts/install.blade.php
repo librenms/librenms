@@ -73,6 +73,22 @@
         </div>
     </div>
 </div>
+<script>
+    function checkStepStatus() {
+        $.ajax('{{ route('install.action.steps') }}')
+        .success(function (data) {
+            console.log(data);
+            Object.keys(data).forEach(function (key) {
+                var button = $('#install-' + key + '-button');
+                if (data[key]) {
+                    button.removeClass('disabled')
+                } else {
+                    button.addClass('disabled')
+                }
+            });
+        })
+    }
+</script>
 @yield('scripts')
 </body>
 </html>
