@@ -87,19 +87,19 @@ if (\LibreNMS\Config::get('old_graphs')) {
 
     $rrd_options .= "\\n'";
     $rrd_options .= ' LINE1.25:'.$ds.'#'.$colour_line.":'".$line_text."'";
-    $rrd_options .= ' GPRINT:'.$ds.':LAST:%6.2lf%s';
-    $rrd_options .= ' GPRINT:'.$ds.':AVERAGE:%6.2lf%s';
-    $rrd_options .= ' GPRINT:'.$ds.'_max:MAX:%6.2lf%s';
+    $rrd_options .= ' GPRINT:'.$ds.':LAST:%6.'.$float_precision.'lf%s';
+    $rrd_options .= ' GPRINT:'.$ds.':AVERAGE:%6.'.$float_precision.'lf%s';
+    $rrd_options .= ' GPRINT:'.$ds.'_max:MAX:%6.'.$float_precision.'lf%s';
 
     if ($percentile) {
-        $rrd_options .= ' GPRINT:'.$ds.'_percentile:%6.2lf%s';
+        $rrd_options .= ' GPRINT:'.$ds.'_percentile:%6.'.$float_precision.'lf%s';
     }
 
     $rrd_options .= "\\\\n";
     $rrd_options .= " COMMENT:\\n";
 
     if ($print_total) {
-        $rrd_options .= ' GPRINT:'.$ds.'_tot:Total\ %6.2lf%s\)\l';
+        $rrd_options .= ' GPRINT:'.$ds.'_tot:Total\ %6.'.$float_precision.'lf%s\)\l';
     }
 
     if ($percentile) {
