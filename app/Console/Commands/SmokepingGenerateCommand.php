@@ -233,6 +233,10 @@ class SmokepingGenerateCommand extends LnmsCommand
         $lines = [];
 
         foreach ($smokelist as $type => $devices) {
+            if (empty($type)) {
+                $type = 'Ungrouped';
+            }
+
             $lines[] = sprintf('+ %s', $this->buildMenuEntry($type));
             $lines[] = sprintf('  menu = %s', $type);
             $lines[] = sprintf('  title = %s', $type);
