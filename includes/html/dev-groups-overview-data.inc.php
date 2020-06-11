@@ -1,25 +1,31 @@
 <?php
 
-$device_groups="";
-foreach (dbFetchRows("select dg.id, dg.name from devices d, device_group_device g, device_groups dg where dg.id=g.device_group_id and g.device_id=d.device_id and d.hostname=? order by dg.name", array($device['hostname'])) as $groups) {
-    $device_groups .= (empty($device_groups) ? "" : str_repeat("&nbsp; ", 4)) . '<a class="list-device" href="/devices/group=' . $groups['id'] . '" target="_blank">' . $groups['name'] . '</a>';
-}
+$device_groups = dbFetchRows("SELECT dg.id, dg.name FROM device_group_device AS d, device_groups AS dg WHERE dg.id=d.device_group_id AND d.device_id=? ORDER BY dg.name", array($device['device_id']));
 
-if (!empty($device_groups)) {
-    echo "<div class='row'>
+if (count($device_groups)) {
+    ?>
+    <div class='row'>
         <div class='col-md-12'>
-          <div class='panel panel-default panel-condensed device-overview'>
-            <div class='panel-heading'>";
-    echo '<a href="/device-groups">';
-    echo '<i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i><strong>Device Group Membership</strong>';
-    echo '</a></div><div class="panel-body">';
-
-    echo '<div class="row">
-        <div class="col-sm-12">' . $device_groups . '</div>
-      </div>';
-
-    echo "</div>
+            <div class='panel panel-default panel-condensed device-overview'>
+                <div class='panel-heading'>
+                    <a href="/device-groups">
+                        <i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i>
+                        <strong>Device Group Membership</strong>
+                    </a>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                        <?php foreach ($device_groups as $group) { ?>
+                            <span style="margin: 8px;">
+                                <a href="/devices/group=<?=$group['id']?>" target="_blank"><?=$group['name']?></a>
+                            </span>
+                        <?php } ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>";
+    </div>
+    <?php
 }
