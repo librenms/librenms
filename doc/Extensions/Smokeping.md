@@ -33,7 +33,7 @@ sudo yum install smokeping
 ```
 
 Once installed, you should need a cron script installed to make sure that the
-configuration file is updated. You can find an example in ```misc/librenms-smokeping-rhel.example```.
+configuration file is updated. You can find an example in `misc/librenms-smokeping-rhel.example`.
 Put this into /etc/cron.d/hourly, and mark it executable:
 
 ```
@@ -42,7 +42,7 @@ sudo chmod +x /etc/cron.hourly/librenms-smokeping
 ```
 
 Finally, update the default configuration. Strip *everything* from the
-```*** Probes ***``` and ```*** Targets ***``` stanza's, and replace with:
+`*** Probes ***` and `*** Targets ***` stanza's, and replace with:
 
 ```
 *** Probes ***
@@ -63,8 +63,8 @@ remark = Welcome to the SmokePing website of <b>Insert Company Name Here</b>. \
 @include /etc/smokeping/librenms-targets.conf
 ```
 
-Note there may be other stanza's (possibly ```*** Slaves ***```) between the
-```*** Probes ***``` and ```*** Targets ***``` stanza's - leave these intact.
+Note there may be other stanza's (possibly `*** Slaves ***`) between the
+`*** Probes ***` and `*** Targets ***` stanza's - leave these intact.
 
 Leave everything else untouched. If you need to add other confiruation, make
 sure it comes *after* the LibreNMS configuration, and keep in mind that
@@ -88,7 +88,7 @@ sudo apt-get install smokeping
 ```
 
 Once installed, you should need a cron script installed to make sure that the
-configuration file is updated. You can find an example in ```misc/librenms-smokeping-debian.example```.
+configuration file is updated. You can find an example in `misc/librenms-smokeping-debian.example`.
 Put this into /etc/cron.d/hourly, and mark it executable:
 
 ```
@@ -97,7 +97,7 @@ chmod +x /etc/cron.hourly/librenms-smokeping
 ```
 
 Finally, update the default configuration. Strip *everything* from
-```/etc/smokeping/config.d/Probes``` and replace with:
+`/etc/smokeping/config.d/Probes` and replace with:
 
 ```
 *** Probes ***
@@ -105,7 +105,7 @@ Finally, update the default configuration. Strip *everything* from
 @include /etc/smokeping/config.d/librenms-probes.conf
 ```
 
-Strip *everything* from ```/etc/smokeping/config.d/Targets``` and replace with:
+Strip *everything* from `/etc/smokeping/config.d/Targets` and replace with:
 
 ```
 *** Targets ***
@@ -136,9 +136,9 @@ $config['smokeping']['probes'] = 2;
 $config['smokeping']['integration'] = true;
 $config['smokeping']['url'] = 'smokeping/';  // If you have a specific URL or path for smokeping
 ```
-```dir``` should match the location that smokeping writes RRD's to
-```pings``` should match the default smokeping value, default 20
-```probes``` should be the number of processes to spread pings over, default 2
+`dir` should match the location that smokeping writes RRD's to
+`pings` should match the default smokeping value, default 20
+`probes` should be the number of processes to spread pings over, default 2
 
 These settings can also be set in the Web UI.
 
@@ -267,7 +267,7 @@ Then you just need to add to your config `auth_basic` parameters
 
 ### RRDs::update ERROR: opening ... Permission denied
 There is a problem writing to the RRD directory. This is somewhat out of scope
-of LibreNMS, but make sure that file permissions and SELinux labels allow the 
+of LibreNMS, but make sure that file permissions and SELinux labels allow the
 smokeping user to write to the directory.
 
 If you're using RRDCacheD, make sure that the permissions are correct there too,
@@ -286,6 +286,7 @@ sudo usermod -a -G librenms smokeping
 ```
 
 Update data directory in */etc/smokeping*:
+
 ```
 datadir = /opt/librenms/rrd/smokeping
 dyndir = /opt/librenms/rrd/smokeping/__cgi
@@ -300,12 +301,14 @@ sudo systemctl start smokeping
 Remember to update *config.php* with the new locations.
 
 ### Probe FPing missing missing from the probes section
+
 Take a look at the instructions again - something isn't correct in your
 configuration.
 
 ### Section or variable already exists
-Most likely, content wasn't fully removed from the ```*** Probes ***```
-```*** Targets***``` stanza's as instructed.
+
+Most likely, content wasn't fully removed from the `*** Probes ***`
+`*** Targets***` stanza's as instructed.
 If you're trying to integrate LibreNMS, smokeping *and* another source of
 configuration, you're probably trying to redefine a module (e.g. '+ FPing' more
 than once) or stanza. Otherwise, look again at the instructions.

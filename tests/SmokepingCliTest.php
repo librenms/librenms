@@ -376,7 +376,8 @@ class SmokepingCliTest extends DBTestCase
         return implode('', $lines);
     }
 
-    public function canonicalise($input) {
+    public function canonicalise($input)
+    {
         $input = explode(PHP_EOL, $input);
 
         $output = [];
