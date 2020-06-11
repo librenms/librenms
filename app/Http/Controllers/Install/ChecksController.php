@@ -27,9 +27,9 @@ namespace App\Http\Controllers\Install;
 
 use LibreNMS\Validations\Php;
 
-class ChecksController extends \App\Http\Controllers\Controller
+class ChecksController extends InstallationController
 {
-    public function __invoke()
+    public function index()
     {
         $results = [];
         $php_ok = version_compare(PHP_VERSION, Php::PHP_MIN_VERSION, '>=');
@@ -43,12 +43,12 @@ class ChecksController extends \App\Http\Controllers\Controller
             session(['install.checks' => true]);
         }
 
-        return view('install.checks', [
+        return view('install.checks', $this->formatData([
             'php_version' => PHP_VERSION,
             'php_required' => Php::PHP_MIN_VERSION,
             'php_ok' => $php_ok,
             'modules' => $results
-        ]);
+        ]));
     }
 
     private function checkPhpModule(&$results, $module)

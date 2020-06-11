@@ -25,22 +25,20 @@
 
 namespace App\Http\Controllers\Install;
 
-use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
 
-class DatabaseController extends Controller
+class DatabaseController extends InstallationController
 {
     const KEYS = ['host', 'username', 'password', 'database', 'port', 'unix_socket'];
 
-    public function __invoke(Request $request)
+    public function index(Request $request)
     {
         $data = Arr::only(session()->get('db') ?: [], self::KEYS);
-        $data['stage'] = 2;
         $data['status'] = session('install.database');
 
-        return view('install.database', $data);
+        return view('install.database', $this->formatData($data));
     }
 
     public function test(Request $request)

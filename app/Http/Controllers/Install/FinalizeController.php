@@ -28,10 +28,14 @@ namespace App\Http\Controllers\Install;
 use Exception;
 use LibreNMS\Util\EnvHelper;
 
-class FinalizeController extends \App\Http\Controllers\Controller
+class FinalizeController extends InstallationController
 {
-    public function __invoke()
+    public function index()
     {
+        if (!self::enabled($this->steps)) {
+            return redirect()->route('install');
+        }
+
         $env = '';
         $config_file = base_path('config.php');
         $config = $this->getConfigFileContents();
@@ -63,13 +67,13 @@ class FinalizeController extends \App\Http\Controllers\Controller
 //            session()->forget('db');
         }
 
-        return view('install.finish', [
+        return view('install.finish', $this->formatData([
             'env' => $env,
             'config' => $config,
             'messages' => $messages,
             'success' => $success,
             'config_message' => $config_message,
-        ]);
+        ]));
     }
 
     private function writeEnvFile()

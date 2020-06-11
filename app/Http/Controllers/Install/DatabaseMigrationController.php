@@ -25,23 +25,22 @@
 
 namespace App\Http\Controllers\Install;
 
-use App\Http\Controllers\Controller;
 use App\StreamedOutput;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class DatabaseMigrationController extends Controller
+class DatabaseMigrationController extends InstallationController
 {
-    use UsesDatabase;
-
-    public function __invoke()
+    public function index()
     {
-        return view('install.migrate-database');
+        return view('install.migrate-database', $this->formatData());
     }
 
     public function migrate(Request $request)
     {
-        $this->configureDatabase();
+        if (!self::enabled()) {
+            return redirect()->route('install.database');
+        }
 
         $response = new StreamedResponse(function () use ($request) {
             try {

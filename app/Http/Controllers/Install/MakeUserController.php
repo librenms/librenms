@@ -29,27 +29,28 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 
-class MakeUserController extends \App\Http\Controllers\Controller
+class MakeUserController extends InstallationController
 {
-    use UsesDatabase;
-
-    public function __invoke(Request $request)
+    public function index(Request $request)
     {
+        if (!self::enabled()) {
+            return redirect()->route('install');
+        }
+
         if (session('install.database')) {
-            $this->configureDatabase();
             $user = User::first();
         }
 
         if (isset($user)) {
             session(['install.user' => true]);
-            return view('install.user-created', [
+            return view('install.user-created', $this->formatData([
                 'user' => $user,
-            ]);
+            ]));
         }
 
-        return view('install.make-user', [
+        return view('install.make-user', $this->formatData([
             'messages' => Arr::wrap(session('message'))
-        ]);
+        ]));
     }
 
     public function create(Request $request)
@@ -60,7 +61,6 @@ class MakeUserController extends \App\Http\Controllers\Controller
         ]);
 
         try {
-            $this->configureDatabase();
             $user = new User($request->only(['username', 'password', 'email']));
             $user->level = 10;
             $user->setPassword($request->get('password'));

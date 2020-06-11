@@ -54,5 +54,11 @@ return [
         'config_exists' => 'config.php file exists',
         'config_written' => 'config.php file written',
         'config_not_written' => 'Could not write config.php',
+        'not_finished' => 'You have not quite finished yet!',
+        'validate' => 'First, you need to :validate and fix any issues.',
+        'validate_link' => 'validate your install',
+        'thanks' => 'Thank you for setting up LibreNMS.',
+        'statistics' => 'It would be great if you would consider contributing to our statistics, you can do this on the :about and check the box under Statistics.',
+        'statistics_link' => 'About LibreNMS Page',
     ]
 ];

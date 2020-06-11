@@ -150,12 +150,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
 // installation routes
 Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
-    Route::redirect('/', '/install/checks')->name('install');
-    Route::get('/checks', 'ChecksController')->name('install.checks');
-    Route::get('/database', 'DatabaseController')->name('install.database');
-    Route::get('/database/migrate', 'DatabaseMigrationController')->name('install.migrate');
-    Route::get('/user', 'MakeUserController')->name('install.user');
-    Route::get('/finish', 'FinalizeController')->name('install.finish');
+    Route::get('/', 'InstallationController@baseIndex')->name('install');
+    Route::get('/checks', 'ChecksController@index')->name('install.checks');
+    Route::get('/database', 'DatabaseController@index')->name('install.database');
+    Route::get('/database/migrate', 'DatabaseMigrationController@index')->name('install.migrate');
+    Route::get('/user', 'MakeUserController@index')->name('install.user');
+    Route::get('/finish', 'FinalizeController@index')->name('install.finish');
 
     Route::post('/user/create', 'MakeUserController@create')->name('install.action.user');
     Route::post('/database/test', 'DatabaseController@test')->name('install.acton.test-database');
