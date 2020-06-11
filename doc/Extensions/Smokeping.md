@@ -92,8 +92,8 @@ configuration file is updated. You can find an example in `misc/librenms-smokepi
 Put this into /etc/cron.d/hourly, and mark it executable:
 
 ```
-cp /opt/librenms/misc/smokeping-debian.example /etc/cron.hourly/librenms-smokeping
-chmod +x /etc/cron.hourly/librenms-smokeping
+sudo cp /opt/librenms/misc/smokeping-debian.example /etc/cron.hourly/librenms-smokeping
+sudo chmod +x /etc/cron.hourly/librenms-smokeping
 ```
 
 Finally, update the default configuration. Strip *everything* from
