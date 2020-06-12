@@ -83,4 +83,38 @@ class Time
 
         return $result;
     }
+
+
+    /*
+     * @param integer seconds of a time period
+     * @return string human readably time period
+     */
+    public static function humanTime($s) {
+
+        $ret = [];
+
+        if ($s >= 86400) {
+            $d = floor($s / 86400);
+            $s -= $d * 86400;
+            $ret[] = $d . " days";
+        }
+
+        if ($s >= 3600) {
+            $h = floor($s / 3600);
+            $s -= $h * 3600;
+            $ret[] = $h . " hours";
+        }
+
+        if ($s >= 60) {
+            $m = floor($s / 60);
+            $s -= $d * 60;
+            $ret[] = $h . " minutes";
+        }
+
+        if ($s > 0) {
+            $ret[] = $h . " seconds";
+        }
+
+        return implode(' ,', $ret);
+    }
 }
