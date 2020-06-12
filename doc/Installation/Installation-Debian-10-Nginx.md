@@ -178,14 +178,6 @@ use the provided logrotate config file:
 cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
 ```
 
-# Set permissions
-
-```bash
-chown -R librenms:librenms /opt/librenms
-setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-```
-
 # Web installer
 
 Now head to the web installer and follow the on-screen instructions.
