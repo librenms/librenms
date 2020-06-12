@@ -19,10 +19,14 @@ Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
-    Route::get('poller', 'PollerController@pollerTab')->name('poller');
-    Route::get('poller/log', 'PollerController@logTab')->name('poller.log');
-    Route::get('poller/groups', 'PollerController@groupsTab')->name('poller.groups');
-    Route::get('poller/performance', 'PollerController@performanceTab')->name('poller.performance');
+    Route::group(['prefix' => 'poller'], function () {
+        Route::get('', 'PollerController@pollerTab')->name('poller.index');
+        Route::get('log', 'PollerController@logTab')->name('poller.log');
+        Route::get('groups', 'PollerController@groupsTab')->name('poller.groups');
+        Route::get('settings', 'PollerController@settingsTab')->name('poller.settings');
+        Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
+        Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
+    });
     Route::get('locations', 'LocationController@index');
     Route::resource('preferences', 'UserPreferencesController', ['only' => ['index', 'store']]);
     Route::resource('users', 'UserController');
