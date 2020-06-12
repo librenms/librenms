@@ -15,7 +15,7 @@
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // WebUI
-Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
+Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
@@ -148,8 +148,8 @@ Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
 });
 
 // Legacy routes
-Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth.web');
+Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth');
 Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummy');
 Route::any('/{path?}', 'LegacyController@index')
     ->where('path', '^((?!_debugbar).)*')
-    ->middleware('auth.web');
+    ->middleware('auth');
