@@ -1,5 +1,5 @@
 os: exa
-text: Calix E7
+text: Calix EXA
 type: network
 ifname: true
 empty_ifdescr: true

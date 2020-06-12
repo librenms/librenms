@@ -2,7 +2,9 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$descr_len  = 12;
+if (!isset($descr_len)) {
+    $descr_len  = 12;
+}
 
 if ($nototal) {
     $descr_len += '2';

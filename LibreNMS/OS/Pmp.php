@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
@@ -270,7 +271,7 @@ class Pmp extends OS implements
     private function isAp()
     {
         $device = $this->getDevice();
-        return str_contains($device['hardware'], 'AP') || str_contains($device['hardware'], 'Master');
+        return Str::contains($device['hardware'], 'AP') || Str::contains($device['hardware'], 'Master');
     }
 
     /**
@@ -296,7 +297,7 @@ class Pmp extends OS implements
         $boxType = snmp_get($device, 'boxDeviceType.0', '-Oqv', 'WHISP-BOX-MIBV2-MIB');
 
         foreach ($types as $key => $value) {
-            if (str_contains($boxType, $key)) {
+            if (Str::contains($boxType, $key)) {
                 return $value;
             }
         }

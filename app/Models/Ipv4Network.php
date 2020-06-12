@@ -36,6 +36,6 @@ class Ipv4Network extends Model
 
     public function ipv4()
     {
-        return $this->hasMany('App\Models\Ipv4Address', 'ipv4_network_id');
+        return $this->hasMany(\App\Models\Ipv4Address::class, 'ipv4_network_id');
     }
 }

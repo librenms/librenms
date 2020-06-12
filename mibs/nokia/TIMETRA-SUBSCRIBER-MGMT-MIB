@@ -76,6 +76,7 @@ IMPORTS
     THsmdaCounterIdOrZeroOrAll,
     THsmdaPIRKRateOverride,
     THsmdaWrrWeightOverride,
+    TIcmpCodeOrNone, TIcmpTypeOrNone,
     TIngHsmdaPerPacketOffsetOvr,
     TIngressHsmdaCounterId,
     TIngressPolicerId,
@@ -137,7 +138,9 @@ IMPORTS
     TmnxSubAuthPlcyUserNameOp,
     TmnxSubCallingStationIdType,
     TmnxSubCreditVolumeUnit,
-    TmnxSubHostGrouping, TmnxSubIdentString,
+    TmnxSubHostGrouping,
+    TmnxSubIdentShortString,
+    TmnxSubIdentString,
     TmnxSubIdentStringOrEmpty,
     TmnxSubMgtIntDestIdOrEmpty,
     TmnxSubNasPortPrefixType,
@@ -444,7 +447,7 @@ TmnxSubBrgId                     ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "The data type TmnxSubBrgId is a string that represents the identifier
          of a Bridged Residential Gateway."
-    SYNTAX      DisplayString (SIZE (1..32))
+    SYNTAX      DisplayString (SIZE (1..64))
 
 TmnxSubBrgIdOrEmpty              ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -452,7 +455,7 @@ TmnxSubBrgIdOrEmpty              ::= TEXTUAL-CONVENTION
         "The data type TmnxSubBrgIdOrEmpty is a string that represents the
          identifier of a Bridged Residential Gateway, or, if it is empty, the
          absence of such an identifier."
-    SYNTAX      DisplayString (SIZE (0..32))
+    SYNTAX      DisplayString (SIZE (0..64))
 
 TmnxSubCcErrorAction             ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -594,9 +597,9 @@ TmnxSubHostOrigin                ::= TEXTUAL-CONVENTION
                                      (TIMETRA-SAP-MIB::sapStatHost6Table)
          - mngdHostDataTrigger (13): created as a result of a data triggered
                                      managed host
-            - mngdHostAaa         (14): created as a result of a aaa managed host
-            - mngdHostGtp         (15): created as a result of a GTP managed host
-            - mngdHostBonding     (16): created as a result of a bonding-type
+         - mngdHostAaa         (14): created as a result of a aaa managed host
+         - mngdHostGtp         (15): created as a result of a GTP managed host
+         - mngdHostBonding     (16): created as a result of a bonding-type
                                         managed host"
     SYNTAX      BITS {
         staticHost          (0),
@@ -615,7 +618,8 @@ TmnxSubHostOrigin                ::= TEXTUAL-CONVENTION
         mngdHostDataTrigger (13),
         mngdHostAaa         (14),
         mngdHostGtp         (15),
-        mngdHostBonding     (16)
+        mngdHostBonding     (16),
+        reserved17          (17)
     }
 
 TmnxSubHostTrkStatsType          ::= TEXTUAL-CONVENTION
@@ -684,7 +688,8 @@ TmnxSubManagedHostType           ::= TEXTUAL-CONVENTION
         dataTriggered (1),
         aaa           (2),
         gtp           (3),
-        bonding       (4)
+        bonding       (4),
+        reserved5     (5)
     }
 
 TmnxSubProfEgrEncapOffset        ::= TEXTUAL-CONVENTION
@@ -1032,7 +1037,8 @@ TmnxSubAutoSubIdKey              ::= TEXTUAL-CONVENTION
         circuitId         (3),
         remoteId          (4),
         sessionId         (5),
-        dualStackRemoteId (6)
+        dualStackRemoteId (6),
+        reserved7         (7)
     }
 
 TmnxSubSlaacInfoOrigin           ::= TEXTUAL-CONVENTION
@@ -4745,6 +4751,7 @@ TmnxSubscriberInfoEntry          ::= SEQUENCE
     tmnxSubInfoEgrAggRateLimit       TPIRRateOverride,
     tmnxSubInfoQos                   TmnxMdaQos,
     tmnxSubInfoIngQosPolIdOvr        TAnyQosPolicyIDorZero,
+    tmnxSubInfoShortId               TmnxSubIdentShortString,
     tmnxSubInfoEgrAggRateLimitLow    TruthValue
 }
 
@@ -4885,6 +4892,15 @@ tmnxSubInfoIngQosPolIdOvr        OBJECT-TYPE
          The value of tmnxSubInfoIngQosPolIdOvr is only used for HSMDA-2
          subscribers."
     ::= { tmnxSubscriberInfoEntry 13 }
+
+tmnxSubInfoShortId               OBJECT-TYPE
+    SYNTAX      TmnxSubIdentShortString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxSubInfoShortId specifies the short subscriber id of the
+         subscriber, see tmnxSubShortTable."
+    ::= { tmnxSubscriberInfoEntry 14 }
 
 tmnxSubInfoEgrAggRateLimitLow    OBJECT-TYPE
     SYNTAX      TruthValue
@@ -6055,7 +6071,7 @@ tmnxSPIEgrQStatModeFormat        OBJECT-TYPE
 tmnxSubscriberInfoModifyTable    OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSubscriberInfoModifyEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The tmnxSubscriberInfoModifyTable augments the
          tmnxSubscriberInfoTable. The table allows the operator to modify
@@ -6065,7 +6081,7 @@ tmnxSubscriberInfoModifyTable    OBJECT-TYPE
 tmnxSubscriberInfoModifyEntry    OBJECT-TYPE
     SYNTAX      TmnxSubscriberInfoModifyEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Each row entry contains parameters that allow to modify a subscriber
          attribute"
@@ -6078,7 +6094,7 @@ TmnxSubscriberInfoModifyEntry    ::= SEQUENCE
 tmnxSubInfoModifySubIdent        OBJECT-TYPE
     SYNTAX      TmnxSubIdentStringOrEmpty
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSubInfoModifySubIdent allows to specify a new name
          for this subscriber.
@@ -11407,8 +11423,8 @@ TmnxSubCredCatIpFltrEntry        ::= SEQUENCE
     tmnxCcIpFltrDestPortValue2       TTcpUdpPort,
     tmnxCcIpFltrDestPortOperator     TTcpUdpPortOperator,
     tmnxCcIpFltrFragment             TItemMatch,
-    tmnxCcIpFltrIcmpCode             Integer32,
-    tmnxCcIpFltrIcmpType             Integer32,
+    tmnxCcIpFltrIcmpCode             TIcmpCodeOrNone,
+    tmnxCcIpFltrIcmpType             TIcmpTypeOrNone,
     tmnxCcIpFltrIpOptionValue        TIpOption,
     tmnxCcIpFltrIpOptionMask         TIpOption,
     tmnxCcIpFltrMultipleOption       TItemMatch,
@@ -11655,30 +11671,26 @@ tmnxCcIpFltrFragment             OBJECT-TYPE
     ::= { tmnxSubCredCatIpFltrEntry 20 }
 
 tmnxCcIpFltrIcmpCode             OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpCodeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tmnxCcIpFltrIcmpCode specifies the icmp code to be
-         matched. tmnxCcIpFltrIcmpCode complements the object
-         tmnxCcIpFltrIcmpType. Both of them need to be set to actually enable
-         ICMP matching.
+        "The value of tmnxCcIpFltrIcmpCode specifies the ICMP code to be
+         matched.
 
-         The default value of -1 disables ICMP matching."
+         The default value of -1 disables ICMP code matching."
     DEFVAL      { -1 }
     ::= { tmnxSubCredCatIpFltrEntry 21 }
 
 tmnxCcIpFltrIcmpType             OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpTypeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tmnxCcIpFltrIcmpType specifies the icmp type to be
-         matched. tmnxCcIpFltrIcmpType complements the object
-         tmnxCcIpFltrIcmpCode. Both of them need to be set to actually enable
-         ICMP matching.
+        "The value of tmnxCcIpFltrIcmpType specifies the ICMP type to be
+         matched.
 
-         The default value of -1 disables ICMP matching."
+         The default value of -1 disables ICMP type matching."
     DEFVAL      { -1 }
     ::= { tmnxSubCredCatIpFltrEntry 22 }
 
@@ -11844,8 +11856,8 @@ TmnxSubCredCatIpv6FltrEntry      ::= SEQUENCE
     tmnxCcIpv6FltrDestPortValue1     TTcpUdpPort,
     tmnxCcIpv6FltrDestPortValue2     TTcpUdpPort,
     tmnxCcIpv6FltrDestPortOperator   TTcpUdpPortOperator,
-    tmnxCcIpv6FltrIcmpCode           Integer32,
-    tmnxCcIpv6FltrIcmpType           Integer32,
+    tmnxCcIpv6FltrIcmpCode           TIcmpCodeOrNone,
+    tmnxCcIpv6FltrIcmpType           TIcmpTypeOrNone,
     tmnxCcIpv6FltrTcpSyn             TItemMatch,
     tmnxCcIpv6FltrTcpAck             TItemMatch
 }
@@ -12083,30 +12095,26 @@ tmnxCcIpv6FltrDestPortOperator   OBJECT-TYPE
     ::= { tmnxSubCredCatIpv6FltrEntry 19 }
 
 tmnxCcIpv6FltrIcmpCode           OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpCodeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tmnxCcIpv6FltrIcmpCode specifies the icmp code to be
-         matched. tmnxCcIpv6FltrIcmpCode complements the object
-         tmnxCcIpv6FltrIcmpType. Both of them need to be set to actually enable
-         ICMP matching.
+        "The value of tmnxCcIpv6FltrIcmpCode specifies the ICMP code to be
+         matched.
 
-         The default value of -1 disables ICMP matching."
+         The default value of -1 disables ICMP code matching."
     DEFVAL      { -1 }
     ::= { tmnxSubCredCatIpv6FltrEntry 20 }
 
 tmnxCcIpv6FltrIcmpType           OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpTypeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tmnxCcIpv6FltrIcmpType specifies the icmp type to be
-         matched. tmnxCcIpv6FltrIcmpType complements the object
-         tmnxCcIpv6FltrIcmpCode. Both of them need to be set to actually enable
-         ICMP matching.
+        "The value of tmnxCcIpv6FltrIcmpType specifies the ICMP type to be
+         matched.
 
-         The default value of -1 disables ICMP matching."
+         The default value of -1 disables ICMP type matching."
     DEFVAL      { -1 }
     ::= { tmnxSubCredCatIpv6FltrEntry 21 }
 
@@ -29543,6 +29551,49 @@ tmnxSubSpiAleDatalink            OBJECT-TYPE
          the DSL Access Loop."
     ::= { tmnxSubSpiAleEntry 2 }
 
+tmnxSubShortTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSubShortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSubShortTable has an entry for each subscriber that exists in
+         the system. It allows to find the subscriber-id for a given short
+         subscriber id"
+    ::= { tmnxSubMgmtObjects 1005 }
+
+tmnxSubShortEntry                OBJECT-TYPE
+    SYNTAX      TmnxSubShortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular subscriber in the system"
+    INDEX       { tmnxSubShortId }
+    ::= { tmnxSubShortTable 1 }
+
+TmnxSubShortEntry                ::= SEQUENCE
+{
+    tmnxSubShortId                   TmnxSubIdentShortString,
+    tmnxSubLongId                    DisplayString
+}
+
+tmnxSubShortId                   OBJECT-TYPE
+    SYNTAX      TmnxSubIdentShortString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxSubShortId specifies the short subscriber id of the
+         subscriber."
+    ::= { tmnxSubShortEntry 1 }
+
+tmnxSubLongId                    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxSubLongId specifies the external subscriber id of the
+         subscriber."
+    ::= { tmnxSubShortEntry 2 }
+
 tmnxSubscriberNotifyObjects      OBJECT IDENTIFIER ::= { tmnxSubMgmt 2 }
 
 tmnxSubIdent                     OBJECT-TYPE
@@ -37817,7 +37868,8 @@ TmnxSubBrgEntry                  ::= SEQUENCE
     tmnxSubBrgAppProfile             TNamedItemOrEmpty,
     tmnxSubBrgAaSubScope             TmnxSapAASubScope,
     tmnxSubBrgRemainUplinkInitWait   Unsigned32,
-    tmnxSubBrgVasIpv4Filter          TNamedItemOrEmpty
+    tmnxSubBrgVasIpv4Filter          TNamedItemOrEmpty,
+    tmnxSubBrgIdShort                DisplayString
 }
 
 tmnxSubBrgId                     OBJECT-TYPE
@@ -38431,6 +38483,15 @@ tmnxSubBrgVasIpv4Filter          OBJECT-TYPE
          filter used by this BRG instance."
     ::= { tmnxSubBrgEntry 62 }
 
+tmnxSubBrgIdShort                OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..32))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSubBrgIdShort specifies the short ID of
+         the BRG."
+    ::= { tmnxSubBrgEntry 63 }
+
 tmnxSubBrgHostTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSubBrgHostEntry
     MAX-ACCESS  not-accessible
@@ -38648,7 +38709,7 @@ tmnxSubAddrPlStdbyAddrRemainTime OBJECT-TYPE
 tmnxSubBrgPoolTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSubBrgPoolEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The tmnxSubBrgPoolTable contains the home-aware pools associated with
          the Bridged Residential Gateways."
@@ -38657,7 +38718,7 @@ tmnxSubBrgPoolTable              OBJECT-TYPE
 tmnxSubBrgPoolEntry              OBJECT-TYPE
     SYNTAX      TmnxSubBrgPoolEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "Each conceptual row contains an association between a Bridged
          Residential Gateway and a home-aware address pool.
@@ -38675,7 +38736,7 @@ TmnxSubBrgPoolEntry              ::= SEQUENCE
 tmnxSubBrgPoolName               OBJECT-TYPE
     SYNTAX      TLNamedItem
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSubBrgPoolName indicates the name of a home-aware
          address pool."
@@ -39408,6 +39469,117 @@ tmnxSubBrgStatsBrgProxyAuth      OBJECT-TYPE
          Bridged Residential Gateways (BRG) in this system for which the value
          of the object tmnxSubBrgProxyAuthenticated is equal to 'true'."
     ::= { tmnxSubBrgStatsObjs 5 }
+
+tmnxSubBrgPubStDevTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSubBrgPubStDevEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSubBrgPubStDevTable contains information about public static
+         devices for Subscriber Bridged Residential Gateway (BRG) instances."
+    ::= { tmnxSubVcpeObjs 22 }
+
+tmnxSubBrgPubStDevEntry          OBJECT-TYPE
+    SYNTAX      TmnxSubBrgPubStDevEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each conceptual row represents the configuration of a public static
+         device for a BRG instance.
+
+         Entries in this table are created and destroyed by the system."
+    INDEX       {
+        tmnxSubBrgPubStDevBrgId,
+        tmnxSubBrgPubStDevMacAddr
+    }
+    ::= { tmnxSubBrgPubStDevTable 1 }
+
+TmnxSubBrgPubStDevEntry          ::= SEQUENCE
+{
+    tmnxSubBrgPubStDevBrgId          TmnxSubBrgId,
+    tmnxSubBrgPubStDevMacAddr        MacAddress,
+    tmnxSubBrgPubStDevIpAddr4Type    InetAddressType,
+    tmnxSubBrgPubStDevIpAddr4        InetAddress
+}
+
+tmnxSubBrgPubStDevBrgId          OBJECT-TYPE
+    SYNTAX      TmnxSubBrgId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSubBrgPubStDevBrgId indicates the BRG Id
+         of this public static device."
+    ::= { tmnxSubBrgPubStDevEntry 1 }
+
+tmnxSubBrgPubStDevMacAddr        OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubBrgPubStDevMacAddr specifies the MAC address of
+         this public static device."
+    ::= { tmnxSubBrgPubStDevEntry 2 }
+
+tmnxSubBrgPubStDevIpAddr4Type    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSubBrgPubStDevIpAddr4Type indicates the address type
+         of tmnxSubBrgPubStDevIpAddr4."
+    ::= { tmnxSubBrgPubStDevEntry 3 }
+
+tmnxSubBrgPubStDevIpAddr4        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSubBrgPubStDevIpAddr4 indicates the IP
+         address of this public static device"
+    ::= { tmnxSubBrgPubStDevEntry 4 }
+
+tmnxSubBrgShortTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSubBrgShortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSubBrgShortTable has an entry for each Bridged Residential
+         Gateway (BRG) that exists in the system."
+    ::= { tmnxSubVcpeObjs 26 }
+
+tmnxSubBrgShortEntry             OBJECT-TYPE
+    SYNTAX      TmnxSubBrgShortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a particular Bridged Residential Gateway
+         (BRG) that exists in the system."
+    INDEX       { tmnxSubBrgShortId }
+    ::= { tmnxSubBrgShortTable 1 }
+
+TmnxSubBrgShortEntry             ::= SEQUENCE
+{
+    tmnxSubBrgShortId                DisplayString,
+    tmnxSubBrgLongId                 DisplayString
+}
+
+tmnxSubBrgShortId                OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxSubBrgShortId specifies the short internal identifier of
+         the BRG."
+    ::= { tmnxSubBrgShortEntry 1 }
+
+tmnxSubBrgLongId                 OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tmnxSubBrgLongId specifies the external identifier of the
+         BRG."
+    ::= { tmnxSubBrgShortEntry 2 }
 
 tmnxSubErrObjs                   OBJECT IDENTIFIER ::= { tmnxSubMgmt 12 }
 
@@ -42836,7 +43008,7 @@ tmnxSubFlterProfV16v0Compliance  MODULE-COMPLIANCE
     ::= { tmnxSubMgmtCompliances 30 }
 
 tmnxSubMgmtSROSV19v0Compliance   MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for TIMETRA-SUBSCRIBER-MGMT-MIB on Nokia SROS
          systems release 19.0."
@@ -42934,9 +43106,112 @@ tmnxSubMgmtSROSV19v0Compliance   MODULE-COMPLIANCE
             tmnxSubGtpObjV16v0Group,
             tmnxSubMgmtV16v0NotifGroup,
             tmnxSubMgmtV19v0NotifGroup,
-            tmnxSubPccRuleEntryV19v0Group
+            tmnxSubPccRuleEntryV19v0Group,
+            tmnxSubStringLenLongV20v0Group
         }
     ::= { tmnxSubMgmtCompliances 31 }
+
+tmnxSubMgmtSROSV20v0Compliance   MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for TIMETRA-SUBSCRIBER-MGMT-MIB on Nokia SROS
+         systems release 20.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSubAuthenticationV10v0Group,
+            tmnxSubAuthenticationV11v0Group,
+            tmnxSubAuthenticationV12v0Group,
+            tmnxSubAuthenticationV14v0Group,
+            tmnxSubAccountingV10v0Group,
+            tmnxSubAccountingV11v0Group,
+            tmnxSubAccountingV12v0Group,
+            tmnxSubAccountingV13v0Group,
+            tmnxSubAccountingV14v0Group,
+            tmnxSubAccountingV15v0Group,
+            tmnxSubAccountingV16v0Group,
+            tmnxSubAccountingV19v0Group,
+            tmnxSubMgmtV7v0NotifGroup,
+            tmnxSubMgmtV9v0NotifGroup,
+            tmnxSubMgmtV10v0NotifGroup,
+            tmnxSubMgmtV12v0NotifGroup,
+            tmnxSubMgmtV13v0NotifGroup,
+            tmnxSubMgmtObsoletedNotifGroup,
+            tmnxSubMgmtIpoeNotifGroup,
+            tmnxSubRadNotifStatsV6v0Group,
+            tmnxSubFrameBasedAccntV6v0Group,
+            tmnxHsmdaSubscriberV10v0Group,
+            tmnxSubBsxObjV16v0Group,
+            tmnxSubHostTrackingV9v0Group,
+            tmnxSubRadusPlcyCustomRecordV7v0Group,
+            tmnxSubCreditControlV8v0Group,
+            tmnxCcIpFltrV8v0Group,
+            tmnxCcIpv6FltrV8v0Group,
+            tmnxSubV6GrpIfRAV11v0Group,
+            tmnxSubMgmtIPv6V8v0Group,
+            tmnxSubProfileMssExtensionsGroup,
+            tmnxSubCreditControlV9v0Group,
+            tmnxSubCreditControlV10v0Group,
+            tmnxSubCreditControlV13v0Group,
+            tmnxSubAutoSubIdV10v0Group,
+            tmnxSubAutoSubIdV13v0Group,
+            tmnxSubIpoeLinkV10v0Group,
+            tmnxSubPppV11v0Group,
+            tmnxSubPppV13v0Group,
+            tmnxSubSlaacV11v0Group,
+            tmnxSubSlaacV12v0Group,
+            tmnxSubSlaacV13v0Group,
+            tmnxSubNatV14v0Group,
+            tmnxSubL2tpGroup,
+            tmnxSubMgmtV11v0Group,
+            tmnxSubMgmtV12v0Group,
+            tmnxSubMgmtV13v0Group,
+            tmnxSubMgmtV14v0Group,
+            tmnxSubMgmtV15v0Group,
+            tmnxSubMgmtV16v0Group,
+            tmnxSubHttpRedirectGroup,
+            tmnxSubHttpRedirectV12v0Group,
+            tmnxSubVSubnetV12v0Group,
+            tmnxSubSysGroup,
+            tmnxSubServiceGroup,
+            tmnxSubSchedulerRateV11v0Group,
+            tmnxSubSchedulerRateV12v0Group,
+            tmnxSubSchedulerRateV13v0Group,
+            tmnxSubMgmtQosV20v0Group,
+            tmnxSubQosParentLocV12v0Group,
+            tmnxSubIpoeV13v0Group,
+            tmnxSubRipV13v0Group,
+            tmnxSubCcLongCatMapNameGroup,
+            tmnxSubPimGroup,
+            tmnxSubShcvGroup,
+            tmnxSubPppDfGroup,
+            tmnxSubPccRuleEntryV13v0Group,
+            tmnxSubPccRuleEntryV14v0Group,
+            tmnxSubDataTriggerGroup,
+            tmnxSubRadClassGroup,
+            tmnxSubIpoeV14v0Group,
+            tmnxSubMgmtV14v0NotifGroup,
+            tmnxSubHsmdaV14v0Group,
+            tmnxSubErrorsGroup,
+            tmnxSubCreditControlV14v0Group,
+            tmnxSubHsqV15v0Group,
+            tmnxSubAccuStatsV15v0Group,
+            tmnxSteeringProfV15v0Group,
+            tmnxSubVcpeV15v0Group,
+            tmnxSubRtrAdvPlcyV15v0Group,
+            tmnxSubMgmtV15v0NotifGroup,
+            tmnxSubMgmtSvcChainV15v0Group,
+            tmnxSubDhcpOverloadGroup,
+            tmnxSubSpiSharingV16v0Group,
+            tmnxSubProfileV19v0Group,
+            tmnxSubGtpObjV15v0Group,
+            tmnxSubGtpObjV16v0Group,
+            tmnxSubMgmtV16v0NotifGroup,
+            tmnxSubMgmtV19v0NotifGroup,
+            tmnxSubPccRuleEntryV19v0Group,
+            tmnxSubStringLenLongV20v0Group,
+            tmnxSubVcpeV20v0Group
+        }
+    ::= { tmnxSubMgmtCompliances 32 }
 
 tmnxSubMgmtGroups                OBJECT IDENTIFIER ::= { tmnxSubMgmtConformance 2 }
 
@@ -47158,7 +47433,7 @@ tmnxSubMgmtQosV11v0Group         OBJECT-GROUP
         tmnxSubLcktPlcyHostKey,
         tmnxSubIgmpPlcyHostMaxSources
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of subscriber profiles on
          release 11.0 of the Nokia SROS series systems."
@@ -47348,7 +47623,7 @@ tmnxSubMgmtQosV12v0Group         OBJECT-GROUP
         tmnxSPIStatsEgrQchipFwdV6Pkts,
         tmnxSPIStatsEgrQchipFwdV6Octets
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of subscriber profiles on
          the Nokia SROS series systems added in release 12.0."
@@ -48162,9 +48437,11 @@ tmnxSubVcpeGroup                 OBJECT-GROUP
         tmnxSubBrgStatsBrgOperational,
         tmnxSubBrgStatsBrgCv,
         tmnxSubBrgStatsBrgHold,
-        tmnxSubBrgStatsBrgProxyAuth
+        tmnxSubBrgStatsBrgProxyAuth,
+        tmnxSubBrgPubStDevIpAddr4Type,
+        tmnxSubBrgPubStDevIpAddr4
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of subscriber Subscriber
          Virtual CPE on the Nokia SROS series."
@@ -48336,7 +48613,7 @@ tmnxSubMgmtQosV14v0Group         OBJECT-GROUP
         tmnxSPIEgrPStatsFwdInPProfOcts,
         tmnxSPIEgrPStatsDrpInPProfOcts
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of subscriber profiles on
          release 14.0 of the Nokia SROS series systems."
@@ -49328,6 +49605,554 @@ tmnxSubPccRuleEntryV19v0Group    OBJECT-GROUP
         "The group of objects supporting PCC-rules on Nokia SROS series release
          19.0 systems."
     ::= { tmnxSubMgmtGroups 156 }
+
+tmnxSubStringLenLongV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSubLongId,
+        tmnxSubInfoShortId,
+        tmnxSubBrgLongId,
+        tmnxSubBrgIdShort
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting subscriber management on Nokia SROS
+         series release 19.0 systems."
+    ::= { tmnxSubMgmtGroups 157 }
+
+tmnxSubMgmtQosV20v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxSubProfRowStatus,
+        tmnxSubProfLastMgmtChange,
+        tmnxSubProfDescription,
+        tmnxSubProfIngQosSchedPolicy,
+        tmnxSubProfEgrQosSchedPolicy,
+        tmnxSubProfCollectAcctStats,
+        tmnxSubProfAccountingPolicyId,
+        tmnxSubProfEgrAggRateLimit,
+        tmnxSubProfRadiusAcctPolicy,
+        tmnxSubProfDuplRadiusAcctPolicy,
+        tmnxSubProfUseDirectSLAMapAsDef,
+        tmnxSubProfSchedOvrRowStatus,
+        tmnxSubProfSchedOvrLastMgmtChange,
+        tmnxSubProfSchedOvrSummedCIR,
+        tmnxSubProfSLAProfMapRowStatus,
+        tmnxSubProfSLAProfMapLastMgmtChange,
+        tmnxSubProfSLAProfMapSLAProfile,
+        tmnxSLAProfRowStatus,
+        tmnxSLAProfLastMgmtChange,
+        tmnxSLAProfDescription,
+        tmnxSLAProfHostLimit,
+        tmnxSLAProfRemoveOldest,
+        tmnxSLAProfIngQosPolId,
+        tmnxSLAProfIngSharedQPolicy,
+        tmnxSLAProfIngUseMpointShared,
+        tmnxSLAProfIngIPFilterId,
+        tmnxSLAProfEgrQosPolId,
+        tmnxSLAProfEgrIPFilterId,
+        tmnxSLAProfReportIngRateType,
+        tmnxSLAProfReportIngRateSched,
+        tmnxSLAProfReportEgrRateType,
+        tmnxSLAProfReportEgrRateSched,
+        tmnxSLAProfEgrQosMarkingFromSap,
+        tmnxSLAProfEgrSchedulerType,
+        tmnxSLAProfOTHttpRdrIpv4FltrId,
+        tmnxSLAProfEgrUseIngL2tpDscp,
+        tmnxSLAIngQueueOvrRowStatus,
+        tmnxSLAIngQueueOvrLastMgmtChange,
+        tmnxSLAIngQueueOvrPIR,
+        tmnxSLAIngQueueOvrCIR,
+        tmnxSLAIngQueueOvrCBS,
+        tmnxSLAIngQueueOvrHiPrioOnly,
+        tmnxSLAIngQueueOvrMBSBytes,
+        tmnxSLAEgrQueueOvrRowStatus,
+        tmnxSLAEgrQueueOvrLastMgmtChange,
+        tmnxSLAEgrQueueOvrPIR,
+        tmnxSLAEgrQueueOvrCIR,
+        tmnxSLAEgrQueueOvrCBS,
+        tmnxSLAEgrQueueOvrHiPrioOnly,
+        tmnxSLAEgrQueueOvrAvgOverhead,
+        tmnxSLAEgrQueueOvrMBSBytes,
+        tmnxSubExplicitMapRowStatus,
+        tmnxSubExplicitMapLastMgmtChange,
+        tmnxSubExplicitMapSubProfile,
+        tmnxSubExplicitMapSLAProfile,
+        tmnxSubExplicitMapAlias,
+        tmnxSubIPolRowStatus,
+        tmnxSubIPolLastMgmtChange,
+        tmnxSubIPolDescription,
+        tmnxSubIPolScript1URL,
+        tmnxSubIPolScript1AdminState,
+        tmnxSubIPolScript1OperState,
+        tmnxSubIPolScript2URL,
+        tmnxSubIPolScript2AdminState,
+        tmnxSubIPolScript2OperState,
+        tmnxSubIPolScript3URL,
+        tmnxSubIPolScript3AdminState,
+        tmnxSubIPolScript3OperState,
+        tmnxSubIPolUseDirectSubMapAsDef,
+        tmnxSubIPolUseDirectSLAMapAsDef,
+        tmnxSubIPolRejectUnknownStrings,
+        tmnxSubIPolStringsFromOption,
+        tmnxSubIPolSubProfMapRowStatus,
+        tmnxSubIPolSubProfMapLastMgmtChange,
+        tmnxSubIPolSubProfMapSubProfile,
+        tmnxSubIPolSLAProfMapRowStatus,
+        tmnxSubIPolSLAProfMapLastMgmtChange,
+        tmnxSubIPolSLAProfMapSLAProfile,
+        tmnxSubInfoSubProfile,
+        tmnxSubInfoSubAncpString,
+        tmnxSubInfoNumSubProfileChanges,
+        tmnxSubInfoIntermediateDestId,
+        tmnxSubIngQosSchedStatsFwdPkts,
+        tmnxSubIngQosSchedStatsFwdOctets,
+        tmnxSubEgrQosSchedStatsFwdPkts,
+        tmnxSubEgrQosSchedStatsFwdOctets,
+        tmnxSPIStatsIngPchipOffHiPrioPkts,
+        tmnxSPIStatsIngPchipOffHiPrioOctets,
+        tmnxSPIStatsIngPchipOffLoPrioPkts,
+        tmnxSPIStatsIngPchipOffLoPrioOctets,
+        tmnxSPIStatsIngPchipOffUncolPkts,
+        tmnxSPIStatsIngPchipOffUncolOctets,
+        tmnxSPIStatsIngQchipDropHiPrioPkts,
+        tmnxSPIStatsIngQchipDropHiPrioOctets,
+        tmnxSPIStatsIngQchipDropLoPrioPkts,
+        tmnxSPIStatsIngQchipDropLoPrioOctets,
+        tmnxSPIStatsIngQchipFwdInProfPkts,
+        tmnxSPIStatsIngQchipFwdInProfOctets,
+        tmnxSPIStatsIngQchipFwdOutProfPkts,
+        tmnxSPIStatsIngQchipFwdOutProfOctets,
+        tmnxSPIStatsEgrQchipDropInProfPkts,
+        tmnxSPIStatsEgrQchipDropInProfOctets,
+        tmnxSPIStatsEgrQchipDropOutProfPkts,
+        tmnxSPIStatsEgrQchipDropOutProfOctets,
+        tmnxSPIStatsEgrQchipFwdInProfPkts,
+        tmnxSPIStatsEgrQchipFwdInProfOctets,
+        tmnxSPIStatsEgrQchipFwdOutProfPkts,
+        tmnxSPIStatsEgrQchipFwdOutProfOctets,
+        tmnxSPIIngQStatsOffHiPrioPkts,
+        tmnxSPIIngQStatsDropHiPrioPkts,
+        tmnxSPIIngQStatsOffLoPrioPkts,
+        tmnxSPIIngQStatsDropLoPrioPkts,
+        tmnxSPIIngQStatsOffHiPrioOctets,
+        tmnxSPIIngQStatsDropHiPrioOctets,
+        tmnxSPIIngQStatsOffLoPrioOctets,
+        tmnxSPIIngQStatsDropLoPrioOctets,
+        tmnxSPIIngQStatsOffUncolPkts,
+        tmnxSPIIngQStatsOffUncolOctets,
+        tmnxSPIIngQStatsFwdInProfPkts,
+        tmnxSPIIngQStatsFwdOutProfPkts,
+        tmnxSPIIngQStatsFwdInProfOctets,
+        tmnxSPIIngQStatsFwdOutProfOctets,
+        tmnxSPIEgrQStatsFwdInProfPkts,
+        tmnxSPIEgrQStatsDropInProfPkts,
+        tmnxSPIEgrQStatsFwdOutProfPkts,
+        tmnxSPIEgrQStatsDropOutProfPkts,
+        tmnxSPIEgrQStatsFwdInProfOctets,
+        tmnxSPIEgrQStatsDropInProfOctets,
+        tmnxSPIEgrQStatsFwdOutProfOctets,
+        tmnxSPIEgrQStatsDropOutProfOctets,
+        tmnxSubHostInfoV2FwdingState,
+        tmnxSubHostInfoV2Origin,
+        tmnxSubHostInfoV2SubIdent,
+        tmnxSubHostInfoV2SubProfile,
+        tmnxSubHostInfoV2SLAProfile,
+        tmnxSubHostInfoV2RetailerSvcId,
+        tmnxSubHostInfoV2RetailerIf,
+        tmnxSubHostInfoV2PfxLen,
+        tmnxSubHostInfoV2EgrQGrpName,
+        tmnxSubHostInfoV2EgrVPortName,
+        tmnxSubHostInfoV2AcctSessionId,
+        tmnxSubHostInfoV2AddressOrigin,
+        tmnxSubHostInfoV2PppIndex,
+        tmnxSubHostInfoV2AcctMultiSessId,
+        tmnxSubHostInfoV2IngFilter,
+        tmnxSubHostInfoV2EgrFilter,
+        tmnxSubHostInfoV2OtHttpRdrState,
+        tmnxSubHostInfoV2OtHttpRdrFilter,
+        tmnxSubHostInfoV2OtHttpRdrSource,
+        tmnxSPISubHostV2Origin,
+        tmnxSPISubHostV2PfxLen,
+        tmnxSPIInfoCategoryMapName,
+        tmnxSPIInfoDiamSessId,
+        tmnxSLAIngPlcrOverrideTblLstChng,
+        tmnxSLAEgrPlcrOverrideTblLstChng,
+        tmnxSLAIngPolicerOvrRowStatus,
+        tmnxSLAIngPolicerOvrLastMgmtChg,
+        tmnxSLAIngPolicerOvrPIR,
+        tmnxSLAIngPolicerOvrCIR,
+        tmnxSLAIngPolicerOvrMBS,
+        tmnxSLAIngPolicerOvrCBS,
+        tmnxSLAIngPolicerOvrPktOffset,
+        tmnxSLAIngPolicerOvrStatMode,
+        tmnxSLAEgrPolicerOvrRowStatus,
+        tmnxSLAEgrPolicerOvrLastMgmtChg,
+        tmnxSLAEgrPolicerOvrPIR,
+        tmnxSLAEgrPolicerOvrCIR,
+        tmnxSLAEgrPolicerOvrMBS,
+        tmnxSLAEgrPolicerOvrCBS,
+        tmnxSLAEgrPolicerOvrPktOffset,
+        tmnxSLAEgrPolicerOvrStatMode,
+        tmnxSubProfPCtrlOvrRowStatus,
+        tmnxSubProfPCtrlOvrTblLstChng,
+        tmnxSubProfPCtrlOvrLastChange,
+        tmnxSubProfPCtrlOvrMaxRate,
+        tmnxSubProfPCtrlOvrMinMBSSep,
+        tmnxSubProfPCtrlLvlOvrTblLstChng,
+        tmnxSubProfPCtrlLvlOvrRowStatus,
+        tmnxSubProfPCtrlLvlOvrLastChange,
+        tmnxSubProfPCtrlLvlOvrCumMBS,
+        tmnxSPIIngPStatsMode,
+        tmnxSPIIngPStatsOffHiPrioPkts,
+        tmnxSPIIngPStatsOffHiPrioPktsL,
+        tmnxSPIIngPStatsOffHiPrioPktsH,
+        tmnxSPIIngPStatsDrpHiPrioPkts,
+        tmnxSPIIngPStatsDrpHiPrioPktsL,
+        tmnxSPIIngPStatsDrpHiPrioPktsH,
+        tmnxSPIIngPStatsOffLoPrioPkts,
+        tmnxSPIIngPStatsOffLoPrioPktsL,
+        tmnxSPIIngPStatsOffLoPrioPktsH,
+        tmnxSPIIngPStatsDrpLoPrioPkts,
+        tmnxSPIIngPStatsDrpLoPrioPktsL,
+        tmnxSPIIngPStatsDrpLoPrioPktsH,
+        tmnxSPIIngPStatsOffHiPrioOcts,
+        tmnxSPIIngPStatsOffHiPrioOctsL,
+        tmnxSPIIngPStatsOffHiPrioOctsH,
+        tmnxSPIIngPStatsDrpHiPrioOcts,
+        tmnxSPIIngPStatsDrpHiPrioOctsL,
+        tmnxSPIIngPStatsDrpHiPrioOctsH,
+        tmnxSPIIngPStatsOffLoPrioOcts,
+        tmnxSPIIngPStatsOffLoPrioOctsL,
+        tmnxSPIIngPStatsOffLoPrioOctsH,
+        tmnxSPIIngPStatsDrpLoPrioOcts,
+        tmnxSPIIngPStatsDrpLoPrioOctsL,
+        tmnxSPIIngPStatsDrpLoPrioOctsH,
+        tmnxSPIIngPStatsOffUncolPkts,
+        tmnxSPIIngPStatsOffUncolPktsL,
+        tmnxSPIIngPStatsOffUncolPktsH,
+        tmnxSPIIngPStatsOffUncolOcts,
+        tmnxSPIIngPStatsOffUncolOctsL,
+        tmnxSPIIngPStatsOffUncolOctsH,
+        tmnxSPIIngPStatsFwdInProfPkts,
+        tmnxSPIIngPStatsFwdInProfPktsL,
+        tmnxSPIIngPStatsFwdInProfPktsH,
+        tmnxSPIIngPStatsFwdOutProfPkts,
+        tmnxSPIIngPStatsFwdOutProfPktsL,
+        tmnxSPIIngPStatsFwdOutProfPktsH,
+        tmnxSPIIngPStatsFwdInProfOcts,
+        tmnxSPIIngPStatsFwdInProfOctsL,
+        tmnxSPIIngPStatsFwdInProfOctsH,
+        tmnxSPIIngPStatsFwdOutProfOcts,
+        tmnxSPIIngPStatsFwdOutProfOctsL,
+        tmnxSPIIngPStatsFwdOutProfOctsH,
+        tmnxSPIEgrPStatsMode,
+        tmnxSPIEgrPStatsOffInProfPkts,
+        tmnxSPIEgrPStatsOffInProfPktsL,
+        tmnxSPIEgrPStatsOffInProfPktsH,
+        tmnxSPIEgrPStatsFwdInProfPkts,
+        tmnxSPIEgrPStatsFwdInProfPktsL,
+        tmnxSPIEgrPStatsFwdInProfPktsH,
+        tmnxSPIEgrPStatsDrpInProfPkts,
+        tmnxSPIEgrPStatsDrpInProfPktsL,
+        tmnxSPIEgrPStatsDrpInProfPktsH,
+        tmnxSPIEgrPStatsOffOutProfPkts,
+        tmnxSPIEgrPStatsOffOutProfPktsL,
+        tmnxSPIEgrPStatsOffOutProfPktsH,
+        tmnxSPIEgrPStatsFwdOutProfPkts,
+        tmnxSPIEgrPStatsFwdOutProfPktsL,
+        tmnxSPIEgrPStatsFwdOutProfPktsH,
+        tmnxSPIEgrPStatsDrpOutProfPkts,
+        tmnxSPIEgrPStatsDrpOutProfPktsL,
+        tmnxSPIEgrPStatsDrpOutProfPktsH,
+        tmnxSPIEgrPStatsOffInProfOcts,
+        tmnxSPIEgrPStatsOffInProfOctsL,
+        tmnxSPIEgrPStatsOffInProfOctsH,
+        tmnxSPIEgrPStatsFwdInProfOcts,
+        tmnxSPIEgrPStatsFwdInProfOctsL,
+        tmnxSPIEgrPStatsFwdInProfOctsH,
+        tmnxSPIEgrPStatsDrpInProfOcts,
+        tmnxSPIEgrPStatsDrpInProfOctsL,
+        tmnxSPIEgrPStatsDrpInProfOctsH,
+        tmnxSPIEgrPStatsOffOutProfOcts,
+        tmnxSPIEgrPStatsOffOutProfOctsL,
+        tmnxSPIEgrPStatsOffOutProfOctsH,
+        tmnxSPIEgrPStatsFwdOutProfOcts,
+        tmnxSPIEgrPStatsFwdOutProfOctsL,
+        tmnxSPIEgrPStatsFwdOutProfOctsH,
+        tmnxSPIEgrPStatsDrpOutProfOcts,
+        tmnxSPIEgrPStatsDrpOutProfOctsL,
+        tmnxSPIEgrPStatsDrpOutProfOctsH,
+        tmnxSPIEgrPStatsOffUncolPkts,
+        tmnxSPIEgrPStatsOffUncolPktsL,
+        tmnxSPIEgrPStatsOffUncolPktsH,
+        tmnxSPIEgrPStatsOffUncolOcts,
+        tmnxSPIEgrPStatsOffUncolOctsL,
+        tmnxSPIEgrPStatsOffUncolOctsH,
+        tmnxSubIngQosArbitStatsFwdPkts,
+        tmnxSubIngQosArbitStatsFwdPktsLo,
+        tmnxSubIngQosArbitStatsFwdPktsHi,
+        tmnxSubIngQosArbitStatsFwdOcts,
+        tmnxSubIngQosArbitStatsFwdOctsLo,
+        tmnxSubIngQosArbitStatsFwdOctsHi,
+        tmnxSubEgrQosArbitStatsFwdPkts,
+        tmnxSubEgrQosArbitStatsFwdPktsLo,
+        tmnxSubEgrQosArbitStatsFwdPktsHi,
+        tmnxSubEgrQosArbitStatsFwdOcts,
+        tmnxSubEgrQosArbitStatsFwdOctsLo,
+        tmnxSubEgrQosArbitStatsFwdOctsHi,
+        tmnxSubIgmpPlcyRowStatus,
+        tmnxSubIgmpPlcyDescription,
+        tmnxSubIgmpPlcyImportPolicy,
+        tmnxSubIgmpPlcyHostMaxGroups,
+        tmnxSubIgmpPlcyAdminVersion,
+        tmnxSubIgmpPlcyFastLeave,
+        tmnxSubIgmpPlcyRedirectionPolicy,
+        tmnxSubIgmpPlcyEgrRateModType,
+        tmnxSubIgmpPlcyEgrRateModSched,
+        tmnxSubIgmpPlcyPerHostReplic,
+        tmnxSubIgmpPlcyMcRprtDestName,
+        tmnxSubIgmpPlcyMcRprtOptFields,
+        tmnxSubIgmpPlcyMcRprtAdminState,
+        tmnxSubIgmpPlcyStaticRowStatus,
+        tmnxSLAProfInstOvrCBS,
+        tmnxSLAProfInstOvrMBS,
+        tmnxSubOvrCBS,
+        tmnxSubOvrMBS,
+        tmnxSubIgmpHostsCreated,
+        tmnxSubIgmpPlcySubscriberId,
+        tmnxSubIgmpStatusPlcyName,
+        tmnxSubInfoRadEgrAggRateLimit,
+        tmnxSubInfoEgrAggRateLimit,
+        tmnxSubMcacPlcyRowStatus,
+        tmnxSubMcacPlcyDescription,
+        tmnxSubMcacPlcyAdminState,
+        tmnxSubMcacPlcyUnconstrainedBW,
+        tmnxSubMcacPlcyPreRsvdMandBW,
+        tmnxSubMcacPlcyLastMgmtChange,
+        tmnxSubMcacPlcySubscriberId,
+        tmnxSubMcacStatusPlcyName,
+        tmnxSubMcacStatusinUseMandBw,
+        tmnxSubMcacStatusinUseOpnlBw,
+        tmnxSubMcacStatusAvailMandBw,
+        tmnxSubMcacStatusAvailOpnlBw,
+        tmnxSubFlterProfRowStatus,
+        tmnxSubLcktPlcyRowStatus,
+        tmnxSubLcktPlcyLastMgmtChange,
+        tmnxSubLcktPlcyDescription,
+        tmnxSubLcktPlcyLcktTimeMin,
+        tmnxSubLcktPlcyLcktTimeMax,
+        tmnxSubLcktPlcyLcktResetTime,
+        tmnxSubLcktPlcyMaxLcktHosts,
+        tmnxSubLcktPlcyHostKey,
+        tmnxSubIgmpPlcyHostMaxSources,
+        tmnxSPIEgrQosSchedStatsFwdPkts,
+        tmnxSPIEgrQosSchedStatsFwdOctets,
+        tmnxSubPppSapSessionIndex,
+        tmnxSLAIngQueueOvrStatMode,
+        tmnxSLAEgrQueueOvrStatMode,
+        tmnxSubHsmdaEgrQosQStatMode,
+        tmnxSubHsmdaIngQosQTableLastCh,
+        tmnxSubHsmdaIngQosQRowStatus,
+        tmnxSubHsmdaIngQosQLastChgd,
+        tmnxSubHsmdaIngQosQStatMode,
+        tmnxSubHsmdaIngQosPolTableLastCh,
+        tmnxSubHsmdaIngQosPolRowStatus,
+        tmnxSubHsmdaIngQosPolLastChgd,
+        tmnxSubHsmdaIngQosPolStatMode,
+        tmnxSPIStatsIngPchipOffV4Pkts,
+        tmnxSPIStatsIngPchipOffV4Octets,
+        tmnxSPIStatsIngPchipOffV6Pkts,
+        tmnxSPIStatsIngPchipOffV6Octets,
+        tmnxSPIStatsIngQchipDropV4Pkts,
+        tmnxSPIStatsIngQchipDropV4Octets,
+        tmnxSPIStatsIngQchipDropV6Pkts,
+        tmnxSPIStatsIngQchipDropV6Octets,
+        tmnxSPIStatsIngQchipFwdV4Pkts,
+        tmnxSPIStatsIngQchipFwdV4Octets,
+        tmnxSPIStatsIngQchipFwdV6Pkts,
+        tmnxSPIStatsIngQchipFwdV6Octets,
+        tmnxSPIStatsEgrQchipDropV4Pkts,
+        tmnxSPIStatsEgrQchipDropV4Octets,
+        tmnxSPIStatsEgrQchipDropV6Pkts,
+        tmnxSPIStatsEgrQchipDropV6Octets,
+        tmnxSPIStatsEgrQchipFwdV4Pkts,
+        tmnxSPIStatsEgrQchipFwdV4Octets,
+        tmnxSPIStatsEgrQchipFwdV6Pkts,
+        tmnxSPIStatsEgrQchipFwdV6Octets,
+        tmnxSPIEgrPStatsFwdExdProfPkts,
+        tmnxSPIEgrPStatsDrpExdProfPkts,
+        tmnxSPIEgrPStatsFwdExdProfOcts,
+        tmnxSPIEgrPStatsDrpExdProfOcts,
+        tmnxSPIEgrPStatsOffExdProfPkts,
+        tmnxSPIEgrPStatsOffExdProfOcts,
+        tmnxSPIEgrPStatsOffInPProfPkts,
+        tmnxSPIEgrPStatsFwdInPProfPkts,
+        tmnxSPIEgrPStatsDrpInPProfPkts,
+        tmnxSPIEgrPStatsOffInPProfOcts,
+        tmnxSPIEgrPStatsFwdInPProfOcts,
+        tmnxSPIEgrPStatsDrpInPProfOcts
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of all objects supporting management of subscriber profiles
+         on release 20 of the Nokia SROS series systems."
+    ::= { tmnxSubMgmtGroups 158 }
+
+tmnxSubObsoletedV20v0Group       OBJECT-GROUP
+    OBJECTS     {
+        tmnxSubInfoModifySubIdent,
+        tmnxSubBrgPoolName
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of subscriber management objects obsoleted in release 20 of
+         the Nokia SROS series systems."
+    ::= { tmnxSubMgmtGroups 159 }
+
+tmnxSubVcpeV20v0Group            OBJECT-GROUP
+    OBJECTS     {
+        tmnxSubBrgProfTableLastChanged,
+        tmnxSubBrgProfRowStatus,
+        tmnxSubBrgProfLastChanged,
+        tmnxSubBrgProfDescription,
+        tmnxSubBrgProfSubProfileString,
+        tmnxSubBrgProfSlaProfileString,
+        tmnxSubBrgProfRadSrvPlcy,
+        tmnxSubBrgProfRadPassword,
+        tmnxSubBrgProfCvCount,
+        tmnxSubBrgProfCvTimeout,
+        tmnxSubBrgProfCvRetryTime,
+        tmnxSubBrgProfHoldTime,
+        tmnxSubBrgProfInitialHoldTime,
+        tmnxSubBrgProfRadProxLastCh,
+        tmnxSubBrgProfRadProxRowStatus,
+        tmnxSubBrgProfRadProxTableLstCh,
+        tmnxSubBrgProfDhcp4TableLastCh,
+        tmnxSubBrgProfDhcp4LastCh,
+        tmnxSubBrgProfDhcp4SubnetAddrTyp,
+        tmnxSubBrgProfDhcp4SubnetAddr,
+        tmnxSubBrgProfDhcp4SubnetPrefixL,
+        tmnxSubBrgProfDhcp4StartAddrTyp,
+        tmnxSubBrgProfDhcp4StartAddr,
+        tmnxSubBrgProfDhcp4EndAddrTyp,
+        tmnxSubBrgProfDhcp4EndAddr,
+        tmnxSubBrgProfDhcp4LeaseTime,
+        tmnxSubBrgProfDhcp4StandbyIpTime,
+        tmnxSubBrgProfDhcp4OptTableCh,
+        tmnxSubBrgProfDhcp4OptRowStatus,
+        tmnxSubBrgProfDhcp4OptLastCh,
+        tmnxSubBrgProfDhcp4OptType,
+        tmnxSubBrgProfDhcp4OptValue,
+        tmnxSubBrgIfTableLastChange,
+        tmnxSubBrgIfLastChanged,
+        tmnxSubBrgIfAdminState,
+        tmnxSubBrgIfDefaultBrgProfile,
+        tmnxSubBrgIfAuthedBrgOnly,
+        tmnxSubBrgSlaacPfxType,
+        tmnxSubBrgSlaacPfx,
+        tmnxSubBrgSlaacPfxLength,
+        tmnxSubBrgDhcp4SubnetAddrType,
+        tmnxSubBrgDhcp4SubnetAddr,
+        tmnxSubBrgDhcp4SubnetPrefixL,
+        tmnxSubBrgDhcp4StartAddrTyp,
+        tmnxSubBrgDhcp4StartAddr,
+        tmnxSubBrgDhcp4EndAddrTyp,
+        tmnxSubBrgDhcp4EndAddr,
+        tmnxSubBrgDmzAddrType,
+        tmnxSubBrgDmzAddr,
+        tmnxSubBrgDmzAddrInUse,
+        tmnxSubBrgDns1Addr4Type,
+        tmnxSubBrgDns1Addr4,
+        tmnxSubBrgDns1Addr6Type,
+        tmnxSubBrgDns1Addr6,
+        tmnxSubBrgDns2Addr4Type,
+        tmnxSubBrgDns2Addr4,
+        tmnxSubBrgDns2Addr6Type,
+        tmnxSubBrgDns2Addr6,
+        tmnxSubBrgNbns1Addr4Type,
+        tmnxSubBrgNbns1Addr4,
+        tmnxSubBrgNbns2Addr4Type,
+        tmnxSubBrgNbns2Addr4,
+        tmnxSubBrgLeaseTime,
+        tmnxSubBrgDhcpStreamAddrType,
+        tmnxSubBrgDhcpStreamAddr,
+        tmnxSubBrgPortalUrl,
+        tmnxSubBrgIpv6PortalUrl,
+        tmnxSubBrgProfile,
+        tmnxSubBrgSubProfile,
+        tmnxSubBrgSlaProfile,
+        tmnxSubBrgProxyAuthenticated,
+        tmnxSubBrgUpnpPolicyOverride,
+        tmnxSubBrgIngIpv4Filter,
+        tmnxSubBrgEgrIpv4Filter,
+        tmnxSubBrgIngIpv6Filter,
+        tmnxSubBrgEgrIpv6Filter,
+        tmnxSubBrgRemainInitialHoldTime,
+        tmnxSubBrgRemainHoldTime,
+        tmnxSubBrgIpAddrType,
+        tmnxSubBrgIpAddr,
+        tmnxSubBrgSlaacPool,
+        tmnxSubBrgHostAllocationType,
+        tmnxSubBrgHostService,
+        tmnxSubAddrPlDhcp4SubnetAddrType,
+        tmnxSubAddrPlDhcp4SubnetAddr,
+        tmnxSubAddrPlDhcp4SubnetPrefixL,
+        tmnxSubAddrPlDhcp4StartAddrType,
+        tmnxSubAddrPlDhcp4StartAddr,
+        tmnxSubAddrPlDhcp4EndAddrType,
+        tmnxSubAddrPlDhcp4EndAddr,
+        tmnxSubAddrPlStdbyAddrRemainTime,
+        tmnxSubPlBndAddrType,
+        tmnxSubPlBndAddr,
+        tmnxSubPlBndAllocationType,
+        tmnxSubPlBndDhcpLeaseExists,
+        tmnxSubPlBndDhcpRemLeaseTime,
+        tmnxSubPlBndDhcpLeaseStart,
+        tmnxSubBrgOvrPir,
+        tmnxSubBrgOvrCir,
+        tmnxSubBrgOvrCbs,
+        tmnxSubBrgOvrMbs,
+        tmnxSubBrgOvrWrrWeight,
+        tmnxSubBrgOvrSummedCir,
+        tmnxSubBrgFltrRuleAction,
+        tmnxSubBrgFltrRuleDirection,
+        tmnxSubBrgFltrRuleProtocol,
+        tmnxSubBrgFltrRuleSrcAddrType,
+        tmnxSubBrgFltrRuleSrcAddr,
+        tmnxSubBrgFltrRuleSrcPfxLen,
+        tmnxSubBrgFltrRuleSrcPortOper,
+        tmnxSubBrgFltrRuleSrcPortLow,
+        tmnxSubBrgFltrRuleSrcPortHigh,
+        tmnxSubBrgFltrRuleDstAddrType,
+        tmnxSubBrgFltrRuleDstAddr,
+        tmnxSubBrgFltrRuleDstPfxLen,
+        tmnxSubBrgFltrRuleDstPortOper,
+        tmnxSubBrgFltrRuleDstPortLow,
+        tmnxSubBrgFltrRuleDstPortHigh,
+        tmnxSubBrgFltrRuleFragment,
+        tmnxSubBrgFltrRuleOptionValue,
+        tmnxSubBrgFltrRuleOptionPresent,
+        tmnxSubBrgFltrRuleTcpSyn,
+        tmnxSubBrgFltrRuleTcpAck,
+        tmnxSubBrgFltrRuleIcmpType,
+        tmnxSubPlStandbyIpAddr,
+        tmnxSubBrgNatL2AwHostPortBlkSize,
+        tmnxSubBrgStandbyIpTime,
+        tmnxSubBrgState,
+        tmnxSubBrgCv,
+        tmnxSubBrgCvLastTime,
+        tmnxSubBrgStatsBrgInitialized,
+        tmnxSubBrgStatsBrgOperational,
+        tmnxSubBrgStatsBrgCv,
+        tmnxSubBrgStatsBrgHold,
+        tmnxSubBrgStatsBrgProxyAuth,
+        tmnxSubBrgPubStDevIpAddr4Type,
+        tmnxSubBrgPubStDevIpAddr4
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of subscriber Subscriber
+         Virtual CPE on the Nokia SROS series."
+    ::= { tmnxSubMgmtGroups 160 }
 
 tmnxSubMgmtNotifGroup            OBJECT IDENTIFIER ::= { tmnxSubMgmtConformance 3 }
 

@@ -23,6 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 $snmpMockCache = array();
@@ -167,34 +168,34 @@ function snmp_translate_type($oid, $mib = null, $mibdir = null)
         throw new Exception('Could not translate oid: ' . $oid . PHP_EOL . 'Tried: ' . $cmd);
     }
 
-    if (str_contains($result, 'OCTET STRING')) {
+    if (Str::contains($result, 'OCTET STRING')) {
         return 4;
     }
-    if (str_contains($result, 'Integer32')) {
+    if (Str::contains($result, 'Integer32')) {
         return 2;
     }
-    if (str_contains($result, 'NULL')) {
+    if (Str::contains($result, 'NULL')) {
         return 5;
     }
-    if (str_contains($result, 'OBJECT IDENTIFIER')) {
+    if (Str::contains($result, 'OBJECT IDENTIFIER')) {
         return 6;
     }
-    if (str_contains($result, 'IpAddress')) {
+    if (Str::contains($result, 'IpAddress')) {
         return 64;
     }
-    if (str_contains($result, 'Counter32')) {
+    if (Str::contains($result, 'Counter32')) {
         return 65;
     }
-    if (str_contains($result, 'Gauge32')) {
+    if (Str::contains($result, 'Gauge32')) {
         return 66;
     }
-    if (str_contains($result, 'TimeTicks')) {
+    if (Str::contains($result, 'TimeTicks')) {
         return 67;
     }
-    if (str_contains($result, 'Opaque')) {
+    if (Str::contains($result, 'Opaque')) {
         return 68;
     }
-    if (str_contains($result, 'Counter64')) {
+    if (Str::contains($result, 'Counter64')) {
         return 70;
     }
 
@@ -234,11 +235,10 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 
     $data = array();
     foreach ($oids as $index => $oid) {
-        if (str_contains($options, 'n')) {
+        if (Str::contains($options, 'n')) {
             $oid_name = '.' . snmp_translate_number($oid, $mib, $mibdir);
             $val = snmp_get($device, $oid_name, $options, $mib, $mibdir);
-        } elseif (str_contains($options, 's')
-            && str_contains($oid, '::')) {
+        } elseif (Str::contains($options, 's') && Str::contains($oid, '::')) {
             $tmp = explode('::', $oid);
             $oid_name = $tmp[1];
             $val = snmp_get($device, $oid, $options, $mib, $mibdir);
@@ -263,7 +263,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 
     $output = '';
     foreach ($dev as $key => $data) {
-        if (starts_with($key, $num_oid)) {
+        if (Str::startsWith($key, $num_oid)) {
             if ($data[0] == 6) {
                 $output .= '.' . $data[1] . PHP_EOL;
             } else {

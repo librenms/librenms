@@ -24,6 +24,7 @@ use LibreNMS\Config;
 $language = \config('app.locale');
 $settings = (include Config::get('install_dir').'/resources/lang/'.$language.'/settings.php')['settings'];
 
+$attribs = get_dev_attribs($device['device_id']);
 $poller_module_names = $settings['poller_modules'];
 $discovery_module_names = $settings['discovery_modules'];
 

@@ -5,32 +5,7 @@ use LibreNMS\Config;
 use Symfony\Component\Process\Process;
 
 if (Auth::user()->hasGlobalAdmin()) {
-    if (Config::has('rancid_configs') && !is_array(Config::get('rancid_configs'))) {
-        Config::set('rancid_configs', (array)Config::get('rancid_configs', []));
-    }
-
-    if (Config::has('rancid_configs.0')) {
-        foreach (Config::get('rancid_configs') as $configs) {
-            if ($configs[(strlen($configs) - 1)] != '/') {
-                $configs .= '/';
-            }
-
-            if (is_file($configs.$device['hostname'])) {
-                $file = $configs.$device['hostname'];
-                break;
-            } elseif (is_file($configs.strtok($device['hostname'], '.'))) { // Strip domain
-                $file = $configs.strtok($device['hostname'], '.');
-                break;
-            } else {
-                if (!empty(Config::get('mydomain'))) { // Try with domain name if set
-                    if (is_file($configs.$device['hostname'].'.'.Config::get('mydomain'))) {
-                        $file = $configs.$device['hostname'].'.'.Config::get('mydomain');
-                        break;
-                    }
-                }
-            } // end if
-        }
-
+    if (!empty($rancid_file)) {
         echo '<div style="clear: both;">';
 
         print_optionbar_start('', '');
@@ -47,7 +22,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         if (Config::get('rancid_repo_type') == 'svn' && function_exists('svn_log')) {
             $sep     = ' | ';
-            $svnlogs = svn_log($file, SVN_REVISION_HEAD, null, 8);
+            $svnlogs = svn_log($rancid_file, SVN_REVISION_HEAD, null, 8);
             $revlist = array();
 
             foreach ($svnlogs as $svnlog) {
@@ -71,7 +46,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if (Config::get('rancid_repo_type') == 'git') {
             $sep     = ' | ';
 
-            $process = new Process(array('git', 'log', '-n 8', '--pretty=format:%h;%ct', $file), $configs);
+            $process = new Process(array('git', 'log', '-n 8', '--pretty=format:%h;%ct', $rancid_file), $rancid_path);
             $process->run();
             $gitlogs_raw = explode(PHP_EOL, $process->getOutput());
             $gitlogs = array();
@@ -106,7 +81,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         if (Config::get('rancid_repo_type') == 'svn') {
             if (function_exists('svn_log') && in_array($vars['rev'], $revlist)) {
-                list($diff, $errors) = svn_diff($file, ($vars['rev'] - 1), $file, $vars['rev']);
+                list($diff, $errors) = svn_diff($rancid_file, ($vars['rev'] - 1), $rancid_file, $vars['rev']);
                 if (!$diff) {
                     $text = 'No Difference';
                 } else {
@@ -119,13 +94,13 @@ if (Auth::user()->hasGlobalAdmin()) {
                     fclose($errors);
                 }
             } else {
-                $fh   = fopen($file, 'r') or die("Can't open file");
-                $text = fread($fh, filesize($file));
+                $fh   = fopen($rancid_file, 'r') or die("Can't open file");
+                $text = fread($fh, filesize($rancid_file));
                 fclose($fh);
             }
         } elseif (Config::get('rancid_repo_type') == 'git') {
             if (in_array($vars['rev'], $revlist)) {
-                $process = new Process(array('git', 'diff', $vars['rev'] . '^', $vars['rev'], $file), $configs);
+                $process = new Process(array('git', 'diff', $vars['rev'] . '^', $vars['rev'], $rancid_file), $rancid_path);
                 $process->run();
                 $diff = $process->getOutput();
                 if (!$diff) {
@@ -135,8 +110,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                     $previous_config = $vars['rev'] . '^';
                 }
             } else {
-                $fh   = fopen($file, 'r') or die("Can't open file");
-                $text = fread($fh, filesize($file));
+                $fh   = fopen($rancid_file, 'r') or die("Can't open file");
+                $text = fread($fh, filesize($rancid_file));
                 fclose($fh);
             }
         }

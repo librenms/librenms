@@ -37,7 +37,10 @@ class Env
      */
     public static function parseArray($env_name, $default = null, $except = [''])
     {
-        $value = env($env_name, $default);
+        $value = getenv($env_name);
+        if ($value === false) {
+            $value = $default;
+        }
 
         if (is_string($value) && !in_array($value, $except)) {
             $value = explode(',', $value);

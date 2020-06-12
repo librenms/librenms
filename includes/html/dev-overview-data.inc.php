@@ -31,7 +31,7 @@ if ($device['features']) {
     $device['features'] = '('.$device['features'].')';
 }
 
-$device['os_text'] = Config::get("os.{$device['os']}.text");
+$device['os_text'] = Config::getOsSetting($device['os'], 'text');
 
 echo '<div class="row">
         <div class="col-sm-4">System Name</div>

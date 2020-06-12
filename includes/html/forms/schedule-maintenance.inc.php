@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 /*
  * LibreNMS
  *
@@ -40,9 +42,14 @@ if ($sub_type == 'new-maintenance') {
     $start_recurring_hr = mres($_POST['start_recurring_hr']);
     $end_recurring_hr = mres($_POST['end_recurring_hr']);
     $recurring_day = mres($_POST['recurring_day']);
-    $start = mres($_POST['start']);
-    $end   = mres($_POST['end']);
-    $maps  = mres($_POST['maps']);
+    $start    = mres($_POST['start']);
+    $duration = mres($_POST['duration']);
+    $end      = mres($_POST['end']);
+    $maps     = mres($_POST['maps']);
+
+    if (!empty($duration)) {
+        $end = date('Y-m-d H:i:00', strtotime('+'.$duration.' hour', strtotime($start)));
+    }
 
     if (empty($title)) {
         $message = 'Missing title<br />';
@@ -137,10 +144,10 @@ if ($sub_type == 'new-maintenance') {
 
             foreach ($_POST['maps'] as $target) {
                 $type = 'device';
-                if (starts_with($target, 'l')) {
+                if (Str::startsWith($target, 'l')) {
                     $type = 'location';
                     $target = substr($target, 1);
-                } elseif (starts_with($target, 'g')) {
+                } elseif (Str::startsWith($target, 'g')) {
                     $type = 'device_group';
                     $target = substr($target, 1);
                 }

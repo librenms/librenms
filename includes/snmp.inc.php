@@ -16,6 +16,7 @@
  */
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
 
@@ -196,7 +197,7 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
         $value             = trim($value, "\" \n\r");
         list($oid, $index) = explode('.', $oid, 2);
 
-        if (!str_contains($value, 'at this OID')) {
+        if (!Str::contains($value, 'at this OID')) {
             if (is_null($index)) {
                 if (empty($oid)) {
                     continue; // no index or oid
@@ -233,7 +234,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
     $array = array();
     $oid = '';
     foreach ($data as $entry) {
-        if (str_contains($entry, '=')) {
+        if (Str::contains($entry, '=')) {
             list($oid,$value)  = explode('=', $entry, 2);
             $oid               = trim($oid);
             $value             = trim($value, "\\\" \n\r");
@@ -273,7 +274,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     }
 
     $cmd = gen_snmpget_cmd($device, $oid, $options, $mib, $mibdir);
-    $data = trim(external_exec($cmd), "\" \n\r");
+    $data = trim(external_exec($cmd), "\\\" \n\r");
 
     recordSnmpStatistic('snmpget', $time_start);
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
@@ -341,7 +342,7 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
         $oid               = trim($oid);
         $value             = trim($value, "\" \n\r");
         list($oid, $index) = explode('.', $oid, 2);
-        if (!str_contains($value, 'at this OID')) {
+        if (!Str::contains($value, 'at this OID')) {
             if (empty($oid)) {
                 continue; // no index or oid
             } else {
@@ -390,7 +391,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
         d_echo("Invalid snmp_walk() data = " . print_r($data, true));
         $data = false;
     } else {
-        if (ends_with($data, '(It is past the end of the MIB tree)')) {
+        if (Str::endsWith($data, '(It is past the end of the MIB tree)')) {
             $no_more_pattern = '/.*No more variables left in this MIB View \(It is past the end of the MIB tree\)[\n]?/';
             $data = preg_replace($no_more_pattern, '', $data);
         }
@@ -645,7 +646,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), 
 
     $line = strtok($data, "\n");
     while ($line !== false) {
-        if (str_contains($line, 'at this OID')||str_contains($line, 'this MIB View')) {
+        if (Str::contains($line, 'at this OID') || Str::contains($line, 'this MIB View')) {
             $line = strtok("\n");
             continue;
         }
@@ -656,7 +657,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = array(), 
         array_splice($parts, $depth, 0, array_shift($parts)); // move the oid name to the correct depth
 
         $line = strtok("\n"); // get the next line and concatenate multi-line values
-        while ($line !== false && !str_contains($line, '=')) {
+        while ($line !== false && !Str::contains($line, '=')) {
             $value .= $line . PHP_EOL;
             $line = strtok("\n");
         }
@@ -1386,7 +1387,7 @@ function snmpwalk_array_num($device, $oid, $indexes = 1)
 function get_device_max_repeaters($device)
 {
     return $device['attribs']['snmp_max_repeaters'] ??
-        Config::getOsSetting($device['os'], 'snmp.max_repeaters', false);
+        Config::getOsSetting($device['os'], 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
 }
 
 /**

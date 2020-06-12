@@ -148,21 +148,6 @@
             "default": false,
             "type": "boolean"
         },
-        "alerts.port.ifdown": {
-            "default": false,
-            "type": "boolean"
-        },
-        "alerts.port_util_alert": {
-            "default": false,
-            "type": "boolean"
-        },
-        "alerts.port_util_perc": {
-            "default": 85,
-            "type": "integer",
-            "validate": {
-                "value": "integer|between:0,100"
-            }
-        },
         "alert_rule.severity": {
             "default": "warning",
             "group": "alerting",
@@ -1205,6 +1190,10 @@
         },
         "distributed_poller_group": {
             "default": 0,
+            "type": "integer"
+        },
+        "default_poller_group": {
+            "default": 0,
             "type": "integer",
             "group": "poller",
             "section": "distributed",
@@ -1582,12 +1571,12 @@
         },
         "graph_colours.blues": {
             "default": [
-                "A0A0E5",
-                "8080BD",
-                "606096",
-                "40406F",
-                "202048",
-                "000033"
+                "A9A9F2",
+                "9696DD",
+                "8080C9",
+                "6A6AB7",
+                "5151A3",
+                "3D3D99"
             ],
             "type": "array"
         },
@@ -1604,12 +1593,12 @@
         },
         "graph_colours.greens": {
             "default": [
-                "B6D14B",
-                "91B13C",
-                "6D912D",
-                "48721E",
-                "24520F",
-                "003300"
+                "CAE853",
+                "B2D849",
+                "94C63D",
+                "75BA30",
+                "49A81E",
+                "0C990C"
             ],
             "type": "array"
         },
@@ -3236,6 +3225,28 @@
                 "new": "New"
             }
         },
+        "html.device.primary_link": {
+            "group": "webui",
+            "section": "device",
+            "order": 3,
+            "type": "select",
+            "default": "edit",
+            "options": {
+                "edit": "Edit",
+                "web": "Web",
+                "ssh": "SSH",
+                "telnet": "Telnet",
+                "capture": "Capture",
+                "custom1": "Custom 1",
+                "custom2": "Custom 2",
+                "custom3": "Custom 3",
+                "custom4": "Custom 4",
+                "custom5": "Custom 5",
+                "custom6": "Custom 6",
+                "custom7": "Custom 7",
+                "custom8": "Custom 8"
+            }
+        },
         "html_dir": {
             "type": "text"
         },
@@ -4470,8 +4481,16 @@
             "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#a5a5a5 -c MGRID#FF9999 -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
             "type": "text"
         },
+        "rrdgraph_def_text_dark": {
+            "default": "-c BACK#EEEEEE00 -c SHADEA#EEEEEE00 -c SHADEB#EEEEEE00 -c CANVAS#FFFFFF00 -c GRID#292929 -c MGRID#2f343e -c FRAME#5e5e5e -c ARROW#5e5e5e -R normal",
+            "type": "text"
+        },
         "rrdgraph_def_text_color": {
             "default": "000000",
+            "type": "color"
+        },
+        "rrdgraph_def_text_color_dark": {
+            "default": "bfc0c0",
             "type": "color"
         },
         "rrdgraph_real_percentile": {
@@ -4496,6 +4515,172 @@
             "default": true,
             "type": "boolean"
         },
+        "service_poller_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 5,
+            "type": "boolean"
+        },
+        "service_poller_workers": {
+            "default": 24,
+            "group": "poller",
+            "section": "distributed",
+            "order": 6,
+            "type": "integer",
+            "units": "Workers"
+        },
+        "service_poller_frequency": {
+            "default": 300,
+            "group": "poller",
+            "section": "distributed",
+            "order": 7,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_poller_down_retry": {
+            "default": 60,
+            "group": "poller",
+            "section": "distributed",
+            "order": 8,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_discovery_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 9,
+            "type": "boolean"
+        },
+        "service_discovery_workers": {
+            "default": 16,
+            "group": "poller",
+            "section": "distributed",
+            "order": 10,
+            "type": "integer",
+            "units": "Workers"
+        },
+        "service_discovery_frequency": {
+            "default": 21600,
+            "group": "poller",
+            "section": "distributed",
+            "order": 11,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_services_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 12,
+            "type": "boolean"
+        },
+        "service_services_workers": {
+            "default": 8,
+            "group": "poller",
+            "section": "distributed",
+            "order": 13,
+            "type": "integer",
+            "units": "Workers"
+        },
+        "service_services_frequency": {
+            "default": 300,
+            "group": "poller",
+            "section": "distributed",
+            "order": 14,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_billing_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 15,
+            "type": "boolean"
+        },
+        "service_billing_frequency": {
+            "default": 300,
+            "group": "poller",
+            "section": "distributed",
+            "order": 16,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_billing_calculate_frequency": {
+            "default": 60,
+            "group": "poller",
+            "section": "distributed",
+            "order": 17,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_alerting_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 18,
+            "type": "boolean"
+        },
+        "service_alerting_frequency": {
+            "default": 60,
+            "group": "poller",
+            "section": "distributed",
+            "order": 19,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_ping_enabled": {
+            "default": false,
+            "group": "poller",
+            "section": "distributed",
+            "order": 20,
+            "type": "boolean"
+        },
+        "ping_rrd_step": {
+            "default": 60,
+            "group": "poller",
+            "section": "distributed",
+            "order": 21,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_update_enabled": {
+            "default": true,
+            "group": "poller",
+            "section": "distributed",
+            "order": 22,
+            "type": "boolean"
+        },
+        "service_update_frequency": {
+            "default": 86400,
+            "group": "poller",
+            "section": "distributed",
+            "order": 23,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_loglevel": {
+            "default": "INFO",
+            "group": "poller",
+            "section": "distributed",
+            "order": 24,
+            "type": "select",
+            "options": {
+                "DEBUG": "DEBUG",
+                "INFO": "INFO",
+                "WARNING": "WARNING",
+                "ERROR": "ERROR",
+                "CRITICAL": "CRITICAL"
+            }
+        },
+        "service_watchdog_enabled": {
+            "default": false,
+            "group": "poller",
+            "section": "distributed",
+            "order": 25,
+            "type": "boolean"
+        },
         "sfdp": {
             "default": "/usr/bin/sfdp",
             "group": "external",
@@ -4515,10 +4700,6 @@
             "type": "boolean"
         },
         "show_locations_dropdown": {
-            "default": true,
-            "type": "boolean"
-        },
-        "show_overview_tab": {
             "default": true,
             "type": "boolean"
         },
@@ -4624,8 +4805,12 @@
             "type": "text"
         },
         "smokeping.pings": {
-            "default": 20,
-            "type": "integer"
+            "default": 5,
+            "group": "external",
+            "section": "smokeping",
+            "order": 2,
+            "type": "integer",
+            "units": "pings"
         },
         "snmp.community": {
             "group": "poller",
@@ -4873,7 +5058,7 @@
             "group": "alerting",
             "section": "general",
             "order": 0,
-            "default": 84600,
+            "default": 86400,
             "type": "integer",
             "validate": {
                 "value": "integer|min:0"
@@ -4993,6 +5178,26 @@
         "xirrus_disable_stations": {
             "default": false,
             "type": "boolean"
+        },
+        "smokeping.integration": {
+            "default": false,
+            "group": "external",
+            "section": "smokeping",
+            "order": 0,
+            "type": "boolean"
+        },
+        "smokeping.dir": {
+            "default": "/var/lib/smokeping/rrd",
+            "group": "external",
+            "section": "smokeping",
+            "order": 1,
+            "type": "text"
+        },
+        "smokeping.url": {
+            "group": "external",
+            "section": "smokeping",
+            "order": 3,
+            "type": "text"
         }
     }
 }

@@ -153,7 +153,7 @@ class Location extends Model
 
     public function devices()
     {
-        return $this->hasMany('App\Models\Device', 'location_id');
+        return $this->hasMany(\App\Models\Device::class, 'location_id');
     }
 
     public function __toString()

@@ -6,7 +6,6 @@
 
 @parent
 
-<br />
 @if( $pollers->isNotEmpty() )
 <div class="panel panel-default">
     <div class="panel-heading">
@@ -149,7 +148,7 @@
                 $("#confirm-delete").modal('hide');
             },
             error: function () {
-                toastr.error(@lang('An error occurred deleting this poller.'));
+                toastr.error('@lang('An error occurred deleting this poller.')');
                 $("#confirm-delete").modal('hide');
             }
         });

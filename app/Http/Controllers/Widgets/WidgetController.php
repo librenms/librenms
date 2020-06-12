@@ -29,6 +29,7 @@ use App\Http\Controllers\Controller;
 use App\Models\DeviceGroup;
 use App\Models\UserWidget;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\View\View;
 
 abstract class WidgetController extends Controller
@@ -115,7 +116,7 @@ abstract class WidgetController extends Controller
     {
         if ($view instanceof View) {
             $html = $view->__toString();
-            $show_settings = (int)starts_with($view->getName(), 'widgets.settings.');
+            $show_settings = (int)Str::startsWith($view->getName(), 'widgets.settings.');
         } else {
             $html = (string)$view;
             $show_settings = (int)$this->show_settings;

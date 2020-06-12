@@ -26,6 +26,7 @@
 namespace App\Facades;
 
 use Auth;
+use LibreNMS\Enum\Alert;
 
 class LogManager extends \Illuminate\Log\LogManager
 {
@@ -38,7 +39,7 @@ class LogManager extends \Illuminate\Log\LogManager
      * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
      * @param int $reference the id of the referenced entity.  Supported types: interface
      */
-    public function event($text, $device = null, $type = null, $severity = 2, $reference = null)
+    public function event($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null)
     {
         (new \App\Models\Eventlog([
             'device_id' => $device instanceof \App\Models\Device ? $device->device_id : $device,

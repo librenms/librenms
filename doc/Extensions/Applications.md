@@ -124,6 +124,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Puppet Agent](#puppet_agent) - SNMP extend
 1. [PureFTPd](#pureftpd) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
+1. [Redis](#redis) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
 1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
@@ -237,8 +238,8 @@ Extend` heading top of page.
 1: Create stats file with appropriate permissions:
 
 ```bash
-~$ touch /var/run/named/stats
-~$ chown bind:bind /var/run/named/stats
+~$ touch /var/cache/bind/stats
+~$ chown bind:bind /var/cache/bind/stats
 ```
 
 Change `user:group` to the user and group that's running bind/named.
@@ -248,7 +249,7 @@ Change `user:group` to the user and group that's running bind/named.
 ```text
 options {
     ...
-    statistics-file "/var/run/named/stats";
+    statistics-file "/var/cache/bind/stats";
     zone-statistics yes;
     ...
 };
@@ -257,7 +258,7 @@ options {
 3: Restart your bind9/named after changing the configuration.
 
 4: Verify that everything works by executing `rndc stats && cat
-/var/run/named/stats`. In case you get a `Permission Denied` error,
+/var/cache/bind/stats`. In case you get a `Permission Denied` error,
 make sure you changed the ownership correctly.
 
 5: Also be aware that this file is appended to each time `rndc stats`
@@ -294,7 +295,7 @@ own settings.
 rndc = The path to rndc. Default: /usr/bin/env rndc
 call_rndc = A 0/1 boolean on whether or not to call rndc stats.
     Suggest to set to 0 if using netdata. Default: 1
-stats_file = The path to the named stats file. Default: /var/run/named/stats
+stats_file = The path to the named stats file. Default: /var/cache/bind/stats
 agent = A 0/1 boolean for if this is being used as a LibreNMS
     agent or not. Default: 0
 zero_stats = A 0/1 boolean for if the stats file should be zeroed
@@ -1574,6 +1575,24 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd
 the user snmpd is using with `ps aux | grep snmpd`
 
 5: Restart snmpd on PI host
+
+# Redis
+
+SNMP extend script to monitor your Redis Server
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/redis.py
+   -O /etc/snmp/redis.py`
+
+2: Make the script executable: `chmod +x /etc/snmp/redis.py`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend redis /etc/snmp/redis.py
+```
 
 # Seafile
 

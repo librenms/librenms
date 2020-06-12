@@ -2,10 +2,6 @@
 
 namespace App\Providers;
 
-use App\Models\DeviceGroup;
-use App\Models\User;
-use App\Policies\DeviceGroupPolicy;
-use App\Policies\UserPolicy;
 use App\Guards\ApiTokenGuard;
 use Auth;
 use Illuminate\Support\Facades\Gate;
@@ -19,8 +15,11 @@ class AuthServiceProvider extends ServiceProvider
      * @var array
      */
     protected $policies = [
-        User::class => UserPolicy::class,
-        DeviceGroup::class => DeviceGroupPolicy::class,
+        \App\Models\User::class => \App\Policies\UserPolicy::class,
+        \App\Models\Device::class => \App\Policies\DevicePolicy::class,
+        \App\Models\DeviceGroup::class => \App\Policies\DeviceGroupPolicy::class,
+        \App\Models\PollerCluster::class => \App\Policies\PollerClusterPolicy::class,
+        \App\Models\Port::class => \App\Policies\PortPolicy::class,
     ];
 
     /**

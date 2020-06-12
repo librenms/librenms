@@ -43,27 +43,35 @@
                     <td>{{ $version_php }}</td>
                 </tr>
                 <tr>
+                    <td><b>@lang('Python')</b></td>
+                    <td>{{ $version_python }}</td>
+                </tr>
+                <tr>
                     <td><b>@lang('MySQL')</b></td>
                     <td>{{ $version_mysql }}</td>
                 </tr>
                 <tr>
-                    <td><b>@lang('RRDtool')</b></td>
+                    <td><a href="https://laravel.com/"><b>@lang('Laravel')</b></a></td>
+                    <td>{{ $version_laravel }}</td>
+                </tr>
+                <tr>
+                    <td><a href="https://oss.oetiker.ch/rrdtool/"><b>@lang('RRDtool')</b></a></td>
                     <td>{{ $version_rrdtool }}</td>
                 </tr>
             </table>
 
-            <p>
-            <h3>@lang('LibreNMS is a community-based project')</h3>
+          <h3>@lang('LibreNMS is a community-based project')</h3>
+          <p>
             @lang('Please feel free to join us and contribute code, documentation, and bug reports:')
-            <br>
-              <a target="_blank" href="http://www.librenms.org/">@lang('Web site')</a> |
-              <a target="_blank" href="https://docs.librenms.org/">@lang('Docs')</a> |
-              <a target="_blank" href="https://github.com/librenms/">@lang('GitHub')</a> |
-              <a target="_blank" href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
-              <a target="_blank" href="https://community.librenms.org">@lang('Community Forum')</a> |
-              <a target="_blank" href="http://twitter.com/librenms">@lang('Twitter')</a> |
-              <a target="_blank" href="http://www.librenms.org/changelog.html">@lang('Changelog')</a> |
-              <a href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
+            <br />
+            <a target="_blank" href="http://www.librenms.org/">@lang('Web site')</a> |
+            <a target="_blank" href="https://docs.librenms.org/">@lang('Docs')</a> |
+            <a target="_blank" href="https://github.com/librenms/">@lang('GitHub')</a> |
+            <a target="_blank" href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
+            <a target="_blank" href="https://community.librenms.org">@lang('Community Forum')</a> |
+            <a target="_blank" href="http://twitter.com/librenms">@lang('Twitter')</a> |
+            <a target="_blank" href="http://www.librenms.org/changelog.html">@lang('Changelog')</a> |
+            <a href="#" data-toggle="modal" data-target="#git_log">@lang('Local git log')</a>
           </p>
 
           <h3>@lang('Contributors')</h3>
@@ -76,7 +84,6 @@
           <b>Dennis de Houx</b> Application monitors for PowerDNS, Shoutcast, NTPD (Client, Server).<br />
           <b>Erik Bosrup</b> Overlib Library.<br />
           <b>Jonathan De Graeve</b> SNMP code improvements.<br />
-          <b>Mark James</b> Silk Iconset.<br />
           <b>Observium</b> Codebase for fork.<br />
 
       </div>
@@ -156,7 +163,7 @@
                 <td class='text-right'>{{ $stat_events }}</td>
             </tr>
             <tr>
-                <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('Sensors')</b></td>
+                <td><i class='fa fa-fw fa-dashboard fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('sensors.title')</b></td>
                 <td class='text-right'>{{ $stat_sensors }}</td>
                 <td><i class='fa fa-fw fa-wifi fa-lg icon-theme' aria-hidden='true'></i> <b>@lang('Wireless Sensors')</b></td>
                 <td class='text-right'>{{ $stat_wireless }}</td>

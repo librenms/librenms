@@ -15,9 +15,9 @@ class CreateLinksTable extends Migration
     {
         Schema::create('links', function (Blueprint $table) {
             $table->increments('id');
-            $table->unsignedInteger('local_port_id')->nullable()->index('src_if');
+            $table->unsignedInteger('local_port_id')->nullable()->index();
             $table->unsignedInteger('local_device_id');
-            $table->unsignedInteger('remote_port_id')->nullable()->index('dst_if');
+            $table->unsignedInteger('remote_port_id')->nullable()->index();
             $table->boolean('active')->default(1);
             $table->string('protocol', 11)->nullable();
             $table->string('remote_hostname', 128);

@@ -17,10 +17,18 @@ $apps = Application::query()->hasAccess(Auth::user())->where('app_type', $vars['
 });
 
 foreach ($apps as $app) {
+    $app_state = \LibreNMS\Util\Html::appStateIcon($app['app_state']);
+    if (!empty($app_state['icon'])) {
+        $app_state_info = "<font color=\"".$app_state['color']."\"><i title=\"".$app_state['hover_text']."\" class=\"fa ".$app_state['icon']." fa-fw fa-lg\" aria-hidden=\"true\"></i></font>";
+    } else {
+        $app_state_info = '';
+    }
+
     echo '<div class="panel panel-default">
         <div class="panel-heading">
-        <h3 class="panel-title">
-        '. Url::deviceLink($app->device, null, ['tab' => 'apps', 'app' => $app->app_type]).'
+        <h3 class="panel-title">'.
+        $app_state_info.
+        Url::deviceLink($app->device, null, ['tab' => 'apps', 'app' => $app->app_type]).'
         <div class="pull-right"><small class="muted">'.$app->app_instance.' '.$app->app_status.'</small></div>
         </h3>
         </div>

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Alerting;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Schema;
 
@@ -116,7 +117,7 @@ class QueryBuilderParser implements \JsonSerializable
         foreach ($rules['rules'] as $rule) {
             if (array_key_exists('rules', $rule)) {
                 $tables = array_merge($this->findTablesRecursive($rule), $tables);
-            } elseif (str_contains($rule['field'], '.')) {
+            } elseif (Str::contains($rule['field'], '.')) {
                 list($table, $column) = explode('.', $rule['field']);
 
                 if ($table == 'macros') {
@@ -188,7 +189,7 @@ class QueryBuilderParser implements \JsonSerializable
                 $value = '1';
             } else {
                 // value is a field, mark it with backticks
-                if (starts_with($value, '%')) {
+                if (Str::startsWith($value, '%')) {
                     $value = '`' . ltrim($value, '%') . '`';
                 } else {
                     // but if it has quotes just remove the %
@@ -295,7 +296,7 @@ class QueryBuilderParser implements \JsonSerializable
         $op = self::$operators[$builder_op];
         $value = $rule['value'];
 
-        if (is_string($value) && starts_with($value, '`') && ends_with($value, '`')) {
+        if (is_string($value) && Str::startsWith($value, '`') && Str::endsWith($value, '`')) {
             // pass through value such as field
             $value = trim($value, '`');
             if ($expand) {
@@ -329,14 +330,14 @@ class QueryBuilderParser implements \JsonSerializable
      */
     protected function expandMacro($subject, $tables_only = false, $depth_limit = 20)
     {
-        if (!str_contains($subject, 'macros.')) {
+        if (!Str::contains($subject, 'macros.')) {
             return $subject;
         }
 
         $macros = Config::get('alert.macros.rule');
 
         $count = 0;
-        while ($count++ < $depth_limit && str_contains($subject, 'macros.')) {
+        while ($count++ < $depth_limit && Str::contains($subject, 'macros.')) {
             $subject = preg_replace_callback('/%?macros.([^ =()]+)/', function ($matches) use ($macros) {
                 $name = $matches[1];
                 if (isset($macros[$name])) {
@@ -356,7 +357,7 @@ class QueryBuilderParser implements \JsonSerializable
         $subject = preg_replace('/%([^%.]+)\./', '$1.', $subject);
 
         // wrap entire macro result in parenthesis if needed
-        if (!(starts_with($subject, '(') && ends_with($subject, ')'))) {
+        if (!(Str::startsWith($subject, '(') && Str::endsWith($subject, ')'))) {
             $subject = "($subject)";
         }
 
@@ -406,7 +407,7 @@ class QueryBuilderParser implements \JsonSerializable
             $this->schema->getColumns($parent),
             $this->schema->getColumns($child)
         ), function ($table) {
-            return ends_with($table, '_id');
+            return Str::endsWith($table, '_id');
         });
 
         if (count($shared_keys) === 1) {
@@ -425,7 +426,7 @@ class QueryBuilderParser implements \JsonSerializable
 
         if (!$this->schema->columnExists($child, $child_key)) {
             // if they don't match, guess the column name from the parent
-            if (ends_with($parent, 'xes')) {
+            if (Str::endsWith($parent, 'xes')) {
                 $child_key = substr($parent, 0, -2) . '_id';
             } else {
                 $child_key = preg_replace('/s$/', '_id', $parent);

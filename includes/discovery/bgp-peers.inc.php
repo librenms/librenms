@@ -5,197 +5,12 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 
 if (Config::get('enable_bgp')) {
-    if ($device['os'] == 'vrp') {
-        $vrfs = dbFetchRows('SELECT vrf_id, vrf_name from `vrfs` WHERE device_id = ?', [$device['device_id']]);
-        foreach ($vrfs as $vrf) {
-            $map_vrf['byId'][$vrf['vrf_id']]['vrf_name'] = $vrf['vrf_name'];
-            $map_vrf['byName'][$vrf['vrf_name']]['vrf_id'] = $vrf['vrf_id'];
-        }
-        $bgpPeersCache = snmpwalk_cache_oid($device, 'hwBgpPeers', [], 'HUAWEI-BGP-VPN-MIB');
-        foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode(".", $key);
-            $vrfInstance = $value['hwBgpPeerVrfName'];
-            if ($oid[0] == 0) {
-                $vrfInstance = '';
-                $value['hwBgpPeerVrfName'] = '';
-            }
-            $address = str_replace($oid[0].".".$oid[1].".".$oid[2].".".$oid[3].".", '', $key);
-            if ($oid[3] == 'ipv6') {
-                $address = IP::fromHexString($address)->compressed();
-            } elseif ($oid[3] != 'ipv4') {
-                // we have a malformed OID reply, let's skip it
-                continue;
-            }
-
-            $bgpPeers[$vrfInstance][$address] = $value;
-            $bgpPeers[$vrfInstance][$address]['vrf_id'] = $map_vrf['byName'][$vrfInstance]['vrf_id'];
-            $bgpPeers[$vrfInstance][$address]['afi'] = $oid[1];
-            $bgpPeers[$vrfInstance][$address]['safi'] = $oid[2];
-            $bgpPeers[$vrfInstance][$address]['typePeer'] =  $oid[3];
-        }
-
-        foreach ($bgpPeers as $vrfName => $vrf) {
-            $vrfId = $map_vrf['byName'][$vrfName]['vrf_id'];
-            $checkVrf = ' AND vrf_id = ? ';
-            if (empty($vrfId)) {
-                $checkVrf = ' AND `vrf_id` IS NULL ';
-            }
-
-            foreach ($vrf as $address => $value) {
-                $astext = get_astext($value['hwBgpPeerRemoteAs']);
-                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]) < '1') {
-                    $peers = [
-                        'device_id' => $device['device_id'],
-                        'vrf_id' => $vrfId,
-                        'bgpPeerIdentifier' => $address,
-                        'bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'],
-                        'bgpPeerState' => $value['hwBgpPeerState'],
-                        'bgpPeerAdminStatus' => 'stop',
-                        'bgpLocalAddr' => '0.0.0.0',
-                        'bgpPeerRemoteAddr' => $value['hwBgpPeerRemoteAddr'],
-                        'bgpPeerInUpdates' => 0,
-                        'bgpPeerOutUpdates' => 0,
-                        'bgpPeerInTotalMessages' => 0,
-                        'bgpPeerOutTotalMessages' => 0,
-                        'bgpPeerFsmEstablishedTime' => $value['hwBgpPeerFsmEstablishedTime'],
-                        'bgpPeerInUpdateElapsedTime' => 0,
-                        'astext' => $astext,
-                    ];
-                    if (empty($vrfId)) {
-                        unset($peers['vrf_id']);
-                    }
-                    dbInsert($peers, 'bgpPeers');
-
-                    if (Config::get('autodiscovery.bgp')) {
-                        $name = gethostbyaddr($address);
-                        discover_new_device($name, $device, 'BGP');
-                    }
-                    echo '+';
-                    $vrp_bgp_peer_count ++;
-                } else {
-                    dbUpdate(['bgpPeerRemoteAs' => $value['hwBgpPeerRemoteAs'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-                    echo '.';
-                    $vrp_bgp_peer_count ++;
-                }
-                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', array($device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi'])) < 1) {
-                    $device['context_name'] = $vrfName;
-                    add_cbgp_peer($device, ['ip' => $value['hwBgpPeerRemoteAddr']], $value['afi'], $value['safi']);
-                    unset($device['context_name']);
-                } else {
-                    //nothing to update
-                }
-            }
-        }
-        // clean up peers
-        $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
-        foreach ($peers as $value) {
-            $vrfId = $value['vrf_id'];
-            $checkVrf = ' AND vrf_id = ? ';
-            if (empty($vrfId)) {
-                $checkVrf = ' AND `vrf_id` IS NULL ';
-            }
-            $vrfName = $map_vrf['byId'][$vrfId]['vrf_name'];
-            $address = $value['bgpPeerIdentifier'];
-
-            if ((empty($vrfId) && empty($bgpPeers[''][$address])) ||
-                (!empty($vrfId) && !empty($vrfName) && empty($bgpPeers[$vrfName][$address])) ||
-                (!empty($vrfId) && empty($vrfName))) {
-                $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]);
-
-                echo str_repeat('-', $deleted);
-                echo PHP_EOL;
-            }
-        }
-
-        $af_query = "SELECT bgpPeerIdentifier, afi, safi FROM bgpPeers_cbgp WHERE `device_id`=? AND bgpPeerIdentifier=?";
-        foreach (dbFetchRows($af_query, [$device['device_id'], $peer['ip']]) as $entry) {
-            $afi  = $entry['afi'];
-            $safi = $entry['safi'];
-            $vrfName = $entry['context_name'];
-            if (!exist($bgpPeersCache[$vrfName]) ||
-                    !exist($bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']]) ||
-                    $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['afi']] != $afi ||
-                    $bgpPeersCache[$vrfName][$entry['bgpPeerIdentifier']][$entry['safi']] != $safi) {
-                dbDelete(
-                    'bgpPeers_cbgp',
-                    '`device_id`=? AND `bgpPeerIdentifier`=? AND context_name=? AND afi=? AND safi=?',
-                    [$device['device_id'], $address, $vrfName, $afi, $safi]
-                );
-            }
-        }
-
-        unset($bgpPeersCache);
-        unset($bgpPeers);
-        if ($vrp_bgp_peer_count > 0) {
-            return; //Finish BGP discovery here, cause we collected data
-        }
-        // If not, we continue with standard BGP4 MIB
+    //
+    // Load OS specific file
+    //
+    if (file_exists(Config::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php")) {
+        include Config::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php";
     }
-
-    if ($device['os'] == 'timos') {
-        $bgpPeersCache =snmpwalk_cache_multi_oid($device, 'tBgpPeerNgTable', [], 'TIMETRA-BGP-MIB', 'nokia');
-        foreach ($bgpPeersCache as $key => $value) {
-            $oid = explode(".", $key);
-            $vrfInstance = $oid[0];
-            $address = str_replace($oid[0].".".$oid[1].".", '', $key);
-            if (strlen($address) > 15) {
-                $address = IP::fromHexString($address)->compressed();
-            }
-            $bgpPeers[$vrfInstance][$address] = $value;
-        }
-        unset($bgpPeersCache);
-
-        foreach ($bgpPeers as $vrfOid => $vrf) {
-            $vrfId = dbFetchCell('SELECT vrf_id from `vrfs` WHERE vrf_oid = ?', [$vrfOid]);
-            foreach ($vrf as $address => $value) {
-                $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
-
-                if (dbFetchCell('SELECT COUNT(*) from `bgpPeers` WHERE device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]) < '1') {
-                    $peers = [
-                        'device_id' => $device['device_id'],
-                        'vrf_id' => $vrfId,
-                        'bgpPeerIdentifier' => $address,
-                        'bgpPeerRemoteAs' => $value['tBgpPeerNgPeerAS4Byte'],
-                        'bgpPeerState' => 'idle',
-                        'bgpPeerAdminStatus' => 'stop',
-                        'bgpLocalAddr' => '0.0.0.0',
-                        'bgpPeerRemoteAddr' => '0.0.0.0',
-                        'bgpPeerInUpdates' => 0,
-                        'bgpPeerOutUpdates' => 0,
-                        'bgpPeerInTotalMessages' => 0,
-                        'bgpPeerOutTotalMessages' => 0,
-                        'bgpPeerFsmEstablishedTime' => 0,
-                        'bgpPeerInUpdateElapsedTime' => 0,
-                        'astext' => $astext,
-                    ];
-                    dbInsert($peers, 'bgpPeers');
-                    if (Config::get('autodiscovery.bgp')) {
-                        $name = gethostbyaddr($address);
-                        discover_new_device($name, $device, 'BGP');
-                    }
-                    echo '+';
-                } else {
-                    dbUpdate(['bgpPeerRemoteAs' => $value['tBgpPeerNgPeerAS4Byte'], 'astext' => $astext], 'bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-                    echo '.';
-                }
-            }
-        }
-        // clean up peers
-        $peers = dbFetchRows('SELECT `B`.`vrf_id` AS `vrf_id`, `bgpPeerIdentifier`, `vrf_oid` FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
-        foreach ($peers as $value) {
-            $vrfId = $value['vrf_id'];
-            $vrfOid = $value['vrf_oid'];
-            $address = $value['bgpPeerIdentifier'];
-
-            if (empty($bgpPeers[$vrfOid][$address])) {
-                $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
-
-                echo str_repeat('-', $deleted);
-                echo PHP_EOL;
-            }
-        }
-    }
-    unset($bgpPeers);
 
     if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco'])!=0)) {
         $vrfs_lite_cisco = $device['vrf_lite_cisco'];
@@ -203,7 +18,7 @@ if (Config::get('enable_bgp')) {
         $vrfs_lite_cisco = array(array('context_name'=>''));
     }
 
-    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-Oqvn', 'BGP4-MIB');
+    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
 
     foreach ($vrfs_lite_cisco as $vrf) {
         $device['context_name'] = $vrf['context_name'];
@@ -228,7 +43,7 @@ if (Config::get('enable_bgp')) {
 
             if (empty($peers_data)) {
                 $bgp4_mib = true;
-                $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-Oq', 'BGP4-MIB');
+                $peers_data = preg_replace('/= /', '', snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB'));
             }
         } else {
             echo 'No BGP on host';

@@ -1,6 +1,7 @@
 <?php
 
 require 'includes/html/graphs/common.inc.php';
+$descr_len = 20;
 
 $rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
 

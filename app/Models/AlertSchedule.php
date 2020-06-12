@@ -201,8 +201,7 @@ class AlertSchedule extends Model
                             // Check we are on the correct day of the week
                             ->where(function ($query) use ($now) {
                                 $query->where('recurring_day', 'like', $now->format('%N%'))
-                                    ->orWhereNull('recurring_day')
-                                    ->orWhere('recurring_day', '');
+                                    ->orWhereNull('recurring_day');
                             });
                     });
                 });
@@ -213,11 +212,11 @@ class AlertSchedule extends Model
 
     public function devices()
     {
-        return $this->morphedByMany('App\Models\Device', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphedByMany(\App\Models\Device::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
     }
 
     public function deviceGroups()
     {
-        return $this->morphedByMany('App\Models\DeviceGroup', 'alert_schedulable');
+        return $this->morphedByMany(\App\Models\DeviceGroup::class, 'alert_schedulable');
     }
 }

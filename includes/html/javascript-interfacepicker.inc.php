@@ -6,7 +6,11 @@ var ajax = new Array();
 function getInterfaceList(sel)
 {
         var deviceId = sel.options[sel.selectedIndex].value;
-        document.getElementById('port_id').options.length = 0;     // Empty city select box
+        // Empty city select box
+        var el = document.getElementById('port_id');
+        if (el !== null) {
+            el.options.length = 0;
+        }
         if (deviceId.length>0) {
                 var index = ajax.length;
                 ajax[index] = new sack();

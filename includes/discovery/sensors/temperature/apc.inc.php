@@ -31,7 +31,10 @@ foreach (array_keys($apc_env_data) as $index) {
         $high_warn_limit = ($apc_env_data[$index]['iemConfigProbeHighTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeHighTempThreshold'] : null);
         $high_limit      = ($apc_env_data[$index]['iemConfigProbeMaxTempEnable'] != 1 ? $apc_env_data[$index]['iemConfigProbeMaxTempThreshold'] : null);
 
-        discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        if ($current > 0) {
+            // Temperature = 0 -> Sensor not available
+            discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, $sensorType, $descr, 1, 1, $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $current);
+        }
     }
 }
 

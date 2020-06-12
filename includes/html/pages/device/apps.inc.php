@@ -12,7 +12,16 @@ $link_array = array(
     'tab'    => 'apps',
 );
 
-foreach (dbFetchRows('SELECT * FROM `applications` WHERE `device_id` = ? ORDER BY `app_type` ASC', array($device['device_id'])) as $app) {
+$app_list = [];
+foreach (dbFetchRows('SELECT * FROM `applications` WHERE `device_id` = ?', array($device['device_id'])) as $app) {
+    $app['app_display'] = nicecase($app['app_type']);
+    $app_list[] = $app;
+}
+
+$app_displays = array_column($app_list, 'app_display');
+array_multisort($app_displays, SORT_NATURAL|SORT_FLAG_CASE, $app_list);
+
+foreach ($app_list as $app) {
     echo $sep;
 
     if (!$vars['app']) {
@@ -21,11 +30,18 @@ foreach (dbFetchRows('SELECT * FROM `applications` WHERE `device_id` = ? ORDER B
 
     if ($vars['app'] == $app['app_type']) {
         echo "<span class='pagemenu-selected'>";
-    } else {
     }
 
     $link_add = array('app' => $app['app_type']);
-    $text     = nicecase($app['app_type']);
+
+    $app_state = \LibreNMS\Util\Html::appStateIcon($app['app_state']);
+    if (!empty($app_state['icon'])) {
+        $text = "<font color=\"".$app_state['color']."\"><i title=\"".$app_state['hover_text']."\" class=\"fa ".$app_state['icon']." fa-fw fa-lg\" aria-hidden=\"true\"></i></font>";
+    } else {
+        $text = '';
+    }
+    $text .= $app['app_display'];
+
     if (!empty($app['app_instance'])) {
         $text                .= '('.$app['app_instance'].')';
         $link_add['instance'] = $app['app_id'];

@@ -27,6 +27,7 @@ namespace LibreNMS\Snmptrap;
 
 use App\Models\Device;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use LibreNMS\Snmptrap\Handlers\Fallback;
 use LibreNMS\Util\IP;
 use Log;
@@ -79,7 +80,7 @@ class Trap
     public function findOid($search)
     {
         return $this->oid_data->keys()->first(function ($oid) use ($search) {
-            return str_contains($oid, $search);
+            return Str::contains($oid, $search);
         });
     }
 
@@ -91,7 +92,7 @@ class Trap
     public function findOids($search)
     {
         return $this->oid_data->keys()->filter(function ($oid) use ($search) {
-            return str_contains($oid, $search);
+            return Str::contains($oid, $search);
         })->all();
     }
 
