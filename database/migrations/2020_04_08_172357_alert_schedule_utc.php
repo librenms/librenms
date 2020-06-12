@@ -12,11 +12,13 @@ class AlertScheduleUtc extends Migration
      */
     public function up()
     {
-        DB::table('alert_schedule')->update([
-            'start' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(start_recurring_dt, ' ', start_recurring_hr), '%Y-%m-%d %H:%i:%s'), start), @@global.time_zone, '+00:00')"),
-            'end' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(IFNULL(end_recurring_dt, '9000-09-09'), ' ', end_recurring_hr), '%Y-%m-%d %H:%i:%s'), end), @@global.time_zone, '+00:00')"),
-            'recurring_day' => DB::raw('REPLACE(recurring_day, 0, 7)'), // convert to RFC N date format
-        ]);
+        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            DB::table('alert_schedule')->update([
+                'start' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(start_recurring_dt, ' ', start_recurring_hr), '%Y-%m-%d %H:%i:%s'), start), @@global.time_zone, '+00:00')"),
+                'end' => DB::raw("CONVERT_TZ(IF(`recurring` = 1, STR_TO_DATE(CONCAT(IFNULL(end_recurring_dt, '9000-09-09'), ' ', end_recurring_hr), '%Y-%m-%d %H:%i:%s'), end), @@global.time_zone, '+00:00')"),
+                'recurring_day' => DB::raw('REPLACE(recurring_day, 0, 7)'), // convert to RFC N date format
+            ]);
+        }
 
         Schema::table('alert_schedule', function (Blueprint $table) {
             $table->dropColumn(['start_recurring_dt', 'start_recurring_hr', 'end_recurring_dt', 'end_recurring_hr']);
@@ -37,14 +39,16 @@ class AlertScheduleUtc extends Migration
             $table->time('end_recurring_hr')->nullable(false)->default('00:00:00')->after('end_recurring_dt');
         });
 
-        DB::table('alert_schedule')->update([
-            'start' => DB::raw("CONVERT_TZ(start, '+00:00', @@global.time_zone)"),
-            'end' => DB::raw("CONVERT_TZ(end, '+00:00', @@global.time_zone)"),
-            'start_recurring_dt' => DB::raw("DATE(CONVERT_TZ(start, '+00:00', @@global.time_zone))"),
-            'start_recurring_hr' => DB::raw("TIME(CONVERT_TZ(start, '+00:00', @@global.time_zone))"),
-            'end_recurring_dt' => DB::raw("DATE(CONVERT_TZ(end, '+00:00', @@global.time_zone))"),
-            'end_recurring_hr' => DB::raw("TIME(CONVERT_TZ(end, '+00:00', @@global.time_zone))"),
-            'recurring_day' => DB::raw('REPLACE(recurring_day, 7, 0)'),
-        ]);
+        if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+            DB::table('alert_schedule')->update([
+                'start' => DB::raw("CONVERT_TZ(start, '+00:00', @@global.time_zone)"),
+                'end' => DB::raw("CONVERT_TZ(end, '+00:00', @@global.time_zone)"),
+                'start_recurring_dt' => DB::raw("DATE(CONVERT_TZ(start, '+00:00', @@global.time_zone))"),
+                'start_recurring_hr' => DB::raw("TIME(CONVERT_TZ(start, '+00:00', @@global.time_zone))"),
+                'end_recurring_dt' => DB::raw("DATE(CONVERT_TZ(end, '+00:00', @@global.time_zone))"),
+                'end_recurring_hr' => DB::raw("TIME(CONVERT_TZ(end, '+00:00', @@global.time_zone))"),
+                'recurring_day' => DB::raw('REPLACE(recurring_day, 7, 0)'),
+            ]);
+        }
     }
 }
