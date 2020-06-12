@@ -198,7 +198,7 @@ availability:
     - { Field: availability_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: duration, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: availability_perc, Type: float, 'Null': false, Extra: '', Default: '0' }
+    - { Field: availability_perc, Type: 'double(3,6)', 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [availability_id], Unique: true, Type: BTREE }
     availability_device_id_index: { Name: availability_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -578,7 +578,7 @@ device_outages:
   Columns:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: up_again, Type: biging, 'Null': true, Extra: '' }
+    - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }

@@ -23,7 +23,7 @@ class CreateDeviceOutagesTable extends Migration
             $table->increments('availability_id');
             $table->unsignedInteger('device_id')->index();
             $table->bigInteger('duration');
-            $table->float('availability_perc')->default(0);
+            $table->float('availability_perc', 3, 6)->default(0);
             $table->unique(['device_id','duration']);
         });
     }
