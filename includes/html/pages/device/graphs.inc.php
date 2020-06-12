@@ -82,6 +82,5 @@ if (is_file("includes/html/pages/device/graphs/$group.inc.php")) {
             }
         }
     }
-
 }
 $pagetitle[] = 'Graphs';

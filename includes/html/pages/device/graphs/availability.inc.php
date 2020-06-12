@@ -6,7 +6,6 @@ $row = 1;
 
 $duration_list = dbFetchRows("SELECT * FROM `availability` WHERE `device_id` = ? ORDER BY `duration`", array($device['device_id']));
 foreach ($duration_list as $duration) {
-
     if (is_integer($row / 2)) {
         $row_colour = \LibreNMS\Config::get('list_colour.even');
     } else {

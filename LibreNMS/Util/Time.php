@@ -89,7 +89,8 @@ class Time
      * @param integer seconds of a time period
      * @return string human readably time period
      */
-    public static function humanTime($s) {
+    public static function humanTime($s)
+    {
 
         $ret = [];
 

@@ -27,20 +27,20 @@ if (isset($device['uptime']) && ($device['uptime'] > 0 )) {
         $avail = \LibreNMS\Device\Availability::availability($device, $row['duration']);
         $human_time = \LibreNMS\Util\Time::humanTime($row['duration']);
 
-     $rrd_name = array('availability', $row['duration']);
-     $rrd_def = RrdDefinition::make()
-         ->addDataset('availability', 'GAUGE', 0);
+        $rrd_name = array('availability', $row['duration']);
+        $rrd_def = RrdDefinition::make()
+            ->addDataset('availability', 'GAUGE', 0);
 
-     $fields = array(
-         'availability' => $avail,
-     );
+         $fields = array(
+             'availability' => $avail,
+         );
 
-     $tags = array('name' => $row['duration'], 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
-     data_update($device, 'availability', $tags, $fields);
+         $tags = array('name' => $row['duration'], 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
+         data_update($device, 'availability', $tags, $fields);
 
-     dbUpdate(array('availability_perc' => $avail), 'availability', '`availability_id` = ?', array($row['availability_id']));
+         dbUpdate(array('availability_perc' => $avail), 'availability', '`availability_id` = ?', array($row['availability_id']));
 
-     echo $human_time . ' : ' . $avail . '%'. PHP_EOL;
+         echo $human_time . ' : ' . $avail . '%'. PHP_EOL;
     }
     unset($duration);
 }
