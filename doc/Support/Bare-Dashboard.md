@@ -1,7 +1,7 @@
 source: Support/Bare-Dashboard.md
 path: blob/master/doc/
 
-Hide Menubar
+# Hide Menubar
 
 To hide Menubar e.g. for Monitoring TV Screens
 attach `?bare=yes` on URL
