@@ -32,7 +32,7 @@ class Gigamon extends OS implements OSDiscovery
 {
     public function discoverOS(): void
     {
-	$device = $this->getDeviceModel();
+        $device = $this->getDeviceModel();
         $info = snmp_getnext_multi($this->getDevice(), 'version serialNumber', '-OQUs', 'GIGAMON-SNMP-MIB');
         $device->version = $info['version'];
         $device->serial = $info['serialNumber'];
