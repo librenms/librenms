@@ -36,7 +36,6 @@ class Gigamon extends OS implements OSDiscovery
         $info = snmp_getnext_multi($this->getDevice(), 'version serialNumber', '-OQUs', 'GIGAMON-SNMP-MIB');
         $device->version = $info['version'];
         $device->serial = $info['serialNumber'];
-        #$device->hardware = "GIGAMON " . $device->sysDescr;
         $device->hardware = $device->sysDescr;
     }
 }
