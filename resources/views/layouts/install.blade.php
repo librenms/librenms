@@ -35,6 +35,17 @@
             border-bottom: 1px solid #f6f6f6;
             margin-bottom: 20px;
         }
+        #progress-icons {
+            padding-left: 0;
+            padding-right: 0;
+        }
+        .install-progress {
+            margin-top: auto;
+            margin-bottom: auto;
+            height: 10px;
+            width: 100%;
+            background-color: gray;
+        }
     </style>
     @yield('style')
 </head>
@@ -45,8 +56,9 @@
             <img class="card-img-top p-3" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_" . \LibreNMS\Config::get('applied_site_style') . ".svg")) }}" alt="LibreNMS">
             <span class="h2">@yield('title')</span>
         </div>
-        <div class="card-body">
-            <div class="d-flex flex-row justify-content-around">
+        <div class="card-body pl-0 pr-0">
+            <div id="progress-icons" class="d-flex flex-row justify-content-around">
+                <div class="install-progress"></div>
                 @foreach($steps as $step => $controller)
                     <div>
                         <a href="{{ route('install.' . $step) }}"
@@ -57,6 +69,7 @@
                             <i class="fa fa-lg {{ $controller::icon() }}"></i>
                         </a>
                     </div>
+                    <div class="install-progress"></div>
                 @endforeach
             </div>
             <div class="content-divider"></div>
