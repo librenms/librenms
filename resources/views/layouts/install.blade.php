@@ -18,7 +18,7 @@
         .primary-panel {
             padding: 0;
             border:0;
-            box-shadow: 0 0 30px #222;
+            box-shadow: 3px 3px 30px #222;
             min-height: 540px;
         }
 
@@ -32,44 +32,44 @@
             box-shadow: 2px 2px 4px grey;
         }
 
-        .content-divider {
-            padding-top: 20px;
-            border-bottom: 1px solid #f6f6f6;
-            margin-bottom: 20px;
-        }
-
         .card-img-top {
-            background-color: #0794C8;
+            background-color: #EEEEEE;
         }
         #progress-icons {
-            background: linear-gradient(to bottom, #0794C8 50%, white 50%)
+            background: linear-gradient(to bottom, #EEEEEE 50%, white 50%)
         }
-        #progress-icons .btn {
+        .btn-circle {
             background-color: #70A9A1;
             border-color: #66A39B;
         }
-        #progress-icons .btn:hover {
+        .btn-circle:hover {
             background-color: #548C85;
             border-color: #4D807A;
         }
-        #progress-icons .btn.disabled {
+        .btn-circle.disabled {
             opacity: 1;
             background-color: #A6C9C5;
             border-color: #9AC1BC;
         }
 
         .install-progress {
-            margin-top: auto;
-            margin-bottom: auto;
+            margin: auto -1px auto 0;
             height: 14px;
+            display: inline-block;
             width: 100%;
             background-color: lightgray;
             box-shadow:
                 inset 0 6px 4px -5px black,
                 inset 0 -6px 4px -7px black;
         }
+        .install-progress.loop {
+            box-shadow:
+                inset 0 6px 4px -5px black,
+                inset 0 -6px 4px -7px black,
+                inset 8px 0 4px -6px grey; /* missing button shadow */
+        }
         .install-progress.complete {
-            background-color: yellowgreen;
+            background-color: #db202e;
         }
 
         #step-title {
@@ -82,7 +82,7 @@
 <div class="container">
     <div class="card col-lg-8 offset-lg-2 col-md-10 offset-md-1 col-12 primary-panel">
         <div class="card-img-top">
-            <img class="card-img-top p-4" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_dark.svg")) }}" alt="LibreNMS">
+            <img class="card-img-top p-4" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_light.svg")) }}" alt="LibreNMS">
             <div id="progress-icons" class="d-flex flex-row justify-content-around">
                 <div class="install-progress complete"></div>
                 @foreach($steps as $step => $controller)
@@ -95,7 +95,7 @@
                             <i class="fa fa-lg {{ $controller::icon() }}"></i>
                         </a>
                     </div>
-                    <div class="install-progress"></div>
+                    <div class="install-progress loop"></div>
                 @endforeach
             </div>
         </div>
