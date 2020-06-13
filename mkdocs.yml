@@ -78,6 +78,7 @@ nav:
       - SNMP Proxy: Extensions/SNMP-Proxy.md
       - SNMP Trap Handler: Extensions/SNMP-Trap-Handler.md
       - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
+      - Bare Dashboard: Support/Bare-Dashboard.md
       - Cleanup Options: Support/Cleanup-options.md
   - 6. 3rd Party Integration:
       - Gateone: Extensions/Gateone.md
