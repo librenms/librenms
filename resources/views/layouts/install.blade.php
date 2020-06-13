@@ -11,13 +11,15 @@
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap4.min.js') }}"></script>
     <style type="text/css">
-        .primary-panel {
-            box-shadow: 0 0 25px #333;
-            min-height: 540px;
+        body {
+            background-color: #046C8B;
         }
 
-        body {
-            background-color: #047396;
+        .primary-panel {
+            padding: 0;
+            border:0;
+            box-shadow: 0 0 30px #222;
+            min-height: 540px;
         }
 
         .btn-circle {
@@ -35,16 +37,43 @@
             border-bottom: 1px solid #f6f6f6;
             margin-bottom: 20px;
         }
-        #progress-icons {
-            padding-left: 0;
-            padding-right: 0;
+
+        .card-img-top {
+            background-color: #0794C8;
         }
+        #progress-icons {
+            background: linear-gradient(to bottom, #0794C8 50%, white 50%)
+        }
+        #progress-icons .btn {
+            background-color: #70A9A1;
+            border-color: #66A39B;
+        }
+        #progress-icons .btn:hover {
+            background-color: #548C85;
+            border-color: #4D807A;
+        }
+        #progress-icons .btn.disabled {
+            opacity: 1;
+            background-color: #A6C9C5;
+            border-color: #9AC1BC;
+        }
+
         .install-progress {
             margin-top: auto;
             margin-bottom: auto;
-            height: 10px;
+            height: 14px;
             width: 100%;
-            background-color: gray;
+            background-color: lightgray;
+            box-shadow:
+                inset 0 6px 4px -5px black,
+                inset 0 -6px 4px -7px black;
+        }
+        .install-progress.complete {
+            background-color: yellowgreen;
+        }
+
+        #step-title {
+            padding-bottom: 20px;
         }
     </style>
     @yield('style')
@@ -52,13 +81,10 @@
 <body>
 <div class="container">
     <div class="card col-lg-8 offset-lg-2 col-md-10 offset-md-1 col-12 primary-panel">
-        <div class="card-header text-center" style="margin: 0 -20px">
-            <img class="card-img-top p-3" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_" . \LibreNMS\Config::get('applied_site_style') . ".svg")) }}" alt="LibreNMS">
-            <span class="h2">@yield('title')</span>
-        </div>
-        <div class="card-body pl-0 pr-0">
+        <div class="card-img-top">
+            <img class="card-img-top p-4" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_dark.svg")) }}" alt="LibreNMS">
             <div id="progress-icons" class="d-flex flex-row justify-content-around">
-                <div class="install-progress"></div>
+                <div class="install-progress complete"></div>
                 @foreach($steps as $step => $controller)
                     <div>
                         <a href="{{ route('install.' . $step) }}"
@@ -72,7 +98,13 @@
                     <div class="install-progress"></div>
                 @endforeach
             </div>
-            <div class="content-divider"></div>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h2 id="step-title">@yield('title')</h2>
+                </div>
+            </div>
             <div class="row">
                 <div id="error-box" class="col-12">
                     @if(!empty($messages))
