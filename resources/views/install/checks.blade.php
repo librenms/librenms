@@ -8,10 +8,10 @@
             <div class="checks card ">
                 <div class="card-body">
                     <div class="row bg-light check-row">
-                        <div class="col-8">
+                        <div class="col-7">
                             PHP <small>(@lang('install.checks.php_required', ['version' => $php_required]))</small>
                         </div>
-                        <div class="col-4 text-right text-nowrap @if($php_ok) green @else red @endif">
+                        <div class="col-5 text-right text-nowrap @if($php_ok) green @else red @endif">
                             {{ $php_version }}
                             @if($php_ok)
                                 <i class="fa fa-lg fa-check-square-o green align-middle"></i>
@@ -24,10 +24,10 @@
 
                     @foreach($modules as $module)
                     <div class="row check-row border-top">
-                        <div class="col-8">
+                        <div class="col-7">
                             {{ $module['name'] }}
                         </div>
-                        <div class="col-4 text-right">
+                        <div class="col-5 text-right">
                             @if($module['status'])
                                 <i class="fa fa-lg fa-check-square-o green align-middle"></i>
                             @else
