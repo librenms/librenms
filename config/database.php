@@ -23,7 +23,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', env('APP_ENV') == 'testing' ? 'testing' : 'mysql'),
+    'default' => env('DB_CONNECTION', env('DBTEST') ? 'testing' : 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
