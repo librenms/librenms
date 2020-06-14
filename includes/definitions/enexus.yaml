@@ -16,7 +16,7 @@ discovery:
     - snmpget:
           oid: .1.3.6.1.4.1.12148.10.2.6.0
           op: regex
-          value: '/Micropack System|Smartpack S/'
+          value: '/Micropack System|Smartpack S|SPS-FPS/'
 poller_modules:
     entity-physical: false
     hr-mib: false
