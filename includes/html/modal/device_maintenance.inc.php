@@ -78,7 +78,8 @@ foreach ($hour_steps as $hour) {
                         </div>
                     </div>
                     <div class="form-group">
-                        <div class="col-sm-offset-3 col-sm-3">
+                        <label for="maintenance-submit" class="col-sm-4 control-label"></label>
+                        <div class="col-sm-8">
                             <button type="submit" id="maintenance-submit" data-device_id="<?php echo($device['device_id']); ?>" <?php echo(\LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"')?> name="maintenance-submit"><i class="fa fa-wrench"></i> Start Maintenance</button>
                         </div>
                     </div>
