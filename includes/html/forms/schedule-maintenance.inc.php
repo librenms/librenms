@@ -139,7 +139,7 @@ if ($sub_type == 'new-maintenance') {
             $fail  = 0;
 
             if ($update == 1) {
-                dbDelete('alert_schedulables', '`schedule_id`=?', array($schedule_id));
+                dbDelete('alert_schedulables', '`schedule_id`=?', [$alert_schedule->schedule_id]);
             }
 
             foreach ($_POST['maps'] as $target) {
@@ -152,7 +152,7 @@ if ($sub_type == 'new-maintenance') {
                     $target = substr($target, 1);
                 }
 
-                $item = dbInsert(['schedule_id' => $schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
+                $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
                 if ($notes && $type = 'device' && get_user_pref('add_schedule_note_to_device', false)) {
                     $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
                     $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
@@ -170,7 +170,7 @@ if ($sub_type == 'new-maintenance') {
                     dbDelete('alert_schedulables', '`item_id`=?', array($item));
                 }
 
-                dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
+                dbDelete('alert_schedule', '`schedule_id`=?', [$alert_schedule->schedule_id]);
                 $message = 'Issue scheduling maintenance';
             } else {
                 $status  = 'ok';

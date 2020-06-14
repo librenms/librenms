@@ -307,7 +307,8 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 <script>
     $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
 
-    $("#maintenance").click(function() {
+    $("#maintenance").click(function(event) {
+        event.preventDefault();
         var device_id = $(this).data("device_id");
         var title = '<?=display($device['hostname']);?>';
         var notes = '';
