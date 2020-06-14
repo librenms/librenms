@@ -34,13 +34,13 @@ you select the same option when they are presented.
     === "NGINX"
         ```
         dnf install epel-release
-        dnf install bash-completion cronie fping git nginx ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool
+dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached rrdtool
         ```
     
     === "Apache"
         ```
         dnf install epel-release
-        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
+        dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached rrdtool unzip
         ```
 
 === "Debian 10"
@@ -394,7 +394,12 @@ listen = /run/php-fpm-librenms.sock;
     SELinux not enabled by default
 
 === "CentOS 8"
-    
+    Install the policy tool for SELinux:	
+
+    ```	
+    dnf install policycoreutils-python-utils	
+    ``` 
+
     ## Configure the contexts needed by LibreNMS:
     
     ```
@@ -452,7 +457,7 @@ listen = /run/php-fpm-librenms.sock;
     firewall-cmd --permanent --zone public --add-service http --add-service https
     ```
 
-# Enable lnms command auto-completion
+# Enable lnms command completion
 
 This feature grants you the opportunity to use tab for completion on lnms commands as you would
 for normal linux commands.
@@ -520,24 +525,6 @@ to the file. Run:
 ```
 chown librenms:librenms /opt/librenms/config.php
 ```
-
-# Set location to fping6
-
-On the validate screen, <http://librenms.example.com/validate> 
-you might get a message like this:
-
-```
-fping6 location is incorrect or bin not installed.
-```
-
-=== "Ubuntu 20.04 / Debian 10"
-    This is not a known problem in this distro.
-=== "CentOS 8"
-    To fix this: copy the following line to `config.php`:
-
-    ```
-    $config['fping6'] = '/usr/sbin/fping';
-    ```
 
 # Final steps
 
