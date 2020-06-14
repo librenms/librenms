@@ -395,11 +395,11 @@ listen = /run/php-fpm-librenms.sock;
 
 === "CentOS 8"
     Install the policy tool for SELinux:
-    
+
     ```
     dnf install policycoreutils-python-utils
     ```
-    
+
     ## Configure the contexts needed by LibreNMS:
     
     ```
@@ -458,6 +458,9 @@ listen = /run/php-fpm-librenms.sock;
     ```
 
 # Enable lnms command completion
+
+This feature grants you the opportunity to use tab for completion on lnms commands as you would
+for normal linux commands.
 
 ```
 ln -s /opt/librenms/lnms /usr/local/bin/lnms
