@@ -5,7 +5,7 @@
             @if($parent_id)
                 <a href="{{ route('device', $parent_id) }}" title="@lang('VM Host')"><i class="fa fa-server fa-fw fa-lg"></i></a>
             @endif
-            @if(\LibreNMS\Alert\AlertUtil::isMaintenance($device_id))
+            @if($device->isUnderMaintenance())
                 <span title="@lang('Scheduled Maintenance')" class="fa fa-wrench fa-fw fa-lg"></span>
             @endif
             <span style="font-size: 20px;">@deviceLink($device)</span><br/>

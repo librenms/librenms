@@ -31,6 +31,7 @@ use Date;
 use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class AlertSchedule extends Model
 {
@@ -167,7 +168,7 @@ class AlertSchedule extends Model
         // check inside start and end times or outside start and end times (if we span a day)
         $active = $spans_days ? ($after_start && ($now_time < $end_time || $now_time >= $start_time)) : ($now_time >= $start_time && $now_time < $end_time);
 
-        return $active && str_contains($this->attributes['recurring_day'], $now->format('N')) ? self::SCHEDULE_ACTIVE : self::SCHEDULE_SET;
+        return $active && Str::contains($this->attributes['recurring_day'], $now->format('N')) ? self::SCHEDULE_ACTIVE : self::SCHEDULE_SET;
     }
 
     // ---- Query scopes ----
@@ -212,11 +213,16 @@ class AlertSchedule extends Model
 
     public function devices()
     {
-        return $this->morphedByMany(\App\Models\Device::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->morphedByMany(\App\Models\Device::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 
     public function deviceGroups()
     {
-        return $this->morphedByMany(\App\Models\DeviceGroup::class, 'alert_schedulable');
+        return $this->morphedByMany(\App\Models\DeviceGroup::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
+    }
+
+    public function locations()
+    {
+        return $this->morphedByMany(\App\Models\Location::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'alert_schedulable_id');
     }
 }
