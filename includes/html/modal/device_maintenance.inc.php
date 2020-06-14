@@ -29,7 +29,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
     die('ERROR: You need to be admin');
 }
 
-$hour_steps = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+$hour_steps = range(0, 23, 1);
 $minute_steps = [0, 30];
 $exclude_durations = ['0:00'];
 
