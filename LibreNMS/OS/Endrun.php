@@ -1,8 +1,8 @@
 <?php
 /**
- * Gigavue.php
+ * EndRun.php
  *
- * Gigamon GigaVUE OS
+ * EndRun Technologies 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
  *
  * @package    LibreNMS
  * @link       http://librenms.org
- * @copyright  2020 Hans Erasmus
- * @author     Hans Erasmus <erasmushans27@gmail.com>
+ * @copyright  2020 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
@@ -28,14 +28,16 @@ namespace LibreNMS\OS;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
 
-class Gigamon extends OS implements OSDiscovery
+class Endrun extends OS implements OSDiscovery
 {
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-        $info = snmp_getnext_multi($this->getDevice(), 'version serialNumber', '-OQUs', 'GIGAMON-SNMP-MIB');
-        $device->version = $info['version'];
-        $device->serial = $info['serialNumber'];
-        $device->hardware = $device->sysDescr;
+        $info = snmp_getnext_multi($this->getDevice(), 'cntpVersion', '-OQUs', 'TEMPUSLXUNISON-MIB');
+        #$device->version = $info['version'];
+        $device->version = $info['cntpVersion'];
+        #$device->serial = $info['serialNumber'];
+//        $device->hardware = "EndRun" . $device->sysDescr;
+        $device->hardware = "EndRun" . $device->version;
     }
 }
