@@ -1521,13 +1521,13 @@ SNMP extend script to monitor PureFTPd.
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
 ```
-extend pureftpd /etc/snmp/pureftpd.py
+extend pureftpd sudo /etc/snmp/pureftpd.py
 ```
 
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /usr/sbin/pure-ftpwho
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/pureftpd.py
 ```
 or the path where your pure-ftpwho is located
 
@@ -1561,7 +1561,7 @@ SNMP extend script to get your PI data into your host.
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
 ```
-extend raspberry /etc/snmp/raspberry.sh
+extend raspberry sudo /etc/snmp/raspberry.sh
 ```
 
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
@@ -1949,7 +1949,14 @@ echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
 chmod +x /etc/snmp/zfs-linux
-echo "extend zfs /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
+echo "extend zfs sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
 ```
+
+Edit your sudo users (usually `visudo`) and add at the bottom:
+
+```
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/zfs-linux
+```
+
 
 Now restart snmpd and you're all set.
