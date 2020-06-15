@@ -40,11 +40,14 @@ class Smartax extends OS implements ProcessorDiscovery
     {
         $proc_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.5.0';
         $descr_oid = '1.3.6.1.4.1.2011.2.6.7.1.1.2.1.7.0';
+
         $data = snmpwalk_array_num($this->getDevice(), $proc_oid);
         $descr_data = snmpwalk_array_num($this->getDevice(), $descr_oid);
+
         // remove first array
         $data = reset($data);
         $descr_data = reset($descr_data);
+
         $processors = [];
         foreach ($data as $index => $value) {
             if ($value != -1) {
@@ -60,6 +63,7 @@ class Smartax extends OS implements ProcessorDiscovery
                 );
             }
         }
+
         return $processors;
     }
 }
