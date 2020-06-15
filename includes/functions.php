@@ -337,6 +337,8 @@ function compare_var($a, $b, $comparison = '=')
             return in_array($a, $b);
         case "not_in_array":
             return !in_array($a, $b);
+        case "exists":
+            return isset($a) == $b;
         default:
             return false;
     }

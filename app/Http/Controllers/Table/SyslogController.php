@@ -56,6 +56,11 @@ class SyslogController extends TableController
         ];
     }
 
+    public function sortFields($request)
+    {
+        return ['label', 'timestamp', 'level', 'device_id', 'program', 'msg', 'priority'];
+    }
+
     /**
      * Defines the base query for this resource
      *
