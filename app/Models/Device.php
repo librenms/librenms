@@ -203,9 +203,10 @@ class Device extends BaseModel
         return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
-    public function formatUptime($short = false)
+    public function formatDownUptime($short = false)
     {
-        return Time::formatInterval($this->uptime, $short);
+        $time = ($this->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
+        return Time::formatInterval($time, $short);
     }
 
     /**
