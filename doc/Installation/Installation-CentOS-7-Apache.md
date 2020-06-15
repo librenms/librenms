@@ -37,7 +37,7 @@ yum-config-manager --enable remi-php73
 Install the required packages
 
 ```
-yum install mod_php php-cli php-common php-curl php-gd php-mbstring php-process php-snmp php-xml php-zip php-memcached php-mysqlnd
+yum install php73 mod_php php-cli php-common php-curl php-gd php-mbstring php-process php-snmp php-xml php-zip php-memcached php-mysqlnd
 ```
 
 #### Running with CentOS SCL php
