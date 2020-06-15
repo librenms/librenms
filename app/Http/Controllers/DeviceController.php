@@ -55,16 +55,11 @@ class DeviceController extends Controller
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
 
-    public function index(Request $request, $device_id, $current_tab = 'overview', $vars = '')
+    public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
-        $device_id = str_replace('device=', '', $device_id);
-        if (is_numeric($device_id)) {
-            $device_id = (int)$device_id;
-            $device = DeviceCache::get($device_id);
-        } else {
-            $device = DeviceCache::getByHostname($device_id);
-            $device_id = $device->device_id;
-        }
+        $device = str_replace('device=', '', $device);
+        $device = is_numeric($device) ? DeviceCache::get($device) : DeviceCache::getByHostname($device);
+        $device_id = $device->device_id;
         DeviceCache::setPrimary($device_id);
 
         if (!$device->exists) {
