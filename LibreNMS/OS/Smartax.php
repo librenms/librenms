@@ -22,6 +22,7 @@
  * @copyright  2018 TheGreatDoc
  * @author     TheGreatDoc <doctoruve@gmail.com>
  */
+
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\Processor;
