@@ -103,10 +103,6 @@ alert_schedule:
     - { Field: recurring, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: start, Type: datetime, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
     - { Field: end, Type: datetime, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
-    - { Field: start_recurring_dt, Type: date, 'Null': false, Extra: '', Default: '1970-01-01' }
-    - { Field: end_recurring_dt, Type: date, 'Null': true, Extra: '' }
-    - { Field: start_recurring_hr, Type: time, 'Null': false, Extra: '', Default: '00:00:00' }
-    - { Field: end_recurring_hr, Type: time, 'Null': false, Extra: '', Default: '00:00:00' }
     - { Field: recurring_day, Type: varchar(15), 'Null': true, Extra: '' }
     - { Field: title, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: notes, Type: text, 'Null': false, Extra: '' }
@@ -1326,6 +1322,28 @@ poller_cluster:
     - { Field: poller_groups, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
     - { Field: last_report, Type: datetime, 'Null': false, Extra: '' }
     - { Field: master, Type: tinyint, 'Null': false, Extra: '' }
+    - { Field: poller_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: poller_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: poller_workers, Type: int, 'Null': true, Extra: '' }
+    - { Field: poller_down_retry, Type: int, 'Null': true, Extra: '' }
+    - { Field: discovery_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: discovery_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: discovery_workers, Type: int, 'Null': true, Extra: '' }
+    - { Field: services_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: services_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: services_workers, Type: int, 'Null': true, Extra: '' }
+    - { Field: billing_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: billing_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: billing_calculate_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: alerting_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: alerting_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: ping_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: ping_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: update_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: update_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: loglevel, Type: varchar(8), 'Null': true, Extra: '' }
+    - { Field: watchdog_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: watchdog_log, Type: varchar(255), 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     poller_cluster_node_id_unique: { Name: poller_cluster_node_id_unique, Columns: [node_id], Unique: true, Type: BTREE }

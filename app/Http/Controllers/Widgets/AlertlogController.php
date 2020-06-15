@@ -34,7 +34,8 @@ class AlertlogController extends WidgetController
         'title' => null,
         'device_id' => '',
         'state' => -1,
-        'min_severity' => null
+        'min_severity' => null,
+        'hidenavigation' => 0,
     ];
 
     public function getView(Request $request)
