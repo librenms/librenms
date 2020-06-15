@@ -114,35 +114,35 @@ class FdbTablesController extends TableController
         $sort = $request->get('sort');
 
         if (isset($sort['mac_address'])) {
-            $query->orderBy('mac_address', $sort['mac_address']);
+            $query->orderBy('mac_address', $sort['mac_address'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['device'])) {
             $query->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
-                ->orderBy('hostname', $sort['device']);
+                ->orderBy('hostname', $sort['device'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['vlan'])) {
             $query->leftJoin('vlans', 'ports_fdb.vlan_id', 'vlans.vlan_id')
-                ->orderBy('vlan_vlan', $sort['vlan']);
+                ->orderBy('vlan_vlan', $sort['vlan'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['interface'])) {
             $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
-                ->orderBy('ports.ifDescr', $sort['interface']);
+                ->orderBy('ports.ifDescr', $sort['interface'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['description'])) {
             $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
-                ->orderBy('ports.ifDescr', $sort['description']);
+                ->orderBy('ports.ifDescr', $sort['description'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['last_seen'])) {
-            $query->orderBy('updated_at', $sort['last_seen']);
+            $query->orderBy('updated_at', $sort['last_seen'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['first_seen'])) {
-            $query->orderBy('created_at', $sort['first_seen']);
+            $query->orderBy('created_at', $sort['first_seen'] == 'desc' ? 'desc' : 'asc');
         }
 
         return $query;
@@ -163,7 +163,7 @@ class FdbTablesController extends TableController
             'first_seen' => 'unknown',
             'last_seen' => 'unknown'
         ];
-        
+
         // diffForHumans and doDateTimeString are not safe
         if ($fdb_entry->updated_at) {
             $item['last_seen'] = $fdb_entry->updated_at->diffForHumans();

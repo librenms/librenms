@@ -55,6 +55,11 @@ class EventlogController extends TableController
         ];
     }
 
+    protected function sortFields($request)
+    {
+        return ['datetime', 'type', 'device_id', 'message', 'username'];
+    }
+
     /**
      * Defines the base query for this resource
      *

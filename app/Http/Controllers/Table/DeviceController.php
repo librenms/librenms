@@ -67,6 +67,11 @@ class DeviceController extends TableController
         return ['sysName', 'hostname', 'hardware', 'os', 'locations.location'];
     }
 
+    protected function sortFields($request)
+    {
+        return ['status', 'icon', 'hostname', 'hardware', 'os', 'uptime', 'location'];
+    }
+
     /**
      * Defines the base query for this resource
      *
