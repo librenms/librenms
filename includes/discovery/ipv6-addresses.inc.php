@@ -41,13 +41,18 @@ foreach ($vrfs_lite_cisco as $vrf) {
             $ipv6_prefixlen = explode('.', $ipv6_prefixlen);
             $ipv6_prefixlen = str_replace('"', '', end($ipv6_prefixlen));
 
+            if (Str::contains($ipv6_prefixlen, 'SNMPv2-SMI::zeroDotZero')) {
+                d_echo('Incomplete IPv6 data in IF-MIB');
+                $oids = trim(Str::replaceFirst($data, '', $oids));
+            }
+            
             $ipv6_origin = snmp_get($device, ".1.3.6.1.2.1.4.34.1.6.2.16.$oid", '-Ovq', 'IP-MIB');
 
             discover_process_ipv6($valid, $ifIndex, $ipv6_address, $ipv6_prefixlen, $ipv6_origin, $device['context_name']);
         } //end if
     } //end foreach
 
-    if (!$oids) {
+    if (empty($oids)) {
         $oids = snmp_walk($device, 'ipv6AddrPfxLength', ['-OsqnU', '-Ln'], 'IPV6-MIB');
         $oids = str_replace('.1.3.6.1.2.1.55.1.8.1.2.', '', $oids);
         $oids = str_replace('"', '', $oids);
