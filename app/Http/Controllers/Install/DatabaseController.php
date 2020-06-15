@@ -25,11 +25,14 @@
 
 namespace App\Http\Controllers\Install;
 
+use App\StreamedOutput;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Interfaces\InstallerStep;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
-class DatabaseController extends InstallationController
+class DatabaseController extends InstallationController implements InstallerStep
 {
     const KEYS = ['host', 'username', 'password', 'database', 'port', 'unix_socket'];
 
@@ -72,12 +75,42 @@ class DatabaseController extends InstallationController
         ]);
     }
 
-    public static function enabled(): bool
+    public function migrate(Request $request)
+    {
+        $response = new StreamedResponse(function () use ($request) {
+            try {
+                $this->configureDatabase();
+                $output = new StreamedOutput(fopen('php://stdout', 'w'));
+                echo "Starting Update...\n";
+                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--database' => $this->connection], $output);
+                if ($ret !== 0) {
+                    throw new \RuntimeException('Migration failed');
+                }
+                echo "\n\nSuccess!";
+                session(['install.migrate' => true]);
+                session()->save();
+            } catch (\Exception $e) {
+                echo $e->getMessage() . "\n\nError!";
+            }
+        });
+
+        $response->headers->set('Content-Type', 'text/plain');
+        $response->headers->set('X-Accel-Buffering', 'no');
+
+        return $response;
+    }
+
+    public function complete(): bool
+    {
+        return false;
+    }
+
+    public function enabled(): bool
     {
         return true;
     }
 
-    public static function icon(): string
+    public function icon(): string
     {
         return 'fa-database';
     }

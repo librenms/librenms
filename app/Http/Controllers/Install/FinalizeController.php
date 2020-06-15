@@ -26,9 +26,10 @@
 namespace App\Http\Controllers\Install;
 
 use Exception;
+use LibreNMS\Interfaces\InstallerStep;
 use LibreNMS\Util\EnvHelper;
 
-class FinalizeController extends InstallationController
+class FinalizeController extends InstallationController implements InstallerStep
 {
     public function index()
     {
@@ -106,22 +107,6 @@ class FinalizeController extends InstallationController
         }
     }
 
-    public static function enabled($steps): bool
-    {
-        foreach ($steps as $step => $controller) {
-            if ($step !== 'finish' && !session("install.$step")) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    public static function icon(): string
-    {
-        return 'fa-check';
-    }
-
     private function getConfigFileContents()
     {
         $db = session('db');
@@ -170,5 +155,26 @@ class FinalizeController extends InstallationController
 #\$config['update'] = 0;  # uncomment to completely disable updates
 EOD;
 
+    }
+
+    public function enabled(): bool
+    {
+        foreach ($this->steps as $step => $controller) {
+            if ($step !== 'finish' && !session("install.$step")) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public function complete(): bool
+    {
+        return false;
+    }
+
+    public function icon(): string
+    {
+        return 'fa-check';
     }
 }

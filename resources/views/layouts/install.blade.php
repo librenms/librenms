@@ -89,13 +89,13 @@
                     <div>
                         <a href="{{ route('install.' . $step) }}"
                            id="install-{{ $step }}-button"
-                           class="btn btn-primary btn-circle @if(!$controller::enabled($steps)) disabled @endif"
+                           class="btn btn-primary btn-circle @if(!$controller->enabled($steps)) disabled @endif"
                            title="@lang("install.$step.title")"
                         >
-                            <i class="fa fa-lg {{ $controller::icon() }}"></i>
+                            <i class="fa fa-lg {{ $controller->icon() }}"></i>
                         </a>
                     </div>
-                    <div class="install-progress loop"></div>
+                    <div id="progress-{{ $step }}-bar" class="install-progress loop @if($controller->complete()) complete @endif"></div>
                 @endforeach
             </div>
         </div>

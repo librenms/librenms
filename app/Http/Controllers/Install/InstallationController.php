@@ -34,7 +34,6 @@ class InstallationController extends Controller
     protected $steps = [
         'checks' => \App\Http\Controllers\Install\ChecksController::class,
         'database' => \App\Http\Controllers\Install\DatabaseController::class,
-        'migrate' => \App\Http\Controllers\Install\DatabaseMigrationController::class,
         'user' => \App\Http\Controllers\Install\MakeUserController::class,
         'finish' => \App\Http\Controllers\Install\FinalizeController::class,
     ];
@@ -65,9 +64,16 @@ class InstallationController extends Controller
         }, $this->steps));
     }
 
+    final protected function markStepComplete($step)
+    {
+        session(["install.$step" => true]);
+    }
+
     final protected function formatData($data = [])
     {
-        $data['steps'] = $this->steps;
+        $data['steps'] = array_map(function ($class) {
+            return app()->make($class);
+        }, $this->steps);
         return $data;
     }
 

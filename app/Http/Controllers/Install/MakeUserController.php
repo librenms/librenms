@@ -28,8 +28,9 @@ namespace App\Http\Controllers\Install;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use LibreNMS\Interfaces\InstallerStep;
 
-class MakeUserController extends InstallationController
+class MakeUserController extends InstallationController implements InstallerStep
 {
     public function index(Request $request)
     {
@@ -73,12 +74,17 @@ class MakeUserController extends InstallationController
         return redirect()->back()->with('message', $message);
     }
 
-    public static function enabled(): bool
+    public function complete(): bool
+    {
+        return false;
+    }
+
+    public function enabled(): bool
     {
         return (bool)session('install.migrate');
     }
 
-    public static function icon(): string
+    public function icon(): string
     {
         return 'fa-key';
     }
