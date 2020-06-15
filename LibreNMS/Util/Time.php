@@ -97,23 +97,39 @@ class Time
         if ($s >= 86400) {
             $d = floor($s / 86400);
             $s -= $d * 86400;
-            $ret[] = $d . " days";
+            if ($d == 1) {
+                $ret[] = $d . " day";
+            } else {
+                $ret[] = $d . " days";
+            }
         }
 
         if ($s >= 3600) {
             $h = floor($s / 3600);
             $s -= $h * 3600;
-            $ret[] = $h . " hours";
+            if ($h == 1) {
+                $ret[] = $h . " hour";
+            } else {
+                $ret[] = $h . " hours";
+            }
         }
 
         if ($s >= 60) {
             $m = floor($s / 60);
-            $s -= $d * 60;
-            $ret[] = $h . " minutes";
+            $s -= $m * 60;
+            if ($m == 1) {
+                $ret[] = $m . " minute";
+            } else {
+                $ret[] = $m . " minutes";
+            }
         }
 
         if ($s > 0) {
-            $ret[] = $h . " seconds";
+            if ($s == 1) {
+                $ret[] = $s . " second";
+            } else {
+                $ret[] = $s . " seconds";
+            }
         }
 
         return implode(' ,', $ret);
