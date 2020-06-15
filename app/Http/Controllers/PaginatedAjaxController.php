@@ -171,8 +171,9 @@ abstract class PaginatedAjaxController extends Controller
         $sort = $request->get('sort', $this->default_sort);
 
         foreach ($sort as $column => $direction) {
-            if (isset($columns[$column])) {
-                $query->orderBy($columns[$column], $direction == 'desc' ? 'desc' : 'asc');
+            if (isset($columns[$column]) || in_array($column, $columns)) {
+                $name = $columns[$column] ?? $column;
+                $query->orderBy($name, $direction == 'desc' ? 'desc' : 'asc');
             }
         }
 

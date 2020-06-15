@@ -38,6 +38,11 @@ class CustomersController extends TableController
         return ['port_descr_descr', 'ifName', 'ifDescr', 'ifAlias', 'hostname', 'sysDescr', 'port_descr_speed', 'port_descr_notes'];
     }
 
+    public function sortFields($request)
+    {
+        return ['port_descr_descr', 'hostname', 'ifDescr', 'port_descr_speed', 'port_descr_circuit', 'port_descr_notes'];
+    }
+
     /**
      * Defines the base query for this resource
      *
