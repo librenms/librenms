@@ -42,7 +42,7 @@
         "influxdb/influxdb-php": "^1.14",
         "laravel/framework": "^6.18",
         "laravel/tinker": "^2.0",
-        "martinlindhe/laravel-vue-i18n-generator": "^0.1.42",
+        "librenms/laravel-vue-i18n-generator": "^0.1.46",
         "oriceon/toastr-5-laravel": "dev-master",
         "pear/console_color2": "^0.1",
         "pear/console_table": "^1.3",

@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Util;
 
-use App\Facades\DeviceCache;
+use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
@@ -145,6 +145,7 @@ class ModuleTestHelper
         $snmp_oids = $this->collectOids($device_id);
 
         $device = device_by_id_cache($device_id, true);
+        DeviceCache::setPrimary($device_id);
 
         $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
@@ -174,6 +175,7 @@ class ModuleTestHelper
         global $debug, $vdebug, $device;
 
         $device = device_by_id_cache($device_id);
+        DeviceCache::setPrimary($device_id);
 
         // Run discovery
         ob_start();
@@ -520,7 +522,6 @@ class ModuleTestHelper
         try {
             Config::set('snmp.community', [$this->file_name]);
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
-            DeviceCache::setPrimary($device_id);
 
             // disable to block normal pollers
             dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
@@ -533,6 +534,7 @@ class ModuleTestHelper
 
         // Populate the device variable
         $device = device_by_id_cache($device_id, true);
+        DeviceCache::setPrimary($device_id);
 
         $data = [];  // array to hold dumped data
 

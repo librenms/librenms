@@ -27,6 +27,7 @@ namespace LibreNMS\Alert;
 
 use App\Models\Device;
 use App\Models\User;
+use DeviceCache;
 use LibreNMS\Config;
 use PHPMailer\PHPMailer\PHPMailer;
 
@@ -196,8 +197,7 @@ class AlertUtil
      */
     public static function isMaintenance($device_id)
     {
-        $device = Device::find($device_id);
-        return !is_null($device) && $device->isUnderMaintenance();
+        return DeviceCache::get($device_id)->isUnderMaintenance();
     }
 
     /**

@@ -65,7 +65,7 @@ return [
     'noise-floor' => [
         'short' => '背景雜訊',
         'long' => '背景雜訊',
-        'unit' => 'dBm/Hz',
+        'unit' => 'dBm',
     ],
     'power' => [
         'short' => '電力/訊號',

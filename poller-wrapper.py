@@ -232,8 +232,8 @@ if __name__ == '__main__':
             raise
         except ImportError:
             print("ERROR: missing memcache python module:")
-            print("On deb systems: apt-get install python-memcache")
-            print("On other systems: easy_install python-memcached")
+            print("On deb systems: apt-get install python3-memcache")
+            print("On other systems: pip3 install python-memcached")
             print("Disabling distributed poller.")
             distpoll = False
     else:

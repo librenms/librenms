@@ -34,13 +34,74 @@ use App\Models\PortsNac;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 
 class Vrp extends OS implements
     ProcessorDiscovery,
     NacPolling,
     WirelessApCountDiscovery,
-    WirelessClientsDiscovery
+    WirelessClientsDiscovery,
+    OSDiscovery
 {
+
+    /**
+     * Discover OS Vrp
+     *
+     */
+    public function discoverOS(): void
+    {
+        $device = $this->getDeviceModel();
+        //Huawei VRP devices are not providing the HW description in a unified way
+        preg_match("/Version [^\s]*/m", $device->sysDescr, $matches);
+        $device->version = trim(str_replace('Version ', '', $matches[0]));
+
+        preg_match("/\(([^\s]*) (V[0-9]{3}R[0-9]{3}[0-9A-Z]+)/m", $device->sysDescr, $matches);
+        if (!empty($matches[2])) {
+            $device->version .= " (" . trim($matches[2]) . ")";
+        }
+
+        $patch = snmp_getnext($this->getDevice(), 'HUAWEI-SYS-MAN-MIB::hwPatchVersion', '-OQv');
+        if ($patch) {
+            $device->version .= " [$patch]";
+        }
+
+        $oidList = [
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityExtentMIB.6.5.0',
+            'HUAWEI-DEVICE-EXT-MIB::hwProductName.0',
+            'HUAWEI-MIB::hwDatacomm.183.1.25.1.5.1',
+            'HUAWEI-MIB::mlsr.20.1.1.1.3.0',
+            'HUAWEI-ENTITY-EXTENT-MIB::hwEntityBoardName.9',
+        ];
+
+        foreach ($oidList as $oid) {
+            $hardware_tmp = snmp_get($this->getDevice(), $oid, '-OQv');
+
+            if (!empty($hardware_tmp)) {
+                $device->hardware = "Huawei " . $hardware_tmp;
+                break;
+            }
+        }
+
+        // Let's use sysDescr if nothing else is found in the OIDs. sysDescr is less detailled than OIDs most of the time
+        if (empty($hardware_tmp) && !empty($matches[1])) {
+            $device->hardware = "Huawei " . trim($matches[1]);
+        }
+
+        // Serial
+        // Multiple possible OIDs to grab the serial number
+
+        $oidList = [
+            'ENTITY-MIB::entPhysicalSerialNum.9',
+        ];
+        foreach ($oidList as $oid) {
+            $serial_tmp = snmp_get($this->getDevice(), $oid, '-OQv');
+            if (!empty($serial_tmp)) {
+                $device->serial = $serial_tmp;
+                break;
+            }
+        }
+    }
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered

@@ -160,8 +160,8 @@ function record_sensor_data($device, $all_sensors)
         $sensor_value      = $sensor['new_value'];
         $prev_sensor_value = $sensor['sensor_current'];
 
-        if ($sensor_value == -32768) {
-            echo 'Invalid (-32768) ';
+        if ($sensor_value == -32768 || is_nan($sensor_value)) {
+            echo 'Invalid (-32768 or NaN)';
             $sensor_value = 0;
         }
 

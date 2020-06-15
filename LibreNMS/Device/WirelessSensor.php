@@ -33,6 +33,7 @@ class WirelessSensor extends Sensor
     protected static $name = 'Wireless Sensor';
     protected static $table = 'wireless_sensors';
     protected static $data_name = 'wireless-sensor';
+    protected static $translation_prefix = 'wireless';
 
     private $access_point_ip;
 
