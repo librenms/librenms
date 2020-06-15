@@ -69,7 +69,15 @@ class DeviceController extends TableController
 
     protected function sortFields($request)
     {
-        return ['status', 'icon', 'hostname', 'hardware', 'os', 'uptime', 'location'];
+        return [
+            'status' => 'status',
+            'icon' => 'icon',
+            'hostname' => 'hostname',
+            'hardware' => 'hardware',
+            'os' => 'os',
+            'uptime' => \DB::raw("IF(`status` = 1, `uptime`, `last_polled` - NOW()))"),
+            'location' => 'location'
+        ];
     }
 
     /**
