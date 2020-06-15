@@ -87,6 +87,7 @@ by following the steps under the `SNMP Extend` heading.
 
 1. [Apache](#apache) - SNMP extend, Agent
 1. [Asterisk](#asterisk) - SNMP extend
+1. [backupninja](#backupninja) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [Certificate](#certificate) - Certificate extend
 1. [C.H.I.P.](#chip) - SNMP extend
@@ -232,6 +233,28 @@ extend asterisk /etc/snmp/asterisk
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
+
+# backupninja
+
+A small shell script that reports status of last backupninja backup.
+
+## SNMP Extend
+
+1: Download the [backupninja
+script](https://github.com/librenms/librenms-agent/blob/master/snmp/backupninja.py)
+to `/etc/snmp/backupninja.py` on your backuped server.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/backupninja.py -O /etc/snmp/backupninja.py`
+```
+2: Make the script executable: `chmod +x /etc/snmp/backupninja.py`
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend backupninja /etc/snmp/backupninja.py
+```
+
+4: Restart snmpd on your host
+
 
 # BIND9 aka named
 
