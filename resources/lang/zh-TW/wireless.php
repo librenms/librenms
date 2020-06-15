@@ -11,6 +11,7 @@ return [
     |
     */
 
+    'title' => '無線網路',
     'ap-count' => [
         'short' => 'AP 數量',
         'long' => 'AP 數量',
