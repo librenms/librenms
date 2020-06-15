@@ -13,7 +13,9 @@ $colour_area = '8B8BEB';
 
 $colour_area_max = 'cc9999';
 
-$graph_title .= '::'.\LibreNMS\Util\Time::humanTime($vars['duration']);
+$line_text = \LibreNMS\Util\Time::humanTime($vars['duration']);
+
+$graph_title .= '::'.$line_text;
 
 $graph_max = 1;
 $graph_min = 0;
