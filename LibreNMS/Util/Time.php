@@ -91,7 +91,6 @@ class Time
      */
     public static function humanTime($s)
     {
-
         $ret = [];
 
         if ($s >= 86400) {
