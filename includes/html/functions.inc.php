@@ -1333,21 +1333,6 @@ function get_arrays_with_seafile($device, $app_id, $category)
 }
 
 /**
- * Get all dhcp data from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @param string $category which category of dhcp graphs are searched
- * @return array list of dhcp data
- */
-function get_arrays_with_dhcpstats($device, $app_id, $category)
-{
-    $app_name = 'dhcp-stats';
-    return get_arrays_with_application($device, $app_id, $app_name, $category);
-}
-
-/**
  * Get all mdadm arrays from the collected
  * rrd files.
  *

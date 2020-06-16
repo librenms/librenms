@@ -16,7 +16,7 @@ $addarea       = 1;
 $transparency  = 15;
 
 
-$arrays = get_arrays_with_dhcpstats($device, $app_id, $category);
+$arrays = get_arrays_with_application($device, $app_id, $name, $category);
 
 $int=0;
 while (isset($arrays[$int])) {
