@@ -124,6 +124,12 @@ $graphs['os-updates'] = array(
 );
 $graphs['dhcp-stats'] = array(
      'stats',
+     'pools_percent',
+     'pools_current',
+     'pools_max',
+     'networks_percent',
+     'networks_current',
+     'networks_max',
 );
 $graphs['fail2ban'] = array(
     'banned',
