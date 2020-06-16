@@ -80,9 +80,10 @@ class Laravel
 
     public static function enableQueryDebug()
     {
+        static $sql_debug_enabled;
         $db = Eloquent::DB();
 
-        if ($db && !$db->getEventDispatcher()->hasListeners('Illuminate\Database\Events\QueryExecuted')) {
+        if ($db && !$sql_debug_enabled) {
             $db->listen(function (QueryExecuted $query) {
                 // collect bindings and make them a little more readable
                 $bindings = collect($query->bindings)->map(function ($item) {
@@ -99,6 +100,7 @@ class Laravel
                     c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
                 }
             });
+            $sql_debug_enabled = true;
         }
     }
 
