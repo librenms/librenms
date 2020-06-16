@@ -38,18 +38,11 @@
         #progress-icons {
             background: linear-gradient(to bottom, #EEEEEE 50%, white 50%)
         }
-        .btn-circle {
-            background-color: #70A9A1;
-            border-color: #66A39B;
-        }
-        .btn-circle:hover {
-            background-color: #548C85;
-            border-color: #4D807A;
-        }
+
         .btn-circle.disabled {
             opacity: 1;
-            background-color: #A6C9C5;
-            border-color: #9AC1BC;
+            background-color: #62bcca;
+            border-color: #64c0ce;
         }
 
         .install-progress {
@@ -89,7 +82,7 @@
                     <div>
                         <a href="{{ route('install.' . $step) }}"
                            id="install-{{ $step }}-button"
-                           class="btn btn-primary btn-circle @if(!$controller->enabled($steps)) disabled @endif"
+                           class="btn btn-info btn-circle @if(!$controller->enabled($steps)) disabled @endif"
                            title="@lang("install.$step.title")"
                         >
                             <i class="fa fa-lg {{ $controller->icon() }}"></i>

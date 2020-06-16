@@ -19,7 +19,7 @@ return [
     'database' => [
         'title' => 'Configure Database',
         'status' => 'Status',
-        'test' => 'Test',
+        'test' => 'Check Connection',
         'host' => 'Host',
         'port' => 'Port',
         'socket' => 'Unix-Socket',
