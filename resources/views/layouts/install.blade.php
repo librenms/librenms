@@ -81,8 +81,7 @@
                 @foreach($steps as $step => $controller)
                     <div>
                         <a href="{{ route('install.' . $step) }}"
-                           id="install-{{ $step }}-button"
-                           class="btn btn-info btn-circle @if(!$controller->enabled($steps)) disabled @endif"
+                           class="install-enable-{{ $step }} btn btn-info btn-circle @if(!$controller->enabled($steps)) disabled @endif"
                            title="@lang("install.$step.title")"
                         >
                             <i class="fa fa-lg {{ $controller->icon() }}"></i>
@@ -117,11 +116,12 @@
         .success(function (data) {
             console.log(data);
             Object.keys(data).forEach(function (key) {
-                var button = $('#install-' + key + '-button');
                 if (data[key]) {
-                    button.removeClass('disabled')
+                    $('.install-enable-' + key).removeClass('disabled');
+                    $('.install-show-' + key).show();
                 } else {
-                    button.addClass('disabled')
+                    $('.install-enable-' + key).addClass('disabled');
+                    $('.install-show-' + key).hide();
                 }
             });
         })

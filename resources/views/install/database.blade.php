@@ -63,7 +63,7 @@
             </form>
         </div>
     </div>
-    <div id="migration-output" class="row">
+    <div id="migration-output" class="row install-show-migrate">
         <div class="col-12">
             <label for="db-update">@lang('install.migrate.building')<br />@lang('install.migrate.building_interrupt')</label>
             <textarea readonly id="db-update" class="form-control" rows="20" placeholder="@lang('install.migrate.wait')"></textarea>
@@ -83,7 +83,7 @@
         $('#database-form').submit(function (event) {
             event.preventDefault();
             $('#database-status>i').attr('class', 'fa fa-2x fa-spinner fa-spin');
-            $('.db-error').remove();
+            $('#error-box').empty();
 
             $.ajax({
                 type: 'POST',

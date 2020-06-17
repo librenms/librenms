@@ -59,8 +59,9 @@ class InstallationController extends Controller
 
     public function stepsCompleted()
     {
-        return response()->json(array_map(function ($controller) {
-            return $controller::enabled($this->steps);
+        return response()->json(array_map(function ($class) {
+            $controller = app()->make($class);
+            return $controller->enabled($this->steps);
         }, $this->steps));
     }
 
