@@ -34,8 +34,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index');
-    Route::match(['get', 'post'], 'device/{device_id}/{tab?}/{vars?}', 'DeviceController@index')
-        ->name('device')->where(['device_id' => '(device=)?[0-9]+', 'vars' => '.*']);
+    Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
+        ->name('device')->where(['vars' => '.*']);
 
     // Maps
     Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
