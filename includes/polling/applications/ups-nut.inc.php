@@ -42,8 +42,31 @@ if (!$ups_nut) {
 
 echo ' '.$name;
 
-// (2016-11-25, R.Morris) Correct list and data below, to match latest ups-nut.sh script (missing one input, and misaligned).
-list ($charge, $battery_low, $remaining, $bat_volt, $bat_nom, $line_nom, $input_volt, $load) = explode("\n", $ups_nut);
+// (2020-05-13, Jon.W) Added ups status data and updated ups-nut.sh script.
+list (
+    $charge,
+    $battery_low,
+    $remaining,
+    $bat_volt,
+    $bat_nom,
+    $line_nom,
+    $input_volt,
+    $load,
+    $UPSOnLine,
+    $UPSOnBattery,
+    $UPSLowBattery,
+    $UPSHighBattery,
+    $UPSBatteryReplace,
+    $UPSBatteryCharging,
+    $UPSBatteryDischarging,
+    $UPSUPSBypass,
+    $UPSRuntimeCalibration,
+    $UPSOffline,
+    $UPSUPSOverloaded,
+    $UPSUPSBuck,
+    $UPSUPSBoost,
+    $UPSForcedShutdown
+    ) = explode("\n", $ups_nut);
 
 $rrd_name = array('app', $name, $app_id);
 $rrd_def = RrdDefinition::make()
@@ -66,6 +89,28 @@ $fields = array(
     'input_voltage' => $input_volt,
     'load' => $load
 );
+
+$sensors = [
+    ['state_name' => 'UPSOnLine'            , 'value' => $UPSOnLine],
+    ['state_name' => 'UPSOnBattery'         , 'value' => $UPSOnBattery],
+    ['state_name' => 'UPSLowBattery'        , 'value' => $UPSLowBattery],
+    ['state_name' => 'UPSHighBattery'       , 'value' => $UPSHighBattery],
+    ['state_name' => 'UPSBatteryReplace'    , 'value' => $UPSBatteryReplace],
+    ['state_name' => 'UPSBatteryCharging'   , 'value' => $UPSBatteryCharging],
+    ['state_name' => 'UPSBatteryDischarging', 'value' => $UPSBatteryDischarging],
+    ['state_name' => 'UPSUPSBypass'         , 'value' => $UPSUPSBypass],
+    ['state_name' => 'UPSRuntimeCalibration', 'value' => $UPSRuntimeCalibration],
+    ['state_name' => 'UPSOffline'           , 'value' => $UPSOffline],
+    ['state_name' => 'UPSUPSOverloaded'     , 'value' => $UPSUPSOverloaded],
+    ['state_name' => 'UPSUPSBuck'           , 'value' => $UPSUPSBuck],
+    ['state_name' => 'UPSUPSBoost'          , 'value' => $UPSUPSBoost],
+    ['state_name' => 'UPSForcedShutdown'    , 'value' => $UPSForcedShutdown]
+];
+
+foreach ($sensors as $index => $sensor) {
+    $rrd_def->addDataset($sensor['state_name'], 'GAUGE', 0);
+    $fields[$sensor['state_name']]= $sensor['value'];
+}
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);

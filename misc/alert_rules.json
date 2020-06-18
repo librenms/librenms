@@ -456,5 +456,57 @@
     "name": "CustomOID under warning limit",
     "severity": "warning",
     "default": true
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSOnBattery\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT on battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSLowBattery\" AND macros.state_sensor_critical = 1",
+    "name": "UPS-NUT low battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSHighBattery\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT high battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSBatteryReplace\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery needs to be replaced"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSBatteryCharging\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery is charging"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSBatteryDischarging\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery is discharging"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSUPSBypass\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT bypass circuit is active"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSRuntimeCalibration\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT performing runtime calibration"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSOffline\" AND macros.state_sensor_critical = 1",
+    "name": "UPS-NUT offline and is not supplying power to the load"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSUPSOverloaded\" AND macros.state_sensor_critical = 1",
+    "name": "UPS-NUT overloaded"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSUPSBuck\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT trimming incoming voltage"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSUPSBoost\" AND macros.state_sensor_warning = 1",
+    "name": "UPS-NUT boosting incoming voltage"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" AND state_indexes.state_name = \"UPSForcedShutdown\" AND macros.state_sensor_critical = 1",
+    "name": "UPS-NUT trimming incoming voltage"
   }
 ]
