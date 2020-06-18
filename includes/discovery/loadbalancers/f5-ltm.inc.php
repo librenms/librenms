@@ -124,7 +124,7 @@ if (!empty($ltmBwcEntry['name'])) {
  * False == no object found - this is not an error, OID doesn't exist.
  * null  == timeout or something else that caused an error, OID may exist but we couldn't get it.
  */
-if (!empty($ltmBwcEntry) !empty($ltmVirtualServEntry) || !empty($ltmPoolEntry) || !empty($ltmPoolMemberEntry)) {
+if (!empty($ltmBwcEntry) || !empty($ltmVirtualServEntry) || !empty($ltmPoolEntry) || !empty($ltmPoolMemberEntry)) {
     // No Nulls, lets go....
     d_echo("Objects Found:\n");
 
