@@ -69,8 +69,8 @@ if (!empty($dhcp_networks[$dhcp_networks_base_oid])) {
         $oid = $value['oid'];
         $index = $value['index'];
         $type = $value['type'];
-        $descr = $value['description'] . ' (' . $pool_data[$value['oid']] . '/' . $divisor . ')';
         $divisor = $pool_data[$value['size_oid']];
+        $descr = $value['description'] . ' (' . $pool_data[$value['oid']] . '/' . $divisor . ')';
         $current = (($pool_data[$value['oid']] / $divisor) * 100);
         $group = $value['group'];
 
