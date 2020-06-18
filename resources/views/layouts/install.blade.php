@@ -121,10 +121,9 @@
     </div>
 </div>
 <script>
-    function checkStepStatus() {
+    function checkStepStatus(callback) {
         $.ajax('{{ route('install.action.steps') }}')
         .success(function (data) {
-            console.log(data);
             Object.keys(data).forEach(function (key) {
                 if (data[key]) {
                     $('.install-enable-' + key).removeClass('disabled');
@@ -132,6 +131,10 @@
                     $('.install-enable-' + key).addClass('disabled');
                 }
             });
+
+            if (callback && typeof callback === "function") {
+                callback(data);
+            }
         })
     }
 </script>
