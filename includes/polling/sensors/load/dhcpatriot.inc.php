@@ -25,4 +25,3 @@ if ($new_descr != $prev_descr) {
 }
 
 unset($prev_divisor, $new_divisor, $prev_descr, $new_descr);
-
