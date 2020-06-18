@@ -578,9 +578,11 @@ foreach ($ports as $port) {
             }
         }
 
-        // work around invalid values for ifHighSpeed (fortigate)
-        if ($this_port['ifHighSpeed'] == 4294901759) {
-            $this_port['ifHighSpeed'] = null;
+        // ifHighSpeed is signed integer, but should be unsigned (Gauge32 in RFC2233). Workaround for some fortinet devices.
+        if ($device['os'] == 'fortigate' || $device['os'] == 'fortisandbox') {
+            if ($this_port['ifHighSpeed'] > 2147483647) {
+                $this_port['ifHighSpeed'] = null;
+            }
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {

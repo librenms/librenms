@@ -32,7 +32,17 @@ use Illuminate\Http\Request;
 
 abstract class TableController extends PaginatedAjaxController
 {
-    protected $default_sort = [];
+    protected $model;
+
+    protected function sortFields($request)
+    {
+        if (isset($this->model)) {
+            $fields = \Schema::getColumnListing((new $this->model)->getTable());
+            return array_combine($fields, $fields);
+        }
+
+        return [];
+    }
 
     final protected function baseRules()
     {

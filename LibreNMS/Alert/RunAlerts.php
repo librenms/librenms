@@ -453,7 +453,7 @@ class RunAlerts
                 $noacc = false;
             }
 
-            if (AlertUtil::isMaintenance($alert['device_id']) > 0) {
+            if (AlertUtil::isMaintenance($alert['device_id'])) {
                 $noiss = true;
                 $noacc = true;
             }

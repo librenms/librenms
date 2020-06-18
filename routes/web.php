@@ -15,7 +15,7 @@
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // WebUI
-Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
+Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
@@ -34,8 +34,8 @@ Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index');
-    Route::match(['get', 'post'], 'device/{device_id}/{tab?}/{vars?}', 'DeviceController@index')
-        ->name('device')->where(['device_id' => '(device=)?[0-9]+', 'vars' => '.*']);
+    Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
+        ->name('device')->where(['vars' => '.*']);
 
     // Maps
     Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
@@ -108,6 +108,7 @@ Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
 
         // jquery bootgrid data controllers
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
+            Route::post('alert-schedule', 'AlertScheduleController');
             Route::post('customers', 'CustomersController');
             Route::post('device', 'DeviceController');
             Route::post('eventlog', 'EventlogController');
@@ -148,8 +149,8 @@ Route::group(['middleware' => ['auth.web'], 'guard' => 'auth'], function () {
 });
 
 // Legacy routes
-Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth.web');
+Route::any('/dummy_legacy_auth/{path?}', 'LegacyController@dummy')->middleware('auth');
 Route::any('/dummy_legacy_unauth/{path?}', 'LegacyController@dummy');
 Route::any('/{path?}', 'LegacyController@index')
     ->where('path', '^((?!_debugbar).)*')
-    ->middleware('auth.web');
+    ->middleware('auth');

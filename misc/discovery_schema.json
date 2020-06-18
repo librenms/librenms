@@ -62,7 +62,7 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": ["integer", "string", "array"],
+                                                                    "type": ["boolean", "integer", "string", "array"],
                                                                     "items": {
                                                                         "type": ["integer", "string"]
                                                                     }
@@ -204,7 +204,7 @@
                                                                     "$ref": "#/definitions/comparison"
                                                                 },
                                                                 "value": {
-                                                                    "type": ["integer", "string", "array"],
+                                                                    "type": ["boolean", "integer", "string", "array"],
                                                                     "items": {
                                                                         "type": ["integer", "string"]
                                                                     }
@@ -385,7 +385,7 @@
                                     "$ref": "#/definitions/comparison"
                                 },
                                 "value": {
-                                    "type": ["integer", "string", "array"],
+                                    "type": ["boolean", "integer", "string", "array"],
                                     "items": {
                                         "type": ["integer", "string"]
                                     }
@@ -468,7 +468,8 @@
                 "not_contains",
                 "not_regex",
                 "in_array",
-                "not_in_array"
+                "not_in_array",
+                "exists"
             ]
         }
     }

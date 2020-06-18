@@ -26,7 +26,7 @@
 <br style="clear:both;">
 
 @foreach($devices as $device)
-    <a href="@deviceUrl($device)" title="{{ $device->displayName() }}@if($device->formatUptime(true)) - @endif{{ $device->formatUptime(true) }}">
+    <a href="@deviceUrl($device)" title="{{$device->displayName() }}@if($device->stateName == 'up' or $device->stateName == 'warn')@if($device->formatDownUptime(true)) - @endif{{ $device->formatDownUptime(true) }}@elseif($device->stateName == 'down')@if($device->formatDownUptime(true)) - downtime @endif{{$device->formatDownUptime(true)}}@endif">
         @if($type == 0)
             @if($color_only_select == 1)
                 <span class="label {{ $device->labelClass }} widget-availability-fixed widget-availability label-font-border"> </span>
