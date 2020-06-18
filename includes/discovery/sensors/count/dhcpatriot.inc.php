@@ -8,27 +8,27 @@
 */
 
 $oids = array(
-    1 => array(
+    0 => array(
         'type'  => 'dhcpatriotDatabaseThreads',
         'descr' => 'Database Threads',
         'oid'   => '.1.3.6.1.4.1.2021.50.45'
     ),
-    2 => array(
+    1 => array(
         'type'  => 'dhcpatriotDatabaseQueriesPerSecond',
         'descr' => 'Database Queries Per Second',
         'oid'   => '.1.3.6.1.4.1.2021.50.46'
     ),
-    3 => array(
+    2 => array(
         'type'  => 'dhcpatriotDHCPv4LeasesPerSecond',
         'descr' => 'DHCPv4 Leases Per Second',
         'oid'   => '.1.3.6.1.4.1.2021.50.70'
     ),
-    4 => array(
+    3 => array(
         'type'  => 'dhcpatriotDHCPv6LeasesPerSecond',
         'descr' => 'DHCPv6 Leases Per Second',
         'oid'   => '.1.3.6.1.5.1.2021.50.140'
     ),
-    5 => array(
+    4 => array(
         'type'  => 'dhcpatriotLicenseExpiration',
         'descr' => 'License Expiration Days Remaining',
         'oid'   => '.1.3.6.1.4.1.2021.51.12.4.1.2.7.76.73.67.69.78.83.69.1'
@@ -50,12 +50,14 @@ $group = null;
 
 $current_time = time();
 
+$tmp_snmp_multi = snmp_get_multi_oid($device, array_column($oids, 'oid'));
+
 foreach ($oids as $index => $entry) {
     $oid = $entry['oid'];
     $type = $entry['type'];
     $descr = $entry['descr'];
 
-    $current = snmp_get($device, $oid, '-Oqv');
+    $current = $tmp_snmp_multi[$oid];
 
     if ($type === 'dhcpatriotLicenseExpiration' && $current !== 'FULL:0' && gettype($current) === 'string') {
         $epoch_time = explode(':', $current);

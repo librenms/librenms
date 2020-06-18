@@ -8,64 +8,50 @@
 */
 
 $oids = array(
-    1 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    0 => array(
         'descr' => 'System Software Health',
         'oid'   => '.1.3.6.1.4.1.2021.51.9.4.1.2.6.72.69.65.76.84.72.1'
     ),
-    2 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    1 => array(
         'descr' => 'DHCPv4',
         'oid'   => '.1.3.6.1.4.1.2021.52.6.4.1.2.4.68.72.67.80.1'
     ),
-    3 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    2 => array(
         'descr' => 'DHCPv6',
         'oid'   => '.1.3.6.1.4.1.2021.52.9.4.1.2.5.68.72.67.80.54.1'
     ),
-    4 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    3 => array(
         'descr' => 'DNS',
         'oid'   => '.1.3.6.1.4.1.2021.52.1.4.1.2.3.68.78.83.1'
     ),
-    5 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    4 => array(
         'descr' => 'HTTP',
         'oid'   => '.1.3.6.1.4.1.2021.52.2.4.1.2.4.72.84.84.80.1'
     ),
-    6 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    5 => array(
         'descr' => 'HTTPS',
         'oid'   => '.1.3.6.1.4.1.2021.52.3.4.1.2.5.72.84.84.80.83.1'
     ),
-    7 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    6 => array(
         'descr' => 'NTP',
         'oid'   => '.1.3.6.1.4.1.2021.52.4.4.1.2.3.78.84.80.1'
     ),
-    8 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    7 => array(
         'descr' => 'SSH',
         'oid'   => '.1.3.6.1.4.1.2021.52.5.4.1.2.3.83.83.72.1'
     ),
-    9 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    8 => array(
         'descr' => 'Database Status',
         'oid'   => '.1.3.6.1.4.1.2021.51.2.4.1.2.5.77.89.83.81.76.1'
     ),
-    10 => array(
-        'type'  => 'dhcpatriotServiceStatus',
+    9 => array(
         'descr' => 'Database Sync Status',
         'oid'   => '.1.3.6.1.4.1.2021.51.3.4.1.2.16.77.89.83.81.76.82.69.80.76.73.67.65.84.73.79.78.1'
-    ),
-    11 => array(
-        'type'  => 'dhcpatriotSystemTime',
-        'descr' => 'System Time',
-        'oid'   => '.1.3.6.1.4.1.2021.51.13.4.1.2.4.84.73.77.69.1'
     )
 );
 
 $class = 'state';
+$type = 'dhcpatriotServiceStatus';
 $divisor = 1;
 $multiplier = 1;
 $low_limit = null;
@@ -80,43 +66,32 @@ $group = null;
 
 $current_time = time();
 
+$tmp_snmp_multi = snmp_get_multi_oid($device, array_column($oids, 'oid'));
+
 foreach ($oids as $index => $entry) {
     $oid = $entry['oid'];
-    $type = $entry['type'];
     $descr = $entry['descr'];
 
-    $tmp_snmp_data = snmp_get($device, $oid, '-Oqv');
+    if (!empty($tmp_snmp_multi) && gettype($tmp_snmp_multi[$oid]) === 'string') {
+        $tmp_data = explode(':', $tmp_snmp_multi[$oid]);
 
-    if (!empty($tmp_snmp_data) && gettype($tmp_snmp_data) === 'string' && $type === 'dhcpatriotServiceStatus') {
-        $tmp_snmp_data = explode(':', $tmp_snmp_data);
-        $current = intval($tmp_snmp_data[1]);
+        $current = intval($tmp_data[1]);
 
-        if ((intval($tmp_snmp_data[0]) - $current_time) > 300) {
+        if (abs(intval($tmp_data[0]) - $current_time) > 300) {
             $current = 2;
         }
 
-        if ($tmp_snmp_data[1] === '999') {
+        if ($tmp_data[1] === '999') {
             $current = 3;
         }
 
         $states = [
             ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'serviceUp'],
-            ['value' => 2, 'generic' => 1, 'graph' => 0, 'descr' => 'serviceNotUpdatedWithinLast5Min'],
+            ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'serviceNotUpdatedWithinLast5Min'],
             ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'serviceDown'],
         ];
     }
 
-    if (!empty($tmp_snmp_data) && gettype($tmp_snmp_data) === 'string' && $type === 'dhcpatriotSystemTime') {
-        $current = 1;
-        if ((intval($tmp_snmp_data) - $current_time) > 300) {
-            $current = 3;
-        }
-
-        $states = [
-            ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'systemTimeOK'],
-            ['value' => 3, 'generic' => 2, 'graph' => 0, 'descr' => 'systemTimeOutOfSync'],
-        ];
-    }
     create_state_index($type, $states);
 
     if (!empty($current)) {
@@ -145,4 +120,4 @@ foreach ($oids as $index => $entry) {
     create_sensor_to_state_index($device, $type, $index);
 }
 
-unset($current_time, $tmp_snmp_data, $states, $class, $oid, $index, $type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group);
+unset($class, $oid, $index, $type, $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, $poller_type, $entPhysicalIndex, $entPhysicalIndex_measured, $user_func, $group, $oids, $current_time, $tmp_snmp_multi, $tmp_data, $states);
