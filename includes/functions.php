@@ -2112,17 +2112,19 @@ function device_is_up($device, $record_perf = false)
 
             if ($device['uptime']) {
                 $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL', array($device['device_id']));
-                $up_again = time() - $device['uptime'];
-                if ($up_again <= $going_down) {
-                    # network connection loss, not device down
-                    $up_again = time();
+                if (!empty($going_down)) {
+                    $up_again = time() - $device['uptime'];
+                    if ($up_again <= $going_down) {
+                        # network connection loss, not device down
+                        $up_again = time();
+                    }
+                    dbUpdate(
+                        array('device_id' => $device['device_id'], 'up_again' => $up_again),
+                        'device_outages',
+                        'device_id=? and up_again is NULL',
+                        array($device['device_id'])
+                    );
                 }
-                dbUpdate(
-                    array('device_id' => $device['device_id'], 'up_again' => $up_again),
-                    'device_outages',
-                    'device_id=? and up_again is NULL',
-                    array($device['device_id'])
-                );
             }
         } else {
             $type = 'down';
