@@ -68,6 +68,7 @@ class InstallationController extends Controller
     final protected function markStepComplete($step)
     {
         session(["install.$step" => true]);
+        session()->save();
     }
 
     final protected function formatData($data = [])

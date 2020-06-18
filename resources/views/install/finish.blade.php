@@ -38,17 +38,3 @@
     </div>
 </div>
 @endsection
-
-@section('style')
-<style type="text/css">
-    .rotate-if-collapsed {
-        transition: .4s transform;
-    }
-    [data-toggle="collapse"] {
-        cursor: pointer;
-    }
-    [data-toggle="collapse"][aria-expanded="true"] > .rotate-if-collapsed {
-        transform: rotate(180deg);
-    }
-</style>
-@endsection

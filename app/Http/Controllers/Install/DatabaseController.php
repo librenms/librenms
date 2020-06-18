@@ -29,6 +29,7 @@ use App\StreamedOutput;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\DB\Schema;
 use LibreNMS\Interfaces\InstallerStep;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
@@ -39,7 +40,8 @@ class DatabaseController extends InstallationController implements InstallerStep
     public function index(Request $request)
     {
         $data = Arr::only(session()->get('db') ?: [], self::KEYS);
-        $data['status'] = session('install.database');
+        $data['valid_credentials'] = Eloquent::isConnected();
+        $data['migrated'] = session('install.database');
 
         return view('install.database', $this->formatData($data));
     }
@@ -57,6 +59,7 @@ class DatabaseController extends InstallationController implements InstallerStep
         );
 
         session()->put('db', Arr::only(config('database.connections.setup', []), self::KEYS));
+        session()->forget('install.database'); // reset db complete status
 
         $ok = false;
         $message = '';
@@ -66,8 +69,6 @@ class DatabaseController extends InstallationController implements InstallerStep
         } catch (\Exception $e) {
             $message = $e->getMessage();
         }
-
-        session(['install.database' => $ok]);
 
         return response()->json([
             'result' => $ok ? 'ok' : 'fail',
@@ -82,13 +83,12 @@ class DatabaseController extends InstallationController implements InstallerStep
                 $this->configureDatabase();
                 $output = new StreamedOutput(fopen('php://stdout', 'w'));
                 echo "Starting Update...\n";
-                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true, '--database' => $this->connection], $output);
+                $ret = \Artisan::call('migrate', ['--seed' => true, '--force' => true], $output);
                 if ($ret !== 0) {
                     throw new \RuntimeException('Migration failed');
                 }
                 echo "\n\nSuccess!";
-                session(['install.migrate' => true]);
-                session()->save();
+                $this->markStepComplete('database');
             } catch (\Exception $e) {
                 echo $e->getMessage() . "\n\nError!";
             }
@@ -102,6 +102,16 @@ class DatabaseController extends InstallationController implements InstallerStep
 
     public function complete(): bool
     {
+        if (session('install.database')) {
+            return true;
+        }
+
+        $this->configureDatabase();
+        if (Eloquent::isConnected() && Schema::isCurrent()) {
+            $this->markStepComplete('database');
+            return true;
+        }
+
         return false;
     }
 

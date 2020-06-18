@@ -68,6 +68,16 @@
         #step-title {
             padding-bottom: 20px;
         }
+
+        .rotate-if-collapsed {
+            transition: .4s transform ease-in-out;
+        }
+        [data-toggle="collapse"] {
+            cursor: pointer;
+        }
+        [data-toggle="collapse"][aria-expanded="true"] .rotate-if-collapsed {
+            transform: rotate(180deg);
+        }
     </style>
     @yield('style')
 </head>
@@ -118,10 +128,8 @@
             Object.keys(data).forEach(function (key) {
                 if (data[key]) {
                     $('.install-enable-' + key).removeClass('disabled');
-                    $('.install-show-' + key).show();
                 } else {
                     $('.install-enable-' + key).addClass('disabled');
-                    $('.install-show-' + key).hide();
                 }
             });
         })
