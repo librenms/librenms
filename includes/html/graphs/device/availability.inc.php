@@ -9,7 +9,7 @@ $rrd_filename = rrd_name($device['hostname'], array('availability', $vars['durat
 $ds = 'availability';
 
 $colour_line = '000000';
-$colour_area = '8B8BEB';
+$colour_area = '8B8BEB44';
 
 $colour_area_max = 'cc9999';
 
