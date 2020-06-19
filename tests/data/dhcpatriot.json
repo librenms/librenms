@@ -1229,7 +1229,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 88.673998230312,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1253,7 +1253,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 34.778012684989,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1277,7 +1277,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 62.60162601626,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1301,7 +1301,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 8.9430894308943,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1325,7 +1325,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 4.8780487804878,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1349,7 +1349,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 6.5040650406504,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1373,7 +1373,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 8.130081300813,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1397,7 +1397,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 3.9840637450199,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1421,7 +1421,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 8.130081300813,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1445,7 +1445,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 3.2520325203252,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1493,7 +1493,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 0.8130081300813,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1565,7 +1565,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": 92.231075697211,
+                    "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
                 },
