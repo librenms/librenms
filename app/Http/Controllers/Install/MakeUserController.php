@@ -39,11 +39,11 @@ class MakeUserController extends InstallationController implements InstallerStep
         }
 
         if (session('install.database')) {
-            $user = User::first();
+            $user = User::adminOnly()->first();
         }
 
         if (isset($user)) {
-            session(['install.user' => true]);
+            $this->markStepComplete('user');
             return view('install.user-created', $this->formatData([
                 'user' => $user,
             ]));
@@ -76,12 +76,12 @@ class MakeUserController extends InstallationController implements InstallerStep
 
     public function complete(): bool
     {
-        return false;
+        return User::adminOnly()->exists();
     }
 
     public function enabled(): bool
     {
-        return (bool)session('install.migrate');
+        return (bool)session('install.database');
     }
 
     public function icon(): string
