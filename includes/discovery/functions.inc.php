@@ -1402,7 +1402,7 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         }
     }
 
-    if($name) {
+    if ($name) {
         $where = array();
         $params = array();
 
@@ -1422,9 +1422,9 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
         $ids = dbFetchColumn($sql, $params);
         if (count($ids) == 1) {
             return (int)$ids[0];
-        } elseif (count($ids) > 1 ) {
-           d_echo("find_device_id: more than one device found with sysName '$name'.\n");
-           // don't do anything, try other methods, if any
+        } elseif (count($ids) > 1) {
+            d_echo("find_device_id: more than one device found with sysName '$name'.\n");
+            // don't do anything, try other methods, if any
         }
     }
 
