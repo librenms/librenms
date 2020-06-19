@@ -61,7 +61,7 @@ class InstallationController extends Controller
     {
         return response()->json(array_map(function ($class) {
             $controller = app()->make($class);
-            return $controller->enabled($this->steps);
+            return $controller->complete();
         }, $this->steps));
     }
 

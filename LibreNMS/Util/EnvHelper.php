@@ -25,24 +25,31 @@
 
 namespace LibreNMS\Util;
 
+use LibreNMS\Exceptions\FileWriteFailedException;
+
 class EnvHelper
 {
     /**
-     * Fix .env with # in them without a space before it
+     * Set a setting in .env file.
+     * Will only set non-empty unset variables
+     *
+     * @param array $settings KEY => value list of settings
+     * @param array $unset Remove the given KEYS from the config
+     * @param string $file
+     * @return string
      */
-    public static function fixComments($dotenv)
+    public static function writeEnv($settings, $unset = [], $file = '.env')
     {
-        return implode(PHP_EOL, array_map(function ($line) {
-            $parts = explode('=', $line, 2);
-            if (isset($parts[1])
-                && preg_match('/(?<!\s)#/', $parts[1]) // number symbol without a space before it
-                && !preg_match('/^(".*"|\'.*\')$/', $parts[1]) // not already quoted
-            ) {
-                return trim($parts[0]) . '="' . trim($parts[1]) . '"';
-            }
+        $original_content = file_get_contents($file);
 
-            return $line;
-        }, explode(PHP_EOL, $dotenv)));
+        $new_content = self::setEnv($original_content, $settings, $unset);
+
+        // only write if the content has changed
+        if ($new_content !== $original_content) {
+            file_put_contents($file, $new_content);
+        }
+
+        return $new_content;
     }
 
     /**
@@ -53,12 +60,35 @@ class EnvHelper
      * @param array $unset Remove the given KEYS from the config
      * @param string $file
      * @return string
+     * @throws \LibreNMS\Exceptions\FileWriteFailedException
      */
-    public static function setEnv($settings, $unset = [], $file = '.env')
+    public static function tryWriteEnv($settings, $unset = [], $file = '.env')
     {
-        $original_content = $content = file_get_contents($file);
-        // TODO implement force
+        $original_content = file_get_contents($file);
 
+        $new_content = self::setEnv($original_content, $settings, $unset);
+
+        // only write if the content has changed
+        if ($new_content !== $original_content) {
+            if(!file_put_contents($file, $new_content)) {
+                throw new FileWriteFailedException($file);
+            }
+        }
+
+        return $new_content;
+    }
+
+    /**
+     * Set a setting in .env file.
+     * Will only set non-empty unset variables
+     *
+     * @param string $content
+     * @param array $settings KEY => value list of settings
+     * @param array $unset Remove the given KEYS from the config
+     * @return string
+     */
+    public static function setEnv($content, $settings, $unset = [])
+    {
         // ensure trailing line return
         if (substr($content, -1) !== PHP_EOL) {
             $content .= PHP_EOL;
@@ -76,10 +106,7 @@ class EnvHelper
                 continue;
             }
 
-            // quote strings with spaces
-            if (strpos($value, ' ') !== false) {
-                $value = "\"$value\"";
-            }
+            $value = self::escapeValue($value);
 
             if (strpos($content, "$key=") !== false) {
                 // only replace ones that aren't already set for safety and uncomment
@@ -90,13 +117,42 @@ class EnvHelper
             }
         }
 
-        $content = self::fixComments($content);
+        return self::fixComments($content);
+    }
 
-        // only write if the content has changed
-        if ($content !== $original_content) {
-            file_put_contents($file, $content);
+    /**
+     * Fix .env with # in them without a space before it
+     *
+     * @param string $dotenv
+     * @return string
+     */
+    private static function fixComments($dotenv)
+    {
+        return implode(PHP_EOL, array_map(function ($line) {
+            $parts = explode('=', $line, 2);
+            if (isset($parts[1])
+                && preg_match('/(?<!\s)#/', $parts[1]) // number symbol without a space before it
+                && !preg_match('/^(".*"|\'.*\')$/', $parts[1]) // not already quoted
+            ) {
+                return trim($parts[0]) . '="' . trim($parts[1]) . '"';
+            }
+
+            return $line;
+        }, explode(PHP_EOL, $dotenv)));
+    }
+
+    /**
+     * quote strings with spaces
+     *
+     * @param $value
+     * @return string
+     */
+    private static function escapeValue($value)
+    {
+        if (strpos($value, ' ') !== false) {
+            return "\"$value\"";
         }
 
-        return $content;
+        return $value;
     }
 }

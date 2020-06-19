@@ -99,7 +99,7 @@ class ComposerHelper
 
         @include 'config.php';
 
-        EnvHelper::setEnv([
+        EnvHelper::writeEnv([
             'NODE_ID'        => uniqid(),
             'DB_HOST'        => $config['db_host'],
             'DB_PORT'        => $config['db_port'],
