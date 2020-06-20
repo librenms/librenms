@@ -2131,6 +2131,7 @@ function device_is_up($device, $record_perf = false)
             $reason = $response['status_reason'];
             if ($device['uptime']) {
                 $data = ['device_id' => $device['device_id'],
+                         'uptime' => $device['uptime'],
                          'going_down' => strtotime($device['last_polled'])];
                 dbInsert($data, 'device_outages');
             }

@@ -17,6 +17,7 @@ class CreateDeviceOutagesTable extends Migration
             $table->unsignedInteger('device_id')->index();
             $table->bigInteger('going_down');
             $table->bigInteger('up_again')->nullable();
+            $table->bigInteger('uptime')->nullable();
             $table->unique(['device_id', 'going_down']);
         });
         Schema::create('availability', function (Blueprint $table) {
