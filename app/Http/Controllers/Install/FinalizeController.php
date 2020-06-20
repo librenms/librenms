@@ -79,7 +79,7 @@ class FinalizeController extends InstallationController implements InstallerStep
     {
         $this->configureDatabase();
         $connection = config('database.default', $this->connection);
-        return EnvHelper::tryWriteEnv([
+        return EnvHelper::writeEnv([
             'NODE_ID' => uniqid(),
             'DB_HOST' => config("database.connections.$connection.host"),
             'DB_PORT' => config("database.connections.$connection.port"),

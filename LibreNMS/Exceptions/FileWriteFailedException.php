@@ -29,8 +29,31 @@ use Throwable;
 
 class FileWriteFailedException extends \Exception
 {
+    protected $file;
+
     public function __construct($file, $code = 0, Throwable $previous = null)
     {
+        $this->file = $file;
         parent::__construct("Failed to write file: $file", $code, $previous);
     }
+
+//    /**
+//     * Render the exception into an HTTP or JSON response.
+//     *
+//     * @param  \Illuminate\Http\Request
+//     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+//     */
+//    public function render(\Illuminate\Http\Request $request)
+//    {
+//        $title = trans('exceptions.file_write_failed.title');
+//        $message = trans('exceptions.file_write_failed.message', ['file' => $this->file]);
+//
+//        return $request->wantsJson() ? response()->json([
+//            'status' => 'error',
+//            'message' => "$title: $message",
+//        ]) : response()->view('errors.generic', [
+//            'title' => $title,
+//            'content' => $message,
+//        ]);
+//    }
 }

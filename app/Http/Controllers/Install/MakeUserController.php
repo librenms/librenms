@@ -28,6 +28,7 @@ namespace App\Http\Controllers\Install;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Interfaces\InstallerStep;
 
 class MakeUserController extends InstallationController implements InstallerStep
@@ -76,7 +77,7 @@ class MakeUserController extends InstallationController implements InstallerStep
 
     public function complete(): bool
     {
-        return User::adminOnly()->exists();
+        return Eloquent::isConnected() && User::adminOnly()->exists();
     }
 
     public function enabled(): bool

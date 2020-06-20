@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use Composer\Script\Event;
+use LibreNMS\Exceptions\FileWriteFailedException;
 use LibreNMS\Util\EnvHelper;
 
 class ComposerHelper
@@ -78,13 +79,6 @@ class ComposerHelper
      */
     private static function populateEnv()
     {
-        $install = false;
-        if (!file_exists('.env')) {
-            copy('.env.example', '.env');
-            self::exec('php artisan key:generate');
-            $install = true;
-        }
-
         $config = [
             'db_host' => '',
             'db_port' => '',
@@ -99,19 +93,23 @@ class ComposerHelper
 
         @include 'config.php';
 
-        EnvHelper::writeEnv([
-            'NODE_ID'        => uniqid(),
-            'DB_HOST'        => $config['db_host'],
-            'DB_PORT'        => $config['db_port'],
-            'DB_USERNAME'    => $config['db_user'],
-            'DB_PASSWORD'    => $config['db_pass'],
-            'DB_DATABASE'    => $config['db_name'],
-            'DB_SOCKET'      => $config['db_socket'],
-            'APP_URL'        => $config['base_url'],
-            'LIBRENMS_USER'  => $config['user'],
-            'LIBRENMS_GROUP' => $config['group'],
-            'INSTALL'        => $install,
-        ]);
+        try {
+            EnvHelper::init();
+            EnvHelper::writeEnv([
+                'NODE_ID' => uniqid(),
+                'DB_HOST' => $config['db_host'],
+                'DB_PORT' => $config['db_port'],
+                'DB_USERNAME' => $config['db_user'],
+                'DB_PASSWORD' => $config['db_pass'],
+                'DB_DATABASE' => $config['db_name'],
+                'DB_SOCKET' => $config['db_socket'],
+                'APP_URL' => $config['base_url'],
+                'LIBRENMS_USER' => $config['user'],
+                'LIBRENMS_GROUP' => $config['group'],
+            ]);
+        } catch (FileWriteFailedException $exception) {
+            echo $exception->getMessage() . PHP_EOL;
+        }
     }
 
     private static function setPermissions()

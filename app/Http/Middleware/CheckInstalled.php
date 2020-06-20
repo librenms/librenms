@@ -27,6 +27,7 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
+use LibreNMS\Util\EnvHelper;
 
 class CheckInstalled
 {
@@ -39,11 +40,17 @@ class CheckInstalled
      */
     public function handle($request, Closure $next)
     {
+        config(['app.debug' => true]);
         $installed = !config('librenms.install') && file_exists(base_path('.env'));
         $is_install_route = $request->is('install*');
 
+        // further middleware will fail without an app key, init one
+        if (empty(config('app.key'))) {
+            config(['app.key' => EnvHelper::init()]);
+        }
+
         if (!$installed && !$is_install_route) {
-            // no config.php does so let's redirect to the install
+            // redirect to install if not installed
             return redirect()->route('install');
         } elseif ($installed && $is_install_route) {
             throw new AuthorizationException('This should only be called during install');

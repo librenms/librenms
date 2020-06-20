@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Util;
 
+use Artisan;
+use ErrorException;
 use LibreNMS\Exceptions\FileWriteFailedException;
 
 class EnvHelper
@@ -37,49 +39,30 @@ class EnvHelper
      * @param array $unset Remove the given KEYS from the config
      * @param string $file
      * @return string
+     * @throws \LibreNMS\Exceptions\FileWriteFailedException
      */
     public static function writeEnv($settings, $unset = [], $file = '.env')
     {
-        $original_content = file_get_contents($file);
+        try {
+            $original_content = file_get_contents($file);
 
-        $new_content = self::setEnv($original_content, $settings, $unset);
+            $new_content = self::setEnv($original_content, $settings, $unset);
 
-        // only write if the content has changed
-        if ($new_content !== $original_content) {
-            file_put_contents($file, $new_content);
-        }
-
-        return $new_content;
-    }
-
-    /**
-     * Set a setting in .env file.
-     * Will only set non-empty unset variables
-     *
-     * @param array $settings KEY => value list of settings
-     * @param array $unset Remove the given KEYS from the config
-     * @param string $file
-     * @return string
-     * @throws \LibreNMS\Exceptions\FileWriteFailedException
-     */
-    public static function tryWriteEnv($settings, $unset = [], $file = '.env')
-    {
-        $original_content = file_get_contents($file);
-
-        $new_content = self::setEnv($original_content, $settings, $unset);
-
-        // only write if the content has changed
-        if ($new_content !== $original_content) {
-            if(!file_put_contents($file, $new_content)) {
-                throw new FileWriteFailedException($file);
+            // only write if the content has changed
+            if ($new_content !== $original_content) {
+                if (!file_put_contents($file, $new_content)) {
+                    throw new FileWriteFailedException($file);
+                }
             }
-        }
 
-        return $new_content;
+            return $new_content;
+        } catch (ErrorException $e) {
+            throw new FileWriteFailedException($file, 0, $e);
+        }
     }
 
     /**
-     * Set a setting in .env file.
+     * Set a setting in .env file content.
      * Will only set non-empty unset variables
      *
      * @param string $content
@@ -118,6 +101,36 @@ class EnvHelper
         }
 
         return self::fixComments($content);
+    }
+
+    /**
+     * Copy the example .env file and set APP_KEY
+     *
+     * @return bool|string
+     * @throws \LibreNMS\Exceptions\FileWriteFailedException
+     */
+    public static function init()
+    {
+        $env_file = base_path('.env');
+        try {
+            if (!file_exists($env_file)) {
+                Artisan::call('key:generate', ['--show' => true]);
+                $key = trim(Artisan::output());
+                config(['app.key' => $key]);
+
+                copy(base_path('.env.example'), $env_file);
+                self::writeEnv([
+                    'APP_KEY' => $key,
+                    'INSTALL' => !file_exists(base_path('config.php')) ? 'true' : false, // if both .env and config.php are missing, assume install is needed
+                ], [], $env_file);
+
+                return $key;
+            }
+
+            return false;
+        } catch (ErrorException $e) {
+            throw new FileWriteFailedException($env_file, 0, $e);
+        }
     }
 
     /**
