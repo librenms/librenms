@@ -10,7 +10,7 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "os": "f5"
+                    "os": "f5",
                     "type": "loadbalancer",
                     "serial": null,
                     "icon": "f5.svg",
