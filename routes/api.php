@@ -63,6 +63,9 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::post('{hostname}/components/{type}', 'LegacyApiController@add_components')->name('add_components');
             Route::put('{hostname}/components', 'LegacyApiController@edit_components')->name('edit_components');
             Route::delete('{hostname}/components/{component}', 'LegacyApiController@delete_components')->name('delete_components');
+            Route::post('{hostname}/customoids', 'LegacyApiController@add_customoids')->name('add_customoids');
+            Route::patch('{hostname}/customoids/{customoid}', 'LegacyApiController@update_customoids')->name('update_customoids');
+            Route::delete('{hostname}/customoids/{customoid}', 'LegacyApiController@delete_customoids')->name('delete_customoids');
         });
 
         Route::post('bills', 'LegacyApiController@create_edit_bill')->name('create_bill');
@@ -101,6 +104,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('{hostname}/ip', 'LegacyApiController@get_device_ip_addresses')->name('get_ip_addresses');
         Route::get('{hostname}/port_stack', 'LegacyApiController@get_port_stack')->name('get_port_stack');
         Route::get('{hostname}/components', 'LegacyApiController@get_components')->name('get_components');
+        Route::get('{hostname}/customoids/{customoid?}', 'LegacyApiController@get_customoids')->name('get_customoids');
         Route::get('{hostname}/groups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
         // consumes the route below, but passes to it when detected
         Route::get('{hostname}/ports/{ifname}', 'LegacyApiController@get_port_stats_by_port_hostname')->name('get_port_stats_by_port_hostname')->where('ifname', '.*');

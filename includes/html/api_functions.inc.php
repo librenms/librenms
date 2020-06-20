@@ -643,6 +643,141 @@ function get_graph_by_portgroup(\Illuminate\Http\Request $request)
     return api_get_graph($vars);
 }
 
+function get_customoids(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $customoid = $request->route('customoid');
+
+    $customoidsResults = array();
+    if (ctype_digit($customoid)) {
+        $customoidsResults = dbFetchRows("SELECT * FROM customoids WHERE `device_id` = ? AND `customoid_id` = ?", array($device_id, $customoid));
+    } else {
+        $customoidsResults = dbFetchRows("SELECT * FROM customoids WHERE `device_id` = ?", array($device_id));
+    }
+
+    $customoids = array();
+    foreach ($customoidsResults as $customoidsResult) {
+        $data = array();
+        $data['id'] = $customoidsResult['customoid_id'];
+        $data['name'] = $customoidsResult['customoid_descr'];
+        $data['oid'] = $customoidsResult['customoid_oid'];
+        $data['datatype'] = $customoidsResult['customoid_datatype'];
+        $data['unit'] = $customoidsResult['customoid_unit'];
+        $data['divisor'] = $customoidsResult['customoid_divisor'];
+        $data['multiplier'] = $customoidsResult['customoid_multiplier'];
+        $data['limit'] = $customoidsResult['customoid_limit'];
+        $data['limit_warn'] = $customoidsResult['customoid_limit_warn'];
+        $data['limit_low'] = $customoidsResult['customoid_limit_low'];
+        $data['limit_low_warn'] = $customoidsResult['customoid_limit_low_warn'];
+        $data['alert'] = $customoidsResult['customoid_alert'];
+        $data['user_func'] = $customoidsResult['user_func'];
+        $customoids[] = $data;
+    }
+
+    $total_customoids = count($customoids);
+    if (!is_numeric($total_customoids)) {
+        return api_error(500, 'Error retrieving customoids');
+    }
+
+    return api_success($customoids, 'customoids');
+}
+
+function add_customoids(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $data = json_decode($request->getContent(), true);
+
+    if (empty($data['name'])) {
+        return api_error(500, 'No OID name provided');
+    }
+    if (dbFetchCell('SELECT 1 FROM `customoids` WHERE `customoid_descr` = ? AND `device_id`=?', array($data['name'], $device_id))) {
+        return api_error(500, "OID named {$data['name']} on this device already exists");
+    }
+
+
+    $insertData = array(
+            'device_id'                => $device_id,
+            'customoid_descr'          => $data['name'],
+            'customoid_oid'            => $data['oid'],
+            'customoid_passed'         => 1
+    );
+    if (!empty($data['datatype'])) $insertData['customoid_datatype'] = $data['datatype'];
+    if (!empty($data['unit'])) $insertData['customoid_unit'] = $data['unit'];
+    if (!empty($data['divisor'])) $insertData['customoid_divisor'] = $data['divisor'];
+    if (!empty($data['multiplier'])) $insertData['customoid_multiplier'] = $data['multiplier'];
+    if (!empty($data['limit'])) $insertData['customoid_limit'] = $data['limit'];
+    if (!empty($data['limit_warn'])) $insertData['customoid_limit_warn'] = $data['limit_warn'];
+    if (!empty($data['limit_low'])) $insertData['customoid_limit_low'] = $data['limit_low'];
+    if (!empty($data['limit_low_warn'])) $insertData['customoid_limit_low_warn'] = $data['limit_low_warn'];
+    if (!empty($data['alert'])) $insertData['customoid_alert'] = $data['alert'];
+
+    $id = dbInsert(
+        $insertData,
+        'customoids'
+    );
+    if (!$id) {
+        return api_error(500, "Failed to add OID: {$data['name']}");
+    }
+
+    return api_success_noresult(201, "Custom OID {$data['name']} added.");
+}
+
+function update_customoids(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $data = json_decode($request->getContent(), true);
+
+    $customoid = $request->route('customoid');
+    if (!ctype_digit($customoid)) {
+        return api_error(500, 'No Custom OID ID provided');
+    }
+
+    $updates = array();
+    if (!empty($data['name'])) $updates['customoid_descr'] = $data['name'];
+    if (!empty($data['oid'])) $updates['customoid_oid'] = $data['oid'];
+    if (!empty($data['datatype'])) $updates['customoid_datatype'] = $data['datatype'];
+    if (!empty($data['unit'])) $updates['customoid_unit'] = $data['unit'];
+    if (!empty($data['divisor'])) $updates['customoid_divisor'] = $data['divisor'];
+    if (!empty($data['multiplier'])) $updates['customoid_multiplier'] = $data['multiplier'];
+    if (!empty($data['limit'])) $updates['customoid_limit'] = $data['limit'];
+    if (!empty($data['limit_warn'])) $updates['customoid_limit_warn'] = $data['limit_warn'];
+    if (!empty($data['limit_low'])) $updates['customoid_limit_low'] = $data['limit_low'];
+    if (!empty($data['limit_low_warn'])) $updates['customoid_limit_low_warn'] = $data['limit_low_warn'];
+    if (!empty($data['alert'])) $updates['customoid_alert'] = $data['alert'];
+    if (!empty($data['user_func'])) $updates['user_func'] = $data['user_func'];
+
+    $res = dbUpdate(
+        $updates,
+        'customoids',
+        "`customoid_id` = ?, `device_id` = ?",
+        [ $customoid, $device_id ]
+    );
+
+    if ($res<0) {
+        return api_error(500, "Failed to edit OID");
+    }
+
+    return api_success_noresult(201, "Custom OID updated successfully");
+}
+
+function delete_customoids(\Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $customoid = $request->route('customoid');
+    if ($customoid < 1) {
+        return api_error(400, 'Could not remove custom OID with id '.$customoid.'. Invalid id');
+    }
+
+    $res = dbDelete('customoids', '`customoid_id` =  ?, `device_id` = ? LIMIT 1', [ $customoid, $device_id ]);
+    if ($res == 1) {
+        return api_success_noresult(200, 'Custom OID has been removed');
+    }
+    return api_error(400, 'Could not remove custom OID with id '.$customoid);
+}
 
 function get_components(\Illuminate\Http\Request $request)
 {

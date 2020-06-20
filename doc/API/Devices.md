@@ -771,6 +771,148 @@ Output:
 }
 ```
 
+### `get_customoids`
+
+Get a list of custom OIDs for a particular device.
+
+Route: `/api/v0/devices/:hostname/customoids/:customoid`
+
+- hostname can be either the device hostname or id
+- customoid is optional and should be the ID of the custom OID
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/customoids
+```
+
+Output:
+
+```json
+{
+  "status": "ok",
+  "customoids": [
+    {
+      "id": 1,
+      "name": "Name",
+      "oid": ".1.3.6.1.4.1.8072.1.3.2.4.1.2.17.112.104.112.45.112.114.111.99.101.115.115.45.99.111.117.110.116.1",
+      "datatype": "",
+      "unit": "Count",
+      "divisor": 1,
+      "multiplier": 1,
+      "limit": null,
+      "limit_warn": null,
+      "limit_low": null,
+      "limit_low_warn": null,
+      "alert": 0,
+      "user_func": null
+    }
+  ],
+  "count": 1
+}
+```
+
+### `add_customoids`
+
+Create a new custom OID on a particular device.
+
+Route: `/api/v0/devices/:hostname/customoid`
+
+- hostname can be either the device hostname or id
+
+Input (JSON):
+
+- name: A description of the OID
+- oid: The SNMP Object Identifier
+- datatype: SNMP data type, either GAUGE or COUNTER
+- unit: Unit of value being polled
+- divisor: Divide raw SNMP value by
+- multiplier: Multiply raw SNMP value by
+- limit: Level to alert above
+- limit_warn: Level to warn above
+- limit_low: Level to alert below
+- limit_low_warn: Level to warn below
+- alert: Alerts for this OID enabled
+- user_func: User function to apply to value
+
+Example:
+
+```curl
+curl -X POST -d '{"name":"Name","oid":".1.3.6.1.4.1.8072.1.3.2.4.1.2.17.112.104.112.45.112.114.111.99.101.115.115.45.99.111.117.110.116.1"}'  -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/customoids
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Custom OID Name added."
+}
+```
+
+### `update_customoids`
+
+Edit an existing custom oid on a particular device.
+
+Route: `/api/v0/devices/:hostname/customoids/:customoid`
+
+- hostname can be either the device hostname or id
+- customoid is the ID of the custom OID
+
+Input (JSON):
+
+- name: A description of the OID
+- oid: The SNMP Object Identifier
+- datatype: SNMP data type, either GAUGE or COUNTER
+- unit: Unit of value being polled
+- divisor: Divide raw SNMP value by
+- multiplier: Multiply raw SNMP value by
+- limit: Level to alert above
+- limit_warn: Level to warn above
+- limit_low: Level to alert below
+- limit_low_warn: Level to warn below
+- alert: Alerts for this OID enabled
+- user_func: User function to apply to value
+
+In this example we enable alerts:
+
+```curl
+curl -X PATCH -d '{"alert": 1}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/customoids/1
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Custom OID updated successfully"
+}
+```
+
+### `delete_customoids`
+
+Delete an existing custom oid on a particular device.
+
+Route: `/api/v0/devices/:hostname/customoids/:customoid`
+
+- hostname can be either the device hostname or id
+- customoid is the ID of the custom OID to be deleted
+
+Example:
+
+```curl
+curl -X DELETE -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/customoids/1
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Custom OID has been removed"
+}
+```
+
 ### `get_port_stats_by_port_hostname`
 
 Get information about a particular port for a device.
@@ -1216,7 +1358,7 @@ search all oxidized device configs for a string.
 Route: `api/v0/oxidized/config/search/:searchstring`
 
   - searchstring is the specific string you would like to search for.
-  
+
 Input:
 
 -
@@ -1251,7 +1393,7 @@ Returns a specific device's config from oxidized.
 Route: `api/v0/oxidized/config/:device_name`
 
   - device_name is the full dns name of the device used when adding the device to librenms.
-  
+
 Input:
 
 -
