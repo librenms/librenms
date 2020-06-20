@@ -1,6 +1,6 @@
 <?php
 /**
- * Widget.php
+ * Availability.php
  *
  * -Description-
  *
