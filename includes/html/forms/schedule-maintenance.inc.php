@@ -43,12 +43,12 @@ if ($sub_type == 'new-maintenance') {
     $end_recurring_hr = mres($_POST['end_recurring_hr']);
     $recurring_day = mres($_POST['recurring_day']);
     $start    = mres($_POST['start']);
-    $duration = mres($_POST['duration']);
+    list($duration_hour, $duration_min) = explode(':', mres($_POST['duration']));
     $end      = mres($_POST['end']);
     $maps     = mres($_POST['maps']);
 
-    if (!empty($duration)) {
-        $end = date('Y-m-d H:i:00', strtotime('+'.$duration.' hour', strtotime($start)));
+    if (isset($duration_hour) && isset($duration_min)) {
+        $end = date('Y-m-d H:i:00', strtotime('+'.intval($duration_hour).' hour '.intval($duration_min).' minute', strtotime($start)));
     }
 
     if (empty($title)) {
