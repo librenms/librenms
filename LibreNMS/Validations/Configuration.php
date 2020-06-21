@@ -26,6 +26,7 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Validator;
 
 class Configuration extends BaseValidation
@@ -45,6 +46,10 @@ class Configuration extends BaseValidation
 
         if (config('app.debug')) {
             $validator->warn('Debug enabled.  This is a security risk.');
+        }
+
+        if (Eloquent::isConnected() && !\DB::table('devices')->exists()) {
+            $validator->warn('You have no devices.', 'Consider adding a device such as localhost: ' . $validator->getBaseURL() . '/addhost');
         }
     }
 }
