@@ -40,7 +40,6 @@ class CheckInstalled
      */
     public function handle($request, Closure $next)
     {
-        config(['app.debug' => true]);
         $installed = !config('librenms.install') && file_exists(base_path('.env'));
         $is_install_route = $request->is('install*');
 
