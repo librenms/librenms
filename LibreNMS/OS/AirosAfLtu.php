@@ -37,7 +37,7 @@ class AirosAfLtu extends OS implements
      */
     public function discoverWirelessDistance()
     {
-        $oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.23.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRemoteDistance.1
+        $oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.23.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaRemoteDistance.1
         return array(
             new WirelessSensor('distance', $this->getDeviceId(), $oid, 'airos-af-ltu', 1, 'Distance', null, 1, 1000),
         );
@@ -51,18 +51,18 @@ class AirosAfLtu extends OS implements
      */
     public function discoverWirelessPower()
     {
-        $rx_power0_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.5.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRxPower0.1
-        $rx_power1_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.6.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRxPower1.1
-        $rx_ideal_power0_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.7.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaIdealRxPower0.1
-        $rx_ideal_power1_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.8.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaIdealRxPower1.1
-        $rx_power0_level_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.9.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel0.1
-        $rx_power1_level_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.10.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel1.1
+        $rx_power0_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.5.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaRxPower0.1
+        $rx_power1_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.6.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaRxPower1.1
+        $rx_ideal_power0_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.7.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaIdealRxPower0.1
+        $rx_ideal_power1_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.8.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaIdealRxPower1.1
+        $rx_power0_level_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.9.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel0.1
+        $rx_power1_level_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.10.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaRxPowerLevel1.1
         $tx_eirp_oid = '.1.3.6.1.4.1.41112.1.10.1.2.6.0'; //UBNT-AFLTU-MIB::afLTUTxEIRP
         return array(
-            new WirelessSensor('power', $this->getDeviceId(), $rx_power0_oid, 'airos-af-ltu-tx-chain-0', 1, 'Tx Power Chain 0'),
-            new WirelessSensor('power', $this->getDeviceId(), $rx_power1_oid, 'airos-af-ltu-tx-chain-1', 1, 'Tx Power Chain 1'),
-            new WirelessSensor('power', $this->getDeviceId(), $rx_ideal_power0_oid, 'airos-af-ltu-ideal-tx-chain-0', 1, 'Tx Ideal Power Chain 0'),
-            new WirelessSensor('power', $this->getDeviceId(), $rx_ideal_power1_oid, 'airos-af-ltu-ideal-tx-chain-1', 1, 'Tx Ideal Power Chain 1'),
+            new WirelessSensor('power', $this->getDeviceId(), $rx_power0_oid, 'airos-af-ltu-tx-chain-0', 1, 'Rx Power Chain 0'),
+            new WirelessSensor('power', $this->getDeviceId(), $rx_power1_oid, 'airos-af-ltu-tx-chain-1', 1, 'Rx Power Chain 1'),
+            new WirelessSensor('power', $this->getDeviceId(), $rx_ideal_power0_oid, 'airos-af-ltu-ideal-tx-chain-0', 1, 'Rx Ideal Power Chain 0'),
+            new WirelessSensor('power', $this->getDeviceId(), $rx_ideal_power1_oid, 'airos-af-ltu-ideal-tx-chain-1', 1, 'Rx Ideal Power Chain 1'),
             new WirelessSensor('quality', $this->getDeviceId(), $rx_power0_level_oid, 'airos-af-ltu-level-rx-chain-0', 1, 'Signal Level Chain 0'),
             new WirelessSensor('quality', $this->getDeviceId(), $rx_power1_level_oid, 'airos-af-ltu-level-rx-chain-1', 1, 'Signal Level Chain 1'),
             new WirelessSensor('power', $this->getDeviceId(), $tx_eirp_oid, 'airos-af-ltu-tx-eirp', 1, 'Tx EIRP'),
@@ -77,8 +77,8 @@ class AirosAfLtu extends OS implements
      */
     public function discoverWirelessRate()
     {
-        $tx_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.3.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaTxCapacity.1
-        $rx_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.4.24.232.41.30.48.222'; //UBNT-AFLTU-MIB::afLTUStaRxCapacity.1
+        $tx_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.3.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaTxCapacity.1
+        $rx_oid = '.1.3.6.1.4.1.41112.1.10.1.4.1.4.24.232.41.30.56.214'; //UBNT-AFLTU-MIB::afLTUStaRxCapacity.1
         return array(
             new WirelessSensor('rate', $this->getDeviceId(), $tx_oid, 'airos-af-ltu-tx', 1, 'Tx Rate', null, 1000),
             new WirelessSensor('rate', $this->getDeviceId(), $rx_oid, 'airos-af-ltu-rx', 1, 'Rx Rate', null, 1000),
