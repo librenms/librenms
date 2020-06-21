@@ -75,11 +75,6 @@ class Availability
 
         $now = time();
 
-        # uptime is greater duration interval -> full availability
-        if ($device['uptime'] >= $duration) {
-            return 100 * 1;
-        }
-
         $query = DeviceOutage::where('device_id', '=', $device['device_id'])
             ->where('up_again', '>=', $now - $duration)
             ->orderBy('going_down');
@@ -88,7 +83,12 @@ class Availability
 
         # no recorded outages found, so use current uptime
         if (!count($found_outages)) {
-            return round(100 * $device['uptime'] / $duration, $precision);
+            # uptime is greater duration interval -> full availability
+            if ($device['uptime'] >= $duration) {
+                return 100 * 1;
+            } else {
+                return round(100 * $device['uptime'] / $duration, $precision);
+            }
         }
 
         $oldest_date_going_down = $query->first()->value('going_down');
