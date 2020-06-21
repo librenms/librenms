@@ -2,23 +2,41 @@
 
 @section('content')
 <div class="card mb-2">
-  <div class="card-header" data-toggle="collapse" data-target="#env-file-text" aria-expanded="false">
-      @lang('install.finish.env_written')
-      <i class="fa fa-chevron-up rotate-if-collapsed pull-right"></i>
+  <div class="card-header" data-toggle="collapse" data-target="#env-file-text" aria-expanded="{{ $success ? 'false' : 'true' }}">
+    @if($success)
+      <i class="fa fa-lg fa-check-circle text-success"></i>
+    @else
+      <i class="fa fa-lg fa-times-circle text-danger"></i>
+    @endif
+    {{ $env_message }}
+    @if($env)<i class="fa fa-lg fa-chevron-down rotate-if-collapsed pull-right"></i>@endif($env)
   </div>
-  <div id="env-file-text" class="card-body collapse">
-      <pre class="card bg-light p-3">{{ $env }}</pre>
-  </div>
+    @if($env)
+    <div id="env-file-text" class="card-body collapse @if(!$success) show @endif">
+        <button class="btn btn-primary float-right" onclick="location.reload()">@lang('install.finish.retry')</button>
+        <strong>
+            @lang('install.finish.env_manual', ['file' => base_path('.env')])
+        </strong>
+        <pre class="card bg-light p-3 mt-3">{{ $env }}</pre>
+    </div>
+    @endif
 </div>
 <div class="card mb-2">
     <div class="card-header" data-toggle="collapse" data-target="#config-file-text" aria-expanded="false">
+        <i class="fa fa-lg fa-check-circle text-success"></i>
         {{ $config_message }}
-        <i class="fa fa-chevron-up rotate-if-collapsed pull-right"></i>
+        @if($config)<i class="fa fa-lg fa-chevron-down rotate-if-collapsed pull-right"></i>@endif
     </div>
+    @if($config)
     <div id="config-file-text" class="card-body collapse">
-        <pre class="card bg-light p-3">{{ $config }}</pre>
+        <strong>
+            @lang('install.finish.config_not_required')
+        </strong>
+        <pre class="card bg-light p-3 mt-3">{{ $config }}</pre>
     </div>
+    @endif
 </div>
+@if($success)
 <div class="row">
     <div class="col-12">
         <div class="alert alert-warning">
@@ -35,4 +53,5 @@
         </div>
     </div>
 </div>
+@endif
 @endsection

@@ -49,6 +49,7 @@ class InstallationController extends Controller
     public function redirectToIncomplete()
     {
         foreach ($this->filterActiveSteps() as $step => $controller) {
+            /** @var InstallerStep $controller */
             if (!$controller->complete()) {
                 return redirect()->route("install.$step");
             }
@@ -77,12 +78,12 @@ class InstallationController extends Controller
         $this->filterActiveSteps();
         $this->configureDatabase();
 
-        foreach ($this->stepStatus() as $step => $complete) {
+        foreach ($this->stepStatus() as $step => $status) {
             if ($step == $this->step) {
                 return true;
             }
 
-            if (!$complete) {
+            if (!$status['complete']) {
                 return false;
             }
         }
@@ -121,7 +122,7 @@ class InstallationController extends Controller
                 $db['password'] ?? null,
                 $db['database'] ?? 'librenms',
                 $db['port'] ?? 3306,
-                $db['socket'] ?? null,
+                $db['socket'] ?? null
             );
             config(['database.default', $this->connection]);
         }

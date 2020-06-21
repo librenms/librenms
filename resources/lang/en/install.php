@@ -50,8 +50,11 @@ return [
     'finish' => [
         'title' => 'Finish Install',
         'env_written' => '.env file written',
+        'env_not_written' => 'Could not write .env file',
+        'env_manual' => 'Manually update :file with the following content',
         'config_exists' => 'config.php file exists',
         'config_written' => 'config.php file written',
+        'config_not_required' => 'This file is not required.  Here is the default.',
         'config_not_written' => 'Could not write config.php',
         'not_finished' => 'You have not quite finished yet!',
         'validate' => 'First, you need to :validate and fix any issues.',
@@ -59,5 +62,6 @@ return [
         'thanks' => 'Thank you for setting up LibreNMS.',
         'statistics' => 'It would be great if you would consider contributing to our statistics, you can do this on the :about and check the box under Statistics.',
         'statistics_link' => 'About LibreNMS Page',
+        'retry' => 'Retry'
     ]
 ];
