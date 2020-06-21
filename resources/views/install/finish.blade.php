@@ -1,7 +1,5 @@
 @extends('layouts.install')
 
-@section('title', trans('install.finish.title'))
-
 @section('content')
 <div class="card mb-2">
   <div class="card-header" data-toggle="collapse" data-target="#env-file-text" aria-expanded="false">

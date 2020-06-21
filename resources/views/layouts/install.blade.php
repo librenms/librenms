@@ -17,7 +17,7 @@
 
         .primary-panel {
             padding: 0;
-            border:0;
+            border: 0;
             box-shadow: 3px 3px 30px #222;
             min-height: 540px;
         }
@@ -35,6 +35,7 @@
         .card-img-top {
             background-color: #EEEEEE;
         }
+
         #progress-icons {
             background: linear-gradient(to bottom, #EEEEEE 50%, white 50%)
         }
@@ -51,16 +52,16 @@
             display: inline-block;
             width: 100%;
             background-color: lightgray;
-            box-shadow:
-                inset 0 6px 4px -5px black,
-                inset 0 -6px 4px -7px black;
+            box-shadow: inset 0 6px 4px -5px black,
+            inset 0 -6px 4px -7px black;
         }
+
         .install-progress.loop {
-            box-shadow:
-                inset 0 6px 4px -5px black,
-                inset 0 -6px 4px -7px black,
-                inset 8px 0 4px -6px grey; /* missing button shadow */
+            box-shadow: inset 0 6px 4px -5px black,
+            inset 0 -6px 4px -7px black,
+            inset 8px 0 4px -6px grey; /* missing button shadow */
         }
+
         .install-progress.complete {
             background-color: #db202e;
         }
@@ -72,9 +73,11 @@
         .rotate-if-collapsed {
             transition: .4s transform ease-in-out;
         }
+
         [data-toggle="collapse"] {
             cursor: pointer;
         }
+
         [data-toggle="collapse"][aria-expanded="true"] .rotate-if-collapsed {
             transform: rotate(180deg);
         }
@@ -88,30 +91,33 @@
             <img class="card-img-top p-4" src="{{ asset(\LibreNMS\Config::get('title_image', "images/librenms_logo_light.svg")) }}" alt="LibreNMS">
             <div id="progress-icons" class="d-flex flex-row justify-content-around">
                 <div class="install-progress complete"></div>
-                @foreach($steps as $step => $controller)
+                @foreach($steps as $name => $controller)
                     <div>
-                        <a href="{{ route('install.' . $step) }}"
-                           class="install-enable-{{ $step }} btn btn-info btn-circle @if(!$controller->enabled($steps)) disabled @endif"
-                           title="@lang("install.$step.title")"
+                        <a href="{{ route('install.' . $name) }}"
+                           id="install-step-{{ $name }}"
+                           class="install-step btn btn-circle
+                           @if($step === $name) btn-outline-info @else btn-info @endif
+                           @if(!$controller->enabled()) disabled @endif"
+                           title="@lang("install.$name.title")"
                         >
                             <i class="fa fa-lg {{ $controller->icon() }}"></i>
                         </a>
                     </div>
-                    <div id="progress-{{ $step }}-bar" class="install-progress loop @if($controller->complete()) complete @endif"></div>
+                    <div id="progress-{{ $name }}-bar" class="install-progress loop @if($controller->complete()) complete @endif"></div>
                 @endforeach
             </div>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-12 text-center">
-                    <h2 id="step-title">@yield('title')</h2>
+                    <h2 id="step-title">@lang("install.$step.title")</h2>
                 </div>
             </div>
             <div class="row">
                 <div id="error-box" class="col-12">
                     @if(!empty($messages))
                         @foreach($messages as $message)
-                        <div class="alert alert-danger">{{ $message }}</div>
+                            <div class="alert alert-danger">{{ $message }}</div>
                         @endforeach
                     @endif
                 </div>
@@ -121,22 +127,43 @@
     </div>
 </div>
 <script>
+    var step = '{{ $step }}';
     function checkStepStatus(callback) {
         $.ajax('{{ route('install.action.steps') }}')
-        .success(function (data) {
-            Object.keys(data).forEach(function (key) {
-                if (data[key]) {
-                    $('.install-enable-' + key).removeClass('disabled');
-                } else {
-                    $('.install-enable-' + key).addClass('disabled');
-                }
-            });
+            .success(function (data) {
+                var primary;
+                Object.keys(data).forEach(function (key) {
+                    var classes = 'btn btn-circle';
+                    classes += (key === step ? ' btn-outline-info' : ' btn-info');
 
-            if (callback && typeof callback === "function") {
-                callback(data);
-            }
-        })
+                    // mark buttons enabled
+                    if (!data[key].enabled) {
+                        classes += ' disabled';
+                    } else if (!data[key].complete && !primary) {
+                        // if this step is the first enabled, but not complete, mark it as primary
+                        primary = key
+                    }
+
+                    $('#install-step-' + key).attr('class', classes);
+                });
+
+                if (primary) {
+                    $('#install-step-' + primary)
+                        .removeClass('btn-info')
+                        .removeClass('btn-outline-info')
+                        .addClass(primary === step ? 'btn-outline-primary' : 'btn-primary');
+                } else {
+                    // all complete
+                    $('.install-progress').addClass('complete')
+                }
+
+                if (callback && typeof callback === "function") {
+                    callback(data);
+                }
+            })
     }
+
+    checkStepStatus();
 </script>
 @yield('scripts')
 </body>

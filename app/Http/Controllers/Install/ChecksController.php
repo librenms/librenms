@@ -71,6 +71,10 @@ class ChecksController extends InstallationController implements InstallerStep
 
     public function complete(): bool
     {
+        if ($this->stepCompleted('checks')) {
+            return true;
+        }
+
         if (!$this->checkPhpVersion()) {
             return false;
         }

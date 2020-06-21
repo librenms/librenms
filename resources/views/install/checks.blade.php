@@ -1,7 +1,5 @@
 @extends('layouts.install')
 
-@section('title', trans('install.checks.title'))
-
 @section('content')
     <div class="row">
         <div class=" col-8 offset-2">

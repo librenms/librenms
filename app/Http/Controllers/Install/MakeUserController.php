@@ -26,9 +26,9 @@
 namespace App\Http\Controllers\Install;
 
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Interfaces\InstallerStep;
 
 class MakeUserController extends InstallationController implements InstallerStep
@@ -65,11 +65,20 @@ class MakeUserController extends InstallationController implements InstallerStep
         ]);
 
         try {
-            $user = new User($request->only(['username', 'password', 'email']));
-            $user->level = 10;
-            $user->setPassword($request->get('password'));
-            $res = $user->save();
-            $message = $res ? trans('install.user.success') : trans('install.user.failure');
+            // only allow the first admin to be created
+            if (!$this->complete()) {
+                $this->configureDatabase();
+                $user = new User($request->only(['username', 'password', 'email']));
+                $user->level = 10; // admin
+                $user->setPassword($request->get('password'));
+                $res = $user->save();
+
+                $message = trans('install.user.failure');
+                if ($res) {
+                    $message = trans('install.user.success');
+                    $this->markStepComplete();
+                }
+            }
         } catch (\Exception $e) {
             $message = $e->getMessage();
         }
@@ -79,12 +88,27 @@ class MakeUserController extends InstallationController implements InstallerStep
 
     public function complete(): bool
     {
-        return Eloquent::isConnected() && User::adminOnly()->exists();
+        if ($this->stepCompleted('user')) {
+            return true;
+        }
+
+        try {
+            if ($this->stepCompleted('database')) {
+                $exists = User::adminOnly()->exists();
+                if ($exists) {
+                    $this->markStepComplete();
+                }
+                return $exists;
+            }
+        } catch (QueryException $e) {
+            //
+        }
+        return false;
     }
 
     public function enabled(): bool
     {
-        return (bool)session('install.database');
+        return $this->stepCompleted('database');
     }
 
     public function icon(): string

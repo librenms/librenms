@@ -107,7 +107,7 @@ class DatabaseController extends InstallationController implements InstallerStep
 
     public function complete(): bool
     {
-        if (session('install.database')) {
+        if ($this->stepCompleted('database')) {
             return true;
         }
 

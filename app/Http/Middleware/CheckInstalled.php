@@ -53,6 +53,10 @@ class CheckInstalled
             // redirect to install if not installed
             return redirect()->route('install');
         } elseif ($installed && $is_install_route) {
+            // in case someone refreshes on the finish step
+            if ($request->routeIs('install.finish')) {
+                return redirect()->route('home');
+            }
             throw new AuthorizationException('This should only be called during install');
         }
 

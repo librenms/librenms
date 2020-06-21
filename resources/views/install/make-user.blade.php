@@ -1,7 +1,5 @@
 @extends('layouts.install')
 
-@section('title', trans('install.user.title'))
-
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -28,7 +26,7 @@
                         @error('email')<div class="invalid-feedback">{{ $message }}</div>@enderror
                     </div>
                 </div>
-                <button type="submit" class="btn btn-success float-right">@lang('install.user.button')</button>
+                <button type="submit" class="btn btn-primary float-right">@lang('install.user.button')</button>
             </form>
         </div>
     </div>

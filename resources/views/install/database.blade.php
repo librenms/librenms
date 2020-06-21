@@ -1,7 +1,5 @@
 @extends('layouts.install')
 
-@section('title', trans('install.database.title'))
-
 @section('content')
     <div class="row">
         <div class="col-12">
@@ -73,7 +71,7 @@
             </div>
         </div>
     </div>
-    <div class="row" @if(!$valid_credentials) style="display: none" @endif>
+    <div id="migrate-step" class="row" @if(!$valid_credentials) style="display: none" @endif>
         <div class="col-12">
             <div class="card">
                 <div id="db-form-header"
@@ -95,12 +93,16 @@
                     <i class="fa fa-lg fa-chevron-down rotate-if-collapsed fa-pull-right"></i>
                 </div>
                 <div id="migrate-container" class="card-body collapse @if(!$migrated) show @endif">
-                    <div class="mb-2 text-right">
-                        <button id="migrate-btn" type="button" class="btn btn-primary">
-                            @lang('install.migrate.migrate')
-                        </button>
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div id="migrate-warning" class="alert alert-warning">@lang('install.migrate.building_interrupt')</div>
+                        </div>
+                        <div class="col-md-4 text-right">
+                            <button id="migrate-btn" type="button" class="btn btn-primary mt-1 mb-4">
+                                @lang('install.migrate.migrate')
+                            </button>
+                        </div>
                     </div>
-                    <div id="migrate-warning" class="alert alert-warning">@lang('install.migrate.building_interrupt')</div>
                     <textarea readonly id="db-update" class="form-control" rows="20" placeholder="@lang('install.migrate.wait')"></textarea>
                 </div>
             </div>
@@ -123,7 +125,7 @@
                 success: function (response) {
                     if (response.result === 'ok') {
                         $('#credential-status>i').attr('class', 'fa fa-lg fa-check-circle text-success');
-                        $('#migration-output').show();
+                        $('#migrate-step').show();
                         $('#db-form-container').collapse('hide')
                     } else {
                         $('#credential-status>i').attr('class', 'fa fa-lg fa-times-circle text-danger')
@@ -168,8 +170,7 @@
                 if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
                     $('#migrate-warning').hide();
                     checkStepStatus(function (status) {
-                        console.log(status);
-                        if (status.database) {
+                        if (status.database.complete) {
                             $('#migrate-status>i').attr('class', 'fa fa-lg fa-check-circle text-success');
                             $('#migrate-container').collapse('hide');
                         }
@@ -185,10 +186,6 @@
     <style type="text/css">
         #db-update {
             resize: vertical;
-        }
-
-        #retry-btn {
-            display: none;
         }
         #migrate-warning {
             display: none;

@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Install;
 
 use App\Http\Controllers\Controller;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Interfaces\InstallerStep;
 
 class InstallationController extends Controller
 {
@@ -39,10 +40,16 @@ class InstallationController extends Controller
         'finish' => \App\Http\Controllers\Install\FinalizeController::class,
     ];
 
+    public function redirectToFirst()
+    {
+        $step = collect($this->filterActiveSteps())->keys()->first(null, 'checks');
+        return redirect()->route("install.$step");
+    }
+
     public function redirectToIncomplete()
     {
-        foreach ($this->stepStatus() as $step => $complete) {
-            if (!$complete) {
+        foreach ($this->filterActiveSteps() as $step => $controller) {
+            if (!$controller->complete()) {
                 return redirect()->route("install.$step");
             }
         }
@@ -63,21 +70,19 @@ class InstallationController extends Controller
     /**
      * Init step info and return false if previous steps have not been completed.
      *
-     * @return bool
+     * @return bool if all previous steps have been completed
      */
     final protected function initInstallStep()
     {
-        if (is_string(config('librenms.install'))) {
-            $this->steps = array_intersect_key($this->steps, array_flip(explode(',', config('librenms.install'))));
-        }
+        $this->filterActiveSteps();
         $this->configureDatabase();
 
-        foreach ($this->stepStatus() as $step => $completed) {
+        foreach ($this->stepStatus() as $step => $complete) {
             if ($step == $this->step) {
                 return true;
             }
 
-            if (!$completed) {
+            if (!$complete) {
                 return false;
             }
         }
@@ -87,13 +92,21 @@ class InstallationController extends Controller
 
     final protected function markStepComplete()
     {
-        session(["install.$this->step" => true]);
-        session()->save();
+        if (!$this->stepCompleted($this->step)) {
+            session(["install.$this->step" => true]);
+            session()->save();
+        }
+    }
+
+    final protected function stepCompleted(string $step)
+    {
+        return (bool)session("install.$step");
     }
 
     final protected function formatData($data = [])
     {
         $data['steps'] = $this->hydrateControllers();
+        $data['step'] = $this->step;
         return $data;
     }
 
@@ -114,18 +127,32 @@ class InstallationController extends Controller
         }
     }
 
+    protected function filterActiveSteps()
+    {
+        if (is_string(config('librenms.install'))) {
+            $this->steps = array_intersect_key($this->steps, array_flip(explode(',', config('librenms.install'))));
+        }
+
+        return $this->steps;
+    }
+
     private function hydrateControllers()
     {
         $this->steps = array_map(function ($class) {
             return is_object($class) ? $class : app()->make($class);
         }, $this->steps);
+
+        return $this->steps;
     }
 
     private function stepStatus()
     {
         $this->hydrateControllers();
-        return array_map(function ($controller) {
-            return $controller->complete();
-        }, $this->steps);
+        return array_map(function (InstallerStep $controller) {
+            return [
+                'enabled' => $controller->enabled(),
+                'complete' => $controller->complete(),
+            ];
+       }, $this->steps);
     }
 }

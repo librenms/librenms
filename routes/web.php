@@ -33,7 +33,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
-    Route::get('/', 'OverviewController@index');
+    Route::get('/', 'OverviewController@index')->name('home');
     Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
         ->name('device')->where(['vars' => '.*']);
 
@@ -150,7 +150,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
 // installation routes
 Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
-    Route::get('/', 'InstallationController@redirectToIncomplete')->name('install');
+    Route::get('/', 'InstallationController@redirectToFirst')->name('install');
     Route::get('/checks', 'ChecksController@index')->name('install.checks');
     Route::get('/database', 'DatabaseController@index')->name('install.database');
     Route::get('/user', 'MakeUserController@index')->name('install.user');
