@@ -103,7 +103,7 @@
                             <i class="fa fa-lg {{ $controller->icon() }}"></i>
                         </a>
                     </div>
-                    <div id="progress-{{ $name }}-bar" class="install-progress loop @if($controller->complete()) complete @endif"></div>
+                    <div id="progress-{{ $name }}-bar" class="install-progress loop @if($controller->complete() || $step == 'finish') complete @endif"></div>
                 @endforeach
             </div>
         </div>
@@ -152,9 +152,6 @@
                         .removeClass('btn-info')
                         .removeClass('btn-outline-info')
                         .addClass(primary === step ? 'btn-outline-primary' : 'btn-primary');
-                } else {
-                    // all complete
-                    $('.install-progress').addClass('complete')
                 }
 
                 if (callback && typeof callback === "function") {
