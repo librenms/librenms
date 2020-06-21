@@ -12,11 +12,11 @@
                 >
                     <span id="credential-status">
                        @if($valid_credentials === null)
-                            <i class="fa fa-lg fa-question-circle text-muted"></i>
+                            <i class="fa fa-lg fa-question-circle-o text-muted"></i>
                         @elseif($valid_credentials)
-                            <i class="fa fa-lg fa-check-circle text-success"></i>
+                            <i class="fa fa-lg fa-check-square-o text-success"></i>
                         @else
-                            <i class="fa fa-lg fa-times-circle text-danger"></i>
+                            <i class="fa fa-lg fa-times-rectangle-o text-danger"></i>
                         @endif
                     </span>
                     @lang('install.database.credentials')
@@ -82,11 +82,11 @@
                 >
                     <span id="migrate-status">
                         @if($migrated === null)
-                            <i class="fa fa-lg fa-question-circle text-muted"></i>
+                            <i class="fa fa-lg fa-question-circle-o text-muted"></i>
                         @elseif($migrated)
-                            <i class="fa fa-lg fa-check-circle text-success"></i>
+                            <i class="fa fa-lg fa-check-square-o text-success"></i>
                         @else
-                            <i class="fa fa-lg fa-times-circle text-danger"></i>
+                            <i class="fa fa-lg fa-times-rectangle-o text-danger"></i>
                         @endif
                     </span>
                     @lang('install.migrate.migrate')
@@ -124,11 +124,11 @@
                 data: $('#database-form').serialize(),
                 success: function (response) {
                     if (response.result === 'ok') {
-                        $('#credential-status>i').attr('class', 'fa fa-lg fa-check-circle text-success');
+                        $('#credential-status>i').attr('class', 'fa fa-lg fa-check-square-o text-success');
                         $('#migrate-step').show();
                         $('#db-form-container').collapse('hide')
                     } else {
-                        $('#credential-status>i').attr('class', 'fa fa-lg fa-times-circle text-danger')
+                        $('#credential-status>i').attr('class', 'fa fa-lg fa-times-rectangle-o text-danger')
                         if (response.message) {
                             $('#error-box').append($('<div class="alert alert-danger">' + response.message + '</div>'))
                         }
@@ -155,7 +155,7 @@
                 if (output.innerHTML.indexOf('Error!') !== -1) {
                     // if error word in output, show the retry button
                     $('#migrate-warning').hide();
-                    $('#migrate-status>i').attr('class', 'fa fa-lg fa-times-circle text-danger')
+                    $('#migrate-status>i').attr('class', 'fa fa-lg fa-times-rectangle-o text-danger')
                     $('#migrate-btn').removeClass('disabled').text('@lang('install.migrate.retry')')
                     $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.error')</div>'));
                 }
@@ -171,7 +171,7 @@
                     $('#migrate-warning').hide();
                     checkStepStatus(function (status) {
                         if (status.database.complete) {
-                            $('#migrate-status>i').attr('class', 'fa fa-lg fa-check-circle text-success');
+                            $('#migrate-status>i').attr('class', 'fa fa-lg fa-check-square-o text-success');
                             $('#migrate-container').collapse('hide');
                         }
                     });

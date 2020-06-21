@@ -62,6 +62,8 @@ return [
         'thanks' => 'Thank you for setting up LibreNMS.',
         'statistics' => 'It would be great if you would consider contributing to our statistics, you can do this on the :about and check the box under Statistics.',
         'statistics_link' => 'About LibreNMS Page',
-        'retry' => 'Retry'
+        'retry' => 'Retry',
+        'copied' => 'Copied to clipboard',
+        'manual_copy' => 'Press Ctrl-C to copy',
     ]
 ];
