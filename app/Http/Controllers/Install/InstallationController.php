@@ -31,6 +31,7 @@ use LibreNMS\DB\Eloquent;
 class InstallationController extends Controller
 {
     protected $connection = 'setup';
+    protected $step;
     protected $steps = [
         'checks' => \App\Http\Controllers\Install\ChecksController::class,
         'database' => \App\Http\Controllers\Install\DatabaseController::class,
@@ -38,18 +39,15 @@ class InstallationController extends Controller
         'finish' => \App\Http\Controllers\Install\FinalizeController::class,
     ];
 
-    public function __construct()
+    public function redirectToIncomplete()
     {
-        if (is_string(config('librenms.install'))) {
-            $this->steps = array_intersect_key($this->steps, array_flip(explode(',', config('librenms.install'))));
+        foreach ($this->stepStatus() as $step => $complete) {
+            if (!$complete) {
+                return redirect()->route("install.$step");
+            }
         }
-        $this->configureDatabase();
-    }
 
-    public function baseIndex()
-    {
-        $initial = key($this->steps) ?: 'checks';
-        return redirect()->route("install.$initial");
+        return redirect()->route('install.checks');
     }
 
     public function invalid()
@@ -59,23 +57,43 @@ class InstallationController extends Controller
 
     public function stepsCompleted()
     {
-        return response()->json(array_map(function ($class) {
-            $controller = app()->make($class);
-            return $controller->complete();
-        }, $this->steps));
+        return response()->json($this->stepStatus());
     }
 
-    final protected function markStepComplete($step)
+    /**
+     * Init step info and return false if previous steps have not been completed.
+     *
+     * @return bool
+     */
+    final protected function initInstallStep()
     {
-        session(["install.$step" => true]);
+        if (is_string(config('librenms.install'))) {
+            $this->steps = array_intersect_key($this->steps, array_flip(explode(',', config('librenms.install'))));
+        }
+        $this->configureDatabase();
+
+        foreach ($this->stepStatus() as $step => $completed) {
+            if ($step == $this->step) {
+                return true;
+            }
+
+            if (!$completed) {
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    final protected function markStepComplete()
+    {
+        session(["install.$this->step" => true]);
         session()->save();
     }
 
     final protected function formatData($data = [])
     {
-        $data['steps'] = array_map(function ($class) {
-            return app()->make($class);
-        }, $this->steps);
+        $data['steps'] = $this->hydrateControllers();
         return $data;
     }
 
@@ -94,5 +112,20 @@ class InstallationController extends Controller
             );
             config(['database.default', $this->connection]);
         }
+    }
+
+    private function hydrateControllers()
+    {
+        $this->steps = array_map(function ($class) {
+            return is_object($class) ? $class : app()->make($class);
+        }, $this->steps);
+    }
+
+    private function stepStatus()
+    {
+        $this->hydrateControllers();
+        return array_map(function ($controller) {
+            return $controller->complete();
+        }, $this->steps);
     }
 }

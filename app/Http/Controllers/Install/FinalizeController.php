@@ -31,10 +31,12 @@ use LibreNMS\Util\EnvHelper;
 
 class FinalizeController extends InstallationController implements InstallerStep
 {
+    protected $step = 'finish';
+
     public function index()
     {
-        if (!$this->enabled()) {
-            return redirect()->route('install');
+        if (!$this->initInstallStep()) {
+            return $this->redirectToIncomplete();
         }
 
         $env = '';

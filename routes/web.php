@@ -150,7 +150,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
 // installation routes
 Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
-    Route::get('/', 'InstallationController@baseIndex')->name('install');
+    Route::get('/', 'InstallationController@redirectToIncomplete')->name('install');
     Route::get('/checks', 'ChecksController@index')->name('install.checks');
     Route::get('/database', 'DatabaseController@index')->name('install.database');
     Route::get('/user', 'MakeUserController@index')->name('install.user');

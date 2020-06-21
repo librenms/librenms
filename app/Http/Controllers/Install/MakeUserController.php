@@ -33,10 +33,12 @@ use LibreNMS\Interfaces\InstallerStep;
 
 class MakeUserController extends InstallationController implements InstallerStep
 {
+    protected $step = 'user';
+
     public function index(Request $request)
     {
-        if (!self::enabled()) {
-            return redirect()->route('install');
+        if (!$this->initInstallStep()) {
+            return $this->redirectToIncomplete();
         }
 
         if (session('install.database')) {
@@ -44,7 +46,7 @@ class MakeUserController extends InstallationController implements InstallerStep
         }
 
         if (isset($user)) {
-            $this->markStepComplete('user');
+            $this->markStepComplete();
             return view('install.user-created', $this->formatData([
                 'user' => $user,
             ]));

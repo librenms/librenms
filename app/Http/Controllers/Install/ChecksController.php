@@ -31,11 +31,14 @@ use LibreNMS\Validations\Php;
 class ChecksController extends InstallationController implements InstallerStep
 {
     const MODULES = ['pdo_mysql', 'mysqlnd', 'gd'];
+    protected $step = 'checks';
 
     public function index()
     {
+        $this->initInstallStep();
+
         if ($this->complete()) {
-            $this->markStepComplete('checks');
+            $this->markStepComplete();
         }
 
         return view('install.checks', $this->formatData([

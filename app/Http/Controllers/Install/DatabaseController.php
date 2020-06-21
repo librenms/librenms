@@ -36,9 +36,14 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 class DatabaseController extends InstallationController implements InstallerStep
 {
     const KEYS = ['host', 'username', 'password', 'database', 'port', 'unix_socket'];
+    protected $step = 'database';
 
     public function index(Request $request)
     {
+        if (!$this->initInstallStep()) {
+            return $this->redirectToIncomplete();
+        }
+
         $data = Arr::only(session()->get('db') ?: [], self::KEYS);
         $data['valid_credentials'] = Eloquent::isConnected();
         $data['migrated'] = session('install.database');
@@ -88,7 +93,7 @@ class DatabaseController extends InstallationController implements InstallerStep
                     throw new \RuntimeException('Migration failed');
                 }
                 echo "\n\nSuccess!";
-                $this->markStepComplete('database');
+                $this->markStepComplete();
             } catch (\Exception $e) {
                 echo $e->getMessage() . "\n\nError!";
             }
@@ -108,7 +113,7 @@ class DatabaseController extends InstallationController implements InstallerStep
 
         $this->configureDatabase();
         if (Eloquent::isConnected() && Schema::isCurrent()) {
-            $this->markStepComplete('database');
+            $this->markStepComplete();
             return true;
         }
 
