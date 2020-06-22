@@ -6,7 +6,6 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="{{ asset('css/bootstrap4.min.css') }}" rel="stylesheet" type="text/css"/>
-    <link href="{{ asset(\LibreNMS\Config::get('stylesheet')) }}" rel="stylesheet" type="text/css"/>
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet" type="text/css"/>
     <script src="{{ asset('js/jquery.min.js') }}"></script>
     <script src="{{ asset('js/popper.min.js') }}"></script>
@@ -46,6 +45,12 @@
             opacity: 1;
             background-color: #62bcca;
             border-color: #64c0ce;
+        }
+        .btn-circle.btn-outline-info:not(:hover) {
+            background-color: white;
+        }
+        .btn-circle.btn-primary-info:not(:hover) {
+            background-color: white;
         }
 
         .install-progress {

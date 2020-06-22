@@ -137,7 +137,7 @@ class InstallationController extends Controller
         return $this->steps;
     }
 
-    private function hydrateControllers()
+    protected function hydrateControllers()
     {
         $this->steps = array_map(function ($class) {
             return is_object($class) ? $class : app()->make($class);

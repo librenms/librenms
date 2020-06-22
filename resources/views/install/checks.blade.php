@@ -9,12 +9,12 @@
                         <div class="col-7">
                             PHP <small>(@lang('install.checks.php_required', ['version' => $php_required]))</small>
                         </div>
-                        <div class="col-5 text-right text-nowrap @if($php_ok) green @else red @endif">
+                        <div class="col-5 text-right text-nowrap @if($php_ok) text-success @else text-danger @endif">
                             {{ $php_version }}
                             @if($php_ok)
-                                <i class="fa fa-lg fa-check-square-o green align-middle"></i>
+                                <i class="fa fa-lg fa-check-square-o text-success align-middle"></i>
                             @else
-                                <i class="fa fa-lg fa-times-rectangle-o red align-middle"></i>
+                                <i class="fa fa-lg fa-times-rectangle-o text-danger align-middle"></i>
                             @endif
 
                         </div>
@@ -27,9 +27,9 @@
                         </div>
                         <div class="col-5 text-right">
                             @if($module['status'])
-                                <i class="fa fa-lg fa-check-square-o green align-middle"></i>
+                                <i class="fa fa-lg fa-check-square-o text-success align-middle"></i>
                             @else
-                                <i class="fa fa-lg fa-times-rectangle-o red align-middle"></i>
+                                <i class="fa fa-lg fa-times-rectangle-o text-danger align-middle"></i>
                             @endif
                         </div>
                     </div>

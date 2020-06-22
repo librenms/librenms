@@ -131,8 +131,9 @@ class FinalizeController extends InstallationController implements InstallerStep
 
     public function enabled(): bool
     {
-        foreach ($this->steps as $step => $controller) {
-            if ($step !== 'finish' && !session("install.$step")) {
+        foreach ($this->hydrateControllers() as $step => $controller) {
+            /** @var InstallerStep $controller */
+            if ($step !== 'finish' && !$controller->complete()) {
                 return false;
             }
         }
