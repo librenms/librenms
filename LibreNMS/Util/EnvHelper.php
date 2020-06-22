@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Util;
 
-use Artisan;
 use ErrorException;
 use LibreNMS\Exceptions\FileWriteFailedException;
 
@@ -114,11 +113,11 @@ class EnvHelper
         $env_file = base_path('.env');
         try {
             if (!file_exists($env_file)) {
-                Artisan::call('key:generate', ['--show' => true]);
-                $key = trim(Artisan::output());
+                copy(base_path('.env.example'), $env_file);
+
+                $key = trim(exec(PHP_BINDIR . '/php ' . base_path('artisan') . ' key:generate --show'));
                 config(['app.key' => $key]);
 
-                copy(base_path('.env.example'), $env_file);
                 self::writeEnv([
                     'APP_KEY' => $key,
                     'INSTALL' => !file_exists(base_path('config.php')) ? 'true' : false, // if both .env and config.php are missing, assume install is needed
