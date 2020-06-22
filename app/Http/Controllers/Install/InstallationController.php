@@ -154,6 +154,6 @@ class InstallationController extends Controller
                 'enabled' => $controller->enabled(),
                 'complete' => $controller->complete(),
             ];
-       }, $this->steps);
+        }, $this->steps);
     }
 }

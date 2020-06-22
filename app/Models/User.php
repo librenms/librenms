@@ -137,7 +137,8 @@ class User extends Authenticatable
         });
     }
 
-    public function scopeAdminOnly($query) {
+    public function scopeAdminOnly($query)
+    {
         $query->where('level', 10);
     }
 
