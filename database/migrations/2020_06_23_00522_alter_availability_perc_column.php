@@ -14,7 +14,7 @@ class AlterMetricColumn extends Migration
     public function up()
     {
         Schema::table('availability_perc', function (Blueprint $table) {
-            $table->float('availability_perc', 6, 6)->default(0.000000);
+            $table->float('availability_perc', 6, 6)->change();
         });
     }
 
@@ -26,7 +26,7 @@ class AlterMetricColumn extends Migration
     public function down()
     {
         Schema::table('availability_perc', function (Blueprint $table) {
-            $table->double('availability_perc', 6, 6)->default(0.000000);
+            $table->double('availability_perc', 6, 6)->change();
         });
     }
 }
