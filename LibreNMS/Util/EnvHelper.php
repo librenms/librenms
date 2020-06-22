@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use ErrorException;
+use Illuminate\Contracts\Container\BindingResolutionException;
 use LibreNMS\Exceptions\FileWriteFailedException;
 
 class EnvHelper
@@ -116,19 +117,22 @@ class EnvHelper
                 copy(base_path('.env.example'), $env_file);
 
                 $key = trim(exec(PHP_BINDIR . '/php ' . base_path('artisan') . ' key:generate --show'));
-                config(['app.key' => $key]);
 
                 self::writeEnv([
                     'APP_KEY' => $key,
                     'INSTALL' => !file_exists(base_path('config.php')) ? 'true' : false, // if both .env and config.php are missing, assume install is needed
                 ], [], $env_file);
 
+                config(['app.key' => $key]);
                 return $key;
             }
 
             return false;
         } catch (ErrorException $e) {
             throw new FileWriteFailedException($env_file, 0, $e);
+        } catch (BindingResolutionException $e) {
+            // called outside of Laravel, ignore config() failure
+            return $key;
         }
     }
 
