@@ -13,7 +13,7 @@ class AlterAvailabilityPercColumn extends Migration
      */
     public function up()
     {
-        Schema::table('availability_perc', function (Blueprint $table) {
+        Schema::table('availability', function (Blueprint $table) {
             $table->float('availability_perc', 9, 6)->change();
         });
     }
@@ -25,7 +25,7 @@ class AlterAvailabilityPercColumn extends Migration
      */
     public function down()
     {
-        Schema::table('availability_perc', function (Blueprint $table) {
+        Schema::table('availability', function (Blueprint $table) {
             $table->double('availability_perc', 6, 6)->change();
         });
     }
