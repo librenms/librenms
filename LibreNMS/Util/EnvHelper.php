@@ -2,7 +2,7 @@
 /**
  * EnvHelper.php
  *
- * -Description-
+ * Helper for manipulation of the .env file
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -123,16 +123,18 @@ class EnvHelper
                     'INSTALL' => !file_exists(base_path('config.php')) ? 'true' : false, // if both .env and config.php are missing, assume install is needed
                 ], [], $env_file);
 
-                config(['app.key' => $key]);
+                try {
+                    config(['app.key' => $key]);
+                } catch (BindingResolutionException $e) {
+                    // called outside of Laravel, ignore config() failure
+                }
+
                 return $key;
             }
 
             return false;
         } catch (ErrorException $e) {
             throw new FileWriteFailedException($env_file, 0, $e);
-        } catch (BindingResolutionException $e) {
-            // called outside of Laravel, ignore config() failure
-            return $key;
         }
     }
 
