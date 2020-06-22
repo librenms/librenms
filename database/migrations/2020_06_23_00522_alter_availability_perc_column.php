@@ -30,4 +30,3 @@ class AlterMetricColumn extends Migration
         });
     }
 }
-
