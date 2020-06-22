@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AlterMetricColumn extends Migration
+class AlterAvailabilityPercColumn extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AlterMetricColumn extends Migration
     public function up()
     {
         Schema::table('availability_perc', function (Blueprint $table) {
-            $table->float('availability_perc', 6, 6)->change();
+            $table->float('availability_perc', 9, 6)->change();
         });
     }
 
