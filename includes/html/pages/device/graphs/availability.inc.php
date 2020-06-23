@@ -21,7 +21,7 @@ foreach ($duration_list as $duration) {
 
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
-                <h3 class='panel-title'>".$human_duration."<div class='pull-right'>".$duration['availability_perc']."%</div></h3>
+                <h3 class='panel-title'>".$human_duration."<div class='pull-right'>".round($duration['availability_perc'], 3)."%</div></h3>
             </div>";
     echo "<div class='panel-body'>";
     include 'includes/html/print-graphrow.inc.php';
