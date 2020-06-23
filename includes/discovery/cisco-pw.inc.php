@@ -37,7 +37,6 @@ if (Config::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
             $pseudowire_id = $pws_db[$pw['cpwVcID']];
             echo '.';
         } else {
-            echo "Saving to DB";
             $pseudowire_id = dbInsert(
                 array(
                     'device_id'      => $device['device_id'],
