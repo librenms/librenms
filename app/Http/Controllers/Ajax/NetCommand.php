@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Ajax;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Str;
 use \LibreNMS\Config;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -71,7 +72,7 @@ class NetCommand extends Controller
             function () use ($proc, $request) {
                 // a bit dirty, bust browser initial cache
                 $ua = $request->header('User-Agent');
-                if (str_contains($ua, ['Chrome', 'Trident'])) {
+                if (Str::contains($ua, ['Chrome', 'Trident'])) {
                     $char = "\f"; // line feed
                 } else {
                     $char = "";

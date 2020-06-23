@@ -3,6 +3,7 @@ text: 'Imco Power'
 type: power
 icon: imco
 group: IMCO POWER
+nobulk: true
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.818.32.4

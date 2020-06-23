@@ -23,6 +23,8 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
+use Illuminate\Support\Str;
+
 $serverscheck_oids = [
     'sensor1Value.0' => '.1.3.6.1.4.1.17095.3.2.0',
     'sensor2Value.0' => '.1.3.6.1.4.1.17095.3.6.0',
@@ -33,10 +35,10 @@ $serverscheck_oids = [
 
 $temp_x = 1;
 foreach ($pre_cache['serverscheck_control'] as $oid_name => $oid_value) {
-    if (str_contains($oid_name, 'name')) {
+    if (Str::contains($oid_name, 'name')) {
         $tmp_oid = 'sensor' . $temp_x . 'Value.0';
         $current = $pre_cache['serverscheck_control'][$tmp_oid];
-        if (str_contains($oid_value, ['Temp', 'BR'])) {
+        if (Str::contains($oid_value, ['Temp', 'BR'])) {
             if (is_numeric($current)) {
                 $index = str_replace('.0', '', $oid_name);
                 $descr = $oid_value;

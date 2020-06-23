@@ -93,13 +93,13 @@ if (\Auth::user()->hasGlobalAdmin()) {
                         <div class="form-group">
                             <label for="recurring_day" class="col-sm-4 control-label">Only on weekday: </label>
                             <div class="col-sm-8">
-                                <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="1" />Mo</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="2" />Tu</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="3" />We</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="4" />Th</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="5" />Fr</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="6" />Sa</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="recurring_day" name="recurring_day[]" value="0" />Su</label></div>
+                                <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="1" />Mo</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="2" />Tu</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="3" />We</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="4" />Th</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="5" />Fr</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="6" />Sa</label></div>
+                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="7" />Su</label></div>
                             </div>
                         </div>
                     </div>
@@ -126,7 +126,6 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
     $('#schedule_id').val('');
     $('#title').val('');
     $('#notes').val('');
-    $('#recurring').val('');
     $('#start').val(moment().format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(moment());
     $('#end').val(moment().add(1, 'hour').format('YYYY-MM-DD HH:mm')).data("DateTimePicker").maxDate(false).minDate(moment());
     var $startRecurringDt = $('#start_recurring_dt');
@@ -138,7 +137,7 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
 
     $('#start_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
     $('#end_recurring_hr').val('').data("DateTimePicker").minDate(false).maxDate(false);
-    $('#recurring_day').prop('checked', false);
+    $("input[name='recurring_day[]']").prop('checked', false);
     $("#recurring").bootstrapSwitch('state', false);
     $('#recurring').val(0);
     $('#norecurringgroup').show();
@@ -184,7 +183,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $('#end_recurring_dt').val('');
                     $('#start_recurring_hr').val('');
                     $('#end_recurring_hr').val('');
-                    $('#recurring_day').prop('checked', false);
+                    $("input[name='recurring_day[]']").prop('checked', false);
                     $("#recurring").bootstrapSwitch('state', false);
                     $('#recurring').val(0);
                 }else{
@@ -211,7 +210,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                             $("input[name='recurring_day[]'][value="+checkedday+"]").prop('checked', true);
                         });
                     }else{
-                        $('#recurring_day').prop('checked', false);
+                        $("input[name='recurring_day[]']").prop('checked', false);
                     }
 
                     $('#norecurringgroup').hide();

@@ -78,17 +78,15 @@ UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
 SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::someOid\n";
 
+        Log::shouldReceive('info')->once()->with('Unhandled trap snmptrap', [ 'device' => $device->hostname, 'oid' => 'SNMPv2-MIB::someOid']);
+        Log::shouldReceive('event')->once()->withArgs(function ($e_message, $e_device, $e_type) use ($device) {
+            return $e_message == 'SNMP trap received: SNMPv2-MIB::someOid' &&
+                $device->is($e_device) &&
+                $e_type == 'trap';
+        });
+
         $trap = new Trap($trapText);
         $this->assertFalse(Dispatcher::handle($trap));
-
-        $this->assertEquals([
-            'device_id' => $device->device_id,
-            'message' => 'SNMP trap received: SNMPv2-MIB::someOid',
-            'type' => 'trap',
-            'reference' => null,
-            'username' => '',
-            'severity' => 2,
-        ], Eventlog::orderBy('event_id', 'asc')->select(['device_id', 'message', 'type', 'reference', 'username', 'severity'])->first()->toArray());
     }
 
     public function testAuthorization()
@@ -163,6 +161,23 @@ SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::coldStart";
         $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
     }
 
+    public function testWarmStart()
+    {
+        $device = factory(Device::class)->create();
+
+        $trapText = "$device->hostname
+UDP: [$device->ip]:44298->[192.168.5.5]:162
+DISMAN-EVENT-MIB::sysUpTimeInstance 0:0:2:12.7
+SNMPv2-MIB::snmpTrapOID.0 SNMPv2-MIB::warmStart";
+
+        Log::shouldReceive('event')->once()->with('SNMP Trap: Device ' . $device->displayName() . ' warm booted', $device->device_id, 'reboot', 4);
+
+        $trap = new Trap($trapText);
+        $this->assertTrue(Dispatcher::handle($trap));
+
+        // check that the device was found
+        $this->assertEquals($device->hostname, $trap->getDevice()->hostname);
+    }
 
     public function testEntityDatabaseChanged()
     {

@@ -176,7 +176,7 @@
     "name": "APC UPS Diagonstics Test Result"
   },
   {
-    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]},{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"}]}],"valid":true},
+    "builder": {"condition":"AND","rules":[{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"equal","value":"3"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsBasicOutputStatus"}]},{"condition":"AND","rules":[{"id":"sensors.sensor_current","field":"sensors.sensor_current","type":"string","input":"text","operator":"not_equal","value":"4"},{"id":"sensors.sensor_type","field":"sensors.sensor_type","type":"string","input":"text","operator":"equal","value":"upsAdvTestDiagnosticsResults"}]}],"valid":true},
     "name": "APC UPS Switched to Battery Power"
   },
   {
@@ -312,7 +312,7 @@
     "name": "Cisco NX-OS device has a bad fan"
   },
   {
-    "rule": "devices.os = \"panos\" & sensors.sensor_type = \"panSysHAState\" && sensors.sensor_current = \"1\" && sensors.sensor_prev = \"2\"",
+    "rule": "devices.os = \"panos\" && sensors.sensor_type = \"panSysHAState\" && sensors.sensor_current = \"1\" && sensors.sensor_prev = \"2\"",
     "name": "Palo Alto Networks passive firewall changed to active"
   },
   {
@@ -456,5 +456,57 @@
     "name": "CustomOID under warning limit",
     "severity": "warning",
     "default": true
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSOnBattery\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT on battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSLowBattery\" && macros.state_sensor_critical = 1",
+    "name": "UPS-NUT low battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSHighBattery\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT high battery"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSBatteryReplace\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery needs to be replaced"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSBatteryCharging\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery is charging"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSBatteryDischarging\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT battery is discharging"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSUPSBypass\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT bypass circuit is active"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSRuntimeCalibration\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT performing runtime calibration"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSOffline\" && macros.state_sensor_critical = 1",
+    "name": "UPS-NUT offline and is not supplying power to the load"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSUPSOverloaded\" && macros.state_sensor_critical = 1",
+    "name": "UPS-NUT overloaded"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSUPSBuck\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT trimming incoming voltage"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSUPSBoost\" && macros.state_sensor_warning = 1",
+    "name": "UPS-NUT boosting incoming voltage"
+  },
+  {
+    "rule": "applications.app_type = \"ups-nut\" && state_indexes.state_name = \"UPSForcedShutdown\" && macros.state_sensor_critical = 1",
+    "name": "UPS-NUT trimming incoming voltage"
   }
 ]

@@ -175,5 +175,5 @@ $fields = array(
 $tags = array('name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name);
 data_update($device, 'app', $tags, $fields);
 
-$response = ($returnedoids == false) ? false : 'Data ok';
-update_application($app, $response, $fields);
+$squid_app_status = ($returnedoids == false) ? false : 'Data ok';
+update_application($app, $squid_app_status, $fields);

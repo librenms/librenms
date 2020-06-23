@@ -28668,17 +28668,18 @@ svcVprnVxlanTunTermFpeId         OBJECT-TYPE
 svcEvpnVxlanESDestTEPTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcEvpnVxlanESDestTEPEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The svcEvpnVxlanESDestTEPTable contains entries for all the BGP
          EVPN-MPLS Tunnel Endpoint and ethernet segment pairs for a particular
-         service."
+         service. This table is obsoleted in 20.2 R1 and will be replaced with
+         svcEvpnVxlanInstESDstTEPTable."
     ::= { tmnxSvcObjs 235 }
 
 svcEvpnVxlanESDestTEPEntry       OBJECT-TYPE
     SYNTAX      SvcEvpnVxlanESDestTEPEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A BGP EVPN-MPLS VXLAN Tunnel Endpoint and ethernet segment binding
          entry in the svcEvpnVxlanESDestTEPTable."
@@ -28702,7 +28703,7 @@ SvcEvpnVxlanESDestTEPEntry       ::= SEQUENCE
 svcEvpnVxlanESDestTEPAddrType    OBJECT-TYPE
     SYNTAX      InetAddressType
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object svcEvpnVxlanESDestTEPAddrType indicates the
          type of the address associated with svcEvpnVxlanESDestTEPAddress."
@@ -28711,7 +28712,7 @@ svcEvpnVxlanESDestTEPAddrType    OBJECT-TYPE
 svcEvpnVxlanESDestTEPAddress     OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (4|16))
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object svcEvpnVxlanESDestTEPAddress indicates a
          Tunnel Endpoint address associated with this entry."
@@ -28720,7 +28721,7 @@ svcEvpnVxlanESDestTEPAddress     OBJECT-TYPE
 svcEvpnVxlanESDestTEPVni         OBJECT-TYPE
     SYNTAX      TmnxVni
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcEvpnVxlanESDestTEPVni indicates the VNI associated
          with the Tunnel Endpoint address in the service."
@@ -28729,7 +28730,7 @@ svcEvpnVxlanESDestTEPVni         OBJECT-TYPE
 svcEvpnVxlanESDestTEPLastChanged OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object svcEvpnVxlanESDestTEPLastChanged indicates the
          timestamp of the modification of the ethernet segment destination
@@ -28780,17 +28781,18 @@ svcOperGroupConfigName           OBJECT-TYPE
 svcEvpnVxlanESDestTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcEvpnVxlanESDestEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The svcEvpnVxlanESDestTable contains entries for all the BGP
          EVPN-VXLAN Tunnel ethernet segment destination for a particular VPLS
-         service."
+         service. This table is obsoleted in 20.2 R1. It is being replaced by
+         svcEvpnVxlanInstESDestTable."
     ::= { tmnxSvcObjs 237 }
 
 svcEvpnVxlanESDestEntry          OBJECT-TYPE
     SYNTAX      SvcEvpnVxlanESDestEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A BGP EVPN-VXLAN Tunnel Endpoint and ethernet segment binding entry in
          the svcEvpnVxlanESDestTable."
@@ -28809,7 +28811,7 @@ SvcEvpnVxlanESDestEntry          ::= SEQUENCE
 svcEvpnVxlanESDestLastChanged    OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of the object svcEvpnVxlanESDestLastChanged indicates the
          timestamp of the modification of the ethernet segment destination
@@ -28819,7 +28821,7 @@ svcEvpnVxlanESDestLastChanged    OBJECT-TYPE
 svcEvpnVxlanESDestNumMacs        OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of svcEvpnVxlanESDestNumMacs indicates number of MAC
          addresses associated with this entry."
@@ -29568,7 +29570,8 @@ SvcTlsVxInstVTEPEgrVniEntry      ::= SEQUENCE
     svcTlsVxInstVTEPEgrVniOperState  ServiceOperStatus,
     svcTlsVxInstVTEPEgrVniL2EsPbr    TruthValue,
     svcTlsVxInstVTEPEgrVniMcast      INTEGER,
-    svcTlsVxInstVTEPEgrVniVxlanType  INTEGER
+    svcTlsVxInstVTEPEgrVniVxlanType  INTEGER,
+    svcTlsVxInstVTEPEgrVniSbdMcast   TruthValue
 }
 
 svcTlsVxInstVTEPAddrType         OBJECT-TYPE
@@ -29632,7 +29635,8 @@ svcTlsVxInstVTEPEgrVniMcast      OBJECT-TYPE
         none (0),
         u    (1),
         bm   (2),
-        bum  (3)
+        bum  (3),
+        m    (4)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -29653,6 +29657,16 @@ svcTlsVxInstVTEPEgrVniVxlanType  OBJECT-TYPE
         "The value of the object svcTlsVxInstVTEPEgrVniVxlanType indicates the
          type of vxlan instance created on this VPLS service."
     ::= { svcTlsVxInstVTEPEgrVniEntry 9 }
+
+svcTlsVxInstVTEPEgrVniSbdMcast   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcTlsVxInstVTEPEgrVniSbdMcast
+         indicates if the  VTEP and Egress VNI is included in the
+         supplementery broadcast-list multicast for this VPLS service."
+    ::= { svcTlsVxInstVTEPEgrVniEntry 10 }
 
 svcTlsVxlanInstARLfRplCndTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcTlsVxlanInstARLfRplCndEntry
@@ -31507,7 +31521,8 @@ SvcEvpnMplsTEPEgrLblTnlEntry     ::= SEQUENCE
     svcEvpnMplsTEPEgrLblTnlNumMACs   Unsigned32,
     svcEvpnMplsTEPEgrLblTnlInMcList  TruthValue,
     svcEvpnMplsTEPEgrLblTnlResType   TmnxSvcEvpnMplsTransportType,
-    svcEvpnMplsTEPEgrLblTnlSbdMcast  TruthValue
+    svcEvpnMplsTEPEgrLblTnlSbdMcast  TruthValue,
+    svcEvpnMplsTEPEgrLblMcast        INTEGER
 }
 
 svcEvpnMplsTEPEgrLblTEPTnlId     OBJECT-TYPE
@@ -31566,6 +31581,21 @@ svcEvpnMplsTEPEgrLblTnlSbdMcast  OBJECT-TYPE
          indicates if the  TEP and egress label is included in the
          supplementery broadcast-list multicast for the BGP EVPN-MPLS VPLS service."
     ::= { svcEvpnMplsTEPEgrLblTnlEntry 6 }
+
+svcEvpnMplsTEPEgrLblMcast        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none (0),
+        u    (1),
+        bm   (2),
+        bum  (3),
+        m    (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of svcEvpnMplsTEPEgrLblMcast indicates the multicast
+         forwarding type."
+    ::= { svcEvpnMplsTEPEgrLblTnlEntry 7 }
 
 svcRvplsEvpnArpAdvrtTable        OBJECT-TYPE
     SYNTAX      SEQUENCE OF SvcRvplsEvpnArpAdvrtEntry
@@ -35240,7 +35270,7 @@ tmnxSvcV15v0Compliance           MODULE-COMPLIANCE
     ::= { tmnxSvcCompliances 128 }
 
 tmnxSvcV15v1Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of services on Nokia SROS
          series systems release 15.1."
@@ -35635,7 +35665,7 @@ tmnxSvcV16v0Compliance           MODULE-COMPLIANCE
     ::= { tmnxSvcCompliances 130 }
 
 tmnxSvcV19v5Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of services on Nokia SROS
          series systems release 19.5."
@@ -35872,6 +35902,232 @@ tmnxSvcV19v10Compliance          MODULE-COMPLIANCE
             tmnxSvcV19v0Group
         }
     ::= { tmnxSvcCompliances 132 }
+
+tmnxSvcV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services on Nokia SROS
+         series systems release 20.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxSvcV20v0Group,
+            tmnxSvcTlsFdbV7v0Group,
+            tmnxSvcIesIfV6v0Group,
+            tmnxSvcTlsShgV6v0Group,
+            tmnxSvcTlsMFibV6v0Group,
+            tmnxSvcTlsMFibV13v0Group,
+            tmnxSvcTlsMstiV6v0Group,
+            tmnxSvcDhcpV11v0Group,
+            tmnxSvcDhcpV13v0Group,
+            tmnxSvcEndPointV6v0Group,
+            tmnxSvcIfDHCP6V6v0Group,
+            tmnxSvcTlsBackbone6v1Group,
+            tmnxSvcTlsBgpV8v0Group,
+            tmnxSvcEpipeV6v0Group,
+            tmnxSvcTlsPipV7v0Group,
+            tmnxSvcObsoletedV6v0Group,
+            tmnxSvcRoutedCOV9v0Group,
+            tmnxSvcRoutedCOV10v0Group,
+            tmnxSvcRoutedCOV13v0Group,
+            tmnxSvcBsxV8v0Group,
+            tmnxSvcIpipeV8v0Group,
+            tmnxSvcMCEPNotifyGroup,
+            tmnxSvcDhcpBgpV7v0Group,
+            tmnxSvcV7v0Group,
+            tmnxSvcV8v0Group,
+            tmnxSvcTlsV7v0Group,
+            tmnxSvcIesIfV7v0Group,
+            tmnxSvcPbbMacV7v0Group,
+            tmnxSvcPbbMacV12v0Group,
+            tmnxSvcMrpPolicyV8v0Group,
+            tmnxSvcSiteV15v1Group,
+            tmnxSvcObsoletedV8v0Group,
+            tmnxSvcRoutedVplsV8v0Group,
+            tmnxSvcNotifyV8v0Group,
+            tmnxSvcPwV8v0Group,
+            tmnxSvcMvrpV8v0Group,
+            tmnxSvcIesIfV8v0Group,
+            tmnxSvcTlsPipV8v0Group,
+            tmnxSvcOperGrpV9v0Group,
+            tmnxSvcEthCfmGroup,
+            tmnxSvcV9v0R4Group,
+            tmnxSvcMSPwPeV9v0Group,
+            tmnxSvcApipeInfoV9v0Group,
+            tmnxSvcMacReNotifyGroup,
+            tmnxSvcSpbGroup,
+            tmnxSvcVllBgpV15v1Group,
+            tmnxSvcV10v0Group,
+            tmnxSvcIesIfV10v0Group,
+            tmnxSvcIesIfNHV10v0Group,
+            tmnxSvcP2mpGroup,
+            tmnxSvcNotifyV10v0Group,
+            tmnxSvcPEObsoletedGroup,
+            tmnxSvcNotifyObsoletedV11v0Group,
+            tmnxSvcIesIfV11v0Group,
+            tmnxSvcIesIfV12v0Group,
+            tmnxSvcSpbV11v0Group,
+            tmnxSvcCondStaticMacGroup,
+            tmnxSvcSchedulerRateV11v0Group,
+            tmnxSvcMHGroup,
+            tmnxSvcV12v0Group,
+            tmnxSvcQosV12v0Group,
+            tmnxSvcTestGroup,
+            tmnxSvcCreation15v1Group,
+            tmnxSvcIesIfIpoeV13v0Group,
+            tmnxSvcIpipeFaultPropGroup,
+            tmnxSvcQosSchedV13v0Group,
+            tmnxSvcTlsProxyArpGroup,
+            tmnxSvcTlsProxyNdGroup,
+            tmnxSvcTlsProxyArpEnhGroup,
+            tmnxSvcTlsEvpnProxyArpGroup,
+            tmnxSvcVprnV13v0Group,
+            tmnxSvcIesIfV13v0Group,
+            tmnxSvcVsdGlobalObjsV13v0Group,
+            tmnxSvcQosRateV13v0Group,
+            tmnxSvcGrpIfGroup,
+            tmnxSvcShcvPolicyGroup,
+            tmnxSvcVsdDynamicSvcGroup,
+            tmnxSvcV14v0Group,
+            tmnxSvcRadClassGroup,
+            tmnxSvcVllBgpEvpnV16v0Group,
+            tmnxSvcNotifyV14v0Group,
+            tmnxSvcNotifyObjsV14v0Group,
+            tmnxSvcSysVxlanARV16v0Group,
+            tmnxSvcSysVxlanTunTermGroup,
+            tmnxSvcSysVirtualEthSegGroup,
+            tmnxSvcSelectiveUrpfGroup,
+            tmnxSvcEpipeVxlanVtepGroup,
+            tmnxSvcEpipeNatOutsideV15v0Group,
+            tmnxSvcTlsV15v0Group,
+            tmnxSvcRateV15v0Group,
+            tmnxSvcDhcpV15v0Group,
+            tmnxSvcSysFdbUsgNotifGroup,
+            tmnxSvcNotifyV15v0Group,
+            tmnxSvcV15v0Group,
+            tmnxSvcCustomerNameGroup,
+            svcV15v0NotifyObjsGroup,
+            tmnxSvcInterAsObsoletedGroup,
+            tmnxSvcEpipeVxlanV16v0Group,
+            tmnxSvcIesIfV16v0Group,
+            svcPppoeRedirectGroup,
+            svcSysGreEthBrgdTnlTrmGroup,
+            svcSysEvpnESDfPrefNotifGroup,
+            tmnxSvcV16v0ObsoletedGroup,
+            tmnxSvcAdminTagsV16v0Group,
+            tmnxSvcEvpnMplsQinqV16v0Group,
+            tmnxSvcEpipePwPortFlexV16v0Group,
+            tmnxSvcSysPwPortListV16v0Group,
+            svcSysVpnGreSrcIpV16v0Group,
+            tmnxSvcEvpnVpwsVxlanV16v0Group,
+            tmnxSvcSrOspf3V16v0Group,
+            svcV19v0NotifyObjsGroup,
+            tmnxCustV9v0Group,
+            tmnxCustV14v0Group,
+            tmnxApipeV3v0Group,
+            tmnxArpHostV11v0Group,
+            tmnxArpHostV13v0Group,
+            tmnxArpHostNotifyGroup,
+            tmnxArpHostBgpGroup,
+            svcArpHostNotifGroup,
+            tmnxArpHostV15v0Group,
+            svcIgmpTrkGroup,
+            svcTlsMacV7v0Group,
+            svcTlsEndPointV7v0Group,
+            svcTlsFdbMacStatsGroup,
+            svcTlsEtreeGroup,
+            svcTlsProxyNdNotifGroup,
+            svcTlsProxyArpNotifyObjsGroup,
+            svcTlsProxyArpNotifGroup,
+            svcTlsEsPbrL2Group,
+            svcTlsStaticBHGroup,
+            svcTlsPbbV14v0Group,
+            svcVplsEvpnV14v0Group,
+            svcVplsEvpnInclMcastV14v0Group,
+            svcVplsIpv6McastV15v0Group,
+            svcTlsPmsiV15v0Group,
+            svcTlsFdbV15v0Group,
+            svcVplsProxyArpNdRtmV15v0Group,
+            svcTlsFdbMacScaleV15v0Group,
+            svcTlsVxInstVTEPEgrVniGroup,
+            svcTlsVxInstReplicatorNotifGroup,
+            svcTlsStaticVxlanV16v0Group,
+            svcTlsStaticVxlanNotifGroup,
+            svcVplsVxlanRxDiscardGroup,
+            svcVplsEvpnMplsTnlIdGroup,
+            svcVplsResFilterV19v5Group,
+            svcOperGrpBfdGroup,
+            svcOperGroupConfigGroup,
+            tmnxIesIfRtrSolicitGroup,
+            tmnxIesIfVplsEvpnGroup,
+            svcVsdGroup,
+            svcBgpEvpnNotifGroup,
+            svcBgpEvpnIPRouteGroup,
+            svcBgpAutoRDV15v1Group,
+            svcEvpnMplsNotifGroup,
+            svcAutoBindTunnelGroup,
+            svcBgpVpwsGroup,
+            svcBgpMHSiteGroup,
+            svcEvpnMhEsDFNotifGroup,
+            svcBgpEvpnMplsV14v0Group,
+            svcEvpnMhEsDFNotifGroup,
+            svcAutoBindTunnelSRTEGroup,
+            svcBgpEvpnP2mpMldpGroup,
+            svcEvpnAlmpNotifGroup,
+            svcBgpEvpnMplsRSMV16v0Group,
+            svcBgpEvpnMplsMhAdEviRtGroup,
+            svcBgpEvpnMacDupDetBHGroup,
+            svcBgpEvpnMacDupDetBHNotifGroup,
+            svcAutoBindTunnelV15v0Group,
+            svcBgpEvpnMplsMhDfPrefGroup,
+            svcBgpEvpnEtreeV15v0Group,
+            svcBgpEvpnEtreeNotifGroup,
+            svcEvpnMHStandbyNotifGroup,
+            svcBgpEvpnMplsV16v0Group,
+            svcEvpnMplsBindsTransportGroup,
+            svcBgpEvpnMplsMh1V15v0Group,
+            svcEvpnMplsMhBindsTransportGroup,
+            svcBgpEvpnMhEthSegPwPortGroup,
+            svcBgpEvpnInstGroup,
+            svcBgpEvpnDefRtTagV16v0Group,
+            svcBgpEvpnMplsABTV16v0Group,
+            svcEvpnMplsEPGroup,
+            svcBgpEvpnOperGrpGroup,
+            svcBgpEvpnVxlanMhNotifGroup,
+            svcBgpEvpnV20v0Group,
+            svcBgpEvpnVxlanMhV20v0Group,
+            svcSpiLoadBalGroup,
+            svcTeidLoadBalGroup,
+            svcRipListenerGroup,
+            svcSiteMinDnTimerNotifyObjsGroup,
+            svcSiteMinDnTimerNotifGroup,
+            svcVprnEsPbrL3Group,
+            svcVprnWeightedLoadBalanceGroup,
+            svcVprnBgpAutoBindUdpTnlGroup,
+            svcVprnAaaTacPlusV16v0Group,
+            svcVprnAaaLdapV16v0Group,
+            svcVprnAaaRadiusV16v0Group,
+            svcVprnRibApiV16v0Group,
+            svcVprnMgmtIfV19v0Group,
+            svcEpipePwPortGroup,
+            svcEpipeVxInstV16v0Group,
+            svcProxyArpNdMacListGroup,
+            svcTlsProxyV20v0Group,
+            svcPbbEvpnIsidRtGroup,
+            svcPbbEvpnEtreeV15v0Group,
+            svcVxlanEvpnMplsDestNotifGroup,
+            svcVxlanMhV16v0Group,
+            svcVxlanEcmpGroup,
+            svcVxlanTermV15v0Group,
+            svcVxlan16v0NotifGroup,
+            svcVxlanV16v0Group,
+            tmnxVxlanV20v0Group,
+            svcMdAutoIdV16v0Group,
+            svcMplsFwdPlcyV16v0Group,
+            svcDHCPLeaseV20v0Group,
+            tmnxSvcDhcpMRtV20v0Group,
+            svcEvpnOismV20v0Group
+        }
+    ::= { tmnxSvcCompliances 133 }
 
 tmnxSvcGroups                    OBJECT IDENTIFIER ::= { tmnxSvcConformance 2 }
 
@@ -41139,7 +41395,7 @@ tmnxSvcV16v0Group                OBJECT-GROUP
         svcBgpEvpnDetDupMacAddress,
         svcBgpEvpnDetDupMacTime
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of Services general
          capabilities on Nokia SROS series systems that were added in release
@@ -41698,7 +41954,7 @@ svcBgpEvpnVxlanMhGroup           OBJECT-GROUP
         svcBgpEvpnInstVxlanMhMode,
         svcEvpnVxlanESDestNumMacs
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting VXLAN multi-homing in BGP EVPN feature
          on Nokia SROS series systems in release 19.5."
@@ -41866,6 +42122,158 @@ tmnxSvcV19v0Group                OBJECT-GROUP
         "The group of objects supporting management of Services capabilities on
          Nokia SROS series systems added in release 19.0."
     ::= { tmnxSvcConformance 638 }
+
+svcTlsVxInstVTEPEgrVniGroup      OBJECT-GROUP
+    OBJECTS     {
+        svcTlsVxInstVTEPEgrVniSbdMcast
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of VTEP Egress VNI on
+         router interfaces on Nokia SROS series systems in 20.0 release."
+    ::= { tmnxSvcConformance 640 }
+
+tmnxSvcV20v0Group                OBJECT-GROUP
+    OBJECTS     {
+        custCreationOrigin,
+        svcNumEntries,
+        svcId,
+        svcRowStatus,
+        svcType,
+        svcCustId,
+        svcIpRouting,
+        svcDescription,
+        svcMtu,
+        svcAdminStatus,
+        svcOperStatus,
+        svcNumSaps,
+        svcNumSdps,
+        svcLastMgmtChange,
+        svcVpnId,
+        svcVRouterId,
+        svcLastStatusChange,
+        svcVllType,
+        svcMgmtVpls,
+        svcRadiusDiscovery,
+        svcVcSwitching,
+        svcVplsType,
+        svcTotalFdbMimDestIdxEntries
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Services general
+         capabilities on Nokia SROS series systems that were supported in
+         release R20.0."
+    ::= { tmnxSvcConformance 642 }
+
+svcVxlanV20v0ObsoletedGroup      OBJECT-GROUP
+    OBJECTS     {
+        svcEvpnVxlanESDestTEPLastChanged,
+        svcEvpnVxlanESDestLastChanged,
+        svcEvpnVxlanESDestNumMacs
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects made obsolete related to the service Vxlan
+         feature in release 20.0 on Nokia SROS series systems."
+    ::= { tmnxSvcConformance 643 }
+
+svcDHCPLeaseV20v0Group           OBJECT-GROUP
+    OBJECTS     {
+        svcDhcpLeaseTerminationType,
+        svcDhcpLeaseIpoeSessionHost,
+        svcDhcpLeasePppSession
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the DHCP Lease on Nokia SROS series
+         systems release R20.0."
+    ::= { tmnxSvcConformance 644 }
+
+tmnxSvcDhcpMRtV20v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxSvcDhcpMRtStatus,
+        tmnxSvcDhcpMRtMetric,
+        tmnxSvcDhcpMRtPreference,
+        tmnxSvcDhcpMRtTag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Dhcp Managed Route on Nokia SROS
+         series systems release R20.0."
+    ::= { tmnxSvcConformance 645 }
+
+svcBgpEvpnV20v0Group             OBJECT-GROUP
+    OBJECTS     {
+        svcBgpEvpnCfmMacAdvertisement,
+        svcBgpEvpnMplsEvpnEncapMpls,
+        svcBgpEvpnMplsEvpnEncapMplsoUdp,
+        svcBgpEvpnTableLastChanged,
+        svcBgpEvpnRowStatus,
+        svcBgpEvpnLastChanged,
+        svcBgpEvpnMacAdvertisement,
+        svcBgpEvpnMacAdvDefaultRoute,
+        svcBgpEvpnCreationOrigin,
+        svcBgpEvpnMacDupDetNumMoves,
+        svcBgpEvpnMacDupDetWindow,
+        svcBgpEvpnMacDupDetRetry,
+        svcBgpEvpnMacDupDetNumDups,
+        svcBgpEvpnDetDupMacAddress,
+        svcBgpEvpnDetDupMacTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting service BGP EVPN on Nokia SROS series
+         systems release R20.0."
+    ::= { tmnxSvcConformance 646 }
+
+tmnxVxlanV20v0Group              OBJECT-GROUP
+    OBJECTS     {
+        tmnxESVxlanInstSvcRngTblLstChd,
+        tmnxESVxlanInstSvcRngTo,
+        tmnxESVxlanInstSvcRngRowStatus,
+        tmnxSvcSysEthSegVxlanInstanceId,
+        tmnxESVxlanInstSvcRngLastChgd,
+        svcVTEPNumVxlanESDest,
+        svcVTEPNumVxlanNonESDest
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting VXLAN feature on Nokia SROS series
+         systems release R20.0."
+    ::= { tmnxSvcConformance 647 }
+
+svcTlsProxyV20v0Group            OBJECT-GROUP
+    OBJECTS     {
+        svcTlsProxyArpTblLastChngd,
+        svcTlsProxyArpMacAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting vpls proxy  on Nokia SROS series
+         systems release R20.0."
+    ::= { tmnxSvcConformance 648 }
+
+svcBgpEvpnVxlanMhV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        svcBgpEvpnInstVxlanAutoDiscRtAdv,
+        svcBgpEvpnInstVxlanMhMode
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting VXLAN multi-homing in BGP EVPN feature
+         on Nokia SROS series systems in release 20.0."
+    ::= { tmnxSvcConformance 649 }
+
+svcEvpnOismV20v0Group            OBJECT-GROUP
+    OBJECTS     {
+        svcEvpnMplsTEPEgrLblMcast
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of EVPN MPLS Tunnel
+         services on Nokia SROS series systems in release 20.0."
+    ::= { tmnxSvcConformance 651 }
 
 tmnxTstpConformance              OBJECT IDENTIFIER ::= { tmnxServConformance 5 }
 

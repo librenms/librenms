@@ -13,6 +13,7 @@
  * @author     LibreNMS Contributors
 */
 
+$no_refresh = true;
 $page_title = 'Alerts';
 ?>
 

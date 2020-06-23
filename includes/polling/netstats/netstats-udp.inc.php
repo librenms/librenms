@@ -1,8 +1,9 @@
 <?php
 
+use Illuminate\Support\Str;
 use LibreNMS\RRD\RrdDefinition;
 
-if (!starts_with($device['os'], ['Snom', 'asa'])) {
+if (!Str::startsWith($device['os'], ['Snom', 'asa'])) {
     echo ' UDP';
 
     $oids = [

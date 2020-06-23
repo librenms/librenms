@@ -17,7 +17,7 @@ class CreateMplsLspPathsTable extends Migration
             $table->increments('lsp_path_id');
             $table->unsignedInteger('lsp_id');
             $table->unsignedInteger('path_oid');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->enum('mplsLspPathRowStatus', array('active','notInService','notReady','createAndGo','createAndWait','destroy'));
             $table->bigInteger('mplsLspPathLastChange');
             $table->enum('mplsLspPathType', array('other', 'primary', 'standby', 'secondary'));

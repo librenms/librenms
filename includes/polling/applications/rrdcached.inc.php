@@ -43,8 +43,9 @@ if ($agent_data['app'][$name]) {
     if (!$sock) {
         $socket = \LibreNMS\Config::get('rrdcached');
         if (substr($socket, 0, 6) == 'unix:/') {
-            if (file_exists(substr($socket, 5))) {
-                $sock = fsockopen($socket);
+            $socket_file = substr($socket, 5);
+            if (file_exists($socket_file)) {
+                $sock = fsockopen("unix://" . $socket_file);
             }
         }
     }

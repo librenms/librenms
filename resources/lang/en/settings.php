@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'title' => 'Settings',
     'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Alerting',
@@ -10,6 +11,7 @@ return [
         'global' => 'Global',
         'os' => 'OS',
         'discovery' => 'Discovery',
+        'graphing' => 'Graphing',
         'poller' => 'Poller',
         'system' => 'System',
         'webui' => 'Web UI',
@@ -42,6 +44,10 @@ return [
             'peeringdb' => 'PeeringDB Integration',
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
+            'smokeping' => 'Smokeping Integration'
+        ],
+        'graphing' => [
+            'availability' => 'Device Availability',
         ],
         'poller' => [
             'distributed' => 'Distributed Poller',
@@ -505,7 +511,7 @@ return [
             'description' => 'Enable Distributed Polling (requires additional setup)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
         ],
-        'distributed_poller_group' => [
+        'default_poller_group' => [
             'description' => 'Default Poller Group',
             'help' => 'The default poller group all pollers should poll if none is set in config.php'
         ],
@@ -634,6 +640,12 @@ return [
                 'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots'
             ]
         ],
+        'graphing' => [
+            'availability' => [
+                'description' => 'Duration',
+                'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)'
+            ],
+        ],
         'graylog' => [
             'base_uri' => [
                 'description' => 'Base URI',
@@ -673,6 +685,14 @@ return [
                 'description' => 'Version',
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.'
             ]
+        ],
+        'html' => [
+            'device' => [
+                'primary_link' => [
+                    'description' => 'Primary Dropdown Link',
+                    'help' => 'Sets the primary link in the device dropdown menu'
+                ]
+            ],
         ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
@@ -991,6 +1011,9 @@ return [
             'aruba-controller' => [
                 'description' => 'Aruba Controller'
             ],
+            'availability' => [
+                'description' => 'Availability'
+            ],
             'entity-physical' => [
                 'description' => 'Entity Physical'
             ],
@@ -1253,16 +1276,33 @@ return [
             'help' => 'Location Map is shown by default'
         ],
         'force_hostname_to_sysname' => [
-            'description' => 'use SNMP SysName instead of Hostname',
-            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the SNMP sysName instead as the preferred reference to the device'
+            'description' => 'show SysName instead of Hostname',
+            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device'
         ],
         'force_ip_to_sysname' => [
-            'description' => 'use SNMP SysName instead of IP Address',
-            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its SNMP sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices'
+            'description' => 'show SysName instead of IP Address',
+            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices'
         ],
         'whois' => [
             'description' => 'Path to whois'
+        ],
+        'smokeping.integration' => [
+            'description' => 'Enable',
+            'help' => 'Enable smokeping integration'
+        ],
+        'smokeping.dir' => [
+            'description' => 'Path to rrds',
+            'help' => 'Full path to Smokeping RRDs'
+        ],
+        'smokeping.pings' => [
+            'description' => 'Pings',
+            'help' => 'Number of pings configured in Smokeping'
+        ],
+        'smokeping.url' => [
+            'description' => 'URL to smokeping',
+            'help' => 'Full URL to the smokeping gui'
         ]
+
     ],
     'twofactor' => [
         'description' => 'Enable Two-Factor Auth',

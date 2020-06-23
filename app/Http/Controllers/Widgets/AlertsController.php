@@ -41,6 +41,7 @@ class AlertsController extends WidgetController
         'proc' => 0,
         'location' => 1,
         'sort' => 1,
+        'hidenavigation' => 0,
     ];
 
     public function getView(Request $request)

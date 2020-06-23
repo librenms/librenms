@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
@@ -35,6 +36,11 @@ class CustomersController extends TableController
     public function searchFields($request)
     {
         return ['port_descr_descr', 'ifName', 'ifDescr', 'ifAlias', 'hostname', 'sysDescr', 'port_descr_speed', 'port_descr_notes'];
+    }
+
+    public function sortFields($request)
+    {
+        return ['port_descr_descr', 'hostname', 'ifDescr', 'port_descr_speed', 'port_descr_circuit', 'port_descr_notes'];
     }
 
     /**
@@ -128,6 +134,6 @@ class CustomersController extends TableController
 
     private function getTypeStrings()
     {
-        return array_wrap(Config::get('customers_descr', ['cust']));
+        return Arr::wrap(Config::get('customers_descr', ['cust']));
     }
 }

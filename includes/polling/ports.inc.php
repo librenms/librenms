@@ -333,8 +333,13 @@ if (Config::get('enable_ports_poe')) {
             $ifTable_ifDescr = snmpwalk_cache_oid($device, 'ifDescr', [], 'IF-MIB');
             $port_ent_to_if = [];
             foreach ($ifTable_ifDescr as $if_index => $if_descr) {
-                if (preg_match('/^[[:alpha:]]+ethernet([0-9\/.]+)$/i', $if_descr['ifDescr'], $matches)) {
-                    $port_ent_to_if[str_replace('/', '.', $matches[1])] = ['portIfIndex' => $if_index];
+                /*
+                The ...EthernetX/Y/Z SNMP entries on Catalyst 9x00 iosxe
+                are cpeExtStuff.X.Z instead of cpeExtStuff.X.Y.Z
+                We need to ignore the middle subslot number so this is slot.port
+                */
+                if (preg_match('/^[a-z]+ethernet(\d+)\/(\d+)(?:\/(\d+))?$/i', $if_descr['ifDescr'], $matches)) {
+                    $port_ent_to_if[$matches[1] . '.' . ($matches[3] ?: $matches[2])] = ['portIfIndex' => $if_index];
                 }
             }
         }
@@ -573,9 +578,11 @@ foreach ($ports as $port) {
             }
         }
 
-        // work around invalid values for ifHighSpeed (fortigate)
-        if ($this_port['ifHighSpeed'] == 4294901759) {
-            $this_port['ifHighSpeed'] = null;
+        // ifHighSpeed is signed integer, but should be unsigned (Gauge32 in RFC2233). Workaround for some fortinet devices.
+        if ($device['os'] == 'fortigate' || $device['os'] == 'fortisandbox') {
+            if ($this_port['ifHighSpeed'] > 2147483647) {
+                $this_port['ifHighSpeed'] = null;
+            }
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
@@ -764,7 +771,7 @@ foreach ($ports as $port) {
             $port['stats']['ifInBits_rate'] = round(($port['stats']['ifInOctets_rate'] * 8));
             $port['stats']['ifOutBits_rate'] = round(($port['stats']['ifOutOctets_rate'] * 8));
 
-            // If we have a valid ifSpeed we should populate the stats for checking.
+            // If we have a valid ifSpeed we should populate the stats for checking
             if (is_numeric($this_port['ifSpeed']) && $this_port['ifSpeed'] > 0) {
                 $port['stats']['ifInBits_perc']  = round(($port['stats']['ifInBits_rate'] / $this_port['ifSpeed'] * 100));
                 $port['stats']['ifOutBits_perc'] = round(($port['stats']['ifOutBits_rate'] / $this_port['ifSpeed'] * 100));
@@ -773,17 +780,6 @@ foreach ($ports as $port) {
             echo 'bps(' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ')';
             echo 'bytes(' . formatStorage($port['stats']['ifInOctets_diff']) . '/' . formatStorage($port['stats']['ifOutOctets_diff']) . ')';
             echo 'pkts(' . format_si($port['stats']['ifInUcastPkts_rate']) . 'pps/' . format_si($port['stats']['ifOutUcastPkts_rate']) . 'pps)';
-
-            // Port utilisation % threshold alerting. // FIXME allow setting threshold per-port. probably 90% of ports we don't care about.
-            if (Config::get('alerts.port_util_alert') && $port['ignore'] == '0') {
-                // Check for port saturation of 'alerts.port_util_perc' or higher.  Alert if we see this.
-                // Check both inbound and outbound rates
-                $saturation_threshold = ($this_port['ifSpeed'] * (Config::get('alerts.port_util_perc') / 100));
-                echo 'IN: ' . $port['stats']['ifInBits_rate'] . ' OUT: ' . $port['stats']['ifOutBits_rate'] . ' THRESH: ' . $saturation_threshold;
-                if (($port['stats']['ifInBits_rate'] >= $saturation_threshold || $port['stats']['ifOutBits_rate'] >= $saturation_threshold) && $saturation_threshold > 0) {
-                    log_event('Port reached saturation threshold: ' . formatRates($port['stats']['ifInBits_rate']) . '/' . formatRates($port['stats']['ifOutBits_rate']) . ' - ifspeed: ' . formatRates($this_port['stats']['ifSpeed']), $device, 'interface', 4, $port['port_id']);
-                }
-            }
 
             // Update data stores
             $rrd_name = getPortRrdName($port_id);

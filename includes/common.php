@@ -16,12 +16,12 @@
  * the source code distribution for details.
  */
 
-use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
+use LibreNMS\Util\OS;
 
 function generate_priority_label($priority)
 {
@@ -176,22 +176,6 @@ function print_message($text)
     }
 }
 
-function delete_port($int_id)
-{
-    $interface = dbFetchRow("SELECT * FROM `ports` AS P, `devices` AS D WHERE P.port_id = ? AND D.device_id = P.device_id", array($int_id));
-
-    $interface_tables = array('ipv4_addresses', 'ipv4_mac', 'ipv6_addresses', 'juniAtmVp', 'mac_accounting', 'ospf_nbrs', 'ospf_ports', 'ports', 'ports_adsl', 'ports_perms', 'ports_statistics', 'ports_stp', 'ports_vlans', 'pseudowires');
-
-    foreach ($interface_tables as $table) {
-        dbDelete($table, "`port_id` =  ?", array($int_id));
-    }
-
-    dbDelete('links', "`local_port_id` = ? OR `remote_port_id` = ?", array($int_id, $int_id));
-    dbDelete('ports_stack', "`port_id_low` = ? OR `port_id_high` = ?", array($int_id, $int_id));
-
-    unlink(get_port_rrdfile_path($interface['hostname'], $interface['port_id']));
-}
-
 function get_sensor_rrd($device, $sensor)
 {
     return rrd_name($device['hostname'], get_sensor_rrd_name($device, $sensor));
@@ -209,11 +193,7 @@ function get_sensor_rrd_name($device, $sensor)
 
 function getPortRrdName($port_id, $suffix = '')
 {
-    if (!empty($suffix)) {
-        $suffix = '-' . $suffix;
-    }
-
-    return "port-id$port_id$suffix";
+    return Rrd::portName($port_id, $suffix);
 }
 
 function get_port_rrdfile_path($hostname, $port_id, $suffix = '')
@@ -701,41 +681,16 @@ function get_device_graphs($device)
 
 function get_smokeping_files($device)
 {
-    $smokeping_files = array();
-    if (Config::has('smokeping.dir')) {
-        $smokeping_dir = generate_smokeping_file($device);
-        if ($handle = opendir($smokeping_dir)) {
-            while (false !== ($file = readdir($handle))) {
-                if ($file != '.' && $file != '..') {
-                    if (stripos($file, '.rrd') !== false) {
-                        if (strpos($file, '~') !== false) {
-                            list($target,$slave) = explode('~', str_replace('.rrd', '', $file));
-                            $target = str_replace('_', '.', $target);
-                            $smokeping_files['in'][$target][$slave] = $file;
-                            $smokeping_files['out'][$slave][$target] = $file;
-                        } else {
-                            $target = str_replace('.rrd', '', $file);
-                            $target = str_replace('_', '.', $target);
-                            $smokeping_files['in'][$target][Config::get('own_hostname')] = $file;
-                            $smokeping_files['out'][Config::get('own_hostname')][$target] = $file;
-                        }
-                    }
-                }
-            }
-        }
-    }
-    return $smokeping_files;
-} // end get_smokeping_files
+    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get($device['device_id']));
+    return $smokeping->findFiles();
+}
 
 
 function generate_smokeping_file($device, $file = '')
 {
-    if (Config::get('smokeping.integration') === true) {
-        return Config::get('smokeping.dir') . '/' . $device['type'] . '/' . $file;
-    } else {
-        return Config::get('smokeping.dir') . '/' . $file;
-    }
-} // generate_smokeping_file
+    $smokeping = new \LibreNMS\Util\Smokeping(DeviceCache::get($device['device_id']));
+    return $smokeping->generateFileName($file);
+}
 
 
 /*
@@ -1045,13 +1000,14 @@ function version_info($remote = false)
             curl_setopt($api, CURLOPT_CONNECTTIMEOUT, 5);
             $output['github'] = json_decode(curl_exec($api), true);
         }
-        list($local_sha, $local_date) = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
+        [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
         $output['local_sha']    = $local_sha;
         $output['local_date']   = $local_date;
         $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
     }
     $output['db_schema']   = vsprintf('%s (%s)', $version->database());
     $output['php_ver']     = phpversion();
+    $output['python_ver']  = \LibreNMS\Util\Version::python();
     $output['mysql_ver']   = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
         Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
@@ -1261,7 +1217,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
             if (sizeof($glues) == 1 && $glues[0]['COLUMN_NAME'] != $target) {
                 //Search for new candidates to expand
                 $ntables = array();
-                list($tmp) = explode('_', $glues[0]['COLUMN_NAME'], 2);
+                [$tmp] = explode('_', $glues[0]['COLUMN_NAME'], 2);
                 $ntables[] = $tmp;
                 $ntables[] = $tmp.'s';
                 $tmp = dbFetchRows('SELECT TABLE_NAME FROM information_schema.TABLES WHERE TABLE_NAME LIKE "'.substr($table, 0, -1).'_%" && TABLE_NAME != "'.$table.'"');
@@ -1277,7 +1233,7 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
                     if ($glue['COLUMN_NAME'] == $target) {
                         return array_merge($last, array($table.'.'.$target));
                     } else {
-                        list($tmp) = explode('_', $glue['COLUMN_NAME']);
+                        [$tmp] = explode('_', $glue['COLUMN_NAME']);
                         $tmp .= 's';
                         if (!in_array($tmp, $tables) && !in_array($tmp, $hist)) {
                             //Expand table
@@ -1293,25 +1249,6 @@ function ResolveGlues($tables, $target, $x = 0, $hist = array(), $last = array()
     }
     //You should never get here.
     return false;
-}
-
-if (!function_exists('str_contains')) {
-    /**
-     * Determine if a given string contains a given substring.
-     *
-     * @param  string $haystack
-     * @param  string|array $needles
-     * @return bool
-     */
-    function str_contains($haystack, $needles)
-    {
-        foreach ((array)$needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) !== false) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
 
 /**
@@ -1359,44 +1296,6 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
         return " AND `$alert_rules_name`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
     return "";
-}
-
-if (!function_exists('ends_with')) {
-    /**
-     * Determine if a given string ends with a given substring.
-     *
-     * @param  string $haystack
-     * @param  string|array $needles
-     * @return bool
-     */
-    function ends_with($haystack, $needles)
-    {
-        foreach ((array)$needles as $needle) {
-            if ((string)$needle === substr($haystack, -strlen($needle))) {
-                return true;
-            }
-        }
-        return false;
-    }
-}
-
-if (!function_exists('starts_with')) {
-    /**
-     * Determine if a given string starts with a given substring.
-     *
-     * @param  string $haystack
-     * @param  string|array $needles
-     * @return bool
-     */
-    function starts_with($haystack, $needles)
-    {
-        foreach ((array)$needles as $needle) {
-            if ($needle != '' && strpos($haystack, $needle) === 0) {
-                return true;
-            }
-        }
-        return false;
-    }
 }
 
 /**
@@ -1462,17 +1361,11 @@ function load_os(&$device)
         return;
     }
 
-    if (!Config::get("os.{$device['os']}.definition_loaded")) {
-        $tmp_os = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents(Config::get('install_dir') . '/includes/definitions/' . $device['os'] . '.yaml')
-        );
-
-        Config::set("os.{$device['os']}", array_replace_recursive($tmp_os, Config::get("os.{$device['os']}", [])));
-    }
+    \LibreNMS\Util\OS::loadDefinition($device['os']);
 
     // Set type to a predefined type for the OS if it's not already set
     $loaded_os_type = Config::get("os.{$device['os']}.type");
-    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && $loaded_os_type != $device['type']) {
+    if ((!isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && array_key_exists('type', $device) && $loaded_os_type != $device['type']) {
         log_event('Device type changed ' . $device['type'] . ' => ' . $loaded_os_type, $device, 'system', 3);
         $device['type'] = $loaded_os_type;
         dbUpdate(['type' => $loaded_os_type], 'devices', 'device_id=?', [$device['device_id']]);
@@ -1484,50 +1377,6 @@ function load_os(&$device)
     } else {
         unset($device['os_group']);
     }
-
-    Config::set("os.{$device['os']}.definition_loaded", true);
-}
-
-/**
- * Load all OS, optionally load just the OS used by existing devices
- * Default cache time is 1 day. Controlled by os_def_cache_time.
- *
- * @param bool $existing Only load OS that have existing OS in the database
- * @param bool $cached Load os definitions from the cache file
- */
-function load_all_os($existing = false, $cached = true)
-{
-    Device::loadAllOs($existing, $cached);
-}
-
-/**
- * * Update the OS cache file cache/os_defs.cache
- * @param bool $force
- * @return bool true if the cache was updated
- */
-function update_os_cache($force = false)
-{
-    $install_dir = Config::get('install_dir');
-    $cache_file = "$install_dir/cache/os_defs.cache";
-    $cache_keep_time = Config::get('os_def_cache_time', 86400) - 7200; // 2hr buffer
-
-    if ($force === true || !is_file($cache_file) || time() - filemtime($cache_file) > $cache_keep_time) {
-        d_echo('Updating os_def.cache... ');
-
-        // remove previously cached os settings and replace with user settings
-        $config = ['os' => []]; // local $config variable, not global
-        include "$install_dir/config.php";
-        Config::set('os', $config['os']);
-
-        // load the os defs fresh from cache (merges with existing OS settings)
-        load_all_os(false, false);
-
-        file_put_contents($cache_file, serialize(Config::get('os')));
-        d_echo("Done\n");
-        return true;
-    }
-
-    return false;
 }
 
 /**

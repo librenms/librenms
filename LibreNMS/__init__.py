@@ -35,8 +35,8 @@ def call_script(script, args=()):
     base_dir = os.path.realpath(os.path.dirname(__file__) + "/..")
     cmd = base + ("{}/{}".format(base_dir, script),) + tuple(map(str, args))
     debug("Running {}".format(cmd))
-    # preexec_fn=os.setsid here keeps process signals from propagating
-    return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid, close_fds=True).decode()
+    # preexec_fn=os.setsid here keeps process signals from propagating (close_fds=True is default)
+    return subprocess.check_output(cmd, stderr=subprocess.STDOUT, preexec_fn=os.setsid).decode()
 
 
 class DB:

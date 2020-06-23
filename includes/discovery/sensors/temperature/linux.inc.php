@@ -4,6 +4,7 @@
  * requires snmp extend agent script from librenms-agent
  */
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 
 $sensor_oid = ".1.3.6.1.4.1.8072.1.3.2.4.1.2.9.114.97.115.112.98.101.114.114.121.1";
@@ -15,7 +16,7 @@ if (is_numeric($value)) {
     discover_sensor($valid['sensor'], 'temperature', $device, $sensor_oid, 1, $sensor_type, $descr, 1, 1, null, null, null, null, $value);
 }
 
-if (starts_with($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
+if (Str::startsWith($device['sysObjectID'], '.1.3.6.1.4.1.232.')) {
     echo 'HP_ILO ';
     $oids = snmp_walk($device, '.1.3.6.1.4.1.232.6.2.6.8.1.2.1', '-Osqn', '');
     $oids = trim($oids);

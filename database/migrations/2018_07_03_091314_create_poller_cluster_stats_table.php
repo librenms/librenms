@@ -22,7 +22,7 @@ class CreatePollerClusterStatsTable extends Migration
             $table->double('worker_seconds')->unsigned();
             $table->unsignedInteger('workers');
             $table->unsignedInteger('frequency');
-            $table->unique(['parent_poller', 'poller_type'], 'parent_poller_poller_type');
+            $table->unique(['parent_poller', 'poller_type']);
         });
     }
 

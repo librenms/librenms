@@ -37,7 +37,7 @@ class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 990464400;
 
-    public function setUp() : void
+    protected function setUp() : void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class OpenTSDBStoreTest extends TestCase
         Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
     }
 
-    public function tearDown() : void
+    protected function tearDown() : void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();

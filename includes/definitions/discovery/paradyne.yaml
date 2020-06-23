@@ -1,0 +1,19 @@
+mib: HDSL2-SHDSL-LINE-MIB
+modules:
+    sensors:
+        count:
+            data:
+                -
+                    oid: hdsl2ShdslSpanStatusTable
+                    value: hdsl2ShdslStatusMaxAttainableLineRate
+                    num_oid: '.1.3.6.1.2.1.10.48.1.2.1.2.{{ $index }}'
+                    descr: 'Max Line Rate'
+                    index: 'mlr-{{ $index }}'
+                    group: 'Modem {{ $subindex0 }}'
+                -
+                    oid: hdsl2ShdslSpanStatusTable
+                    value: hdsl2ShdslStatusActualLineRate
+                    num_oid: '.1.3.6.1.2.1.10.48.1.2.1.3.{{ $index }}'
+                    descr: 'Actual Line Rate'
+                    index: 'alr-{{ $index }}'
+                    group: 'Modem {{ $subindex0 }}'

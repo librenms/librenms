@@ -5,18 +5,18 @@ use LibreNMS\Config;
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
         $force_save = ($_POST['force_save'] == 'on');
-        $poller_group = isset($_POST['poller_group']) ? clean($_POST['poller_group']) : 0;
+        $poller_group = isset($_POST['poller_group']) ? $_POST['poller_group'] : 0;
         $snmp_enabled = ($_POST['snmp'] == 'on');
 
         if ($snmp_enabled) {
-            $max_repeaters = clean($_POST['max_repeaters']);
-            $max_oid = clean($_POST['max_oid']);
-            $port = $_POST['port'] ? clean($_POST['port']) : Config::get('snmp.port');
-            $port_assoc_mode = clean($_POST['port_assoc_mode']);
-            $retries = clean($_POST['retries']);
-            $snmpver = clean($_POST['snmpver']);
-            $transport = $_POST['transport'] ? clean($_POST['transport']) : $transport = 'udp';
-            $timeout = clean($_POST['timeout']);
+            $max_repeaters = $_POST['max_repeaters'];
+            $max_oid = $_POST['max_oid'];
+            $port = $_POST['port'] ? $_POST['port'] : Config::get('snmp.port');
+            $port_assoc_mode = $_POST['port_assoc_mode'];
+            $retries = $_POST['retries'];
+            $snmpver = $_POST['snmpver'];
+            $transport = $_POST['transport'] ? $_POST['transport'] : $transport = 'udp';
+            $timeout = $_POST['timeout'];
 
             $update = array(
                 'poller_group' => $poller_group,
@@ -34,7 +34,7 @@ if ($_POST['editing']) {
             }
 
             if ($snmpver != "v3") {
-                $community = clean($_POST['community']);
+                $community = $_POST['community'];
                 $update['community' ] = $community;
             }
 
@@ -48,24 +48,24 @@ if ($_POST['editing']) {
             if ($snmpver == "v3") {
                 $community = ''; // if v3 works, we don't need a community
 
-                $v3['authalgo'] = clean($_POST['authalgo']);
-                $v3['authlevel'] = clean($_POST['authlevel']);
-                $v3['authname'] = clean($_POST['authname']);
-                $v3['authpass'] = clean($_POST['authpass']);
-                $v3['cryptoalgo'] = clean($_POST['cryptoalgo']);
-                $v3['cryptopass'] = clean($_POST['cryptopass']);
+                $v3['authalgo'] = $_POST['authalgo'];
+                $v3['authlevel'] = $_POST['authlevel'];
+                $v3['authname'] = $_POST['authname'];
+                $v3['authpass'] = $_POST['authpass'];
+                $v3['cryptoalgo'] = $_POST['cryptoalgo'];
+                $v3['cryptopass'] = $_POST['cryptopass'];
 
                 $update = array_merge($update, $v3);
             }
         } else {
             // snmp is disabled
             $update['features'] = null;
-            $update['hardware'] = clean($_POST['hardware']);
+            $update['hardware'] = $_POST['hardware'];
             $update['icon'] = null;
-            $update['os'] = $_POST['os'] ? clean($_POST['os_id']) : "ping";
+            $update['os'] = $_POST['os'] ? $_POST['os_id'] : "ping";
             $update['poller_group'] = $poller_group;
             $update['snmp_disable'] = 1;
-            $update['sysName'] = $_POST['sysName'] ? clean($_POST['sysName']) : null;
+            $update['sysName'] = $_POST['sysName'] ? $_POST['sysName'] : null;
             $update['version'] = null;
         }
 
@@ -156,7 +156,7 @@ if ($_POST['editing']) {
         }
 
         if ($snmp_enabled && ($force_save !== true && !$device_issnmpable)) {
-            $update_failed_message[] = "Could not connect to " . $device['hostname'] . " with those SNMP settings.  To save anyway, turn on Force Save.";
+            $update_failed_message[] = "Could not connect to " . htmlspecialchars($device['hostname']) . " with those SNMP settings.  To save anyway, turn on Force Save.";
             $update_message[] = 'SNMP settings reverted';
         }
 
@@ -230,19 +230,19 @@ echo "
     <div class='form-group'>
     <label for='sysName' class='col-sm-2 control-label'>sysName (optional)</label>
     <div class='col-sm-4'>
-    <input id='sysName' class='form-control' name='sysName' value='".$device['sysName']."'/>
+    <input id='sysName' class='form-control' name='sysName' value='".htmlspecialchars($device['sysName'])."'/>
     </div>
     </div>
     <div class='form-group'>
     <label for='hardware' class='col-sm-2 control-label'>Hardware (optional)</label>
     <div class='col-sm-4'>
-    <input id='hardware' class='form-control' name='hardware' value='".$device['hardware']."'/>
+    <input id='hardware' class='form-control' name='hardware' value='".htmlspecialchars($device['hardware'])."'/>
     </div>
     </div>
     <div class='form-group'>
     <label for='os' class='col-sm-2 control-label'>OS (optional)</label>
     <div class='col-sm-4'>
-    <input id='os' class='form-control' name='os' value='" . Config::get("os.{$device['os']}.text") . "'/>
+    <input id='os' class='form-control' name='os' value='" . htmlspecialchars(Config::get("os.{$device['os']}.text")) . "'/>
     <input type='hidden' id='os_id' class='form-control' name='os_id' value='".$device['os']."'/>
     </div>
     </div>
@@ -259,7 +259,7 @@ echo "
     </select>
     </div>
     <div class='col-sm-2'>
-    <input type='text' name='port' placeholder='port' class='form-control input-sm' value='" . ($device['port'] == Config::get('snmp.port') ? "" : $device['port']) . "'>
+    <input type='number' name='port' placeholder='port' class='form-control input-sm' value='" . htmlspecialchars($device['port'] == Config::get('snmp.port') ? "" : $device['port']) . "'>
     </div>
     <div class='col-sm-1'>
     <select name='transport' id='transport' class='form-control input-sm'>";
@@ -279,10 +279,10 @@ echo "      </select>
     <div class='col-sm-2'>
     </div>
     <div class='col-sm-1'>
-    <input id='timeout' name='timeout' class='form-control input-sm' value='".($device['timeout'] ? $device['timeout'] : '')."' placeholder='seconds' />
+    <input type='number' id='timeout' name='timeout' class='form-control input-sm' value='".htmlspecialchars($device['timeout'] ? $device['timeout'] : '')."' placeholder='seconds' />
     </div>
     <div class='col-sm-1'>
-    <input id='retries' name='retries' class='form-control input-sm' value='".($device['timeout'] ? $device['retries'] : '')."' placeholder='retries' />
+    <input type='number' id='retries' name='retries' class='form-control input-sm' value='".htmlspecialchars($device['timeout'] ? $device['retries'] : '')."' placeholder='retries' />
     </div>
     </div>
     <div class='form-group'>
@@ -307,13 +307,13 @@ echo "        </select>
     <div class='form-group'>
         <label for='max_repeaters' class='col-sm-2 control-label'>Max Repeaters</label>
         <div class='col-sm-1'>
-            <input id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".$max_repeaters."' placeholder='max repeaters' />
+            <input type='number' id='max_repeaters' name='max_repeaters' class='form-control input-sm' value='".htmlspecialchars($max_repeaters)."' placeholder='max repeaters' />
         </div>
     </div>
     <div class='form-group'>
         <label for='max_oid' class='col-sm-2 control-label'>Max OIDs</label>
         <div class='col-sm-1'>
-            <input id='max_oid' name='max_oid' class='form-control input-sm' value='".$max_oid."' placeholder='max oids' />
+            <input type='number' id='max_oid' name='max_oid' class='form-control input-sm' value='".htmlspecialchars($max_oid)."' placeholder='max oids' />
         </div>
     </div>
     <div id='snmpv1_2'>
@@ -323,7 +323,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='".$device['community']."'/>
+    <input id='community' class='form-control' name='community' value='".htmlspecialchars($device['community'])."'/>
     </div>
     </div>
     </div>
@@ -344,13 +344,13 @@ echo "        </select>
     <div class='form-group'>
     <label for='authname' class='col-sm-2 control-label'>Auth User Name</label>
     <div class='col-sm-4'>
-    <input type='text' id='authname' name='authname' class='form-control' value='".$device['authname']."' autocomplete='off'>
+    <input type='text' id='authname' name='authname' class='form-control' value='".htmlspecialchars($device['authname'])."' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
     <label for='authpass' class='col-sm-2 control-label'>Auth Password</label>
     <div class='col-sm-4'>
-    <input type='password' id='authpass' name='authpass' class='form-control' value='".$device['authpass']."' autocomplete='off'>
+    <input type='password' id='authpass' name='authpass' class='form-control' value='".htmlspecialchars($device['authpass'])."' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
@@ -365,7 +365,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='cryptopass' class='col-sm-2 control-label'>Crypto Password</label>
     <div class='col-sm-4'>
-    <input type='password' id='cryptopass' name='cryptopass' class='form-control' value='".$device['cryptopass']."' autocomplete='off'>
+    <input type='password' id='cryptopass' name='cryptopass' class='form-control' value='".htmlspecialchars($device['cryptopass'])."' autocomplete='off'>
     </div>
     </div>
     <div class='form-group'>
@@ -399,7 +399,7 @@ if (Config::get('distributed_poller') === true) {
             echo ' selected';
         }
 
-        echo '>'.$group['group_name'].'</option>';
+        echo '>'.htmlspecialchars($group['group_name']).'</option>';
     }
 
     echo '

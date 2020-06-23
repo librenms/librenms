@@ -83,7 +83,6 @@ class InfluxDB extends BaseDatastore
         $tmp_fields = [];
         $tmp_tags['hostname'] = $device['hostname'];
         foreach ($tags as $k => $v) {
-            $v = preg_replace(['/ /', '/,/', '/=/'], ['\ ', '\,', '\='], $v);
             if (empty($v)) {
                 $v = '_blank_';
             }

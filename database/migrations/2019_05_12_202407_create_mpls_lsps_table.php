@@ -17,7 +17,7 @@ class CreateMplsLspsTable extends Migration
             $table->increments('lsp_id');
             $table->unsignedInteger('vrf_oid');
             $table->unsignedInteger('lsp_oid');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->enum('mplsLspRowStatus', array('active','notInService','notReady','createAndGo','createAndWait','destroy'));
             $table->bigInteger('mplsLspLastChange')->nullable();
             $table->string('mplsLspName', 64);

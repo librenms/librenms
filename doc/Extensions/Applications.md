@@ -33,7 +33,7 @@ For example if snmpd is running as 'Debian-snmp' and we want
 to run the extend for proxmox, we check that the following run without error:
 
 ```
-sudo -u Debian-snmpn/usr/local/bin/proxmox
+sudo -u Debian-snmp /usr/local/bin/proxmox
 ```
 
 If it doesn't work, then you will need to use sudo with the extend command.
@@ -87,6 +87,7 @@ by following the steps under the `SNMP Extend` heading.
 
 1. [Apache](#apache) - SNMP extend, Agent
 1. [Asterisk](#asterisk) - SNMP extend
+1. [backupninja](#backupninja) - SNMP extend
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [Certificate](#certificate) - Certificate extend
 1. [C.H.I.P.](#chip) - SNMP extend
@@ -124,6 +125,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Puppet Agent](#puppet_agent) - SNMP extend
 1. [PureFTPd](#pureftpd) - SNMP extend
 1. [Raspberry PI](#raspberry-pi) - SNMP extend
+1. [Redis](#redis) - SNMP extend
 1. [SDFS info](#sdfs-info) - SNMP extend
 1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
@@ -232,13 +234,35 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
+# backupninja
+
+A small shell script that reports status of last backupninja backup.
+
+## SNMP Extend
+
+1: Download the [backupninja
+script](https://github.com/librenms/librenms-agent/blob/master/snmp/backupninja.py)
+to `/etc/snmp/backupninja.py` on your backuped server.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/backupninja.py -O /etc/snmp/backupninja.py`
+```
+2: Make the script executable: `chmod +x /etc/snmp/backupninja.py`
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend backupninja /etc/snmp/backupninja.py
+```
+
+4: Restart snmpd on your host
+
+
 # BIND9 aka named
 
 1: Create stats file with appropriate permissions:
 
 ```bash
-~$ touch /var/run/named/stats
-~$ chown bind:bind /var/run/named/stats
+~$ touch /var/cache/bind/stats
+~$ chown bind:bind /var/cache/bind/stats
 ```
 
 Change `user:group` to the user and group that's running bind/named.
@@ -248,7 +272,7 @@ Change `user:group` to the user and group that's running bind/named.
 ```text
 options {
     ...
-    statistics-file "/var/run/named/stats";
+    statistics-file "/var/cache/bind/stats";
     zone-statistics yes;
     ...
 };
@@ -257,7 +281,7 @@ options {
 3: Restart your bind9/named after changing the configuration.
 
 4: Verify that everything works by executing `rndc stats && cat
-/var/run/named/stats`. In case you get a `Permission Denied` error,
+/var/cache/bind/stats`. In case you get a `Permission Denied` error,
 make sure you changed the ownership correctly.
 
 5: Also be aware that this file is appended to each time `rndc stats`
@@ -294,7 +318,7 @@ own settings.
 rndc = The path to rndc. Default: /usr/bin/env rndc
 call_rndc = A 0/1 boolean on whether or not to call rndc stats.
     Suggest to set to 0 if using netdata. Default: 1
-stats_file = The path to the named stats file. Default: /var/run/named/stats
+stats_file = The path to the named stats file. Default: /var/cache/bind/stats
 agent = A 0/1 boolean for if this is being used as a LibreNMS
     agent or not. Default: 0
 zero_stats = A 0/1 boolean for if the stats file should be zeroed
@@ -404,25 +428,38 @@ Extend` heading top of page.
 
 # DHCP Stats
 
-A small shell script that reports current DHCP leases stats.
+A small python3 script that reports current DHCP leases stats and pool usage.
+
+Also you have to install the dhcpd-pools Package.
+Under Ubuntu/Debian just run `apt install dhcpd-pools`
 
 ## SNMP Extend
 
 1: Copy the shell script to the desired host.
 
 ```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp-status.sh -O /etc/snmp/dhcp-status.sh
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
 ```
 
-2: Run `chmod +x /etc/snmp/dhcp-status.sh`
+2: Run `chmod +x /etc/snmp/dhcp.py`
 
-3: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+
+3: edit a config file:
+
+Content of an example /etc/snmp/dhcp.json . Please edit with your own settings.
+```
+{"leasefile": "/var/lib/dhcp/dhcpd.leases"
+}
+```
+Key 'leasefile' specifies the path to your lease file.
+
+4: Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
 
 ```
-extend dhcpstats /etc/snmp/dhcp-status.sh
+extend dhcpstats /etc/snmp/dhcp.py
 ```
 
-4: Restart snmpd on your host
+5: Restart snmpd on your host
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
@@ -1463,7 +1500,7 @@ extend proxmox /usr/bin/sudo /usr/local/bin/proxmox
 after, edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
+Debian-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 ```
 
 6: Restart snmpd on your host
@@ -1520,13 +1557,13 @@ SNMP extend script to monitor PureFTPd.
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
 ```
-extend pureftpd /etc/snmp/pureftpd.py
+extend pureftpd sudo /etc/snmp/pureftpd.py
 ```
 
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /usr/sbin/pure-ftpwho
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/pureftpd.py
 ```
 or the path where your pure-ftpwho is located
 
@@ -1560,7 +1597,7 @@ SNMP extend script to get your PI data into your host.
 3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
 
 ```
-extend raspberry /etc/snmp/raspberry.sh
+extend raspberry sudo /etc/snmp/raspberry.sh
 ```
 
 4: Edit your sudo users (usually `visudo`) and add at the bottom:
@@ -1574,6 +1611,24 @@ snmp ALL=(ALL) NOPASSWD: /etc/snmp/raspberry.sh, /usr/bin/vcgencmd
 the user snmpd is using with `ps aux | grep snmpd`
 
 5: Restart snmpd on PI host
+
+# Redis
+
+SNMP extend script to monitor your Redis Server
+
+## SNMP Extend
+
+1: Download the script onto the desired host. `wget
+   https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/redis.py
+   -O /etc/snmp/redis.py`
+
+2: Make the script executable: `chmod +x /etc/snmp/redis.py`
+
+3: Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
+
+```
+extend redis /etc/snmp/redis.py
+```
 
 # Seafile
 
@@ -1930,7 +1985,14 @@ echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
 chmod +x /etc/snmp/zfs-linux
-echo "extend zfs /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
+echo "extend zfs sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
 ```
+
+Edit your sudo users (usually `visudo`) and add at the bottom:
+
+```
+snmp ALL=(ALL) NOPASSWD: /etc/snmp/zfs-linux
+```
+
 
 Now restart snmpd and you're all set.

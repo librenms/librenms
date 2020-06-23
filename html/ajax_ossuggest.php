@@ -54,7 +54,7 @@ function levsortos($base, $obj, $keys)
 
 header('Content-type: application/json');
 if (isset($_GET['term'])) {
-    load_all_os();
+    \LibreNMS\Util\OS::loadAllDefinitions(false, true);
     $_GET['term'] = clean($_GET['term']);
     $sortos = levsortos($_GET['term'], \LibreNMS\Config::get('os'), ["text", "os"]);
     $sortos = array_slice($sortos, 0, 20);

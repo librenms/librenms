@@ -160,9 +160,8 @@ function generate_minigraph_image($device, $start, $end, $type, $legend = 'no', 
 
 function generate_device_url($device, $vars = array())
 {
-    return generate_url(array('page' => 'device', 'device' => $device['device_id']), $vars);
-}//end generate_device_url()
-
+    return \LibreNMS\Util\Url::deviceUrl((int)$device['device_id'], $vars);
+}
 
 function generate_device_link($device, $text = null, $vars = array(), $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
 {
@@ -178,15 +177,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
 
     $text = format_hostname($device, $text);
 
-    if ($device['snmp_disable']) {
-        $graphs = Config::get('os.ping.over');
-    } elseif (Config::has("os.{$device['os']}.over")) {
-        $graphs = Config::get("os.{$device['os']}.over");
-    } elseif (isset($device['os_group']) && Config::has("os.{$device['os_group']}.over")) {
-        $graphs = Config::get("os.{$device['os_group']}.over");
-    } else {
-        $graphs = Config::get('os.default.over');
-    }
+    $graphs = \LibreNMS\Util\Graph::getOverviewGraphsForDevice(DeviceCache::get($device['device_id']));
 
     $url = generate_device_url($device, $vars);
 
@@ -197,7 +188,7 @@ function generate_device_link($device, $text = null, $vars = array(), $start = 0
     }
 
     if ($device['os']) {
-        $contents .= ' - ' . Config::get("os.{$device['os']}.text");
+        $contents .= ' - ' . Config::getOsSetting($device['os'], 'text');
     }
 
     if ($device['version']) {
@@ -247,41 +238,10 @@ function overlib_link($url, $text, $contents, $class = null)
     return \LibreNMS\Util\Url::overlibLink($url, $text, $contents, $class);
 }
 
-
-function generate_graph_popup($graph_array)
-{
-    // Take $graph_array and print day,week,month,year graps in overlib, hovered over graph
-    $original_from = $graph_array['from'];
-
-    $graph = generate_graph_tag($graph_array);
-    $content = '<div class=list-large>' . $graph_array['popup_title'] . '</div>';
-    $content .= "<div style=\'width: 850px\'>";
-    $graph_array['legend'] = 'yes';
-    $graph_array['height'] = '100';
-    $graph_array['width'] = '340';
-    $graph_array['from'] = Config::get('time.day');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.week');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.month');
-    $content .= generate_graph_tag($graph_array);
-    $graph_array['from'] = Config::get('time.year');
-    $content .= generate_graph_tag($graph_array);
-    $content .= '</div>';
-
-    $graph_array['from'] = $original_from;
-
-    $graph_array['link'] = generate_url($graph_array, array('page' => 'graphs', 'height' => null, 'width' => null, 'bg' => null));
-
-    // $graph_array['link'] = "graphs/type=" . $graph_array['type'] . "/id=" . $graph_array['id'];
-    return overlib_link($graph_array['link'], $graph, $content, null);
-}//end generate_graph_popup()
-
-
 function print_graph_popup($graph_array)
 {
-    echo generate_graph_popup($graph_array);
-}//end print_graph_popup()
+    echo \LibreNMS\Util\Url::graphPopup($graph_array);
+}
 
 function bill_permitted($bill_id)
 {
@@ -1158,7 +1118,7 @@ function search_oxidized_config($search_in_conf_textbox)
         )
     );
     $context = stream_context_create($opts);
-    
+
     $nodes = json_decode(file_get_contents($oxidized_search_url, false, $context), true);
     // Look up Oxidized node names to LibreNMS devices for a link
     foreach ($nodes as &$n) {
@@ -1237,7 +1197,7 @@ function get_oxidized_nodes_list()
             //user cannot see this device, so let's skip it.
             continue;
         }
-        
+
         echo "<tr>
         <td>" . $device['device_id'] . "</td>
         <td>" . $object['name'] . "</td>
@@ -1313,12 +1273,13 @@ function get_postgres_databases($device_id)
  *
  * @param array $device device for which we get the rrd's
  * @param int   $app_id application id on the device
- * @param string  $category which category of seafile graphs are searched
+ * @param string  $category which category of graphs are searched
  * @return array list of entry data
  */
 function get_arrays_with_application($device, $app_id, $app_name, $category = null)
 {
     $entries = array();
+    $separator = '-';
 
     if ($category) {
         $pattern = sprintf('%s/%s-%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id, $category);
@@ -1326,10 +1287,13 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
         $pattern = sprintf('%s/%s-%s-%s-*.rrd', get_rrd_dir($device['hostname']), 'app', $app_name, $app_id);
     }
 
+    # app_name contains a separator character? consider it
+    $offset = substr_count($app_name, $separator);
+
     foreach (glob($pattern) as $rrd) {
         $filename = basename($rrd, '.rrd');
 
-        list(,,, $entry) = explode("-", $filename, 4);
+        $entry = explode($separator, $filename, 4 + $offset)[3 + $offset];
 
         if ($entry) {
             array_push($entries, $entry);
@@ -1337,63 +1301,6 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
     }
 
     return $entries;
-}
-
-/**
- * Get all certificate names from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of certificate names
- */
-function get_domains_with_certificates($device, $app_id)
-{
-    $app_name = 'certificate';
-    return get_arrays_with_application($device, $app_id, $app_name);
-}
-
-/**
- * Get all seafile data from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @param string $category which category of seafile graphs are searched
- * @return array list of seafile data
- */
-function get_arrays_with_seafile($device, $app_id, $category)
-{
-    $app_name = 'seafile';
-    return get_arrays_with_application($device, $app_id, $app_name, $category);
-}
-
-/**
- * Get all mdadm arrays from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of raid-arrays
- */
-function get_arrays_with_mdadm($device, $app_id)
-{
-    $app_name = 'mdadm';
-    return get_arrays_with_application($device, $app_id, $app_name);
-}
-
-/**
- * Get all disks (disk serial numbers) from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of disks
- */
-function get_disks_with_smart($device, $app_id)
-{
-    $app_name = 'smart';
-    return get_arrays_with_application($device, $app_id, $app_name);
 }
 
 /**
@@ -1590,6 +1497,9 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     if ($sensor['sensor_class'] == 'runtime') {
         $sensor['sensor_current'] = formatUptime($sensor['sensor_current'] * 60, 'short');
         return "<span class='label $label_style'>".trim($sensor['sensor_current'])."</span>";
+    }
+    if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
+        return "<span class='label $label_style'>".trim($sensor['sensor_current'])." ".$unit."</span>";
     }
     return "<span class='label $label_style'>".trim(format_si($sensor['sensor_current']).$unit)."</span>";
 }

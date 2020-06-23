@@ -3,6 +3,8 @@
 use App\Models\Device;
 use App\Models\Location;
 
+require_once 'includes/html/modal/device_maintenance.inc.php';
+
 $device_model = Device::find($device['device_id']);
 
 if ($_POST['editing']) {
@@ -267,6 +269,13 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
         </div>
     </div>
     <div class="form-group">
+      <label for="maintenance" class="col-sm-2 control-label"></label>
+      <div class="col-sm-6">
+      <button type="button" id="maintenance" data-device_id="<?php echo($device['device_id']); ?>" <?php echo(\LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"')?> name="maintenance"><i class="fa fa-wrench"></i> Maintenance Mode</button>
+      </div>
+    </div>
+
+    <div class="form-group">
       <label for="disable_notify" class="col-sm-2 control-label">Disable alerting:</label>
       <div class="col-sm-6">
         <input id="disable_notify" type="checkbox" name="disable_notify" data-size="small"
@@ -298,8 +307,11 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 </form>
 <br />
 <script>
-    $('[type="checkbox"]').bootstrapSwitch();
+    $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
 
+    $("#maintenance").click(function() {
+        $("#device_maintenance_modal").modal('show');
+    });
     $("#rediscover").click(function() {
         var device_id = $(this).data("device_id");
         $.ajax({
@@ -342,12 +354,9 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 print_optionbar_start();
 list($sizeondisk, $numrrds) = foldersize(get_rrd_dir($device['hostname']));
 echo("Size on Disk: <b>" . formatStorage($sizeondisk) . "</b> in <b>" . $numrrds . " RRD files</b>.");
-print_optionbar_end();
-
-echo("<small>");
-echo("Last polled: <b>" . $device['last_polled'] . "</b>");
+echo(" | Last polled: <b>" . $device['last_polled'] . "</b>");
 if ($device['last_discovered']) {
-    echo("<br>Last discovered: <b>" . $device['last_discovered'] . "</b>");
+    echo(" | Last discovered: <b>" . $device['last_discovered'] . "</b>");
 }
-echo("</small>");
+print_optionbar_end();
 ?>

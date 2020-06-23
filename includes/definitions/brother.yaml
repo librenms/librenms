@@ -2,6 +2,7 @@ os: brother
 group: printer
 text: 'Brother Printer'
 type: printer
+nobulk: true
 over:
     - { graph: device_toner, text: Toner }
 discovery:

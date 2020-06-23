@@ -23,6 +23,7 @@
  * @author     Neil Lathwood <gh+n@laf.io>
  */
 
+use Illuminate\Support\Str;
 use LibreNMS\Alerting\QueryBuilderParser;
 
 header('Content-type: application/json');
@@ -159,9 +160,9 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     $groups = [];
     $locations = [];
     foreach ((array)$vars['maps'] as $item) {
-        if (starts_with($item, 'l')) {
+        if (Str::startsWith($item, 'l')) {
             $locations[] = (int)substr($item, 1);
-        } elseif (starts_with($item, 'g')) {
+        } elseif (Str::startsWith($item, 'g')) {
             $groups[] = (int)substr($item, 1);
         } else {
             $devices[] = (int)$item;
@@ -176,7 +177,7 @@ if (is_numeric($rule_id) && $rule_id > 0) {
     $transports = [];
     $groups = [];
     foreach ((array)$vars['transports'] as $item) {
-        if (starts_with($item, 'g')) {
+        if (Str::startsWith($item, 'g')) {
             $groups[] = (int)substr($item, 1);
         } else {
             $transports[] = (int)$item;
