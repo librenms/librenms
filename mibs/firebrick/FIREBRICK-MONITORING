@@ -1,0 +1,113 @@
+-- *------------------------------------------------
+-- * Firebrick Monitoring MIB
+-- *
+-- * June 2020, Cliff Hones
+-- *
+-- * Copyright (c) 2020 by Andrews & Arnold
+-- * 
+-- * See the Firebrick Manuals for more information
+-- *------------------------------------------------
+
+FIREBRICK-MONITORING DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    NOTIFICATION-TYPE,
+    Counter32,
+    Counter64,
+    Gauge32,
+    Integer32,
+    Integer32
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP,
+    NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    TimeStamp,
+    TimeInterval,
+    TruthValue
+        FROM SNMPv2-TC
+    enterprises
+        FROM RFC1155-SMI
+    firebrickNewStyle
+	FROM FIREBRICK-MIB
+	;
+
+fbMonitoringMib MODULE-IDENTITY
+    LAST-UPDATED "202006170000Z"
+    ORGANIZATION "Andrews & Arnold Limited"
+    CONTACT-INFO
+        "Andrews & Arnold
+        Unit 1&2, Enterprise Court
+        Bracknell, Berkshire, RG12 1QS
+        United Kingdom
+
+        Tel: +44 3333 400 999
+        Email: support@aa.net.uk"
+    DESCRIPTION
+        "This is a MIB Module for monitoring the Firebrick-specific structures
+        for general system features."
+    REVISION "202006170000Z"
+    DESCRIPTION "Initial version of this MIB module"
+    ::= { firebrickNewStyle 1 }
+
+fbMonReadingTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FbMonReadingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The list of readings for this Firebrick"
+    ::= { fbMonitoringMib 1 }
+
+fbMonReadingEntry OBJECT-TYPE
+    SYNTAX FbMonReadingEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry in the FB readings table"
+    INDEX { fbMonReadingIndex }
+    ::= { fbMonReadingTable 1 }
+
+FbMonReadingEntry ::= SEQUENCE {
+    fbMonReadingIndex        Integer32,
+    fbMonReadingType         DisplayString,
+    fbMonReadingName         DisplayString,
+    fbMonReadingValue        Integer32
+}
+
+fbMonReadingIndex OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The index for the readings table"
+    ::= { fbMonReadingEntry 1 }
+
+fbMonReadingType OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The type of this reading"
+    ::= { fbMonReadingEntry 2 }
+
+fbMonReadingName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of this reading"
+    ::= { fbMonReadingEntry 3 }
+
+fbMonReadingValue OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The value of this reading"
+    ::= { fbMonReadingEntry 4 }
+
+END

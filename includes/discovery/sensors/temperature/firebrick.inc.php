@@ -1,69 +1,45 @@
 <?php
-$sysOid = explode(".", $device["sysObjectID"]);
-$modelNumber = $sysOid[count($sysOid)-1];
+$monitoringMib = snmpwalk_cache_multi_oid($device, 'fbMonitoringMib', [], 'FIREBRICK-MONITORING', 'firebrick');
+$params_map = array(
+    "Fan Controller" => array("description" => "Fan Controller",
+                 "crit_low" => 10,
+                 "warn_low" => 20,
+                 "warn_high" => 50,
+                 "crit_high" => 70),
+    "CPU" => array("description" => "CPU",
+                 "crit_low" => 10,
+                 "warn_low" => 20,
+                 "warn_high" => 60,
+                 "crit_high" => 80),
+    "RTC" => array("description" => "Real-time Clock",
+                 "crit_low" => 10,
+                 "warn_low" => 20,
+                 "warn_high" => 50,
+                 "crit_high" => 70),
+    "PCB" => array("description" => "Internal Ambient",
+                 "crit_low" => 10,
+                 "warn_low" => 20,
+                 "warn_high" => 50,
+                 "crit_high" => 70),
+);
 
-$monitoringMib = null;
-if(substr($device["sysDescr"], 0, 6) == "FB2900"){
-    // It's a 2900
-    $monitoringMib = "FB2900-MONITORING";
-    discover_sensor(
-        $valid['sensor'],
-        'temperature',
-        $device,
-        '.1.3.6.1.4.1.24693.1.2.1',
-        '1',
-        'firebrick',
-        'CPU Temperature',
-        '1000',
-        '1',
-        10,
-        20,
-        50,
-        70);
-}elseif((substr($device["sysDescr"], 0, 6) == "FB6000") ||
-        (($modelNumber >= 6000) && ($modelNumber <= 7000))){
-    // It's a 6000
-    $monitoringMib = "FB6000-MONITORING";
-    discover_sensor(
-        $valid['sensor'],
-        'temperature',
-        $device,
-        '.1.3.6.1.4.1.24693.1.2.1',
-        '1',
-        'firebrick',
-        'Fan Controller Temperature',
-        '1000',
-        '1',
-        10,
-        20,
-        50,
-        70);
-    discover_sensor(
-        $valid['sensor'],
-        'temperature',
-        $device,
-        '.1.3.6.1.4.1.24693.1.2.2',
-        '2',
-        'firebrick',
-        'CPU Temperature',
-        '1000',
-        '1',
-        10,
-        20,
-        60,
-        80);
-    discover_sensor(
-        $valid['sensor'],
-        'temperature',
-        $device,
-        '.1.3.6.1.4.1.24693.1.2.1',
-        '3',
-        'firebrick',
-        'RTC Temperature',
-        '1000',
-        '1',
-        10,
-        20,
-        50,
-        70);
+foreach($monitoringMib as $idx => $mibEntry){
+    if(isset($params_map[$mibEntry["fbMonReadingName"]])){
+        $cfg = $params_map[$mibEntry["fbMonReadingName"]];
+        discover_sensor(
+            $valid['sensor'],
+            'temperature',
+            $device,
+            ".1.3.6.1.4.1.24693.100.1.1.1.4." . $idx,
+            $idx,
+            'firebrick',
+            $cfg["description"],
+            (isset($cfg["divisor"]) ? $cfg["divisor"] : '1000'),
+            '1',
+            (isset($cfg["crit_low"]) ? $cfg["crit_low"] : 0),
+            (isset($cfg["warn_low"]) ? $cfg["warn_low"] : 0),
+            (isset($cfg["warn_high"]) ? $cfg["warn_high"] : 15),
+            (isset($cfg["crit_high"]) ? $cfg["crit_high"] : 20),
+            );
+    }
 }

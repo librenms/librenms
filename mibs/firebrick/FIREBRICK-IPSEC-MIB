@@ -1,7 +1,7 @@
 -- *------------------------------------------------
--- * Firebrick 2900 BGP MIB
+-- * Firebrick IPsec MIB
 -- *
--- * April 2020, C Malton
+-- * June 2020, Cliff Hones
 -- *
 -- * Copyright (c) 2020 by Andrews & Arnold
 -- * 
@@ -17,13 +17,15 @@ IMPORTS
         FROM SNMPv2-SMI
     DisplayString
         FROM SNMPv2-TC
-    InetAddressIPv4,
-    InetAddressIPv6
+    InetAddressType,
+    InetAddress
         FROM INET-ADDRESS-MIB
+    firebrickNewStyle
+	FROM FIREBRICK-MIB
         ;
 
-fbIpsecMib MODULE-IDENTITY
-    LAST-UPDATED "202004060000Z"
+fbIPsecMib MODULE-IDENTITY
+    LAST-UPDATED "202006160000Z"
     ORGANIZATION "Andrews & Arnold Limited"
     CONTACT-INFO
         "Andrews & Arnold
@@ -36,93 +38,109 @@ fbIpsecMib MODULE-IDENTITY
     DESCRIPTION
         "This is a MIB Module for monitoring the Firebrick-specific structures
         for IPSec."
-    REVISION "202004060000Z"
+    REVISION "202006160000Z"
     DESCRIPTION "Initial version of this MIB module"
-    ::= { firebrick 500 }
+    ::= { firebrickNewStyle 500 }
 
-firebrick   OBJECT IDENTIFIER ::= { enterprises 24693 }
+fbIPsecGeneral    OBJECT IDENTIFIER ::= { fbIPsecMib 1 }
 
-fbIpsecGeneral    OBJECT IDENTIFIER ::= { fbIpsecMib 0 }
-fbIpsecPeersBase    OBJECT IDENTIFIER ::= { fbIpsecGeneral 2 }
-fbIpsecPeersTable   OBJECT IDENTIFIER ::= { fbIpsecPeersBase 1 }
+fbIPsecEstablished OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The count of currently established IKE connections."
+    ::= { fbIPsecGeneral 1 }
 
-fbPeerNameTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF FbBgpIpv4PeerNameEntry
+fbIPsecHalfOpen OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "The count of incoming IKE connections which have not yet authorized."
+    ::= { fbIPsecGeneral 2 }
+
+fbIPsecConnectionTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FbIPsecConnectionEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The list of BGP peers for this Firebrick"
-    ::= { fbBgpPeerNameTable 4 }
+        "The list of IPsec connections for this Firebrick"
+    ::= { fbIPsecMib 2 }
 
-fbBgpIpv4PeerNameEntry OBJECT-TYPE
-    SYNTAX FbBgpIpv4PeerNameEntry
+fbIPsecConnectionEntry OBJECT-TYPE
+    SYNTAX FbIPsecConnectionEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "An entry in the IPv4 BGP Peer Names Table"
-    INDEX { fbBgpIpv4PeerAddress }
-    ::= { fbBgpIpv4PeerNameTable 1 }
+        "An entry in the IPsec connection table"
+    INDEX { fbIPsecConnectionIndex }
+    ::= { fbIPsecConnectionTable 1 }
 
-FbBgpIpv4PeerNameEntry ::= SEQUENCE {
-    fbBgpIpv4PeerAddress    InetAddressIPv4,
-    fbBgpIpv4PeerName   DisplayString
+FbIPsecConnectionEntry ::= SEQUENCE {
+    fbIPsecConnectionIndex        Integer32,
+    fbIPsecConnectionName         DisplayString,
+    fbIPsecConnectionState        Integer32,
+    fbIPsecConnectionUptime       TimeTicks,
+    fbIPsecConnectionLocalId      DisplayString,
+    fbIPsecConnectionPeerId       DisplayString,
+    fbIPsecConnectionPeerAddress  DisplayString
 }
 
-fbBgpIpv4PeerName OBJECT-TYPE
-    SYNTAX  DisplayString
+fbIPsecConnectionIndex OBJECT-TYPE
+    SYNTAX  Integer32
     MAX-ACCESS  not-accessible
     STATUS  current
     DESCRIPTION
-        "The name of the BGP Peer"
-    ::= { fbBgpIpv4PeerNameEntry 2 }
+        "The index for the connection table"
+    ::= { fbIPsecConnectionEntry 1 }
 
-fbBgpIpv4PeerAddress OBJECT-TYPE
-    SYNTAX InetAddressIPv4
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        "The internet address for the peer.  The type of the address is 
-         determined by the value of the fbBgpPeerAddressType object."
-    ::= { fbBgpIpv4PeerNameEntry 1 }
-
-fbBgpIpv6PeerNameTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF FbBgpIpv6PeerNameEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        "The list of BGP peers for this Firebrick"
-    ::= { fbBgpPeerNameTable 16 }
-
-fbBgpIpv6PeerNameEntry OBJECT-TYPE
-    SYNTAX FbBgpIpv6PeerNameEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        "An entry in the IPv6 BGP Peer Names Table"
-    INDEX { fbBgpIpv6PeerAddress }
-    ::= { fbBgpIpv6PeerNameTable 1 }
-
-FbBgpIpv6PeerNameEntry ::= SEQUENCE {
-    fbBgpIpv6PeerAddress    InetAddressIPv6,
-    fbBgpIpv6PeerName   DisplayString
-}
-
-fbBgpIpv6PeerName OBJECT-TYPE
+fbIPsecConnectionName OBJECT-TYPE
     SYNTAX  DisplayString
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
-        "The name of the BGP Peer"
-    ::= { fbBgpIpv6PeerNameEntry 2}
+        "The config name for this connection"
+    ::= { fbIPsecConnectionEntry 2 }
 
-fbBgpIpv6PeerAddress OBJECT-TYPE
-    SYNTAX InetAddressIPv6
-    MAX-ACCESS not-accessible
-    STATUS current
+fbIPsecConnectionState OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
     DESCRIPTION
-        "The internet address for the peer.  The type of the address is 
-         determined by the value of the fbBgpPeerAddressType object."
-    ::= { fbBgpIpv6PeerNameEntry 1 }
+        "The current state for this connection"
+    ::= { fbIPsecConnectionEntry 3 }
 
+fbIPsecConnectionUptime OBJECT-TYPE
+    SYNTAX  TimeTicks
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The uptime for this connection"
+    ::= { fbIPsecConnectionEntry 4 }
+
+fbIPsecConnectionLocalID OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The local IKE ID for this connection"
+    ::= { fbIPsecConnectionEntry 5 }
+
+fbIPsecConnectionPeerID OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The peer IKE ID for this connection"
+    ::= { fbIPsecConnectionEntry 6 }
+
+fbIPsecConnectionPeerAddress OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "The peer's IP address for this connection"
+    ::= { fbIPsecConnectionEntry 7 }
 
 END

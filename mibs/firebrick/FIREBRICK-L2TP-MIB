@@ -23,6 +23,8 @@ IMPORTS
         FROM INET-ADDRESS-MIB
     OBJECT-GROUP
         FROM SNMPv2-CONF
+    firebrickNewStyle
+        FROM FIREBRICK-MIB
         ;
 
 fbL2tpMib MODULE-IDENTITY
@@ -41,10 +43,9 @@ fbL2tpMib MODULE-IDENTITY
         for L2tp."
     REVISION "202004060000Z"
     DESCRIPTION "Initial version of this MIB module"
-    ::= { firebrick 1701 }
+    ::= { firebrickNewStyle 1701 }
 
 
-firebrick   OBJECT IDENTIFIER ::= { enterprises 24693 }
 fbL2tpGeneral    OBJECT IDENTIFIER ::= { fbL2tpMib 0 }
 fbL2tpGeneralTunnels    OBJECT IDENTIFIER ::= { fbL2tpGeneral 1 }
 fbL2tpGeneralSessions    OBJECT IDENTIFIER ::= { fbL2tpGeneral 2 }
@@ -203,7 +204,7 @@ fbL2tpPeerTable OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The list of L2TP peers for this Firebrick"
-    ::= { fbL2tpMib 8 }
+    ::= { fbL2tpMib 1 }
 
 fbL2tpPeerEntry OBJECT-TYPE
     SYNTAX FbL2tpPeerEntry

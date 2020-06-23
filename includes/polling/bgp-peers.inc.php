@@ -125,6 +125,8 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                             }
                             if($address == $peer_ip){
                                 $peer_data['bgpPeerState'] = $value["fbBgpPeerState"];
+                                $peer_data['bgpPeerRemoteAddr'] = $address;
+                                $peer_data['bgpPeerRemoteAs'] = $value["fbBgpPeerRemoteAS"];
                                 $peer_data['bgpPeerAdminStatus'] = $value["fbBgpPeerState"];
                                 $peer_data['bgpPeerInUpdates'] = 0;
                                 $peer_data['bgpPeerOutUpdates'] = 0;
