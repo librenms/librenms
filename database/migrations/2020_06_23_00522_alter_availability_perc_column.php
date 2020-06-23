@@ -17,7 +17,6 @@ class AlterAvailabilityPercColumn extends Migration
             $table->double('availability_perc', 9, 6)->default(0.000000)->change();
         });
     }
-
     /**
      * Reverse the migrations.
      *
