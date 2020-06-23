@@ -79,7 +79,7 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_optionsb .= ' GPRINT:' . $id . ':LAST:%5.'.$float_precision.'lf%s' . $units . ' GPRINT:' . $id . 'min:MIN:%5.'.$float_precision.'lf%s' . $units;
-    $rrd_optionsb .= ' GPRINT:' . $id . 'max:MAX:%5.'.$float_precision.'lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5.'.$float_precision.'lf%s$units\\n'";
+    $rrd_optionsb .= ' GPRINT:' . $id . 'max:MAX:%5.'.$float_precision.'lf%s' . $units . ' GPRINT:' . $id . ":AVERAGE:'%5.".$float_precision."lf%s$units\\n'";
 
     $i++;
 }

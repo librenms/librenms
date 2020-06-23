@@ -113,7 +113,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' GPRINT:inbits' . $i . ':MAX:%6.'.$float_precision.'lf%s';
 
     if (!$args['nototal']) {
-        $rrd_options .= ' GPRINT:totinB' . $i . ":%6.'.$float_precision.'lf%s$total_units";
+        $rrd_options .= ' GPRINT:totinB' . $i . ":%6.".$float_precision."lf%s$total_units";
     }
 
     if ($_GET['previous'] == 'yes') {
@@ -121,7 +121,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' GPRINT:inbits' . $i . 'X:AVERAGE:%6.'.$float_precision.'lf%s';
         $rrd_options .= ' GPRINT:inbits' . $i . 'X:MAX:%6.'.$float_precision.'lf%s';
         if (!$args['nototal']) {
-            $rrd_options .= ' GPRINT:totinB' . $i . 'X' . ":%6.'.$float_precision.'lf%s$total_units";
+            $rrd_options .= ' GPRINT:totinB' . $i . 'X' . ":%6.".$float_precision."lf%s$total_units";
         }
     }
 
@@ -133,15 +133,15 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' GPRINT:outbits' . $i . ':MAX:%6.'.$float_precision.'lf%s';
 
     if (!$args['nototal']) {
-        $rrd_options .= ' GPRINT:totoutB' . $i . ":%6.'.$float_precision.'lf%s$total_units";
+        $rrd_options .= ' GPRINT:totoutB' . $i . ":%6.".$float_precision."lf%s$total_units";
     }
-    
+
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= " COMMENT:' \t'";
         $rrd_options .= ' GPRINT:outbits' . $i . 'X:AVERAGE:%6.'.$float_precision.'lf%s';
         $rrd_options .= ' GPRINT:outbits' . $i . 'X:MAX:%6.'.$float_precision.'lf%s';
         if (!$args['nototal']) {
-            $rrd_options .= ' GPRINT:totoutB' . $i . 'X' . ":%6.'.$float_precision.'lf%s$total_units";
+            $rrd_options .= ' GPRINT:totoutB' . $i . 'X' . ":%6.".$float_precision."lf%s$total_units";
         }
     }
 
@@ -207,21 +207,21 @@ if (!$args['nototal']) {
     $rrd_options .= ' GPRINT:inbits:LAST:%6.'.$float_precision.'lf%s';
     $rrd_options .= ' GPRINT:inbits:AVERAGE:%6.'.$float_precision.'lf%s';
     $rrd_options .= ' GPRINT:inbits:MAX:%6.'.$float_precision.'lf%s';
-    $rrd_options .= " GPRINT:totin:%6.'.$float_precision.'lf%s$total_units";
+    $rrd_options .= " GPRINT:totin:%6.".$float_precision."lf%s$total_units";
     $rrd_options .= " COMMENT:'\\n'";
 
     $rrd_options .= " HRULE:999999999999990#FFFFFF:'" . str_pad('', $rrddescr_len + 1) . "Out'";
     $rrd_options .= ' GPRINT:outbits:LAST:%6.'.$float_precision.'lf%s';
     $rrd_options .= ' GPRINT:outbits:AVERAGE:%6.'.$float_precision.'lf%s';
     $rrd_options .= ' GPRINT:outbits:MAX:%6.'.$float_precision.'lf%s';
-    $rrd_options .= " GPRINT:totout:%6.'.$float_precision.'lf%s$total_units";
+    $rrd_options .= " GPRINT:totout:%6.".$float_precision."lf%s$total_units";
     $rrd_options .= " COMMENT:'\\n'";
 
     $rrd_options .= " HRULE:999999999999990#FFFFFF:'" . str_pad('', $rrddescr_len + 1) . "Agg'";
     $rrd_options .= ' GPRINT:bits:LAST:%6.'.$float_precision.'lf%s';
     $rrd_options .= ' GPRINT:bits:AVERAGE:%6.'.$float_precision.'lf%s';
     $rrd_options .= ' GPRINT:bits:MAX:%6.'.$float_precision.'lf%s';
-    $rrd_options .= " GPRINT:tot:%6.'.$float_precision.'lf%s$total_units";
+    $rrd_options .= " GPRINT:tot:%6.".$float_precision."lf%s$total_units";
     $rrd_options .= " COMMENT:'\\n'";
     if ($_GET['previous'] == 'yes') {
         $rrd_options .= " COMMENT:' \\n'";
@@ -229,19 +229,19 @@ if (!$args['nototal']) {
         $rrd_options .= " HRULE:999999999999999#FFFFFF:'" . str_pad('Perv Total', $rrddescr_len + 1) . "In '\t\t";
         $rrd_options .= ' GPRINT:inbitsX:AVERAGE:%6.'.$float_precision.'lf%s';
         $rrd_options .= ' GPRINT:inbitsX:MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:totinX:%6.'.$float_precision.'lf%s$total_units";
+        $rrd_options .= " GPRINT:totinX:%6.".$float_precision."lf%s$total_units";
         $rrd_options .= " COMMENT:'\\n'";
         $rrd_options .= " COMMENT:' \t\t\t\t\t\t'";
         $rrd_options .= " HRULE:999999999999990#FFFFFF:'" . str_pad('', $rrddescr_len + 1) . "Out'\t\t";
         $rrd_options .= ' GPRINT:outbitsX:AVERAGE:%6.'.$float_precision.'lf%s';
         $rrd_options .= ' GPRINT:outbitsX:MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:totoutX:%6.'.$float_precision.'lf%s$total_units";
+        $rrd_options .= " GPRINT:totoutX:%6.2lf%s$total_units";
         $rrd_options .= " COMMENT:'\\n'";
         $rrd_options .= " COMMENT:' \t\t\t\t\t\t'";
         $rrd_options .= " HRULE:999999999999990#FFFFFF:'" . str_pad('', $rrddescr_len + 1) . "Agg'\t\t";
         $rrd_options .= ' GPRINT:bitsX:AVERAGE:%6.'.$float_precision.'lf%s';
         $rrd_options .= ' GPRINT:bitsX:MAX:%6.'.$float_precision.'lf%s';
-        $rrd_options .= " GPRINT:totX:%6.'.$float_precision.'lf%s$total_units";
+        $rrd_options .= " GPRINT:totX:%6.".$float_precision."lf%s$total_units";
         $rrd_options .= " COMMENT:'\\n'";
     }
 }
