@@ -704,31 +704,31 @@ function add_customoids(\Illuminate\Http\Request $request)
             'customoid_passed'         => 1
     );
     if (!empty($data['datatype'])) {
-      $insertData['customoid_datatype'] = $data['datatype'];
+        $insertData['customoid_datatype'] = $data['datatype'];
     }
     if (!empty($data['unit'])) {
-      $insertData['customoid_unit'] = $data['unit'];
+        $insertData['customoid_unit'] = $data['unit'];
     }
     if (!empty($data['divisor'])) {
-      $insertData['customoid_divisor'] = $data['divisor'];
+        $insertData['customoid_divisor'] = $data['divisor'];
     }
     if (!empty($data['multiplier'])) {
-      $insertData['customoid_multiplier'] = $data['multiplier'];
+        $insertData['customoid_multiplier'] = $data['multiplier'];
     }
     if (!empty($data['limit'])) {
-      $insertData['customoid_limit'] = $data['limit'];
+        $insertData['customoid_limit'] = $data['limit'];
     }
     if (!empty($data['limit_warn'])) {
-      $insertData['customoid_limit_warn'] = $data['limit_warn'];
+        $insertData['customoid_limit_warn'] = $data['limit_warn'];
     }
     if (!empty($data['limit_low'])) {
-      $insertData['customoid_limit_low'] = $data['limit_low'];
+        $insertData['customoid_limit_low'] = $data['limit_low'];
     }
     if (!empty($data['limit_low_warn'])) {
-      $insertData['customoid_limit_low_warn'] = $data['limit_low_warn'];
+        $insertData['customoid_limit_low_warn'] = $data['limit_low_warn'];
     }
     if (!empty($data['alert'])) {
-      $insertData['customoid_alert'] = $data['alert'];
+        $insertData['customoid_alert'] = $data['alert'];
     }
 
     $id = dbInsert(
@@ -755,40 +755,40 @@ function update_customoids(\Illuminate\Http\Request $request)
 
     $updates = array();
     if (!empty($data['name'])) {
-      $updates['customoid_descr'] = $data['name'];
+        $updates['customoid_descr'] = $data['name'];
     }
     if (!empty($data['oid'])) {
-      $updates['customoid_oid'] = $data['oid'];
+        $updates['customoid_oid'] = $data['oid'];
     }
     if (!empty($data['datatype'])) {
-      $updates['customoid_datatype'] = $data['datatype'];
+        $updates['customoid_datatype'] = $data['datatype'];
     }
     if (!empty($data['unit'])) {
-      $updates['customoid_unit'] = $data['unit'];
+        $updates['customoid_unit'] = $data['unit'];
     }
     if (!empty($data['divisor'])) {
-      $updates['customoid_divisor'] = $data['divisor'];
+        $updates['customoid_divisor'] = $data['divisor'];
     }
     if (!empty($data['multiplier'])) {
-      $updates['customoid_multiplier'] = $data['multiplier'];
+        $updates['customoid_multiplier'] = $data['multiplier'];
     }
     if (!empty($data['limit'])) {
-      $updates['customoid_limit'] = $data['limit'];
+        $updates['customoid_limit'] = $data['limit'];
     }
     if (!empty($data['limit_warn'])) {
-      $updates['customoid_limit_warn'] = $data['limit_warn'];
+        $updates['customoid_limit_warn'] = $data['limit_warn'];
     }
     if (!empty($data['limit_low'])) {
-      $updates['customoid_limit_low'] = $data['limit_low'];
+        $updates['customoid_limit_low'] = $data['limit_low'];
     }
     if (!empty($data['limit_low_warn'])) {
-      $updates['customoid_limit_low_warn'] = $data['limit_low_warn'];
+        $updates['customoid_limit_low_warn'] = $data['limit_low_warn'];
     }
     if (!empty($data['alert'])) {
-      $updates['customoid_alert'] = $data['alert'];
+        $updates['customoid_alert'] = $data['alert'];
     }
     if (!empty($data['user_func'])) {
-      $updates['user_func'] = $data['user_func'];
+        $updates['user_func'] = $data['user_func'];
     }
 
     $res = dbUpdate(
