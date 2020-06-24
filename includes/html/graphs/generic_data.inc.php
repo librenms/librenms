@@ -163,6 +163,11 @@ $rrd_options .= " GPRINT:totout:'Out %6." . $float_precision . "lf%sB)\\l'";
 $rrd_options .= ' LINE1:percentile_in#aa0000';
 $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
+
+if ($port['ifSpeed']) {
+    $rrd_options .= " LINE2:{$port['ifSpeed']}#000000:'Port Speed " . format_si($port['ifSpeed']) . "bps\\n'";
+}
+
 // Linear prediction of trend
 if ($to > time()) {
     $rrd_options .= ' VDEF:islope=inbits_max,LSLSLOPE';
