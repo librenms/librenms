@@ -37,6 +37,11 @@ $alert_severities = array(
     'Warning' => 5
 );
 
+$alert_delays = array(
+    'No' => '',
+    'Yes' => 1
+);
+
 $common_output[] = '<div class="panel panel-default panel-condensed">
                 <div class="panel-heading">
                     <div class="row">
@@ -73,7 +78,7 @@ if (isset($_POST['min_severity'])) {
 }
 if (isset($_POST['delay_filter'])) {
     $selected_delay_filter = '<option value="' . $_POST['delay_filter'] . '" selected="selected">';
-    $selected_delay_filter .= array_search((int)$_POST['delay_filter'], $alert_delay) . '</option>';
+    $selected_delay_filter .= array_search((int)$_POST['delay_filter'], $alert_delays) . '</option>';
 } else {
     $selected_delay_filter = '';
     $_POST['delay_filter'] = '';
