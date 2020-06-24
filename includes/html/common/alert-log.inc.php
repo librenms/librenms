@@ -71,6 +71,13 @@ if (isset($_POST['min_severity'])) {
     $selected_min_severity = '';
     $_POST['min_severity'] = '';
 }
+if (isset($_POST['delay_filter'])) {
+    $selected_delay_filter = '<option value="' . $_POST['delay_filter'] . '" selected="selected">';
+    $selected_delay_filter .= array_search((int)$_POST['delay_filter'], $alert_delay) . '</option>';
+} else {
+    $selected_delay_filter = '';
+    $_POST['delay_filter'] = '';
+}
 
 $common_output[] = '
 <div class="table-responsive">
@@ -140,6 +147,16 @@ $common_output[] = '<div class="form-group"> \
                <option value="1">Ok, warning and critical</option> \
                </select> \
                </div> \
+               <div class="form-group"> \
+               <label> \
+               <strong>&nbsp;Filter on alert rule delay&nbsp;</strong> \
+               </label> \
+               <select name="delay_filter" id="min_severity" class="form-control input-sm"> \
+                ' . $selected_min_severity. ' \
+               <option value>No</option> \
+               <option value="1">Yes</option> \
+               </select> \
+               </div> \
                <button type="submit" class="btn btn-default input-sm">Filter</button> \
                </form></span></div> \
                <div class="col-sm-4 actionBar"><p class="{{css.search}}"></p><p class="{{css.actions}}"></p></div></div></div>\'
@@ -150,6 +167,7 @@ $common_output[] = '<div class="form-group"> \
                 device_id: \'' . htmlspecialchars($_POST['device_id']). '\',
                 state: \'' . htmlspecialchars($_POST['state']). '\',
                 min_severity: \'' . htmlspecialchars($_POST['min_severity']). '\'
+                delay_filter: \'' . htmlspecialchars($_POST['delay_filter']). '\'
             };
         },
         url: "ajax_table.php"
