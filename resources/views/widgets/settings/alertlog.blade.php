@@ -23,6 +23,13 @@
         </select>
     </div>
     <div class="form-group">
+        <label for="delay_filter-{{ $id }}" class="control-label">@lang('Filter alert on alert rule delay'):</label>
+        <select class="form-control" name="delay_filter" id="delay_filter-{{ $id }}">
+            <option value="">@lang('No')</option>
+            <option value="1">@lang('Yes')</option>
+        </select>
+    </div>
+    <div class="form-group">
         <label for="hidenavigation-{{ $id }}" class="control-label">@lang('Hide Navigation')</label>
         <input type="checkbox" class="form-control" name="hidenavigation" id="hidenavigation-{{ $id }}" value="{{ $hidenavigation }}" data-size="normal" @if($hidenavigation) checked @endif>
     </div>
