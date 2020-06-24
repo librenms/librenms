@@ -151,7 +151,7 @@ $common_output[] = '<div class="form-group"> \
                <label> \
                <strong>&nbsp;Filter on alert rule delay&nbsp;</strong> \
                </label> \
-               <select name="delay_filter" id="min_severity" class="form-control input-sm"> \
+               <select name="delay_filter" id="delay_filter" class="form-control input-sm"> \
                 ' . $selected_min_severity. ' \
                <option value>No</option> \
                <option value="1">Yes</option> \
@@ -166,7 +166,7 @@ $common_output[] = '<div class="form-group"> \
                 id: "alertlog",
                 device_id: \'' . htmlspecialchars($_POST['device_id']). '\',
                 state: \'' . htmlspecialchars($_POST['state']). '\',
-                min_severity: \'' . htmlspecialchars($_POST['min_severity']). '\'
+                min_severity: \'' . htmlspecialchars($_POST['min_severity']). '\',
                 delay_filter: \'' . htmlspecialchars($_POST['delay_filter']). '\'
             };
         },

@@ -41,6 +41,10 @@ if (isset($vars['min_severity'])) {
     $where .=  get_sql_filter_min_severity($vars['min_severity'], "R");
 }
 
+if (isset($vars['delay_filter'])) {
+    $where .=  get_sql_filter_alert_rule_delay($vars['delay_filter'], "E");
+}
+
 if (!Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= " AND `E`.`device_id` IN " .dbGenPlaceholders(count($device_ids));
