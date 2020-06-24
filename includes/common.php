@@ -1276,7 +1276,7 @@ function str_i_contains($haystack, $needles)
  * @return string
  */
 
-function get_sql_filter_min_severity($min_severity, $alert_rules_table_name)
+function get_sql_filter_min_severity($min_severity, $table_name)
 {
     $alert_severities = array(
         // alert_rules.status is enum('ok','warning','critical')
@@ -1293,7 +1293,7 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_table_name)
         $min_severity_id = $alert_severities[$min_severity];
     }
     if (isset($min_severity_id)) {
-        return " AND `$alert_rules_table_name`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
+        return " AND `$table_name`.`severity` " . ($min_severity_id > 3 ? "" : ">") . "= " . ($min_severity_id > 3 ? $min_severity_id - 3 : $min_severity_id);
     }
     return "";
 }
@@ -1306,7 +1306,7 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_table_name)
  * @return string
  */
 
-function get_sql_filter_alert_rule_delay($delay_filter, $alert_rules_table_name)
+function get_sql_filter_alert_rule_delay($delay_filter, $table_name)
 {
     $alert_delay_filters = array(
         'no' => 0,
@@ -1318,7 +1318,7 @@ function get_sql_filter_alert_rule_delay($delay_filter, $alert_rules_table_name)
         $delay_filter_num = $alert_delay_filters[$delay_filter];
     }
     if (isset($delay_filter_num)) {
-        return " AND `$alert_rules_table_name`.`delay` = " . $delay_filter_num;
+        return " AND `$table_name`.`delay` = " . $delay_filter_num;
     }
     return "";
 }

@@ -391,6 +391,7 @@ class RunAlerts
             $noiss            = false;
             $noacc            = false;
             $updet            = false;
+            $delay             = 0;
             $rextra           = json_decode($alert['extra'], true);
             if (!isset($rextra['recovery'])) {
                 // backwards compatibility check
@@ -429,12 +430,17 @@ class RunAlerts
                     continue;
                 }
 
+                if($alert['state'] != AlertState::RECOVERED) {
+                    $delay = 1;
+                }
+
                 if (!empty($rextra['interval'])) {
                     if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $tolerence_window) < $rextra['interval']) {
                         continue;
                     } else {
                         $alert['details']['interval'] = time();
                         $updet = true;
+                        $delay = 1;
                     }
                 }
 
@@ -459,7 +465,7 @@ class RunAlerts
             }
 
             if ($updet) {
-                dbUpdate(array('details' => gzcompress(json_encode($alert['details']), 9), 'delay' => 1), 'alert_log', 'id = ?', array($alert['id']));
+                dbUpdate(array('details' => gzcompress(json_encode($alert['details']), 9), 'delay' => $delay), 'alert_log', 'id = ?', array($alert['id']));
             }
 
             if (!empty($rextra['mute'])) {
