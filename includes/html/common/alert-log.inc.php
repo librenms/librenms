@@ -157,7 +157,7 @@ $common_output[] = '<div class="form-group"> \
                <strong>&nbsp;Filter on alert rule delay&nbsp;</strong> \
                </label> \
                <select name="delay_filter" id="delay_filter" class="form-control input-sm"> \
-                ' . $selected_min_severity. ' \
+                ' . $selected_delay_filter. ' \
                <option value>No</option> \
                <option value="1">Yes</option> \
                </select> \
