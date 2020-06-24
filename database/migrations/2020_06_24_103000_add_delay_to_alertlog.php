@@ -16,6 +16,8 @@ class AddDelayToAlertlog extends Migration
         Schema::table('alert_log', function (Blueprint $table) {
             $table->boolean('delay')->default(0);
         });
+        // retro-compatibility - consider that all previous alert logs lasted longer than alert rule delay
+        \DB::statement("UPDATE alert_log SET delay=1;");
     }
 
     /**
