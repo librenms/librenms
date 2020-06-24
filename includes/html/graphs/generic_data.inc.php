@@ -164,7 +164,7 @@ $rrd_options .= ' LINE1:percentile_in#aa0000';
 $rrd_options .= ' LINE1:dpercentile_out#aa0000';
 
 
-if ($port['ifSpeed']) {
+if (!empty($port['ifSpeed'])) {
     $rrd_options .= " LINE2:{$port['ifSpeed']}#000000:'Port Speed " . format_si($port['ifSpeed']) . "bps\\n'";
 }
 
