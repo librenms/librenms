@@ -459,7 +459,7 @@ class RunAlerts
             }
 
             if ($updet) {
-                dbUpdate(array('details' => gzcompress(json_encode($alert['details']), 9)), 'alert_log', 'id = ?', array($alert['id']));
+                dbUpdate(array('details' => gzcompress(json_encode($alert['details']), 9), 'delay' => 1), 'alert_log', 'id = ?', array($alert['id']));
             }
 
             if (!empty($rextra['mute'])) {
