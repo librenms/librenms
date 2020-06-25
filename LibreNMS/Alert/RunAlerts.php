@@ -435,6 +435,11 @@ class RunAlerts
                     $updet = true;
                 }
 
+                if ($alert['state'] = AlertState::RECOVERED) {
+                    $last_delay = dbFetchCell("SELECT delay FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY time_logged DESC LIMIT 1", [$rule['id'], $device_id]);
+                    $alert['delay'] = (!is_null($last_delay)) ? $last_delay : 0;
+                }
+
                 if (!empty($rextra['interval'])) {
                     if (!empty($alert['details']['interval']) && (time() - $alert['details']['interval'] + $tolerence_window) < $rextra['interval']) {
                         continue;

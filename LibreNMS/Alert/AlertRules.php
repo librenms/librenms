@@ -123,10 +123,6 @@ class AlertRules
                 if (!is_null($current_state) && $current_state == AlertState::RECOVERED) {
                     c_echo('Status: %bNOCHG');
                 } else {
-                    $current_delay = dbFetchCell("SELECT delay FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY time_logged DESC LIMIT 1", [$rule['id'], $device_id]);
-                    if (is_null($current_delay)){
-                        $current_delay = 0;
-                    }
                     if (dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'delay' => $current_delay], 'alert_log')) {
                         if (is_null($current_state)) {
                             dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
