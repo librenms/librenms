@@ -436,7 +436,7 @@ class RunAlerts
                 }
 
                 if ($alert['state'] == AlertState::RECOVERED) {
-                    $last_delay = dbFetchCell("SELECT delay FROM alert_log WHERE rule_id = ? AND device_id = ? AND alert_log.state != ? ORDER BY time_logged DESC LIMIT 1", [$rule['id'], $device_id, AlertState::RECOVERED]);
+                    $last_delay = dbFetchCell("SELECT delay FROM alert_log WHERE rule_id = ? AND device_id = ? AND alert_log.state != ? ORDER BY time_logged DESC LIMIT 1", array($alert['device_id'], $alert['rule_id'], AlertState::RECOVERED]));
                     $alert['delay'] = (!is_null($last_delay)) ? $last_delay : 0;
                     $updet = true;
                 }
