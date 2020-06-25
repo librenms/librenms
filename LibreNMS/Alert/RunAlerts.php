@@ -430,7 +430,7 @@ class RunAlerts
                     continue;
                 }
 
-                if($alert['state'] != AlertState::RECOVERED) {
+                if ($alert['state'] != AlertState::RECOVERED) {
                     $delay = 1;
                 }
 
