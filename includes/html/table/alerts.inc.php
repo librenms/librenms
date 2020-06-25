@@ -105,7 +105,7 @@ $format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     if (isset($vars['delay_filter']) && $vars['delay_filter'] == 1) {
         $delay = dbFetchCell('SELECT delay FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
-        if ((!is_null($last_delay)) && $delay == 0) {
+        if ((!is_null($delay)) && $delay == 0) {
             // skip if alert rule delay is not over
             continue;
         }
