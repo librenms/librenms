@@ -39,6 +39,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Config;
 
 class Boxcar extends Transport
@@ -71,16 +72,16 @@ class Boxcar extends Transport
                 break;
         }
         switch ($obj['state']) {
-            case 0:
+            case AlertState::RECOVERED:
                 $title_text = "OK";
                 if (!empty($api['sound_ok'])) {
                     $data['notification[sound]'] = $api['sound_ok'];
                 }
                 break;
-            case 1:
+            case AlertState::Active:
                 $title_text = $severity;
                 break;
-            case 2:
+            case AlertState::ACKNOWLEDGED:
                 $title_text = "Acknowledged";
                 break;
         }

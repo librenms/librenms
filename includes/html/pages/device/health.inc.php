@@ -32,6 +32,7 @@ $dBm                   = dbFetchCell("select count(*) from sensors WHERE sensor_
 $states                = dbFetchCell("select count(*) from sensors WHERE sensor_class='state' AND device_id = ?", array($device['device_id']));
 $charge                = dbFetchCell("select count(*) from sensors WHERE sensor_class='charge' AND device_id = ?", array($device['device_id']));
 $load                  = dbFetchCell("select count(*) from sensors WHERE sensor_class='load' AND device_id = ?", array($device['device_id']));
+$loss                  = dbFetchCell("select count(*) from sensors WHERE sensor_class='loss' AND device_id = ?", array($device['device_id']));
 $signal                = dbFetchCell("select count(*) from sensors WHERE sensor_class='signal' AND device_id = ?", array($device['device_id']));
 $airflow               = dbFetchCell("select count(*) from sensors WHERE sensor_class='airflow' AND device_id = ?", array($device['device_id']));
 $snr                   = dbFetchCell("select count(*) from sensors WHERE sensor_class='snr' AND device_id = ?", array($device['device_id']));
@@ -170,6 +171,10 @@ if ($waterflow) {
     $datas[] = 'waterflow';
 }
 
+if ($loss) {
+    $datas[] = 'loss';
+}
+
 $type_text['overview']             = 'Overview';
 $type_text['charge']               = 'Battery Charge';
 $type_text['temperature']          = 'Temperature';
@@ -201,6 +206,7 @@ $type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
 $type_text['ber']                  = 'Bit Error Rate';
 $type_text['eer']                  = 'Energy Efficiency Ratio';
 $type_text['waterflow']            = 'Water Flow Rate';
+$type_text['loss']                 = 'Loss';
 $type_text['qfp']                  = 'QFP';
 
 $link_array = array(

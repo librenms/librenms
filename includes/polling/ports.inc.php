@@ -333,8 +333,13 @@ if (Config::get('enable_ports_poe')) {
             $ifTable_ifDescr = snmpwalk_cache_oid($device, 'ifDescr', [], 'IF-MIB');
             $port_ent_to_if = [];
             foreach ($ifTable_ifDescr as $if_index => $if_descr) {
-                if (preg_match('/^[[:alpha:]]+ethernet([0-9\/.]+)$/i', $if_descr['ifDescr'], $matches)) {
-                    $port_ent_to_if[str_replace('/', '.', $matches[1])] = ['portIfIndex' => $if_index];
+                /*
+                The ...EthernetX/Y/Z SNMP entries on Catalyst 9x00 iosxe
+                are cpeExtStuff.X.Z instead of cpeExtStuff.X.Y.Z
+                We need to ignore the middle subslot number so this is slot.port
+                */
+                if (preg_match('/^[a-z]+ethernet(\d+)\/(\d+)(?:\/(\d+))?$/i', $if_descr['ifDescr'], $matches)) {
+                    $port_ent_to_if[$matches[1] . '.' . ($matches[3] ?: $matches[2])] = ['portIfIndex' => $if_index];
                 }
             }
         }
@@ -573,9 +578,11 @@ foreach ($ports as $port) {
             }
         }
 
-        // work around invalid values for ifHighSpeed (fortigate)
-        if ($this_port['ifHighSpeed'] == 4294901759) {
-            $this_port['ifHighSpeed'] = null;
+        // ifHighSpeed is signed integer, but should be unsigned (Gauge32 in RFC2233). Workaround for some fortinet devices.
+        if ($device['os'] == 'fortigate' || $device['os'] == 'fortisandbox') {
+            if ($this_port['ifHighSpeed'] > 2147483647) {
+                $this_port['ifHighSpeed'] = null;
+            }
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {

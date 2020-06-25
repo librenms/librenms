@@ -11,7 +11,7 @@ $rrd_list     = array();
 $rrd_filename = rrd_name($device['hostname'], array('app', 'puppet-agent', $app['app_id'], 'time'));
 $array        = array(
     'catalog_application',
-    'config_restrieval',
+    'config_retrieval',
     'convert_catalog',
     'fact_generation',
     'node_retrieval',

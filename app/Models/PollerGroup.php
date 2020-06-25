@@ -41,10 +41,15 @@ class PollerGroup extends Model
         parent::boot();
 
         static::deleting(function (PollerGroup $pollergroup) {
-            // handle device pollergroup fallback to default poller
-            $default_poller_id = \LibreNMS\Config::get('distributed_poller_group');
+            // handle device poller group fallback to default poller
+            $default_poller_id = \LibreNMS\Config::get('default_poller_group');
             $pollergroup->devices()->update(['poller_group' => $default_poller_id]);
         });
+    }
+
+    public static function list()
+    {
+        return self::query()->pluck('group_name', 'id')->prepend(__('General'), 0);
     }
 
     public function devices()

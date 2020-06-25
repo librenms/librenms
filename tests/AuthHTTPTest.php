@@ -27,15 +27,13 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\AuthenticationException;
 
-// Note that as this test set depends on mres(), it is a DBTestCase even though the database is unused
-class AuthHTTPTest extends DBTestCase
+class AuthHTTPTest extends TestCase
 {
     private $original_auth_mech;
     private $server;
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +42,7 @@ class AuthHTTPTest extends DBTestCase
         $this->server = $_SERVER;
     }
 
-    public function tearDown(): void
+    protected function tearDown(): void
     {
         Config::set('auth_mechanism', $this->original_auth_mech);
         $_SERVER = $this->server;

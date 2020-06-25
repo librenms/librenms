@@ -8,13 +8,13 @@
                     "sysDescr": "OpenBSD hostname 5.3 GENERIC.MP#58 i386",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "openbsd",
                     "type": "server",
                     "serial": null,
-                    "icon": "openbsd.svg"
+                    "icon": "openbsd.svg",
+                    "location": null
                 }
             ]
         },
@@ -28,11 +28,11 @@
                     "version": "5.3",
                     "hardware": "i386",
                     "features": "GENERIC.MP#58",
-                    "location": null,
                     "os": "openbsd",
                     "type": "server",
                     "serial": null,
-                    "icon": "openbsd.svg"
+                    "icon": "openbsd.svg",
+                    "location": null
                 }
             ]
         }

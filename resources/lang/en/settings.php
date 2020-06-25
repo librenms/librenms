@@ -11,6 +11,7 @@ return [
         'global' => 'Global',
         'os' => 'OS',
         'discovery' => 'Discovery',
+        'graphing' => 'Graphing',
         'poller' => 'Poller',
         'system' => 'System',
         'webui' => 'Web UI',
@@ -43,6 +44,10 @@ return [
             'peeringdb' => 'PeeringDB Integration',
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
+            'smokeping' => 'Smokeping Integration'
+        ],
+        'graphing' => [
+            'availability' => 'Device Availability',
         ],
         'poller' => [
             'distributed' => 'Distributed Poller',
@@ -506,7 +511,7 @@ return [
             'description' => 'Enable Distributed Polling (requires additional setup)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/'
         ],
-        'distributed_poller_group' => [
+        'default_poller_group' => [
             'description' => 'Default Poller Group',
             'help' => 'The default poller group all pollers should poll if none is set in config.php'
         ],
@@ -634,6 +639,12 @@ return [
                 'description' => 'Prefix (Optional)',
                 'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots'
             ]
+        ],
+        'graphing' => [
+            'availability' => [
+                'description' => 'Duration',
+                'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)'
+            ],
         ],
         'graylog' => [
             'base_uri' => [
@@ -1000,6 +1011,9 @@ return [
             'aruba-controller' => [
                 'description' => 'Aruba Controller'
             ],
+            'availability' => [
+                'description' => 'Availability'
+            ],
             'entity-physical' => [
                 'description' => 'Entity Physical'
             ],
@@ -1271,7 +1285,24 @@ return [
         ],
         'whois' => [
             'description' => 'Path to whois'
+        ],
+        'smokeping.integration' => [
+            'description' => 'Enable',
+            'help' => 'Enable smokeping integration'
+        ],
+        'smokeping.dir' => [
+            'description' => 'Path to rrds',
+            'help' => 'Full path to Smokeping RRDs'
+        ],
+        'smokeping.pings' => [
+            'description' => 'Pings',
+            'help' => 'Number of pings configured in Smokeping'
+        ],
+        'smokeping.url' => [
+            'description' => 'URL to smokeping',
+            'help' => 'Full URL to the smokeping gui'
         ]
+
     ],
     'twofactor' => [
         'description' => 'Enable Two-Factor Auth',

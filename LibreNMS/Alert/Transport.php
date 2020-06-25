@@ -5,6 +5,7 @@ namespace LibreNMS\Alert;
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
 use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 abstract class Transport implements TransportInterface
 {
@@ -48,11 +49,11 @@ abstract class Transport implements TransportInterface
     public static function getColorForState($state)
     {
         $colors = array(
-            0 => Config::get('alert_colour.ok'),
-            1 => Config::get('alert_colour.bad'),
-            2 => Config::get('alert_colour.acknowledged'),
-            3 => Config::get('alert_colour.worse'),
-            4 => Config::get('alert_colour.better'),
+            AlertState::CLEAR        => Config::get('alert_colour.ok'),
+            AlertState::ACTIVE       => Config::get('alert_colour.bad'),
+            AlertState::ACKNOWLEDGED => Config::get('alert_colour.acknowledged'),
+            AlertState::WORSE        => Config::get('alert_colour.worse'),
+            AlertState::BETTER       => Config::get('alert_colour.better'),
         );
 
         return isset($colors[$state]) ? $colors[$state] : '#337AB7';

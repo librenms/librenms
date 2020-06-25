@@ -69,11 +69,12 @@ function discover_new_device($hostname, $device = '', $method = '', $interface =
     }
 
     try {
-        $remote_device_id = addHost($hostname, '', '161', 'udp', Config::get('distributed_poller_group'));
+        $remote_device_id = addHost($hostname, '', '161', 'udp', Config::get('default_poller_group'));
         $remote_device = device_by_id_cache($remote_device_id, 1);
         echo '+[' . $remote_device['hostname'] . '(' . $remote_device['device_id'] . ')]';
         discover_device($remote_device);
         device_by_id_cache($remote_device_id, 1);
+
         if ($remote_device_id && is_array($device) && !empty($method)) {
             $extra_log = '';
             $int = cleanPort($interface);
@@ -292,7 +293,7 @@ function discover_sensor(&$valid, $class, $device, $oid, $index, $type, $descr, 
         }
 
         // Fix high/low thresholds (i.e. on negative numbers)
-        if ($low_limit > $high_limit) {
+        if (isset($high_limit) && $low_limit > $high_limit) {
             list($high_limit, $low_limit) = array($low_limit, $high_limit);
         }
 
@@ -960,21 +961,21 @@ function get_toner_capacity($raw_capacity)
  */
 function ignore_storage($os, $descr)
 {
-    foreach (Config::getOsSetting($os, 'ignore_mount') as $im) {
+    foreach (Config::getCombined($os, 'ignore_mount', []) as $im) {
         if ($im == $descr) {
             d_echo("ignored $descr (matched: $im)\n");
             return true;
         }
     }
 
-    foreach (Config::getOsSetting($os, 'ignore_mount_string') as $ims) {
+    foreach (Config::getCombined($os, 'ignore_mount_string', []) as $ims) {
         if (Str::contains($descr, $ims)) {
             d_echo("ignored $descr (matched: $ims)\n");
             return true;
         }
     }
 
-    foreach (Config::getOsSetting($os, 'ignore_mount_regexp') as $imr) {
+    foreach (Config::getCombined($os, 'ignore_mount_regexp', []) as $imr) {
         if (preg_match($imr, $descr)) {
             d_echo("ignored $descr (matched: $imr)\n");
             return true;
@@ -1066,6 +1067,9 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                             $$limit = YamlDiscovery::getValueFromData($limit, $index, $data, $pre_cache, 'null');
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
+                            }
+                            if (is_numeric($$limit) && isset($user_function) && is_callable($user_function)) {
+                                $$limit = $user_function($$limit);
                             }
                         }
                     }

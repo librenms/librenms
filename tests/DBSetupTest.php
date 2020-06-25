@@ -25,72 +25,57 @@
 
 namespace LibreNMS\Tests;
 
-use Illuminate\Support\Str;
-use \PHPUnit\Framework\ExpectationFailedException as PHPUnitException;
+use Artisan;
+use DB;
 
 class DBSetupTest extends DBTestCase
 {
     protected $db_name;
+    protected $connection = 'testing';
 
-    public function setUp(): void
+    protected function setUp(): void
     {
         parent::setUp();
-        $this->db_name = dbFetchCell('SELECT DATABASE()');
+        $this->db_name = DB::connection($this->connection)->getDatabaseName();
     }
 
     public function testSetupDB()
     {
-        global $migrate_output, $migrate_result;
+        $result = Artisan::call('migrate:fresh', [
+            '--seed' => true,
+            '--env' => 'testing',
+            '--database' => $this->connection
+        ]);
 
-        $this->assertSame(0, $migrate_result, "Errors loading DB Schema: " . $migrate_output);
+        $this->assertSame(0, $result, "Errors loading DB Schema: " . Artisan::output());
     }
 
     public function testSchemaFiles()
     {
-        $files = glob(\LibreNMS\Config::get('install_dir') . '/sql-schema/*.sql');
-
-        foreach ($files as $file) {
-            $content = file_get_contents($file);
-
-            foreach (explode("\n", $content) as $line) {
-                // skip comments and empty lines
-                if (empty($line) || Str::startsWith($line, array('#', '--'))) {
-                    continue;
-                }
-
-                // each line must end with ;, prevents multiline and makes sql easy to run by hand
-                // Warning may include whitespace such as space and \r
-                if (!Str::endsWith($line, ';')) {
-                    throw new PHPUnitException("Each line must end with a semicolin (;)\n$file: $line");
-                }
-
-                // cannot assume user use the librenms database name
-                if (Str::contains($line, 'librenms.')) {
-                    throw new PHPUnitException("Do not include the database name in schema files\n$file: $line");
-                }
-            }
-        }
-
-        $this->expectNotToPerformAssertions();
+        $files = glob(base_path('/sql-schema/*.sql'));
+        $this->assertCount(282, $files, 'You should not create new legacy schema files.');
     }
 
     public function testSchema()
     {
         $files = array_map(function ($migration_file) {
             return basename($migration_file, '.php');
-        }, array_diff(scandir(\LibreNMS\Config::get('install_dir') . '/database/migrations'), ['.', '..']));
-        $migrated = dbFetchColumn('SELECT migration FROM migrations');
+        }, array_diff(scandir(base_path('/database/migrations')), ['.', '..']));
+        $migrated = DB::connection($this->connection)->table('migrations')->pluck('migration')->toArray();
         sort($files);
         sort($migrated);
         $this->assertEquals($files, $migrated, "List of run migrations did not match existing migration files.");
 
-        $schema = get_db_schema();
+        // check legacy schema version is 1000
+        $schema = DB::connection($this->connection)->table('dbSchema')
+            ->orderBy('version', 'DESC')
+            ->value('version');
         $this->assertEquals(1000, $schema, "Seed not run, after seed legacy dbSchema should be 1000");
     }
 
     public function testCheckDBCollation()
     {
-        $collation = dbFetchRows("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')");
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')"));
         if (isset($collation[0])) {
             $error = implode(' ', $collation[0]);
         } else {
@@ -101,7 +86,7 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckTableCollation()
     {
-        $collation = dbFetchRows("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );");
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );"));
         $error = '';
         foreach ($collation as $id => $data) {
             $error .= implode(' ', $data) . PHP_EOL;
@@ -111,7 +96,7 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckColumnCollation()
     {
-        $collation = dbFetchRows("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );");
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );"));
         $error = '';
         foreach ($collation as $id => $data) {
             $error .= implode(' ', $data) . PHP_EOL;
@@ -123,7 +108,7 @@ class DBSetupTest extends DBTestCase
     {
         $this->assertEquals(
             'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION',
-            dbFetchCell("SELECT @@sql_mode")
+            DB::connection($this->connection)->select(DB::raw("SELECT @@sql_mode AS mode"))[0]->mode
         );
     }
 
@@ -134,9 +119,9 @@ class DBSetupTest extends DBTestCase
                 file_get_contents('misc/db_schema.yaml')
             );
 
-            $current_schema = dump_db_schema();
+            $current_schema = dump_db_schema($this->connection);
 
-            $message = "Schema does not match the excpected schema defined by misc/db_schema.yaml\n";
+            $message = "Schema does not match the expected schema defined by misc/db_schema.yaml\n";
             $message .= "If you have changed the schema, make sure you update it with ./scripts/build-schema.php\n";
 
             $this->assertEquals($master_schema, $current_schema, $message);

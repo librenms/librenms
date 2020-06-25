@@ -28,10 +28,19 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 
 class Discord extends Transport
 {
+    const ALERT_FIELDS_TO_DISCORD_FIELDS = [
+        'timestamp' => 'Timestamp',
+        'severity' => 'Severity',
+        'hostname' => 'Hostname',
+        'name' => 'Rule Name',
+        'rule' => 'Rule'
+    ];
+
     public function deliverAlert($obj, $opts)
     {
         $discord_opts = [
@@ -46,9 +55,25 @@ class Discord extends Transport
     {
         $host          = $discord_opts['url'];
         $curl          = curl_init();
+        $discord_title = '#' . $obj['uid'] . ' '  . $obj['title'];
         $discord_msg   = strip_tags($obj['msg']);
+        $color         = self::getColorForState($obj['state']);
+
+        // Special handling for the elapsed text in the footer if the elapsed is not set.
+        $footer_text = $obj['elapsed'] ? 'alert took ' . $obj['elapsed'] : '';
+
         $data          = [
-            'content' => "". $obj['title'] ."\n" . $discord_msg
+            'embeds' => [
+                [
+                    'title' => $discord_title,
+                    'color' => hexdec($color),
+                    'description' => $discord_msg,
+                    'fields' => $this->createDiscordFields($obj, $discord_opts),
+                    'footer' => [
+                        'text' => $footer_text
+                    ]
+                ]
+            ]
         ];
         if (!empty($discord_opts['options'])) {
             $data = array_merge($data, $discord_opts['options']);
@@ -71,6 +96,25 @@ class Discord extends Transport
             return 'HTTP Status code ' . $code;
         }
         return true;
+    }
+
+    public function createDiscordFields($obj, $discord_opts)
+    {
+        $result = [];
+
+        foreach (self::ALERT_FIELDS_TO_DISCORD_FIELDS as $objKey => $discordKey) {
+            // Skip over keys that do not exist so Discord does not give us a 400.
+            if (!$obj[$objKey]) {
+                continue;
+            }
+
+            array_push($result, [
+                'name' => $discordKey,
+                'value' => $obj[$objKey],
+            ]);
+        }
+
+        return $result;
     }
 
     public static function configTemplate()

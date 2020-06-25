@@ -26,9 +26,11 @@ class AddForeignKeysToDeviceRelationshipsTable extends Migration
      */
     public function down()
     {
-        Schema::table('device_relationships', function (Blueprint $table) {
-            $table->dropForeign('device_relationship_child_device_id_fk');
-            $table->dropForeign('device_relationship_parent_device_id_fk');
-        });
+        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('device_relationships', function (Blueprint $table) {
+                $table->dropForeign('device_relationship_child_device_id_fk');
+                $table->dropForeign('device_relationship_parent_device_id_fk');
+            });
+        }
     }
 }

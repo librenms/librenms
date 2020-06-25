@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """
 Scan networks for snmp hosts and add them to LibreNMS
 
@@ -21,27 +21,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 @author     Tony Murray <murraytony@gmail.com>
 """
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
 import argparse
-from argparse import RawTextHelpFormatter
 import json
 from collections import namedtuple
+from ipaddress import ip_network, ip_address
 from multiprocessing import Pool
 from os import path, chdir
 from socket import gethostbyname, gethostbyaddr, herror, gaierror
 from subprocess import check_output, CalledProcessError
 from sys import stdout
 from time import time
-
-try:
-    from ipaddress import ip_network, ip_address
-except:
-    print('Could not import ipaddress module.  Please install python-ipaddress or use python3 to run this script')
-    print('Debian/Ubuntu: apt install python-ipaddress')
-    print('RHEL/CentOS: yum install python-ipaddress')
-    exit(2)
 
 Result = namedtuple('Result', ['ip', 'hostname', 'outcome', 'output'])
 
@@ -100,53 +89,53 @@ def handle_result(data):
     stats[data.outcome] += 1
 
 
-def check_ip_excluded(ip):
-    for net in EXCLUDED_NETS:
-        if ip in net:
-            debug("\033[91m{} excluded by autodiscovery.nets-exclude\033[0m".format(ip), 1)
+def check_ip_excluded(check_ip):
+    for network_check in EXCLUDED_NETS:
+        if check_ip in network_check:
+            debug("\033[91m{} excluded by autodiscovery.nets-exclude\033[0m".format(check_ip), 1)
             stats[Outcome.EXCLUDED] += 1
             return True
     return False
 
 
-def scan_host(ip):
+def scan_host(scan_ip):
     hostname = None
 
     try:
         try:
             # attempt to convert IP to hostname, if anything goes wrong, just use the IP
-            tmp = gethostbyaddr(ip)[0]
-            if gethostbyname(tmp) == ip:  # check that forward resolves
+            tmp = gethostbyaddr(scan_ip)[0]
+            if gethostbyname(tmp) == scan_ip:  # check that forward resolves
                 hostname = tmp
         except (herror, gaierror):
             pass
 
         try:
-            arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or ip]
+            arguments = ['/usr/bin/env', 'php', 'addhost.php', hostname or scan_ip]
             if args.ping:
                 arguments.insert(3, args.ping)
             add_output = check_output(arguments)
-            return Result(ip, hostname, Outcome.ADDED, add_output)
+            return Result(scan_ip, hostname, Outcome.ADDED, add_output)
         except CalledProcessError as err:
             output = err.output.decode().rstrip()
             if err.returncode == 2:
                 if 'Could not ping' in output:
-                    return Result(ip, hostname, Outcome.UNPINGABLE, output)
+                    return Result(scan_ip, hostname, Outcome.UNPINGABLE, output)
                 else:
-                    return Result(ip, hostname, Outcome.FAILED, output)
+                    return Result(scan_ip, hostname, Outcome.FAILED, output)
             elif err.returncode == 3:
-                return Result(ip, hostname, Outcome.KNOWN, output)
+                return Result(scan_ip, hostname, Outcome.KNOWN, output)
     except KeyboardInterrupt:
-        return Result(ip, hostname, Outcome.TERMINATED, 'Terminated')
+        return Result(scan_ip, hostname, Outcome.TERMINATED, 'Terminated')
 
-    return Result(ip, hostname, Outcome.UNDEFINED, output)
+    return Result(scan_ip, hostname, Outcome.UNDEFINED, output)
 
 
 if __name__ == '__main__':
     ###################
     # Parse arguments #
     ###################
-    parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.', formatter_class=RawTextHelpFormatter)
+    parser = argparse.ArgumentParser(description='Scan network for snmp hosts and add them to LibreNMS.', formatter_class=argparse.RawTextHelpFormatter)
     parser.add_argument('network', action='append', nargs='*', type=str, help="""CIDR noted IP-Range to scan. Can be specified multiple times
 This argument is only required if 'nets' config is not set
 Example: 192.168.0.0/24

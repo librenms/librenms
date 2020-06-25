@@ -26,6 +26,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 use GuzzleHttp\Client;
 
 class Api extends Transport

@@ -1,0 +1,279 @@
+-- *****************************************************************
+-- Chassis  MIB
+-- *****************************************************************
+
+SL-CHASSIS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE,
+	NOTIFICATION-TYPE, IpAddress      	FROM SNMPv2-SMI
+	DisplayString, TruthValue, 
+	TimeStamp, RowStatus, PhysAddress	FROM SNMPv2-TC
+	MODULE-COMPLIANCE, OBJECT-GROUP,
+	NOTIFICATION-GROUP                  FROM SNMPv2-CONF
+	InterfaceIndex		               	FROM IF-MIB
+	PerfCurrentCount, PerfIntervalCount,
+	PerfTotalCount                      FROM PerfHist-TC-MIB
+    slMain				        		FROM SL-MAIN-MIB;
+
+slChassis MODULE-IDENTITY
+	LAST-UPDATED "201305050000Z"
+	ORGANIZATION "PacketLight Networks Ltd."
+	CONTACT-INFO
+		"Omri_Viner@PacketLight.com"
+	DESCRIPTION
+		"This MIB module describes the Multi-Chassis information"
+	::= { slMain 18 }
+
+--	The Chassis MIB consists of the following groups:
+--	General Chassis information
+--	Chassis Slot table
+
+slChassisInfo	 	OBJECT IDENTIFIER ::= { slChassis 1 }
+slChassisSlot	 	OBJECT IDENTIFIER ::= { slChassis 2 }
+
+slChassisInfoNodeSlotId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The slot ID of the node.
+         This number is assigned to the node before it is a part of the chassis.
+         Slot ID should be assigned also to the GNE nodes.
+         The Slot ID should be unique in the chassis."
+    ::= { slChassisInfo 1 }
+
+slChassisInfoNodeRole OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	gneNode(1),
+    	internalSlotNode(2),
+    	none(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The role of the node.
+         gneNode - for Master or Backup chassis GNE node.
+         internalSlotNode - for non gne node.
+         none - the node is in a simple chassis"
+    ::= { slChassisInfo 2 }  
+                                 
+slChassisInfoLanVrrpIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VRRP ip of the node on the LAN interface."
+    ::= { slChassisInfo 3 }
+                                 
+slChassisInfoOscVrrpIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The VRRP ip of the node on the OSC interface."
+    ::= { slChassisInfo 4 }
+
+slChassisInfoTopology OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	osc(1),    -- the OSC is used for the internal connections
+    	lan(2),    -- the LAN is used for internal connections
+    	simple(3)  -- No GNE (Legacy)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The topology mode of the multichassis:
+         osc - the management use the LAN IP of the GNE and VRRP.
+         lan - the management use the OSC IP of the GNE and VRRP.
+         simple - no GNE to the chassis. Used for display only"
+    ::= { slChassisInfo 5 }  
+
+slChassisInfoVrrpEnable OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	enable(1),
+    	disable(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable/Disable the activation of the VRRP protocol by the GNE"
+    ::= { slChassisInfo 6 }  
+                                                         	
+	
+-- The Chassis Slot Table
+-- This table contains the Chassis Slot content
+
+slChassisSlotTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF SlChassisSlotEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current
+	DESCRIPTION
+		"This table contains the chassis slots."
+	::= { slChassisSlot 1 }
+
+slChassisSlotEntry OBJECT-TYPE
+	SYNTAX  SlChassisSlotEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the Chassis Slot table."
+	INDEX   { slChassisSlotId }
+	::= { slChassisSlotTable 1 }
+
+SlChassisSlotEntry ::=
+	SEQUENCE {
+		slChassisSlotId             INTEGER,
+		slChassisSlotRole           INTEGER,
+		slChassisSlotInternalIp		IpAddress,
+		slChassisSlotProductType	OBJECT IDENTIFIER,
+		slChassisSlotSysName		DisplayString,
+		slChassisSlotSnmp161Port    INTEGER,   -- not relevant for GNE
+		slChassisSlotSnmp162MinPort INTEGER,   -- not relevant for GNE
+		slChassisSlotSnmp162MaxPort INTEGER,   -- not relevant for GNE
+		slChassisSlotHttpPort       INTEGER,   -- not relevant for GNE
+		slChassisSlotTelnetPort     INTEGER,   -- not relevant for GNE
+		slChassisSlotFtpPort     	INTEGER,   -- not relevant for GNE
+		slChassisSlotTL1Port     	INTEGER,   -- not relevant for GNE
+		slChassisSlotPingIdentifier INTEGER,   -- not relevant for GNE
+		slChassisSlotHttpsPort     	INTEGER,   -- not relevant for GNE
+		slChassisSlotSshPort     	INTEGER,   -- not relevant for GNE
+		slChassisSlotSTL1Port     	INTEGER    -- not relevant for GNE
+	}
+
+slChassisSlotId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The slot ID of the node."
+    ::= { slChassisSlotEntry 1 }
+
+slChassisSlotRole OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	gneNode(1),
+    	internalNode(2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The role of the node.
+         gneNode - for Master or Backup chassis GNE node.
+         internalNode - for non gne node"
+    ::= { slChassisSlotEntry 2 }  
+
+slChassisSlotInternalIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The internal ip of the node.
+        This address is used to identify the node and not for management access."
+    ::= { slChassisSlotEntry 3 }
+	
+slChassisSlotProductType OBJECT-TYPE
+    SYNTAX      OBJECT IDENTIFIER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The sysObjectID of the node."
+    ::= { slChassisSlotEntry 4 }
+
+slChassisSlotSysName OBJECT-TYPE
+	SYNTAX  DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+            "The SysName of the node"
+       ::= { slChassisSlotEntry 5 }
+
+slChassisSlotSnmp161Port OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SNMP Gte/Set port of the node."
+    ::= { slChassisSlotEntry 6 }
+
+slChassisSlotSnmp162MinPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The minimal SNMP Trap port of the node."
+    ::= { slChassisSlotEntry 7 }
+
+slChassisSlotSnmp162MaxPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximal SNMP Trap port of the node."
+    ::= { slChassisSlotEntry 8 }
+
+slChassisSlotHttpPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The HTTP port of the node."
+    ::= { slChassisSlotEntry 9 }
+
+slChassisSlotTelnetPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Telnet port of the node."
+    ::= { slChassisSlotEntry 10 }
+
+slChassisSlotFtpPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Ftp port of the node."
+    ::= { slChassisSlotEntry 12 }
+
+slChassisSlotTL1Port OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TL1 port of the node."
+    ::= { slChassisSlotEntry 13 }
+
+slChassisSlotPingIdentifier OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The ping identifier of the node."
+    ::= { slChassisSlotEntry 14 }
+
+slChassisSlotHttpsPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The HTTPS port of the node."
+    ::= { slChassisSlotEntry 15 }
+
+slChassisSlotSshPort OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The SSH port of the node."
+    ::= { slChassisSlotEntry 16 }
+
+slChassisSlotSTL1Port OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The TL1 over SSH port of the node."
+    ::= { slChassisSlotEntry 17 }
+
+
+END

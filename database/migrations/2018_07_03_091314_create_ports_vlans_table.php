@@ -23,7 +23,7 @@ class CreatePortsVlansTable extends Migration
             $table->string('state', 16);
             $table->integer('cost');
             $table->boolean('untagged')->default(0);
-            $table->unique(['device_id','port_id','vlan'], 'unique');
+            $table->unique(['device_id','port_id','vlan']);
         });
     }
 
