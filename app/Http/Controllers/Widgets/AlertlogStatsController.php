@@ -36,6 +36,7 @@ class AlertlogStatsController extends WidgetController
         'min_severity' => 2,
         'time_interval' => 7,
         'hidenavigation' => 0,
+        'delay_filter' => '',
     ];
 
     public function getView(Request $request)
