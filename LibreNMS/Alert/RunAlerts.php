@@ -425,6 +425,7 @@ class RunAlerts
                 }
             } else {
                 // This is the new way
+                print_r($alert['details');
                 if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != AlertState::RECOVERED) {
                     // skip if alert rule delay is not over 
                     continue;
@@ -435,7 +436,7 @@ class RunAlerts
                     $updet = true;
                 }
 
-                if ($alert['state'] = AlertState::RECOVERED) {
+                if ($alert['state'] == AlertState::RECOVERED) {
                     $last_delay = dbFetchCell("SELECT delay FROM alert_log WHERE rule_id = ? AND device_id = ? AND alert_log.state != ? ORDER BY time_logged DESC LIMIT 1", [$rule['id'], $device_id, AlertState::RECOVERED]);
                     $alert['delay'] = (!is_null($last_delay)) ? $last_delay : 0;
                     $updet = true;
