@@ -357,7 +357,7 @@ class RunAlerts
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
-                'SELECT alert_log.id,alert_log.rule_id,alert_log.device_id,alert_log.state,alert_log.details,alert_log.time_logged,alert_rules.rule,alert_rules.severity,alert_rules.extra,alert_rules.name,alert_rules.query,alert_rules.builder,alert_rules.proc FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+                'SELECT alert_log.id, alert_log.rule_id, alert_log.device_id, alert_log.state, alert_log.details, alert_log.time_logged, alert_log.delay, alert_rules.rule, alert_rules.severity, alert_rules.extra, alert_rules.name, alert_rules.query, alert_rules.builder, alert_rules.proc FROM alert_log, alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 array($alert_status['device_id'], $alert_status['rule_id'])
             );
 
@@ -391,7 +391,6 @@ class RunAlerts
             $noiss            = false;
             $noacc            = false;
             $updet            = false;
-            $delay             = 0;
             $rextra           = json_decode($alert['extra'], true);
             if (!isset($rextra['recovery'])) {
                 // backwards compatibility check
@@ -427,11 +426,13 @@ class RunAlerts
             } else {
                 // This is the new way
                 if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != AlertState::RECOVERED) {
+                    // continue if alert rule delay is not over 
                     continue;
                 }
 
-                if ($alert['state'] != AlertState::RECOVERED) {
-                    $delay = 1;
+                if ($alert['state'] != AlertState::RECOVERED && $alert['delay'] == 0) {
+                    $alert['delay'] = 1;
+                    $updet = true;
                 }
 
                 if (!empty($rextra['interval'])) {
@@ -440,7 +441,6 @@ class RunAlerts
                     } else {
                         $alert['details']['interval'] = time();
                         $updet = true;
-                        $delay = 1;
                     }
                 }
 
@@ -465,7 +465,7 @@ class RunAlerts
             }
 
             if ($updet) {
-                dbUpdate(array('details' => gzcompress(json_encode($alert['details']), 9), 'delay' => $delay), 'alert_log', 'id = ?', array($alert['id']));
+                dbUpdate(array('details' => gzcompress(json_encode($alert['details']), 9), 'delay' => $alert['delay']), 'alert_log', 'id = ?', array($alert['id']));
             }
 
             if (!empty($rextra['mute'])) {
