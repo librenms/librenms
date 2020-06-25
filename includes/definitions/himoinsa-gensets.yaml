@@ -6,5 +6,6 @@ group: himoinsa
 over:
     - { graph: device_uptime, text: 'Device Uptime' }
 discovery:
-    - sysDescr:
-        - 'C2LAN SNMP'
+    -
+        sysDescr:
+            - 'C2LAN SNMP'

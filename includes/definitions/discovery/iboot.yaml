@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - outletTable
+                -
+                    oid:
+                        - outletTable
         temperature:
             options:
                 skip_values: [999, 99999]

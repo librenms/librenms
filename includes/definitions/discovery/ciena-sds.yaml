@@ -11,22 +11,23 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - dot1dBasePortIfIndex
-                    - cienaCesLogicalPortConfigPortName
-                    - cienaCesChassisPowerSupplySlotName
-                    - cienaCesPortXcvrLowTempAlarmThreshold
-                    - cienaCesPortXcvrHighTempAlarmThreshold
-                    - cienaCesPortXcvrLowVccAlarmThreshold
-                    - cienaCesPortXcvrHighVccAlarmThreshold
-                    - cienaCesPortXcvrLowBiasAlarmThreshold
-                    - cienaCesPortXcvrHighBiasAlarmThreshold
-                    - cienaCesPortXcvrLowRxPwAlarmThreshold
-                    - cienaCesPortXcvrHighRxPwAlarmThreshold
-                    - cienaCesPortXcvrLowTxPwAlarmThreshold
-                    - cienaCesPortXcvrHighTxPwAlarmThreshold
-                    - cienaCesPortXcvrOperState
-                    - cienaCesPortXcvrTxState
+                -
+                    oid:
+                        - dot1dBasePortIfIndex
+                        - cienaCesLogicalPortConfigPortName
+                        - cienaCesChassisPowerSupplySlotName
+                        - cienaCesPortXcvrLowTempAlarmThreshold
+                        - cienaCesPortXcvrHighTempAlarmThreshold
+                        - cienaCesPortXcvrLowVccAlarmThreshold
+                        - cienaCesPortXcvrHighVccAlarmThreshold
+                        - cienaCesPortXcvrLowBiasAlarmThreshold
+                        - cienaCesPortXcvrHighBiasAlarmThreshold
+                        - cienaCesPortXcvrLowRxPwAlarmThreshold
+                        - cienaCesPortXcvrHighRxPwAlarmThreshold
+                        - cienaCesPortXcvrLowTxPwAlarmThreshold
+                        - cienaCesPortXcvrHighTxPwAlarmThreshold
+                        - cienaCesPortXcvrOperState
+                        - cienaCesPortXcvrTxState
         temperature:
             data:
                 -

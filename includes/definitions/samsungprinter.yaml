@@ -5,10 +5,11 @@ type: printer
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - 'Samsung C'
-        - 'Samsung S'
-        - 'Samsung ML'
+    -
+        sysDescr:
+            - 'Samsung C'
+            - 'Samsung S'
+            - 'Samsung ML'
 discovery_modules:
     toner: true
 poller_modules:
