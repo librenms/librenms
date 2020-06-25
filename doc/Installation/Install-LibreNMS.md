@@ -203,15 +203,12 @@ listen = /run/php-fpm-librenms.sock;
          location / {
           try_files $uri $uri/ /index.php?$query_string;
          }
-         location /api/v0 {
-          try_files $uri $uri/ /api_v0.php?$query_string;
-         }
-         location ~ \.php {
-          include fastcgi.conf;
-          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+         location ~ [^/]\.php(/|$) {
           fastcgi_pass unix:/run/php-fpm-librenms.sock;
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          include fastcgi.conf;
          }
-         location ~ /\.ht {
+         location ~ /\.(?!well-known).* {
           deny all;
          }
         }
