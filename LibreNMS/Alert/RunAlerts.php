@@ -426,7 +426,7 @@ class RunAlerts
             } else {
                 // This is the new way
                 if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != AlertState::RECOVERED) {
-                    // skip if alert rule delay is not over 
+                    // skip if alert rule delay is not over
                     continue;
                 }
 

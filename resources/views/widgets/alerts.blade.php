@@ -33,7 +33,8 @@
                 group: '{{ $device_group }}',
                 proc: '{{ $proc }}',
                 sort: '{{ $sort }}',
-                device_id: '{{ $device }}'
+                device_id: '{{ $device }}',
+                delay_filter: '{{ $delay_filter }}',
             }
         },
         url: "ajax_table.php",
