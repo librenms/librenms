@@ -123,7 +123,7 @@ class AlertRules
                 if (!is_null($current_state) && $current_state == AlertState::RECOVERED) {
                     c_echo('Status: %bNOCHG');
                 } else {
-                    if (dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'delay' => $current_delay], 'alert_log')) {
+                    if (dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id']], 'alert_log')) {
                         if (is_null($current_state)) {
                             dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
                         } else {
