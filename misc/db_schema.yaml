@@ -132,6 +132,11 @@ alert_transports:
     - { Field: transport_type, Type: varchar(20), 'Null': false, Extra: '', Default: mail }
     - { Field: is_default, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: transport_config, Type: text, 'Null': true, Extra: '' }
+    - { Field: timerange, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
+    - { Field: start_hr, Type: time, 'Null': true, Extra: '' }
+    - { Field: end_hr, Type: time, 'Null': true, Extra: '' }
+    - { Field: day, Type: varchar(15), 'Null': true, Extra: '' }
+    - { Field: invert_map, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [transport_id], Unique: true, Type: BTREE }
 alert_transport_groups:
@@ -148,6 +153,16 @@ alert_transport_map:
     - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+alert_transport_timerange_map:
+  Columns:
+    - { Field: item_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: mapto_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: transport_mapto_type, Type: varchar(255), 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [item_id], Unique: true, Type: BTREE }
+    schedulable_morph_index: { Name: schedulable_morph_index, Columns: [transport_mapto_type, mapto_id], Unique: false, Type: BTREE }
+    transport_id: { Name: transport_id, Columns: [transport_id], Unique: false, Type: BTREE }
 api_tokens:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -199,7 +214,6 @@ availability:
     PRIMARY: { Name: PRIMARY, Columns: [availability_id], Unique: true, Type: BTREE }
     availability_device_id_index: { Name: availability_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     availability_device_id_duration_unique: { Name: availability_device_id_duration_unique, Columns: [device_id, duration], Unique: true, Type: BTREE }
-
 bgpPeers:
   Columns:
     - { Field: bgpPeer_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
