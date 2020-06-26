@@ -143,6 +143,14 @@ foreach (dbFetch($query) as $device) {
         $unreachable_devices++;
     }
 
+    // Update device_groups
+    echo "### Start Device Groups ###\n";
+    $dg_start = microtime(true);
+    $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
+    d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
+    d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
+    echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
+
     echo "#### Start Alerts ####\n";
     $rules = new AlertRules();
     $rules->runRules($device['device_id']);

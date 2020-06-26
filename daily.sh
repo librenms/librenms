@@ -177,6 +177,49 @@ check_dependencies() {
     return 1;
 }
 
+#######################################
+# Compare two numeric versions
+# Arguments:
+#   args:
+#        version 1
+#        version 2
+#        parts: Number of parts to compare, from the left, compares all if unspecified
+# Returns:
+#   Exit-Code: 0: if equal 1: if 1 > 2  2: if 1 < 2
+#######################################
+version_compare () {
+    if [[ "$1" == "$2" ]]; then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+
+    local parts2=${#ver2[@]}
+    [[ -n $3 ]] && parts2=$3
+
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<parts2; i++)); do
+        ver1[i]=0
+    done
+
+    local parts1=${#ver1[@]}
+    [[ -n $3 ]] && parts1=$3
+
+    for ((i=0; i<parts1; i++)); do
+        if [[ -z ${ver2[i]} ]]; then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]})); then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 2
+        fi
+    done
+    return 0
+}
+
 
 #######################################
 # Entry into program
@@ -243,10 +286,28 @@ main () {
             new_ver=$(git rev-parse --short HEAD)
         else
             # Update to last Tag
-            old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-            status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
-            update_res=$?
-            new_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
+            old_ver=$(git describe --exact-match --tags "$(git log -n1 --pretty='%h')" 2> /dev/null)
+
+            # fetch new tags
+            status_run 'Fetching new release information' "git fetch --tags" 'update'
+
+            # collect versions full, base, new tag and hash
+            IFS='-' read -ra full_version <<< "$(git describe --tags 2>/dev/null)"
+            base_ver="${full_version[0]}"
+            latest_hash=$(git rev-list --tags --max-count=1)
+            latest_tag=$(git describe --exact-match --tags "${latest_hash}")
+
+            #compare current base and latest version numbers (only the first two sections)
+            version_compare "$base_ver" "$latest_tag" 2
+            newer_check=$?
+
+            if [[ -z $old_ver ]] && [[ $newer_check -eq 0 ]]; then
+                echo 'Between releases, waiting for newer release'
+            else
+                status_run 'Updating to latest release' "git checkout ${latest_hash}" 'update'
+                update_res=$?
+                new_ver=$(git describe --exact-match --tags "$(git log -n1 --pretty='%h')")
+            fi
         fi
 
         if (( $update_res > 0 )); then
@@ -254,7 +315,7 @@ main () {
         fi
 
         # Call ourself again in case above pull changed or added something to daily.sh
-        ${DAILY_SCRIPT} post-pull ${old_ver} ${new_ver}
+        ${DAILY_SCRIPT} post-pull "${old_ver}" "${new_ver}"
     else
         case $arg in
             no-code-update)

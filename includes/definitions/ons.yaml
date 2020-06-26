@@ -27,5 +27,6 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysDescr:
-        - 'Cisco ONS'
+    -
+        sysDescr:
+            - 'Cisco ONS'

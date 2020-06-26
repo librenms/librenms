@@ -96,7 +96,7 @@ data_update($device, 'app', $tags, $fields);
 $rrd_name = array('app', $name, $app_id, 'time');
 $rrd_def = RrdDefinition::make()
     ->addDataset('catalog_application', 'GAUGE', 0)
-    ->addDataset('config_restrieval', 'GAUGE', 0)
+    ->addDataset('config_retrieval', 'GAUGE', 0)
     ->addDataset('convert_catalog', 'GAUGE', 0)
     ->addDataset('fact_generation', 'GAUGE', 0)
     ->addDataset('node_retrieval', 'GAUGE', 0)

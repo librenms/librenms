@@ -2,7 +2,9 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$descr_len  = 12;
+if (!isset($descr_len)) {
+    $descr_len  = 12;
+}
 
 if ($nototal) {
     $descr_len += '2';
@@ -88,11 +90,11 @@ foreach ($rrd_list as $i => $rrd) {
 
     $rrd_options .= ' AREA:'.$g_defname.$i.'#'.$colour.":'".$descr."'$stack";
 
-    $rrd_options .= ' GPRINT:'.$t_defname.$i.':LAST:%5.2lf%s GPRINT:'.$t_defname.$i.'min:MIN:%5.2lf%s';
-    $rrd_options .= ' GPRINT:'.$t_defname.$i.'max:MAX:%5.2lf%s GPRINT:'.$t_defname.$i.":AVERAGE:'%5.2lf%s\\n'";
+    $rrd_options .= ' GPRINT:'.$t_defname.$i.':LAST:%5.'.$float_precision.'lf%s GPRINT:'.$t_defname.$i.'min:MIN:%5.'.$float_precision.'lf%s';
+    $rrd_options .= ' GPRINT:'.$t_defname.$i.'max:MAX:%5.'.$float_precision.'lf%s GPRINT:'.$t_defname.$i.":AVERAGE:'%5.".$float_precision."lf%s\\n'";
 
     if (!$nototal) {
-        $rrd_options .= ' GPRINT:tot'.$rrd['ds'].$i.":%6.2lf%s'".rrdtool_escape($total_units)."'";
+        $rrd_options .= ' GPRINT:tot'.$rrd['ds'].$i.":%6.".$float_precision."lf%s'".rrdtool_escape($total_units)."'";
     }
 
     $rrd_options .= " COMMENT:'\\n'";

@@ -2,8 +2,9 @@ mib: NETGEAR-BOXSERVICES-PRIVATE-MIB
 modules:
     sensors:
         pre-cache:
-                data:
-                    - oid:
+            data:
+                -
+                    oid:
                         - boxServicesNormalTempRangeMin
                         - boxServicesNormalTempRangeMax
         temperature:

@@ -44,7 +44,7 @@ ini_set('display_errors', 1);
 
 $snmpsim = new Snmpsim('127.1.6.2', 1162, null);
 if (getenv('SNMPSIM')) {
-    $snmpsim->fork();
+    $snmpsim->fork(6);
 
     // make PHP hold on a reference to $snmpsim so it doesn't get destructed
     register_shutdown_function(function (Snmpsim $ss) {

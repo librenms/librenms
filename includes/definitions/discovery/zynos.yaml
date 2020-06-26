@@ -1,25 +1,25 @@
 mib: ZYXEL-ES-COMMON:ZYXEL-HW-MONITOR-MIB:ZYXEL-MGS3712-MIB
 modules:
     processors:
-          data:
-              -
-                  oid: ZYXEL-GS4012F-MIB::sysMgmtCPUUsage
-                  value: sysMgmtCPUUsage
-                  snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
-                  num_oid: '.1.3.6.1.4.1.890.1.5.8.20.12.7.{{ $index }}'
-              -
-                  oid: ZYXEL-GS2200-24-MIB::sysMgmtCPUUsage
-                  value: sysMgmtCPUUsage
-                  snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
-                  num_oid: '.1.3.6.1.4.1.890.1.5.8.55.12.7.{{ $index }}'
-              -
-                  oid: ZYXEL-MGS3712-MIB::sysMgmtCPUUsage
-                  value: sysMgmtCPUUsage
-                  snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
-                  num_oid: '.1.3.6.1.4.1.890.1.5.8.47.11.7.{{ $index }}'
-              -
-                  oid: sysMgmtCPU5SecUsage
-                  num_oid: '.1.3.6.1.4.1.890.1.15.3.2.7.{{ $index }}'
+        data:
+            -
+                oid: ZYXEL-GS4012F-MIB::sysMgmtCPUUsage
+                value: sysMgmtCPUUsage
+                snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
+                num_oid: '.1.3.6.1.4.1.890.1.5.8.20.12.7.{{ $index }}'
+            -
+                oid: ZYXEL-GS2200-24-MIB::sysMgmtCPUUsage
+                value: sysMgmtCPUUsage
+                snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
+                num_oid: '.1.3.6.1.4.1.890.1.5.8.55.12.7.{{ $index }}'
+            -
+                oid: ZYXEL-MGS3712-MIB::sysMgmtCPUUsage
+                value: sysMgmtCPUUsage
+                snmp_flags: ['-OeQUs', '-Pu'] # workaround for underscores in mib
+                num_oid: '.1.3.6.1.4.1.890.1.5.8.47.11.7.{{ $index }}'
+            -
+                oid: sysMgmtCPU5SecUsage
+                num_oid: '.1.3.6.1.4.1.890.1.15.3.2.7.{{ $index }}'
     sensors:
         fanspeed:
             options:
@@ -78,10 +78,10 @@ modules:
                     entPhysicalIndex: transceiverDdmInfoEntryPort
                     entPhysicalIndex_measured: ports
                     skip_values:
-                    -
-                      oid: transceiverDdmInfoEntryDescription
-                      op: '!='
-                      value: 'Temperature'
+                        -
+                            oid: transceiverDdmInfoEntryDescription
+                            op: '!='
+                            value: 'Temperature'
         voltage:
             options:
                 skip_values_lt: 0
@@ -119,7 +119,7 @@ modules:
                     entPhysicalIndex: transceiverDdmInfoEntryPort
                     entPhysicalIndex_measured: ports
                     skip_values:
-                    -
-                      oid: transceiverDdmInfoEntryDescription
-                      op: '!='
-                      value: 'Voltage'
+                        -
+                            oid: transceiverDdmInfoEntryDescription
+                            op: '!='
+                            value: 'Voltage'

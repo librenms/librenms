@@ -7,7 +7,8 @@ mib_dir:
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.28381.
-bad_ifname_regexp: 
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.28381.
+bad_ifname_regexp:
     - "/^cpu/"

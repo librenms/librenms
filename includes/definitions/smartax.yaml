@@ -8,5 +8,6 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
 discovery:
-    - sysDescr:
-        - 'Huawei Integrated Access Software'
+    -
+        sysDescr:
+            - 'Huawei Integrated Access Software'

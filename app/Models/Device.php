@@ -133,25 +133,25 @@ class Device extends BaseModel
 
     public function isUnderMaintenance()
     {
+        if (!$this->device_id) {
+            return false;
+        }
+
         $query = AlertSchedule::isActive()
-            ->join('alert_schedulables', 'alert_schedule.schedule_id', 'alert_schedulables.schedule_id')
-            ->where(function ($query) {
-                $query->where(function ($query) {
-                    $query->where('alert_schedulable_type', 'device')
-                        ->where('alert_schedulable_id', $this->device_id);
+            ->where(function (Builder $query) {
+                $query->whereHas('devices', function (Builder $query) {
+                    $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
                 });
 
                 if ($this->groups) {
-                    $query->orWhere(function ($query) {
-                        $query->where('alert_schedulable_type', 'device_group')
-                            ->whereIn('alert_schedulable_id', $this->groups->pluck('id'));
+                    $query->orWhereHas('deviceGroups', function (Builder $query) {
+                        $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
                     });
                 }
 
                 if ($this->location) {
-                    $query->orWhere(function ($query) {
-                        $query->where('alert_schedulable_type', 'location')
-                            ->where('alert_schedulable_id', $this->location->id);
+                    $query->orWhereHas('locations', function (Builder $query) {
+                        $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
                     });
                 }
             });
@@ -203,9 +203,10 @@ class Device extends BaseModel
         return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
-    public function formatUptime($short = false)
+    public function formatDownUptime($short = false)
     {
-        return Time::formatInterval($this->uptime, $short);
+        $time = ($this->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
+        return Time::formatInterval($time, $short);
     }
 
     /**
@@ -228,18 +229,6 @@ class Device extends BaseModel
         }
 
         return asset('images/os/generic.svg');
-    }
-
-    /**
-     * Get list of enabled graphs for this device.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function graphs()
-    {
-        return DB::table('device_graphs')
-            ->where('device_id', $this->device_id)
-            ->pluck('graph');
     }
 
     /**
@@ -530,6 +519,11 @@ class Device extends BaseModel
     public function eventlogs()
     {
         return $this->hasMany(\App\Models\Eventlog::class, 'device_id', 'device_id');
+    }
+
+    public function graphs()
+    {
+        return $this->hasMany(\App\Models\DeviceGraph::class, 'device_id');
     }
 
     public function groups()

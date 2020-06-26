@@ -50,6 +50,7 @@ class Python extends BaseValidation
         }
 
         $this->checkVersion($validator, $version);
+        $this->checkPipVersion($validator, $version);
         $this->checkExtensions($validator);
     }
 
@@ -57,6 +58,16 @@ class Python extends BaseValidation
     {
         if (version_compare($version, self::PYTHON_MIN_VERSION, '<')) {
             $validator->warn("Python version $version too old.", 'Python version ' . self::PYTHON_MIN_VERSION . ' is the minimum supported version. We recommend you update Python to a supported version.');
+        }
+    }
+
+    private function checkPipVersion(Validator $validator, $version)
+    {
+        preg_match('/\(python ([0-9.]+)\)/', `pip3 --version`, $matches);
+        $pip = $matches[1];
+        $python = implode('.', array_slice(explode('.', $version), 0, 2));
+        if ($pip && version_compare($python, $pip, '!=')) {
+            $validator->fail("python3 ($python) and pip3 ($pip) versions do not match.  This likely will cause dependencies to be installed for the wrong python version.");
         }
     }
 

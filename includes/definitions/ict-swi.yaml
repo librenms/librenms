@@ -10,5 +10,6 @@ over:
     - { graph: device_voltage, text: 'Inverter Voltage (VAC)' }
     - { graph: device_load, text: 'Inverter Power' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.39145.12
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.39145.12

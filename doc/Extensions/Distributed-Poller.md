@@ -4,10 +4,10 @@ path: blob/master/doc/
 # Distributed Poller
 
 A normal install contains all parts of LibreNMS:
- * Poller/Discovery/etc workers
- * RRD (Time series data store) *
- * Database *
- * Webserver (Web UI/API) *
+ - Poller/Discovery/etc workers
+ - RRD (Time series data store) *
+ - Database *
+ - Webserver (Web UI/API) *
  
 \* may only be installed on one server (however, some can be clustered)
 
@@ -29,7 +29,7 @@ to communicate with each other.
 These requirements are above the normal requirements for a full LibreNMS install.
 
 - rrdtool version 1.4 or above
-- python-memcached package
+- Python 3 python-memcached package
 - a memcached install
 - a rrdcached install
 

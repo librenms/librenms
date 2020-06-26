@@ -337,6 +337,8 @@ function compare_var($a, $b, $comparison = '=')
             return in_array($a, $b);
         case "not_in_array":
             return !in_array($a, $b);
+        case "exists":
+            return isset($a) == $b;
         default:
             return false;
     }
@@ -2107,9 +2109,32 @@ function device_is_up($device, $record_perf = false)
         if ($response['status']) {
             $type = 'up';
             $reason = $device['status_reason'];
+
+            if ($device['uptime']) {
+                $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL', array($device['device_id']));
+                if (!empty($going_down)) {
+                    $up_again = time() - $device['uptime'];
+                    if ($up_again <= $going_down) {
+                        # network connection loss, not device down
+                        $up_again = time();
+                    }
+                    dbUpdate(
+                        array('device_id' => $device['device_id'], 'up_again' => $up_again),
+                        'device_outages',
+                        'device_id=? and up_again is NULL',
+                        array($device['device_id'])
+                    );
+                }
+            }
         } else {
             $type = 'down';
             $reason = $response['status_reason'];
+            if ($device['uptime']) {
+                $data = ['device_id' => $device['device_id'],
+                         'uptime' => $device['uptime'],
+                         'going_down' => strtotime($device['last_polled'])];
+                dbInsert($data, 'device_outages');
+            }
         }
 
         log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
@@ -2238,7 +2263,7 @@ function dump_db_schema($connection = null)
         foreach (DB::connection($connection)->select(DB::raw("SELECT COLUMN_NAME, COLUMN_TYPE, IS_NULLABLE, COLUMN_DEFAULT, EXTRA FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = '$db_name' AND TABLE_NAME='$table'")) as $data) {
             $def = [
                 'Field'   => $data->COLUMN_NAME,
-                'Type'    => $data->COLUMN_TYPE,
+                'Type'    => preg_replace('/int\([0-9]+\)/', 'int', $data->COLUMN_TYPE),
                 'Null'    => $data->IS_NULLABLE === 'YES',
                 'Extra'   => str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $data->EXTRA),
             ];
@@ -2246,6 +2271,10 @@ function dump_db_schema($connection = null)
             if (isset($data->COLUMN_DEFAULT) && $data->COLUMN_DEFAULT != 'NULL') {
                 $default = trim($data->COLUMN_DEFAULT, "'");
                 $def['Default'] = str_replace('current_timestamp()', 'CURRENT_TIMESTAMP', $default);
+            }
+            // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
+            if ($def['Type'] == 'timestamp') {
+                 $def['Extra'] = preg_replace("/DEFAULT_GENERATED[ ]*/", '', $def['Extra']);
             }
 
             $output[$table]['Columns'][] = $def;
