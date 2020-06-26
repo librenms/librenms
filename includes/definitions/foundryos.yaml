@@ -9,5 +9,6 @@ over:
 mib_dir:
     - foundry
 discovery:
-    - sysDescr:
-        - Foundry Networks
+    -
+        sysDescr:
+            - Foundry Networks

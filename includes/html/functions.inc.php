@@ -1273,7 +1273,7 @@ function get_postgres_databases($device_id)
  *
  * @param array $device device for which we get the rrd's
  * @param int   $app_id application id on the device
- * @param string  $category which category of seafile graphs are searched
+ * @param string  $category which category of graphs are searched
  * @return array list of entry data
  */
 function get_arrays_with_application($device, $app_id, $app_name, $category = null)
@@ -1301,63 +1301,6 @@ function get_arrays_with_application($device, $app_id, $app_name, $category = nu
     }
 
     return $entries;
-}
-
-/**
- * Get all certificate names from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of certificate names
- */
-function get_domains_with_certificates($device, $app_id)
-{
-    $app_name = 'certificate';
-    return get_arrays_with_application($device, $app_id, $app_name);
-}
-
-/**
- * Get all seafile data from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @param string $category which category of seafile graphs are searched
- * @return array list of seafile data
- */
-function get_arrays_with_seafile($device, $app_id, $category)
-{
-    $app_name = 'seafile';
-    return get_arrays_with_application($device, $app_id, $app_name, $category);
-}
-
-/**
- * Get all mdadm arrays from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of raid-arrays
- */
-function get_arrays_with_mdadm($device, $app_id)
-{
-    $app_name = 'mdadm';
-    return get_arrays_with_application($device, $app_id, $app_name);
-}
-
-/**
- * Get all disks (disk serial numbers) from the collected
- * rrd files.
- *
- * @param array $device device for which we get the rrd's
- * @param int   $app_id application id on the device
- * @return array list of disks
- */
-function get_disks_with_smart($device, $app_id)
-{
-    $app_name = 'smart';
-    return get_arrays_with_application($device, $app_id, $app_name);
 }
 
 /**

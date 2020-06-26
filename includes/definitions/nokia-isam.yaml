@@ -11,8 +11,8 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
-      sysObjectID:
-        - .1.3.6.1.4.1.637.61
+        sysObjectID:
+            - .1.3.6.1.4.1.637.61
 mib_dir:
     - nokia
 bad_iftype:

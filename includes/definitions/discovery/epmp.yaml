@@ -1,12 +1,12 @@
 mib: CAMBIUM-PMP80211-MIB
 modules:
     processors:
-            data:
-                -
-                  oid: sysCPUUsage
-                  num_oid: '.1.3.6.1.4.1.17713.21.2.1.64.{{ $index }}'
-                  type: cambium-cpu
-                  precision: 10
+        data:
+            -
+                oid: sysCPUUsage
+                num_oid: '.1.3.6.1.4.1.17713.21.2.1.64.{{ $index }}'
+                type: cambium-cpu
+                precision: 10
     sensors:
         count:
             data:
@@ -36,7 +36,7 @@ modules:
                         - { value: 2, generic: 1, graph: 1, descr: Channel Availability Check }
                         - { value: 3, generic: 0, graph: 1, descr: In-Service }
                         - { value: 4, generic: 2, graph: 1, descr: Radar Signal Detected }
-                        - { value: 5, generic: 0, graph: 1, descr: In-Service Monitoring at Alternative Channel }                    
+                        - { value: 5, generic: 0, graph: 1, descr: In-Service Monitoring at Alternative Channel }
                         - { value: 6, generic: 2, graph: 1, descr: System Not In Service due to DFS }
                 -
                     oid: ePMP2000SmartAntennaStatus

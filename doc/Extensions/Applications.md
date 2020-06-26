@@ -33,7 +33,7 @@ For example if snmpd is running as 'Debian-snmp' and we want
 to run the extend for proxmox, we check that the following run without error:
 
 ```
-sudo -u Debian-snmpn/usr/local/bin/proxmox
+sudo -u Debian-snmp /usr/local/bin/proxmox
 ```
 
 If it doesn't work, then you will need to use sudo with the extend command.
@@ -1500,7 +1500,7 @@ extend proxmox /usr/bin/sudo /usr/local/bin/proxmox
 after, edit your sudo users (usually `visudo`) and add at the bottom:
 
 ```
-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
+Debian-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 ```
 
 6: Restart snmpd on your host

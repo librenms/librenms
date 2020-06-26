@@ -3,7 +3,7 @@ modules:
     sensors:
         pre-cache:
             data:
-                - 
+                -
                     oid:
                         - cpiPduOutletName
                         - cpiPduOutletDescription
@@ -46,7 +46,7 @@ modules:
                     index: '{{ $index }}'
                     divisor: 360000
         state:
-             data:
+            data:
                 -
                     oid: cpiPduOutletControl
                     value: cpiPduOutletControl

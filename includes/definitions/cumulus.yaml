@@ -9,5 +9,6 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 processor_stacked: true
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.40310
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.40310

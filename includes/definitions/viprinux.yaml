@@ -8,5 +8,6 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
 group: viprinet
 discovery:
-    - sysDescr:
-        - 'Viprinet VPN Router'
+    -
+        sysDescr:
+            - 'Viprinet VPN Router'

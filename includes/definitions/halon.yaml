@@ -5,5 +5,6 @@ over:
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_ucd_memory, text: 'Memory Usage' }
 discovery:
-    - sysDescr:
-        - Halon
+    -
+        sysDescr:
+            - Halon

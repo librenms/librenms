@@ -9,5 +9,6 @@ type: appliance
 mib_dir:
     - cyberoam
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.21067.2
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.21067.2

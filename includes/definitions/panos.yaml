@@ -9,5 +9,6 @@ over:
 mib_dir:
     - paloaltonetworks
 discovery:
-    - sysDescr:
-        - 'Palo Alto Networks'
+    -
+        sysDescr:
+            - 'Palo Alto Networks'
