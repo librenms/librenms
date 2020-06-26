@@ -32,6 +32,5 @@ class AddAlertTransportTimerange extends Migration
         Schema::table('alert_transports', function (Blueprint $table) {
             $table->dropColumn(['timerange', 'start_hr', 'end_hr', 'day', 'invert_map']);
         });
-
     }
 }

@@ -57,7 +57,7 @@ if (empty($name)) {
     $status = 'error';
     $message = 'Missing transport information';
 } else {
-    $message = NULL;
+    $message = null;
     $details = array(
         'transport_name' => $name,
         'is_default' => $is_default,
@@ -148,8 +148,8 @@ if (empty($name)) {
                 dbDelete('alert_transports', $where, [$transport_id]);
             }
         } else {
-        $status = 'error';
-        $message = 'Failed to update transport';
+            $status = 'error';
+            $message = 'Failed to update transport';
         }
     } else {
         $status = 'error';

@@ -167,8 +167,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                 echo '</div>';
             }
         }
-    ?>
-    <?php
         echo '<div class="form-group">';
         echo '<div class="col-sm-12 text-center">';
         echo '<button type="button" class="btn btn-success btn-save" name="save-transport">';
