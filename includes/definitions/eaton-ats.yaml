@@ -8,5 +8,6 @@ over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
 discovery:
-    - sysDescr_regex:
-        - '/^Eaton ATS/'
+    -
+        sysDescr_regex:
+            - '/^Eaton ATS/'

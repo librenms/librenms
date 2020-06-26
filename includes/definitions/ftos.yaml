@@ -9,6 +9,7 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysDescr:
-        - 'Force10 Operating System'
-        - 'Force10 Networks Real Time Operating System Software'
+    -
+        sysDescr:
+            - 'Force10 Operating System'
+            - 'Force10 Networks Real Time Operating System Software'

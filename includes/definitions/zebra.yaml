@@ -5,6 +5,7 @@ icon: zebra
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.683.
-        - .1.3.6.1.4.1.10642.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.683.
+            - .1.3.6.1.4.1.10642.

@@ -11,10 +11,10 @@ modules:
                     descr: sensName
                     index: 'sensTable.{{ $index }}'
                     skip_values:
-                    -
-                      oid: sensUnit
-                      op: '!='
-                      value: 1
+                        -
+                            oid: sensUnit
+                            op: '!='
+                            value: 1
         humidity:
             data:
                 -
@@ -25,10 +25,10 @@ modules:
                     descr: sensName
                     index: 'sensTable.{{ $index }}'
                     skip_values:
-                    -
-                      oid: sensUnit
-                      op: '!='
-                      value: 4
+                        -
+                            oid: sensUnit
+                            op: '!='
+                            value: 4
         state:
             data:
                 -

@@ -26,5 +26,6 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysDescr:
-        - 'Cisco Integrated Management Controller'
+    -
+        sysDescr:
+            - 'Cisco Integrated Management Controller'

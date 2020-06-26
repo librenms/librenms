@@ -22,9 +22,9 @@ modules:
                     index: 'hhmsSensorArraySwitchStatus.{{ $index }}'
                     skip_values:
                         -
-                          oid: sensorProbeSwitchOnline
-                          op: '!='
-                          value: 2
+                            oid: sensorProbeSwitchOnline
+                            op: '!='
+                            value: 2
                     states:
                         - { descr: noStatus, graph: 1, value: 1, generic: 3 }
                         - { descr: normal, graph: 1, value: 2, generic: 0 }
@@ -44,9 +44,9 @@ modules:
                     high_limit: sensorProbeHumidityHighCritical
                     skip_values:
                         -
-                          oid: sensorProbeHumidityOnline
-                          op: '!='
-                          value: 2
+                            oid: sensorProbeHumidityOnline
+                            op: '!='
+                            value: 2
         current:
             data:
                 -

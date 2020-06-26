@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - rPDUOutletMeteredStatusName
+                -
+                    oid:
+                        - rPDUOutletMeteredStatusName
         current:
             data:
                 -

@@ -1,11 +1,11 @@
 mib: KMIB
-modules :
+modules:
     sensors:
         state:
             data:
                 -
                     oid: kDevTable
-                    value: kStatus 
+                    value: kStatus
                     num_oid:  '.1.3.6.1.4.1.9193.3.1.7.{{ $index }}'
                     index: 'kKey.{{ $index }}'
                     descr: '{{ $kKey }}, {{ $kName }}, {{ $kDesc }}'

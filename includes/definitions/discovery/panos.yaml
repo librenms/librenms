@@ -3,7 +3,8 @@ modules:
     sensors:
         pre-cache:
             data:
-                -   oid:
+                -
+                    oid:
                         - panSessionMax
                         - panVsysName
                         - panVsysMaxSessions

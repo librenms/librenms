@@ -3,6 +3,7 @@ text: 'Blade Network Technologies'
 type: network
 icon: bnt
 discovery:
-    - sysDescr_regex:
-        - '/Blade Network Technologies/i'
-        - '/^BNT /'
+    -
+        sysDescr_regex:
+            - '/Blade Network Technologies/i'
+            - '/^BNT /'
