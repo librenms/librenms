@@ -100,17 +100,17 @@ if (empty($name)) {
             $newEntry = true;
             $transport_id = dbInsert($details, 'alert_transports');
         }
-    
+
         if ($transport_id) {
             $class = 'LibreNMS\\Alert\\Transport\\'.ucfirst($transport_type);
-    
+
             if (!method_exists($class, 'configTemplate')) {
                 die(json_encode([
                     'status' => 'error',
                     'message' => 'This transport type is not yet supported'
                 ]));
             }
-            
+
             // Build config values
             $result = call_user_func_array($class.'::configTemplate', []);
             $loader = new FileLoader(new Filesystem, "$install_dir/resources/lang");
@@ -136,9 +136,9 @@ if (empty($name)) {
                     'transport_config' => json_encode($transport_config)
                 ];
                 $where = 'transport_id=?';
-    
+
                 dbUpdate($detail, 'alert_transports', $where, [$transport_id]);
-    
+
                 $status = 'ok';
                 $message = 'Updated alert transports';
             }
