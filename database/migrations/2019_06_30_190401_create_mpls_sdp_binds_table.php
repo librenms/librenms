@@ -19,7 +19,7 @@ class CreateMplsSdpBindsTable extends Migration
             $table->unsignedInteger('svc_id');
             $table->unsignedInteger('sdp_oid');
             $table->unsignedInteger('svc_oid');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->enum('sdpBindRowStatus', array('active','notInService','notReady','createAndGo','createAndWait','destroy'))->nullable();
             $table->enum('sdpBindAdminStatus', array('up','down'))->nullable();
             $table->enum('sdpBindOperStatus', array('up','down'))->nullable();

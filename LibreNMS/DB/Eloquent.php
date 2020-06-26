@@ -77,7 +77,7 @@ class Eloquent
      */
     public static function setStrictMode($strict = true)
     {
-        if (self::isConnected()) {
+        if (self::isConnected() && self::getDriver() == 'mysql') {
             if ($strict) {
                 self::DB()->getPdo()->exec("SET sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
             } else {
@@ -117,5 +117,11 @@ class Eloquent
         }
 
         return self::$capsule->getDatabaseManager()->connection();
+    }
+
+    public static function getDriver()
+    {
+        $connection = config('database.default');
+        return config("database.connections.{$connection}.driver");
     }
 }

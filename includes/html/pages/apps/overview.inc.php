@@ -11,7 +11,7 @@ $graph_array_zoom['height'] = '150';
 $graph_array_zoom['width']  = '400';
 $graph_array['legend']      = 'no';
 
-foreach (Application::query()->hasAccess(Auth::user())->with('device')->orderBy('app_type')->get()->groupBy('app_type') as $type => $groupedApps) {
+foreach (Application::query()->hasAccess(Auth::user())->with('device')->get()->sortBy('show_name', SORT_NATURAL|SORT_FLAG_CASE)->groupBy('app_type') as $type => $groupedApps) {
     echo '<div style="clear: both;">';
     echo '<h2>'.generate_link($groupedApps->first()->displayName(), array('page' => 'apps', 'app' => $type)).'</h2>';
     /** @var \Illuminate\Support\Collection $groupedApps */
@@ -29,7 +29,10 @@ foreach (Application::query()->hasAccess(Auth::user())->with('device')->orderBy(
 
         $overlib_url = route('device', [$app->device_id, 'apps', "app=$app->app_type"]);
 
-        $overlib_link = '<span style="float:left; margin-left: 10px; font-weight: bold;">'.optional($app->device)->shortDisplayName().'</span>';
+        $app_state = \LibreNMS\Util\Html::appStateIcon($app->app_state);
+        $app_state_info = "<font color=\"".$app_state['color']."\"><i title=\"".$app_state['hover_text']."\" class=\"fa ".$app_state['icon']." fa-fw fa-lg\" aria-hidden=\"true\"></i></font>";
+
+        $overlib_link = '<span style="float:left; margin-left: 10px; font-weight: bold;">'. $app_state_info . optional($app->device)->shortDisplayName().'</span>';
         if (!empty($app->app_instance)) {
             $overlib_link             .= '<span style="float:right; margin-right: 10px; font-weight: bold;">'.$app->app_instance.'</span>';
             $content_add = '('.$app->app_instance.')';

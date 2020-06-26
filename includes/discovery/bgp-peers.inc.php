@@ -18,7 +18,7 @@ if (Config::get('enable_bgp')) {
         $vrfs_lite_cisco = array(array('context_name'=>''));
     }
 
-    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-Oqvn', 'BGP4-MIB');
+    $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
 
     foreach ($vrfs_lite_cisco as $vrf) {
         $device['context_name'] = $vrf['context_name'];
@@ -43,7 +43,7 @@ if (Config::get('enable_bgp')) {
 
             if (empty($peers_data)) {
                 $bgp4_mib = true;
-                $peers_data = snmp_walk($device, 'bgpPeerRemoteAs', '-Oq', 'BGP4-MIB');
+                $peers_data = preg_replace('/= /', '', snmp_walk($device, 'bgpPeerRemoteAs', '-OQ', 'BGP4-MIB'));
             }
         } else {
             echo 'No BGP on host';

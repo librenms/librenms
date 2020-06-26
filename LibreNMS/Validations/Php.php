@@ -56,6 +56,12 @@ class Php extends BaseValidation
         if (Config::get('update') && version_compare(PHP_VERSION, self::PHP_MIN_VERSION, '<')) {
             $validator->warn("PHP version " . self::PHP_MIN_VERSION . " is the minimum supported version as of " . self::PHP_MIN_VERSION_DATE . ". We recommend you update PHP to a supported version (" . self::PHP_RECOMMENDED_VERSION . " suggested) to continue to receive updates. If you do not update PHP, LibreNMS will continue to function but stop receiving bug fixes and updates.");
         }
+
+        $web_version = PHP_VERSION;
+        $cli_version = rtrim(shell_exec('php -r "echo PHP_VERSION;"'));
+        if (version_compare($web_version, $cli_version, '!=')) {
+            $validator->fail("PHP version of your webserver ($web_version) does not match the cli version ($cli_version)", "If you updated PHP recently, restart php-fpm or apache to switch to the new version");
+        }
     }
 
     private function checkSessionDirWritable(Validator $validator)

@@ -67,6 +67,19 @@ class DeviceController extends TableController
         return ['sysName', 'hostname', 'hardware', 'os', 'locations.location'];
     }
 
+    protected function sortFields($request)
+    {
+        return [
+            'status' => 'status',
+            'icon' => 'icon',
+            'hostname' => 'hostname',
+            'hardware' => 'hardware',
+            'os' => 'os',
+            'uptime' => \DB::raw("IF(`status` = 1, `uptime`, `last_polled` - NOW()))"),
+            'location' => 'location'
+        ];
+    }
+
     /**
      * Defines the base query for this resource
      *
@@ -202,7 +215,6 @@ class DeviceController extends TableController
      */
     private function getOsText($device)
     {
-        $device->loadOs();
         $os_text = Config::getOsSetting($device->os, 'text');
 
         if ($this->isDetailed()) {

@@ -533,7 +533,8 @@
                 "not_contains",
                 "not_regex",
                 "in_array",
-                "not_in_array"
+                "not_in_array",
+                "exists"
             ]
         }
     }

@@ -25,8 +25,10 @@ class AddForeignKeysToWirelessSensorsTable extends Migration
      */
     public function down()
     {
-        Schema::table('wireless_sensors', function (Blueprint $table) {
-            $table->dropForeign('wireless_sensors_device_id_foreign');
-        });
+        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('wireless_sensors', function (Blueprint $table) {
+                $table->dropForeign('wireless_sensors_device_id_foreign');
+            });
+        }
     }
 }

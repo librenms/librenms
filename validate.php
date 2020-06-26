@@ -21,15 +21,11 @@ chdir(__DIR__); // cwd to the directory containing this script
 
 ini_set('display_errors', 1);
 
-require_once 'includes/common.php';
-require_once 'includes/functions.php';
-require_once 'includes/dbFacile.php';
-
 $options = getopt('g:m:s::h::');
 
 if (isset($options['h'])) {
     echo
-        "\n Validate setup tool
+    "\n Validate setup tool
 
     Usage: ./validate.php [-g <group>] [-s] [-h]
         -h This help section.
@@ -57,6 +53,17 @@ if (isset($options['h'])) {
     ;
     exit;
 }
+
+// Check autoload
+if (!file_exists('vendor/autoload.php')) {
+    print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
+    exit;
+}
+
+require_once 'vendor/autoload.php';
+require_once 'includes/common.php';
+require_once 'includes/functions.php';
+require_once 'includes/dbFacile.php';
 
 
 // Buffer output
@@ -98,15 +105,8 @@ if (strpos(`tail config.php`, '?>') !== false) {
     $pre_checks_failed = true;
 }
 
-// Composer checks
-if (!file_exists('vendor/autoload.php')) {
-    print_fail('Composer has not been run, dependencies are missing', './scripts/composer_wrapper.php install --no-dev');
-    exit;
-}
 
-// init autoloading
-require_once 'vendor/autoload.php';
-
+// Composer check
 $validator = new Validator();
 $validator->validate(array('dependencies'));
 if ($validator->getGroupStatus('dependencies') == ValidationResult::FAILURE) {

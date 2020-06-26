@@ -26,7 +26,7 @@ if (isset($options['g']) && $options['g'] >= 0) {
     array_unshift($argv, $cmd);
     $poller_group = $options['g'];
 } elseif (Config::get('distributed_poller') === true) {
-    $poller_group = Config::get('distributed_poller_group');
+    $poller_group = Config::get('default_poller_group');
 } else {
     $poller_group = 0;
 }

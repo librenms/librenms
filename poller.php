@@ -115,7 +115,7 @@ EOH;
     if (isset($options['v'])) {
         $vdebug = true;
     }
-    update_os_cache(true); // Force update of OS Cache
+    \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
 // If we've specified modules with -m, use them
@@ -142,6 +142,14 @@ foreach (dbFetch($query) as $device) {
     if (!poll_device($device, $module_override)) {
         $unreachable_devices++;
     }
+
+    // Update device_groups
+    echo "### Start Device Groups ###\n";
+    $dg_start = microtime(true);
+    $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
+    d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
+    d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
+    echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
 
     echo "#### Start Alerts ####\n";
     $rules = new AlertRules();

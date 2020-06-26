@@ -15,6 +15,7 @@
     $("#eventlog").bootgrid({
         ajax: true,
         rowCount: [50, 100, 250, -1],
+        navigation: ! {{ $hidenavigation }},
         post: function ()
         {
             return {

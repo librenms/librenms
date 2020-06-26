@@ -15,7 +15,7 @@ class AddInsertedToDevices extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             // add inserted column after device id with a default of current_timestamp
-            $table->timestamp('inserted')->default(DB::raw('CURRENT_TIMESTAMP'))->after('device_id');
+            $table->timestamp('inserted')->nullable()->default(null)->after('device_id');
         });
     }
 

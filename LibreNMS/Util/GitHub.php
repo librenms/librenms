@@ -55,12 +55,16 @@ class GitHub
         'billing' => [],
         'discovery' => [],
         'polling' => [],
+        'rancid' => [],
+        'oxidized' => [],
         'bug' => [],
         'refactor' => [],
         'cleanup' => [],
         'documentation' => [],
         'translation' => [],
+        'tests' => [],
         'misc' => [],
+        'dependencies' => [],
     ];
     protected $changelog_users = [];
     protected $changelog_mergers = [];

@@ -26,6 +26,7 @@
 namespace LibreNMS\Alert;
 
 use App\Models\AlertTemplate;
+use LibreNMS\Enum\AlertState;
 
 class Template
 {
@@ -107,7 +108,7 @@ class Template
     {
         return '{{ $alert->title }}' . PHP_EOL .
             'Severity: {{ $alert->severity }}' . PHP_EOL .
-            '@if ($alert->state == 0)Time elapsed: {{ $alert->elapsed }} @endif ' . PHP_EOL .
+            '@if ($alert->state == '.AlertState::RECOVERED.')Time elapsed: {{ $alert->elapsed }} @endif ' . PHP_EOL .
             'Timestamp: {{ $alert->timestamp }}' . PHP_EOL .
             'Unique-ID: {{ $alert->uid }}' . PHP_EOL .
             'Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif ' . PHP_EOL .

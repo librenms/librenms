@@ -16,7 +16,7 @@ class CreateMplsSdpsTable extends Migration
         Schema::create('mpls_sdps', function (Blueprint $table) {
             $table->increments('sdp_id');
             $table->unsignedInteger('sdp_oid');
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->unsignedInteger('device_id')->index();
             $table->enum('sdpRowStatus', array('active','notInService','notReady','createAndGo','createAndWait','destroy'))->nullable();
             $table->enum('sdpDelivery', array('gre','mpls','l2tpv3','greethbridged'))->nullable();
             $table->string('sdpDescription', 80)->nullable();

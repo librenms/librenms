@@ -117,7 +117,11 @@ if ($device['os_group'] == 'cisco') {
                     $multiplier = '1000000000';
                 }
 
-                if (is_numeric($entry['entSensorPrecision']) && $entry['entSensorPrecision'] > '0') {
+                if (is_numeric($entry['entSensorPrecision'])
+                        && $entry['entSensorPrecision'] > '0'
+                        // Workaround for a Cisco SNMP bug
+                        && $entry['entSensorPrecision'] != '1615384784'
+                ) {
                     $divisor = $divisor.str_pad('', $entry['entSensorPrecision'], '0');
                 }
 
@@ -132,6 +136,10 @@ if ($device['os_group'] == 'cisco') {
                 // Check thresholds for this entry (bit dirty, but it works!)
                 if (is_array($t_oids[$index])) {
                     foreach ($t_oids[$index] as $t_index => $key) {
+                        // Skip invalid treshold values
+                        if ($key['entSensorThresholdValue'] == '-32768') {
+                            continue;
+                        }
                         // Critical Limit
                         if (($key['entSensorThresholdSeverity'] == 'major' || $key['entSensorThresholdSeverity'] == 'critical') && ($key['entSensorThresholdRelation'] == 'greaterOrEqual' || $key['entSensorThresholdRelation'] == 'greaterThan')) {
                             $limit = ($key['entSensorThresholdValue'] * $multiplier / $divisor);

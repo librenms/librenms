@@ -42,11 +42,9 @@ chdir($install_dir);
 ini_set('display_errors', 1);
 //error_reporting(E_ALL & ~E_WARNING);
 
-update_os_cache(true); // Force update of OS Cache
-
 $snmpsim = new Snmpsim('127.1.6.2', 1162, null);
 if (getenv('SNMPSIM')) {
-    $snmpsim->fork();
+    $snmpsim->fork(6);
 
     // make PHP hold on a reference to $snmpsim so it doesn't get destructed
     register_shutdown_function(function (Snmpsim $ss) {
@@ -63,12 +61,19 @@ if (getenv('DBTEST')) {
     $connection->query("CREATE DATABASE IF NOT EXISTS {$db_config['database']} CHARACTER SET utf8 COLLATE utf8_unicode_ci");
     unset($connection); // close connection
 
+    // sqlite db file
+    // $dbFile = fopen(storage_path('testing.sqlite'), 'a+');
+    // ftruncate($dbFile, 0);
+    // fclose($dbFile);
+
     // try to avoid erasing people's primary databases
     if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
-        echo "Refreshing database...";
-        $migrate_result = Artisan::call('migrate:fresh', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
-        $migrate_output = Artisan::output();
-        echo "done\n";
+        if (!getenv('SKIP_DB_REFRESH')) {
+            echo "Refreshing database...";
+            $migrate_result = Artisan::call('migrate:fresh', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
+            $migrate_output = Artisan::output();
+            echo "done\n";
+        }
     } else {
         echo "Info: Refusing to reset main database: {$db_config['database']}.  Running migrations.\n";
         $migrate_result = Artisan::call('migrate', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
@@ -77,6 +82,5 @@ if (getenv('DBTEST')) {
     unset($db_config);
 }
 
-// reload the config including database config
-Config::reload();
-load_all_os();
+Config::reload(); // reload the config including database config
+\LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache

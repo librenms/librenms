@@ -40,9 +40,9 @@ class Checks
     public static function preAutoload()
     {
         // Check PHP version otherwise it will just say server error
-        if (version_compare('7.1.3', PHP_VERSION, '>=')) {
+        if (version_compare('7.2.5', PHP_VERSION, '>=')) {
             self::printMessage(
-                'PHP version 7.1.3 or newer is required to run LibreNMS',
+                'PHP version 7.2.5 or newer is required to run LibreNMS',
                 null,
                 true
             );
@@ -90,7 +90,7 @@ class Checks
         $user = Auth::user();
 
         if ($user->isAdmin()) {
-            $notifications = Notification::isUnread($user)->where('severity', '>', 1)->get();
+            $notifications = Notification::isUnread($user)->where('severity', '>', \LibreNMS\Enum\Alert::OK)->get();
             foreach ($notifications as $notification) {
                 Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
             }
@@ -113,6 +113,20 @@ class Checks
             } elseif (!is_writable($temp_dir)) {
                 Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
             }
+        }
+    }
+
+    /**
+     * Check the script is running as the right user (works before config is available)
+     */
+    public static function runningUser()
+    {
+        if (function_exists('posix_getpwuid') && posix_getpwuid(posix_geteuid())['name'] !== get_current_user()) {
+            self::printMessage(
+                'Error: You must run lnms as the user ' . get_current_user(),
+                null,
+                true
+            );
         }
     }
 

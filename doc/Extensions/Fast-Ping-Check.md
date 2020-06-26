@@ -20,25 +20,32 @@ Collection](../Alerting/Rules.md#alert-rules-collection).
 
 ## Setting the ping check to 1 minute
 
-1: Change the ping_rrd_step setting in config.php
+1: If you are using [RRDCached](http://docs.librenms.org/Extensions/RRDCached/), stop the service.
+
+    - This will flush all pending writes so that the rrdstep.php script can change the steps.
+    
+2: Change the ping_rrd_step setting in config.php
 
 ```
 $config['ping_rrd_step'] = 60;
 ```
 
-2: Update the rrd files to change the step (step is hardcoded at file
+3: Update the rrd files to change the step (step is hardcoded at file
 creation in rrd files)
 
 ```
 ./scripts/rrdstep.php -h all
 ```
 
-3: Add the following line to /etc/cron.d/librenms to allow 1 minute
+4: Add the following line to /etc/cron.d/librenms to allow 1 minute
 ping checks
 
 ```
 *    *    * * *   librenms    /opt/librenms/ping.php >> /dev/null 2>&1
 ```
+
+5: If applicable: Start the [RRDCached](http://docs.librenms.org/Extensions/RRDCached/) service
+
 
 **NOTE**: If you are using distributed pollers you can restrict a
 poller to a group by appending `-g` to the cron entry.  Alternatively,
