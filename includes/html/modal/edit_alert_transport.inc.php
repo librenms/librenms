@@ -35,44 +35,44 @@ if (Auth::user()->hasGlobalAdmin()) {
                                 <input type='text' id='name' name='name' class='form-control validation' maxlength='200' required>
                             </div>
                         </div>
-                    <div class="form-group">
-                        <label for="timerange" class="col-sm-3 col-md-2 control-label">Time range <strong class="text-danger">*</strong>: </label>
-                        <div class="col-sm-8">
-                            <input type="checkbox" id="timerange" name="timerange" data-on-text="Yes" data-off-text="No" onchange="timerange_switch();" value=0 />
-                        </div>
-                    </div>
-                    <div id="timerangegroup" style="display:none;">
                         <div class="form-group">
-                            <label for="start_hr" class="col-sm-3 col-md-2 control-label">Start hour <exp>*</exp>: </label>
+                            <label for="timerange" class="col-sm-3 col-md-2 control-label">Time range <strong class="text-danger">*</strong>: </label>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="start_timerange_hr" name="start_timerange_hr" value="" data-date-format="HH:mm">
+                                <input type="checkbox" id="timerange" name="timerange" data-on-text="Yes" data-off-text="No" onchange="timerange_switch();" value=0 />
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="end_hr" class="col-sm-3 col-md-2 control-label">End hour <exp>*</exp>: </label>
-                            <div class="col-sm-8">
-                                <input type="text" class="form-control date" id="end_timerange_hr" name="end_timerange_hr" value="" data-date-format="HH:mm">
+                        <div id="timerangegroup" style="display:none;">
+                            <div class="form-group">
+                                <label for="start_hr" class="col-sm-3 col-md-2 control-label">Start hour <exp>*</exp>: </label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control date" id="start_timerange_hr" name="start_timerange_hr" value="" data-date-format="HH:mm">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="end_hr" class="col-sm-3 col-md-2 control-label">End hour <exp>*</exp>: </label>
+                                <div class="col-sm-8">
+                                    <input type="text" class="form-control date" id="end_timerange_hr" name="end_timerange_hr" value="" data-date-format="HH:mm">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="timerange_day" class="col-sm-3 col-md-2 control-label">Only on weekday: </label>
+                                <div class="col-sm-8">
+                                    <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="1" />Mo</label></div>
+                                    <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="2" />Tu</label></div>
+                                    <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="3" />We</label></div>
+                                    <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="4" />Th</label></div>
+                                    <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="5" />Fr</label></div>
+                                    <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="6" />Sa</label></div>
+                                    <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="0" />Su</label></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                 <label for='maps' class='col-sm-3 col-md-2 control-label'>Map To <exp>*</exp>: </label>
+                                <div class="col-sm-8">
+                                    <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label for="timerange_day" class="col-sm-3 col-md-2 control-label">Only on weekday: </label>
-                            <div class="col-sm-8">
-                                <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="1" />Mo</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="2" />Tu</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="3" />We</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="4" />Th</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="5" />Fr</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="6" />Sa</label></div>
-                                <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="0" />Su</label></div>
-                            </div>
-                        </div>
-                    <div class="form-group">
-                         <label for='maps' class='col-sm-3 col-md-2 control-label'>Map To <exp>*</exp>: </label>
-                        <div class="col-sm-8">
-                            <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
-                        </div>
-                    </div>
-                </div>
                         <div class="form-group" title="The type of transport.">
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
                             <div class="col-sm-3">
