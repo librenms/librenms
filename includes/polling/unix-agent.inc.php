@@ -115,8 +115,8 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             dbDelete('processes', 'device_id = ?', array($device['device_id']));
             $data=array();
             foreach (explode("\n", $agent_data['ps:sep(9)']) as $process) {
-                $process = preg_replace('/\((.*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11', $process);
-                list($user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $process_name) = explode('|', $process, 11);
+                $process = preg_replace('/\(([^,;]+),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*),([0-9]*)?,?([0-9]*)\)(.*)/', '\\1|\\2|\\3|\\4|\\5|\\6|\\7|\\8|\\9|\\10|\\11|\\12', $process);
+                list($user, $VirtualSize, $WorkingSetSize, $zero, $processId, $PageFileUsage, $UserModeTime, $KernelModeTime, $HandleCount, $ThreadCount, $uptime, $process_name) = explode('|', $process, 12);
                 if (!empty($process_name)) {
                     $cputime = ($UserModeTime + $KernelModeTime) / 10000000;
                     $days = floor($cputime / 86400);
