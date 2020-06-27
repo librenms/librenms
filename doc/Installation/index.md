@@ -19,7 +19,7 @@ This document includes instructions for:
  - RHEL / CentOS 8
  - Debian 10
  
- [Install LibreNMS](Install-LibreNMS.md)
+** [Install LibreNMS](Install-LibreNMS.md) **
 
 ## Images
 

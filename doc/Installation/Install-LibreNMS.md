@@ -1,8 +1,13 @@
 source: Installation/Install-LibreNMS.md
 path: blob/master/doc/
 
-This documentation has support for multiple OS/web server options.  Make sure
-you select the same option when they are presented.
+# Linux Server
+
+You should have an installed Linux server running one of the supported OS.
+Make sure you select the correct OS in the tabbed options below each time.
+Choice of web server is your preference, NGINX is recommended.
+
+Connect to the server command line and follow the instructions below.
 
 > NOTE: These instructions assume you are the **root** user.  If you
 > are not, prepend `sudo` to the shell commands (the ones that aren't
@@ -33,13 +38,13 @@ you select the same option when they are presented.
 === "CentOS 8"
     === "NGINX"
         ```
-        dnf install epel-release
+        dnf -y install epel-release
         dnf install bash-completion cronie fping git ImageMagick mariadb-server mtr net-snmp net-snmp-utils nginx nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
         ```
     
     === "Apache"
         ```
-        dnf install epel-release
+        dnf -y install epel-release
         dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip rrdtool unzip
         ```
 
@@ -504,7 +509,7 @@ cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
 
 Now head to the web installer and follow the on-screen instructions.
 
-<http://librenms.example.com/install.php>
+<http://librenms.example.com/install>
 
 The web installer might prompt you to create a `config.php` file in
 your librenms install location manually, copying the content displayed
