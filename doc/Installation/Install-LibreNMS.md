@@ -403,6 +403,7 @@ listen = /run/php-fpm-librenms.sock;
     restorecon -RFvv /opt/librenms
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_execmem 1
+    chcon -t httpd_sys_rw_content_t .env
     ```
     
     # Allow fping
