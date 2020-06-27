@@ -91,8 +91,8 @@ class Availability
             }
         }
 
-        $oldest_date_going_down = $query->first()->value('going_down');
-        $oldest_uptime = $query->first()->value('uptime');
+        $oldest_date_going_down = $query->value('going_down');
+        $oldest_uptime = $query->value('uptime');
         $recorded_duration = $now - ($oldest_date_going_down - $oldest_uptime);
 
         if ($recorded_duration > $duration) {
