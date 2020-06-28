@@ -40,7 +40,7 @@ class Programs extends BaseValidation
     public function validate(Validator $validator)
     {
         // Check programs
-        $bins = array('fping', 'fping6', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk');
+        $bins = array('fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk');
         foreach ($bins as $bin) {
             if (!($cmd = $this->findExecutable($bin))) {
                 $validator->fail(
@@ -48,16 +48,28 @@ class Programs extends BaseValidation
                     "Install $bin or manually set the path to $bin by placing the following in config.php: " .
                     "\$config['$bin'] = '/path/to/$bin';"
                 );
-            } elseif (in_array($bin, array('fping', 'fping6'))) {
+            } elseif ($bin == 'fping') {
                 $this->extraFpingChecks($validator, $bin, $cmd);
+
+                $fping6 = $this->findExecutable('fping6');
+                $fping6 = (!is_executable($fping6) && is_executable($cmd)) ? 'fping -6' : 'fping6';
+                $this->extraFpingChecks($validator, 'fping6', $fping6);
             }
         }
     }
 
     public function extraFpingChecks(Validator $validator, $bin, $cmd)
     {
-        $target = ($bin == 'fping' ? '127.0.0.1' : '::1');
-        $validator->execAsUser("$cmd $target 2>&1", $output, $return);
+        if ($bin == 'fping') {
+            $target = '127.0.0.1';
+            $extra = '';
+        } else {
+            $target = '::1';
+            $fping6 = $this->findExecutable('fping6');
+            $extra = (!is_executable($fping6) && is_executable($cmd)) ? ' -6' : '';
+        }
+
+        $validator->execAsUser("$cmd$extra $target 2>&1", $output, $return);
         $output = implode(" ", $output);
 
         if ($return === 0 && $output == "$target is alive") {
