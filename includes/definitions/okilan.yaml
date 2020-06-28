@@ -6,8 +6,9 @@ over:
 type: printer
 icon: oki
 discovery:
-    - sysDescr:
-        - 'OKI OkiLAN'
+    -
+        sysDescr:
+            - 'OKI OkiLAN'
 discovery_modules:
     toner: true
 poller_modules:

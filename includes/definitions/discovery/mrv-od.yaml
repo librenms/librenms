@@ -3,10 +3,11 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - nbsCmmcChassisTable
-                    - nbsCmmcSlotTable
-                    - nbsCmmcPortTable
+                -
+                    oid:
+                        - nbsCmmcChassisTable
+                        - nbsCmmcSlotTable
+                        - nbsCmmcPortTable
         dbm:
             options:
                 divisor: 1000

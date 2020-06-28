@@ -26,6 +26,8 @@ fdb-table:
             - { left: ports_fdb.port_id, right: ports.port_id, select: [ifIndex] }
             - { left: ports_fdb.vlan_id, right: vlans.vlan_id, select: [vlan_vlan] }
         order_by: ports.ifIndex, vlans.vlan_vlan, ports_fdb.mac_address
+loadbalancers:
+    component: true
 mempools:
     mempools:
         excluded_fields: [device_id, mempool_id]

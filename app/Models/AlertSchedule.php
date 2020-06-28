@@ -29,7 +29,6 @@ use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Date;
 use DB;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
@@ -70,16 +69,7 @@ class AlertSchedule extends Model
 
     public function setRecurringDayAttribute($days)
     {
-        $days = is_array($days) ? $days : explode(',', $days);
-        $new_days = [];
-
-        foreach ($days as $day) {
-            if (isset($this->days[$day])) {
-                $new_days[] = $this->days[$day];
-            }
-        }
-
-        $this->attributes['recurring_day'] = implode(',', $new_days);
+        $this->attributes['recurring_day'] = is_array($days) ? implode(',', $days) : $days;
     }
 
     public function getStartAttribute()

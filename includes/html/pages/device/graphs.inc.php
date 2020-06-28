@@ -58,7 +58,7 @@ $group = $vars['group'];
 $graph_enable = $graph_enable[$group];
 
 $metric = basename($vars['metric']);
-if (is_file("includes/html/pages/device/graphs/$group.inc.php")) {
+if (($group != 'customoid') && (is_file("includes/html/pages/device/graphs/$group.inc.php"))) {
     include "includes/html/pages/device/graphs/$group.inc.php";
 } else {
     foreach ($graph_enable as $graph => $entry) {

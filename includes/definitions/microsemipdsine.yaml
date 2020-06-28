@@ -8,5 +8,6 @@ over:
 mib_dir:
     - microsemi
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.7428.1.1.1.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.7428.1.1.1.

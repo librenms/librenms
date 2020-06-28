@@ -8,5 +8,6 @@ over:
 mib_dir:
     - nimble
 discovery:
-    - sysDescr:
-        -  'Nimble Storage'
+    -
+        sysDescr:
+            - 'Nimble Storage'

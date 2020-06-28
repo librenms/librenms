@@ -35,5 +35,6 @@ discovery_modules:
 register_mibs:
     ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
 discovery:
-    - sysDescr:
-        - 'IOS XR'
+    -
+        sysDescr:
+            - 'IOS XR'

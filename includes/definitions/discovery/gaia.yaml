@@ -3,10 +3,11 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - tempertureSensorName
-                    - fanSpeedSensorName
-                    - voltageSensorName
+                -
+                    oid:
+                        - tempertureSensorName
+                        - fanSpeedSensorName
+                        - voltageSensorName
         state:
             data:
                 -

@@ -3,13 +3,14 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - callerDisplayCallerDisplay
-                    - channelsStartingPhoneNum
-                    - acAnalogFxsFxoType
-                    - acTrunkDialPlanName
-                    - dsx1CircuitIdentifier
-                    - acPMTrunkUtilizationAttributes
+                -
+                    oid:
+                        - callerDisplayCallerDisplay
+                        - channelsStartingPhoneNum
+                        - acAnalogFxsFxoType
+                        - acTrunkDialPlanName
+                        - dsx1CircuitIdentifier
+                        - acPMTrunkUtilizationAttributes
         state:
             data:
                 -

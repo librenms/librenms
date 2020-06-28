@@ -7,7 +7,8 @@ over:
 discovery_modules:
     vmware-vminfo: true
 discovery:
-    - sysDescr_regex:
-        - '/^VMware ESX/'
-        - '/^VMware-vCenter-Server-Appliance/'
-        - '/^VMware vCenter Server Appliance/'
+    -
+        sysDescr_regex:
+            - '/^VMware ESX/'
+            - '/^VMware-vCenter-Server-Appliance/'
+            - '/^VMware vCenter Server Appliance/'

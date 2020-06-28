@@ -1,11 +1,11 @@
 mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB
 modules:
     processors:
-          data:
-              -
-                  oid: hpSwitchCpuStat
-                  num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.{{ $index }}'
-                  type: procurve-fixed
+        data:
+            -
+                oid: hpSwitchCpuStat
+                num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.{{ $index }}'
+                type: procurve-fixed
     sensors:
         temperature:
             data:

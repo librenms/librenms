@@ -3,9 +3,10 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - portTransceiverThresholdInfoTable
-                    - portName
+                -
+                    oid:
+                        - portTransceiverThresholdInfoTable
+                        - portName
         voltage:
             data:
                 -

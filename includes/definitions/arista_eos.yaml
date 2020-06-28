@@ -8,8 +8,9 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysDescr:
-        - Arista Networks EOS
+    -
+        sysDescr:
+            - Arista Networks EOS
 poller_modules:
     wireless: false
     ipmi: false
