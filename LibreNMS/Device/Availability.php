@@ -69,7 +69,7 @@ class Availability
      * @param int $now timestamp for 'now'
      * @return sum of all matching outages in seconds
      */
-    protected static function outage_summary($found_outages, $duration, $now = null)
+    protected static function outageSummary($found_outages, $duration, $now = null)
     {
         if (!is_numeric($now)) {
             $now = time();
@@ -103,9 +103,9 @@ class Availability
     public static function availability($device, $duration, $precision = 3)
     {
         if (Config::get('graphing.availability_increasing')) {
-            return self::availability_increasing($device, $duration, $precision);
+            return self::availabilityIncreasing($device, $duration, $precision);
         } else {
-            return self::availability_decreasing($device, $duration, $precision);
+            return self::availabilityDecreasing($device, $duration, $precision);
         }
     }
 
@@ -120,7 +120,7 @@ class Availability
      * @param int $precision float precision for calculated availability
      * @return float calculated availability
      */
-    private static function availability_increasing($device, $duration, $precision = 3, $now = null)
+    private static function availabilityIncreasing($device, $duration, $precision = 3, $now = null)
     {
         if (!is_numeric($device['uptime'])) {
             return null;
@@ -154,7 +154,7 @@ class Availability
             $recorded_duration = $duration;
         }
 
-        $outage_summary = self::outage_summary($found_outages, $duration, $now);
+        $outage_summary = self::outageSummary($found_outages, $duration, $now);
 
         return round(100 * ($recorded_duration - $outage_summary) / $duration, $precision);
     }
@@ -169,7 +169,7 @@ class Availability
      * @param int $precision float precision for calculated availability
      * @return float calculated availability
      */
-    private static function availability_decreasing($device, $duration, $precision = 3, $now = null)
+    private static function availabilityDecreasing($device, $duration, $precision = 3, $now = null)
     {
         if (!is_numeric($now)) {
             $now = time();
@@ -186,7 +186,7 @@ class Availability
             return 100 * 1;
         }
 
-        $outage_summary = self::outage_summary($found_outages, $duration, $now);
+        $outage_summary = self::outageSummary($found_outages, $duration, $now);
 
         return round(100 * ($duration - $outage_summary) / $duration, $precision);
     }
