@@ -44,8 +44,8 @@ class User extends BaseValidation
     {
         // Check we are running this as the root user
         $username = $validator->getUsername();
-        $lnms_username = Config::get('user', 'librenms');
-        $lnms_groupname = Config::get('group', $lnms_username); // if group isn't set, fall back to user
+        $lnms_username = \config('librenms.user');
+        $lnms_groupname = \config('librenms.group');
 
         if (!($username === 'root' || $username === $lnms_username)) {
             if (isCli()) {
@@ -138,7 +138,7 @@ class User extends BaseValidation
                 )->setFix($fix)->setList('Files', explode(PHP_EOL, $incorrect)));
             }
         } else {
-            $validator->warn("You don't have \$config['user'] set, this most likely needs to be set to librenms");
+            $validator->warn("You don't have LIBRENMS_USER set, this most likely needs to be set to librenms");
         }
     }
 }
