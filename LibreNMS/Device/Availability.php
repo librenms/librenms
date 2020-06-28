@@ -69,7 +69,7 @@ class Availability
      * @param int $now timestamp for 'now'
      * @return sum of all matching outages in seconds
      */
-    protected static function outage_summary($found_outages, $duration, $now=null)
+    protected static function outage_summary($found_outages, $duration, $now = null)
     {
         if (!is_numeric($now)) {
             $now = time();
@@ -120,7 +120,7 @@ class Availability
      * @param int $precision float precision for calculated availability
      * @return float calculated availability
      */
-    private static function availability_increasing($device, $duration, $precision = 3, $now=null)
+    private static function availability_increasing($device, $duration, $precision = 3, $now = null)
     {
         if (!is_numeric($device['uptime'])) {
             return null;
@@ -169,7 +169,7 @@ class Availability
      * @param int $precision float precision for calculated availability
      * @return float calculated availability
      */
-    private static function availability_decreasing($device, $duration, $precision = 3, $now=null)
+    private static function availability_decreasing($device, $duration, $precision = 3, $now = null)
     {
         if (!is_numeric($now)) {
             $now = time();
