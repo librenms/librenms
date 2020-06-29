@@ -26,7 +26,6 @@
 namespace LibreNMS\Device;
 
 use \App\Models\DeviceOutage;
-use LibreNMS\Config;
 
 class Availability
 {
@@ -103,7 +102,7 @@ class Availability
      * @param int $precision float precision for calculated availability
      * @return float calculated availability
      */
-    private static function availability($device, $duration, $precision = 3, $now = null)
+    public static function availability($device, $duration, $precision = 3, $now = null)
     {
         if (!is_numeric($now)) {
             $now = time();
