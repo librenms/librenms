@@ -83,10 +83,8 @@ register_shutdown_function(function () {
 
 $pre_checks_failed = false;
 
-// critical config.php checks
-if (!file_exists('config.php')) {
-    print_fail('config.php does not exist, please copy config.php.default to config.php');
-} else {
+// config.php checks
+if (file_exists('config.php')) {
     $syntax_check = `php -ln config.php`;
     if (strpos($syntax_check, 'No syntax errors detected') === false) {
         print_fail('Syntax error in config.php');
