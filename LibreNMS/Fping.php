@@ -48,7 +48,7 @@ class Fping
         $cmd = [$fping];
         if ($address_family == 'ipv6') {
             $fping6 = Config::get('fping6');
-            $cmd = (!is_executable($fping6) && is_executable($fping)) ? [$fping, '-6'] : [$fping6];
+            $cmd = is_executable($fping6) ? [$fping6] : [$fping, '-6'];
         }
 
         // build the command
