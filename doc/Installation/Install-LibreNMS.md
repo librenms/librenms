@@ -4,7 +4,7 @@ path: blob/master/doc/
 # Prepare Linux Server
 
 You should have an installed Linux server running one of the supported OS.
-Make sure you select the correct OS in the tabbed options below each time.
+Make sure you select your server's OS in the tabbed options below.
 Choice of web server is your preference, NGINX is recommended.
 
 Connect to the server command line and follow the instructions below.
@@ -96,15 +96,15 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
     vi /etc/php/7.4/cli/php.ini
     ```
         
+=== "CentOS 8"
+    ```
+    vi /etc/php.ini
+    ```
+
 === "Debian 10"
     ```bash
     vi /etc/php/7.3/fpm/php.ini
     vi /etc/php/7.3/cli/php.ini
-    ```
-
-=== "CentOS 8"
-    ```
-    vi /etc/php.ini
     ```
 
 Remember to set the system timezone as well.
@@ -116,16 +116,21 @@ timedatectl set-timezone Etc/UTC
 
 # Configure MariaDB
 
-=== "Ubuntu 20.04 / Debian 10"
+=== "Ubuntu 20.04"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
-    
+
 === "CentOS 8"
     ```
     vi /etc/my.cnf.d/mariadb-server.cnf
     ```
 
+=== "Debian 10"
+    ```
+    vi /etc/mysql/mariadb.conf.d/50-server.cnf
+    ```
+    
 Within the `[mysqld]` section add:
 
 ```bash
@@ -160,16 +165,16 @@ exit
     vi /etc/php/7.4/fpm/pool.d/librenms.conf
     ```
 
-=== "Debian 10"
-    ```bash
-    cp /etc/php/7.3/fpm/pool.d/www.conf /etc/php/7.3/fpm/pool.d/librenms.conf
-    vi /etc/php/7.3/fpm/pool.d/librenms.conf
-    ```
-
 === "CentOS 8"
     ```bash
     cp /etc/php-fpm.d/www.conf /etc/php-fpm.d/librenms.conf
     vi /etc/php-fpm.d/librenms.conf
+    ```
+
+=== "Debian 10"
+    ```bash
+    cp /etc/php/7.3/fpm/pool.d/www.conf /etc/php/7.3/fpm/pool.d/librenms.conf
+    vi /etc/php/7.3/fpm/pool.d/librenms.conf
     ```
 
 ```
@@ -265,45 +270,6 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl restart php7.4-fpm
         ```
 
-=== "Debian 10"
-    === "NGINX"
-        ```bash
-        vi /etc/nginx/sites-enabled/librenms.vhost
-        ```
-        
-        Add the following config, edit `server_name` as required:
-        
-        ```nginx
-        server {
-         listen      80;
-         server_name librenms.example.com;
-         root        /opt/librenms/html;
-         index       index.php;
-        
-         charset utf-8;
-         gzip on;
-         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
-         location / {
-          try_files $uri $uri/ /index.php?$query_string;
-         }
-         location ~ [^/]\.php(/|$) {
-          fastcgi_pass unix:/run/php-fpm-librenms.sock;
-          fastcgi_split_path_info ^(.+\.php)(/.+)$;
-          include fastcgi.conf;
-         }
-         location ~ /\.(?!well-known).* {
-          deny all;
-         }
-        }
-        ```
-        
-        ```bash
-        rm /etc/nginx/sites-enabled/default
-        systemctl reload nginx
-        systemctl restart php7.3-fpm
-        ```
-
-
 === "CentOS 8"
     === "NGINX"
         ```
@@ -386,9 +352,47 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl enable --now php-fpm
         ```
 
+=== "Debian 10"
+    === "NGINX"
+        ```bash
+        vi /etc/nginx/sites-enabled/librenms.vhost
+        ```
+        
+        Add the following config, edit `server_name` as required:
+        
+        ```nginx
+        server {
+         listen      80;
+         server_name librenms.example.com;
+         root        /opt/librenms/html;
+         index       index.php;
+        
+         charset utf-8;
+         gzip on;
+         gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+         location / {
+          try_files $uri $uri/ /index.php?$query_string;
+         }
+         location ~ [^/]\.php(/|$) {
+          fastcgi_pass unix:/run/php-fpm-librenms.sock;
+          fastcgi_split_path_info ^(.+\.php)(/.+)$;
+          include fastcgi.conf;
+         }
+         location ~ /\.(?!well-known).* {
+          deny all;
+         }
+        }
+        ```
+        
+        ```bash
+        rm /etc/nginx/sites-enabled/default
+        systemctl reload nginx
+        systemctl restart php7.3-fpm
+        ```
+
 # SELinux
 
-=== "Ubuntu 20.04 / Debian 10"
+=== "Ubuntu 20.04"
     SELinux not enabled by default
 
 === "CentOS 8"
@@ -444,9 +448,12 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     audit2why < /var/log/audit/audit.log
     ```
 
+=== "Debian 10"
+    SELinux not enabled by default
+
 # Allow access through firewall
 
-=== "Ubuntu 20.04 / Debian 10"
+=== "Ubuntu 20.04"
     Firewall not enabled by default
 
 === "CentOS 8"
@@ -455,6 +462,10 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     firewall-cmd --zone public --add-service http --add-service https
     firewall-cmd --permanent --zone public --add-service http --add-service https
     ```
+
+=== "Debian 10"
+    Firewall not enabled by default
+
 
 # Enable lnms command completion
 
