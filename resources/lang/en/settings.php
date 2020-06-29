@@ -622,7 +622,7 @@ return [
                 ]
             ],
             'latlng' => [
-                'description' => 'Attempt to geocode locations',
+                'description' => 'Attempt to Geocode Locations',
                 'help' => 'Try to lookup latitude and longitude via geocoding API during polling'
             ]
         ],
