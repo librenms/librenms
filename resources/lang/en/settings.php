@@ -609,11 +609,11 @@ return [
         ],
         'geoloc' => [
             'api_key' => [
-                'description' => 'Geocoding API Key',
+                'description' => 'Mapping Engine API Key',
                 'help' => 'Geocoding API Key (Required to function)'
             ],
             'engine' => [
-                'description' => 'Geocoding Engine',
+                'description' => 'Mapping Engine',
                 'options' => [
                     'google' => 'Google Maps',
                     'openstreetmap' => 'OpenStreetMap',
