@@ -620,6 +620,10 @@ return [
                     'mapquest' => 'MapQuest',
                     'bing' => 'Bing Maps'
                 ]
+            ],
+            'latlng' => [
+                'description' => 'Attempt to geocode locations',
+                'help' => 'Try to lookup latitude and longitude via geocoding API during polling'
             ]
         ],
         'graphite' => [
