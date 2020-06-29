@@ -81,30 +81,27 @@ register_shutdown_function(function () {
     }
 });
 
-// critical config.php checks
-if (!file_exists('config.php')) {
-    print_fail('config.php does not exist, please copy config.php.default to config.php');
-    exit;
-}
-
 $pre_checks_failed = false;
-$syntax_check = `php -ln config.php`;
-if (strpos($syntax_check, 'No syntax errors detected') === false) {
-    print_fail('Syntax error in config.php');
-    echo $syntax_check;
-    $pre_checks_failed = true;
-}
 
-$first_line = rtrim(`head -n1 config.php`);
-if (!strpos($first_line, '<?php') === 0) {
-    print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
-    $pre_checks_failed = true;
-}
-if (strpos(`tail config.php`, '?>') !== false) {
-    print_fail("Remove the ?> at the end of config.php");
-    $pre_checks_failed = true;
-}
+// config.php checks
+if (file_exists('config.php')) {
+    $syntax_check = `php -ln config.php`;
+    if (strpos($syntax_check, 'No syntax errors detected') === false) {
+        print_fail('Syntax error in config.php');
+        echo $syntax_check;
+        $pre_checks_failed = true;
+    }
 
+    $first_line = rtrim(`head -n1 config.php`);
+    if (!strpos($first_line, '<?php') === 0) {
+        print_fail("config.php doesn't start with a <?php - please fix this ($first_line)");
+        $pre_checks_failed = true;
+    }
+    if (strpos(`tail config.php`, '?>') !== false) {
+        print_fail("Remove the ?> at the end of config.php");
+        $pre_checks_failed = true;
+    }
+}
 
 // Composer check
 $validator = new Validator();
@@ -121,7 +118,7 @@ $init_modules = [];
 require 'includes/init.php';
 
 // make sure install_dir is set correctly, or the next includes will fail
-if (!file_exists(Config::get('install_dir').'/config.php')) {
+if (!file_exists(Config::get('install_dir').'/.env')) {
     $suggested = realpath(__DIR__);
     print_fail('\'install_dir\' config setting is not set correctly.', "It should probably be set to: $suggested");
     exit;
