@@ -3,10 +3,11 @@
     "/css/app.css": "/css/app.css?id=ffec4165a9c98d892a32",
     "/js/manifest.js": "/js/manifest.js?id=3c768977c2574a34506e",
     "/js/vendor.js": "/js/vendor.js?id=c0e0ebbfd027a8baefb4",
-    "/js/lang/de.js": "/js/lang/de.js?id=b1a653a8eba34fe0c83d",
-    "/js/lang/en.js": "/js/lang/en.js?id=490ad0c0f47c3e20fad8",
-    "/js/lang/fr.js": "/js/lang/fr.js?id=f9aba2c115d3716739b5",
-    "/js/lang/ru.js": "/js/lang/ru.js?id=f376f9bbe31e66bae4fc",
-    "/js/lang/uk.js": "/js/lang/uk.js?id=483225c7042242ce65a7",
-    "/js/lang/zh-TW.js": "/js/lang/zh-TW.js?id=038212d88344bec41406"
+    "/js/lang/de.js": "/js/lang/de.js?id=73ed23dde31af205f171",
+    "/js/lang/en.js": "/js/lang/en.js?id=ea1dccb09f2e53fc7c14",
+    "/js/lang/fr.js": "/js/lang/fr.js?id=91daac2f7383c820457b",
+    "/js/lang/it.js": "/js/lang/it.js?id=c202a58a7f5bca08801b",
+    "/js/lang/ru.js": "/js/lang/ru.js?id=aaab82593592e9368a08",
+    "/js/lang/uk.js": "/js/lang/uk.js?id=9b0b074259847e7aaff3",
+    "/js/lang/zh-TW.js": "/js/lang/zh-TW.js?id=21cdd68dc06a428e7260"
 }

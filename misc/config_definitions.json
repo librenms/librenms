@@ -1577,6 +1577,22 @@
                 "bing": "Bing Maps"
             }
         },
+        "geoloc.latlng": {
+            "default": false,
+            "group": "external",
+            "section": "location",
+            "order": 2,
+            "type": "boolean",
+            "when": {
+                "setting": "geoloc.engine",
+                "operator": "in",
+                "value": [
+                    "google",
+                    "mapquest",
+                    "bing"
+                ]
+            }
+        },
         "github_api": {
             "default": "https://api.github.com/repos/librenms/librenms/",
             "type": "text"
