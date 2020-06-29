@@ -142,7 +142,7 @@
             $('#migrate-warning').show()
             $('#migrate-status>i').attr('class', 'fa fa-lg fa-spinner fa-spin');
             $('#error-box').empty();
-            $('#migrate-btn').addClass('disabled')
+            $('#migrate-btn').prop('disabled', true).addClass('disabled')
 
             var output = document.getElementById("db-update");
             var xhr = new XMLHttpRequest();
@@ -156,13 +156,12 @@
                     // if error word in output, show the retry button
                     $('#migrate-warning').hide();
                     $('#migrate-status>i').attr('class', 'fa fa-lg fa-times-rectangle-o text-danger')
-                    $('#migrate-btn').removeClass('disabled').text('@lang('install.migrate.retry')')
+                    $('#migrate-btn').prop('disabled', false).removeClass('disabled').text('@lang('install.migrate.retry')')
                     $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.error')</div>'));
                 }
             };
             xhr.timeout = 240000; // if no response for 4m, allow the user to retry
             xhr.ontimeout = function (e) {
-                $("#retry-btn").css("display", "");
                 $('#migrate-warning').hide();
                 $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.timeout')</div>'));
             };
