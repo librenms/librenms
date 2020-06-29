@@ -118,25 +118,6 @@ class User extends BaseValidation
                     return;
                 }
             }
-
-            // check folder permissions
-            $folders = [
-                'rrd' => $rrd_dir,
-                'log' => $log_dir,
-                'bootstrap' => "$dir/bootstrap/cache/",
-                'storage' => "$dir/storage/",
-                'cache' => "$dir/storage/framework/cache/",
-                'sessions' => "$dir/storage/framework/sessions/",
-                'views' => "$dir/storage/framework/views/",
-            ];
-
-            $folders_string = implode(' ', $folders);
-            $incorrect = exec("find $folders_string -group $lnms_groupname ! -perm -g=w");
-            if (!empty($incorrect)) {
-                $validator->result(ValidationResult::fail(
-                    'Some folders have incorrect file permissions, this may cause issues.'
-                )->setFix($fix)->setList('Files', explode(PHP_EOL, $incorrect)));
-            }
         } else {
             $validator->warn("You don't have \$config['user'] set, this most likely needs to be set to librenms");
         }
