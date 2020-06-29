@@ -41,8 +41,11 @@ class ChecksController extends InstallationController implements InstallerStep
             $this->markStepComplete();
         }
 
+        preg_match('/\d+\.\d+\.\d+/', PHP_VERSION, $matches);
+        $version = $matches[0] ?? PHP_VERSION;
+
         return view('install.checks', $this->formatData([
-            'php_version' => PHP_VERSION,
+            'php_version' => $version,
             'php_required' => Php::PHP_MIN_VERSION,
             'php_ok' => $this->checkPhpVersion(),
             'modules' => $this->moduleResults(),
