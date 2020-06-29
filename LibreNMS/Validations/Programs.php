@@ -49,35 +49,26 @@ class Programs extends BaseValidation
                     "\$config['$bin'] = '/path/to/$bin';"
                 );
             } elseif ($bin == 'fping') {
-                $this->extraFpingChecks($validator, $bin, $cmd);
-
-                $fping6 = $this->findExecutable('fping6');
-                $fping6 = (!is_executable($fping6) && is_executable($cmd)) ? 'fping -6' : 'fping6';
-                $this->extraFpingChecks($validator, 'fping6', $fping6);
+                $this->extraFpingChecks($validator, $cmd);
+                $this->checkFping6($validator, $cmd);
             }
         }
     }
 
-    public function extraFpingChecks(Validator $validator, $bin, $cmd)
+    public function checkFping6(Validator $validator, $fping)
     {
-        if ($bin == 'fping') {
-            $target = '127.0.0.1';
-            $extra = '';
-        } else {
-            $target = '::1';
-            $fping6 = $this->findExecutable('fping6');
-            $extra = (!is_executable($fping6) && is_executable($cmd)) ? ' -6' : '';
-        }
+        $fping6 = $this->findExecutable('fping6');
+        $fping6 = (!is_executable($fping6) && is_executable($fping)) ? "$fping -6" : $fping6;
 
-        $validator->execAsUser("$cmd$extra $target 2>&1", $output, $return);
+        $validator->execAsUser("$fping6 ::1 2>&1", $output, $return);
         $output = implode(" ", $output);
 
-        if ($return === 0 && $output == "$target is alive") {
+        if ($return === 0 && $output == "::1 is alive") {
             return; // fping is working
         }
 
         if ($output == '::1 address not found') {
-            $validator->warn("fping6 does not have IPv6 support?!?!");
+            $validator->warn("fping does not have IPv6 support?!?!");
             return;
         }
 
@@ -86,8 +77,27 @@ class Programs extends BaseValidation
             return;
         }
 
+        if (substr($fping6, -6) == 'fping6') {
+            $this->failFping($validator, $fping6, $output);
+        }
+    }
+
+    public function extraFpingChecks(Validator $validator, $cmd)
+    {
+        $validator->execAsUser("$cmd 127.0.0.1 2>&1", $output, $return);
+        $output = implode(" ", $output);
+
+        if ($return === 0 && $output == "127.0.0.1 is alive") {
+            return; // fping is working
+        }
+
+        $this->failFping($validator, $cmd, $output);
+    }
+
+    private function failFping($validator, $cmd, $output)
+    {
         $validator->fail(
-            "$bin could not be executed. $bin must have CAP_NET_RAW capability (getcap) or suid. Selinux exlusions may be required.\n ($output)"
+            "$cmd could not be executed. $cmd must have CAP_NET_RAW capability (getcap) or suid. Selinux exclusions may be required.\n ($output)"
         );
 
         if ($getcap = $this->findExecutable('getcap')) {
@@ -96,12 +106,12 @@ class Programs extends BaseValidation
 
             if (is_null($matches) || !Str::contains($matches[1], 'cap_net_raw+ep')) {
                 $validator->fail(
-                    "$bin should have CAP_NET_RAW!",
+                    "$cmd should have CAP_NET_RAW!",
                     "setcap cap_net_raw+ep $cmd"
                 );
             }
         } elseif (!(fileperms($cmd) & 2048)) {
-            $validator->fail("$bin should be suid!", "chmod u+s $cmd");
+            $validator->fail("$cmd should be suid!", "chmod u+s $cmd");
         }
     }
 
