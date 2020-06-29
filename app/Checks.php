@@ -165,7 +165,7 @@ class Checks
             return ['mysqlnd'];
         }
 
-        $required_modules = ['mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
+        $required_modules = ['mbstring', 'pcre', 'curl', 'xml', 'gd'];
 
         return array_filter($required_modules, function ($module) {
             return !extension_loaded($module);
