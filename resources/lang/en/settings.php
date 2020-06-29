@@ -641,10 +641,6 @@ return [
             ]
         ],
         'graphing' => [
-            'availability_increasing' => [
-                'description' => 'Alternative Algorithm',
-                'help' => 'Calculates Device Availability starting with 0% (considers current uptime), instead of starting with 100% substracted recorded Outages (default)'
-            ],
             'availability' => [
                 'description' => 'Duration',
                 'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)'

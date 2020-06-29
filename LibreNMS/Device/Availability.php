@@ -94,72 +94,6 @@ class Availability
     }
 
     /**
-     * Get the availability of this device
-     *
-     * @param int $duration timeperiod in seconds
-     * @param int $precision after comma precision
-     * @return availability in %
-     */
-    public static function availability($device, $duration, $precision = 3)
-    {
-        if (Config::get('graphing.availability_increasing')) {
-            return self::availabilityIncreasing($device, $duration, $precision);
-        } else {
-            return self::availabilityDecreasing($device, $duration, $precision);
-        }
-    }
-
-    /**
-     * Get the availability (increasing) of this device
-     * means, starting with 0% as default
-     * considers recorded outages and current uptime combined with duration
-     * substracts recorded outages
-     *
-     * @param array $device device to be looked at
-     * @param int $duration time period to calculate for
-     * @param int $precision float precision for calculated availability
-     * @return float calculated availability
-     */
-    private static function availabilityIncreasing($device, $duration, $precision = 3, $now = null)
-    {
-        if (!is_numeric($device['uptime'])) {
-            return null;
-        }
-
-        if (!is_numeric($now)) {
-            $now = time();
-        }
-
-        $query = DeviceOutage::where('device_id', '=', $device['device_id'])
-            ->where('up_again', '>=', $now - $duration)
-            ->orderBy('going_down');
-
-        $found_outages = $query->get();
-
-        # no recorded outages found, system up whole time
-        if (!count($found_outages)) {
-            # uptime is greater duration interval -> full availability
-            if ($device['uptime'] >= $duration) {
-                return 100 * 1;
-            } else {
-                return round(100 * $device['uptime'] / $duration, $precision);
-            }
-        }
-
-        $oldest_date_going_down = $query->value('going_down');
-        $oldest_uptime = $query->value('uptime');
-        $recorded_duration = $now - ($oldest_date_going_down - $oldest_uptime);
-
-        if ($recorded_duration > $duration) {
-            $recorded_duration = $duration;
-        }
-
-        $outage_summary = self::outageSummary($found_outages, $duration, $now);
-
-        return round(100 * ($recorded_duration - $outage_summary) / $duration, $precision);
-    }
-
-    /**
      * Get the availability (decreasing) of this device
      * means, starting with 100% as default
      * substracts recorded outages
@@ -169,7 +103,7 @@ class Availability
      * @param int $precision float precision for calculated availability
      * @return float calculated availability
      */
-    private static function availabilityDecreasing($device, $duration, $precision = 3, $now = null)
+    private static function availability($device, $duration, $precision = 3, $now = null)
     {
         if (!is_numeric($now)) {
             $now = time();

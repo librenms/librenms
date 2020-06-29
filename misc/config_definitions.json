@@ -612,17 +612,10 @@
                 "/-K9W8-/"
             ]
         },
-        "graphing.availability_increasing": {
-            "group": "graphing",
-            "section": "availability",
-            "order": 0,
-            "default": false,
-            "type": "boolean"
-        },
         "graphing.availability": {
             "group": "graphing",
             "section": "availability",
-            "order": 1,
+            "order": 0,
             "default": [
                 "86400",
                 "604800",
