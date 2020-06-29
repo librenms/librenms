@@ -184,6 +184,9 @@ group = librenms
 listen = /run/php-fpm-librenms.sock;
 ```
 
+If there are no other PHP web applications on this server, you may remove www.conf to save some resources.
+Feel free to tune the performance settings in librenms.conf to meet your needs.
+
 # Configure Web Server
     
 === "Ubuntu 20.04"
@@ -251,7 +254,7 @@ listen = /run/php-fpm-librenms.sock;
           <FilesMatch ".+\.php$">
             SetHandler "proxy:unix:/run/php-fpm-librenms.sock|fcgi://localhost"
           </FilesMatch>
-        </VirtualHost>     
+        </VirtualHost>
         ```
 
         ```bash
@@ -372,7 +375,7 @@ listen = /run/php-fpm-librenms.sock;
           <FilesMatch ".+\.php$">
             SetHandler "proxy:unix:/run/php-fpm-librenms.sock|fcgi://localhost"
           </FilesMatch>
-        </VirtualHost>     
+        </VirtualHost>
         ```
         
         > NOTE: If this is the only site you are hosting on this server (it
@@ -403,7 +406,7 @@ listen = /run/php-fpm-librenms.sock;
     restorecon -RFvv /opt/librenms
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_execmem 1
-    chcon -t httpd_sys_rw_content_t .env
+    chcon -t httpd_sys_rw_content_t /opt/librenms/.env
     ```
     
     # Allow fping
