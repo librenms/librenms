@@ -181,7 +181,7 @@ user = librenms
 group = librenms
 
 # Change listen to a unique name
-listen = /run/php-fpm-librenms.sock;
+listen = /run/php-fpm-librenms.sock
 ```
 
 If there are no other PHP web applications on this server, you may remove www.conf to save some resources.
