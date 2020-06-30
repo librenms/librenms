@@ -18,6 +18,7 @@ class AuthServiceProvider extends ServiceProvider
         \App\Models\User::class => \App\Policies\UserPolicy::class,
         \App\Models\Device::class => \App\Policies\DevicePolicy::class,
         \App\Models\DeviceGroup::class => \App\Policies\DeviceGroupPolicy::class,
+        \App\Models\PollerCluster::class => \App\Policies\PollerClusterPolicy::class,
         \App\Models\Port::class => \App\Policies\PortPolicy::class,
     ];
 

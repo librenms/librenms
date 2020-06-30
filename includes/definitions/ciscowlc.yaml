@@ -30,5 +30,6 @@ discovery_modules:
 mib_dir:
     - cisco
 discovery:
-    - sysDescr:
-        - 'Cisco Controller'
+    -
+        sysDescr:
+            - 'Cisco Controller'

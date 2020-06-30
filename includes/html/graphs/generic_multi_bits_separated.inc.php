@@ -81,11 +81,11 @@ foreach ($rrd_list as $rrd) {
 
     $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . $stacked['transparency'] . ":'" . $descr . "'$stack";
     if (!$nodetails) {
-        $rrd_options .= ' GPRINT:inB' . $i . ":LAST:%6.2lf%s$units";
-        $rrd_options .= ' GPRINT:inB' . $i . ":AVERAGE:%6.2lf%s$units";
-        $rrd_options .= ' GPRINT:inB' . $i . ":MAX:%6.2lf%s$units";
+        $rrd_options .= ' GPRINT:inB' . $i . ":LAST:%6.".$float_precision."lf%s$units";
+        $rrd_options .= ' GPRINT:inB' . $i . ":AVERAGE:%6.".$float_precision."lf%s$units";
+        $rrd_options .= ' GPRINT:inB' . $i . ":MAX:%6.".$float_precision."lf%s$units";
         if (!$nototal) {
-            $rrd_options .= ' GPRINT:totin' . $i . ":%6.2lf%s$total_units";
+            $rrd_options .= ' GPRINT:totin' . $i . ":%6.".$float_precision."lf%s$total_units";
         }
 
         $rrd_options .= '\l';
@@ -95,11 +95,11 @@ foreach ($rrd_list as $rrd) {
     $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . $stacked['transparency'] . ":$stack'";
 
     if (!$nodetails) {
-        $rrd_options .= ' GPRINT:outB' . $i . ":LAST:%6.2lf%s$units";
-        $rrd_options .= ' GPRINT:outB' . $i . ":AVERAGE:%6.2lf%s$units";
-        $rrd_options .= ' GPRINT:outB' . $i . ":MAX:%6.2lf%s$units";
+        $rrd_options .= ' GPRINT:outB' . $i . ":LAST:%6.".$float_precision."lf%s$units";
+        $rrd_options .= ' GPRINT:outB' . $i . ":AVERAGE:%6.".$float_precision."lf%s$units";
+        $rrd_options .= ' GPRINT:outB' . $i . ":MAX:%6.".$float_precision."lf%s$units";
         if (!$nototal) {
-            $rrd_options .= ' GPRINT:totout' . $i . ":%6.2lf%s$total_unit";
+            $rrd_options .= ' GPRINT:totout' . $i . ":%6.".$float_precision."lf%s$total_unit";
         }
 
         $rrd_options .= '\l';
@@ -133,20 +133,20 @@ if (!$noagg) {
     $rrd_options .= ' VDEF:totalout=aggroutbytes,TOTAL';
     $rrd_options .= " COMMENT:' \\\\n'";
     $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate In', ($descr_len + 5)), 0, ($descr_len + 5)) . "'";
-    $rrd_options .= " GPRINT:aggrinbits:LAST:%6.2lf%s$units";
-    $rrd_options .= " GPRINT:aggrinbits:AVERAGE:%6.2lf%s$units";
-    $rrd_options .= " GPRINT:aggrinbits:MAX:%6.2lf%s$units";
+    $rrd_options .= " GPRINT:aggrinbits:LAST:%6.".$float_precision."lf%s$units";
+    $rrd_options .= " GPRINT:aggrinbits:AVERAGE:%6.".$float_precision."lf%s$units";
+    $rrd_options .= " GPRINT:aggrinbits:MAX:%6.".$float_precision."lf%s$units";
     if (!$nototal) {
-        $rrd_options .= " GPRINT:totalin:%6.2lf%s$total_units";
+        $rrd_options .= " GPRINT:totalin:%6.".$float_precision."lf%s$total_units";
     }
 
     $rrd_options .= "\\\\n";
     $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate Out', ($descr_len + 5)), 0, ($descr_len + 5)) . "'";
-    $rrd_options .= " GPRINT:aggroutbits:LAST:%6.2lf%s$units";
-    $rrd_options .= " GPRINT:aggroutbits:AVERAGE:%6.2lf%s$units";
-    $rrd_options .= " GPRINT:aggroutbits:MAX:%6.2lf%s$units";
+    $rrd_options .= " GPRINT:aggroutbits:LAST:%6.".$float_precision."lf%s$units";
+    $rrd_options .= " GPRINT:aggroutbits:AVERAGE:%6.".$float_precision."lf%s$units";
+    $rrd_options .= " GPRINT:aggroutbits:MAX:%6.".$float_precision."lf%s$units";
     if (!$nototal) {
-        $rrd_options .= " GPRINT:totalout:%6.2lf%s$total_units";
+        $rrd_options .= " GPRINT:totalout:%6.".$float_precision."lf%s$total_units";
     }
 
     $rrd_options .= "\\\\n";

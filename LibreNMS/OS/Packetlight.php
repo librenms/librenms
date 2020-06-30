@@ -46,4 +46,13 @@ class Packetlight extends OS
     {
         return ($value - 128);
     }
+
+     /**
+     * Convert Watts 10e-7 to Dbm
+     *
+     */
+    public static function convertWattToDbm($value)
+    {
+        return (10 * log10($value / 10000000) + 30);
+    }
 }

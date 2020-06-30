@@ -3,4 +3,5 @@ text: 'AXIS Network Document Server'
 type: network
 icon: axis
 discovery:
-    - sysDescr_regex: '/^AXIS .* Network Document Server/'
+    -
+        sysDescr_regex: '/^AXIS .* Network Document Server/'

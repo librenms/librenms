@@ -33,7 +33,7 @@ $components = $components[$device['device_id']];
 
 // We extracted all the components for this device, now lets only get the LTM ones.
 $keep = array();
-$types = array('f5-ltm-vs', 'f5-ltm-pool', 'f5-ltm-poolmember');
+$types = array('f5-ltm-vs', 'f5-ltm-bwc', 'f5-ltm-pool', 'f5-ltm-poolmember');
 foreach ($components as $k => $v) {
     foreach ($types as $type) {
         if ($v['type'] == $type) {
@@ -51,6 +51,11 @@ if (count($components > 0)) {
     $f5_stats['ltmVirtualServStatEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.7', 0);
     $f5_stats['ltmVirtualServStatEntryBytesout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.9', 0);
     $f5_stats['ltmVirtualServStatEntryTotconns'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.10.2.3.1.11', 0);
+
+    $f5_stats['ltmBwcEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.7', 0);
+    $f5_stats['ltmBwcEntryBytesin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.4', 0);
+    $f5_stats['ltmBwcEntryBytesDropped'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.6', 0);
+    $f5_stats['ltmBwcEntryBytesPassed'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.13.1.3.1.5', 0);
 
     $f5_stats['ltmPoolMemberStatEntryPktsin'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.5', 0);
     $f5_stats['ltmPoolMemberStatEntryPktsout'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.2.5.4.3.1.7', 0);
@@ -79,7 +84,25 @@ if (count($components > 0)) {
         $hash = $array['hash'];
         $rrd_name = array($type, $label, $hash);
 
-        if ($type == 'f5-ltm-vs') {
+        if ($type == 'f5-ltm-bwc') {
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('pktsin', 'COUNTER', 0)
+                ->addDataset('bytesin', 'COUNTER', 0)
+                ->addDataset('bytesdropped', 'COUNTER', 0)
+                ->addDataset('bytespassed', 'COUNTER', 0);
+
+            $fields = array(
+                'pktsin' => $f5_stats['ltmBwcEntryPktsin']['1.3.6.1.4.1.3375.2.2.13.1.3.1.7.'.$UID],
+                'bytesin' => $f5_stats['ltmBwcEntryBytesin']['1.3.6.1.4.1.3375.2.2.13.1.3.1.4.'.$UID],
+                'bytesdropped' => $f5_stats['ltmBwcEntryBytesDropped']['1.3.6.1.4.1.3375.2.2.13.1.3.1.6.'.$UID],
+                'bytespassed' => $f5_stats['ltmBwcEntryBytesPassed']['1.3.6.1.4.1.3375.2.2.13.1.3.1.5.'.$UID],
+            );
+
+            // Let's print some debugging info.
+            d_echo("\n\nComponent: ".$key."\n");
+            d_echo("    Type: ".$type."\n");
+            d_echo("    Label: ".$label."\n");
+        } elseif ($type == 'f5-ltm-vs') {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('pktsin', 'COUNTER', 0)
                 ->addDataset('pktsout', 'COUNTER', 0)

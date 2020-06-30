@@ -55,17 +55,29 @@ class DeviceController extends Controller
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
     ];
 
-    public function index(Request $request, $device_id, $current_tab = 'overview', $vars = '')
+    public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
     {
+        $device = str_replace('device=', '', $device);
+        $device = is_numeric($device) ? DeviceCache::get($device) : DeviceCache::getByHostname($device);
+        $device_id = $device->device_id;
+        DeviceCache::setPrimary($device_id);
 
-        $device_id = (int)str_replace('device=', '', $device_id);
+        if (!$device->exists) {
+            abort(404);
+        }
+
         $current_tab = str_replace('tab=', '', $current_tab);
         $current_tab = array_key_exists($current_tab, $this->tabs) ? $current_tab : 'overview';
-        DeviceCache::setPrimary($device_id);
-        $device = DeviceCache::getPrimary();
+
         if ($current_tab == 'port') {
             $vars = Url::parseLegacyPath($request->path());
             $port = Port::findOrFail($vars->get('port'));
+
+            // This prevents users from traversal device id's by piggybacking on the auth for the specified port
+            if ($port->device_id !== $device_id) {
+                abort(404);
+            }
+
             $this->authorize('view', $port);
         } else {
             $this->authorize('view', $device);

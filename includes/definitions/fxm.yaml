@@ -9,5 +9,6 @@ over:
     - { graph: device_power, text: 'Device Power' }
     - { graph: device_frequency, text: 'Device Frequency' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.7309.6
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.7309.6

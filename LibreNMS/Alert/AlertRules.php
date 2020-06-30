@@ -34,6 +34,7 @@
 namespace LibreNMS\Alert;
 
 use App\Models\Device;
+use Carbon\Carbon;
 use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Alert\AlertDB;
 use LibreNMS\Enum\AlertState;
@@ -113,7 +114,7 @@ class AlertRules
                         if (is_null($current_state)) {
                             dbInsert(array('state' => AlertState::ACTIVE, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1,'alerted' => 0), 'alerts');
                         } else {
-                            dbUpdate(['state' => AlertState::ACTIVE, 'open' => 1, 'timestamp' => array('NOW()')], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            dbUpdate(['state' => AlertState::ACTIVE, 'open' => 1, 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
                         c_echo(PHP_EOL . 'Status: %rALERT');
                     }
@@ -126,7 +127,7 @@ class AlertRules
                         if (is_null($current_state)) {
                             dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id'], 'open' => 1, 'alerted' => 0], 'alerts');
                         } else {
-                            dbUpdate(['state' => AlertState::RECOVERED, 'open' => 1, 'note' => '', 'timestamp' => array('NOW()')], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
+                            dbUpdate(['state' => AlertState::RECOVERED, 'open' => 1, 'note' => '', 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
 
                         c_echo(PHP_EOL . 'Status: %gOK');

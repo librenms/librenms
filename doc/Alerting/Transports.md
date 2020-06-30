@@ -356,14 +356,19 @@ As a small reminder, here is it's configuration directives including defaults:
 
 ## Microsoft Teams
 
-Microsoft Teams. LibreNMS can send alerts to Microsoft Teams Connector
-API which are then posted to a specific channel.
+LibreNMS can send alerts to Microsoft Teams [Incoming Webhooks](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) which are 
+then posted to a specific channel. Microsoft recommends using 
+[markdown](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format#markdown-formatting-for-connector-cards) formatting for connector cards. 
+Administrators can opt to [compose](https://messagecardplayground.azurewebsites.net/)
+the [MessageCard](https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference)
+themselves using JSON to get the full functionality.
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | WebHook URL | <https://outlook.office365.com/webhook/123456789> |
+| Use JSON? | x |
 
 ## Nagios Compatible
 

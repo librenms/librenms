@@ -36,5 +36,6 @@ discovery_modules:
     vlans: false
     wireless: false
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.21796.4.1
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.21796.4.1

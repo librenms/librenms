@@ -36,6 +36,7 @@ class EventlogController extends WidgetController
         'device' => null,
         'device_group' => null,
         'eventtype' => null,
+        'hidenavigation' => 0,
     ];
 
     public function getSettingsView(Request $request)

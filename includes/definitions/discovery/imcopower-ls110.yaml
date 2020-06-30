@@ -11,10 +11,10 @@ modules:
                     divisor: 100
 
                     skip_values:
-                    -
-                      oid: sdsTempSensValue
-                      op: '>='
-                      value: 100000
+                        -
+                            oid: sdsTempSensValue
+                            op: '>='
+                            value: 100000
 
         charge:
             data:

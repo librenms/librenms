@@ -33,6 +33,7 @@ namespace LibreNMS\Alert;
 use App\Models\DevicePerf;
 use LibreNMS\Config;
 use LibreNMS\Util\Time;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Enum\AlertState;
 use Log;
 
@@ -452,7 +453,7 @@ class RunAlerts
                 $noacc = false;
             }
 
-            if (AlertUtil::isMaintenance($alert['device_id']) > 0) {
+            if (AlertUtil::isMaintenance($alert['device_id'])) {
                 $noiss = true;
                 $noacc = true;
             }
@@ -552,15 +553,26 @@ class RunAlerts
         ];
         $prefix[3] = &$prefix[0];
         $prefix[4] = &$prefix[0];
+
+        if ($obj['state'] == AlertState::RECOVERED) {
+            $severity = Alert::OK;
+        } elseif ($obj['state'] == AlertState::ACTIVE) {
+            $severity = Alert::SEVERITIES[$obj['severity']] ??  Alert::UNKNOWN;
+        } elseif ($obj['state'] == AlertState::ACKNOWLEDGED) {
+            $severity = Alert::NOTICE;
+        } else {
+            $severity = Alert::UNKNOWN;
+        }
+
         if ($result === true) {
             echo 'OK';
-            Log::event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', 1);
+            Log::event('Issued ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], 'alert', $severity);
         } elseif ($result === false) {
             echo 'ERROR';
-            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, 5);
+            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "'", $obj['device_id'], null, Alert::ERROR);
         } else {
             echo "ERROR: $result\r\n";
-            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', 5);
+            Log::event('Could not issue ' . $prefix[$obj['state']] . " for rule '" . $obj['name'] . "' to transport '" . $transport . "' Error: " . $result, $obj['device_id'], 'error', Alert::ERROR);
         }
         return;
     }

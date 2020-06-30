@@ -9,5 +9,6 @@ over:
 mib_dir:
     - carel
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.9839.2606.1
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9839.2606.1

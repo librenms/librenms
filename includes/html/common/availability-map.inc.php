@@ -171,7 +171,7 @@ if (defined('SHOW_SETTINGS')) {
             $in_devices = dbFetchColumn($device_group, [Session::get('group_view')]);
         }
 
-        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
+        $sql = 'SELECT `D`.`hostname`, `D`.`sysName`, `D`.`device_id`, `D`.`status`, `D`.`uptime`, `D`.`last_polled`, `D`.`os`, `D`.`icon`, `D`.`disable_notify`, `D`.`disabled` FROM `devices` AS `D`';
 
         if (!Auth::user()->hasGlobalRead()) {
             $sql .= ' , `devices_perms` AS P WHERE D.`device_id` = P.`device_id` AND P.`user_id` = ? AND ';
@@ -197,6 +197,7 @@ if (defined('SHOW_SETTINGS')) {
         $temp_output = array();
 
         foreach (dbFetchRows($sql, $param) as $device) {
+            $updowntime = "";
             if ($device['disabled'] == '1') {
                 $deviceState = "disabled";
                 $deviceLabel = "blackbg";
@@ -217,11 +218,13 @@ if (defined('SHOW_SETTINGS')) {
                     $deviceLabelOld = 'availability-map-oldview-box-up';
                     $host_up_count++;
                 }
+                $updowntime = ($device['uptime'] ? " - " : "") . formatUptime($device['uptime']);
             } else {
                 $deviceState = 'down';
                 $deviceLabel = 'label-danger';
                 $deviceLabelOld = 'availability-map-oldview-box-down';
                 $host_down_count++;
+                $updowntime = ($device['last_polled'] ? " - " . formatUptime(time() - strtotime($device['last_polled'])) : "") ;
             }
 
             if (AlertUtil::isMaintenance($device['device_id'])) {
@@ -235,7 +238,7 @@ if (defined('SHOW_SETTINGS')) {
                 if ($directpage == "yes") {
                     $deviceIcon = getIconTag($device);
                     $temp_output[] = '
-                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . ($device['uptime'] ? " - " : "") . formatUptime($device['uptime']) . '">
+                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . $updowntime . '">
                     <div class="device-availability ' . $deviceState . '" style="width:' . Config::get('webui.availability_map_box_size') . 'px;">
                         <span class="availability-label label ' . $deviceLabel . ' label-font-border">' . $deviceState . '</span>
                         <span class="device-icon">' . $deviceIcon . '</span><br>
@@ -248,12 +251,12 @@ if (defined('SHOW_SETTINGS')) {
                         $deviceLabel .= ' widget-availability-fixed';
                     }
                     $temp_output[] = '
-                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . " - " . formatUptime($device['uptime']) . '">
+                    <a href="' .generate_device_url($device). '" title="' . $device_system_name . $updowntime . '">
                         <span class="label ' . $deviceLabel . ' widget-availability label-font-border">' . $deviceState . '</span>
                     </a>';
                 }
             } else {
-                $temp_output[] = "<a href='" . generate_device_url($device) . "' title='" . $device_system_name . ' - ' . formatUptime($device['uptime']) . "'><div class='" . $deviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
+                $temp_output[] = "<a href='" . generate_device_url($device) . "' title='" . $device_system_name . $updowntime . "'><div class='" . $deviceLabelOld . "' style='width:${compact_tile}px;height:${compact_tile}px;'></div></a>";
             }
         }
     }

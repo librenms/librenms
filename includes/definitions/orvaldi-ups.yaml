@@ -11,7 +11,7 @@ over:
     - { graph: device_charge, text: Charge }
 discovery:
     -
-      snmpget:
-          oid: .1.3.6.1.4.1.21111.1.1.1.6.0
-          op: starts
-          value: VER
+        snmpget:
+            oid: .1.3.6.1.4.1.21111.1.1.1.6.0
+            op: starts
+            value: VER

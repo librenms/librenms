@@ -11,7 +11,7 @@ path: blob/master/doc/
 # Install Required Packages
 
 ```bash
-apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.3-cli php7.3-curl php7.3-fpm php7.3-gd php7.3-json php7.3-mbstring php7.3-mysql php7.3-snmp php7.3-xml php7.3-zip python-memcache python-mysqldb rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools
+apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.3-cli php7.3-curl php7.3-fpm php7.3-gd php7.3-json php7.3-mbstring php7.3-mysql php7.3-snmp php7.3-xml php7.3-zip python-memcache python-mysqldb rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools
 ```
 
 # Add librenms user
@@ -50,7 +50,7 @@ exit
 ## Configure MySQL
 
 ```bash
-systemctl restart mysql
+service mysql restart
 mysql -uroot -p
 ```
 
@@ -76,7 +76,7 @@ lower_case_table_names=0
 ```
 
 ```bash
-systemctl restart mysql
+service mysql restart
 ```
 
 # Web Server
@@ -94,14 +94,14 @@ nano /etc/php/7.3/cli/php.ini
 ```
 
 ```bash
-systemctl restart php7.3-fpm
+service php7.3-fpm restart
 ```
 
 ## Configure NGINX
 
 ```bash
-rm /etc/nginx/sites-available/default && rm /etc/nginx/sites-enabled/default
-nano /etc/nginx/sites-enabled/librenms.vhost
+rm /etc/nginx/sites-enabled/default
+nano /etc/nginx/sites-available/librenms.vhost
 ```
 
 Add the following config, edit `server_name` as required:
@@ -134,13 +134,15 @@ server {
 ```
 
 ```bash
-systemctl reload nginx
+ln -s /etc/nginx/sites-available/librenms.vhost /etc/nginx/sites-enabled/librenms.vhost
+service nginx reload
 ```
 
 # Configure snmpd
 
 ```bash
 cp /opt/librenms/snmpd.conf.example /etc/snmp/snmpd.conf
+chmod 600 /etc/snmp/snmpd.conf
 nano /etc/snmp/snmpd.conf
 ```
 
@@ -149,7 +151,7 @@ Edit the text which says `RANDOMSTRINGGOESHERE` and set your own community strin
 ```bash
 curl -o /usr/bin/distro https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/distro
 chmod +x /usr/bin/distro
-systemctl restart snmpd
+service snmpd restart
 ```
 
 # Cron job
@@ -174,14 +176,6 @@ use the provided logrotate config file:
 
 ```bash
 cp /opt/librenms/misc/librenms.logrotate /etc/logrotate.d/librenms
-```
-
-# Set permissions
-
-```bash
-chown -R librenms:librenms /opt/librenms
-setfacl -d -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
-setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstrap/cache/ /opt/librenms/storage/
 ```
 
 # Web installer

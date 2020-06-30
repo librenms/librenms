@@ -30,7 +30,8 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysDescr:
-        - 'Cisco Catalyst Operating System Software'
+    -
+        sysDescr:
+            - 'Cisco Catalyst Operating System Software'
 bad_if:
     - vlan
