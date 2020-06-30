@@ -2378,3 +2378,7 @@ label {
     opacity: 1;
     transition: opacity .15s;
 }
+
+#manage-device-groups-table > thead > tr > th:last-child {
+    min-width: 7%;
+}

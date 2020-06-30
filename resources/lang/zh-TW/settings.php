@@ -5,6 +5,7 @@ return [
     'groups' => [
         'alerting' => '警報',
         'auth' => '驗證',
+        'authorization' => '授權',
         'external' => '外部整合',
         'global' => '全域',
         'os' => '作業系統',
@@ -17,15 +18,21 @@ return [
         'alerting' => [
             'general' => '一般警報設定',
             'email' => '電子郵件設定',
+            'rules' => '警報規則預設值',
         ],
         'auth' => [
             'general' => '一般驗證設定',
             'ad' => 'Active Directory 設定',
             'ldap' => 'LDAP 設定'
         ],
+        'authorization' => [
+            'device-group' => '裝置群組設定'
+        ],
         'discovery' => [
             'general' => '一般探索設定',
             'route' => '路由探索模組',
+            'discovery_modules' => '探索模組',
+            'storage' => '儲存模組'
         ],
         'external' => [
             'binaries' => '執行檔位置',
@@ -35,12 +42,18 @@ return [
             'peeringdb' => 'PeeringDB 整合',
             'nfsen' => 'NfSen 整合',
             'unix-agent' => 'Unix-Agent 整合',
+            'smokeping' => 'Smokeping 整合'
         ],
         'poller' => [
             'distributed' => '分散式輪詢器',
+            'graphite' => '資料存放區: Graphite',
+            'influxdb' => '資料存放區: InfluxDB',
+            'opentsdb' => '資料存放區: OpenTSDB',
             'ping' => 'Ping',
+            'prometheus' => '資料存放區: Prometheus',
             'rrdtool' => 'RRDTool 設定',
             'snmp' => 'SNMP',
+            'poller_modules' => '輪詢器模組',
         ],
         'system' => [
             'cleanup' => '清理',
@@ -54,6 +67,8 @@ return [
             'dashboard' => '資訊看板設定',
             'search' => '搜尋設定',
             'style' => '樣式',
+            'device' => '裝置設定',
+            'worldmap' => '世界地圖設定'
         ]
     ],
     'settings' => [
@@ -66,6 +81,40 @@ return [
         'addhost_alwayscheckip' => [
             'description' => '新增裝置時檢察是否 IP 重複',
             'help' => '以 IP 加入主機時，會先檢查此 IP 是否已存在於系統上，若有則不予加入。若是以主機名稱方式加入時，則不會做此檢查。若設定為 True 時，則以主機名稱方式加入時亦做此檢查，以避免加入重複主機的意外發生。'
+        ],
+        'alert_rule' => [
+            'severity' => [
+                'description' => '嚴重性',
+                'help' => 'Severity for an Alert'
+            ],
+            'max_alerts' => [
+                'description' => '最多警報次數',
+                'help' => 'Count of Alerts to be sent'
+            ],
+            'delay' => [
+                'description' => '延遲',
+                'help' => 'Delay before an Alert will be sent'
+            ],
+            'interval' => [
+                'description' => '間隔',
+                'help' => 'Interval to be checked for this Alert'
+            ],
+            'mute_alerts' => [
+                'description' => '警報靜音',
+                'help' => 'Should Alert only be seen in WebUI'
+            ],
+            'invert_rule_match' => [
+                'description' => '反轉比對規則',
+                'help' => 'Alert only if rule doesn\'t match'
+            ],
+            'recovery_alerts' => [
+                'description' => '警報解除',
+                'help' => 'Notify if Alert recovers'
+            ],
+            'invert_map' => [
+                'description' => '除了清單之外的所有裝置',
+                'help' => 'Alert only for Devices which are not listed'
+            ]
         ],
         'alert' => [
             'ack_until_clear' => [
@@ -480,6 +529,30 @@ return [
             'description' => 'HTTP(S) 代理',
             'help' => 'Set this as a fallback if http_proxy or https_proxy environment variable is not available.'
         ],
+        'ignore_mount' => [
+            'description' => '忽略掛接點',
+            'help' => 'Don\'t monitor Disc Usage of this Mountpoints'
+        ],
+        'ignore_mount_network' => [
+            'description' => '忽略網路掛接點',
+            'help' => 'Don\'t monitor Disc Usage of Network Mountpoints'
+        ],
+        'ignore_mount_optical' => [
+            'description' => '忽略光碟機',
+            'help' => 'Don\'t monitor Disc Usage of optical Drives'
+        ],
+        'ignore_mount_removable' => [
+            'description' => '忽略卸除式磁碟機',
+            'help' => 'Don\'t monitor Disc Usage of removable Devices'
+        ],
+        'ignore_mount_regexp' => [
+            'description' => '以 Regex 設定要忽略的掛接點',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which are matching at least one of this Regular Expressions'
+        ],
+        'ignore_mount_string' => [
+            'description' => '以內含字串設定要忽略的掛接點',
+            'help' => 'Don\'t monitor Disc Usage of Mountpoints which contains at least one of this Strings'
+        ],
         'ipmitool' => [
             'description' => 'ipmtool 路徑'
         ],
@@ -588,6 +661,13 @@ return [
         'perf_times_purge' => [
             'description' => '輪詢器效能記錄項目大於 (天)',
             'help' => 'Cleanup done by daily.sh'
+        ],
+        'permission' => [
+            'device_group' => [
+                'allow_dynamic' => [
+                    'description' => '啟用使用者存限可取用動態裝置群組',
+                ]
+            ]
         ],
         'ping' => [
             'description' => 'ping 路徑'
@@ -803,8 +883,36 @@ return [
                 'help' => '圖表最小高度 (預設: 300)'
             ]
         ],
+        'device_location_map_open' => [
+            'description' => '開啟位置圖',
+            'help' => 'Location Map is shown by default'
+        ],
+        'force_hostname_to_sysname' => [
+            'description' => '將 Hostname 改以 SysName 顯示',
+            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device'
+        ],
+        'force_ip_to_sysname' => [
+            'description' => '將 IP 位址改以 SysName 顯示',
+            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices'
+        ],
         'whois' => [
             'description' => 'whois 路徑'
+        ],
+        'smokeping.integration' => [
+            'description' => '啟用',
+            'help' => 'Enable smokeping integration'
+        ],
+        'smokeping.dir' => [
+            'description' => 'RRD 存放路徑',
+            'help' => 'Full path to Smokeping RRDs'
+        ],
+        'smokeping.pings' => [
+            'description' => 'Ping 數量',
+            'help' => 'Number of pings configured in Smokeping'
+        ],
+        'smokeping.url' => [
+            'description' => 'Smokeping URL 位址',
+            'help' => 'Full URL to the smokeping gui'
         ]
     ],
     'twofactor' => [

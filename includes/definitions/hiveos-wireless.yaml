@@ -9,5 +9,6 @@ over:
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_wireless_clients, text: 'Wifi Clients' }
 discovery:
-    - sysDescr_regex:
-        - '/^(Hive)*AP[\w]+(?:_n)?, HiveOS/'
+    -
+        sysDescr_regex:
+            - '/^(Hive)*AP[\w]+(?:_n)?, HiveOS/'

@@ -3,7 +3,7 @@ modules:
     sensors:
         temperature:
             options:
-                    divisor: 10
+                divisor: 10
             data:
                 -
                     oid: wtWebGraphThermHygro
@@ -12,10 +12,10 @@ modules:
                     descr: wtWebGraphThermHygroPortName
                     index: wtWebGraphThermHygroSensorNo.{{ $index }}
                     skip_values:
-                    -
-                        oid: wtWebGraphThermHygroPortName
-                        op: 'not_contains'
-                        value: 'Temp'
+                        -
+                            oid: wtWebGraphThermHygroPortName
+                            op: 'not_contains'
+                            value: 'Temp'
                 -
                     oid: wtWebGraphThermoHygro
                     value: wtWebGraphThermoHygroBinaryTempValue
@@ -23,13 +23,13 @@ modules:
                     descr: wtWebGraphThermoHygroPortName
                     index: wtWebGraphThermoHygroSensorNo.{{ $index }}
                     skip_values:
-                    -
-                        oid: wtWebGraphThermoHygroPortName
-                        op: 'not_contains'
-                        value: 'Temp'
+                        -
+                            oid: wtWebGraphThermoHygroPortName
+                            op: 'not_contains'
+                            value: 'Temp'
         humidity:
             options:
-                    divisor: 10
+                divisor: 10
             data:
                 -
                     oid: wtWebGraphThermHygro
@@ -38,10 +38,10 @@ modules:
                     descr: wtWebGraphThermHygroPortName
                     index: wtWebGraphThermHygroSensorNo.{{ $index }}
                     skip_values:
-                    -
-                        oid: wtWebGraphThermHygroPortName
-                        op: 'not_contains'
-                        value: 'Feucht'
+                        -
+                            oid: wtWebGraphThermHygroPortName
+                            op: 'not_contains'
+                            value: 'Feucht'
                 -
                     oid: wtWebGraphThermoHygro
                     value: wtWebGraphThermoHygroBinaryTempValue
@@ -49,13 +49,13 @@ modules:
                     descr: wtWebGraphThermoHygroPortName
                     index: wtWebGraphThermoHygroSensorNo.{{ $index }}
                     skip_values:
-                    -
-                        oid: wtWebGraphThermoHygroPortName
-                        op: 'not_contains'
-                        value: 'Feucht'
+                        -
+                            oid: wtWebGraphThermoHygroPortName
+                            op: 'not_contains'
+                            value: 'Feucht'
         pressure:
             options:
-                    divisor: 100
+                divisor: 100
             data:
                 -
                     oid: wtWebGraphThermoBaro
@@ -64,8 +64,8 @@ modules:
                     descr: wtWebGraphThermoBaroPortName
                     index: wtWebGraphThermoBaroSensorNo.{{ $index }}
                     skip_values:
-                    -
-                        oid: wtWebGraphThermoBaroPortName
-                        op: 'not_contains'
-                        value: 'druck'
+                        -
+                            oid: wtWebGraphThermoBaroPortName
+                            op: 'not_contains'
+                            value: 'druck'
 

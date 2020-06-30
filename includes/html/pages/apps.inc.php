@@ -124,6 +124,12 @@ $graphs['os-updates'] = array(
 );
 $graphs['dhcp-stats'] = array(
      'stats',
+     'pools_percent',
+     'pools_current',
+     'pools_max',
+     'networks_percent',
+     'networks_current',
+     'networks_max',
 );
 $graphs['fail2ban'] = array(
     'banned',
@@ -332,6 +338,10 @@ $graphs['mailcow-postfix'] = array(
     'traffic',
     'domains',
 );
+$graphs['backupninja'] = array(
+    'backupninja',
+);
+
 echo '<div class="panel panel-default">';
 echo '<div class="panel-heading">';
 echo "<span style='font-weight: bold;'>Apps</span> &#187; ";

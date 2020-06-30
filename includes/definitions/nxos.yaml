@@ -30,6 +30,7 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysDescr:
-        - NX-OS(tm)
-        - Cisco NX-OS
+    -
+        sysDescr:
+            - NX-OS(tm)
+            - Cisco NX-OS

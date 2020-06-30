@@ -137,6 +137,11 @@ class User extends Authenticatable
         });
     }
 
+    public function scopeAdminOnly($query)
+    {
+        $query->where('level', 10);
+    }
+
     // ---- Accessors/Mutators ----
 
     public function setRealnameAttribute($realname)

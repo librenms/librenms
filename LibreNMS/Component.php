@@ -219,10 +219,11 @@ class Component
             ->with('prefs')
             ->get()
             ->each(function (\App\Models\Component $component) use ($updated) {
-                unset($updated[$component->id]['type']); // can't change type
+                $update = $updated[$component->id];
+                unset($update['type']);  // can't change type
 
                 // update component attributes
-                $component->fill($updated[$component->id]);
+                $component->fill($update);
                 if ($component->isDirty()) {
                     // Log the update to the Eventlog.
                     $message = "Component $component->id has been modified: ";

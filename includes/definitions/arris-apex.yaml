@@ -7,5 +7,6 @@ mib_dir:
 over:
     - { graph: '', text: '' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.1166.1.31
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1166.1.31

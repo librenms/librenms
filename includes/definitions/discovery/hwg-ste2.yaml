@@ -10,7 +10,7 @@ modules:
                     descr: sensName
                     index: '{{ $index }}'
                     divisor: 10
-                    skip_values: 
+                    skip_values:
                         -
                             oid: sensUnit
                             op: '!='
@@ -24,7 +24,7 @@ modules:
                     descr: sensName
                     index: '{{ $index }}'
                     divisor: 10
-                    skip_values: 
+                    skip_values:
                         -
                             oid: sensUnit
                             op: '!='

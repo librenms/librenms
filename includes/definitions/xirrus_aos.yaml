@@ -7,6 +7,7 @@ over:
     - { graph: device_xirrus_stations, text: 'Wifi Clients' }
     - { graph: device_wireless_rssi, text: 'Signal RSSI' }
 discovery:
-    - sysDescr:
-        - Xirrus
-        - ArrayOS
+    -
+        sysDescr:
+            - Xirrus
+            - ArrayOS

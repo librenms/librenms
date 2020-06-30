@@ -7,4 +7,5 @@ mib_dir:
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
-- sysDescr_regex: '/^ApexPlus.*/'
+    -
+        sysDescr_regex: '/^ApexPlus.*/'
