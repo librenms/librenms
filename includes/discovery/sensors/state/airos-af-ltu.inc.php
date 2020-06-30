@@ -30,7 +30,7 @@ $modulationrate_data['rx'] = snmp_getnext($device, '.1.3.6.1.4.1.41112.1.10.1.4.
 if (is_string($modulationrate_data['tx']) && is_string($modulationrate_data['rx'])) {
     foreach ($modulationrate_data as $index => $item) {
         list($oid, $value) = explode('=', $item, 2);
-        $modulationrate_data[$index] = ['oid' => trim($oid), 'value' => trim($value, "\" \n\r")];
+        $modulationrate_data[$index] = ['oid' => trim($oid), 'value' => (int)trim($value, "\" \n\r")];
     }
 
     //Create State Index

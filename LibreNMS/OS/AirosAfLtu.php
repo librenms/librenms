@@ -41,7 +41,7 @@ class AirosAfLtu extends OS implements
         if (is_string($oid)) {
             list($oid, $value) = explode('=', $oid, 2);
             $oid = trim($oid);
-            $value = trim($value, "\" \n\r");
+            $value = (int)trim($value, "\" \n\r");
 
             return array(
                 new WirelessSensor('distance', $this->getDeviceId(), $oid, 'airos-af-ltu', 1, 'Distance', $value, 1, 1000),
@@ -75,7 +75,7 @@ class AirosAfLtu extends OS implements
             if (is_string($oid)) {
                 list($oid, $value) = explode('=', $oid, 2);
                 $oid = trim($oid);
-                $value = trim($value, "\" \n\r");
+                $value = (int)trim($value, "\" \n\r");
 
                 $sensors[] = new WirelessSensor($item['class'], $this->getDeviceId(), $oid, $item['type'], 1, $item['desc'], $value);
             }
@@ -105,7 +105,7 @@ class AirosAfLtu extends OS implements
             if (is_string($oid)) {
                 list($oid, $value) = explode('=', $oid, 2);
                 $oid = trim($oid);
-                $value = trim($value, "\" \n\r");
+                $value = (int)trim($value, "\" \n\r");
 
                 $sensors[] = new WirelessSensor($item['class'], $this->getDeviceId(), $oid, $item['type'], 1, $item['desc'], $value, 1000);
             }
