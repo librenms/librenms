@@ -236,8 +236,8 @@ return [
             'help' => 'Active Directory LDAP filter for selecting users'
         ],
         'auth_ad_url' => [
-            'description' => '',
-            'help' => ''
+            'description' => 'Active Directory Server',
+            'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com'
         ],
         'auth_ldap_attr' => [
             'uid' => [
