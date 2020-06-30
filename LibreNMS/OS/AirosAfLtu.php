@@ -39,11 +39,12 @@ class AirosAfLtu extends OS implements
     {
         $oid = snmp_getnext($this->getDevice(), '.1.3.6.1.4.1.41112.1.10.1.4.1.23', '-OnQ'); //UBNT-AFLTU-MIB::afLTUStaRemoteDistance
         if (is_string($oid)) {
-            list($oid) = explode('=', $oid, 2);
+            list($oid, $value) = explode('=', $oid, 2);
             $oid = trim($oid);
+            $value = trim($value, "\" \n\r");
 
             return array(
-                new WirelessSensor('distance', $this->getDeviceId(), $oid, 'airos-af-ltu', 1, 'Distance', null, 1, 1000),
+                new WirelessSensor('distance', $this->getDeviceId(), $oid, 'airos-af-ltu', 1, 'Distance', $value, 1, 1000),
             );
         }
     }
@@ -72,9 +73,11 @@ class AirosAfLtu extends OS implements
             $oid = snmp_getnext($this->getDevice(), $item['oid'], '-OnQ');
 
             if (is_string($oid)) {
-                list($oid) = explode('=', $oid, 2);
+                list($oid, $value) = explode('=', $oid, 2);
                 $oid = trim($oid);
-                $sensors[] = new WirelessSensor($item['class'], $this->getDeviceId(), $oid, $item['type'], 1, $item['desc']);
+                $value = trim($value, "\" \n\r");
+
+                $sensors[] = new WirelessSensor($item['class'], $this->getDeviceId(), $oid, $item['type'], 1, $item['desc'], $value);
             }
         }
 
@@ -100,9 +103,11 @@ class AirosAfLtu extends OS implements
             $oid = snmp_getnext($this->getDevice(), $item['oid'], '-OnQ');
 
             if (is_string($oid)) {
-                list($oid) = explode('=', $oid, 2);
+                list($oid, $value) = explode('=', $oid, 2);
                 $oid = trim($oid);
-                $sensors[] = new WirelessSensor($item['class'], $this->getDeviceId(), $oid, $item['type'], 1, $item['desc'], null, 1000);
+                $value = trim($value, "\" \n\r");
+
+                $sensors[] = new WirelessSensor($item['class'], $this->getDeviceId(), $oid, $item['type'], 1, $item['desc'], $value, 1000);
             }
         }
         return $sensors;
