@@ -230,7 +230,7 @@ return [
             'help' => 'Active Directory LDAP filter for selecting users'
         ],
         'auth_ad_url' => [
-            'description' => 'Active Directory Server',
+            'description' => 'Active Directory Server(s)',
             'help' => 'ldaps://dc1.example.com ldaps://dc2.example.com'
         ],
         'auth_ldap_attr' => [
