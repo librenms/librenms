@@ -78,7 +78,7 @@ class Python extends BaseValidation
         $process->run();
 
         if ($process->getExitCode() !== 0) {
-            $user = Config::get('user', 'librenms');
+            $user = \config('librenms.user');
             $user_mismatch = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) !== $user : false;
 
             if ($user_mismatch) {
