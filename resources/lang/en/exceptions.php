@@ -7,6 +7,10 @@ return [
         'title' => 'It is unsafe to run Dusk in production',
         'message' => 'Run ":command" to remove Dusk or if you are a developer set the appropriate APP_ENV'
     ],
+    'file_write_failed' => [
+        'title' => 'Error: Could not write to file',
+        'message' => 'Failed to write to file (:file).  Please check permissions and SELinux/AppArmor if applicable.'
+    ],
     'ldap_missing' => [
         'title' => 'PHP LDAP support missing',
         'message' => 'PHP does not support LDAP, please install or enable the PHP LDAP extension'

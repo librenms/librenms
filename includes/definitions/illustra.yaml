@@ -4,5 +4,6 @@ type: network
 icon: illustra
 group: illustra
 discovery:
-    - sysDescr:
-        - 'illustra'
+    -
+        sysDescr:
+            - 'illustra'

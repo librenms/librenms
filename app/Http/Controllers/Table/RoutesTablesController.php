@@ -59,6 +59,23 @@ class RoutesTablesController extends TableController
             ];
     }
 
+    protected function sortFields($request)
+    {
+        return [
+            'context_name',
+            'inetCidrRouteDestType',
+            'inetCidrRouteDest',
+            'inetCidrRoutePfxLen',
+            'inetCidrRouteNextHop',
+            'inetCidrRouteIfIndex',
+            'inetCidrRouteMetric1',
+            'inetCidrRouteType',
+            'inetCidrRouteProto',
+            'created_at',
+            'updated_at',
+        ];
+    }
+
     /**
      * Defines the base query for this resource
      *
@@ -67,7 +84,7 @@ class RoutesTablesController extends TableController
      */
     protected function baseQuery($request)
     {
-        $join =  function ($query) {
+        $join = function ($query) {
             $query->on('ports.port_id', 'route.port_id');
         };
         $showAllRoutes = trim(\Request::get('showAllRoutes'));

@@ -35,6 +35,7 @@ class SyslogController extends WidgetController
         'title' => null,
         'device' => null,
         'device_group' => null,
+        'hidenavigation' => 0,
     ];
 
     public function getSettingsView(Request $request)

@@ -208,9 +208,9 @@ modules:
                     index: 'drsServerMonitoringCapable.{{ $index }}'
                     skip_values:
                         -
-                          oid: drsServerSlotName
-                          op: '=='
-                          value: 'N/A'
+                            oid: drsServerSlotName
+                            op: '=='
+                            value: 'N/A'
                     states:
                         - { value: 1, descr: absent, graph: 1, generic: 0 }
                         - { value: 2, descr: none, graph: 1, generic: 0  }
@@ -266,7 +266,7 @@ modules:
                             oid: amperageProbeType
                             op: '!='
                             value: 23
- 
+
         power:
             data:
                 -

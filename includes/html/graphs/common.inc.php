@@ -82,6 +82,10 @@ if (isset($scale_rigid)) {
     $rrd_options .= ' -r';
 }
 
+if (!isset($float_precision)) {
+    $float_precision = 2;
+}
+
 $rrd_options .= ' -E --start '.$from.' --end '.$to.' --width '.$width.' --height '.$height.' ';
 
 if (Config::get('applied_site_style') == 'dark') {

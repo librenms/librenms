@@ -42,6 +42,11 @@ class LocationController extends TableController
         return ['location'];
     }
 
+    protected function sortFields($request)
+    {
+        return ['location', 'devices', 'network', 'servers', 'firewalls', 'down'];
+    }
+
     /**
      * Defines the base query for this resource
      *

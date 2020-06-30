@@ -66,7 +66,7 @@ class Python extends BaseValidation
         preg_match('/\(python ([0-9.]+)\)/', `pip3 --version`, $matches);
         $pip = $matches[1];
         $python = implode('.', array_slice(explode('.', $version), 0, 2));
-        if (version_compare($python, $pip, '!=')) {
+        if ($pip && version_compare($python, $pip, '!=')) {
             $validator->fail("python3 ($python) and pip3 ($pip) versions do not match.  This likely will cause dependencies to be installed for the wrong python version.");
         }
     }
@@ -78,7 +78,7 @@ class Python extends BaseValidation
         $process->run();
 
         if ($process->getExitCode() !== 0) {
-            $user = Config::get('user', 'librenms');
+            $user = \config('librenms.user');
             $user_mismatch = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) !== $user : false;
 
             if ($user_mismatch) {

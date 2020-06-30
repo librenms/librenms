@@ -7,9 +7,9 @@ path: blob/master/doc/
             <span> Installing</span>
           </a>
         </div>
-        <a href="/Installation/">Installing LibreNMS</a><br />
-        <a href="/Installation/Installation-Ubuntu-1804-Nginx/">Ubuntu 18.04 + Nginx</a><br />
-        <a href="/Installation/Installation-CentOS-7-Nginx/">CentOS 7 + Nginx</a><br />
+        <a href="/Installation/">Ways to install</a><br />
+        <a href="/Installation/Install-LibreNMS/">Install LibreNMS Now</a><br />
+        <a href="https://github.com/librenms/docker">Install Using Docker</a><br />
         <a href="/Installation/Installing-LibreNMS/"><strong>More...</strong></a>
     </div>
     <div class="home-box">

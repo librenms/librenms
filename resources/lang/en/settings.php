@@ -11,6 +11,7 @@ return [
         'global' => 'Global',
         'os' => 'OS',
         'discovery' => 'Discovery',
+        'graphing' => 'Graphing',
         'poller' => 'Poller',
         'system' => 'System',
         'webui' => 'Web UI',
@@ -44,6 +45,9 @@ return [
             'nfsen' => 'NfSen Integration',
             'unix-agent' => 'Unix-Agent Integration',
             'smokeping' => 'Smokeping Integration'
+        ],
+        'graphing' => [
+            'availability' => 'Device Availability',
         ],
         'poller' => [
             'distributed' => 'Distributed Poller',
@@ -605,17 +609,21 @@ return [
         ],
         'geoloc' => [
             'api_key' => [
-                'description' => 'Geocoding API Key',
+                'description' => 'Mapping Engine API Key',
                 'help' => 'Geocoding API Key (Required to function)'
             ],
             'engine' => [
-                'description' => 'Geocoding Engine',
+                'description' => 'Mapping Engine',
                 'options' => [
                     'google' => 'Google Maps',
                     'openstreetmap' => 'OpenStreetMap',
                     'mapquest' => 'MapQuest',
                     'bing' => 'Bing Maps'
                 ]
+            ],
+            'latlng' => [
+                'description' => 'Attempt to Geocode Locations',
+                'help' => 'Try to lookup latitude and longitude via geocoding API during polling'
             ]
         ],
         'graphite' => [
@@ -635,6 +643,12 @@ return [
                 'description' => 'Prefix (Optional)',
                 'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots'
             ]
+        ],
+        'graphing' => [
+            'availability' => [
+                'description' => 'Duration',
+                'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)'
+            ],
         ],
         'graylog' => [
             'base_uri' => [
@@ -1000,6 +1014,9 @@ return [
             ],
             'aruba-controller' => [
                 'description' => 'Aruba Controller'
+            ],
+            'availability' => [
+                'description' => 'Availability'
             ],
             'entity-physical' => [
                 'description' => 'Entity Physical'

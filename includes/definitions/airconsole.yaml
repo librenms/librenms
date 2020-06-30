@@ -1,8 +1,9 @@
 os: airconsole
-text: 'Airconsole Server' 
+text: 'Airconsole Server'
 type: network
 icon: airconsole
 group: airconsole
 discovery:
-     - sysObjectID:
-         - .1.3.6.1.4.1.14358.1
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.14358.1

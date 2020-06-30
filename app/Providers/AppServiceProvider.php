@@ -85,6 +85,7 @@ class AppServiceProvider extends ServiceProvider
             'sensor' => \App\Models\Sensor::class,
             'device' => \App\Models\Device::class,
             'device_group' => \App\Models\DeviceGroup::class,
+            'location' => \App\Models\Location::class,
         ], $sensor_types));
     }
 

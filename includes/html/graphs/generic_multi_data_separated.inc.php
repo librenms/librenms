@@ -82,22 +82,22 @@ foreach ($rrd_list as $rrd) {
     }
 
     $rrd_options .= ' AREA:inB' . $i . '#' . $colour_in . $stacked['transparency'] . ":'" . $descr . "'$stack";
-    $rrd_options .= ' GPRINT:inB' . $i . ":LAST:%6.2lf%s$units";
-    $rrd_options .= ' GPRINT:inB' . $i . ":AVERAGE:%6.2lf%s$units";
-    $rrd_options .= ' GPRINT:inB' . $i . ":MAX:%6.2lf%s$units\l";
+    $rrd_options .= ' GPRINT:inB' . $i . ":LAST:%6.".$float_precision."lf%s$units";
+    $rrd_options .= ' GPRINT:inB' . $i . ":AVERAGE:%6.".$float_precision."lf%s$units";
+    $rrd_options .= ' GPRINT:inB' . $i . ":MAX:%6.".$float_precision."lf%s$units\l";
 
     if (!$nototal) {
-        $rrd_options .= ' GPRINT:totin' . $i . ":%6.2lf%s$total_units";
+        $rrd_options .= ' GPRINT:totin' . $i . ":%6.".$float_precision."lf%s$total_units";
     }
 
     $rrd_options .= " 'HRULE:0#" . $colour_out . ':' . $descr_out . "'";
     $rrd_optionsb .= " 'AREA:outB" . $i . '_neg#' . $colour_out . $stacked['transparency'] . ":$stack'";
-    $rrd_options .= ' GPRINT:outB' . $i . ":LAST:%6.2lf%s$units";
-    $rrd_options .= ' GPRINT:outB' . $i . ":AVERAGE:%6.2lf%s$units";
-    $rrd_options .= ' GPRINT:outB' . $i . ":MAX:%6.2lf%s$units\l";
+    $rrd_options .= ' GPRINT:outB' . $i . ":LAST:%6.".$float_precision."lf%s$units";
+    $rrd_options .= ' GPRINT:outB' . $i . ":AVERAGE:%6.".$float_precision."lf%s$units";
+    $rrd_options .= ' GPRINT:outB' . $i . ":MAX:%6.".$float_precision."lf%s$units\l";
 
     if (!$nototal) {
-        $rrd_options .= ' GPRINT:totout' . $i . ":%6.2lf%s$total_units";
+        $rrd_options .= ' GPRINT:totout' . $i . ":%6.".$float_precision."lf%s$total_units";
     }
 
     $rrd_options .= " 'COMMENT:\l'";
