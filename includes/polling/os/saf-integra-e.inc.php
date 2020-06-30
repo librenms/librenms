@@ -28,4 +28,3 @@ preg_match('/Prod: ([A-Za-z-_]+);Vers: ([0-9.]+);.*;S\/N: ([0-9]+)/', $device['s
 $hardware = $matches[1];
 $version = $matches[2];
 $serial = $matches[3];
-
