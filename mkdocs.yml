@@ -19,6 +19,8 @@ markdown_extensions:
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
+extra_javascript:
+    - librenms-docs.js
 extra:
     article_nav_top: false
     article_nav_bottom: true
