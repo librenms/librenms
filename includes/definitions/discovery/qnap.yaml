@@ -2,8 +2,10 @@ mib: NAS-MIB
 modules:
     sensors:
         pre-cache:
-            -
-                diskEnclosureID
+            data:
+                -
+                    oid:
+                        - diskEnclosureID
         temperature:
             options:
                 skip_values: -1
