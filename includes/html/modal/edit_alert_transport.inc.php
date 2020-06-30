@@ -288,22 +288,21 @@ if (Auth::user()->hasGlobalAdmin()) {
             }else{
                 $('#timerange_day').prop('checked', false);
             }
+            if (transport.invert_map == 1) {
+                $("#invert_map").bootstrapSwitch('state', true);
+            } else {
+                $("#invert_map").bootstrapSwitch('state', false);
+            }
             var $maps = $('#maps');
             $maps.empty();
             $maps.val(null).trigger('change'); // clear
             if (transport.maps == null) {
-                // collection rule
                 setTransportDevice()
             } else {
-                $.each(rule.maps, function(index, value) {
+                $.each(transport.maps, function(index, value) {
                     var option = new Option(value.text, value.id, true, true);
                     $maps.append(option).trigger('change')
                 });
-            }
-            if (transport.invert_map == 1) {
-                $("#invert_map").bootstrapSwitch('state', true);
-            }else{
-                $("#invert_map").bootstrapSwitch('state', false);
             }
         }
         
