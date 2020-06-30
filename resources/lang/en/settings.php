@@ -235,6 +235,10 @@ return [
             'description' => 'User LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting users'
         ],
+        'auth_ad_url' => [
+            'description' => '',
+            'help' => ''
+        ],
         'auth_ldap_attr' => [
             'uid' => [
                 'description' => 'Attribute to check username against',
