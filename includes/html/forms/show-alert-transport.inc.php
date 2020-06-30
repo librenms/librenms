@@ -29,6 +29,23 @@ if (is_numeric($transport_id) && $transport_id > 0) {
     } else {
         $is_default = false;
     }
+
+    $maps = [];
+
+    $devices = dbFetchRows('SELECT `device_id`, `hostname`, `sysName` FROM `transport_device_map` LEFT JOIN `devices` USING (`device_id`) WHERE `transport_id`=?', [$transport_id]);
+    foreach ($devices as $device) {
+        $maps[] = ['id' => $device['device_id'], 'text' => format_hostname($device)];
+    }
+
+    $groups = dbFetchRows('SELECT `group_id`, `name` FROM `transport_group_map` LEFT JOIN `device_groups` ON `device_groups`.`id`=`transport_group_map`.`group_id` WHERE `transport_id`=?', [$transport_id]);
+    foreach ($groups as $group) {
+        $maps[] = ['id' => 'g' . $group['group_id'], 'text' => $group['name']];
+    }
+    $locations = dbFetchRows('SELECT `location_id`, `location` FROM `transport_location_map` LEFT JOIN `locations` ON `locations`.`id`=`transport_location_map`.`location_id` WHERE `transport_id`=?', [$transport_id]);
+    foreach ($locations as $location) {
+        $maps[] = ['id' => 'l' . $location['location_id'], 'text' => $location['location']];
+    }
+   
     $details = [];
     // Get alert transport configuration details
     foreach (json_decode($transport['transport_config'], true) as $key => $value) {
@@ -50,6 +67,7 @@ if (is_array($transport)) {
         'start_timerange_hr' => ($transport['start_hr'] == null) ? '' : $transport['start_hr'],
         'invert_map' => ($transport['invert_map'] == true) ? true : false,
         'day' => ($transport['day'] == null) ? '' : $transport['day'],
+        'maps' => $maps,
     ]));
 } else {
     die(json_encode([
