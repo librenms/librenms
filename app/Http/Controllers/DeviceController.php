@@ -71,13 +71,7 @@ class DeviceController extends Controller
 
         if ($current_tab == 'port') {
             $vars = Url::parseLegacyPath($request->path());
-            $port = Port::findOrFail($vars->get('port'));
-
-            // This prevents users from traversal device id's by piggybacking on the auth for the specified port
-            if ($port->device_id !== $device_id) {
-                abort(404);
-            }
-
+            $port = $device->ports()->findOrFail($vars->get('port'));
             $this->authorize('view', $port);
         } else {
             $this->authorize('view', $device);
