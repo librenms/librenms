@@ -23,10 +23,8 @@ if (Config::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
         // Added By Oirbsiu
         // To correct Interface names that use escaped '/' e.g. GigabitEthernet0_4_0_12
         // and translate the underscore back to a slash - e.g. GigabitEthernet0/4/0/12
-        $patern = "/((Gigabit)Ethernet)([0-9]+)_+/";
-        if (preg_match($patern, $pw['cpwVcName'])) {
-                $pw['cpwVcName'] = preg_replace('/_/', '/', $pw['cpwVcName']);
-        }
+        // Thank you @murrant
+        $pw['cpwVcName'] = preg_replace('/(?<=\d)_(?=\d)/', '/', $pw['cpwVcName']);
         // END
 
         list($cpw_remote_id) = explode(':', $pw['cpwVcMplsPeerLdpID']);
