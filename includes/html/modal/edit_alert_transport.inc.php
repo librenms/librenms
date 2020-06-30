@@ -66,10 +66,14 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="0" />Su</label></div>
                                 </div>
                             </div>
-                            <div class="form-group">
-                                 <label for='maps' class='col-sm-3 col-md-2 control-label'>Map To <exp>*</exp>: </label>
-                                <div class="col-sm-8">
+                            <div class="form-group form-inline">
+                                 <label for='maps' class='col-sm-3 col-md-2 control-label'>Match devices, groups and locations list <exp>*</exp>: </label>
+                                    <div class="col-sm-7" style="width: 56%;">
                                     <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
+                                </div>
+                                <div>
+                                    <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list: </label>
+                                    <input type='checkbox' name='invert_map' id='invert_map'>
                                 </div>
                             </div>
                         </div>
@@ -275,7 +279,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                     $field.val(config.value);
                 }
             });
-            var recdayupd = val(transport.days);
+            var recdayupd = transport.day;
             if (recdayupd){
                 var arrayrecdayupd = recdayupd.split(',');
                 $.each(arrayrecdayupd, function(indexcheckedday, checkedday){
@@ -283,6 +287,33 @@ if (Auth::user()->hasGlobalAdmin()) {
                 });
             }else{
                 $('#timerange_day').prop('checked', false);
+            }
+            var $maps = $('#maps');
+            $maps.empty();
+            $maps.val(null).trigger('change'); // clear
+            if (transport.maps == null) {
+                // collection rule
+                setTransportDevice()
+            } else {
+                $.each(rule.maps, function(index, value) {
+                    var option = new Option(value.text, value.id, true, true);
+                    $maps.append(option).trigger('change')
+                });
+            }
+            if (transport.invert_map == 1) {
+                $("#invert_map").bootstrapSwitch('state', true);
+            }else{
+                $("#invert_map").bootstrapSwitch('state', false);
+            }
+        }
+        
+        function setTransportDevice() {
+            // pre-populate device in the maps if this is a per-device rule
+            var device_id = $('#device_id').val();
+            if (device_id > 0) {
+                var device_name = $('#device_name').val();
+                var option = new Option(device_name, device_id, true, true);
+                $('#maps').append(option).trigger('change')
             }
         }
 

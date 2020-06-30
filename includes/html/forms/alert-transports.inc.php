@@ -49,6 +49,13 @@ $timerange = mres($vars['timerange']);
 $start_hr = mres($vars['start_timerange_hr']);
 $end_hr = mres($vars['end_timerange_hr']);
 $timerange_day = mres($vars['timerange_day']);
+$invert_map   = mres(isset($_POST['invert_map']) ? $_POST['invert_map'] : null);
+
+if ($invert_map == 'on') {
+    $invert_map = true;
+} else {
+    $invert_map = false;
+}
 
 if (empty($name)) {
     $status = 'error';
@@ -61,7 +68,8 @@ if (empty($name)) {
     $details = array(
         'transport_name' => $name,
         'is_default' => $is_default,
-        'timerange' => $timerange
+        'timerange' => $timerange,
+        'invert_map' => $invert_map
     );
 
     if (!in_array($timerange, array(0,1))) {
@@ -155,6 +163,26 @@ if (empty($name)) {
         $status = 'error';
         $message = $message;
     }
+}
+
+// update maps
+if (is_numeric($transport_id) && $transport_id > 0) {
+    $devices = [];
+    $groups = [];
+    $locations = [];
+    foreach ((array)$vars['maps'] as $item) {
+        if (Str::startsWith($item, 'l')) {
+            $locations[] = (int)substr($item, 1);
+        } elseif (Str::startsWith($item, 'g')) {
+            $groups[] = (int)substr($item, 1);
+        } else {
+            $devices[] = (int)$item;
+        }
+    }
+
+    dbSyncRelationship('transport_device_map', 'transport_id', $transport_id, 'device_id', $devices);
+    dbSyncRelationship('transport_group_map', 'transport_id', $transport_id, 'group_id', $groups);
+    dbSyncRelationship('transport_location_map', 'transport_id', $transport_id, 'location_id', $locations);
 }
 
 die(json_encode([
