@@ -317,12 +317,11 @@ architecture then the following steps should be all that's needed:
   librenms -u root -p > librenms.sql`)...
 - and import it into your new server (`mysql -u root -p librenms < librenms.sql`).
 - Copy the `rrd/` folder to the new server.
-- Copy the `config.php` file to the new server.
+- Copy the `.env` and `config.php` files to the new server.
 - Check for modified files (eg specific os, ...) with `git status` and 
   migrate them.
 - Ensure ownership of the copied files and folders (substitute your
-  user if necessary) - `chown -R librenms:librenms rrd/; chown
-  librenms:librenms config.php`
+  user if necessary) - `chown -R librenms:librenms /opt/librenms`
 - Delete old pollers on the GUI (gear icon --> Pollers --> Pollers)
 - Validate your installation (/opt/librenms/validate.php)
 - Re-enable cron by uncommenting all lines in `/etc/cron.d/librenms`
