@@ -107,7 +107,6 @@ if (isset($options['f'])) {
 // Now use the saved data to update the saved database data
 $snmpsim = new Snmpsim();
 $snmpsim->fork();
-sleep(180);
 $snmpsim_ip = $snmpsim->getIp();
 $snmpsim_port = $snmpsim->getPort();
 
