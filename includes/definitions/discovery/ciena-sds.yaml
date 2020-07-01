@@ -13,7 +13,7 @@ modules:
                 value: wwpLeosSystemCpuUtilizationLast5Seconds
                 num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.1.{{ $index }}'
                 descr: 'CPU Utilization 5'
-                index: wwpLeosSystemCpuUtilizationLast5Seconds.{{ $index }}
+                index: .1.3.6.1.4.1.6141.2.60.12.1.11.1.{{ $index }}
                 group: 'CPU Utilization'
                 snmp_flags: '-OQUsbe'
                 #low_limit: wwpLeosSystemCpuUtilizationLast5SecondsMinimum
@@ -23,7 +23,7 @@ modules:
                 value: wwpLeosSystemCpuUtilizationLast10Seconds
                 num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.5.{{ $index }}'
                 descr: 'CPU Utilization 10'
-                index: wwpLeosSystemCpuUtilizationLast10Seconds.{{ $index }}
+                index: .1.3.6.1.4.1.6141.2.60.12.1.11.5.{{ $index }}
                 group: 'CPU Utilization'
                 #low_limit: wwpLeosSystemCpuUtilizationLast10SecondsMinimum
                 #high_limit: wwpLeosSystemCpuUtilizationLast10SecondsMaximum
@@ -32,7 +32,7 @@ modules:
                 value: wwpLeosSystemCpuUtilizationLast60Seconds
                 num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.9.{{ $index }}'
                 descr: 'CPU Utilization 60'
-                index: wwpLeosSystemCpuUtilizationLast60Seconds.{{ $index }}
+                index: .1.3.6.1.4.1.6141.2.60.12.1.11.9.{{ $index }}
                 group: 'CPU Utilization'
                 #low_limit: wwpLeosSystemCpuUtilizationLast60SecondsMinimum
                 #high_limit: wwpLeosSystemCpuUtilizationLast60SecondsMaximum
