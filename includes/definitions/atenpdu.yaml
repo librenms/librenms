@@ -11,13 +11,11 @@ over:
     - { graph: device_power, text: Power }
 poller_modules:
     applications: false
-    availability: true
     bgp-peers: false
     ipmi: false
     mempools: false
     mpls: false
     ntp: false
-    os: true
     ospf: false
     ports: false
     sensors: true
@@ -30,7 +28,6 @@ discovery_modules:
     cisco-pw: false
     cisco-cef: false
     cisco-sla: false
-    cisco-cbqos: false
     cisco-otv: false
     cisco-qfp: false
     fdb-table: false
@@ -42,7 +39,6 @@ discovery_modules:
     ports: false
     ports-stack: false
     processors: false
-    route: false
     sensors: true
     storage: false
     stp: false
