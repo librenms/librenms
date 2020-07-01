@@ -180,10 +180,6 @@ return [
             'description' => 'LDAP Benutzerfilter',
             'help' => 'Active Directory LDAP Filter zur Auswahl von Benutzern'
         ],
-        'auth_ad_url' => [
-            'description' => 'Active Directory Server(s)',
-            'help' => 'ldaps://dc1.example.com ldaps://dc2.example.com'
-        ],
         'auth_ldap_attr' => [
             'uid' => [
                 'description' => 'Attribute zur Prüfung von Benutzernamen',
