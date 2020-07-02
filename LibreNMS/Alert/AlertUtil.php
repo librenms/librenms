@@ -69,7 +69,7 @@ class AlertUtil
             )";
 
         $now = CarbonImmutable::now('UTC');
-        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= \"" . $now->toTimeString() . "\" AND at.end_hr >= \"" . $now->toTimeString() . "\" AND at.day LIKE \"" . $now->format('%N%') . "\"))";
+        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= '" . $now->toTimeString() . "' AND at.end_hr >= '" . $now->toTimeString() . "' AND at.day LIKE '" . $now->format('%N%') . "'))";
 
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
             FROM alert_transport_map AS atm
@@ -109,7 +109,7 @@ class AlertUtil
             )";
 
         $now = CarbonImmutable::now('UTC');
-        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= \"" . $now->toTimeString() . "\" AND at.end_hr >= \"" . $now->toTimeString() . "\" AND at.day LIKE \"" . $now->format('%N%') . "\"))";
+        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= '" . $now->toTimeString() . "' AND at.end_hr >= '" . $now->toTimeString() . "' AND at.day LIKE '" . $now->format('%N%') . "'))";
 
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports as at
