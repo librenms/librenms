@@ -153,16 +153,6 @@ alert_transport_map:
     - { Field: target_type, Type: varchar(16), 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-alert_transport_timerange_map:
-  Columns:
-    - { Field: item_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: mapto_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: transport_mapto_type, Type: varchar(255), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [item_id], Unique: true, Type: BTREE }
-    schedulable_morph_index: { Name: schedulable_morph_index, Columns: [transport_mapto_type, mapto_id], Unique: false, Type: BTREE }
-    transport_id: { Name: transport_id, Columns: [transport_id], Unique: false, Type: BTREE }
 api_tokens:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
