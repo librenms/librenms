@@ -53,12 +53,47 @@ class AlertUtil
      * @param $alert_id
      * @return array
      */
-    public static function getAlertTransports($alert_id)
+    public static function getAlertTransports($alert_id, $device_id)
     {
     // A MODIFIER
-        $query = "SELECT b.transport_id, b.transport_type, b.transport_name FROM alert_transport_map AS a LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id WHERE a.target_type='single' AND a.rule_id=? UNION DISTINCT SELECT d.transport_id, d.transport_type, d.transport_name FROM alert_transport_map AS a LEFT JOIN alert_transport_groups AS b ON a.transport_or_group_id=b.transport_group_id LEFT JOIN transport_group_transport AS c ON b.transport_group_id=c.transport_group_id LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id WHERE a.target_type='group' AND a.rule_id=?";
+        $query = "SELECT b.transport_id, b.transport_type, b.transport_name
+        FROM alert_transport_map AS a
+        LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id
+        WHERE a.target_type='single' AND a.rule_id=? AND b.transport_id IN (
+            SELECT DISTINCT at.transport_id FROM alert_transports at
+            LEFT JOIN alert_device_map d ON at.id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
+            LEFT JOIN alert_group_map g ON at.id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
+            LEFT JOIN alert_location_map l ON at.id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
+            LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
+            WHERE at.disabled = 0 AND (
+                (d.device_id IS NULL AND g.group_id IS NULL)
+                OR (at.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
+                OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
+            )
+        )
+        UNION DISTINCT
+        SELECT d.transport_id, d.transport_type, d.transport_name
+        FROM alert_transport_map AS a
+        LEFT JOIN alert_transport_groups AS b ON a.transport_or_group_id=b.transport_group_id
+        LEFT JOIN transport_group_transport AS c ON b.transport_group_id=c.transport_group_id
+        LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id
+        WHERE a.target_type='group' AND a.rule_id=? AND d.transport_id IN (
+            SELECT DISTINCT at.transport_id FROM alert_transports at
+            LEFT JOIN alert_device_map d ON at.id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
+            LEFT JOIN alert_group_map g ON at.id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
+            LEFT JOIN alert_location_map l ON at.id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
+            LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
+            WHERE at.disabled = 0 AND (
+                (d.device_id IS NULL AND g.group_id IS NULL)
+                OR (at.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
+                OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
+            )
+        )";
+
         $rule_id = self::getRuleId($alert_id);
-        return dbFetchRows($query, [$rule_id, $rule_id]);
+        $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
+                   $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];];
+        return dbFetchRows($query, $params);
     }
 
     /**
@@ -67,10 +102,23 @@ class AlertUtil
      *
      * @return array
      */
-    public static function getDefaultAlertTransports()
+    public static function getDefaultAlertTransports($device_id)
     {
     // A MODIFIER
-        $query = "SELECT transport_id, transport_type, transport_name FROM alert_transports WHERE is_default=true";
+        $query = "SELECT transport_id, transport_type, transport_name
+            FROM alert_transports
+            WHERE is_default=true AND transport_id IN (
+                SELECT DISTINCT at.transport_id FROM alert_transports at
+                LEFT JOIN alert_device_map d ON at.id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
+                LEFT JOIN alert_group_map g ON at.id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
+                LEFT JOIN alert_location_map l ON at.id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
+                LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
+                WHERE at.disabled = 0 AND (
+                    (d.device_id IS NULL AND g.group_id IS NULL)
+                    OR (at.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
+                    OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
+                )
+            )";
         return dbFetchRows($query);
     }
 
