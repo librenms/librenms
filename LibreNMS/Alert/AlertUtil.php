@@ -92,7 +92,7 @@ class AlertUtil
 
         $rule_id = self::getRuleId($alert_id);
         $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
-                   $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];];
+                   $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
         return dbFetchRows($query, $params);
     }
 
