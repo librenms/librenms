@@ -1896,10 +1896,34 @@ toner:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [toner_id], Unique: true, Type: BTREE }
     toner_device_id_index: { Name: toner_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+transport_device_map:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    transport_device_map_transport_id_device_id_unique: { Name: transport_device_map_transport_id_device_id_unique, Columns: [transport_id, device_id], Unique: true, Type: BTREE }
+transport_group_map:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    transport_group_map_transport_id_group_id_unique: { Name: transport_group_map_transport_id_group_id_unique, Columns: [transport_id, group_id], Unique: true, Type: BTREE }
 transport_group_transport:
   Columns:
     - { Field: transport_group_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+transport_location_map:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: transport_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: location_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    transport_location_map_transport_id_location_id_uindex: { Name: transport_location_map_transport_id_location_id_uindex, Columns: [transport_id, location_id], Unique: true, Type: BTREE }
 ucd_diskio:
   Columns:
     - { Field: diskio_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
