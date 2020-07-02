@@ -45,7 +45,7 @@ if (is_numeric($transport_id) && $transport_id > 0) {
     foreach ($locations as $location) {
         $maps[] = ['id' => 'l' . $location['location_id'], 'text' => $location['location']];
     }
-   
+
     $details = [];
     // Get alert transport configuration details
     foreach (json_decode($transport['transport_config'], true) as $key => $value) {

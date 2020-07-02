@@ -305,7 +305,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 });
             }
         }
-        
+
         function setTransportDevice() {
             // pre-populate device in the maps if this is a per-device rule
             var device_id = $('#device_id').val();
