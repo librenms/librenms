@@ -79,23 +79,4 @@ class AlertScheduleController extends TableController
             'status' => $schedule->status,
         ];
     }
-
-//    /**
-//     * @param Request $request
-//     * @param Builder $query
-//     * @return Builder
-//     */
-//    protected function sort($request, $query)
-//    {
-//        $columns = $this->sortFields($request);
-//        $sort = $request->get('sort', $this->default_sort);
-//
-//        foreach ($sort as $column => $direction) {
-//            if (isset($columns[$column])) {
-//                $query->orderBy($columns[$column], $direction == 'desc' ? 'desc' : 'asc');
-//            }
-//        }
-//
-//        return $query;
-//    }
 }
