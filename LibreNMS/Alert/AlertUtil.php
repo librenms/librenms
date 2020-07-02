@@ -84,8 +84,10 @@ class AlertUtil
             WHERE atm.target_type='group' AND atm.rule_id=? AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
 
         $rule_id = self::getRuleId($alert_id);
-        $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $now->toTimeString(), $now->toTimeString(), $now->format('%N%'), 
-                   $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $now->toTimeString(), $now->toTimeString(), $now->format('%N%')];
+        $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
+                   $now->toTimeString(), $now->toTimeString(), $now->format('%N%'),
+                   $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
+                   $now->toTimeString(), $now->toTimeString(), $now->format('%N%')];
         return dbFetchRows($query, $params);
     }
 
@@ -114,7 +116,8 @@ class AlertUtil
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports as at
             WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
-        $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
+        $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
+                   $now->toTimeString(), $now->toTimeString(), $now->format('%N%')];
         return dbFetchRows($query, $params);
     }
 
