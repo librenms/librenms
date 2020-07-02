@@ -68,7 +68,7 @@ class AlertUtil
                 OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
             )";
 
-        $now = CarbonImmutable::now('UTC');
+        $now = CarbonImmutable::now(config('app.timezone'));
         $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= ? AND at.end_hr >= ? AND at.day LIKE ?))";
 
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
@@ -110,7 +110,7 @@ class AlertUtil
                 OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
             )";
 
-        $now = CarbonImmutable::now('UTC');
+        $now = CarbonImmutable::now(config('app.timezone'));
         $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= ? AND at.end_hr >= ? AND at.day LIKE ?))";
 
         $query = "SELECT transport_id, transport_type, transport_name
