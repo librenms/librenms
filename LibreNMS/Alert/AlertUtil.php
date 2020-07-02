@@ -69,7 +69,7 @@ class AlertUtil
             )";
 
         $now = CarbonImmutable::now('UTC');
-        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= '" . $now->toTimeString() . "' AND at.end_hr >= '" . $now->toTimeString() . "' AND at.day LIKE '" . $now->format('%N%') . "'))";
+        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <= ? AND at.end_hr >= ? AND at.day LIKE ?))";
 
         $query = "SELECT at.transport_id, at.transport_type, at.transport_name
             FROM alert_transport_map AS atm
@@ -84,8 +84,8 @@ class AlertUtil
             WHERE atm.target_type='group' AND atm.rule_id=? AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
 
         $rule_id = self::getRuleId($alert_id);
-        $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
-                   $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
+        $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $now->toTimeString(), $now->toTimeString(), $now->format('%N%'), 
+                   $rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $now->toTimeString(), $now->toTimeString(), $now->format('%N%')];
         return dbFetchRows($query, $params);
     }
 
