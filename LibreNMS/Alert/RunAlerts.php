@@ -539,7 +539,7 @@ class RunAlerts
         }
 
         if (count($transport_maps) === 0) {
-            echo 'No configured transports';
+            echo 'No matched transports';
         }
     }
 
