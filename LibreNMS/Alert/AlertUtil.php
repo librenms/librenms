@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Alert;
 
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use App\Models\Device;
 use App\Models\User;
 use DeviceCache;
@@ -55,7 +57,6 @@ class AlertUtil
      */
     public static function getAlertTransports($alert_id, $device_id)
     {
-        
         $query_mapto = "SELECT DISTINCT at.transport_id FROM alert_transports at
             LEFT JOIN transport_device_map d ON at.transport_id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
             LEFT JOIN transport_group_map g ON at.transport_id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
@@ -67,17 +68,20 @@ class AlertUtil
                 OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
             )";
 
-        $query = "SELECT b.transport_id, b.transport_type, b.transport_name
-        FROM alert_transport_map AS a
-        LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id
-        WHERE a.target_type='single' AND a.rule_id=? AND b.transport_id IN (" . $query_mapto . ")
-        UNION DISTINCT
-        SELECT d.transport_id, d.transport_type, d.transport_name
-        FROM alert_transport_map AS a
-        LEFT JOIN alert_transport_groups AS b ON a.transport_or_group_id=b.transport_group_id
-        LEFT JOIN transport_group_transport AS c ON b.transport_group_id=c.transport_group_id
-        LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id
-        WHERE a.target_type='group' AND a.rule_id=? AND d.transport_id IN (" . $query_mapto . ")";
+        $now = CarbonImmutable::now('UTC');
+        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <=> " . $now->toTimeString() . " at.end_hr >= " . $now->toTimeString() . " AND at.day LIKE " . $now->format('%N%') . "))";
+
+        $query = "SELECT at.transport_id, at.transport_type, at.transport_name
+            FROM alert_transport_map AS atm
+            LEFT JOIN alert_transports AS at ON at.transport_id=atm.transport_or_group_id
+            WHERE atm.target_type='single' AND atm.rule_id=? AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time . "
+            UNION DISTINCT
+            SELECT at.transport_id, at.transport_type, at.transport_name
+            FROM alert_transport_map AS atm
+            LEFT JOIN alert_transport_groups AS atg ON atm.transport_or_group_id=atg.transport_group_id
+            LEFT JOIN transport_group_transport AS tgt ON atg.transport_group_id=tgt.transport_group_id
+            LEFT JOIN alert_transports AS at ON tgt.transport_id=at.transport_id
+            WHERE atm.target_type='group' AND atm.rule_id=? AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
 
         $rule_id = self::getRuleId($alert_id);
         $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
@@ -93,20 +97,23 @@ class AlertUtil
      */
     public static function getDefaultAlertTransports($device_id)
     {
-        $query = "SELECT transport_id, transport_type, transport_name
-            FROM alert_transports
-            WHERE is_default=true AND transport_id IN (
-                SELECT DISTINCT at.transport_id FROM alert_transports at
-                LEFT JOIN transport_device_map d ON at.transport_id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
-                LEFT JOIN transport_group_map g ON at.transport_id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
-                LEFT JOIN transport_location_map l ON at.transport_id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
-                LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
-                WHERE (
-                    (d.device_id IS NULL AND g.group_id IS NULL)
-                    OR (at.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
-                    OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
-                )
+        $query_mapto = "SELECT DISTINCT at.transport_id FROM alert_transports at
+            LEFT JOIN transport_device_map d ON at.transport_id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
+            LEFT JOIN transport_group_map g ON at.transport_id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
+            LEFT JOIN transport_location_map l ON at.transport_id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
+            LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
+            WHERE (
+                (d.device_id IS NULL AND g.group_id IS NULL)
+                OR (at.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
+                OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
             )";
+
+        $now = CarbonImmutable::now('UTC');
+        $where_time = "(at.timerange = 0 OR (at.timerange = 1 AND at.start_hr <=> " . $now->toTimeString() . " at.end_hr >= " . $now->toTimeString() . " AND at.day LIKE " . $now->format('%N%') . "))";
+
+        $query = "SELECT transport_id, transport_type, transport_name
+            FROM alert_transports as at
+            WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
         $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id];
         return dbFetchRows($query, $params);
     }
