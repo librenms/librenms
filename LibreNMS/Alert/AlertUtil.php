@@ -61,11 +61,11 @@ class AlertUtil
         LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id
         WHERE a.target_type='single' AND a.rule_id=? AND b.transport_id IN (
             SELECT DISTINCT at.transport_id FROM alert_transports at
-            LEFT JOIN alert_device_map d ON at.id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
-            LEFT JOIN alert_group_map g ON at.id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
-            LEFT JOIN alert_location_map l ON at.id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
+            LEFT JOIN transport_device_map d ON at.transport_id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
+            LEFT JOIN transport_group_map g ON at.transport_id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
+            LEFT JOIN transport_location_map l ON at.transport_id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
             LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
-            WHERE at.disabled = 0 AND (
+            WHERE (
                 (d.device_id IS NULL AND g.group_id IS NULL)
                 OR (at.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
                 OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
@@ -79,11 +79,11 @@ class AlertUtil
         LEFT JOIN alert_transports AS d ON c.transport_id=d.transport_id
         WHERE a.target_type='group' AND a.rule_id=? AND d.transport_id IN (
             SELECT DISTINCT at.transport_id FROM alert_transports at
-            LEFT JOIN alert_device_map d ON at.id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
-            LEFT JOIN alert_group_map g ON at.id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
-            LEFT JOIN alert_location_map l ON at.id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
+            LEFT JOIN transport_device_map d ON at.transport_id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
+            LEFT JOIN transport_group_map g ON at.transport_id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
+            LEFT JOIN transport_location_map l ON at.transport_id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
             LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
-            WHERE at.disabled = 0 AND (
+            WHERE (
                 (d.device_id IS NULL AND g.group_id IS NULL)
                 OR (at.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
                 OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
@@ -109,11 +109,11 @@ class AlertUtil
             FROM alert_transports
             WHERE is_default=true AND transport_id IN (
                 SELECT DISTINCT at.transport_id FROM alert_transports at
-                LEFT JOIN alert_device_map d ON at.id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
-                LEFT JOIN alert_group_map g ON at.id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
-                LEFT JOIN alert_location_map l ON at.id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
+                LEFT JOIN transport_device_map d ON at.transport_id=d.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND d.device_id = ?)
+                LEFT JOIN transport_group_map g ON at.transport_id=g.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND g.group_id IN (SELECT DISTINCT device_group_id FROM device_group_device WHERE device_id = ?))
+                LEFT JOIN transport_location_map l ON at.transport_id=l.transport_id AND (at.invert_map = 0 OR at.invert_map = 1 AND l.location_id IN (SELECT DISTINCT location_id FROM devices WHERE device_id = ?))
                 LEFT JOIN device_group_device dg ON g.group_id=dg.device_group_id AND dg.device_id = ?
-                WHERE at.disabled = 0 AND (
+                WHERE (
                     (d.device_id IS NULL AND g.group_id IS NULL)
                     OR (at.invert_map = 0 AND (d.device_id=? OR dg.device_id=?))
                     OR (at.invert_map = 1  AND (d.device_id != ? OR d.device_id IS NULL) AND (dg.device_id != ? OR dg.device_id IS NULL))
