@@ -66,15 +66,15 @@ if (Auth::user()->hasGlobalAdmin()) {
                                     <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="0" />Su</label></div>
                                 </div>
                             </div>
-                            <div class="form-group form-inline">
-                                 <label for='maps' class='col-sm-3 col-md-2 control-label'>Match devices, groups and locations list <exp>*</exp>: </label>
-                                    <div class="col-sm-7" style="width: 56%;">
-                                    <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
-                                </div>
-                                <div>
-                                    <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list: </label>
-                                    <input type='checkbox' name='invert_map' id='invert_map'>
-                                </div>
+                        </div>
+                        <div class="form-group form-inline">
+                             <label for='maps' class='col-sm-3 col-md-2 control-label'>Match devices, groups and locations list <exp>*</exp>: </label>
+                                <div class="col-sm-7" style="width: 56%;">
+                                <select id="maps" name="maps[]" class="form-control" multiple="multiple"></select>
+                            </div>
+                            <div>
+                                <label for='invert_map' class='col-md-1' style="width: 14.1333%;" text-align="left" title="If ON, alert rule check will run on all devices except the selected devices and groups.">All devices except in list: </label>
+                                <input type='checkbox' name='invert_map' id='invert_map'>
                             </div>
                         </div>
                         <div class="form-group" title="The type of transport.">

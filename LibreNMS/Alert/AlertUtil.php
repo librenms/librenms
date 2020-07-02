@@ -55,7 +55,6 @@ class AlertUtil
      */
     public static function getAlertTransports($alert_id, $device_id)
     {
-    // A MODIFIER
         $query = "SELECT b.transport_id, b.transport_type, b.transport_name
         FROM alert_transport_map AS a
         LEFT JOIN alert_transports AS b ON b.transport_id=a.transport_or_group_id
@@ -104,7 +103,6 @@ class AlertUtil
      */
     public static function getDefaultAlertTransports($device_id)
     {
-    // A MODIFIER
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports
             WHERE is_default=true AND transport_id IN (
