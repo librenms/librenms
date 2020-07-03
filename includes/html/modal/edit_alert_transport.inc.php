@@ -43,19 +43,19 @@ if (Auth::user()->hasGlobalAdmin()) {
                         </div>
                         <div id="timerangegroup" style="display:none;">
                             <div class="form-group">
-                                <label for="start_hr" class="col-sm-3 col-md-2 control-label">Start hour <exp>*</exp>: </label>
+                                <label for="start_hr" class="col-sm-3 col-md-2 control-label">Start time <exp>*</exp>: </label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control date" id="start_timerange_hr" name="start_timerange_hr" value="" data-date-format="HH:mm">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="end_hr" class="col-sm-3 col-md-2 control-label">End hour <exp>*</exp>: </label>
+                                <label for="end_hr" class="col-sm-3 col-md-2 control-label">End time <exp>*</exp>: </label>
                                 <div class="col-sm-8">
                                     <input type="text" class="form-control date" id="end_timerange_hr" name="end_timerange_hr" value="" data-date-format="HH:mm">
                                 </div>
                             </div>
                             <div class="form-group">
-                                <label for="timerange_day" class="col-sm-3 col-md-2 control-label">Only on weekday: </label>
+                                <label for="timerange_day" class="col-sm-3 col-md-2 control-label">Only on day: </label>
                                 <div class="col-sm-8">
                                     <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="1" />Mo</label></div>
                                     <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" id="timerange_day" name="timerange_day[]" value="2" />Tu</label></div>

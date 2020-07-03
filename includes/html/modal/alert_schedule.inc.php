@@ -79,19 +79,19 @@ if (\Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="start_recurring_hr" class="col-sm-4 control-label">Start hour <exp>*</exp>: </label>
+                            <label for="start_recurring_hr" class="col-sm-4 control-label">Start time <exp>*</exp>: </label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control date" id="start_recurring_hr" name="start_recurring_hr" value="" data-date-format="HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="end_recurring_hr" class="col-sm-4 control-label">End hour <exp>*</exp>: </label>
+                            <label for="end_recurring_hr" class="col-sm-4 control-label">End time <exp>*</exp>: </label>
                             <div class="col-sm-8">
                                 <input type="text" class="form-control date" id="end_recurring_hr" name="end_recurring_hr" value="" data-date-format="HH:mm">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="recurring_day" class="col-sm-4 control-label">Only on weekday: </label>
+                            <label for="recurring_day" class="col-sm-4 control-label">Only on day: </label>
                             <div class="col-sm-8">
                                 <div style="float: left;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="1" />Mo</label></div>
                                 <div style="float: left;padding-left: 20px;"><label><input type="checkbox" style="width: 20px;" class="form-control" name="recurring_day[]" value="2" />Tu</label></div>
