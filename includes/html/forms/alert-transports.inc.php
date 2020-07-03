@@ -155,6 +155,7 @@ if (empty($name)) {
                 $where = '`transport_id`=?';
                 dbDelete('alert_transports', $where, [$transport_id]);
             }
+
             // update maps
             if (is_numeric($transport_id) && $transport_id > 0) {
                 $devices = [];
@@ -169,7 +170,7 @@ if (empty($name)) {
                         $devices[] = (int)$item;
                     }
                 }
-            
+
                 dbSyncRelationship('transport_device_map', 'transport_id', $transport_id, 'device_id', $devices);
                 dbSyncRelationship('transport_group_map', 'transport_id', $transport_id, 'group_id', $groups);
                 dbSyncRelationship('transport_location_map', 'transport_id', $transport_id, 'location_id', $locations);
