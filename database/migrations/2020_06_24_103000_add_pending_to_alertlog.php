@@ -14,10 +14,10 @@ class AddpendingToAlertlog extends Migration
     public function up()
     {
         Schema::table('alert_log', function (Blueprint $table) {
-            $table->boolean('pending')->default(0);
+            $table->boolean('pending')->default(1);
         });
         // retro-compatibility - consider that all previous alert logs lasted longer than alert rule pending
-        \DB::statement("UPDATE alert_log SET pending=1;");
+        \DB::statement("UPDATE alert_log SET pending=0;");
     }
 
     /**
