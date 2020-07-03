@@ -86,7 +86,7 @@ if (empty($name)) {
             $message .= 'Missing end timerange hour<br />';
         }
 
-        if (strtotime($start_hr) >= strtotime($end_hr)){
+        if (strtotime($start_hr) >= strtotime($end_hr)) {
             $message .= 'Start timerange hour should be stricly inferior to end timerange<br />';
         }
 
@@ -101,7 +101,6 @@ if (empty($name)) {
     }
     if (!is_array($vars['maps']) && $invert_map) {
         $message .= 'Invert map is on but no selection in devices, groups and locations match list<br />';
-
     }
     if (empty($message)) {
         if (is_numeric($transport_id) && $transport_id > 0) {
