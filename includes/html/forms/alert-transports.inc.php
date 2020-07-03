@@ -91,13 +91,12 @@ if (empty($name)) {
         } else {
             $timerange_day = null;
         }
-
-        if (!is_array($vars['maps'])) {
-            $message .= 'Not mapped to any groups or devices<br />';
-        }
         $details['start_hr'] = $start_hr;
         $details['end_hr'] = $end_hr;
         $details['day'] = $timerange_day;
+    }
+    if (!is_array($vars['maps']) && $invert_map) {
+        $message .= 'Invert map is on but no selection in devices, groups and locations match list<br />';
     }
     if (empty($message)) {
         if (is_numeric($transport_id) && $transport_id > 0) {
