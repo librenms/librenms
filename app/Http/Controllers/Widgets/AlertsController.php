@@ -42,7 +42,7 @@ class AlertsController extends WidgetController
         'location' => 1,
         'sort' => 1,
         'hidenavigation' => 0,
-        'delay_filter' => '',
+        'pending_filter' => '',
     ];
 
     public function getView(Request $request)

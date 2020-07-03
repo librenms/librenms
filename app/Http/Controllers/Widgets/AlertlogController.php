@@ -36,7 +36,7 @@ class AlertlogController extends WidgetController
         'state' => -1,
         'min_severity' => null,
         'hidenavigation' => 0,
-        'delay_filter' => '',
+        'pending_filter' => '',
     ];
 
     public function getView(Request $request)

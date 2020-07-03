@@ -1306,19 +1306,19 @@ function get_sql_filter_min_severity($min_severity, $table_name)
  * @return string
  */
 
-function get_sql_filter_alert_rule_delay($delay_filter, $table_name)
+function get_sql_filter_alert_rule_pending($pending_filter, $table_name)
 {
-    $alert_delay_filters = array(
-        'no' => 0,
-        'yes' => 1,
+    $alert_pending_filters = array(
+        'no' => 1,
+        'yes' => 0,
     );
-    if (is_numeric($delay_filter)) {
-        $delay_filter_num = $delay_filter;
-    } elseif (!empty($delay_filter)) {
-        $delay_filter_num = $alert_delay_filters[$delay_filter];
+    if (is_numeric($pending_filter)) {
+        $pending_filter_num = $pending_filter;
+    } elseif (!empty($pending_filter)) {
+        $pending_filter_num = $alert_pending_filters[$pending_filter];
     }
-    if (isset($delay_filter_num)) {
-        return " AND `$table_name`.`delay` = " . $delay_filter_num;
+    if (isset($pending_filter_num)) {
+        return " AND `$table_name`.`pending` = " . $pending_filter_num;
     }
     return "";
 }

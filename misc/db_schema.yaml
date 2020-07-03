@@ -67,7 +67,7 @@ alert_log:
     - { Field: state, Type: int, 'Null': false, Extra: '' }
     - { Field: details, Type: longblob, 'Null': true, Extra: '' }
     - { Field: time_logged, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: delay, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: pending, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     alert_log_device_id_index: { Name: alert_log_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }

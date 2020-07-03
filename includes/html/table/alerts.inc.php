@@ -103,10 +103,10 @@ $sql = "SELECT `alerts`.*, `devices`.`hostname`, `devices`.`sysName`, `devices`.
 $rulei = 0;
 $format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
-    if (isset($vars['delay_filter']) && $vars['delay_filter'] == 1) {
-        $delay = dbFetchCell('SELECT delay FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
-        if ((!is_null($delay)) && $delay == 0) {
-            // skip if alert rule delay is not over
+    if (isset($vars['pending_filter']) && $vars['pending_filter'] == 0) {
+        $pending = dbFetchCell('SELECT pending FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', array($alert['rule_id'], $alert['device_id']));
+        if ((!is_null($pending)) && $pending == 1) {
+            // skip if alert rule pending is not over
             continue;
         }
     }

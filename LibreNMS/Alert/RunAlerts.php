@@ -357,7 +357,7 @@ class RunAlerts
         $alerts = [];
         foreach (dbFetchRows("SELECT alerts.id, alerts.alerted, alerts.device_id, alerts.rule_id, alerts.state, alerts.note, alerts.info FROM alerts WHERE $where") as $alert_status) {
             $alert = dbFetchRow(
-                'SELECT alert_log.id, alert_log.rule_id, alert_log.device_id, alert_log.state, alert_log.details, alert_log.time_logged, alert_log.delay, alert_rules.rule, alert_rules.severity, alert_rules.extra, alert_rules.name, alert_rules.query, alert_rules.builder, alert_rules.proc FROM alert_log, alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
+                'SELECT alert_log.id, alert_log.rule_id, alert_log.device_id, alert_log.state, alert_log.details, alert_log.time_logged, alert_log.pending, alert_rules.rule, alert_rules.severity, alert_rules.extra, alert_rules.name, alert_rules.query, alert_rules.builder, alert_rules.proc FROM alert_log, alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0 ORDER BY alert_log.id DESC LIMIT 1',
                 array($alert_status['device_id'], $alert_status['rule_id'])
             );
 
@@ -426,18 +426,18 @@ class RunAlerts
             } else {
                 // This is the new way
                 if (!empty($rextra['delay']) && (time() - strtotime($alert['time_logged']) + $tolerence_window) < $rextra['delay'] && $alert['state'] != AlertState::RECOVERED) {
-                    // skip if alert rule delay is not over
+                    // skip if alert rule pending is not over
                     continue;
                 }
 
-                if ($alert['state'] != AlertState::RECOVERED && $alert['delay'] == 0) {
-                    $alert['delay'] = 1;
+                if ($alert['state'] != AlertState::RECOVERED && $alert['pending'] == 1) {
+                    $alert['pending'] = 0;
                     $updet = true;
                 }
 
                 if ($alert['state'] == AlertState::RECOVERED) {
-                    $last_delay = dbFetchCell("SELECT delay FROM alert_log WHERE rule_id = ? AND device_id = ? AND alert_log.state != ? ORDER BY time_logged DESC LIMIT 1", array($alert['rule_id'], $alert['device_id'], AlertState::RECOVERED));
-                    $alert['delay'] = (!is_null($last_delay)) ? $last_delay : 0;
+                    $last_pending = dbFetchCell("SELECT pending FROM alert_log WHERE rule_id = ? AND device_id = ? AND alert_log.state != ? ORDER BY time_logged DESC LIMIT 1", array($alert['rule_id'], $alert['device_id'], AlertState::RECOVERED));
+                    $alert['pending'] = (!is_null($last_pending)) ? $last_pending : 1;
                     $updet = true;
                 }
 
@@ -471,7 +471,7 @@ class RunAlerts
             }
 
             if ($updet) {
-                dbUpdate(array('details' => gzcompress(json_encode($alert['details']), 9), 'delay' => $alert['delay']), 'alert_log', 'id = ?', array($alert['id']));
+                dbUpdate(array('details' => gzcompress(json_encode($alert['details']), 9), 'pending' => $alert['pending']), 'alert_log', 'id = ?', array($alert['id']));
             }
 
             if (!empty($rextra['mute'])) {

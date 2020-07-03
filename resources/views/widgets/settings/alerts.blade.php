@@ -68,10 +68,10 @@
         </select>
     </div>
     <div class="form-group">
-        <label for="delay_filter-{{ $id }}" class="control-label">@lang('Rule delay filter - only display confirmed alert on which rule delay is over'):</label>
-        <select class="form-control" name="delay_filter" id="delay_filter-{{ $id }}">
+        <label for="pending_filter-{{ $id }}" class="control-label">@lang('Exclude pending alert'):</label>
+        <select class="form-control" name="pending_filter" id="pending_filter-{{ $id }}">
             <option value="">@lang('No')</option>
-            <option value="1">@lang('Yes')</option>
+            <option value="0">@lang('Yes')</option>
         </select>
     </div>
     <div class="form-group">

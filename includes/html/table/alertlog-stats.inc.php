@@ -31,8 +31,8 @@ if (isset($vars['min_severity'])) {
     $where .=  get_sql_filter_min_severity($vars['min_severity'], "R");
 }
 
-if (isset($vars['delay_filter'])) {
-    $where .=  get_sql_filter_alert_rule_delay($vars['delay_filter'], "E");
+if (isset($vars['pending_filter'])) {
+    $where .=  get_sql_filter_alert_rule_pending($vars['pending_filter'], "E");
 }
 
 if (Auth::user()->hasGlobalRead()) {

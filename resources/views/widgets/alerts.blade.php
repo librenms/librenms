@@ -34,7 +34,7 @@
                 proc: '{{ $proc }}',
                 sort: '{{ $sort }}',
                 device_id: '{{ $device }}',
-                delay_filter: '{{ $delay_filter }}',
+                pending_filter: '{{ $pending_filter }}',
             }
         },
         url: "ajax_table.php",
