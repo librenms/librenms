@@ -290,7 +290,7 @@ GRAPHQL;
         $tmp_markdown .= PHP_EOL;
 
         if (!empty($this->changelog_mergers)) {
-            $tmp_markdown .= "Thanks to maintainers that helped with pull requests this month:" . PHP_EOL . PHP_EOL;
+            $tmp_markdown .= "Thanks to maintainers and others that helped with pull requests this month:" . PHP_EOL . PHP_EOL;
             $tmp_markdown .= $this->formatUserList($this->changelog_mergers) . PHP_EOL;
         }
 
