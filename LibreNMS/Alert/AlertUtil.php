@@ -116,7 +116,7 @@ class AlertUtil
         $query = "SELECT transport_id, transport_type, transport_name
             FROM alert_transports as at
             WHERE at.is_default=true AND at.transport_id IN (" . $query_mapto . ") AND " . $where_time;
-        $params = [$rule_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
+        $params = [$device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id, $device_id,
                    $now->toTimeString(), $now->toTimeString(), $now->format('%N%')];
         return dbFetchRows($query, $params);
     }
