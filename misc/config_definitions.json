@@ -1755,6 +1755,146 @@
             ],
             "type": "array"
         },
+        "graph_colours.generic.area_in": {
+            "default": "90B040",
+            "type": "text"
+        },
+        "graph_colours.generic.area_in_max": {
+            "default": "D7FFC7",
+            "type": "text"
+        },
+        "graph_colours.generic.line_in": {
+            "default": "608720",
+            "type": "text"
+        },
+        "graph_colours.generic.area_out": {
+            "default": "8080C0",
+            "type": "text"
+        },
+        "graph_colours.generic.area_out_max": {
+            "default": "E0E0FF",
+            "type": "text"
+        },
+        "graph_colours.generic.line_out": {
+            "default": "606090",
+            "type": "text"
+        },
+        "graph_colours.generic.percentile_high": {
+            "default": "FF0000",
+            "type": "text"
+        },
+        "graph_colours.generic.percentile_in": {
+            "default": "AA0000",
+            "type": "text"
+        },
+        "graph_colours.generic.percentile_out": {
+            "default": "AA0000",
+            "type": "text"
+        },
+        "graph_colours.generic.lp.in": {
+            "default": "44AA55",
+            "type": "text"
+        },
+        "graph_colours.generic.lp.out": {
+            "default": "4400DD",
+            "type": "text"
+        },
+        "graph_colours.generic.lp.previous.in": {
+            "default": "333300",
+            "type": "text"
+        },
+        "graph_colours.generic.lp.previous.out": {
+            "default": "000099",
+            "type": "text"
+        },
+        "graph_colours.generic.lp.previous.percentile_in": {
+            "default": "00AAAA",
+            "type": "text"
+        },
+        "graph_colours.generic.lp.previous.percentile_out": {
+            "default": "00AAAA",
+            "type": "text"
+        },
+        "graph_colours.ports.upkts.area_in": {
+            "default": "AA66AA",
+            "type": "text"
+        },
+        "graph_colours.ports.upkts.line_in": {
+            "default": "330033",
+            "type": "text"
+        },
+        "graph_colours.ports.upkts.area_out": {
+            "default": "FFDD88",
+            "type": "text"
+        },
+        "graph_colours.ports.upkts.line_out": {
+            "default": "FF6600",
+            "type": "text"
+        },
+        "graph_colours.ports.upkts.area_in_max": {
+            "default": "CC88CC",
+            "type": "text"
+        },
+        "graph_colours.ports.upkts.area_out_max": {
+            "default": "FFEFAA",
+            "type": "text"
+        },
+        "graph_colours.ports.nupkts.area_in": {
+            "default": "AA66AA",
+            "type": "text"
+        },
+        "graph_colours.ports.nupkts.line_in": {
+            "default": "330033",
+            "type": "text"
+        },
+        "graph_colours.ports.nupkts.area_out": {
+            "default": "FFDD88",
+            "type": "text"
+        },
+        "graph_colours.ports.nupkts.line_out": {
+            "default": "FF6600",
+            "type": "text"
+        },
+        "graph_colours.ports.nupkts.area_in_max": {
+            "default": "CC88CC",
+            "type": "text"
+        },
+        "graph_colours.ports.nupkts.area_out_max": {
+            "default": "FFEFAA",
+            "type": "text"
+        },
+        "graph_colours.ports.bpkts.area_in": {
+            "default": "085F63",
+            "type": "text"
+        },
+        "graph_colours.ports.bpkts.area_out": {
+            "default": "49BEB7",
+            "type": "text"
+        },
+        "graph_colours.ports.mpkts.area_in": {
+            "default": "FACF5A",
+             "type": "text"
+        },
+        "graph_colours.ports.mpkts.area_out": {
+            "default": "FF5959",
+            "type": "text"
+        },
+        "graph_colours.ports.err.area_in": {
+            "default": "FF3300",
+            "type": "text"
+        },
+        "graph_colours.ports.err.area_out": {
+            "default": "FF6633",
+            "type": "text"
+        },
+        "graph_colours.ports.dis.area_in": {
+            "default": "805080",
+            "type": "text"
+        },
+        "graph_colours.ports.dis.area_out": {
+            "default": "C0A060",
+            "type": "text"
+        },
         "graph_descr.device_processor": {
             "default": "This is an aggregate graph of all processors in the system.",
             "type": "text"

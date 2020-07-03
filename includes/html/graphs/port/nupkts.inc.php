@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Config;
+
 $rrd_file = get_port_rrdfile_path($device['hostname'], $port['port_id']);
 
 // FIXME uhh..
@@ -16,16 +18,16 @@ if (1) {
     $rrd_list[2]['ds_in']           = 'INBROADCASTPKTS';
     $rrd_list[2]['ds_out']          = 'OUTBROADCASTPKTS';
     $rrd_list[2]['descr']           = 'Broadcast';
-    $rrd_list[2]['colour_area_in']  = '085F63';
-    $rrd_list[2]['colour_area_out'] = '49BEB7';
+    $rrd_list[2]['colour_area_in']  = Config::get('graph_colours.ports.bpkts.area_in');
+    $rrd_list[2]['colour_area_out'] = Config::get('graph_colours.ports.bpkts.area_out');
 
     $rrd_list[4]['filename']        = $rrd_file;
     $rrd_list[4]['descr']           = $int['ifDescr'];
     $rrd_list[4]['ds_in']           = 'INMULTICASTPKTS';
     $rrd_list[4]['ds_out']          = 'OUTMULTICASTPKTS';
     $rrd_list[4]['descr']           = 'Multicast';
-    $rrd_list[4]['colour_area_in']  = 'FACF5A';
-    $rrd_list[4]['colour_area_out'] = 'FF5959';
+    $rrd_list[4]['colour_area_in']  = Config::get('graph_colours.ports.mpkts.area_in');
+    $rrd_list[4]['colour_area_out'] = Config::get('graph_colours.ports.mpkts.area_out');
 
     $units       = '';
     $units_descr = 'Packets';
@@ -43,13 +45,13 @@ if (1) {
     $ds_in  = 'INNUCASTPKTS';
     $ds_out = 'OUTNUCASTPKTS';
 
-    $colour_area_in  = 'AA66AA';
-    $colour_line_in  = '330033';
-    $colour_area_out = 'FFDD88';
-    $colour_line_out = 'FF6600';
+    $colour_area_in  = Config::get('graph_colours.ports.nupkts.area_in');
+    $colour_line_in  = Config::get('graph_colours.ports.nupkts.line_in');
+    $colour_area_out = Config::get('graph_colours.ports.nupkts.area_out');
+    $colour_line_out = Config::get('graph_colours.ports.nupkts.line_out');
 
-    $colour_area_in_max  = 'cc88cc';
-    $colour_area_out_max = 'FFefaa';
+    $colour_area_in_max  = Config::get('graph_colours.ports.nupkts.area_in_max');
+    $colour_area_out_max = Config::get('graph_colours.ports.nupkts.area_out_max');
 
     $unit_text = 'Packets';
 
