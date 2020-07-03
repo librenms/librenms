@@ -409,48 +409,6 @@ if (Auth::user()->hasGlobalAdmin()) {
         });
 
         $(function () {
-            $("#start_timerange_dt").datetimepicker({
-                defaultDate: moment(),
-                minDate: moment().format('YYYY-MM-DD'),
-                icons: {
-                    time: 'fa fa-clock-o',
-                    date: 'fa fa-calendar',
-                    up: 'fa fa-chevron-up',
-                    down: 'fa fa-chevron-down',
-                    previous: 'fa fa-chevron-left',
-                    next: 'fa fa-chevron-right',
-                    today: 'fa fa-calendar-check-o',
-                    clear: 'fa fa-trash-o',
-                    close: 'fa fa-close'
-                }
-            });
-            $("#end_timerange_dt").datetimepicker({
-                minDate: moment().format('YYYY-MM-DD'),
-                icons: {
-                    time: 'fa fa-clock-o',
-                    date: 'fa fa-calendar',
-                    up: 'fa fa-chevron-up',
-                    down: 'fa fa-chevron-down',
-                    previous: 'fa fa-chevron-left',
-                    next: 'fa fa-chevron-right',
-                    today: 'fa fa-calendar-check-o',
-                    clear: 'fa fa-trash-o',
-                    close: 'fa fa-close'
-                }
-            });
-            $("#start_timerange_dt").on("dp.change", function (e) {
-                var $endRecurringDt = $("#end_timerange_dt");
-                var val = $endRecurringDt.val();
-                $endRecurringDt.data("DateTimePicker").minDate(e.date);
-                // work around annoying event interaction
-                if (!val) {
-                    $endRecurringDt.val('');
-                    $("#start_timerange_dt").data("DateTimePicker").maxDate(false);
-                }
-            });
-            $("#end_timerange_dt").on("dp.change", function (e) {
-                $("#start_timerange_dt").data("DateTimePicker").maxDate(e.date);
-            });
             $("#start_timerange_hr").datetimepicker({
                 icons: {
                     time: 'fa fa-clock-o',
@@ -476,12 +434,6 @@ if (Auth::user()->hasGlobalAdmin()) {
                     clear: 'fa fa-trash-o',
                     close: 'fa fa-close'
                 }
-            });
-            $("#start_timerange_hr").on("dp.change", function (e) {
-                $("#end_timerange_hr").data("DateTimePicker").minDate(e.date);
-            });
-            $("#end_timerange_hr").on("dp.change", function (e) {
-                $("#start_timerange_hr").data("DateTimePicker").maxDate(e.date);
             });
         });
     $("[name='timerange']").bootstrapSwitch();

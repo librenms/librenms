@@ -86,6 +86,10 @@ if (empty($name)) {
             $message .= 'Missing end timerange hour<br />';
         }
 
+        if (strtotime($start_hr) >= strtotime($end_hr)){
+            $message .= 'Start timerange hour should be stricly inferior to end timerange<br />';
+        }
+
         if (isset($vars['timerange_day']) && is_array($vars['timerange_day']) && !empty($vars['timerange_day'])) {
             $timerange_day = implode(',', $vars['timerange_day']);
         } else {
