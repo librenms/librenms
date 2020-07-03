@@ -97,6 +97,7 @@ if (empty($name)) {
     }
     if (!is_array($vars['maps']) && $invert_map) {
         $message .= 'Invert map is on but no selection in devices, groups and locations match list<br />';
+
     }
     if (empty($message)) {
         if (is_numeric($transport_id) && $transport_id > 0) {
@@ -154,6 +155,25 @@ if (empty($name)) {
                 $where = '`transport_id`=?';
                 dbDelete('alert_transports', $where, [$transport_id]);
             }
+            // update maps
+            if (is_numeric($transport_id) && $transport_id > 0) {
+                $devices = [];
+                $groups = [];
+                $locations = [];
+                foreach ((array)$vars['maps'] as $item) {
+                    if (Str::startsWith($item, 'l')) {
+                        $locations[] = (int)substr($item, 1);
+                    } elseif (Str::startsWith($item, 'g')) {
+                        $groups[] = (int)substr($item, 1);
+                    } else {
+                        $devices[] = (int)$item;
+                    }
+                }
+            
+                dbSyncRelationship('transport_device_map', 'transport_id', $transport_id, 'device_id', $devices);
+                dbSyncRelationship('transport_group_map', 'transport_id', $transport_id, 'group_id', $groups);
+                dbSyncRelationship('transport_location_map', 'transport_id', $transport_id, 'location_id', $locations);
+            }
         } else {
             $status = 'error';
             $message = 'Failed to update transport';
@@ -162,26 +182,6 @@ if (empty($name)) {
         $status = 'error';
         $message = $message;
     }
-}
-
-// update maps
-if (is_numeric($transport_id) && $transport_id > 0) {
-    $devices = [];
-    $groups = [];
-    $locations = [];
-    foreach ((array)$vars['maps'] as $item) {
-        if (Str::startsWith($item, 'l')) {
-            $locations[] = (int)substr($item, 1);
-        } elseif (Str::startsWith($item, 'g')) {
-            $groups[] = (int)substr($item, 1);
-        } else {
-            $devices[] = (int)$item;
-        }
-    }
-
-    dbSyncRelationship('transport_device_map', 'transport_id', $transport_id, 'device_id', $devices);
-    dbSyncRelationship('transport_group_map', 'transport_id', $transport_id, 'group_id', $groups);
-    dbSyncRelationship('transport_location_map', 'transport_id', $transport_id, 'location_id', $locations);
 }
 
 die(json_encode([
