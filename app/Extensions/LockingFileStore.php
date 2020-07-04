@@ -38,7 +38,7 @@ class LockingFileStore extends FileStore implements LockProvider
 
     public function restoreLock($name, $owner)
     {
-        // TODO: Implement restoreLock() method.
+        return $this->lock($name, 0, $owner);
     }
 
     /**
