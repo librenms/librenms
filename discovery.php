@@ -9,8 +9,6 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
-use LibreNMS\Util\FileLock;
-
 $init_modules = ['discovery'];
 require __DIR__ . '/includes/init.php';
 
