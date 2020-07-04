@@ -59,6 +59,10 @@ return [
         'file' => [
             'driver' => 'file',
             'path' => storage_path('framework/cache/data'),
+            'control' => [
+                'path' => storage_path('framework/cache/control'),
+                'wait' => 100, // 100ths of a second
+            ],
         ],
 
         'memcached' => [

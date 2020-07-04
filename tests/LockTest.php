@@ -24,46 +24,121 @@
 
 namespace LibreNMS\Tests;
 
-use LibreNMS\Util\FileLock;
+use App\Extensions\LockingFileStore;
+use Carbon\Carbon;
 
 class LockTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->getFilestore()->flush();
+    }
+
     public function testFileLock()
     {
-        $lock = FileLock::lock('tests');
+        $store = $this->getFilestore();
+
+        $lock = $store->lock('foo');
+        $lock->forceRelease();
+        $this->assertTrue($lock->get(), 'Failed to get lock');
         $lock->release();
 
-        $new_lock = FileLock::lock('tests');
-        unset($new_lock);
-
-        FileLock::lock('tests');
-
-        $this->expectNotToPerformAssertions();
+        $lock = $store->lock('foo');
+        $this->assertTrue($lock->get(), 'Failed to get lock after releasing');
+        unset($lock);
     }
 
     public function testFileLockFail()
     {
-        $lock = FileLock::lock('tests');
+        $store = $this->getFilestore();
 
-        $this->expectException('LibreNMS\Exceptions\LockException');
-        $failed_lock = FileLock::lock('tests');
+        $lock = $store->lock('foo');
+        $lock->get();
 
-        $this->expectNotToPerformAssertions();
+        $failed_lock = $store->lock('foo');
+        $this->assertFalse($failed_lock->get(), 'Reacquired lock, oops');
     }
 
-    public function testFileLockWait()
+    public function testCannotAquireLockTwice()
     {
-        $lock = FileLock::lock('tests');
+        $store = $this->getFilestore();
+        $lock = $store->lock('foo');
 
-        $start = microtime(true);
-        $this->expectException('LibreNMS\Exceptions\LockException');
-        $wait_lock = FileLock::lock('tests', 1);
-        $this->assertGreaterThan(1, microtime(true) - $start, 'Lock did not wait.');
+        $this->assertTrue($lock->acquire());
+        $this->assertFalse($lock->acquire());
+    }
 
-        $lock->release();
+    public function testCanAquireLockAgainAfterExpiry()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = $this->getFilestore();
+        $lock = $store->lock('foo', 10);
+        $lock->acquire();
+        Carbon::setTestNow(Carbon::now()->addSeconds(10));
 
-        $start = microtime(true);
-        $wait_lock = FileLock::lock('tests', 5);
-        $this->assertLessThan(1, microtime(true) - $start, 'Lock waited when it should not have');
+        $this->assertTrue($lock->acquire());
+    }
+
+    public function testLockExpirationLowerBoundary()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $now = Carbon::now();
+        $store = $this->getFilestore();
+        $lock = $store->lock('foo', 10);
+        $lock->acquire();
+        Carbon::setTestNow(Carbon::now()->addSeconds(10)->subSecond()); // file cache only has second resolution
+
+        $this->assertFalse($lock->acquire());
+    }
+
+    public function testLockWithNoExpirationNeverExpires()
+    {
+        Carbon::setTestNow(Carbon::now());
+        $store = $this->getFilestore();
+        $lock = $store->lock('foo');
+        $lock->acquire();
+        Carbon::setTestNow(Carbon::now()->addYears(100));
+
+        $this->assertFalse($lock->acquire());
+    }
+
+    public function testCanAcquireLockAfterRelease()
+    {
+        $store = $this->getFilestore();
+        $lock = $store->lock('foo', 10);
+        $lock->acquire();
+
+        $this->assertTrue($lock->release());
+        $this->assertTrue($lock->acquire());
+    }
+
+    public function testAnotherOwnerCannotReleaseLock()
+    {
+        $store = $this->getFilestore();
+        $owner = $store->lock('foo', 10);
+        $wannabeOwner = $store->lock('foo', 10);
+        $owner->acquire();
+
+        $this->assertFalse($wannabeOwner->release());
+    }
+
+    public function testAnotherOwnerCanForceReleaseALock()
+    {
+        $store = $this->getFilestore();
+        $owner = $store->lock('foo', 10);
+        $wannabeOwner = $store->lock('foo', 10);
+        $owner->acquire();
+        $wannabeOwner->forceRelease();
+
+        $this->assertTrue($wannabeOwner->acquire());
+    }
+
+    private function getFilestore()
+    {
+        return new LockingFileStore($this->app->make('files'),
+            $this->app->make('config')->get('cache.stores.file.path'),
+            $this->app->make('config')->get('cache.stores.file.permissions')
+        );
     }
 }
