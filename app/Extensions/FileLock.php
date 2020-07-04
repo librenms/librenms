@@ -2,7 +2,8 @@
 /**
  * FileLock.php
  *
- * -Description-
+ * Atomic locking.  Only expected to work on a single system.
+ * For multi-system use Redis or Memcache locks.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
