@@ -16,12 +16,10 @@ use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
-use LibreNMS\Exceptions\LockException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Fping;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\MemcacheLock;
 use LibreNMS\Util\Time;
 use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Process\Process;
@@ -2446,12 +2444,9 @@ function get_device_oid_limit($device)
  */
 function lock_and_purge($table, $sql)
 {
-    try {
-        $purge_name = $table . '_purge';
-
-        if (Config::get('distributed_poller')) {
-            MemcacheLock::lock($purge_name, 0, 86000);
-        }
+    $purge_name = $table . '_purge';
+    $lock = Cache::lock($purge_name, 86000);
+    if ($lock->get()) {
         $purge_days = Config::get($purge_name);
 
         $name = str_replace('_', ' ', ucfirst($table));
@@ -2460,13 +2455,11 @@ function lock_and_purge($table, $sql)
                 echo "$name cleared for entries over $purge_days days\n";
             }
         }
-
+        $lock->release();
         return 0;
-    } catch (LockException $e) {
-        echo $e->getMessage() . PHP_EOL;
-
-        return -1;
     }
+
+    return -1;
 }
 
 /**
@@ -2481,24 +2474,19 @@ function lock_and_purge_query($table, $sql, $msg)
 {
     $purge_name = $table . '_purge';
 
-    if (Config::get('distributed_poller')) {
-        MemcacheLock::lock($purge_name, 0, 86000);
-    }
     $purge_duration = Config::get($purge_name);
     if (! (is_numeric($purge_duration) && $purge_duration > 0)) {
         return -2;
     }
-    try {
-        if (dbQuery($sql, [$purge_duration])) {
+    $lock = Cache::lock($purge_name, 86000);
+    if ($lock->get()) {
+        if (dbQuery($sql, array($purge_duration))) {
             printf($msg, $purge_duration);
         }
-    } catch (LockException $e) {
-        echo $e->getMessage() . PHP_EOL;
-
-        return -1;
+        $lock->release();
+        return 0;
     }
-
-    return 0;
+    return -1;
 }
 
 /**

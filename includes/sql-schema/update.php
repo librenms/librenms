@@ -37,15 +37,8 @@ if (! isset($init_modules) && php_sapi_name() == 'cli') {
 
 $return = 0;
 
-try {
-    if (isset($skip_schema_lock) && ! $skip_schema_lock) {
-        if (Config::get('distributed_poller')) {
-            $schemaLock = MemcacheLock::lock('schema', 30, 86000);
-        } else {
-            $schemaLock = FileLock::lock('schema', 30);
-        }
-    }
-
+$schemaLock = Cache::lock('schema', 86000);
+if (!empty($skip_schema_lock) || $schemaLock->get()) {
     $db_rev = get_db_schema();
 
     $migrate_opts = ['--force' => true, '--ansi' => true];
@@ -107,10 +100,5 @@ try {
         echo Artisan::output();
     }
 
-    if (isset($schemaLock)) {
-        $schemaLock->release();
-    }
-} catch (LockException $e) {
-    echo $e->getMessage() . PHP_EOL;
-    $return = 1;
+    $schemaLock->release();
 }
