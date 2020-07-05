@@ -124,6 +124,11 @@ class OSModulesTest extends DBTestCase
                 . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
 
+            if ($module === 'route') {
+                // no route poller module
+                continue;
+            }
+
             if ($expected_data[$module]['poller'] == 'matches discovery') {
                 $expected = $expected_data[$module]['discovery'];
             } else {
