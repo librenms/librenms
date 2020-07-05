@@ -164,10 +164,12 @@ class AppServiceProvider extends ServiceProvider
     {
         Cache::extend('file', function ($app) {
             return Cache::repository(
-                new LockingFileStore($app['files'],
+                new LockingFileStore(
+                    $app['files'],
                     $app['config']->get('cache.stores.file.path'),
                     $app['config']->get('cache.stores.file.permissions')
-                ));
+                )
+            );
         });
     }
 }

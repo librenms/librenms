@@ -42,7 +42,6 @@ class FileLock extends Lock
         $this->store = $store;
         $this->controlLock = $this->controlPath($this->key());
         $this->wait = config('cache.stores.file.control.wait');
-
     }
 
     protected function getCurrentOwner()

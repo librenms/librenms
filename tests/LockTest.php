@@ -136,7 +136,8 @@ class LockTest extends TestCase
 
     private function getFilestore()
     {
-        return new LockingFileStore($this->app->make('files'),
+        return new LockingFileStore(
+            $this->app->make('files'),
             $this->app->make('config')->get('cache.stores.file.path'),
             $this->app->make('config')->get('cache.stores.file.permissions')
         );
