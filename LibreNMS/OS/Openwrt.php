@@ -50,8 +50,8 @@ class Openwrt extends OS implements
         $interfaces = explode(PHP_EOL, snmp_get($this->getDevice(), 'NET-SNMP-EXTEND-MIB::nsExtendOutputFull."interfaces"', '-Osqnv'));
         $arrIfaces = array();
         foreach ($interfaces as $interface) {
-                list($k, $v) = explode(',', $interface);
-                $arrIfaces[$k] = $v;
+            list($k, $v) = explode(',', $interface);
+            $arrIfaces[$k] = $v;
         }
         return $arrIfaces;
     }
@@ -66,35 +66,35 @@ class Openwrt extends OS implements
      *
      * @return array Sensors
      */
-    private function getSensorData($type, $query = '', $system = False, $stats = False)
+    private function getSensorData($type, $query = '', $system = false, $stats = false)
     {
-	// Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
+        // Initialize needed variables, and get interfaces (actual network name, and LibreNMS name)
         $sensors = array();
         $interfaces = $this->getInterfaces();
-	$count = 1;
+        $count = 1;
 
-	// Build array for stats - if desired
-	$statstr = [''];
-	if ($stats) {
-		$statstr = ['-min', '-max', '-avg'];
-	}
-
-	// Loop over interfaces, adding sensors
-	foreach ($interfaces as $index => $interface) {
-		// Loop over stats, appending to sensors as needed (only a single, blank, addition if no stats)
-		foreach ($statstr as $stat) {
-	                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-$index$stat\"";
-        	        $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, "$interface$query$stat");
-                	$count += 1;
-		}
+        // Build array for stats - if desired
+        $statstr = [''];
+        if ($stats) {
+            $statstr = ['-min', '-max', '-avg'];
         }
-	// If system level (i.e. overall) sensor desired, add that one as well
+
+        // Loop over interfaces, adding sensors
+        foreach ($interfaces as $index => $interface) {
+            // Loop over stats, appending to sensors as needed (only a single, blank, addition if no stats)
+            foreach ($statstr as $stat) {
+                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-$index$stat\"";
+                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, "$interface$query$stat");
+                $count += 1;
+            }
+        }
+        // If system level (i.e. overall) sensor desired, add that one as well
         if ($system and (count($interfaces) > 1)) {
-                $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-wlan\"";
-                $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, 'wlan');
+            $oid = "NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"$type$query-wlan\"";
+            $sensors[] = new WirelessSensor($type, $this->getDeviceId(), snmp_translate($oid), "openwrt$query", $count, 'wlan');
         }
 
-	// And, return all the sensors that have been created above (i.e. the array of sensors)
+        // And, return all the sensors that have been created above (i.e. the array of sensors)
         return $sensors;
     }
 
@@ -106,7 +106,7 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessClients()
     {
-        return $this->getSensorData('clients', '', True, False);
+        return $this->getSensorData('clients', '', true, false);
     }
 
     /**
@@ -117,7 +117,7 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        return $this->getSensorData('frequency', '', False, False);
+        return $this->getSensorData('frequency', '', false, false);
     }
 
     /**
@@ -128,7 +128,7 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        return $this->getSensorData('noise-floor', '', False, False);
+        return $this->getSensorData('noise-floor', '', false, false);
     }
 
     /**
@@ -139,8 +139,8 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessRate()
     {
-	$txrate = $this->getSensorData('rate', '-tx', False, True);
-	$rxrate = $this->getSensorData('rate', '-rx', False, True);
+        $txrate = $this->getSensorData('rate', '-tx', false, true);
+        $rxrate = $this->getSensorData('rate', '-rx', false, true);
         return array_merge($txrate, $rxrate);
     }
 
@@ -152,7 +152,6 @@ class Openwrt extends OS implements
      */
     public function discoverWirelessSNR()
     {
-	return $this->getSensorData('snr', '', False, True);
+        return $this->getSensorData('snr', '', false, true);
     }
-
 }
