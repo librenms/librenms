@@ -8,7 +8,6 @@
         <li role="presentation" @if( $current_tab == 'poller' ) class="active" @endif>
           <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-lg icon-theme" aria-hidden="true"></i> @lang('Poller')</a>
         </li>
-        @config('distributed_poller')
         <li role="presentation" @if( $current_tab == 'groups' ) class="active" @endif>
           <a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-lg icon-theme" aria-hidden="true"></i> @lang('Groups')</a>
         </li>
@@ -17,7 +16,6 @@
               <a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-lg icon-theme" aria-hidden="true"></i> @lang('Settings')</a>
             </li>
           @endif
-        @endconfig
         <li role="presentation" @if( $current_tab == 'performance' ) class="active" @endif>
           <a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-lg icon-theme" aria-hidden="true"></i> @lang('Performance')</a>
         </li>
