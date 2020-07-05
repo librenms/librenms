@@ -27,7 +27,6 @@ $oids = snmpwalk_cache_oid($device, 'afLTUStaTxRate', array(), 'UBNT-AFLTU-MIB',
 $oids = snmpwalk_cache_oid($device, 'afLTUStaRxRate', $oids, 'UBNT-AFLTU-MIB', null, '-OteQUsb'); //UBNT-AFLTU-MIB::afLTUStaRxRate
 
 foreach ($oids as $index => $entry) {
-
     //Create State Index
     $txrate_state_name = 'afLTUStaTxRate';
     $rxrate_state_name = 'afLTUStaRxRate';
