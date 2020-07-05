@@ -192,7 +192,7 @@ if (count($components > 0)) {
         }
         if ($type == 'f5-ltm-poolmember') {
             $nodename = $f5_stats['ltmPoolMemberStatEntryName']['1.3.6.1.4.1.3375.2.2.5.4.3.1.28.'.$UID];
-            $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label', 'nodename' );
+            $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label', 'nodename');
         } else {
             $tags = compact('rrd_name', 'rrd_def', 'type', 'hash', 'label');
         }
