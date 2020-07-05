@@ -65,7 +65,7 @@
             {!! \LibreNMS\Util\Url::deviceLink($device, $device->shortDisplayName()) !!}
             <span class="device-rebooted">@lang('Device Rebooted')</span>
             <br />
-            <span class="body-date-1">{{ $device->formatUptime(true) }}</span>
+            <span class="body-date-1">{{ $device->formatDownUptime(true) }}</span>
         </div>
     @endforeach
 

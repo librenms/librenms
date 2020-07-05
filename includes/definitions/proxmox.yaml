@@ -22,7 +22,7 @@ discovery_modules:
 processor_stacked: true
 discovery:
     -
-      sysObjectID:
+        sysObjectID:
             - .1.3.6.1.4.1.8072.3.2.10
-      sysDescr_regex:
+        sysDescr_regex:
             - '/ PVE|pve /'

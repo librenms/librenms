@@ -55,6 +55,9 @@ class LoadBalancerController implements DeviceTab
             $component = new \LibreNMS\Component();
             $component_count = $component->getComponentCount($device['device_id']);
 
+            if (isset($component_count['f5-ltm-bwc'])) {
+                $this->tabs[] = 'ltm_bwc';
+            }
             if (isset($component_count['f5-ltm-vs'])) {
                 $this->tabs[] = 'ltm_vs';
             }

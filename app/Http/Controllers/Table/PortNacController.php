@@ -43,6 +43,26 @@ class PortNacController extends TableController
         return ['username', 'ip_address', 'mac_address'];
     }
 
+    protected function sortFields($request)
+    {
+        return [
+            'port_id',
+            'mac_address',
+            'ip_address',
+            'vlan',
+            'domain',
+            'host_mode',
+            'username',
+            'authz_by',
+            'timeout',
+            'time_elapsed',
+            'time_left',
+            'authc_status',
+            'authz_status',
+            'method'
+        ];
+    }
+
     /**
      * Defines the base query for this resource
      *

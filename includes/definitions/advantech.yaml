@@ -8,5 +8,6 @@ mib_dir:
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.10297.202
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.10297.202

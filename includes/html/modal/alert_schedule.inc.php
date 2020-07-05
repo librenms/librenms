@@ -20,9 +20,14 @@ if (\Auth::user()->hasGlobalAdmin()) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="Create">Create maintenance</h5>
+                <h5 class="modal-title" id="sched-title">Create maintenance</h5>
             </div>
             <div class="modal-body">
+                <div id="sched-spinner" style="display: none; width: 100%; height: 200px">
+                    <div style="display: flex; justify-content: center; width: 100%; height: 100%">
+                        <i class="fa fa-lg fa-spinner fa-spin" style="align-self: center"></i>
+                    </div>
+                </div>
                 <form method="post" role="form" id="sched-form" class="form-horizontal schedule-maintenance-form">
                     <?php echo csrf_field() ?>
                     <input type="hidden" name="schedule_id" id="schedule_id">
@@ -148,6 +153,9 @@ $('#schedule-maintenance').on('hide.bs.modal', function (event) {
 $('#schedule-maintenance').on('show.bs.modal', function (event) {
     var schedule_id = $('#schedule_id').val();
     if (schedule_id > 0) {
+        $('#sched-title').text('<?php echo __('Edit Schedule'); ?>');
+        $('#sched-form').hide();
+        $('#sched-spinner').show();
         $.ajax({
             type: "POST",
             url: "ajax_form.php",
@@ -171,10 +179,10 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                 if (output['recurring'] == 0){
                     var start = $('#start').data("DateTimePicker");
                     if (output['start']) {
-                        start.minDate(output['start']);
+                        start.minDate(moment(output['start']));
                     }
-                    start.date(output['start']);
-                    $('#end').data("DateTimePicker").date(output['end']);
+                    start.date(moment(output['start']));
+                    $('#end').data("DateTimePicker").date(moment(output['end']));
 
                     $('#norecurringgroup').show();
                     $('#recurringgroup').hide();
@@ -187,6 +195,7 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $("#recurring").bootstrapSwitch('state', false);
                     $('#recurring').val(0);
                 }else{
+                    $('#sched-title').text('<?php echo __('Create Schedule'); ?>');
                     var start_recurring_dt = $('#start_recurring_dt').data("DateTimePicker");
                     if (output['start_recurring_dt']) {
                         start_recurring_dt.minDate(output['start_recurring_dt']);
@@ -220,8 +229,19 @@ $('#schedule-maintenance').on('show.bs.modal', function (event) {
                     $('#end').val('');
                 }
 
+                // show
+                $('#sched-spinner').hide();
+                $('#sched-form').show();
+            },
+            error: function(){
+                $("#schedule-maintenance").modal('hide');
+                toastr.error('<?php echo __('Failed to load schedule'); ?>');
             }
         });
+    } else {
+        $('#sched-title').text('<?php echo __('Create Schedule'); ?>');
+        $('#sched-spinner').hide();
+        $('#sched-form').show();
     }
 });
 
@@ -235,14 +255,18 @@ function recurring_switch() {
         $('#recurringgroup').hide();
         $('#recurring').val(0);
     }
-};
+}
 
 $('#sched-submit').click('', function(e) {
     e.preventDefault();
+    // parse start/end to ISO8601
+    var formData = $('form.schedule-maintenance-form').serializeArray();
+    formData.find(input => input.name === 'start').value = $('#start').data("DateTimePicker").date().format();
+    formData.find(input => input.name === 'end').value = $('#end').data("DateTimePicker").date().format();
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: $('form.schedule-maintenance-form').serialize(),
+        data: formData,
         dataType: "json",
         success: function(data){
             if(data.status == 'ok') {

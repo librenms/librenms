@@ -10,5 +10,6 @@ over:
     - { graph: device_voltage, text: 'Output Voltage' }
     - { graph: device_current, text: 'Output Current' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.39145.13
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.39145.13

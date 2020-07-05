@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - ifDescr
+                -
+                    oid:
+                        - ifDescr
         dbm:
             data:
                 -
@@ -92,9 +93,9 @@ modules:
                     index: 'snStackingOperUnitState.{{ $index }}'
                     skip_values:
                         -
-                          oid: snStackingGlobalConfigState.0
-                          op: '!='
-                          value: 1
+                            oid: snStackingGlobalConfigState.0
+                            op: '!='
+                            value: 1
                     group: Stacking Status
                     state_name: snStackingOperUnitState
                     states:
@@ -110,13 +111,13 @@ modules:
                     index: 'snStackingOperUnitStackPort1State.{{ $index }}'
                     skip_values:
                         -
-                          oid: snStackingGlobalConfigState.0
-                          op: '!='
-                          value: 1
+                            oid: snStackingGlobalConfigState.0
+                            op: '!='
+                            value: 1
                         -
-                          oid: snStackingOperUnitStackPort1
-                          op: '='
-                          value: 0
+                            oid: snStackingOperUnitStackPort1
+                            op: '='
+                            value: 0
                     group: Stacking Status
                     state_name: snStackingOperUnitStackPortState
                     states:
@@ -131,13 +132,13 @@ modules:
                     index: 'snStackingOperUnitStackPort2State.{{ $index }}'
                     skip_values:
                         -
-                          oid: snStackingGlobalConfigState.0
-                          op: '!='
-                          value: 1
+                            oid: snStackingGlobalConfigState.0
+                            op: '!='
+                            value: 1
                         -
-                          oid: snStackingOperUnitStackPort2
-                          op: '='
-                          value: 0
+                            oid: snStackingOperUnitStackPort2
+                            op: '='
+                            value: 0
                     group: Stacking Status
                     state_name: snStackingOperUnitStackPortState
                     states:

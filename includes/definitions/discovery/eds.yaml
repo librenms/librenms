@@ -3,12 +3,13 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - owDeviceName
-                    - owDS18B20Temperature
-                    - owDeviceType
-                    - owDS18B20Resolution
-                    
+                -
+                    oid:
+                        - owDeviceName
+                        - owDS18B20Temperature
+                        - owDeviceType
+                        - owDS18B20Resolution
+
         count:
             data:
                 -

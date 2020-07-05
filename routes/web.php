@@ -33,9 +33,9 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('about', 'AboutController@index');
     Route::get('authlog', 'UserController@authlog');
     Route::get('overview', 'OverviewController@index')->name('overview');
-    Route::get('/', 'OverviewController@index');
-    Route::match(['get', 'post'], 'device/{device_id}/{tab?}/{vars?}', 'DeviceController@index')
-        ->name('device')->where(['device_id' => '(device=)?[0-9]+', 'vars' => '.*']);
+    Route::get('/', 'OverviewController@index')->name('home');
+    Route::match(['get', 'post'], 'device/{device}/{tab?}/{vars?}', 'DeviceController@index')
+        ->name('device')->where(['vars' => '.*']);
 
     // Maps
     Route::group(['prefix' => 'maps', 'namespace' => 'Maps'], function () {
@@ -146,6 +146,21 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // demo helper
     Route::permanentRedirect('demo', '/');
+});
+
+// installation routes
+Route::group(['prefix' => 'install', 'namespace' => 'Install'], function () {
+    Route::get('/', 'InstallationController@redirectToFirst')->name('install');
+    Route::get('/checks', 'ChecksController@index')->name('install.checks');
+    Route::get('/database', 'DatabaseController@index')->name('install.database');
+    Route::get('/user', 'MakeUserController@index')->name('install.user');
+    Route::get('/finish', 'FinalizeController@index')->name('install.finish');
+
+    Route::post('/user/create', 'MakeUserController@create')->name('install.action.user');
+    Route::post('/database/test', 'DatabaseController@test')->name('install.acton.test-database');
+    Route::get('/ajax/database/migrate', 'DatabaseController@migrate')->name('install.action.migrate');
+    Route::get('/ajax/steps', 'InstallationController@stepsCompleted')->name('install.action.steps');
+    Route::any('{path?}', 'InstallationController@invalid')->where('path', '.*'); // 404
 });
 
 // Legacy routes

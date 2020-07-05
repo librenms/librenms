@@ -9,5 +9,5 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
-      sysObjectID: .1.3.6.1.4.1.10002.1
-      sysDescr_regex: '/^NFT 2/'
+        sysObjectID: .1.3.6.1.4.1.10002.1
+        sysDescr_regex: '/^NFT 2/'

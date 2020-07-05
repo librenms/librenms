@@ -10,7 +10,7 @@ $transparency  = 15;
 if (isset($vars['array'])) {
     $arrays=array($vars['array']);
 } else {
-    $arrays=get_arrays_with_seafile($device, $app['app_id'], $category);
+    $arrays = get_arrays_with_application($device, $app_id, $name, $category);
 }
 
 $int=0;

@@ -9,5 +9,5 @@ good_if:
     - SHDSL
 discovery:
     -
-      sysObjectID:
-          - .1.3.6.1.4.1.3278.1.
+        sysObjectID:
+            - .1.3.6.1.4.1.3278.1.

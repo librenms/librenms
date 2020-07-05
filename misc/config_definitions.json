@@ -375,6 +375,12 @@
             "order": 10,
             "type": "text"
         },
+        "auth_ad_url": {
+            "group": "auth",
+            "section": "ad",
+            "order": 11,
+            "type": "text"
+        },
         "auth_ldap_attr.uid": {
             "default": "uid",
             "group": "auth",
@@ -611,6 +617,18 @@
             "default": [
                 "/-K9W8-/"
             ]
+        },
+        "graphing.availability": {
+            "group": "graphing",
+            "section": "availability",
+            "order": 0,
+            "default": [
+                "86400",
+                "604800",
+                "2592000",
+                "31536000"
+            ],
+            "type": "array"
         },
         "bad_disk_regexp": {
             "default": [],
@@ -1563,6 +1581,22 @@
                 "openstreetmap": "OpenStreetMap",
                 "mapquest": "MapQuest",
                 "bing": "Bing Maps"
+            }
+        },
+        "geoloc.latlng": {
+            "default": false,
+            "group": "external",
+            "section": "location",
+            "order": 2,
+            "type": "boolean",
+            "when": {
+                "setting": "geoloc.engine",
+                "operator": "in",
+                "value": [
+                    "google",
+                    "mapquest",
+                    "bing"
+                ]
             }
         },
         "github_api": {
@@ -2780,6 +2814,14 @@
                 "section": "system",
                 "order": 0,
                 "descr": "Filesystem Usage"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.availability": {
+            "default": {
+                "section": "availability",
+                "order": 0,
+                "descr": "Device Availability"
             },
             "type": "graph"
         },
@@ -4011,6 +4053,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.availability": {
+            "order": 25,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
             "type": "boolean"
         },
         "poller_modules.os": {
