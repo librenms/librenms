@@ -1,4 +1,4 @@
-mib: BRIDGE-MIB:CIENA-SMI:CIENA-CES-CHASSIS-MIB:CIENA-CES-FEATURE-LICENSE-MIB:CIENA-CES-PORT-MIB:CIENA-CES-PORT-XCVR-MIB
+mib: BRIDGE-MIB:CIENA-SMI:CIENA-CES-CHASSIS-MIB:CIENA-CES-FEATURE-LICENSE-MIB:CIENA-CES-PORT-MIB:CIENA-CES-PORT-XCVR-MIB:WWP-PRODUCTS-MIB:WWP-LEOS-PORT-XCVR-MIB:WWP-LEOS-SYSTEM-CONFIG-MIB
 modules:
     processors:
         data:
@@ -8,26 +8,87 @@ modules:
                 num_oid: '.1.3.6.1.4.1.1271.2.1.5.1.2.1.4.5.1.4.{{ $index }}'
                 descr: 'Slot {{ $subindex1 }} CPU'
                 snmp_flags: '-OQUsbe'
+            -
+                oid: wwpLeosSystemCpuUtilization
+                value: wwpLeosSystemCpuUtilizationLast5Seconds
+                num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.1.{{ $index }}'
+                descr: 'CPU Utilization 5'
+                index: cpu5.{{ $index }}
+                snmp_flags: '-OQUsbe'
+                #low_limit: wwpLeosSystemCpuUtilizationLast5SecondsMinimum
+                #high_limit: wwpLeosSystemCpuUtilizationLast5SecondsMaximum
+            -
+                oid: wwpLeosSystemCpuUtilization
+                value: wwpLeosSystemCpuUtilizationLast10Seconds
+                num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.5.{{ $index }}'
+                descr: 'CPU Utilization 10'
+                index: cpu10.{{ $index }}
+                #low_limit: wwpLeosSystemCpuUtilizationLast10SecondsMinimum
+                #high_limit: wwpLeosSystemCpuUtilizationLast10SecondsMaximum
+            -
+                oid: wwpLeosSystemCpuUtilization
+                value: wwpLeosSystemCpuUtilizationLast60Seconds
+                num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.9.{{ $index }}'
+                descr: 'CPU Utilization 60'
+                index: cpu60.{{ $index }}
+                #low_limit: wwpLeosSystemCpuUtilizationLast60SecondsMinimum
+                #high_limit: wwpLeosSystemCpuUtilizationLast60SecondsMaximum
     sensors:
         pre-cache:
             data:
+                - oid:
+                    - dot1dBasePortIfIndex
+                    - cienaCesLogicalPortConfigPortName
+                    - cienaCesChassisPowerSupplySlotName
+                    - cienaCesPortXcvrLowTempAlarmThreshold
+                    - cienaCesPortXcvrHighTempAlarmThreshold
+                    - cienaCesPortXcvrLowVccAlarmThreshold
+                    - cienaCesPortXcvrHighVccAlarmThreshold
+                    - cienaCesPortXcvrLowBiasAlarmThreshold
+                    - cienaCesPortXcvrHighBiasAlarmThreshold
+                    - cienaCesPortXcvrLowRxPwAlarmThreshold
+                    - cienaCesPortXcvrHighRxPwAlarmThreshold
+                    - cienaCesPortXcvrLowTxPwAlarmThreshold
+                    - cienaCesPortXcvrHighTxPwAlarmThreshold
+                    - cienaCesPortXcvrOperState
+                    - cienaCesPortXcvrTxState
+                    - wwpLeosPortXcvrTable
+        dbm:
+            data:
                 -
-                    oid:
-                        - dot1dBasePortIfIndex
-                        - cienaCesLogicalPortConfigPortName
-                        - cienaCesChassisPowerSupplySlotName
-                        - cienaCesPortXcvrLowTempAlarmThreshold
-                        - cienaCesPortXcvrHighTempAlarmThreshold
-                        - cienaCesPortXcvrLowVccAlarmThreshold
-                        - cienaCesPortXcvrHighVccAlarmThreshold
-                        - cienaCesPortXcvrLowBiasAlarmThreshold
-                        - cienaCesPortXcvrHighBiasAlarmThreshold
-                        - cienaCesPortXcvrLowRxPwAlarmThreshold
-                        - cienaCesPortXcvrHighRxPwAlarmThreshold
-                        - cienaCesPortXcvrLowTxPwAlarmThreshold
-                        - cienaCesPortXcvrHighTxPwAlarmThreshold
-                        - cienaCesPortXcvrOperState
-                        - cienaCesPortXcvrTxState
+                    oid: wwpLeosPortXcvrTable
+                    value: wwpLeosPortXcvrRxDbmPower
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.105.{{ $index }}'
+                    descr: 'Rx Port {{ $index }} - Optic SN: {{ $wwpLeosPortXcvrSerialNum }}'
+                    divisor: 10000
+                    index: wwpLeosPortXcvrRxDbmPower.{{ $index }}
+                    group: 'Rx dBm'
+                    entPhysicalIndex: '{{ $dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: wwpLeosPortXcvrLowRxDbmPwAlarmThreshold
+                    high_limit: wwpLeosPortXcvrHighRxDbmPwAlarmThreshold
+                    skip_values:
+                        -
+                            oid: wwpLeosPortXcvrWaveLength
+                            op: '='
+                            value: 0
+                -
+                    oid: wwpLeosPortXcvrTable
+                    value: wwpLeosPortXcvrTxDbmPower
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.106.{{ $index }}'
+                    descr: 'Tx Port {{ $index }} - Optic SN: {{ $wwpLeosPortXcvrSerialNum }}'
+                    divisor: 10000
+                    index: wwpLeosPortXcvrTxDbmPower.{{ $index }}
+                    group: 'Tx dBm'
+                    entPhysicalIndex: '{{ $dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: wwpLeosPortXcvrLowTxDbmPwAlarmThreshold
+                    high_limit: wwpLeosPortXcvrHighTxDbmPwAlarmThreshold
+                    skip_values:
+                        -
+                            oid: wwpLeosPortXcvrWaveLength
+                            op: '='
+                            value:  0
         temperature:
             data:
                 -
@@ -75,6 +136,22 @@ modules:
                             oid: cienaCesPortXcvrOperState
                             op: 'in_array'
                             value: [4]
+                -
+                    oid: wwpLeosPortXcvrTable
+                    value: wwpLeosPortXcvrTemperature
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.4.1.1.1.1.16.{{ $index }}'
+                    descr: 'Port {{ $subindex0 }} - Optic SN: {{ $wwpLeosPortXcvrSerialNum }}'
+                    index: wwpLeosPortXcvrTemperature.{{ $index }}
+                    group: 'Ports'
+                    entPhysicalIndex: '{{ $dot1dBasePortIfIndex }}'
+                    entPhysicalIndex_measured: 'ports'
+                    low_limit: wwpLeosPortXcvrLowTempAlarmThreshold
+                    high_limit: wwpLeosPortXcvrHighTempAlarmThreshold
+                    skip_values:
+                        -
+                            oid: wwpLeosPortXcvrWaveLength
+                            op: '='
+                            value: 0
         fanspeed:
             data:
                 -
@@ -207,6 +284,45 @@ modules:
                     group: 'Service Line Modules'
         state:
             data:
+                -
+                    oid: wwpLeosSystemCpuUtilization
+                    value: wwpLeosSystemCpuUtilizationLast5SecondsState
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.4.{{ $index }}'
+                    descr: ' 5 Second CPU State'
+                    state_name: wwpLeosSystemCpuUtilizationLast5SecondsState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: normal }
+                        - { value: 2, generic: 1, graph: 0, descr: warning }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                    snmp_flags: '-OQUsbe'
+                    group: 'CPU'
+                -
+                    oid: wwpLeosSystemCpuUtilization
+                    value: wwpLeosSystemCpuUtilizationLast10SecondsState
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.8.{{ $index }}'
+                    descr: '10 Second CPU State'
+                    state_name: wwpLeosSystemCpuUtilizationLast10SecondsState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: normal }
+                        - { value: 2, generic: 1, graph: 0, descr: warning }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                    snmp_flags: '-OQUsbe'
+                    group: 'CPU'
+                -
+                    oid: wwpLeosSystemCpuUtilization
+                    value: wwpLeosSystemCpuUtilizationLast60SecondsState
+                    num_oid: '.1.3.6.1.4.1.6141.2.60.12.1.11.12.{{ $index }}'
+                    descr: '60 Second CPU State'
+                    state_name: wwpLeosSystemCpuUtilizationLast60SecondsState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: normal }
+                        - { value: 2, generic: 1, graph: 0, descr: warning }
+                        - { value: 3, generic: 1, graph: 0, descr: degraded }
+                        - { value: 4, generic: 1, graph: 0, descr: faulted }
+                    snmp_flags: '-OQUsbe'
+                    group: 'CPU'
                 -
                     oid: cienaCesPortXcvrFecMode
                     value: cienaCesPortXcvrFecMode
