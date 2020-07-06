@@ -21,7 +21,9 @@ require_once 'includes/html/modal/edit_transport_group.inc.php';
         <th>#</th>
         <th>Transport Name</th>
         <th>Transport Type</th>
+        <th colspan='2'>Devices</th>
         <th>Default</th>
+        <th>Time range</th>
         <th>Details</th>
         <th style="width:126px;">Action</th>
     </tr>
@@ -34,13 +36,82 @@ if (Auth::user()->hasGlobalAdmin()) {
 echo "</td>";
 
 // Iterate through each alert transport
-$query = "SELECT `transport_id` AS `id`, `transport_name` AS `name`, `transport_type` AS `type`, `is_default`, `transport_config` AS `config` FROM `alert_transports`";
+$query = "SELECT `transport_id` AS `id`, `transport_name` AS `name`, `transport_type` AS `type`, `timerange`, `invert_map`, `is_default`, `transport_config` AS `config` FROM `alert_transports`";
 foreach (dbFetchRows($query) as $transport) {
     echo "<tr id=\"alert-transport-{$transport['id']}\">";
     echo "<td><i>#".((int)$transport['id'])."</i></td>";
     echo "<td>".$transport['name']."</td>";
     echo "<td>".$transport['type']."</td>";
+    // Devices (and Groups)
+
+    if ($transport['invert_map'] == 0) {
+        $groups_msg = 'Only devices in this group.';
+        $devices_msg = 'Only this device.';
+        $except_device_or_group = null;
+    }
+
+    if ($transport['invert_map'] == 1) {
+        $devices_msg = 'All devices EXCEPT this device. ';
+        $groups_msg = 'All devices EXCEPT this group.';
+        $except_device_or_group = '<strong><em>EXCEPT</em></strong> ';
+    }
+
+    $device_count = dbFetchCell('SELECT COUNT(*) FROM transport_device_map WHERE transport_id=?', [$transport['id']]);
+    $group_count = dbFetchCell('SELECT COUNT(*) FROM transport_group_map WHERE transport_id=?', [$transport['id']]);
+    $location_count = dbFetchCell('SELECT COUNT(*) FROM transport_location_map WHERE transport_id=?', [$transport['id']]);
+
+    $popover_position = 'right';
+
+    $locations = null;
+    if ($location_count) {
+        $location_query = 'SELECT locations.location, locations.id FROM transport_location_map, locations WHERE transport_location_map.transport_id=? and transport_location_map.location_id = locations.id ORDER BY location';
+        $location_maps = dbFetchRows($location_query, [$transport['id']]);
+        foreach ($location_maps as $location_map) {
+            $locations .= "$except_device_or_group<a href=\"/devices\/location=".$location_map['id']."\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View Devices for Location' target=\"_blank\">".$location_map['location']."</a><br>";
+        }
+    }
+
+    $groups = null;
+    if ($group_count) {
+        $group_query = 'SELECT device_groups.name, device_groups.id FROM transport_group_map, device_groups WHERE transport_group_map.transport_id=? and transport_group_map.group_id = device_groups.id ORDER BY name';
+        $group_maps = dbFetchRows($group_query, [$transport['id']]);
+        foreach ($group_maps as $group_map) {
+            $groups .= "$except_device_or_group<a href=\"/device-groups/" . $group_map['id'] . "/edit\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $group_map['name'] . "' title='$groups_msg' target=\"_blank\">" . $group_map['name'] . "</a><br>";
+        }
+    }
+
+    $devices = null;
+    if ($device_count) {
+        $device_query = 'SELECT devices.device_id,devices.hostname FROM transport_device_map, devices WHERE transport_device_map.transport_id=? and transport_device_map.device_id = devices.device_id ORDER BY hostname';
+        $device_maps = dbFetchRows($device_query, [$transport['id']]);
+        foreach ($device_maps as $device_map) {
+            $devices .= "$except_device_or_group<a href=\"/device/device=" . $device_map['device_id'] . "/tab=edit/\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='" . $device_map['hostname'] . "' title='$devices_msg' target=\"_blank\">" . $device_map['hostname'] . "</a><br>";
+        }
+    }
+
+    echo "<td colspan='2'>";
+    if ($locations) {
+        echo $locations;
+    }
+    if ($groups) {
+        echo $groups;
+    }
+    if ($devices) {
+        echo $devices;
+    }
+    if (!$devices && !$groups && !$locations) {
+        // All Devices
+        echo "<a href=\"/devices\" data-container='body' data-toggle='popover' data-placement='$popover_position' data-content='View All Devices' target=\"_blank\">All Devices</a><br>";
+    }
+
+    echo "</td>";
+
     if ($transport['is_default'] == true) {
+        echo "<td>Yes</td>";
+    } else {
+        echo "<td>No</td>";
+    }
+    if ($transport['timerange'] == true) {
         echo "<td>Yes</td>";
     } else {
         echo "<td>No</td>";
