@@ -101,6 +101,14 @@ $extra = array(
 
 $extra_json = json_encode($extra);
 
+if (!is_array($vars['maps']) && $invert_map) {
+    die(json_encode([
+        'status' => 'error',
+        'message' => 'Invert map is on but no selection in devices, groups and locations match list<br />'
+    ]));
+}
+
+
 if (is_numeric($rule_id) && $rule_id > 0) {
     if (dbUpdate(
         array(

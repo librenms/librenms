@@ -183,10 +183,10 @@ if ($sub_type == 'new-maintenance') {
         'message' => $message,
     );
 } elseif ($sub_type == 'parse-maintenance') {
-    $schedule_id = mres($_POST['schedule_id']);
-    $alert_schedule    = \App\Models\AlertSchedule::findOrFail($schedule_id);
-    $items       = [];
-    foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$schedule_id]) as $target) {
+    $alert_schedule = \App\Models\AlertSchedule::findOrFail($_POST['schedule_id']);
+    $items = [];
+
+    foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$alert_schedule->schedule_id]) as $target) {
         $id = $target['alert_schedulable_id'];
         if ($target['alert_schedulable_type'] == 'location') {
             $text = dbFetchCell('SELECT location FROM locations WHERE id = ?', [$id]);
