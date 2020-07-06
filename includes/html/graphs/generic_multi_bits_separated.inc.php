@@ -135,7 +135,7 @@ if (!$noagg) {
     $rrd_options .= ' VDEF:totalin=aggrinbytes,TOTAL';
     $rrd_options .= ' VDEF:totalout=aggroutbytes,TOTAL';
     $rrd_options .= " COMMENT:' \\\\n'";
-    $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate In', ($descr_len + 5)), 0, ($descr_len + 5)) . "'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate', ($descr_len + 5)), 0, ($descr_len + 5)) . 'In' . "'";
     $rrd_options .= " GPRINT:aggrinbits:LAST:%6.".$float_precision."lf%s$units";
     $rrd_options .= " GPRINT:aggrinbits:AVERAGE:%6.".$float_precision."lf%s$units";
     $rrd_options .= " GPRINT:aggrinbits:MAX:%6.".$float_precision."lf%s$units";
@@ -144,7 +144,7 @@ if (!$noagg) {
     }
 
     $rrd_options .= "\\\\n";
-    $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate Out', ($descr_len + 5)), 0, ($descr_len + 5)) . "'";
+    $rrd_options .= " COMMENT:'" . substr(str_pad('Aggregate', ($descr_len + 4)), 0, ($descr_len + 4)) . 'Out' . "'";
     $rrd_options .= " GPRINT:aggroutbits:LAST:%6.".$float_precision."lf%s$units";
     $rrd_options .= " GPRINT:aggroutbits:AVERAGE:%6.".$float_precision."lf%s$units";
     $rrd_options .= " GPRINT:aggroutbits:MAX:%6.".$float_precision."lf%s$units";
