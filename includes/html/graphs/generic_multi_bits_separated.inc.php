@@ -18,11 +18,14 @@ require 'includes/html/graphs/common.inc.php';
 $stacked = generate_stacked_graphs();
 
 $i = 0;
-if ($width > '500') {
-    $descr_len = 18;
+if ($width > '1500') {
+    $descr_len = 40;
+} else if ($width >= '500') {
+    $descr_len = 8;
+    $descr_len += min(40, round(($width - 320) / 15));
 } else {
     $descr_len = 8;
-    $descr_len += round(($width - 260) / 9.5);
+    $descr_len += min(20, round(($width - 260) / 9.5));
 }
 
 $unit_text = 'Bits/sec';
