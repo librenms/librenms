@@ -56,7 +56,7 @@ modules:
                     descr: 'Temperature'
                     index: 'sensorIntegerValueIndex.{{ $index }}'
                     low_limit: 0
-                    high_limit: 75
+                    high_limit: 60
         humidity:
             options:
                 skip_values:
