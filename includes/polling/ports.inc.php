@@ -220,15 +220,19 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             return !($port['deleted'] || $port['disabled']);
         });
 
-        // if less than 5 ports or less than 10% of the total ports are skipped, walk the base oids instead of get
-        $polled_port_count = count($polled_ports);
-        $total_port_count = count($ports);
-        $walk_base = $total_port_count - $polled_port_count < 5 || $polled_port_count / $total_port_count > 0.9 ;
+        // only try to guess if we should walk base oids if selected_ports is set only globally
+        $walk_base = false;
+        if (!Config::has("os.{$device['os']}.polling.selected_ports") && !array_key_exists('selected_ports', $device['attribs'])) {
+            // if less than 5 ports or less than 10% of the total ports are skipped, walk the base oids instead of get
+            $polled_port_count = count($polled_ports);
+            $total_port_count = count($ports);
+            $walk_base = $total_port_count - $polled_port_count < 5 || $polled_port_count / $total_port_count > 0.9;
 
-        if ($walk_base) {
-            echo "Not enough ports for selected port polling, walking base OIDs instead\n";
-            foreach ($table_base_oids as $oid) {
-                $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+            if ($walk_base) {
+                echo "Not enough ports for selected port polling, walking base OIDs instead\n";
+                foreach ($table_base_oids as $oid) {
+                    $port_stats = snmpwalk_cache_oid($device, $oid, $port_stats, 'IF-MIB');
+                }
             }
         }
 
