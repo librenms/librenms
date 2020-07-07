@@ -117,7 +117,7 @@ check for the validity of these attributes but will deliver them to
 Oxidized as defined.
 
 Matching of hosts can be done using `hostname`, `sysname`, `os`,
-`location`, `sysDescr` or `hardware` and including either a 'match'
+`location`, `sysDescr`, `poller_group_name` or `hardware` and including either a 'match'
 key and value, or a 'regex' key and value. The order of matching is:
 
 - `hostname`
@@ -127,6 +127,7 @@ key and value, or a 'regex' key and value. The order of matching is:
 - `os`
 - `location`
 - `ip`
+- `poller_group_name`
 
 To match on the device hostnames or sysnames that contain 'lon-sw' or
 if the location contains 'London' then you would place the following
