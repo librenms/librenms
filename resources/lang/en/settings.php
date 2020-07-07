@@ -5,6 +5,7 @@ return [
     'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Alerting',
+        'api' => 'API',
         'auth' => 'Authentication',
         'authorization' => 'Authorization',
         'external' => 'External',
@@ -21,6 +22,9 @@ return [
             'general' => 'General Alert Settings',
             'email' => 'Email Options',
             'rules' => 'Alert Rule Default Settings',
+        ],
+        'api' => [
+            'cors' => 'CORS',
         ],
         'auth' => [
             'general' => 'General Authentication Settings',
@@ -192,6 +196,38 @@ return [
         'allow_unauth_graphs_cidr' => [
             'description' => 'Allow the given networks graph access',
             'help' => 'Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)'
+        ],
+        'api' => [
+            'cors' => [
+                'allowheaders' => [
+                    'description' => 'Allow Headers',
+                    'help' => 'Sets the Access-Control-Allow-Headers response header',
+                ],
+                'allowcredentials' => [
+                    'description' => 'Allow Credentials',
+                    'help' => 'Sets the Access-Control-Allow-Credentials header',
+                ],
+                'allowmethods' => [
+                    'description' => 'Allowed Methods',
+                    'help' => 'Matches the request method.',
+                ],
+                'enabled' => [
+                    'description' => 'Enable CORS support for the API',
+                    'help' => 'Allows you to load api resources from a web client',
+                ],
+                'exposeheaders' => [
+                    'description' => 'Expose Headers',
+                    'help' => 'Sets the Access-Control-Expose-Headers response header',
+                ],
+                'maxage' => [
+                    'description' => 'Max Age',
+                    'help' => 'Sets the Access-Control-Max-Age response header',
+                ],
+                'origin' => [
+                    'description' => 'Allow Request Origins',
+                    'help' => 'Matches the request origin. Wildcards can be used, eg. *.mydomain.com',
+                ],
+            ],
         ],
         'api_demo' => [
             'description' => 'This is the demo'
