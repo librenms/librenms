@@ -43,7 +43,7 @@ class AirosAfLtu extends OS implements
 
         foreach ($oids as $index => $entry) {
             return array(
-                new WirelessSensor('distance', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.10.1.4.1.5.' . $index, 'airos-af-ltu', 1, 'Distance', $entry['afLTUStaRemoteDistance'], 1, 1000), //UBNT-AFLTU-MIB::afLTUStaRemoteDistance
+                new WirelessSensor('distance', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.10.1.4.1.23.' . $index, 'airos-af-ltu', 1, 'Distance', $entry['afLTUStaRemoteDistance'], 1, 1000), //UBNT-AFLTU-MIB::afLTUStaRemoteDistance
             );
         }
     }
