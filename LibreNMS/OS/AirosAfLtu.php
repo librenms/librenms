@@ -63,7 +63,7 @@ class AirosAfLtu extends OS implements
         $oids = snmpwalk_cache_oid($this->getDevice(), 'afLTUStaRxPower0', array(), 'UBNT-AFLTU-MIB', null, '-OteQUsb');
         $oids = snmpwalk_cache_oid($this->getDevice(), 'afLTUStaRxPower1', $oids, 'UBNT-AFLTU-MIB', null, '-OteQUsb');
         $oids = snmpwalk_cache_oid($this->getDevice(), 'afLTUStaIdealRxPower0', $oids, 'UBNT-AFLTU-MIB', null, '-OteQUsb');
-        $oids = snmpwalk_cache_oid($this->getDevice(), 'afLTUStaIdealRxPower0', $oids, 'UBNT-AFLTU-MIB', null, '-OteQUsb');
+        $oids = snmpwalk_cache_oid($this->getDevice(), 'afLTUStaIdealRxPower1', $oids, 'UBNT-AFLTU-MIB', null, '-OteQUsb');
 
         foreach ($oids as $index => $entry) {
             $sensors[] = new WirelessSensor('power', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.10.1.4.1.5.' . $index, 'airos-af-ltu-rx-chain-0', 1, 'RX Power Chain 0', $entry['afLTUStaRxPower0']); //UBNT-AFLTU-MIB::afLTUStaRxPower0
