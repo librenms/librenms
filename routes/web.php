@@ -43,7 +43,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     });
 
     // admin pages
-    Route::group(['guard' => 'admin'], function () {
+    Route::group(['middleware' => ['can:admin']], function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
         Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
