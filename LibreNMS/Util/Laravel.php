@@ -124,7 +124,7 @@ class Laravel
     public static function disableCliDebugOutput()
     {
         if (self::isBooted()) {
-            Log::setDefaultDriver('logfile');
+            Log::setDefaultDriver('stack');
         }
     }
 
