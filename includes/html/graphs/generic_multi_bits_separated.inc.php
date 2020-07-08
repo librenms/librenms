@@ -32,15 +32,20 @@ $unit_text = 'Bits/sec';
 
 if (!$noagg || !$nodetails) {
     if ($width > '500') {
-        $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "    Current      Average     Maximum    '";
+        $rrd_options .= sprintf(" COMMENT:'%s'", substr(str_pad($unit_text, ($descr_len +5)), 0, ($descr_len+5)));
+        $rrd_options .= sprintf(" COMMENT:'%12s'", "Current");
+        $rrd_options .= sprintf(" COMMENT:'%10s'", "Average");
+        $rrd_options .= sprintf(" COMMENT:'%10s'", "Maximum");
         if (!$nototal) {
-            $rrd_options .= " COMMENT:'Total      '";
+            $rrd_options .= sprintf(" COMMENT:'%8s'", "Total");
         }
-
         $rrd_options .= " COMMENT:'\l'";
     } else {
         $nototal = true;
-        $rrd_options .= " COMMENT:'" . substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)) . "     Now         Ave          Max\l'";
+        $rrd_options .= sprintf(" COMMENT:'%s'", substr(str_pad($unit_text, ($descr_len + 5)), 0, ($descr_len + 5)));
+        $rrd_options .= sprintf(" COMMENT:'%12s'", "Now");
+        $rrd_options .= sprintf(" COMMENT:'%10s'", "Avg");
+        $rrd_options .= sprintf(" COMMENT:'%10s\l'", "Max");
     }
 }
 
@@ -102,7 +107,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' GPRINT:outB' . $i . ":AVERAGE:%6.".$float_precision."lf%s$units";
         $rrd_options .= ' GPRINT:outB' . $i . ":MAX:%6.".$float_precision."lf%s$units";
         if (!$nototal) {
-            $rrd_options .= ' GPRINT:totout' . $i . ":%6.".$float_precision."lf%s$total_unit";
+            $rrd_options .= ' GPRINT:totout' . $i . ":%6.".$float_precision."lf%s$total_units";
         }
 
         $rrd_options .= '\l';
