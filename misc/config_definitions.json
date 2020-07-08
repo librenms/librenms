@@ -273,7 +273,17 @@
                 "Accept",
                 "X-Auth-Token"
             ],
+            "group": "api",
+            "section": "cors",
+            "order": 4,
             "type": "array"
+        },
+        "api.cors.allowcredentials": {
+            "default": false,
+            "group": "api",
+            "section": "cors",
+            "order": 7,
+            "type": "boolean"
         },
         "api.cors.allowmethods": {
             "default": [
@@ -283,14 +293,37 @@
                 "DELETE",
                 "PATCH"
             ],
+            "group": "api",
+            "section": "cors",
+            "order": 2,
             "type": "array"
         },
         "api.cors.enabled": {
             "default": false,
+            "group": "api",
+            "section": "cors",
+            "order": 1,
             "type": "boolean"
+        },
+        "api.cors.exposeheaders": {
+            "default": [
+                "Cache-Control",
+                "Content-Language",
+                "Content-Type",
+                "Expires",
+                "Last-Modified",
+                "Pragma"
+            ],
+            "group": "api",
+            "section": "cors",
+            "order": 5,
+            "type": "array"
         },
         "api.cors.maxage": {
             "default": 86400,
+            "group": "api",
+            "section": "cors",
+            "order": 6,
             "type": "integer",
             "units": "seconds",
             "validate": {
@@ -298,8 +331,11 @@
             }
         },
         "api.cors.origin": {
-            "default": "*",
-            "type": "text"
+            "default": ["*"],
+            "group": "api",
+            "section": "cors",
+            "order": 3,
+            "type": "array"
         },
         "api_demo": {
             "default": false,
