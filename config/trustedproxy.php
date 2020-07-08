@@ -23,7 +23,7 @@ return [
      * of your proxy (e.g. if using ELB or similar).
      *
      */
-    'proxies' => \LibreNMS\Util\Env::parseArray('APP_TRUSTED_PROXIES', '*', ['', '*', '**']),
+    'proxies' => \LibreNMS\Util\Env::parseArray('APP_TRUSTED_PROXIES', null, ['', '*', '**']),
 
     /*
      * To trust one or more specific proxies that connect
