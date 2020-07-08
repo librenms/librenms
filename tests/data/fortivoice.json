@@ -10,10 +10,10 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "fortivoice",
+                    "type": "firewall",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "fortinet.svg",
                     "location": null
                 }
             ]
@@ -28,10 +28,10 @@
                     "version": null,
                     "hardware": null,
                     "features": null,
-                    "os": "generic",
-                    "type": "server",
+                    "os": "fortivoice",
+                    "type": "firewall",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "fortinet.svg",
                     "location": "<private>"
                 }
             ]
@@ -902,5 +902,23 @@
                 }
             ]
         }
+    },
+    "processors": {
+        "discovery": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.12356.115.1.6.0",
+                    "processor_index": "1",
+                    "processor_type": "fortivoice",
+                    "processor_usage": 0,
+                    "processor_descr": "Processor",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
