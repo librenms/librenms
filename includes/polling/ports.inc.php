@@ -631,6 +631,11 @@ foreach ($ports as $port) {
             $this_port['ifVlan'] = $this_port['dot1qPvid'];
         }
 
+        // Set ifConnectorPresent to null when the device does not support IF-MIB truth values.
+        if (isset($this_port['ifConnectorPresent']) && !in_array($this_port['ifConnectorPresent'], ['true', 'false'])) {
+            $this_port['ifConnectorPresent'] = null;
+        }
+
         // FIXME use $q_bridge_mib[$this_port['ifIndex']] to see if it is a trunk (>1 array count)
         echo "VLAN = {$this_port['ifVlan']} ";
 

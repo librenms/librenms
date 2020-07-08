@@ -7653,7 +7653,7 @@
                     "ifIndex": 40000,
                     "ifSpeed": null,
                     "ifSpeed_prev": 0,
-                    "ifConnectorPresent": "0",
+                    "ifConnectorPresent": null,
                     "ifPromiscuousMode": "false",
                     "ifHighSpeed": 0,
                     "ifHighSpeed_prev": null,
