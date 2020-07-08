@@ -1,5 +1,5 @@
 os: fortivoice
-text: 'Fortinet Fortivoice'
+text: 'Fortinet FortiVoice'
 type: firewall
 icon: fortinet
 mib_dir:
