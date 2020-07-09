@@ -2,6 +2,7 @@
 
 namespace App\Exceptions;
 
+use Throwable;
 use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -35,7 +36,7 @@ class Handler extends ExceptionHandler
         \LibreNMS\Exceptions\MaximumExecutionTimeExceeded::class,
     ];
 
-    public function render($request, Exception $exception)
+    public function render($request, Throwable $exception)
     {
         // If for some reason Blade hasn't been registered, try it now
         try {
@@ -59,7 +60,7 @@ class Handler extends ExceptionHandler
         return parent::render($request, $exception);
     }
 
-    protected function convertExceptionToArray(Exception $e)
+    protected function convertExceptionToArray(Throwable $e)
     {
         // override the non-debug error output to clue in user on how to debug
         if (!config('app.debug') && !$this->isHttpException($e)) {
