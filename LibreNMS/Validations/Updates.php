@@ -29,17 +29,16 @@ use DateTime;
 use DateTimeZone;
 use Exception;
 use LibreNMS\Config;
-use LibreNMS\Util\Env;
+use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
-use LibreNMS\Validations\Php;
 
 class Updates extends BaseValidation
 {
     public function validate(Validator $validator)
     {
-        if (Env::librenmsDocker()) {
+        if (EnvHelper::librenmsDocker()) {
             $validator->warn('Updates are managed through the official Docker image');
             return;
         }

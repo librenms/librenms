@@ -27,6 +27,7 @@ namespace App\Http\Middleware;
 
 use Asm89\Stack\CorsService;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Arr;
 
 class HandleCors extends \Fruitcake\Cors\HandleCors
 {
@@ -35,8 +36,6 @@ class HandleCors extends \Fruitcake\Cors\HandleCors
         'origin' => 'allowed_origins',
         'allowheaders' => 'allowed_headers',
         'exposeheaders' => 'exposed_headers',
-        'maxage' => 'max_age',
-        'allowcredentials' => 'supports_credentials',
     ];
 
     public function __construct(Container $container)
@@ -49,8 +48,12 @@ class HandleCors extends \Fruitcake\Cors\HandleCors
             $laravel_config['paths'][] = 'api/*';
 
             foreach ($this->map as $config_key => $option_key) {
-                $laravel_config[$option_key] = $legacy[$config_key] ?? $laravel_config[$option_key];
+                if (isset($legacy[$config_key])) {
+                    $laravel_config[$option_key] = Arr::wrap($legacy[$config_key]);
+                }
             }
+            $laravel_config['max_age'] = $legacy['maxage'] ?? $laravel_config['max_age'];
+            $laravel_config['supports_credentials'] = $legacy['allowcredentials'] ?? $laravel_config['supports_credentials'];
 
             $container['config']->set('cors', $laravel_config);
         }
