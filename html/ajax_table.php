@@ -25,7 +25,7 @@ $current = $_REQUEST['current'];
 settype($current, 'integer');
 $rowCount = $_REQUEST['rowCount'];
 settype($rowCount, 'integer');
-if (isset($_REQUEST['sort']) && is_array($_POST['sort'])) {
+if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
     foreach ($_REQUEST['sort'] as $k => $v) {
         $sort .= " $k $v";
     }
