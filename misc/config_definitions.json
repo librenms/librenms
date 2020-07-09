@@ -3326,7 +3326,7 @@
             }
         },
         "html_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "http_proxy": {
             "group": "system",
@@ -3484,7 +3484,7 @@
             "order": 8
         },
         "install_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "int_core": {
             "default": true,
@@ -3644,7 +3644,7 @@
             "type": "color"
         },
         "log_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "log_file": {
             "type": "text"
@@ -3669,7 +3669,7 @@
             "type": "text"
         },
         "mib_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "mono_font": {
             "default": "DejaVuSansMono",
@@ -3695,7 +3695,7 @@
         },
         "nagios_plugins": {
             "default": "/usr/lib/nagios/plugins",
-            "type": "text"
+            "type": "directory"
         },
         "network_map_items": {
             "default": [
@@ -4082,7 +4082,7 @@
             "type": "executable"
         },
         "plugin_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "poller_modules.unix-agent": {
             "order": 420,
@@ -4540,7 +4540,7 @@
             "group": "poller",
             "section": "rrdtool",
             "order": 6,
-            "type": "text"
+            "type": "directory"
         },
         "rrd_purge": {
             "group": "system",
@@ -5052,7 +5052,7 @@
             "type": "integer"
         },
         "temp_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "title_image": {
             "group": "webui",
@@ -5276,7 +5276,7 @@
             "group": "external",
             "section": "smokeping",
             "order": 1,
-            "type": "text"
+            "type": "directory"
         },
         "smokeping.url": {
             "group": "external",

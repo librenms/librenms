@@ -88,6 +88,8 @@ class DynamicConfigItem implements \ArrayAccess
             return !is_array($value);
         } elseif ($this->type === 'executable') {
             return is_executable($value);
+        } elseif ($this->type === 'directory') {
+            return is_dir($value);
         }
 
         return false;
