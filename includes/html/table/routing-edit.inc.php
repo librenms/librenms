@@ -18,7 +18,10 @@ $sql = " FROM `bgpPeers` AS `B` LEFT JOIN `devices` AS `D` ON `B`.`device_id` = 
 $param[] = $device_id;
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `B`.`bgpPeerRemoteAs` LIKE '%$searchPhrase%' OR `B`.`bgpPeerIdentifier` LIKE '%$searchPhrase%' OR `B`.`bgpPeerDescr` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE ? OR `B`.`bgpPeerRemoteAs` LIKE ? OR `B`.`bgpPeerIdentifier` LIKE ? OR `B`.`bgpPeerDescr` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`bgpPeer_id`) $sql";
