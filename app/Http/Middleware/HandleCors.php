@@ -27,7 +27,7 @@ namespace App\Http\Middleware;
 
 use Asm89\Stack\CorsService;
 use Illuminate\Contracts\Container\Container;
-use LibreNMS\Util\EnvHelper;
+use Illuminate\Support\Arr;
 
 class HandleCors extends \Fruitcake\Cors\HandleCors
 {
@@ -49,7 +49,7 @@ class HandleCors extends \Fruitcake\Cors\HandleCors
 
             foreach ($this->map as $config_key => $option_key) {
                 if (isset($legacy[$config_key])) {
-                    $laravel_config[$option_key] = EnvHelper::parseArray($legacy[$config_key]);
+                    $laravel_config[$option_key] = Arr::wrap($legacy[$config_key]);
                 }
             }
             $laravel_config['max_age'] = $legacy['maxage'] ?? $laravel_config['max_age'];
