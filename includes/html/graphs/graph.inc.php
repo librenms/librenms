@@ -60,7 +60,7 @@ function graph_error($string)
     include 'includes/html/graphs/common.inc.php';
 
     $rrd_options .= ' HRULE:0#555555';
-    $rrd_options .= " --title='".$string."'";
+    $rrd_options .= " --title=" . escapeshellarg($string);
 
     rrdtool_graph($graphfile, $rrd_options);
 
