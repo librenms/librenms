@@ -21,7 +21,7 @@ $rrddescr_len = 14; // length of the padded rrd_descr in legend
 
 if ($width > '1500') {
     $rrddescr_len = 30;
-} else if ($width >= '500') {
+} elseif ($width >= '500') {
     $rrddescr_len = 8;
     $rrddescr_len += min(30, round(($width - 320) / 15));
 } else {
@@ -43,21 +43,21 @@ if ($format == 'octets' || $format == 'bytes') {
 
 $i = 0;
 
-    if ($width > '500') {
-        $rrd_options .= sprintf(" COMMENT:'%s'", $units_descr);
-        $rrd_options .= sprintf(" COMMENT:'%12s'", "Current");
-        $rrd_options .= sprintf(" COMMENT:'%10s'", "Average");
-        $rrd_options .= sprintf(" COMMENT:'%10s'", "Maximum");
-        if (!$$args['nototal']) {
-            $rrd_options .= sprintf(" COMMENT:'%8s'", "Total");
-        }
-    } else {
-        $nototal = true;
-        $rrd_options .= sprintf(" COMMENT:'%s'", $units_descr);
-        $rrd_options .= sprintf(" COMMENT:'%12s'", "Now");
-        $rrd_options .= sprintf(" COMMENT:'%10s'", "Avg");
-        $rrd_options .= sprintf(" COMMENT:'%10s'", "Max");
+if ($width > '500') {
+    $rrd_options .= sprintf(" COMMENT:'%s'", $units_descr);
+    $rrd_options .= sprintf(" COMMENT:'%12s'", "Current");
+    $rrd_options .= sprintf(" COMMENT:'%10s'", "Average");
+    $rrd_options .= sprintf(" COMMENT:'%10s'", "Maximum");
+    if (!$$args['nototal']) {
+        $rrd_options .= sprintf(" COMMENT:'%8s'", "Total");
     }
+} else {
+    $nototal = true;
+    $rrd_options .= sprintf(" COMMENT:'%s'", $units_descr);
+    $rrd_options .= sprintf(" COMMENT:'%12s'", "Now");
+    $rrd_options .= sprintf(" COMMENT:'%10s'", "Avg");
+    $rrd_options .= sprintf(" COMMENT:'%10s'", "Max");
+}
 
 if ($_GET['previous']) {
     $rrd_options .= sprintf(" COMMENT:'\t'", "");
