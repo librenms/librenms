@@ -27,6 +27,8 @@ $rowCount = $_REQUEST['rowCount'];
 settype($rowCount, 'integer');
 if (isset($_REQUEST['sort']) && is_array($_REQUEST['sort'])) {
     foreach ($_REQUEST['sort'] as $k => $v) {
+        $k = preg_replace('/[^A-Za-z0-9_]/', '', $k); // only allow plain columns
+        $v = strtolower($v) == 'desc' ? 'DESC' : 'ASC';
         $sort .= " $k $v";
     }
 }
