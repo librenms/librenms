@@ -22,7 +22,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        (new \Wpb\String_Blade_Compiler\StringBladeServiceProvider(app()))->register();
+        (new \Wpb\String_Blade_Compiler\StringBladeServiceProvider($this->app))->register();
         $this->registerFacades();
         $this->registerGeocoder();
 
