@@ -6,7 +6,11 @@ $sql = " FROM `processors` AS `P` LEFT JOIN `devices` AS `D` ON `P`.`device_id` 
 $param[] = $device_id;
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `P`.`processor_descr` LIKE '%$searchPhrase%' OR `S`.`processor_usage` LIKE '%$searchPhrase%' OR `P`.`processor_perc_warn` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE ? OR `P`.`processor_descr` LIKE ? OR `S`.`processor_usage` LIKE ? OR `P`.`processor_perc_warn` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`processor_id`) $sql";
