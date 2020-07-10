@@ -170,3 +170,4 @@ nav:
       - Device Notes:
           - Intro: Support/Device-Notes/index.md
           - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
+          - OpenWRT: Support/Device-Notes/Openwrt.md
