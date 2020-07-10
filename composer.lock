@@ -5608,12 +5608,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/librenms/StringBladeCompiler.git",
-                "reference": "3634744d964b48a7e16a026e36386d33dd1b2c14"
+                "reference": "f4666b72ce4a48093cc6cf1c989b6359b3c4e464"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/librenms/StringBladeCompiler/zipball/3634744d964b48a7e16a026e36386d33dd1b2c14",
-                "reference": "3634744d964b48a7e16a026e36386d33dd1b2c14",
+                "url": "https://api.github.com/repos/librenms/StringBladeCompiler/zipball/f4666b72ce4a48093cc6cf1c989b6359b3c4e464",
+                "reference": "f4666b72ce4a48093cc6cf1c989b6359b3c4e464",
                 "shasum": ""
             },
             "require": {
@@ -5652,9 +5652,9 @@
                 "laravel"
             ],
             "support": {
-                "source": "https://github.com/iNtergrated/StringBladeCompiler/tree/laravel-7-and-autoload-blade-custom-directives"
+                "source": "https://github.com/librenms/StringBladeCompiler/tree/laravel-7-and-autoload-blade-custom-directives"
             },
-            "time": "2020-04-02T19:03:22+00:00"
+            "time": "2020-07-10T19:15:25+00:00"
         },
         {
             "name": "xjtuwangke/passwordhash",
@@ -5698,7 +5698,7 @@
                 "password",
                 "security"
             ],
-            "time": "2014-07-16T15:38:21+00:00"
+            "time": "2012-08-31T00:00:00+00:00"
         }
     ],
     "packages-dev": [
