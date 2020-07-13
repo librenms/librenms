@@ -93,12 +93,13 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
                           <th>Port</th>
                           <th>Port Type</th>
                           <th>Port State</th>
+                          <th>Cost</th>
                           <th>Status</th>
                           <th>Area ID</th>
                         </tr>
                       </thead>
                   </div>';
-    foreach (dbFetchRows("SELECT * FROM `ospf_ports` AS O, `ports` AS P WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND P.port_id = O.port_id ORDER BY O.`ospfIfAreaId`", array($device['device_id'])) as $ospfport) {
+    foreach (dbFetchRows("SELECT * FROM `ospf_ports` AS O, `ports` AS P, `ospf_tos` AS T WHERE O.`ospfIfAdminStat` = 'enabled' AND O.`device_id` = ? AND P.port_id = O.port_id AND O.ospf_port_id = T.ospf_port_id ORDER BY O.`ospfIfAreaId`", array($device['device_id'])) as $ospfport) {
         $ospfport = cleanPort($ospfport);
         $port_status_color = 'default';
 
@@ -112,6 +113,7 @@ foreach (dbFetchRows('SELECT * FROM `ospf_instances` WHERE `device_id` = ?', arr
                       <td>' . generate_port_link($ospfport) . '</td>
                       <td>' . $ospfport['ospfIfType'] . '</td>
                       <td>' . $ospfport['ospfIfState'] . '</td>
+                      <td>' . $ospfport['ospfIfMetricValue'] . '</td>
                       <td><span class="label label-' . $port_status_color . '">' . $ospfport['ospfIfAdminStat'] . '</span></td>
                       <td>' . $ospfport['ospfIfAreaId'] . '</td>
                     </tr>
