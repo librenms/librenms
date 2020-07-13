@@ -6,6 +6,7 @@ use App\Models\OspfArea;
 use App\Models\OspfInstance;
 use App\Models\OspfNbr;
 use App\Models\OspfPort;
+use App\Models\OspfTos;
 use LibreNMS\RRD\RrdDefinition;
 
 $device_model = Device::find($device['device_id']);
@@ -138,6 +139,31 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
         ->whereNotIn('id', $ospf_neighbours->pluck('id'))->delete();
 
     echo $ospf_neighbours->count();
+
+    /* start of OSPF TOS - remove later */
+    echo ' TOS Metrics: ';
+
+    // Pull data from device
+    $ospf_tos_poll = snmpwalk_cache_oid($device, 'OSPF-MIB::ospfIfMetricEntry', array(), 'OSPF-MIB');
+    d_echo($ospf_tos_poll);
+
+    $ospf_tos_metrics = collect();
+    foreach ($ospf_tos_poll as $ospf_tos_id => $ospf_tos) {
+        $tos = OspfTos::updateOrCreate([
+            'device_id' => $device['device_id'],
+            'ospf_port_id' => $ospf_tos_id,
+            'context_name' => $device['context_name'],
+        ], $ospf_tos);
+
+        $ospf_tos_metrics->push($tos);
+    }
+
+    // cleanup
+    OspfPort::query()
+        ->where(['device_id' => $device['device_id'], 'context_name' => $device['context_name']])
+        ->whereNotIn('id', $ospf_tos_metrics->pluck('id'))->delete();
+
+    echo $ospf_tos_metrics->count();
 }
 
 unset($device['context_name'], $vrfs_lite_cisco, $vrf_lite);
@@ -148,12 +174,14 @@ if ($instance_count) {
         ->addDataset('instances', 'GAUGE', 0, 1000000)
         ->addDataset('areas', 'GAUGE', 0, 1000000)
         ->addDataset('ports', 'GAUGE', 0, 1000000)
+        ->addDataset('metrics', 'GAUGE', 0, 1000000)
         ->addDataset('neighbours', 'GAUGE', 0, 1000000);
 
     $fields = [
         'instances'   => $instance_count,
         'areas'       => $ospf_areas->count(),
         'ports'       => $ospf_ports->count(),
+        'metrics'     => $ospf_tos_metrics->count(),
         'neighbours'  => $ospf_neighbours->count(),
     ];
 
@@ -185,6 +213,9 @@ unset(
     $ospf_nbr,
     $neighbour,
     $ospf_nbr_id,
+    $ospf_tos,
+    $tos,
+    $ospf_tos_id,
     $rrd_def,
     $fields,
     $tags
