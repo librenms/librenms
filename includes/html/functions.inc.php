@@ -1104,6 +1104,10 @@ function get_rules_from_json()
 
 function search_oxidized_config($search_in_conf_textbox)
 {
+    if (!Auth::user()->hasGlobalRead()) {
+        return false;
+    }
+
     $oxidized_search_url = Config::get('oxidized.url') . '/nodes/conf_search?format=json';
     $postdata = http_build_query(
         array(
@@ -1125,6 +1129,14 @@ function search_oxidized_config($search_in_conf_textbox)
         $dev = device_by_name($n['node']);
         $n['dev_id'] = $dev ? $dev['device_id'] : false;
     }
+
+    /*
+    // Filter nodes we don't have access too
+    $nodes = array_filter($nodes, function($device) {
+        return \Permissions::canAccessDevice($device['dev_id'], Auth::id());
+    });
+    */
+
     return $nodes;
 }
 
