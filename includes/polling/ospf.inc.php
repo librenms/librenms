@@ -148,9 +148,14 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
     $ospf_tos_metrics = collect();
     foreach ($ospf_tos_poll as $ospf_tos_id => $ospf_tos) {
+        // get ospf_port_id
+        $ospf_tos['ospf_port_id'] = OspfPort::query()
+            ->where('ospfIfIpAddress', $ospf_tos['ospfIfMetricIpAddress'])
+            ->where('context_name', $device['context_name'])
+            ->value('ospf_port_id');
         $tos = OspfTos::updateOrCreate([
             'device_id' => $device['device_id'],
-            'ospf_port_id' => $ospf_tos_id,
+            'ospf_port_id' => $ospf_tos['ospf_port_id'],
             'context_name' => $device['context_name'],
         ], $ospf_tos);
 
@@ -158,7 +163,7 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
     }
 
     // cleanup
-    OspfPort::query()
+    OspfTos::query()
         ->where(['device_id' => $device['device_id'], 'context_name' => $device['context_name']])
         ->whereNotIn('id', $ospf_tos_metrics->pluck('id'))->delete();
 
