@@ -140,7 +140,6 @@ foreach ($vrfs_lite_cisco as $vrf_lite) {
 
     echo $ospf_neighbours->count();
 
-    /* start of OSPF TOS - remove later */
     echo ' TOS Metrics: ';
 
     // Pull data from device
