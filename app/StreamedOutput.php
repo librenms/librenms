@@ -38,7 +38,9 @@ class StreamedOutput extends StreamOutput
 
         echo $message . PHP_EOL;
 
-        ob_flush();
+        if (ob_get_level() > 0) {
+            ob_flush();
+        }
         flush();
     }
 }
