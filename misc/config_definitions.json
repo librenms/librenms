@@ -1538,14 +1538,14 @@
             "type": "boolean"
         },
         "fping": {
-            "default": "/usr/bin/fping",
+            "default": "fping",
             "group": "external",
             "section": "binaries",
             "order": 0,
             "type": "executable"
         },
         "fping6": {
-            "default": "/usr/bin/fping6",
+            "default": "fping6",
             "group": "external",
             "section": "executable",
             "order": 1,
@@ -4583,7 +4583,7 @@
             "type": "boolean"
         },
         "rrdtool": {
-            "default": "/usr/bin/rrdtool",
+            "default": "rrdtool",
             "group": "external",
             "section": "binaries",
             "order": -1,
@@ -5069,14 +5069,14 @@
             "type": "boolean"
         },
         "traceroute": {
-            "default": "/usr/sbin/traceroute",
+            "default": "traceroute",
             "group": "external",
             "section": "binaries",
             "order": 13,
             "type": "executable"
         },
         "traceroute6": {
-            "default": "/usr/sbin/traceroute6",
+            "default": "traceroute6",
             "group": "external",
             "section": "binaries",
             "order": 14,
