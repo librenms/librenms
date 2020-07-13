@@ -255,7 +255,7 @@ if (!$args['nototal']) {
         $rrd_options .= " COMMENT:' \t'";
         $rrd_options .= ' GPRINT:outbitsX:AVERAGE:%6.'.$float_precision."lf%s$units";
         $rrd_options .= ' GPRINT:outbitsX:MAX:%6.'.$float_precision."lf%s$units";
-        $rrd_options .= " GPRINT:totoutX:%6.2lf%s$total_units";
+        $rrd_options .= ' GPRINT:totoutX:%6.'.$float_precision."lf%s$total_units";
     }
     $rrd_options .= " COMMENT:'\\n'";
 
