@@ -1,0 +1,2824 @@
+TAIT-TN9300-MIB DEFINITIONS ::= BEGIN
+--
+-- Versions:
+--
+-- Release 1
+-- Preliminary support for monitoring of TN9300 DMR Node controller status.
+--
+-- Release 2
+-- Changed type of the site syscode to string
+--
+-- Notes:
+--  None
+--
+
+IMPORTS
+   enterprises, Integer32, Unsigned32, Gauge32, Counter32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY, NOTIFICATION-TYPE
+      FROM SNMPv2-SMI
+   DisplayString, DateAndTime, TruthValue
+      FROM SNMPv2-TC
+   InetAddressType, InetAddress
+      FROM INET-ADDRESS-MIB
+   MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+      FROM SNMPv2-CONF
+   NodeRequestedState, NodeState, NetworkCheckState,
+   ChannelState, Mpt1327LinkState,
+   Mpt1327ChannelState, RemoteNodeState,
+   DipLineState, NgwLinkState, SipCallSpeechVotingPriority,
+   SipLineIncomingType, SipLineRegistrationType, SipLineState,
+   UnitStatusMessageId, EventSeverity, LicenseValidity, 
+   UnitAuthentication, RemoteNodeSyncState
+      FROM TAIT-TN9300-TC
+
+   taitProducts, taitModules
+      FROM TAIT-COMMON-MIB;
+
+tn9300MibModule MODULE-IDENTITY
+   LAST-UPDATED "201903181400Z"
+   ORGANIZATION "www.taitworld.com"
+   CONTACT-INFO
+      "postal:   Tait International Limited
+                 558 Wairakei Road
+                 Christchurch
+                 PO Box 1645
+                 Christchurch
+                 New Zealand
+
+       phone:    +64 3358 3399
+       email:    support@taitworld.com"
+   DESCRIPTION "TaitNet TN9300 DMR Node Controller Module"
+
+   REVISION "201903181400Z"
+   DESCRIPTION "Added four new site and channel objects for the alternate channel."
+
+   REVISION "201901281630Z"
+   DESCRIPTION "Defined a new tn9300ChannelBaseStationNumber object then added it as a channel table index.
+                Also updated some of the description text."
+
+   REVISION "201901091200Z"
+   DESCRIPTION "Added the description for tn9300LicenseValidity."
+
+   REVISION "201812041200Z"
+   DESCRIPTION "Defined a new set of events, 19 in total, and its corresponding groups and objects.
+                These new events are intended to be an alternative to the original set."
+
+   REVISION "201811231200Z"
+   DESCRIPTION "Defined the channel stuck mute event."
+
+   REVISION "201811211200Z"
+   DESCRIPTION "Created a new tn9300EventBaseStationNumber object and added it to the channel jammed/unjammed traps.
+                For the other channel traps, the channel number object previously added was replaced with this."
+
+   REVISION "201810251200Z"
+   DESCRIPTION "Replaced the added site number in site failure/ok events with site name.
+                Added the site name and channel number to all of the channel related events.
+                Defined tn9300EventChannelNumber to serve as the channel number object specifically for events.
+                Changed the OID of tn9300EventUnitAddress to use the tn9300ObjectsForEvents subtree instead.
+                Defined a new group for event objects and added the two mentioned above.
+                Fixed some errors and warnings, and corrected some descriptions."
+
+   REVISION "201807311200Z"
+   DESCRIPTION "Added the site number to the site failure event and the channel number to the channel failure event"
+
+   REVISION "201807171005Z"
+   DESCRIPTION "Changed to Tait International Limited"
+
+   REVISION "201805291200Z"
+   DESCRIPTION "Added dual CC and syscode for dynamic adjacent site"
+
+   REVISION "201804231200Z"
+   DESCRIPTION "Fixed range restriction for tn9300UnitAddress.
+            Removed tn9300UnitAddress from tn9300UnitAddressGroup."
+
+   REVISION "201804171200Z"
+   DESCRIPTION "Fixed identifier for tn9300UnitGroup.
+            Fixed ranage restriction for tn9300AdjSiteSendOrder and tn9300UnitAddress.
+            Changed to use tn9300EventIUnitAddress in the tn9300UnitStatusMessageEvent.
+            Changed to accessible-for-notify for tn9300UnitAddress
+            Set tn9300EventIUnitAddress to tn9300UnitGroup "
+
+   REVISION "201803182203Z"
+   DESCRIPTION "Added identifiers to conformance group.
+            Fixed inconsistency in type of 'tn9300SipLineProxyAddress'.
+            Changed some naming conventions."
+
+   REVISION "201803081200Z"
+   DESCRIPTION "Added table for adjacent site and added site alias in site table"
+
+   REVISION "201803051200Z"
+   DESCRIPTION "Added traps for deregistration by system"
+
+   REVISION "201801260000Z"
+   DESCRIPTION "Added traps for remote node database sync"
+
+   REVISION "201711220000Z"
+   DESCRIPTION "Fixed format and description for dual control channel"
+
+   REVISION "201705240000Z"
+   DESCRIPTION "Added CPU and memory utilization monitoring."
+
+   REVISION "201703160054Z"
+   DESCRIPTION "Fixed uppercase/lowercase inconsistencies."
+
+   REVISION "201608221200Z"
+   DESCRIPTION "Added 3 Terminal alarm descriptions"
+
+   REVISION "201510301200Z"
+   DESCRIPTION "Added SipLine objects and changed the term FxoLine to SipLine.
+                Changed some descriptions."
+
+   REVISION "201503172208Z"
+   DESCRIPTION "added Unit object, table and status notification"
+
+   REVISION "201404042307Z"
+   DESCRIPTION "Added authentication ok and failure notifications."
+
+   REVISION "201211292201Z"
+   DESCRIPTION "Object descriptions updated."
+
+   REVISION "201206282228Z"
+   DESCRIPTION "Removed digital io tables and notifications.
+                Changed format of notifications to include a newline between the DESCRIPTION
+                tag and the description text."
+
+   REVISION "201206270902Z"
+   DESCRIPTION "Changed type of the syscode value to string"
+
+   REVISION "201205282317Z"
+   DESCRIPTION "Initial revision of this module"
+       ::= { taitModules 11 }
+
+-- root for items in the tn9300 MIB module
+tn9300MIB OBJECT IDENTIFIER ::= { taitProducts 6 }
+
+-- conformance area, containing groups and compliance specifications
+tn9300Confs  OBJECT IDENTIFIER ::= { tn9300MIB 1 }
+tn9300Groups OBJECT IDENTIFIER ::= { tn9300Confs 1 }
+tn9300Compl  OBJECT IDENTIFIER ::= { tn9300Confs 2 }
+
+-- sub-tree for objects and for each functional area
+tn9300Objs             OBJECT IDENTIFIER ::= { tn9300MIB 2 }
+tn9300NodeObjs         OBJECT IDENTIFIER ::= { tn9300Objs 1 }
+tn9300SiteObjs         OBJECT IDENTIFIER ::= { tn9300Objs 2 }
+tn9300SipLineObjs      OBJECT IDENTIFIER ::= { tn9300Objs 3 }
+tn9300DipLineObjs      OBJECT IDENTIFIER ::= { tn9300Objs 4 }
+tn9300Mpt1327Objs      OBJECT IDENTIFIER ::= { tn9300Objs 5 }
+tn9300Mpt1327ChObjs    OBJECT IDENTIFIER ::= { tn9300Objs 6 }
+tn9300RemoteNodeObjs   OBJECT IDENTIFIER ::= { tn9300Objs 7 }
+tn9300MobileIpObjs     OBJECT IDENTIFIER ::= { tn9300Objs 8 }
+tn9300UnitObjs         OBJECT IDENTIFIER ::= { tn9300Objs 9 }
+tn9300NetworkGwObjs    OBJECT IDENTIFIER ::= { tn9300Objs 10 }
+tn9300EventObjs        OBJECT IDENTIFIER ::= { tn9300Objs 99 }
+
+-- sub-tree for events
+tn9300Events           OBJECT IDENTIFIER ::= { tn9300MIB 3 }
+tn9300EventsV2         OBJECT IDENTIFIER ::= { tn9300Events 0 }
+tn9300ObjectsForEvents OBJECT IDENTIFIER ::= { tn9300Events 99 }
+
+-- sub-tree for Channel Group Manager
+tn9300CgmMIB   OBJECT IDENTIFIER ::= { tn9300MIB 4 }
+
+tn9300Version OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The version of software running on the node controller."
+      ::= { tn9300NodeObjs 1 }
+
+tn9300Name OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Name:
+                Represents the name of this node controller."
+      ::= { tn9300NodeObjs 2 }
+
+tn9300Priority OBJECT-TYPE
+   SYNTAX Integer32 (0..21)
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Priority:
+                Represents the priority of this node. On multi-node systems the lowest priority node
+                assumes control of the network."
+      ::= { tn9300NodeObjs 3 }
+
+tn9300RequestedState OBJECT-TYPE
+   SYNTAX NodeRequestedState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Requested state:
+                Represents the state in which this node has been instructed to operate. Status types are Unknown (0), Offline (1), Program (2) or Online (3)."
+      ::= { tn9300NodeObjs 4 }
+
+tn9300State OBJECT-TYPE
+   SYNTAX NodeState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "State:
+                Represents the state in which this node is operating. Status types are Unknown (0), Offline (1), Program (2), Switching (3) or Control (4)."
+      ::= { tn9300NodeObjs 5 }
+
+tn9300NetCheckAddressAType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The type of internet address for network check A."
+      ::= { tn9300NodeObjs 7 }
+
+tn9300NetCheckAddressA OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The IP address for network check A."
+      ::= { tn9300NodeObjs 8 }
+
+tn9300NetCheckStateA OBJECT-TYPE
+   SYNTAX NetworkCheckState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The status of network check A. Status types are Not Configured (0), OK (1) or Failed (2)."
+      ::= { tn9300NodeObjs 9 }
+
+tn9300NetCheckAddressBType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The type of internet address for network check B."
+      ::= { tn9300NodeObjs 10 }
+
+tn9300NetCheckAddressB OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The IP address for network check B."
+      ::= { tn9300NodeObjs 11 }
+
+tn9300NetCheckStateB OBJECT-TYPE
+   SYNTAX NetworkCheckState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The status of network check B. Status types are Not Configured (0), OK (1) or Failed (2)."
+      ::= { tn9300NodeObjs 12 }
+
+tn9300CallsSwitching OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of calls being switched by this node."
+      ::= { tn9300NodeObjs 13 }
+
+tn9300ConnectionsSwitching OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of connections being switched by this node."
+      ::= { tn9300NodeObjs 14 }
+
+tn9300MemoryUsage OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total physical memory used by all node processes (percent)"
+      ::= { tn9300NodeObjs 15 }
+
+tn9300CpuUsage OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The current total CPU load of all node processes (percent)"
+      ::= { tn9300NodeObjs 16 }
+
+tn9300DiskSpaceOk OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Indicates whether the available disk space is above or below threshold."
+      ::= { tn9300NodeObjs 17 }
+
+tn9300LicenseValidity OBJECT-TYPE
+   SYNTAX LicenseValidity
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The current validity of the license. Types are as follows:
+                Valid (0),
+                File not found (1),
+                Invalid host ID (2),
+                Invalid product code (3),
+                Invalid version (4),
+                Invalid expiry date (5),
+                Expired (6),
+                Corrupt signature (7),
+                Conflicting features (8),
+                Invalid tier mode (9),
+                Invalid license format (10)"
+      ::= { tn9300NodeObjs 18 }
+
+--
+-- The site table
+--
+
+tn9300SiteTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300SiteEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the status of the sites connected to this node controller."
+      ::= { tn9300SiteObjs 1 }
+
+tn9300SiteEntry OBJECT-TYPE
+   SYNTAX Tn9300SiteEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, just the site number."
+   INDEX { tn9300SiteNumber }
+      ::= { tn9300SiteTable 1 }
+
+Tn9300SiteEntry ::=
+   SEQUENCE {
+      tn9300SiteNumber Integer32,
+      tn9300SiteName DisplayString,
+      tn9300SiteSyscode DisplayString,
+      tn9300SiteEnabled TruthValue,
+      tn9300SiteOk TruthValue,
+      tn9300SiteAutoQueueDepth TruthValue,
+      tn9300SiteQueueDepth Integer32,
+      tn9300SiteZone Integer32,
+      tn9300SiteExtraWaitSlots Integer32,
+      tn9300SiteCCReassignTimeout Integer32,
+      tn9300SiteTCRotation TruthValue,
+      tn9300SiteRxActivityTimeout Integer32,
+      tn9300SiteRxInactiveTimeout Integer32,
+      tn9300SiteFramelength Integer32,
+      tn9300SiteMinFramelength Integer32,
+      tn9300SiteMaxFramelength Integer32,
+      tn9300SiteDualCC Integer32,
+      tn9300SiteOpenMuteTimeout Integer32,
+      tn9300SiteManAdjSiteRF Integer32,
+      tn9300SiteManAdjSiteSyscode DisplayString,
+      tn9300SiteNChannels Gauge32,
+      tn9300SiteNControlChannels Gauge32,
+      tn9300SiteNTrafficChannels Gauge32,
+      tn9300SiteNIdleChannels Gauge32,
+      tn9300SiteNDisabledChannels Gauge32,
+      tn9300SiteNFailedChannels Gauge32,
+      tn9300SiteNOnAirCalls Gauge32,
+      tn9300SiteNRingingCalls Gauge32,
+      tn9300SiteNQueuedCalls Gauge32,
+      tn9300SiteTotalCalls Counter32,
+      tn9300SiteTotalChannelCalls Counter32,
+      tn9300SiteTotalQueueTime Counter32,
+      tn9300SiteChannelTimeFailed Counter32,
+      tn9300SiteChannelTimeTraffic Counter32,
+      tn9300SiteChannelTimeControl Counter32,
+      tn9300SiteChannelTimeIdle Counter32,
+      tn9300SiteCallsQueuedUnder5 Counter32,
+      tn9300SiteCallsQueued5To10 Counter32,
+      tn9300SiteCallsQueued10To20 Counter32,
+      tn9300SiteCallsQueuedOver20 Counter32,
+      tn9300SiteAlias DisplayString,
+      tn9300SiteControlChCountOk TruthValue,
+      tn9300SiteNAlternateChannels Gauge32,
+      tn9300SiteChannelTimeAlternate Counter32
+   }
+
+tn9300SiteNumber OBJECT-TYPE
+   SYNTAX Integer32 (1..250)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "Site Number:
+                Represents a unique identifier for this site."
+      ::= { tn9300SiteEntry 1 }
+
+tn9300SiteName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Site Name:
+                The name of this site."
+      ::= { tn9300SiteEntry 2 }
+
+tn9300SiteSyscode OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Syscode:
+                The syscode of this site."
+      ::= { tn9300SiteEntry 3 }
+
+tn9300SiteEnabled OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Enabled:
+                 Boolean value, true if this site is enabled."
+      ::= { tn9300SiteEntry 4 }
+
+tn9300SiteOk OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Enabled:
+                 Boolean value, true if this site is OK."
+      ::= { tn9300SiteEntry 5 }
+
+tn9300SiteAutoQueueDepth OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Automatic Queue Depth:
+                 Boolean value, if true, the queue depth is set to twice the number of traffic
+                 channels at this site with a minimum value of 3 and a maximum of 20."
+      ::= { tn9300SiteEntry 6 }
+
+tn9300SiteQueueDepth OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Queue Depth:
+                Represents the maximum number of calls that are allowed to be queued at this site."
+      ::= { tn9300SiteEntry 7 }
+
+tn9300SiteZone OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Zone:
+                The ID of the zone to which this site belongs.
+                When a call is placed to a radio that is registered on a site with a
+                zone ID the network will attempt to contact the radio on all sites
+                with the same zone ID.
+
+                This reduces registration traffic but increases individual call
+                request traffic. It is useful on systems with large numbers of radios
+                and few individual calls. These systems often only make group calls.
+
+                This feature is not recommended if registration based group calls are used."
+      ::= { tn9300SiteEntry 8 }
+
+tn9300SiteExtraWaitSlots OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Extra Wait Slots:
+                Represents the number of extra slots that the site should wait for a radio
+                to reply to a control channel poll (i.e. an AHOY).
+
+                This feature is used at sites where there is an extra delay in the
+                transmission/reception of on-air codewords that puts it outside of the MPT timing
+                specifications, e.g. a cell extender site, which can add in 1 or more slots of delay.
+
+                Disadvantages:
+                1. To stop conflicts, the site will withdraw the extra slots when waiting. This
+                means other radios will be unable to make call requests during this time.
+
+                2. As a site can only process one outgoing call (site to radio) at a time, it will
+                not be able to process as many calls.
+
+                3. As a rule of thumb, each extra wait slot added to the site will halve the maximum
+                call rate the site can handle."
+      ::= { tn9300SiteEntry 9 }
+
+tn9300SiteCCReassignTimeout OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Control Channel Reassignment Timeout:
+                Represents the time (in minutes), between switching the control channel from
+                one channel to another.
+
+                Control channel reassignment should be used only when there is a compelling
+                (i.e. regulatory) reason to move the control channel at intervals.
+
+                If this feature is used it is recommended that jammed channels are inhibited
+                from becoming control channels.
+
+                If set to 0, the lowest numbered, uninhibited channel becomes the control
+                channel and remains so unless it fails. If it fails the node will reassign
+                the next lowest numbered channel.
+
+                Immediately before reassignment, the control channel issues a MOVE command to
+                all radios to transfer them to the new control channel frequency."
+      ::= { tn9300SiteEntry 10 }
+
+tn9300SiteTCRotation OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Traffic Channel Rotation:
+                 If traffic channel rotation is enabled, the node will allocate a new traffic channel
+                 to each call. The traffic channels are chosen based on the channel number with lower
+                 numbers being used first. Only idle channels that are configured to be traffic channels
+                 are used in the selection process. When all the channels at the site have been used, the
+                 selection process starts again with the lowest channel number."
+      ::= { tn9300SiteEntry 11 }
+
+tn9300SiteRxActivityTimeout OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Site Receiver Activity Timeout:
+                Represents a number of slots (each of duration 106ms). If interference is detected in
+                each consecutive slot for this number of slots, the channel is deemed to be jammed."
+      ::= { tn9300SiteEntry 12 }
+
+tn9300SiteRxInactiveTimeout OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Site Receiver Activity Timeout:
+                Represents a number of slots (each of duration 106ms). If no interference is detected in
+                each consecutive slot for this number of slots, the channel is deemed to be not jammed."
+      ::= { tn9300SiteEntry 13 }
+
+tn9300SiteFramelength OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Framelength:
+                Represents the number of slots in a frame. Bigger framelengths reduce the probability of
+                two radios selecting the same slot and failing. However call setup is slower when retries
+                occur.
+
+                A value of zero represents dynamic framelength. In this case the node will use an
+                algorithm, based on codeword statistics, to determine the most appropriate framelength
+                between the limits set by the maximum and minimum dynamic framelength."
+      ::= { tn9300SiteEntry 14 }
+
+tn9300SiteMinFramelength OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Minimum Dynamic Framelength:
+                Represents the minimum number of slots in a frame when using dynamic framelength."
+      ::= { tn9300SiteEntry 15 }
+
+tn9300SiteMaxFramelength OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Maximum Dynamic Framelength:
+                Represents the maximum number of slots in a frame when using dynamic framelength."
+      ::= { tn9300SiteEntry 16 }
+
+tn9300SiteDualCC OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "Dual Control Channels:
+                 Allows for a second control channel on this site. Both control channels
+                 share the other channels for traffic use.
+
+                 This is useful at sites with lots of traffic channels and/or a large quantity of
+                 data communications. In addition to the primary control channel the next lowest
+                 numbered channel will be used as the second control channel (so long as it is
+                 correctly configured and not inhibited.)
+
+                 When this feature is enabled and a radio registers on the primary control channel:
+
+                 1. The node determines if it is allowed to used the second control channel.
+                 2. If it is, the node instructs the radio to register on the second control channel.
+
+                 When using dual control channels, you can have them with the same syscode
+                 or with complementary syscodes that have different PAR values
+
+                 Single (0), Dual-same syscode(1), Dual-different PAR(2)"
+      ::= { tn9300SiteEntry 17 }
+
+tn9300SiteOpenMuteTimeout OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Open Mute Timeout:
+                Represents the time (seconds) that a traffic channel will wait for the receiver
+                to go idle before sending clear messages.
+
+                The traffic channel waits for the receiver to go idle as parties transmitting on
+                the channel may miss the clear messages.
+
+                On some systems the receiver may get jammed from noise (stuck mute) and therefore
+                the channel may not go 'idle'. This timeout is used to force the sending of clear
+                messages in these circumstances."
+      ::= { tn9300SiteEntry 18 }
+
+tn9300SiteManAdjSiteRF OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Manual Adjacent Site RF:
+                Represents the RF number of a manual adjacent control channel. Used for a cell extender."
+      ::= { tn9300SiteEntry 19 }
+
+tn9300SiteManAdjSiteSyscode OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Manual Adjacent Site Syscode:
+                Represents the syscode of a manual adjacent control channel. Used for a cell extender."
+      ::= { tn9300SiteEntry 20 }
+
+tn9300SiteNChannels  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of channels:
+                Represents the number of channels installed at this site."
+      ::= { tn9300SiteEntry 21 }
+
+tn9300SiteNControlChannels  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of control channels:
+                Represents the number of channels operating as control channels at this site."
+      ::= { tn9300SiteEntry 22 }
+
+tn9300SiteNTrafficChannels  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of traffic channels:
+                Represents the number of channels operating as traffic channels at this site."
+      ::= { tn9300SiteEntry 23 }
+
+tn9300SiteNIdleChannels  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of idle channels:
+                Represents the number of idle channels at this site."
+      ::= { tn9300SiteEntry 24 }
+
+tn9300SiteNDisabledChannels  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of disabled channels:
+                Represents the number of disabled channels at this site."
+      ::= { tn9300SiteEntry 25 }
+
+tn9300SiteNFailedChannels  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of failed channels:
+                Represents the number of failed channels at this site."
+      ::= { tn9300SiteEntry 26 }
+
+tn9300SiteNOnAirCalls  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of on-air calls:
+                Represents the number of calls currently on-air at this site."
+      ::= { tn9300SiteEntry 27 }
+
+tn9300SiteNRingingCalls  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of ringing calls:
+                Represents the number of calls waiting to be answered at this site."
+      ::= { tn9300SiteEntry 28 }
+
+tn9300SiteNQueuedCalls  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of queued calls:
+                Represents the number of calls that are queued at this site."
+      ::= { tn9300SiteEntry 29 }
+
+tn9300SiteTotalCalls OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Total calls:
+                Represents the total number of calls at this site since the node started."
+      ::= { tn9300SiteEntry 30 }
+
+tn9300SiteTotalChannelCalls OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Total channel calls:
+                Represents the total number of calls that required a traffic channel at this site since the node started."
+      ::= { tn9300SiteEntry 31 }
+
+tn9300SiteTotalQueueTime OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Total queue time:
+                Represents the total queue time in seconds of all calls at this site since the node started."
+      ::= { tn9300SiteEntry 32 }
+
+tn9300SiteChannelTimeFailed OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Channel time failed:
+                Represents the total time in seconds that channels at this site have spent in the failed state since the node started."
+      ::= { tn9300SiteEntry 33 }
+
+tn9300SiteChannelTimeTraffic OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Channel time traffic:
+                Represents the total time in seconds that channels at this site have spent as traffic channels since the node started."
+      ::= { tn9300SiteEntry 34 }
+
+tn9300SiteChannelTimeControl OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Channel time control:
+                Represents the total time in seconds that channels at this site have spent as control channels since the node started."
+      ::= { tn9300SiteEntry 35 }
+
+tn9300SiteChannelTimeIdle OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Channel time idle:
+                Represents the total time in seconds that channels at this site have spent in the idle state since the node started."
+      ::= { tn9300SiteEntry 36 }
+
+tn9300SiteCallsQueuedUnder5 OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of calls that have been queued under 5 seconds at this site since the node started."
+      ::= { tn9300SiteEntry 37 }
+
+tn9300SiteCallsQueued5To10 OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of calls that have been queued between 5 and 10 seconds at this site since the node started."
+      ::= { tn9300SiteEntry 38 }
+
+tn9300SiteCallsQueued10To20 OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of calls that have been queued between 10 and 20 seconds at this site since the node started."
+      ::= { tn9300SiteEntry 39 }
+
+tn9300SiteCallsQueuedOver20 OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of calls that have been queued for longer than 20 seconds at this site since the node started."
+      ::= { tn9300SiteEntry 40 }
+
+tn9300SiteAlias OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Site alias:
+                The short name of this site."
+      ::= { tn9300SiteEntry 41 }
+
+tn9300SiteControlChCountOk OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Indicates whether the actual number of control channel for the site matches the required."
+      ::= { tn9300SiteEntry 42 }
+
+tn9300SiteNAlternateChannels OBJECT-TYPE
+  SYNTAX Gauge32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Number of alternate channels:
+               Represents the number of channels operating as alternate channels at this site."
+     ::= { tn9300SiteEntry 43 }
+
+tn9300SiteChannelTimeAlternate OBJECT-TYPE
+  SYNTAX Counter32
+  MAX-ACCESS read-only
+  STATUS current
+  DESCRIPTION "Channel time alternate:
+               Represents the total time in seconds that channels at this site have spent as alternate channels since the node started."
+     ::= { tn9300SiteEntry 44 }
+
+-- TODO Partitions, AdjacentSites, PooledSites
+
+--
+-- The channel table
+--
+
+tn9300ChannelTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300ChannelEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of the channels."
+      ::= { tn9300SiteObjs 2 }
+
+tn9300ChannelEntry OBJECT-TYPE
+   SYNTAX Tn9300ChannelEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the site number and the channel number."
+   INDEX { tn9300SiteNumber, tn9300ChannelBaseStationNumber, tn9300ChannelNumber }
+      ::= { tn9300ChannelTable 1 }
+
+Tn9300ChannelEntry ::=
+   SEQUENCE {
+      tn9300ChannelNumber Integer32,
+      tn9300ChannelIpAddressType InetAddressType,
+      tn9300ChannelIpAddress InetAddress,
+      tn9300ChannelPort Integer32,
+      tn9300ChannelRf Integer32,
+      tn9300ChannelEnabled TruthValue,
+      tn9300ChannelControlAllowed TruthValue,
+      tn9300ChannelTrafficAllowed TruthValue,
+      tn9300ChannelInhibitIfJammed TruthValue,
+      tn9300ChannelState ChannelState,
+      tn9300ChannelJammed TruthValue,
+      tn9300ChannelMinorAlarm TruthValue,
+      tn9300ChannelMajorAlarm TruthValue,
+      tn9300ChannelAParty DisplayString,
+      tn9300ChannelBParty DisplayString,
+      tn9300ChannelBspRxPackets Counter32,
+      tn9300ChannelBspTxPackets Counter32,
+      tn9300ChannelBspLostPackets Counter32,
+      tn9300ChannelRtpRxPackets Counter32,
+      tn9300ChannelRtpTxPackets Counter32,
+      tn9300ChannelRtpLostPackets Counter32,
+      tn9300ChannelRtpRtt Gauge32,
+      tn9300ChannelRtpRttJitter Gauge32,
+      tn9300ChannelTimeFailed Counter32,
+      tn9300ChannelTimeTraffic Counter32,
+      tn9300ChannelTimeControl Counter32,
+      tn9300ChannelTimeIdle Counter32,
+      tn9300ChannelAlternateAllowed TruthValue,
+      tn9300ChannelTimeAlternate Counter32,
+      tn9300ChannelBaseStationNumber Integer32
+   }
+
+tn9300ChannelNumber OBJECT-TYPE
+   SYNTAX Integer32 (1..24)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The number of this channel."
+      ::= { tn9300ChannelEntry 1 }
+
+tn9300ChannelIpAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The type of internet address for this channel."
+      ::= { tn9300ChannelEntry 2 }
+
+tn9300ChannelIpAddress OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The IP address for this channel."
+      ::= { tn9300ChannelEntry 3 }
+
+tn9300ChannelPort OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The port number of this channel."
+      ::= { tn9300ChannelEntry 4 }
+
+tn9300ChannelRf OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The radio frequency of this channel."
+      ::= { tn9300ChannelEntry 5 }
+
+tn9300ChannelEnabled OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Boolean value, true if this channel is enabled."
+      ::= { tn9300ChannelEntry 6 }
+
+tn9300ChannelControlAllowed OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Boolean value, true if this channel is allowed to become a control channel."
+      ::= { tn9300ChannelEntry 7 }
+
+tn9300ChannelTrafficAllowed OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Boolean value, true if this channel is allowed to become a traffic channel."
+      ::= { tn9300ChannelEntry 8 }
+
+tn9300ChannelInhibitIfJammed OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Boolean value, true if this channel is configured to be inhibited if it is jammed."
+      ::= { tn9300ChannelEntry 9 }
+
+tn9300ChannelState OBJECT-TYPE
+   SYNTAX ChannelState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The state of this channel. Status types are Unknown (0), Disabled (1), Idle (2), Control (3), Traffic (4), Data (5) or Failed (6)."
+      ::= { tn9300ChannelEntry 10 }
+
+tn9300ChannelJammed OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Boolean value, true if this channel is jammed."
+      ::= { tn9300ChannelEntry 11 }
+
+tn9300ChannelMinorAlarm OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Boolean value, true if this channel has a minor alarm."
+      ::= { tn9300ChannelEntry 12 }
+
+tn9300ChannelMajorAlarm OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Boolean value, true if this channel has a major alarm."
+      ::= { tn9300ChannelEntry 13 }
+
+tn9300ChannelAParty OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The MPT1327 number of the A party (if a call is in progress on the channel)."
+      ::= { tn9300ChannelEntry 14 }
+
+tn9300ChannelBParty OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The MPT1327 number of the B party (if a call is in progress on the channel)."
+      ::= { tn9300ChannelEntry 15 }
+
+tn9300ChannelBspRxPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of BSP packets received from this channel."
+      ::= { tn9300ChannelEntry 16 }
+
+tn9300ChannelBspTxPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of BSP packets transmitted to this channel."
+      ::= { tn9300ChannelEntry 17 }
+
+tn9300ChannelBspLostPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of BSP packets which were lost in transmission to this channel."
+      ::= { tn9300ChannelEntry 18 }
+
+tn9300ChannelRtpRxPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of RTP packets received from this channel."
+      ::= { tn9300ChannelEntry 19 }
+
+tn9300ChannelRtpTxPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of RTP packets transmitted to this channel."
+      ::= { tn9300ChannelEntry 20 }
+
+tn9300ChannelRtpLostPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of RTP packets which were lost in transmission to this channel."
+      ::= { tn9300ChannelEntry 21 }
+
+tn9300ChannelRtpRtt OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The round trip time for RTP pings."
+      ::= { tn9300ChannelEntry 22 }
+
+tn9300ChannelRtpRttJitter OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The round trip time jitter for RTP pings."
+      ::= { tn9300ChannelEntry 23 }
+
+tn9300ChannelTimeFailed OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total time in seconds that this channel has spent in the failed state since the node started."
+      ::= { tn9300ChannelEntry 24 }
+
+tn9300ChannelTimeTraffic OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total time in seconds that this channel has spent as a traffic channel since the node started."
+      ::= { tn9300ChannelEntry 25 }
+
+tn9300ChannelTimeControl OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total time in seconds that this channel has spent as a control channel since the node started."
+      ::= { tn9300ChannelEntry 26 }
+
+tn9300ChannelTimeIdle OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total time in seconds that this channel has spent in the idle state since the node started."
+      ::= { tn9300ChannelEntry 27 }
+
+tn9300ChannelAlternateAllowed OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Boolean value, true if this channel is allowed to become an alternate channel."
+      ::= { tn9300ChannelEntry 28 }
+
+tn9300ChannelTimeAlternate OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The total time in seconds that this channel has spent as an alternate channel since the node started."
+      ::= { tn9300ChannelEntry 29 }
+
+tn9300ChannelBaseStationNumber OBJECT-TYPE
+   SYNTAX Integer32 (1..20)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The number of the base station this channel belongs to."
+      ::= { tn9300ChannelEntry 99 }
+
+--
+-- The adjacent site table
+--
+
+tn9300AdjacentSiteTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300AdjacentSiteEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of the adjacent sites."
+      ::= { tn9300SiteObjs 5 }
+
+tn9300AdjacentSiteEntry OBJECT-TYPE
+   SYNTAX Tn9300AdjacentSiteEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the site number and the adjacent site number."
+   INDEX { tn9300SiteNumber, tn9300AdjSiteSendOrder }
+      ::= { tn9300AdjacentSiteTable 1 }
+
+Tn9300AdjacentSiteEntry ::=
+   SEQUENCE {
+      tn9300AdjSiteSendOrder Integer32,
+      tn9300AdjSiteAlias DisplayString,
+      tn9300AdjSiteSyscode1 DisplayString,
+      tn9300AdjSiteRF1 Integer32,
+      tn9300AdjSiteSyscode2 DisplayString,
+      tn9300AdjSiteRF2 Integer32
+   }
+
+tn9300AdjSiteSendOrder OBJECT-TYPE
+   SYNTAX Integer32 (1..1024)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The send order of this adjacent site."
+      ::= { tn9300AdjacentSiteEntry 1 }
+
+tn9300AdjSiteAlias OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Site alias:
+                The short name of this site."
+      ::= { tn9300AdjacentSiteEntry 2 }
+
+tn9300AdjSiteSyscode1 OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Adjacent Site Syscode1:
+                Represents the first syscode of a this adjacent control channel. Used for a cell extender."
+      ::= { tn9300AdjacentSiteEntry 3 }
+
+tn9300AdjSiteRF1 OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Adjacent Site RF1:
+                Represents the first RF number of this adjacent control channel. Used for a cell extender."
+      ::= { tn9300AdjacentSiteEntry 4 }
+
+tn9300AdjSiteSyscode2 OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Adjacent Site Syscode2:
+                Represents the second syscode of a this adjacent control channel. Used for a cell extender."
+      ::= { tn9300AdjacentSiteEntry 5 }
+
+tn9300AdjSiteRF2 OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Adjacent Site RF2:
+                Represents the second RF number of this adjacent control channel. Used for a cell extender."
+      ::= { tn9300AdjacentSiteEntry 6 }
+
+--
+-- Mpt1327 Gateway
+--
+
+tn9300Mpt1327IpAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The type of internet address for the MPT1327 Gateway."
+      ::= { tn9300Mpt1327Objs 1 }
+
+tn9300Mpt1327IpAddress OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The IP address of the MPT1327 Gateway."
+      ::= { tn9300Mpt1327Objs 2 }
+
+tn9300Mpt1327Port OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The port number for the MPT1327 Gateway."
+      ::= { tn9300Mpt1327Objs 3 }
+
+tn9300Mpt1327State OBJECT-TYPE
+   SYNTAX Mpt1327LinkState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The state in which the MPT1327 gateway is operating. Status types are Unknown (0), OK (1) or Failed (2)."
+      ::= { tn9300Mpt1327Objs 4 }
+
+tn9300Mpt1327RxBytes OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of bytes received from the MPT1327 Gateway."
+      ::= { tn9300Mpt1327Objs 5 }
+
+tn9300Mpt1327TxBytes OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of bytes transmitted to the MPT1327 Gateway."
+      ::= { tn9300Mpt1327Objs 6 }
+
+tn9300Mpt1327LinkErrors OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of errors detected on the link to the MPT1327 Gateway."
+      ::= { tn9300Mpt1327Objs 7 }
+
+tn9300Mpt1327Connections OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of connections established to the MPT1327 Gateway."
+      ::= { tn9300Mpt1327Objs 8 }
+
+--
+-- The Mpt1327 gateway channel table
+--
+
+tn9300Mpt1327ChTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300Mpt1327ChEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of the MPT1327 gateway channels."
+      ::= { tn9300Mpt1327ChObjs 1 }
+
+tn9300Mpt1327ChEntry OBJECT-TYPE
+   SYNTAX Tn9300Mpt1327ChEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the MPT1327 gateway channel number."
+   INDEX { tn9300Mpt1327ChNumber }
+      ::= { tn9300Mpt1327ChTable 1 }
+
+Tn9300Mpt1327ChEntry ::=
+   SEQUENCE {
+      tn9300Mpt1327ChNumber Integer32,
+      tn9300Mpt1327ChIpAddressType InetAddressType,
+      tn9300Mpt1327ChIpAddress InetAddress,
+      tn9300Mpt1327ChPort Integer32,
+      tn9300Mpt1327ChState Mpt1327ChannelState,
+      tn9300Mpt1327ChLinkState NgwLinkState,
+      tn9300Mpt1327ChAParty DisplayString,
+      tn9300Mpt1327ChBParty DisplayString,
+      tn9300Mpt1327ChNgpRxPackets Counter32,
+      tn9300Mpt1327ChNgpTxPackets Counter32,
+      tn9300Mpt1327ChNgpLostPackets Counter32,
+      tn9300Mpt1327ChRtpRxPackets Counter32,
+      tn9300Mpt1327ChRtpTxPackets Counter32,
+      tn9300Mpt1327ChRtpLostPackets Counter32,
+      tn9300Mpt1327ChRtpRtt Gauge32,
+      tn9300Mpt1327ChRtpJitter Gauge32
+   }
+
+tn9300Mpt1327ChNumber OBJECT-TYPE
+   SYNTAX Integer32 (1..24)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel number:
+                The number of this channel."
+      ::= { tn9300Mpt1327ChEntry 1 }
+
+tn9300Mpt1327ChIpAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel IP address type:
+                The type of internet address for the network gateway used by this channel."
+      ::= { tn9300Mpt1327ChEntry 2 }
+
+tn9300Mpt1327ChIpAddress OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel IP address:
+                The IP address of the network gateway used by this channel."
+      ::= { tn9300Mpt1327ChEntry 3 }
+
+tn9300Mpt1327ChPort OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel port:
+                The port on the network gateway used by this channel."
+      ::= { tn9300Mpt1327ChEntry 4 }
+
+tn9300Mpt1327ChState OBJECT-TYPE
+   SYNTAX Mpt1327ChannelState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel state:
+                The state in which this channel is operating. Status types are Unknown (0), Idle (1), Traffic (2), Control (3) or Failed (4)."
+      ::= { tn9300Mpt1327ChEntry 5 }
+
+tn9300Mpt1327ChLinkState OBJECT-TYPE
+   SYNTAX NgwLinkState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel link state:
+                The state of the link between this channel and its associated network gateway. Status types are Unknown (0), OK (1) or Failed (2)."
+      ::= { tn9300Mpt1327ChEntry 6 }
+
+tn9300Mpt1327ChAParty OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel A party:
+                The MPT1327 number of the A party (if a call is in progress on this channel)."
+      ::= { tn9300Mpt1327ChEntry 7 }
+
+tn9300Mpt1327ChBParty OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel B party:
+                The MPT1327 number of the B party (if a call is in progress on this channel)."
+      ::= { tn9300Mpt1327ChEntry 8 }
+
+tn9300Mpt1327ChNgpRxPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel NGP rx packets:
+                The number of NGP packets received on this channel from its associated
+                network gateway."
+      ::= { tn9300Mpt1327ChEntry 9 }
+
+tn9300Mpt1327ChNgpTxPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel NGP tx packets:
+                The number of NGP packets transmitted from this channel to its associated
+                network gateway."
+      ::= { tn9300Mpt1327ChEntry 10 }
+
+tn9300Mpt1327ChNgpLostPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel NGP lost packets:
+                The number of NGP packets lost in transmission from this channel to its associated
+                network gateway."
+      ::= { tn9300Mpt1327ChEntry 11 }
+
+tn9300Mpt1327ChRtpRxPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel RTP rx packets:
+                The number of RTP packets received on this channel from its associated
+                network gateway."
+      ::= { tn9300Mpt1327ChEntry 12 }
+
+tn9300Mpt1327ChRtpTxPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel RTP tx packets:
+                The number of RTP packets transmitted from this channel to its associated
+                network gateway."
+      ::= { tn9300Mpt1327ChEntry 13 }
+
+tn9300Mpt1327ChRtpLostPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel RTP lost packets:
+                The number of RTP packets lost in transmission from this channel to its associated
+                network gateway."
+      ::= { tn9300Mpt1327ChEntry 14 }
+
+tn9300Mpt1327ChRtpRtt  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel RTP round trip time:
+                The round trip time for RTP pings."
+      ::= { tn9300Mpt1327ChEntry 15 }
+
+tn9300Mpt1327ChRtpJitter  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "MPT1327 gateway channel RTP round trip time jitter:
+                The round trip time jitter for RTP pings."
+      ::= { tn9300Mpt1327ChEntry 16 }
+
+--
+-- The SIP line table
+--
+
+tn9300SipLineTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300SipLineEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of the SIP lines."
+      ::= { tn9300SipLineObjs 1 }
+
+tn9300SipLineEntry OBJECT-TYPE
+   SYNTAX Tn9300SipLineEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the SIP line number."
+   INDEX { tn9300SipLineNumber }
+      ::= { tn9300SipLineTable 1 }
+
+Tn9300SipLineEntry ::=
+   SEQUENCE {
+      tn9300SipLineNumber Integer32,
+      tn9300SipLineName DisplayString,
+      tn9300SipLineRegistrationType SipLineRegistrationType,
+      tn9300SipLineUserName DisplayString,
+      tn9300SipLineEnabled TruthValue,
+      tn9300SipLineSpchVotePri SipCallSpeechVotingPriority,
+      tn9300SipLineAisMultipartContents TruthValue,
+      tn9300SipLineAisMonitor TruthValue,
+      tn9300SipLineSipGroup DisplayString,
+      tn9300SipLineInphoneTable DisplayString,
+      tn9300SipLineIncomingType SipLineIncomingType,
+      tn9300SipLineProxyAddressType InetAddressType,
+      tn9300SipLineProxyAddress InetAddress,
+      tn9300SipLineIpAddressType InetAddressType,
+      tn9300SipLineIpAddress InetAddress,
+      tn9300SipLineState SipLineState,
+      tn9300SipLineUptime Counter32,
+      tn9300SipLineConnects Counter32,
+      tn9300SipLineCalls Counter32
+   }
+
+tn9300SipLineNumber OBJECT-TYPE
+   SYNTAX Integer32 (1..100)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "SIP line number:
+                The number of this SIP line."
+      ::= { tn9300SipLineEntry 1 }
+
+tn9300SipLineName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line name:
+                The name of this SIP line."
+      ::= { tn9300SipLineEntry 2 }
+
+tn9300SipLineRegistrationType OBJECT-TYPE
+   SYNTAX SipLineRegistrationType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line type:
+                The registration type configured on this SIP line. Registration types are Unknown (0), Outbound (1), Inbound (2) or AIS (3)."
+      ::= { tn9300SipLineEntry 3 }
+
+tn9300SipLineUserName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line user name:
+                The user name of this SIP line."
+      ::= { tn9300SipLineEntry 4 }
+
+tn9300SipLineEnabled OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Enabled:
+                Boolean value, true if this SIP line is enabled."
+      ::= { tn9300SipLineEntry 5 }
+
+tn9300SipLineSpchVotePri OBJECT-TYPE
+   SYNTAX SipCallSpeechVotingPriority
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line speech voting priority:
+                Priorities are Unknown (0), Normal (1) or Override (2)."
+      ::= { tn9300SipLineEntry 6 }
+
+tn9300SipLineAisMultipartContents OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Multipart contents on AIS INVITE message:
+                Boolean value, true if the multipart contents are supported."
+      ::= { tn9300SipLineEntry 7 }
+
+tn9300SipLineAisMonitor OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Registration of AIS call monitor:
+                Boolean value, true if an AIS console is permitted to register as a call monitor."
+      ::= { tn9300SipLineEntry 8 }
+
+tn9300SipLineSipGroup OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP group name:
+                The SIP group name for this SIP line."
+      ::= { tn9300SipLineEntry 9 }
+
+tn9300SipLineInphoneTable OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Inphone table name:
+                The Inphone table name for this SIP line."
+      ::= { tn9300SipLineEntry 10 }
+
+tn9300SipLineIncomingType OBJECT-TYPE
+   SYNTAX SipLineIncomingType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line A party ID:
+                The ident of the A party for incoming calls on this SIP line (if any). Ident types are Unknown (0), PSTNI (1) or PABXI (2)."
+      ::= { tn9300SipLineEntry 11 }
+
+tn9300SipLineProxyAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line outgoing proxy IP address type:
+                The type of internet address for the outgoing proxy used by this SIP line."
+      ::= { tn9300SipLineEntry 12 }
+
+tn9300SipLineProxyAddress OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line outgoing proxy IP address:
+                The IP address for the outgoing proxy used by this SIP line."
+      ::= { tn9300SipLineEntry 13 }
+
+tn9300SipLineIpAddressType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP gateway IP address type:
+                The type of internet address for the SIP gateway connected this SIP line."
+      ::= { tn9300SipLineEntry 14 }
+
+tn9300SipLineIpAddress OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP gateway IP address:
+                The IP address of the SIP gateway connected by this SIP line."
+      ::= { tn9300SipLineEntry 15 }
+
+tn9300SipLineState OBJECT-TYPE
+   SYNTAX SipLineState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line state:
+                The state in which this SIP line is operating. Status types are Unknown (0), Disabled (1), Up (2) or Down (3)."
+      ::= { tn9300SipLineEntry 16 }
+
+tn9300SipLineUptime OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line uptime:
+                The length of time (in days hh:mm:ss) that the connection between the SIP gateway and the node has been established since its last reset."
+      ::= { tn9300SipLineEntry 17 }
+
+tn9300SipLineConnects OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line connects:
+                The number of times that the connection between the node and the SIP gateway has been re-established."
+      ::= { tn9300SipLineEntry 18 }
+
+tn9300SipLineCalls OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "SIP line calls:
+                The number of calls in progress on the SIP line."
+      ::= { tn9300SipLineEntry 19 }
+
+--
+-- The DIP connection table
+--
+
+tn9300DipLineTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300DipLineEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of the DIP connection channels."
+      ::= { tn9300DipLineObjs 1 }
+
+tn9300DipLineEntry OBJECT-TYPE
+   SYNTAX Tn9300DipLineEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the DIP connection channel number."
+   INDEX { tn9300DipLineNumber }
+      ::= { tn9300DipLineTable 1 }
+
+Tn9300DipLineEntry ::=
+   SEQUENCE {
+      tn9300DipLineNumber Integer32,
+      tn9300DipLineName DisplayString,
+      tn9300DipLineNgwIpAddrType InetAddressType,
+      tn9300DipLineNgwIpAddr InetAddress,
+      tn9300DipLineAddress DisplayString,
+      tn9300DipLinePilotAddress DisplayString,
+      tn9300DipLineSpchVotePri SipCallSpeechVotingPriority,
+      tn9300DipLineState DipLineState,
+      tn9300DipLineNgwLinkState NgwLinkState,
+      tn9300DipLineAParty DisplayString,
+      tn9300DipLineBParty DisplayString,
+      tn9300DipLnClientIpAddrType InetAddressType,
+      tn9300DipLnClientIpAddr InetAddress,
+      tn9300DipLineClientUptime Counter32,
+      tn9300DipLineClientConnects Counter32,
+      tn9300DipLineNgpRxPackets Counter32,
+      tn9300DipLineNgpTxPackets Counter32,
+      tn9300DipLineNgpLostPackets Counter32,
+      tn9300DipLineRtpRxPackets Counter32,
+      tn9300DipLineRtpTxPackets Counter32,
+      tn9300DipLineRtpLostPackets Counter32,
+      tn9300DipLineRtpRtt Gauge32,
+      tn9300DipLineRtpJitter Gauge32
+   }
+
+tn9300DipLineNumber OBJECT-TYPE
+   SYNTAX Integer32 (1..300)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "DIP connection number:
+                The number of this DIP connection."
+      ::= { tn9300DipLineEntry 1 }
+
+tn9300DipLineName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection name:
+                The name of this DIP connection."
+      ::= { tn9300DipLineEntry 2 }
+
+tn9300DipLineNgwIpAddrType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection NGW IP address type:
+                The type of internet address for the network gateway used by this DIP connection."
+      ::= { tn9300DipLineEntry 3 }
+
+tn9300DipLineNgwIpAddr OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection NGW IP address:
+                The IP address of the network gateway used by this DIP connection."
+      ::= { tn9300DipLineEntry 4 }
+
+tn9300DipLineAddress OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection Address:
+                The MPT1327 address used for this DIP connection."
+      ::= { tn9300DipLineEntry 5 }
+
+tn9300DipLinePilotAddress OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection Address:
+                The MPT1327 pilot address used for this DIP connection."
+      ::= { tn9300DipLineEntry 6 }
+
+tn9300DipLineSpchVotePri OBJECT-TYPE
+   SYNTAX SipCallSpeechVotingPriority
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection speech voting priority:
+                How the node's packet switch handles incoming speech from the DIP connection. Unknown (0). Normal (1) - speech is handled in the same way as speech from a radio. Override (2) - speech will pre-empt existing speech from a radio, the dispatcher can interrupt any radio in a group call."
+      ::= { tn9300DipLineEntry 7 }
+
+tn9300DipLineState OBJECT-TYPE
+   SYNTAX DipLineState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection state:
+                The state in which this DIP connection is operating. Status types are Unknown (0), Unconfigured (1), Idle (2), Active (3) or Failed (4)."
+      ::= { tn9300DipLineEntry 8 }
+
+tn9300DipLineNgwLinkState OBJECT-TYPE
+   SYNTAX NgwLinkState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection NGW link state:
+                The state of the link between this DIP connection and its associated network gateway. Status types are Unknown (0), OK (1) or Failed (2)."
+      ::= { tn9300DipLineEntry 9 }
+
+tn9300DipLineAParty OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection A party:
+                The MPT1327 number of the A party (if a call is in progress on this DIP connection)."
+      ::= { tn9300DipLineEntry 10 }
+
+tn9300DipLineBParty OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection channel B party:
+                The MPT1327 number of the B party (if a call is in progress on this DIP connection)."
+      ::= { tn9300DipLineEntry 11 }
+
+tn9300DipLnClientIpAddrType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection client IP address type:
+                The type of internet address for the client connected to this DIP connection."
+      ::= { tn9300DipLineEntry 12 }
+
+tn9300DipLnClientIpAddr OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection client IP address:
+                The IP address of the client connected to this DIP connection."
+      ::= { tn9300DipLineEntry 13 }
+
+tn9300DipLineClientUptime OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection client uptime:
+                The time that the client has been connected to this DIP connection."
+      ::= { tn9300DipLineEntry 14 }
+
+tn9300DipLineClientConnects OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection client connects:
+                The number of client connections on this DIP connection since this node was last started."
+      ::= { tn9300DipLineEntry 15 }
+
+tn9300DipLineNgpRxPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection NGP rx packets:
+                The number of NGP packets received on this DIP connection from its associated network gateway."
+      ::= { tn9300DipLineEntry 16 }
+
+tn9300DipLineNgpTxPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection NGP tx packets:
+                The number of NGP packets transmitted from this DIP connection to its associated network gateway."
+      ::= { tn9300DipLineEntry 17 }
+
+tn9300DipLineNgpLostPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection NGP lost packets:
+                The number of NGP packets lost in transmission from this DIP connection to its associated network gateway."
+      ::= { tn9300DipLineEntry 18 }
+
+tn9300DipLineRtpRxPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection RTP rx packets:
+                The number of RTP packets received on this DIP connection from its associated network gateway."
+      ::= { tn9300DipLineEntry 19 }
+
+tn9300DipLineRtpTxPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection RTP tx packets:
+                The number of RTP packets transmitted from this DIP connection to its associated network gateway."
+      ::= { tn9300DipLineEntry 20 }
+
+tn9300DipLineRtpLostPackets  OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection RTP lost packets:
+                The number of RTP packets lost in transmission from this DIP connection to its associated network gateway."
+      ::= { tn9300DipLineEntry 21 }
+
+tn9300DipLineRtpRtt  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection RTP round trip time:
+                The round trip time for RTP pings between this DIP connection and its associated network gateway."
+      ::= { tn9300DipLineEntry 22 }
+
+tn9300DipLineRtpJitter  OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "DIP connection RTP round trip time jitter:
+                The round trip time jitter for RTP pings between this DIP connection and its associated network gateway."
+      ::= { tn9300DipLineEntry 23 }
+
+--
+-- The remote node table
+--
+
+tn9300RemoteNodeTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300RemoteNodeEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of the remote nodes."
+      ::= { tn9300RemoteNodeObjs 1 }
+
+tn9300RemoteNodeEntry OBJECT-TYPE
+   SYNTAX Tn9300RemoteNodeEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the node number."
+   INDEX { tn9300RemoteNodeNumber }
+      ::= { tn9300RemoteNodeTable 1 }
+
+Tn9300RemoteNodeEntry ::=
+   SEQUENCE {
+      tn9300RemoteNodeNumber Integer32,
+      tn9300RemoteNodeName DisplayString,
+      tn9300RemoteNodeIpAddrType InetAddressType,
+      tn9300RemoteNodeIpAddr InetAddress,
+      tn9300RemoteNodePriority Integer32,
+      tn9300RemoteNodeState RemoteNodeState,
+      tn9300RemoteNodeCallSw Gauge32,
+      tn9300RemoteNodeConnectSw Gauge32,
+      tn9300RemoteNodeSynced RemoteNodeSyncState
+   }
+
+tn9300RemoteNodeNumber OBJECT-TYPE
+   SYNTAX Integer32 (1..20)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "Remote node number:
+                The number of this remote node."
+      ::= { tn9300RemoteNodeEntry 1 }
+
+tn9300RemoteNodeName OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Remote node name."
+      ::= { tn9300RemoteNodeEntry 2 }
+
+tn9300RemoteNodeIpAddrType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Remote node IP address type:
+                The type of internet address for this remote node."
+      ::= { tn9300RemoteNodeEntry 3 }
+
+tn9300RemoteNodeIpAddr OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Remote node IP address:
+                The IP address of this remote node."
+      ::= { tn9300RemoteNodeEntry 4 }
+
+tn9300RemoteNodePriority OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Remote node priority."
+      ::= { tn9300RemoteNodeEntry 5 }
+
+tn9300RemoteNodeState OBJECT-TYPE
+   SYNTAX RemoteNodeState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Remote node state:
+                The state in which the this remote node is operating. Status types are Unknown (0), Offline (1), Program (2), Switching (3), Control (4), Failed (5) or Graceful Shutdown (6)."
+      ::= { tn9300RemoteNodeEntry 6 }
+
+tn9300RemoteNodeCallSw OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of calls being switched on this remote node."
+      ::= { tn9300RemoteNodeEntry 7 }
+
+tn9300RemoteNodeConnectSw OBJECT-TYPE
+   SYNTAX Gauge32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Number of connections being switched on this remote node."
+      ::= { tn9300RemoteNodeEntry 8 }
+
+tn9300RemoteNodeSynced OBJECT-TYPE
+   SYNTAX RemoteNodeSyncState
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The state of synchronisation between the control and a remote node. Types are OK (0), Failed (1), Unknown (2), or None (3)."
+      ::= { tn9300RemoteNodeEntry 9 }
+
+-- ===================================================================
+--
+-- Unit Table / Objects
+--
+-- ===================================================================
+--
+--
+
+tn9300UnitTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300UnitEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of the units."
+      ::= { tn9300UnitObjs 1 }
+
+tn9300UnitEntry OBJECT-TYPE
+   SYNTAX Tn9300UnitEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the unit address."
+   INDEX { tn9300UnitAddress }
+      ::= { tn9300UnitTable 1 }
+
+Tn9300UnitEntry ::=
+   SEQUENCE {
+      tn9300UnitAddress Integer32,
+      tn9300UnitAlias DisplayString,
+      tn9300UnitAuthentication UnitAuthentication
+   }
+
+tn9300UnitAddress OBJECT-TYPE
+   SYNTAX Integer32 (0..16777215)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "Unit address: The unit number, in the format of the DMR raw address."
+      ::= { tn9300UnitEntry 1 }
+
+tn9300UnitAlias OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "Unit alias: a 7 bit ASCII character unique identifier."
+      ::= { tn9300UnitEntry 2 }
+
+tn9300UnitAuthentication OBJECT-TYPE
+   SYNTAX UnitAuthentication
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The authentication state of a unit. Types are as follows:
+                Not Polled (0),
+                Polling (1),
+                Not Home (2),
+                Busy (3),
+                Bad Authentication (4),
+                Bad CRC Received (5),
+                Good Authentication Received (6),
+                Rejected (7),
+                Not Registered (8)"
+      ::= { tn9300UnitEntry 3 }
+
+tn9300UnitStatusMessageId OBJECT-TYPE
+   SYNTAX UnitStatusMessageId
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "Unit alarm status message IDs:
+        PPP link to MPC down (1),
+        GPS signal lost (2),
+        GPS signal regained (after loss) (3),
+        Unit antenna connection failure (VSWR out of range) (4),
+        Unit supply voltage out of range (5),
+        Unit temperature T0 (normal range) (6),
+        Unit temperature T1 (over temp) (7),
+        Unit temperature T2 (over temp) (8),
+        Unit temperature T3 (over temp) (9),
+        Unit loss of service (10),
+        Radio frequency out of lock (service regained) (11),
+        MCP configuration error (12)"
+      ::= { tn9300UnitObjs 2 }
+
+--
+--
+--
+-- ===================================================================
+-- ===================================================================
+
+
+tn9300MipRegistered OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of units registered on the mobile home agent."
+      ::= { tn9300MobileIpObjs 1 }
+
+tn9300MipFailing OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of units failing to register on the mobile home agent."
+      ::= { tn9300MobileIpObjs 2 }
+
+tn9300MipTimeouts OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of home agent registration timeouts that have occured."
+      ::= { tn9300MobileIpObjs 3 }
+
+tn9300MipRejections OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of home agent registration rejections that have occured."
+      ::= { tn9300MobileIpObjs 4 }
+
+tn9300MipIcmpRxPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of ICMP packets that have been received over mobile IP."
+      ::= { tn9300MobileIpObjs 5 }
+
+tn9300MipIcmpTxPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of ICMP packets that have been sent over mobile IP."
+      ::= { tn9300MobileIpObjs 6 }
+
+tn9300MipUdpRxPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of UDP packets that have been received over mobile IP."
+      ::= { tn9300MobileIpObjs 7 }
+
+tn9300MipUdpTxPackets OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of UDP packets that have been sent over mobile IP."
+      ::= { tn9300MobileIpObjs 8 }
+
+
+tn9300MipRxBytes OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of bytes that have been received over mobile IP."
+      ::= { tn9300MobileIpObjs 9 }
+
+tn9300MipTxBytes OBJECT-TYPE
+   SYNTAX Counter32
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION "The number of bytes that have been sent over mobile IP."
+      ::= { tn9300MobileIpObjs 10 }
+
+--
+-- The network gateway table
+--
+
+tn9300NetworkGwTable OBJECT-TYPE
+   SYNTAX SEQUENCE OF Tn9300NetworkGwEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "This table stores the details of network gateways."
+      ::= { tn9300NetworkGwObjs 1 }
+
+tn9300NetworkGwEntry OBJECT-TYPE
+   SYNTAX Tn9300NetworkGwEntry
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The table entry index specification, the network gateway ID."
+   INDEX { tn9300NetworkGwId }
+      ::= { tn9300NetworkGwTable 1 }
+
+Tn9300NetworkGwEntry ::=
+   SEQUENCE {
+      tn9300NetworkGwId Integer32,
+      tn9300NetworkGwConnOk TruthValue,
+      tn9300NetworkGwIpAddrType InetAddressType,
+      tn9300NetworkGwIpAddr InetAddress
+   }
+
+tn9300NetworkGwId OBJECT-TYPE
+   SYNTAX Integer32 (0..2147483647)
+   MAX-ACCESS not-accessible
+   STATUS current
+   DESCRIPTION "The ID of a network gateway."
+      ::= { tn9300NetworkGwEntry 1 }
+
+tn9300NetworkGwConnOk OBJECT-TYPE
+   SYNTAX TruthValue
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "Indicates whether the network gateway connection is up or not."
+      ::= { tn9300NetworkGwEntry 2 }
+
+tn9300NetworkGwIpAddrType OBJECT-TYPE
+   SYNTAX InetAddressType
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "The type of internet address for this network gateway."
+      ::= { tn9300NetworkGwEntry 3 }
+
+tn9300NetworkGwIpAddr OBJECT-TYPE
+   SYNTAX InetAddress (SIZE (0|4|8|16|20))
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "The IP address for this network gateway."
+      ::= { tn9300NetworkGwEntry 4 }
+
+--
+-- Event objects
+--
+
+tn9300EventSeverity OBJECT-TYPE
+   SYNTAX EventSeverity
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "The severity of an event. Types are OK (0), Minor (1), or Major (2)."
+      ::= { tn9300EventObjs 2 }
+
+tn9300EventUnitAddress OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "The unit number, in the format of the DMR raw address. Corresponds to tn9300UnitAddress."
+      ::= { tn9300EventObjs 3 }
+
+tn9300EventBaseStationNumber OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "The number of the base station the channel belongs to. Corresponds to tn9300ChannelBaseStationNumber."
+      ::= { tn9300EventObjs 4 }
+
+tn9300EventChannelNumber OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "The number of this channel. Corresponds to tn9300ChannelNumber."
+      ::= { tn9300EventObjs 5 }
+
+tn9300EventNetworkGwId OBJECT-TYPE
+   SYNTAX Integer32
+   MAX-ACCESS accessible-for-notify
+   STATUS current
+   DESCRIPTION "The ID of this network gateway. Corresponds to tn9300NetworkGwId."
+      ::= { tn9300EventObjs 6 }
+
+--
+-- Events
+--
+
+tn9300NodeActivationEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300State }
+   STATUS current
+   DESCRIPTION "Node activated:
+                The node has entered the active state."
+      ::= { tn9300EventsV2 1 }
+
+tn9300SiteFailureEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300SiteOk, tn9300SiteName }
+   STATUS current
+   DESCRIPTION "Site failure:
+                A site has failed."
+      ::= { tn9300EventsV2 2 }
+
+tn9300SiteOkEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300SiteOk, tn9300SiteName }
+   STATUS current
+   DESCRIPTION "Site OK:
+                A site has recovered."
+      ::= { tn9300EventsV2 3 }
+
+tn9300ChannelMinorAlarmEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300ChannelMinorAlarm, tn9300SiteName, tn9300EventBaseStationNumber }
+   STATUS current
+   DESCRIPTION "Channel minor alarm:
+                A channel has raised a minor alarm."
+      ::= { tn9300EventsV2 4 }
+
+tn9300ChannelMajorAlarmEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300ChannelMajorAlarm, tn9300SiteName, tn9300EventBaseStationNumber }
+   STATUS current
+   DESCRIPTION "Channel major alarm:
+                A channel has raised a major alarm."
+      ::= { tn9300EventsV2 5 }
+
+tn9300ChannelFailureEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300ChannelState, tn9300SiteName, tn9300EventBaseStationNumber }
+   STATUS current
+   DESCRIPTION "Channel failure:
+                A channel has failed."
+      ::= { tn9300EventsV2 6 }
+
+tn9300ChannelOkEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300ChannelState, tn9300SiteName, tn9300EventBaseStationNumber }
+   STATUS current
+   DESCRIPTION "Channel OK:
+                A channel has recovered."
+      ::= { tn9300EventsV2 7 }
+
+tn9300ChannelJammedEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300ChannelJammed, tn9300SiteName, tn9300EventBaseStationNumber, tn9300EventChannelNumber }
+   STATUS current
+   DESCRIPTION "A channel is jammed."
+      ::= { tn9300EventsV2 8 }
+
+tn9300ChannelUnjammedEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300ChannelJammed, tn9300SiteName, tn9300EventBaseStationNumber, tn9300EventChannelNumber }
+   STATUS current
+   DESCRIPTION "A channel is no longer jammed."
+      ::= { tn9300EventsV2 9 }
+
+tn9300SipLinkUpEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300SipLineState, tn9300SipLineIpAddressType, tn9300SipLineIpAddress }
+   STATUS current
+   DESCRIPTION "SIP link up."
+      ::= { tn9300EventsV2 14 }
+
+tn9300SipLinkDownEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300SipLineState }
+   STATUS current
+   DESCRIPTION "SIP link down."
+      ::= { tn9300EventsV2 15 }
+
+tn9300DipLinkUpEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300DipLineState, tn9300DipLnClientIpAddrType, tn9300DipLnClientIpAddr, tn9300DipLineAddress }
+   STATUS current
+   DESCRIPTION "DIP link up."
+      ::= { tn9300EventsV2 16 }
+
+tn9300DipLinkDownEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300DipLineState, tn9300DipLnClientIpAddrType, tn9300DipLnClientIpAddr, tn9300DipLineAddress }
+   STATUS current
+   DESCRIPTION "DIP link down."
+      ::= { tn9300EventsV2 17 }
+
+tn9300ControlChannelEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300SiteNControlChannels, tn9300SiteName }
+   STATUS current
+   DESCRIPTION "Too few control channels:
+                The number of control channels at a site is less than required."
+      ::= { tn9300EventsV2 18 }
+
+tn9300NetworkErrorEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300NetCheckStateA, tn9300NetCheckAddressAType, tn9300NetCheckAddressA, tn9300NetCheckStateB, tn9300NetCheckAddressBType, tn9300NetCheckAddressB }
+   STATUS current
+   DESCRIPTION "One or both of the network checks failed."
+      ::= { tn9300EventsV2 19 }
+
+tn9300RemoteNodeUpEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300RemoteNodeState, tn9300RemoteNodeIpAddrType, tn9300RemoteNodeIpAddr }
+   STATUS current
+   DESCRIPTION "A remote node is up."
+      ::= { tn9300EventsV2 20 }
+
+tn9300RemoteNodeDownEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300RemoteNodeState, tn9300RemoteNodeIpAddrType, tn9300RemoteNodeIpAddr }
+   STATUS current
+   DESCRIPTION "A remote node is down."
+      ::= { tn9300EventsV2 21 }
+
+tn9300LowDiskSpaceEvent NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION "The node is low on available disk space."
+      ::= { tn9300EventsV2 22 }
+
+tn9300LicenseCheckFailedEvent NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION "The node does not have a valid license installed."
+      ::= { tn9300EventsV2 23 }
+
+tn9300NetworkGatewayUpEvent NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION "A network gateway connection has been established."
+      ::= { tn9300EventsV2 24 }
+
+tn9300NetworkGatewayDownEvent NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION "A network gateway has been disconnected."
+      ::= { tn9300EventsV2 25 }
+
+tn9300NodeFailedEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300NetCheckStateA, tn9300NetCheckAddressAType, tn9300NetCheckAddressA, tn9300NetCheckStateB, tn9300NetCheckAddressBType, tn9300NetCheckAddressB }
+   STATUS current
+   DESCRIPTION "All network checks have failed."
+      ::= { tn9300EventsV2 26 }
+
+tn9300NetworkUpEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300NetCheckStateA, tn9300NetCheckAddressAType, tn9300NetCheckAddressA, tn9300NetCheckStateB, tn9300NetCheckAddressBType, tn9300NetCheckAddressB }
+   STATUS current
+   DESCRIPTION "A network check has succeeded."
+      ::= { tn9300EventsV2 27 }
+
+tn9300AuthenticationOkEvent NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION "A radio has passed an authentication check."
+      ::= { tn9300EventsV2 28 }
+
+tn9300AuthenticationFailureEvent NOTIFICATION-TYPE
+   STATUS current
+   DESCRIPTION "A radio has failed an authentication check."
+      ::= { tn9300EventsV2 29 }
+
+tn9300UnitStatusMessageEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300UnitStatusMessageId,  tn9300EventUnitAddress }
+   STATUS current
+   DESCRIPTION "Terminal alarm notification (UnitStatusMessageId) from <unit address>. Terminal alarm status message IDs:
+        PPP link to MPC down (1),
+        GPS signal lost (2),
+        GPS signal regained (after loss) (3),
+        Terminal antenna connection failure (VSWR out of range) (4),
+        Terminal supply voltage out of range (5),
+        Terminal temperature T0 (normal range) (6),
+        Terminal temperature T1 (over temp) (7),
+        Terminal temperature T2 (over temp) (8),
+        Terminal temperature T3 (over temp) (9),
+        Terminal loss of service (10),
+        Radio frequency out of lock (service regained) (11),
+        MCP configuration error (12),
+        Terminal antenna connection good (13),
+        Terminal unsolicited reset (14),
+        Terminal gained service (15)"
+      ::= { tn9300EventsV2 30 }
+
+tn9300RemoteNodeSyncFailedEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300RemoteNodeState, tn9300RemoteNodeIpAddrType, tn9300RemoteNodeIpAddr }
+   STATUS current
+   DESCRIPTION "A remote node database is out of sync."
+      ::= { tn9300EventsV2 31 }
+
+tn9300RemoteNodeSyncOkEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300RemoteNodeState, tn9300RemoteNodeIpAddrType, tn9300RemoteNodeIpAddr }
+   STATUS current
+   DESCRIPTION "A remote node database is synced with this node."
+      ::= { tn9300EventsV2 32 }
+
+tn9300UnitDeregisteredBySystemEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventUnitAddress }
+   STATUS current
+   DESCRIPTION "A unit was deregistered by system (timed-out)."
+      ::= { tn9300EventsV2 33 }
+
+tn9300NodeStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300State }
+   STATUS current
+   DESCRIPTION "The node has changed state."
+      ::= { tn9300EventsV2 34 }
+
+tn9300NodeIpNetworkStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300NetCheckStateA, tn9300NetCheckAddressAType, tn9300NetCheckAddressA, tn9300NetCheckStateB, tn9300NetCheckAddressBType, tn9300NetCheckAddressB }
+   STATUS current
+   DESCRIPTION "At least one of the network check results have changed."
+      ::= { tn9300EventsV2 35 }
+
+tn9300NodeDiskSpaceEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300DiskSpaceOk }
+   STATUS current
+   DESCRIPTION "The available disk space has either went below or above threshold."
+      ::= { tn9300EventsV2 36 }
+
+tn9300NodeLicenseEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300LicenseValidity }
+   STATUS current
+   DESCRIPTION "The validity of the license has changed."
+      ::= { tn9300EventsV2 37 }
+
+tn9300SiteStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300SiteOk, tn9300SiteName }
+   STATUS current
+   DESCRIPTION "A site has changed state."
+      ::= { tn9300EventsV2 38 }
+
+tn9300SiteControlChCountEvent  NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300SiteControlChCountOk, tn9300SiteName, tn9300SiteNControlChannels }
+   STATUS current
+   DESCRIPTION "The number of control channels for a site has either went below or equal the required."
+      ::= { tn9300EventsV2 39 }
+
+tn9300BSMinorAlarmStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300ChannelMinorAlarm, tn9300SiteName, tn9300EventBaseStationNumber }
+   STATUS current
+   DESCRIPTION "A base station's minor alarm state has changed."
+      ::= { tn9300EventsV2 40 }
+
+tn9300BSMajorAlarmStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300ChannelMajorAlarm, tn9300SiteName, tn9300EventBaseStationNumber }
+   STATUS current
+   DESCRIPTION "A base station's major alarm state has changed."
+      ::= { tn9300EventsV2 41 }
+
+tn9300BSStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300ChannelState, tn9300SiteName, tn9300EventBaseStationNumber }
+   STATUS current
+   DESCRIPTION "A base station has changed state."
+      ::= { tn9300EventsV2 42 }
+
+tn9300ChannelJammedStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300ChannelJammed, tn9300SiteName, tn9300EventBaseStationNumber, tn9300EventChannelNumber }
+   STATUS current
+   DESCRIPTION "A channel's jammed state has changed."
+      ::= { tn9300EventsV2 43 }
+
+tn9300ChannelStuckMuteEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300SiteName, tn9300EventBaseStationNumber, tn9300EventChannelNumber }
+   STATUS current
+   DESCRIPTION "A channel has reached its site's open mute timeout."
+      ::= { tn9300EventsV2 44 }
+
+tn9300SipLinkStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300SipLineState, tn9300SipLineName, tn9300SipLineIpAddressType, tn9300SipLineIpAddress }
+   STATUS current
+   DESCRIPTION "A SIP link has changed state."
+      ::= { tn9300EventsV2 45 }
+
+tn9300DipLinkStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300DipLineState, tn9300DipLineName, tn9300DipLnClientIpAddrType, tn9300DipLnClientIpAddr, tn9300DipLineAddress }
+   STATUS current
+   DESCRIPTION "A DIP link has changed state."
+      ::= { tn9300EventsV2 46 }
+
+tn9300RemoteNodeStateEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300RemoteNodeState, tn9300RemoteNodeName, tn9300RemoteNodeIpAddrType, tn9300RemoteNodeIpAddr }
+   STATUS current
+   DESCRIPTION "A remote node has changed state."
+      ::= { tn9300EventsV2 47 }
+
+tn9300RemoteNodeSyncEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300RemoteNodeSynced, tn9300RemoteNodeName, tn9300RemoteNodeIpAddrType, tn9300RemoteNodeIpAddr }
+   STATUS current
+   DESCRIPTION "A remote node's sync state has changed."
+      ::= { tn9300EventsV2 48 }
+
+tn9300NetworkGwConnEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300NetworkGwConnOk, tn9300EventNetworkGwId, tn9300NetworkGwIpAddrType, tn9300NetworkGwIpAddr }
+   STATUS current
+   DESCRIPTION "A network gateway has changed state."
+      ::= { tn9300EventsV2 49 }
+
+tn9300UnitAuthenticationEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300UnitAuthentication, tn9300EventUnitAddress }
+   STATUS current
+   DESCRIPTION "A unit's authentication state has changed."
+      ::= { tn9300EventsV2 50 }
+
+tn9300UnitStatusMsgEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300UnitStatusMessageId, tn9300EventUnitAddress }
+   STATUS current
+   DESCRIPTION "A status message from a unit was received."
+      ::= { tn9300EventsV2 51 }
+
+tn9300UnitRegTimeoutEvent NOTIFICATION-TYPE
+   OBJECTS { tn9300EventSeverity, tn9300EventUnitAddress }
+   STATUS current
+   DESCRIPTION "A unit has reached the registration time limit and was deregistered by the system."
+      ::= { tn9300EventsV2 52 }
+
+--
+--
+-- =======================================================
+
+--
+-- Object and Event Groups
+--
+
+tn9300StatusGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300Version,
+      tn9300Name,
+      tn9300Priority,
+      tn9300RequestedState,
+      tn9300State,
+      tn9300NetCheckAddressAType,
+      tn9300NetCheckAddressA,
+      tn9300NetCheckStateA,
+      tn9300NetCheckAddressBType,
+      tn9300NetCheckAddressB,
+      tn9300NetCheckStateB,
+      tn9300CallsSwitching,
+      tn9300ConnectionsSwitching,
+      tn9300MemoryUsage,
+      tn9300CpuUsage,
+      tn9300DiskSpaceOk,
+      tn9300LicenseValidity
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of the node controller."
+      ::= { tn9300Groups 1 }
+
+tn9300SiteGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300SiteName,
+      tn9300SiteSyscode,
+      tn9300SiteEnabled,
+      tn9300SiteOk,
+      tn9300SiteAutoQueueDepth,
+      tn9300SiteQueueDepth,
+      tn9300SiteZone,
+      tn9300SiteExtraWaitSlots,
+      tn9300SiteCCReassignTimeout,
+      tn9300SiteTCRotation,
+      tn9300SiteRxActivityTimeout,
+      tn9300SiteRxInactiveTimeout,
+      tn9300SiteFramelength,
+      tn9300SiteMinFramelength,
+      tn9300SiteMaxFramelength,
+      tn9300SiteDualCC,
+      tn9300SiteOpenMuteTimeout,
+      tn9300SiteManAdjSiteRF,
+      tn9300SiteManAdjSiteSyscode,
+      tn9300SiteNChannels,
+      tn9300SiteNControlChannels,
+      tn9300SiteNTrafficChannels,
+      tn9300SiteNIdleChannels,
+      tn9300SiteNDisabledChannels,
+      tn9300SiteNFailedChannels,
+      tn9300SiteNOnAirCalls,
+      tn9300SiteNRingingCalls,
+      tn9300SiteNQueuedCalls,
+      tn9300SiteTotalCalls,
+      tn9300SiteTotalChannelCalls,
+      tn9300SiteTotalQueueTime,
+      tn9300SiteChannelTimeFailed,
+      tn9300SiteChannelTimeTraffic,
+      tn9300SiteChannelTimeControl,
+      tn9300SiteChannelTimeIdle,
+      tn9300SiteCallsQueuedUnder5,
+      tn9300SiteCallsQueued5To10,
+      tn9300SiteCallsQueued10To20,
+      tn9300SiteCallsQueuedOver20,
+      tn9300SiteAlias,
+      tn9300AdjSiteAlias,
+      tn9300AdjSiteSyscode1,
+      tn9300AdjSiteSyscode2,
+      tn9300AdjSiteRF1,
+      tn9300AdjSiteRF2,
+      tn9300SiteControlChCountOk,
+      tn9300SiteNAlternateChannels,
+      tn9300SiteChannelTimeAlternate
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of a site."
+      ::= { tn9300Groups 2 }
+
+tn9300ChannelGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300ChannelIpAddressType,
+      tn9300ChannelIpAddress,
+      tn9300ChannelPort,
+      tn9300ChannelRf,
+      tn9300ChannelEnabled,
+      tn9300ChannelControlAllowed,
+      tn9300ChannelTrafficAllowed,
+      tn9300ChannelInhibitIfJammed,
+      tn9300ChannelState,
+      tn9300ChannelJammed,
+      tn9300ChannelMinorAlarm,
+      tn9300ChannelMajorAlarm,
+      tn9300ChannelAParty,
+      tn9300ChannelBParty,
+      tn9300ChannelBspRxPackets,
+      tn9300ChannelBspTxPackets,
+      tn9300ChannelBspLostPackets,
+      tn9300ChannelRtpRxPackets,
+      tn9300ChannelRtpTxPackets,
+      tn9300ChannelRtpLostPackets,
+      tn9300ChannelRtpRtt,
+      tn9300ChannelRtpRttJitter,
+      tn9300ChannelTimeFailed,
+      tn9300ChannelTimeTraffic,
+      tn9300ChannelTimeControl,
+      tn9300ChannelTimeIdle,
+      tn9300ChannelAlternateAllowed,
+      tn9300ChannelTimeAlternate
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of a channel."
+      ::= { tn9300Groups 3 }
+
+tn9300Mpt1327Group OBJECT-GROUP
+   OBJECTS     {
+      tn9300Mpt1327IpAddressType,
+      tn9300Mpt1327IpAddress,
+      tn9300Mpt1327Port,
+      tn9300Mpt1327State,
+      tn9300Mpt1327RxBytes,
+      tn9300Mpt1327TxBytes,
+      tn9300Mpt1327LinkErrors,
+      tn9300Mpt1327Connections
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of the MPT1327 Gateway."
+      ::= { tn9300Groups 6 }
+
+tn9300Mpt1327ChGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300Mpt1327ChIpAddressType,
+      tn9300Mpt1327ChIpAddress,
+      tn9300Mpt1327ChPort,
+      tn9300Mpt1327ChState,
+      tn9300Mpt1327ChLinkState,
+      tn9300Mpt1327ChAParty,
+      tn9300Mpt1327ChBParty,
+      tn9300Mpt1327ChNgpRxPackets,
+      tn9300Mpt1327ChNgpTxPackets,
+      tn9300Mpt1327ChNgpLostPackets,
+      tn9300Mpt1327ChRtpRxPackets,
+      tn9300Mpt1327ChRtpTxPackets,
+      tn9300Mpt1327ChRtpLostPackets,
+      tn9300Mpt1327ChRtpRtt,
+      tn9300Mpt1327ChRtpJitter
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of an MPT1327 gateway channel."
+      ::= { tn9300Groups 7 }
+
+tn9300SipLineGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300SipLineName,
+      tn9300SipLineIncomingType,
+      tn9300SipLineSpchVotePri,
+      tn9300SipLineIpAddressType,
+      tn9300SipLineIpAddress,
+      tn9300SipLineState,
+      tn9300SipLineUptime,
+      tn9300SipLineConnects,
+      tn9300SipLineRegistrationType,
+      tn9300SipLineUserName,
+      tn9300SipLineEnabled,
+      tn9300SipLineAisMultipartContents,
+      tn9300SipLineAisMonitor,
+      tn9300SipLineSipGroup,
+      tn9300SipLineInphoneTable,
+      tn9300SipLineProxyAddressType,
+      tn9300SipLineProxyAddress,
+      tn9300SipLineCalls
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of a SIP line."
+      ::= { tn9300Groups 8 }
+
+tn9300DipLineGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300DipLineName,
+      tn9300DipLineNgwIpAddrType,
+      tn9300DipLineNgwIpAddr,
+      tn9300DipLineAddress,
+      tn9300DipLinePilotAddress,
+      tn9300DipLineSpchVotePri,
+      tn9300DipLineState,
+      tn9300DipLineNgwLinkState,
+      tn9300DipLineAParty,
+      tn9300DipLineBParty,
+      tn9300DipLnClientIpAddrType,
+      tn9300DipLnClientIpAddr,
+      tn9300DipLineClientUptime,
+      tn9300DipLineClientConnects,
+      tn9300DipLineNgpRxPackets,
+      tn9300DipLineNgpTxPackets,
+      tn9300DipLineNgpLostPackets,
+      tn9300DipLineRtpRxPackets,
+      tn9300DipLineRtpTxPackets,
+      tn9300DipLineRtpLostPackets,
+      tn9300DipLineRtpRtt,
+      tn9300DipLineRtpJitter
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of a DIP connection."
+      ::= { tn9300Groups 9 }
+
+tn9300RemoteNodeGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300RemoteNodeName,
+      tn9300RemoteNodeIpAddrType,
+      tn9300RemoteNodeIpAddr,
+      tn9300RemoteNodePriority,
+      tn9300RemoteNodeState,
+      tn9300RemoteNodeCallSw,
+      tn9300RemoteNodeConnectSw,
+      tn9300RemoteNodeSynced
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of a remote node."
+      ::= { tn9300Groups 10 }
+
+tn9300EventGroup NOTIFICATION-GROUP
+   NOTIFICATIONS {
+      tn9300NodeActivationEvent,
+      tn9300SiteFailureEvent,
+      tn9300SiteOkEvent,
+      tn9300ChannelMinorAlarmEvent,
+      tn9300ChannelMajorAlarmEvent,
+      tn9300ChannelFailureEvent,
+      tn9300ChannelOkEvent,
+      tn9300ChannelJammedEvent,
+      tn9300ChannelUnjammedEvent,
+      tn9300SipLinkUpEvent,
+      tn9300SipLinkDownEvent,
+      tn9300DipLinkUpEvent,
+      tn9300DipLinkDownEvent,
+      tn9300ControlChannelEvent,
+      tn9300NetworkErrorEvent,
+      tn9300RemoteNodeUpEvent,
+      tn9300RemoteNodeDownEvent,
+      tn9300LowDiskSpaceEvent,
+      tn9300LicenseCheckFailedEvent,
+      tn9300NetworkGatewayUpEvent,
+      tn9300NetworkGatewayDownEvent,
+      tn9300NodeFailedEvent,
+      tn9300NetworkUpEvent,
+      tn9300AuthenticationOkEvent,
+      tn9300AuthenticationFailureEvent,
+      tn9300UnitStatusMessageEvent,
+      tn9300RemoteNodeSyncFailedEvent,
+      tn9300RemoteNodeSyncOkEvent,
+      tn9300UnitDeregisteredBySystemEvent
+   }
+   STATUS current
+   DESCRIPTION "The notification group."
+      ::= { tn9300Groups 12 }
+
+tn9300MobileIpGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300MipRegistered,
+      tn9300MipFailing,
+      tn9300MipTimeouts,
+      tn9300MipRejections,
+      tn9300MipIcmpRxPackets,
+      tn9300MipIcmpTxPackets,
+      tn9300MipUdpRxPackets,
+      tn9300MipUdpTxPackets,
+      tn9300MipRxBytes,
+      tn9300MipTxBytes
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the counters for mobile IP."
+      ::= { tn9300Groups 13 }
+
+tn9300UnitGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300UnitAlias,
+      tn9300UnitStatusMessageId,
+      tn9300UnitAuthentication
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of a unit."
+      ::= { tn9300Groups 14 }
+
+tn9300EventObjectGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300EventSeverity,
+      tn9300EventUnitAddress,
+      tn9300EventBaseStationNumber,
+      tn9300EventChannelNumber,
+      tn9300EventNetworkGwId
+   }
+   STATUS      current
+   DESCRIPTION "The objects that are used specifically for events."
+      ::= { tn9300Groups 15 }
+
+tn9300EventGroupV2 NOTIFICATION-GROUP
+   NOTIFICATIONS     {
+      tn9300NodeStateEvent,
+      tn9300NodeIpNetworkStateEvent,
+      tn9300NodeDiskSpaceEvent,
+      tn9300NodeLicenseEvent,
+      tn9300SiteStateEvent,
+      tn9300SiteControlChCountEvent,
+      tn9300BSMinorAlarmStateEvent,
+      tn9300BSMajorAlarmStateEvent,
+      tn9300BSStateEvent,
+      tn9300ChannelJammedStateEvent,
+      tn9300ChannelStuckMuteEvent,
+      tn9300SipLinkStateEvent,
+      tn9300DipLinkStateEvent,
+      tn9300RemoteNodeStateEvent,
+      tn9300RemoteNodeSyncEvent,
+      tn9300NetworkGwConnEvent,
+      tn9300UnitAuthenticationEvent,
+      tn9300UnitStatusMsgEvent,
+      tn9300UnitRegTimeoutEvent
+   }
+   STATUS      current
+   DESCRIPTION "The new set of notification objects."
+      ::= { tn9300Groups 16 }
+
+tn9300NetworkGwGroup OBJECT-GROUP
+   OBJECTS     {
+      tn9300NetworkGwConnOk,
+      tn9300NetworkGwIpAddrType,
+      tn9300NetworkGwIpAddr
+   }
+   STATUS      current
+   DESCRIPTION "The objects that describe the status of a network gateway."
+      ::= { tn9300Groups 17 }
+
+-- the compliance specifications
+tn9300ComplianceV1 MODULE-COMPLIANCE
+   STATUS current
+   DESCRIPTION "The implementation requirements for the Tait TN9300 MIB"
+   MODULE -- This Module
+      MANDATORY-GROUPS {
+         tn9300StatusGroup,
+         tn9300SiteGroup,
+         tn9300ChannelGroup,
+         tn9300SipLineGroup,
+         tn9300DipLineGroup,
+         tn9300Mpt1327Group,
+         tn9300Mpt1327ChGroup,
+         tn9300RemoteNodeGroup,
+         tn9300EventGroup,
+         tn9300MobileIpGroup,
+         tn9300UnitGroup,
+         tn9300EventObjectGroup,
+         tn9300EventGroupV2,
+         tn9300NetworkGwGroup
+      }
+      ::= { tn9300Compl 1}
+
+END
