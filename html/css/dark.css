@@ -7207,3 +7207,6 @@
   .bootgrid-table th:active, .bootgrid-table th:hover {
     background: #525961;
   }
+  .vis-legend-text {
+    color: black;
+  }
