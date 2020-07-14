@@ -33,15 +33,13 @@ class Endrun extends OS implements OSDiscovery
     public function discoverOS(): void
     {
         $device = $this->getDeviceModel();
-        $info = snmp_getnext_multi($this->getDevice(), 'cntpVersion cdmaVersion', '-OQUs', 'TEMPUSLXUNISON-MIB');
-        $info2 = snmp_getnext_multi($this->getDevice(), 'snmpSetSerialNo', '-OQUs', 'SNMPv2-MIB');
-        $device->serial = $info2['snmpSetSerialNo'];
-        $device->features = $info['cdmaVersion'];
+        $info = snmp_get_multi($this->getDevice(), ['cntpVersion.0', 'cdmaVersion.0', 'snmpSetSerialNo.0'], '-OQUs', 'TEMPUSLXUNISON-MIB:SNMPv2-MIB');
+        $device->features = $info[0]['cdmaVersion'] ?? null;
+        $device->serial = $info[0]['snmpSetSerialNo'] ?? null;
         // The cntpVersion string output is rather long. Ex. Tempus LX CDMA 6010-0042-000 v 5.70 - Wed Oct 1 04:39:21 UTC 2014
         // so we use preg_split to get the values we wanted.
-        $Descr_chopper = preg_split('/v /', $info['cntpVersion']);
-        $operating_system = preg_split('/ - /', $Descr_chopper[1]);
-        $device->version = $operating_system[0];
-        $device->hardware = $Descr_chopper[0];
+        preg_match('/(.+) v (.+) - /', $info[0]['cntpVersion'], $matches);
+        $device->hardware = $matches[1] ?? null;
+        $device->version = $matches[2] ?? null;
     }
 }
