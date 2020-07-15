@@ -1,0 +1,11 @@
+os: bdos
+text: ''
+type: network
+icon: blankom
+group: blankom
+mib_dir:
+    - blankom
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.16744.2.45

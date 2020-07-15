@@ -1,0 +1,114 @@
+--  **************************************************************************
+--  File BLANKOM_Root.mib
+--
+--  Copyright � 2002-2003 by BLANKOM Digital GmbH
+--
+--  **************************************************************************
+
+
+BLANKOM-ROOT-MIB DEFINITIONS ::= BEGIN
+
+
+--  LAST-UPDATED "22.April 2003"    
+--
+--  ORGANIZATION "Blankom Digital GmbH"
+--
+--  CONTACT-INFO "Blankom Digital GmbH
+--                TecCenter
+--                31162 Bad Salzdetfurth
+--                e-mail info@blankom-digital.de"
+--
+--  DESCRIPTION
+--      "This MIB implements the Blankom root object identifiers"
+-- 
+-- 
+--  REVISION     "V01.00.00"  
+--  DESCRIPTION
+--      "First release"		
+-- 
+
+
+IMPORTS
+    enterprises
+        FROM RFC1155-SMI;
+
+--
+-- Type definitions
+--
+	
+		DisplayString ::= OCTET STRING
+		
+		TruthValue ::= INTEGER
+			{
+			true(1),
+			false(2)
+			}
+		
+		ActiveValue ::= INTEGER
+			{
+			active(1),
+			inactive(2)
+			}
+		
+		NESlotValue ::= INTEGER (0..60)
+		
+		ModuleWidthValue ::= INTEGER (0..4)
+		
+		SwitchStateValue ::= INTEGER
+			{
+			connected(1),
+			attenuated(2),
+			disconnected(3)
+			}
+		
+		InitPhaseValue ::= INTEGER
+			{
+			noFrameSync(1),
+			frameSyncOk(2),
+			groupAddressOk(3),
+			talkRequestOk(4),
+			regRequestOk(5),
+			registrationOk(6)
+			}
+		
+		PerceivedSeverityValue ::= INTEGER
+			{
+			critical(1),
+			major(2),
+			minor(3),
+			warning(4),
+			clear(5)
+			}
+		
+		APSValue ::= INTEGER
+			{
+			default(1),
+			autoOffNominalactive(2),
+			autoOffRedundantactive(3)
+			}
+		
+		RevertiveValue ::= INTEGER
+			{
+			revertive(1),
+			nonRevertive(2)
+			}
+		
+		SwitchModeValue		::=INTEGER		-- Mode of Input Switch
+			{
+			standAlone(1),
+			transponder(2)			
+			}
+		InputStateValue		::=INTEGER		-- Input Path
+			{
+			main(1),
+			redundand(2)			
+			}
+
+
+blankom                         OBJECT IDENTIFIER ::= { enterprises 16744 }
+
+antennentechnik                 OBJECT IDENTIFIER ::= { blankom 1 }
+
+digital                         OBJECT IDENTIFIER ::= { blankom 2 }
+
+END 
