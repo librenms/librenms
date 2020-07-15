@@ -78,7 +78,7 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
+$sql = "SELECT R.severity, D.device_id,name AS alert,rule_id, state,time_logged,DATE_FORMAT(time_logged, '" . \LibreNMS\Config::get('dateformat.mysql.compact') . "') as humandate,details $sql";
 
 $rulei = 0;
 foreach (dbFetchRows($sql, $param) as $alertlog) {
@@ -102,14 +102,14 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         $status = 'label-primary';
     }//end if
 
-
     $response[] = array(
         'id' => $rulei++,
         'time_logged' => $alertlog['humandate'],
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
         'hostname' => '<div class="incident">' . generate_device_link($dev, shorthost($dev['hostname'])) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
         'alert' => htmlspecialchars($alertlog['alert']),
-        'status' => "<i class='alert-status " . $status . "'></i>"
+        'status' => "<i class='alert-status " . $status . "' title='". ($alert_state ? 'active':'recovered')."'></i>",
+        'severity' => $alertlog['severity']
     );
 }//end foreach
 
