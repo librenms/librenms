@@ -18,24 +18,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.24681",
-                    "sysDescr": "Linux hostname 4.2.2",
-                    "sysContact": null,
-                    "version": "4.3.3",
-                    "hardware": "Turbo NAS TVS-871U-RP",
-                    "features": null,
-                    "os": "qnap",
-                    "type": "storage",
-                    "serial": null,
-                    "icon": "qnap.svg",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
