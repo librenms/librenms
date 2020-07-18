@@ -5283,6 +5283,13 @@
             "section": "smokeping",
             "order": 3,
             "type": "text"
+        },
+        "applications.metric.always_update": {
+            "default": [],
+            "group": "poller",
+            "section": "applications",
+            "order": 0,
+            "type": "array"
         }
     }
 }

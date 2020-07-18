@@ -351,7 +351,7 @@ function poll_device($device, $force_module = false)
                 echo "Module [ $module ] disabled globally.\n\n";
             }
         }
-        
+
         if (!$force_module && !empty($graphs)) {
             echo "Enabling graphs: ";
             $graphs = collect($graphs)->keys();
@@ -631,7 +631,7 @@ function update_application($app, $response, $metrics = array(), $status = '')
                     'application_metrics'
                 );
                 echo '+';
-            } elseif ($value != $db_metrics[$metric_name]['value']) {
+            } elseif ($value != $db_metrics[$metric_name]['value'] || Str::is(Config::get('applications.metric.always_update'), $metric_name)) {
                 dbUpdate(
                     array(
                         'value' => $value,

@@ -63,6 +63,7 @@ return [
             'rrdtool' => 'Datastore: RRDTool',
             'snmp' => 'SNMP',
             'poller_modules' => 'Poller Modules',
+            'applications' => 'Applications',
         ],
         'system' => [
             'cleanup' => 'Cleanup',
@@ -1345,6 +1346,10 @@ return [
         'smokeping.url' => [
             'description' => 'URL to smokeping',
             'help' => 'Full URL to the smokeping gui'
+        ],
+        'applications.metric.always_update' => [
+            'description' => 'Always update metric',
+            'help' => 'By default, value and value_prev only updates on change. Adding a metric here will make it always update. NOTE: It must be the internal metric_name'
         ]
 
     ],
