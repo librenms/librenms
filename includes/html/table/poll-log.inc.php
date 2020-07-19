@@ -10,6 +10,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
 }
 
 $sql .= " LEFT JOIN `locations` as L ON `D`.`location_id`=`L`.`id`";
+
 $sql .= " LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`";
 
 if (!Auth::user()->hasGlobalAdmin()) {
