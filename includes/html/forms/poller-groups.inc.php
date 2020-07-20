@@ -23,10 +23,12 @@ $group_id   = $_POST['group_id'];
 $group_name = mres($_POST['group_name']);
 $descr      = mres($_POST['descr']);
 $rules      = mres($_POST['rules']);
+$priority   = mres($_POST['priority']);
 if (!empty($group_name)) {
     $db_data = ['group_name' => $group_name,
                 'descr'      => $descr,
-                'rules'      => $rules];
+                'rules'      => $rules,
+                'priority'   => $priority];
 
     if (is_numeric($group_id)) {
         if (dbUpdate($db_data, 'poller_groups', 'id = ?', array($group_id)) >= 0) {

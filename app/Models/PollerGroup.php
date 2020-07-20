@@ -35,7 +35,7 @@ class PollerGroup extends BaseModel
 {
     public $timestamps = false;
     protected $fillable = ['group_name', 'descr'];
-    protected $casts = ['rules' => 'array'];
+    protected $casts = ['rules' => 'array', 'priority' => 'integer'];
 
     /**
      * Initialize this class

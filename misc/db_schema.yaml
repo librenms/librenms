@@ -1386,6 +1386,7 @@ poller_groups:
     - { Field: group_name, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: descr, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: rules, Type: text, 'Null': true, Extra: '' }
+    - { Field: priority, Type: int, 'Null': true, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
 ports:

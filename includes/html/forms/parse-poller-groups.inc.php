@@ -28,6 +28,7 @@ if (is_numeric($group_id) && $group_id > 0) {
         'group_name' => $group['group_name'],
         'descr'      => $group['descr'],
         'rule'       => json_decode($group['rules']),
+        'priority'   => $group['priority'],
     );
     header('Content-type: application/json');
     echo _json_encode($output);

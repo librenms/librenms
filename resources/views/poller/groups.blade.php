@@ -25,6 +25,7 @@
             <th>@lang('Description')</th>
             @if( $distributed_poller_type == 'dynamic')
             <th>@lang('Pattern')</th>
+            <th>@lang('Priority')</th>
             @endif
             <th>@lang('Action')</th>
         </tr>
@@ -35,6 +36,7 @@
             <td></td>
             @if( $distributed_poller_type == 'dynamic')
             <td></td>
+            <td>0</td>
             @endif
             <td>
         </tr>
@@ -46,6 +48,7 @@
             <td>{{ $group->descr }}</td>
             @if($distributed_poller_type == 'dynamic')
             <td>{{ $group->getParser()->toSql(false) }}</td>
+            <td>{{ $group->priority }}</td>
             @endif
             <td>
                 @if($group->id)
@@ -113,6 +116,12 @@
                             </div>
                         </div>
                         @if($distributed_poller_type == 'dynamic')
+                        <div class="form-group">
+                            <label for="priority" class="col-sm-3 control-label">@lang('Priority'):</label>
+                            <div class="col-sm-9">
+                                <input type="number" class="form-control" id="priority" name="priority" placeholder=0>
+                            </div>
+                        </div>
                         <div class="form-group @if($errors->has('rules')) has-error @endif">
                             <label for="pattern" class="col-sm-3 control-label">@lang('Define Rules'):</label>
                             <div class="col-sm-9">
@@ -176,6 +185,7 @@ $('#poller-groups').on('show.bs.modal', function (event) {
             success: function(output) {
                 $('#group_name').val(output.group_name);
                 $('#descr').val(output.descr);
+                $('#priority').val(output.priority);
                 $('#builder').queryBuilder("setRules", output.rule);
             }
         });
@@ -187,11 +197,12 @@ $('#create-group').click('', function(e) {
     var group_name = $("#group_name").val();
     var descr = $("#descr").val();
     var rules = JSON.stringify(builder.queryBuilder('getRules'));
+    var priority = $('#priority').val();
     var group_id = $('#group_id').val();
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "poller-groups", group_name: group_name, descr: descr, rules: rules, group_id: group_id},
+        data: { type: "poller-groups", group_name: group_name, descr: descr, rules: rules, priority: priority, group_id: group_id},
         dataType: "html",
         success: function(msg){
             if(msg.indexOf("ERROR:") <= -1) {
