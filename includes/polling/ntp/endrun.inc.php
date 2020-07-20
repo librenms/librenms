@@ -1,8 +1,8 @@
 <?php
 /*
- * LibreNMS module to capture statistics from the AT-NTP-MIB
+ * LibreNMS module to capture NTP statistics from the TEMPUSLXUNISON-MIB
  *
- * Copyright (c) 2018 Matt Read <matt.read@alliedtelesis.co.nz>
+ * Copyright (c) 2020 Hans Erasmus <erasmushans27@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
