@@ -8,5 +8,6 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.27662
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.27662

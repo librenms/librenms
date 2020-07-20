@@ -202,7 +202,7 @@ if ($format == "graph") {
         $where .= " )";
     }
 
-    $query = "SELECT * FROM `devices`,locations WHERE devices.location_id = locations.id ";
+    $query = "SELECT * FROM `devices` LEFT JOIN `locations` ON `devices`.`location_id` = `locations`.`id` WHERE 1";
 
     if (isset($where)) {
         $query .= $where;

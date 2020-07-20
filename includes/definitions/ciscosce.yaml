@@ -32,5 +32,6 @@ discovery_modules:
 mib_dir:
     - cisco
 discovery:
-    - sysDescr:
-        - 'Cisco Service Control'
+    -
+        sysDescr:
+            - 'Cisco Service Control'

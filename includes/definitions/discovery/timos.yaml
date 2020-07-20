@@ -1,10 +1,10 @@
 mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB
 modules:
     processors:
-          data:
-              -
-                  oid: sgiCpuUsage
-                  num_oid: '.1.3.6.1.4.1.6527.3.1.2.1.1.1.{{ $index }}'
+        data:
+            -
+                oid: sgiCpuUsage
+                num_oid: '.1.3.6.1.4.1.6527.3.1.2.1.1.1.{{ $index }}'
 
     sensors:
         state:
@@ -91,9 +91,9 @@ modules:
                     high_limit: tmnxHwTempThreshold
                     skip_values:
                         -
-                          oid: tmnxHwTempSensor
-                          op: '='
-                          value: 2
+                            oid: tmnxHwTempSensor
+                            op: '='
+                            value: 2
         load:
             data:
                 -

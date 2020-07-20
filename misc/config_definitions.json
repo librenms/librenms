@@ -273,7 +273,17 @@
                 "Accept",
                 "X-Auth-Token"
             ],
+            "group": "api",
+            "section": "cors",
+            "order": 4,
             "type": "array"
+        },
+        "api.cors.allowcredentials": {
+            "default": false,
+            "group": "api",
+            "section": "cors",
+            "order": 7,
+            "type": "boolean"
         },
         "api.cors.allowmethods": {
             "default": [
@@ -283,14 +293,37 @@
                 "DELETE",
                 "PATCH"
             ],
+            "group": "api",
+            "section": "cors",
+            "order": 2,
             "type": "array"
         },
         "api.cors.enabled": {
             "default": false,
+            "group": "api",
+            "section": "cors",
+            "order": 1,
             "type": "boolean"
+        },
+        "api.cors.exposeheaders": {
+            "default": [
+                "Cache-Control",
+                "Content-Language",
+                "Content-Type",
+                "Expires",
+                "Last-Modified",
+                "Pragma"
+            ],
+            "group": "api",
+            "section": "cors",
+            "order": 5,
+            "type": "array"
         },
         "api.cors.maxage": {
             "default": 86400,
+            "group": "api",
+            "section": "cors",
+            "order": 6,
             "type": "integer",
             "units": "seconds",
             "validate": {
@@ -298,8 +331,11 @@
             }
         },
         "api.cors.origin": {
-            "default": "*",
-            "type": "text"
+            "default": ["*"],
+            "group": "api",
+            "section": "cors",
+            "order": 3,
+            "type": "array"
         },
         "api_demo": {
             "default": false,
@@ -373,6 +409,12 @@
             "group": "auth",
             "section": "ad",
             "order": 10,
+            "type": "text"
+        },
+        "auth_ad_url": {
+            "group": "auth",
+            "section": "ad",
+            "order": 11,
             "type": "text"
         },
         "auth_ldap_attr.uid": {
@@ -611,6 +653,18 @@
             "default": [
                 "/-K9W8-/"
             ]
+        },
+        "graphing.availability": {
+            "group": "graphing",
+            "section": "availability",
+            "order": 0,
+            "default": [
+                "86400",
+                "604800",
+                "2592000",
+                "31536000"
+            ],
+            "type": "array"
         },
         "bad_disk_regexp": {
             "default": [],
@@ -1574,6 +1628,22 @@
                 "openstreetmap": "OpenStreetMap",
                 "mapquest": "MapQuest",
                 "bing": "Bing Maps"
+            }
+        },
+        "geoloc.latlng": {
+            "default": false,
+            "group": "external",
+            "section": "location",
+            "order": 2,
+            "type": "boolean",
+            "when": {
+                "setting": "geoloc.engine",
+                "operator": "in",
+                "value": [
+                    "google",
+                    "mapquest",
+                    "bing"
+                ]
             }
         },
         "github_api": {
@@ -2791,6 +2861,14 @@
                 "section": "system",
                 "order": 0,
                 "descr": "Filesystem Usage"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.availability": {
+            "default": {
+                "section": "availability",
+                "order": 0,
+                "descr": "Device Availability"
             },
             "type": "graph"
         },
@@ -4022,6 +4100,13 @@
             "group": "poller",
             "section": "poller_modules",
             "default": false,
+            "type": "boolean"
+        },
+        "poller_modules.availability": {
+            "order": 25,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
             "type": "boolean"
         },
         "poller_modules.os": {

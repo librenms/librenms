@@ -13,6 +13,7 @@ type: network
 mib_dir:
     - ciena
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.6141.1.
-        - .1.3.6.1.4.1.1271.1.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.6141.1.
+            - .1.3.6.1.4.1.1271.1.

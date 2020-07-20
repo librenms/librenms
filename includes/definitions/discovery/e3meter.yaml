@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - e3IpmLabel
+                -
+                    oid:
+                        - e3IpmLabel
         temperature:
             data:
                 -

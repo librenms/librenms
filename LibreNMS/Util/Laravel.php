@@ -80,9 +80,10 @@ class Laravel
 
     public static function enableQueryDebug()
     {
+        static $sql_debug_enabled;
         $db = Eloquent::DB();
 
-        if ($db && !$db->getEventDispatcher()->hasListeners('Illuminate\Database\Events\QueryExecuted')) {
+        if ($db && !$sql_debug_enabled) {
             $db->listen(function (QueryExecuted $query) {
                 // collect bindings and make them a little more readable
                 $bindings = collect($query->bindings)->map(function ($item) {
@@ -99,6 +100,7 @@ class Laravel
                     c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
                 }
             });
+            $sql_debug_enabled = true;
         }
     }
 
@@ -122,7 +124,7 @@ class Laravel
     public static function disableCliDebugOutput()
     {
         if (self::isBooted()) {
-            Log::setDefaultDriver('logfile');
+            Log::setDefaultDriver('stack');
         }
     }
 
@@ -137,6 +139,11 @@ class Laravel
         // set dummy path allows url helper to work and prevents full init again
         $new_uri = ($auth ? '/dummy_legacy_auth' : '/dummy_legacy_unauth');
         $request->server->set('REQUEST_URI', $new_uri);
+        
+        // tests fail without this
+        if ($request->server->get('REMOTE_ADDR') === null) {
+            $request->server->set('REMOTE_ADDR', '127.0.0.1');
+        }
 
         // set json type to prevent redirects in the dummy page
         $request->server->set('HTTP_ACCEPT', 'dummy/json');

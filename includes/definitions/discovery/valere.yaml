@@ -25,7 +25,8 @@ modules:
                     group: 'Shelf {{ $vpwrBayIndex }}'
                     descr: 'Module {{ $vpwrModuleIndex }} Current'
                     skip_values:
-                        -   oid: vpwrModuleOID
+                        -
+                            oid: vpwrModuleOID
                             op: '='
                             value: 'vpwrDcPowerLvd'
         temperature:

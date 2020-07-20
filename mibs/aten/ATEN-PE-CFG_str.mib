@@ -1,0 +1,5010 @@
+ -- MIB version: 1.1.115
+
+ -- MIB release note
+ --        |    date     | MIB version |  author      |    note         
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 02/11/2015  | 1.1.116     |  Zack Huang  |   Syntax modification of POP modes 
+ -- --------------------------------------------------------------------------------------------------------------------------
+ --        | 12/02/2014  | 1.1.115     |  Zack Huang  |   Wording modification
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 10/22/2014  | 1.1.114     |  HC Sun      |   Add get/set function for new POP feature  
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 07/28/2014  | 1.1.113     |  Zack Huang  |   Modify and unify responses of empty and not-support measurement values
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 10/31/2013  | 1.1.112     |  Zack Huang  |   updated mib to pass smilint level 3
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 10/03/2013  | 1.1.111     |  Jenny Teng  |   updated mib to pass smilint level 3
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 08/09/2013  | 1.1.110     |  Jenny Teng  |   Add outlet init mode
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 07/17/2013  | 1.1.109     |  Zack Huang  |   Add CAP Priority Settings
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 07/05/2013  | 1.1.108     |  Jenny Teng  |   Add Description and change some Syntax of oids  
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 05/23/2013  | 1.1.107     |  Carter Wu   |   Change "usrEnable" order from 40 to 47 in "UsrListEntry"  
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 05/21/2013  | 1.1.106     |  Carter Wu   |   Hide CAP function 
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 05/14/2013  | 1.1.105     |  Carter Wu   |   Modify Power Threshold Description 
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 05/07/2013  | 1.1.104     |  Carter Wu   |   Add CAP Function OID
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 04/26/2013  | 1.1.103     |  Zack Huang  |   Add Door Sensor Type OID
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 04/24/2013  | 1.1.102     |  Zack Huang  |   Modify Status Description of Door Sensor
+ -- -------------------------------------------------------------------------------------------------------------------------- 
+ --        | 02/20/2013  | 1.1.101     |  Zack Huang  |   
+ -- --------------------------------------------------------------------------------------------------------------------------
+ --        | 02/17/2012  |             |  Jenny Teng  |   
+ -- --------------------------------------------------------------------------------------------------------------------------
+ --        | 03/29/2010  |             |  Zack Yang   |   Initiative Version
+ -- --------------------------------------------------------------------------------------------------------------------------
+ 
+ -- ATEN International Co., Ltd.
+ -- This file defines the mib struct of Management in PE series
+ -- We attach this mib node on enterprises.aten.atenProducts.overip.poweroverip.pe subtree
+
+                                                  
+ATEN-PE-CFG DEFINITIONS ::= BEGIN
+ 
+    IMPORTS
+        enterprises, IpAddress, Gauge, TimeTicks     FROM RFC1155-SMI
+        enterprises									FROM RFC1155-SMI
+		DisplayString                                FROM RFC1213-MIB
+		OBJECT-TYPE                                  FROM RFC-1212                                                
+		TRAP-TYPE                                    FROM RFC-1215
+		MODULE-IDENTITY,
+		NOTIFICATION-TYPE							 FROM SNMPv2-SMI
+				KeyChange				      		FROM SNMP-USER-BASED-SM-MIB
+		TEXTUAL-CONVENTION			      			FROM SNMPv2-TC;
+		
+			   
+
+    aten MODULE-IDENTITY
+        LAST-UPDATED "201310311110Z"
+        ORGANIZATION "ATEN"
+        CONTACT-INFO "Aten, Inc."
+        DESCRIPTION
+                "ATEN PE MIB"
+        REVISION "201310311110Z"
+        DESCRIPTION
+                "updated mib to pass smilint level 3"
+        ::= { enterprises 21317 }   
+
+
+ atenProducts OBJECT IDENTIFIER ::= { aten 1 }
+ overip    	OBJECT IDENTIFIER ::= { atenProducts 3 }
+ poweroverip		OBJECT IDENTIFIER ::= { overip 2}
+ pe			OBJECT IDENTIFIER ::= {poweroverip 2}
+ userManagement                   	                OBJECT IDENTIFIER ::=  { pe 1 }
+	control                                             OBJECT IDENTIFIER ::=  { pe 2 }
+	device												OBJECT IDENTIFIER ::=  { control 1 }
+	   doorSensor                                       OBJECT IDENTIFIER ::=  { device 16 }
+	   pop                                              OBJECT IDENTIFIER ::=  { device 17 }
+	   cap												OBJECT IDENTIFIER ::=  { device 18 }
+	outlet												OBJECT IDENTIFIER ::=  { control 2 }
+	bank                                                OBJECT IDENTIFIER ::=  { control 3 }
+deviceManagement									OBJECT IDENTIFIER ::=  { pe 3 }
+	config												OBJECT IDENTIFIER ::=  { deviceManagement 4 }
+		dashBoard											OBJECT IDENTIFIER ::=  { config 4 }
+		servicePorts										OBJECT IDENTIFIER ::=  { config 5 }
+		ipv4config											OBJECT IDENTIFIER ::=  { config 6 }
+		eventNotification									OBJECT IDENTIFIER ::=  { config 7 }
+			devicesnmp												OBJECT IDENTIFIER ::=  { eventNotification 1 }
+			syslog												OBJECT IDENTIFIER ::=  { eventNotification 2 }
+			smtp												OBJECT IDENTIFIER ::=  { eventNotification 3 } 
+			configurationNotification							OBJECT IDENTIFIER ::=  { eventNotification 9 } 
+
+			
+		dateTime											OBJECT IDENTIFIER ::=  { config 8 }
+			timeZone											OBJECT IDENTIFIER ::=  { dateTime 1 }
+			manualInput											OBJECT IDENTIFIER ::=  { dateTime 2 }
+			networkTime											OBJECT IDENTIFIER ::=  { dateTime 3 }
+		
+	devicesecurity											OBJECT IDENTIFIER ::=  { deviceManagement 5 }
+		loginFailures										OBJECT IDENTIFIER ::=  { devicesecurity 1 }
+		workingMode											OBJECT IDENTIFIER ::=  { devicesecurity 2 }
+		accountPolicy 										OBJECT IDENTIFIER ::=  { devicesecurity 3 }
+		loginRestriction									OBJECT IDENTIFIER ::=  { devicesecurity 4 }
+			ipFilter											OBJECT IDENTIFIER ::=  { loginRestriction 2 }
+			macFilter											OBJECT IDENTIFIER ::=  { loginRestriction 3 }
+		authentication										OBJECT IDENTIFIER ::=  { devicesecurity 5 }
+			radius												OBJECT IDENTIFIER ::=  { authentication 1 }
+--CPM		               								OBJECT IDENTIFIER ::=  { pe 7 }
+--	CPMDevice                                              OBJECT IDENTIFIER ::=  { CPM 9 }
+--    Sensor												OBJECT IDENTIFIER ::=  { CPM 10 }
+--	EnergySensor											OBJECT IDENTIFIER ::=  { CPM 11 }
+
+
+--SNMPv3UsmAuthPrivProtocol ::=  TEXTUAL-CONVENTION
+--    STATUS  current
+--    DESCRIPTION
+--		"This textual convention enumerates the authentication and privledge 
+--		protocol for USM configuration.
+--        "
+--       SYNTAX    INTEGER
+-- 			{
+--				hmacMD5Auth(2),
+--				hmacSHAAuth(3)
+--				desPrivProtocol(5),
+--				aesPrivProtocol(6)
+--			}
+
+-- Device Control	
+modelName OBJECT-TYPE		
+	SYNTAX DisplayString	
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"Indicate PE device model name."
+	::= { device 1 }	
+	
+deviceName OBJECT-TYPE		
+	SYNTAX DisplayString	
+	MAX-ACCESS read-write	
+	STATUS current	
+	DESCRIPTION	
+		"The name of PE device.
+		string length: 1~39  
+		NOTE: Input string as /empty to set this object to NULL. 
+		"
+	::= { device 2 }	
+	
+deviceValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DeviceValueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Device value table. This table displays device's current, voltage, power and
+		 power dissipation.
+		"
+    ::= { device 3 }
+
+deviceValueEntry OBJECT-TYPE
+    SYNTAX DeviceValueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single deviceValue entry containing device info."
+    INDEX { deviceValueIndex }
+     ::= { deviceValueTable 1 }
+     
+DeviceValueEntry ::=
+    SEQUENCE {
+        deviceValueIndex
+            INTEGER,
+        deviceCurrent
+            DisplayString,
+        deviceVoltage
+            DisplayString,
+		devicePower
+            DisplayString,
+		devicePowerDissipation
+            DisplayString,
+        inputMaxVoltage
+        	INTEGER,
+        inputMaxCurrent
+        	INTEGER,
+        powerCapacity
+        	INTEGER,
+        devicePowerFactor        
+          	DisplayString
+    }
+
+deviceValueIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of deviceValue."
+    ::= { deviceValueEntry 1 }
+deviceCurrent  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device electric current value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { deviceValueEntry 2 }
+deviceVoltage  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device voltage value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { deviceValueEntry 3 }
+devicePower  OBJECT-TYPE
+    SYNTAX DisplayString 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device power value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { deviceValueEntry 4 }
+    
+devicePowerDissipation  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only 
+    STATUS current
+    DESCRIPTION
+        "Device power dissipation value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { deviceValueEntry 5 }
+
+inputMaxVoltage  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device input Voltage value. unit:(V)    
+        If the device does not support this OID, we show value 0.
+        "
+    ::= { deviceValueEntry 6 }
+    
+inputMaxCurrent  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device input Current value. unit:(A)
+        If the device does not support this OID, we show value 0."
+    ::= { deviceValueEntry 7 }
+
+powerCapacity  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device power Capacity value.unit:(VA)
+        If the device does not support this OID, we show value 0."
+    ::= { deviceValueEntry 8 }
+
+devicePowerFactor  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Device power Factor value.
+        If the device does not support this OID, it returns: not-support."
+    ::= { deviceValueEntry 9 }
+        	
+sensorValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SensorValueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Device's sensor value table. This table displays sensor's temperature, humidity and
+		 pressure.
+		"
+    ::= { device 4 }
+
+sensorValueEntry OBJECT-TYPE
+    SYNTAX SensorValueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single device's sensor value entry containing device info."
+    INDEX { sensorValueIndex }
+     ::= { sensorValueTable 1 }
+     
+SensorValueEntry ::=
+    SEQUENCE {
+    		sensorValueIndex
+    			INTEGER,
+		sensorTemperature
+            		DisplayString,
+		sensorHumidity
+			DisplayString,
+		sensorPressure
+			DisplayString,
+		sensorProperty
+			INTEGER
+    }
+
+sensorValueIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..6)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of sensor number."
+    ::= { sensorValueEntry 1 }	
+sensorTemperature  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sensor's Temperature value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { sensorValueEntry 2 }
+sensorHumidity  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sensor's Humidity value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { sensorValueEntry 3 }
+sensorPressure  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sensor's Pressure value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { sensorValueEntry 4 }
+    
+sensorProperty  OBJECT-TYPE
+    SYNTAX INTEGER { intake(1), exhaust(2), floor(3) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Sensor's Property."
+    ::= { sensorValueEntry 5 }
+	
+deviceOutletStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DeviceOutletStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Device outlet status value table."
+    ::= { device 5 }
+
+deviceOutletStatusEntry OBJECT-TYPE
+    SYNTAX DeviceOutletStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single deviceOutletStatus entry containing device info."
+    INDEX { deviceOutletStatusIndex }
+     ::= { deviceOutletStatusTable 1 }
+     
+DeviceOutletStatusEntry ::=
+    SEQUENCE {
+        deviceOutletStatusIndex
+            INTEGER,
+	displayOutletStatus
+            INTEGER
+        --deviceOutletControl
+            --INTEGER,
+        --deviceOutletReboot
+        --	INTEGER    
+       
+    }
+
+deviceOutletStatusIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of deviceOutletStatus"
+    ::= { deviceOutletStatusEntry 1 }
+displayOutletStatus OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), fault(4), noauth(5), not-support(6), pop(7) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Display outlet status."
+    ::= { deviceOutletStatusEntry 2 }
+
+    	
+deviceConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DeviceConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current                               
+    DESCRIPTION
+        "Device configuration table"
+    ::= { device 6 }
+
+deviceConfigEntry OBJECT-TYPE
+    SYNTAX DeviceConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single deviceConfig entry containing device info."
+    INDEX { deviceConfigIndex }
+     ::= { deviceConfigTable 1 }
+     
+DeviceConfigEntry ::=
+    SEQUENCE {
+        deviceConfigIndex
+            INTEGER,
+        deviceMinCurMT
+            INTEGER,
+        deviceMaxCurMT
+            INTEGER,
+		
+		deviceMinVolMT
+            INTEGER,
+        deviceMaxVolMT
+            INTEGER,
+		deviceMinPMT
+            INTEGER,
+        deviceMaxPMT
+            INTEGER,
+		
+		--deviceMinPDMT
+            --INTEGER,
+        deviceMaxPDMT
+            INTEGER
+        --deviceCurFlu
+        --    INTEGER,
+        --deviceVolFlu
+        --    INTEGER,
+        --devicePFlu
+        --    INTEGER    
+		--devicePDFlu
+            --INTEGER
+    }
+
+deviceConfigIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of deviceConfig"
+    ::= { deviceConfigEntry 1 }
+deviceMinCurMT  OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set device minimum electric current measurement threshold.
+        Example: range 0.0~32.0 represents 0~320.
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceConfigEntry 2 }
+deviceMaxCurMT  OBJECT-TYPE 
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set device maximum electric current measurement threshold.  
+        Example: range 0.0~32.0 represents 0~320 
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceConfigEntry 3 }
+
+deviceMinVolMT  OBJECT-TYPE
+    SYNTAX INTEGER (900..2600 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set device minimum voltage measurement threshold. 
+        Exapmple: range 90.0~260.0 represents 900~2600
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceConfigEntry 4 }
+    
+deviceMaxVolMT  OBJECT-TYPE
+    SYNTAX INTEGER (900..2600 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set device maximum voltage measurement threshold. 
+        Example: range 90.0~260.0 represents 900~2600
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceConfigEntry 5 }
+
+deviceMinPMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..99999 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set device minimum power measurement threshold. 
+        Example: range 0.0 ~ 9999.9 represents 0~99999
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceConfigEntry 6 }
+    
+deviceMaxPMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..99999 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set device maximum power measurement threshold. 
+        Example: range 0.0 ~ 9999.9 represents 0~99999
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceConfigEntry 7 }
+    
+--deviceCurFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display device electric current fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+	--	 "
+    --::= { deviceConfigEntry 9 }
+    
+--deviceVolFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display device voltage fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { deviceConfigEntry 10 } 
+       
+--devicePFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display device power fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold 
+    --    "
+    --::= { deviceConfigEntry 11 }
+
+--deviceMinPDMT  OBJECT-TYPE
+    --SYNTAX INTEGER (0..2000)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set device minimum power dissipation measurement threshold."
+    --::= { deviceConfigEntry 8 }
+deviceMaxPDMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..999990 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set device maximum power dissipation measurement threshold. 
+        Example: range 0.0 ~ 99999.0 represents 0~999990
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceConfigEntry 8 }
+--devicePDFlu  OBJECT-TYPE
+    --SYNTAX INTEGER (0..2000)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+     --   "Display device power dissipation fluctuation threshold."
+    --::= { deviceConfigEntry 13 }
+
+	
+deviceSensorTresholdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DeviceSensorTresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Device environment value table"
+    ::= { device 7 }
+
+deviceSensorTresholdEntry OBJECT-TYPE
+    SYNTAX DeviceSensorTresholdEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Device's sensor Environment entry containing sensor info."
+    INDEX { deviceSensorTresholdIndex }
+     ::= { deviceSensorTresholdTable 1 }
+     
+DeviceSensorTresholdEntry ::=
+    SEQUENCE {
+        deviceSensorTresholdIndex
+            INTEGER,
+        sensorMinTempMT
+            INTEGER,
+        sensorMaxTempMT
+            INTEGER,
+		
+		sensorMinHumMT
+            INTEGER,
+		sensorMaxHumMT
+            INTEGER,
+		sensorMinPressMT
+            INTEGER,
+        sensorMaxPressMT
+            INTEGER
+        --sensorTempFlu
+            --INTEGER,
+        --sensorHumFlu
+			--INTEGER,
+		--sensorPressFlu
+            --INTEGER
+    }
+
+deviceSensorTresholdIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..6)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of sensor number"
+    ::= { deviceSensorTresholdEntry 1 }
+    
+sensorMinTempMT  OBJECT-TYPE
+    SYNTAX INTEGER (-200..600 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set sensor minimum temperature measurement threshold. 
+        Example: range -20.0 ~ 60.0 represents -200~600
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceSensorTresholdEntry 2 }
+sensorMaxTempMT  OBJECT-TYPE
+    SYNTAX INTEGER (-200..600 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set sensor maximum temperature measurement threshold. 
+        Example: range -20.0 ~ 60.0 represents -200~600
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceSensorTresholdEntry 3 }
+
+sensorMinHumMT  OBJECT-TYPE
+    SYNTAX INTEGER (150..950 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set sensor minimum humidity measurement threshold. 
+        Example: range 15.0 ~ 95.0 represents 150~950
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceSensorTresholdEntry 4 }
+sensorMaxHumMT  OBJECT-TYPE
+    SYNTAX INTEGER (150..950 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set sensor maximum humidity measurement threshold. 
+        Example: range 15.0 ~ 95.0 represents 150~950
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceSensorTresholdEntry 5 }
+
+sensorMinPressMT  OBJECT-TYPE
+    SYNTAX INTEGER (-2500..2500 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set sensor minimum pressure measurement threshold. 
+        Example: range -250.0 ~ 250.0 represents -2500 ~ 2500
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceSensorTresholdEntry 6 }
+    
+sensorMaxPressMT  OBJECT-TYPE
+    SYNTAX INTEGER (-2500..2500 | -3000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set sensor maximum pressure measurement threshold. 
+        Example: range -250.0 ~ 250.0 represents -2500 ~ 2500
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { deviceSensorTresholdEntry 7 }
+    
+--sensorTempFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display sensor temperature fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { deviceEnvironmentEntry 8 } 
+    
+--sensorHumFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display sensor humidity fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { deviceEnvironmentEntry 9 }    
+    
+    
+--sensorPressFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display sensor pressure fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { deviceEnvironmentEntry 10 }
+
+deviceOutletControl OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), nostatus(3), not-support(4) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        " This function is used for all outlet ports control.
+          Set off(1) to turn off for all outlet ports.
+          Set on(2) to turn on for all outlet ports.
+          Get this object always return nostatus(3), because there is no device status.
+        	
+        "
+    ::= { device 8 }
+    
+deviceOutletReboot OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2), not-support(4)  }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        " This function is used for all outlet ports to reboot.
+          Only when outlet status is ON can do outlet reboot action to all ports.
+          Set yes(2) to reboot all outlet ports.
+          Get this object always return no(1).
+		"
+    ::= { device 9 }
+ 
+switchable OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2), mix(3)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " Outlet is switchable or not."
+    ::= { device 10 }
+    
+perportreading OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " Outlet is per-port reading or not."
+    ::= { device 11 }
+    
+sensornumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " Sensor number."
+    ::= { device 12 }
+
+outletnumber OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " Outlet number."
+    ::= { device 13 }
+        
+banknumber OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " Bank number."
+    ::= { device 14 }
+    
+--chainnumber OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-only
+    --STATUS current
+    --DESCRIPTION 
+    --    " The slave device number."
+    --::= { device 15 }
+
+doorSensorStatus OBJECT-TYPE
+    SYNTAX INTEGER { close(0), open(1), not-attached(2), not-support(4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        " Display door sensor status.
+      	  close(0) represents door close.
+	  open(1) represents door open.
+	  not-attached(2) represents door sensor don't attach to device."
+    ::= { doorSensor 1 }
+    
+doorSensorType OBJECT-TYPE
+    SYNTAX INTEGER { notinstalled(0), photo(1), inductiveproximity(2), reed(3) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Door Sensor Type Selection"
+    ::= { doorSensor 2 }    
+--
+-- pop
+enablePOPmode OBJECT-TYPE
+    SYNTAX INTEGER {no(1), yes(2)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        " Enable/Disable POP mode."
+    ::= { pop 1 }
+
+popThreshold OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        " (-1)means default value same as Bank Max Current 16 A.
+          
+          Example: range 0.0~32.0 represents 0~320
+          You can define the POP threshold or set as default(-1) value."
+    ::= { pop 2 }
+
+enableOutletPOPmode OBJECT-TYPE
+    SYNTAX INTEGER {no(1), yes(2), not-support(3)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        " Enable/Disable Outlet POP mode."
+    ::= { pop 3 }
+	
+enableLIFOPOPmode OBJECT-TYPE
+    SYNTAX INTEGER {no(1), yes(2), not-support(3)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        " Enable/Disable LIFO POP mode."
+    ::= { pop 4 }
+
+enablePriorityPOPmode OBJECT-TYPE
+    SYNTAX INTEGER {no(1), yes(2), not-support(3)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        " Enable/Disable Priority POP mode."
+    ::= { pop 5 }
+
+-- CAP
+enableCAPmode OBJECT-TYPE
+    SYNTAX INTEGER {no(1), yes(2)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        " Enable/Disable CAP mode."
+    ::= { cap 1 }
+        
+outletCAPTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OutletCAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Outlet CAP table"
+    ::= { cap 2 }
+
+outletCAPEntry OBJECT-TYPE
+    SYNTAX OutletCAPEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Outlet CAP entry containing CAP info."
+    INDEX { outletCAPIndex }
+     ::= { outletCAPTable 1 }
+     
+OutletCAPEntry ::=
+    SEQUENCE {
+        outletCAPIndex
+            INTEGER,
+        outletCAPPriority
+            INTEGER
+    }
+
+outletCAPIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..40)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of outlet's CAP configuration"
+    ::= { outletCAPEntry 1 }
+
+outletCAPPriority  OBJECT-TYPE
+    SYNTAX INTEGER (0..99)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the CAP Priority of outlet.
+		Priority 0 means this outlet does not support this OID."
+    ::= { outletCAPEntry 2 }
+-- ontlet control init mode
+
+outletInitMode OBJECT-TYPE
+    SYNTAX INTEGER {no-delaytime(1), delaytime(2), not-support(3)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "choose outlet init mode you want."
+    ::= { device 19 }
+
+
+
+-- integer value
+
+--deviceIntegerValueTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF DeviceIntegerValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Device value table. This table displays device's current, voltage, power and
+--		 power dissipation.
+--		"
+--    ::= { device 99 }
+
+--deviceIntegerValueEntry OBJECT-TYPE
+--    SYNTAX DeviceIntegerValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Single deviceValue entry containing device info."
+--    INDEX { deviceIntegerValueIndex }
+--     ::= { deviceIntegerValueTable 1 }
+     
+--DeviceIntegerValueEntry ::=
+--    SEQUENCE {
+--        deviceIntegerValueIndex
+--            INTEGER,
+--        deviceIntegerCurrent
+--            INTEGER,
+--        deviceIntegerVoltage
+--            INTEGER,
+--		deviceIntegerPower
+--            INTEGER,
+--		deviceIntegerPowerDissipation
+--            INTEGER
+        --inputMaxVoltage
+        --	INTEGER,
+        --inputMaxCurrent
+        --	INTEGER,
+        --powerCapacity
+        --	INTEGER
+        --devicePowerFactor        
+        --  INTEGER  	
+--    }
+
+--deviceIntegerValueIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1)
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Index of deviceValue."
+--    ::= { deviceIntegerValueEntry 1 }
+    
+--deviceIntegerCurrent  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device electric current value.
+--         This value indicates that 1,000 times.
+--        "
+--    ::= { deviceIntegerValueEntry 2 } 
+    
+--deviceIntegerVoltage  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device voltage value.
+--        This value indicates that 1,000 times
+--        "
+--    ::= { deviceIntegerValueEntry 3 } 
+    
+--deviceIntegerPower  OBJECT-TYPE
+--    SYNTAX INTEGER 
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device power value.
+--        This value indicates that 1,000 times.
+--        "
+--    ::= { deviceIntegerValueEntry 4 }
+    
+--deviceIntegerPowerDissipation  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device power dissipation value.
+--        This value indicates that 1,000 times
+--        "
+--    ::= { deviceIntegerValueEntry 5 }
+
+--inputMaxVoltage  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device input Voltage value. unit:(V)"
+--    ::= { deviceValueEntry 6 }
+    
+--inputMaxCurrent  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device input Current value. unit:(A)"
+--    ::= { deviceValueEntry 7 }
+
+--powerCapacity  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device power Capacity value.unit:(VA)"
+--    ::= { deviceValueEntry 8 }
+
+--devicePowerFactor  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device power Factor value."
+--    ::= { deviceValueEntry 9 }
+-- 
+
+--sensorIntegerValueTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF SensorIntegerValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Device's sensor value table. This table displays sensor's temperature, humidity and
+--		 pressure.
+--		"
+--    ::= { device 100 }
+
+--sensorIntegerValueEntry OBJECT-TYPE
+--    SYNTAX SensorIntegerValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Single device's sensor value entry containing device info."
+--    INDEX { sensorIntegerValueIndex }
+--     ::= { sensorIntegerValueTable 1 }
+     
+--SensorIntegerValueEntry ::=
+--    SEQUENCE {
+--    		sensorIntegerValueIndex
+--    			INTEGER,
+--			sensorIntegerTemperature
+--            	INTEGER,
+--			sensorIntegerHumidity
+--				INTEGER,
+--			sensorIntegerPressure
+--				INTEGER		
+		--sensorIntegerProperty
+		--	INTEGER
+--    }
+
+--sensorIntegerValueIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1..6)
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Index of sensor number."
+--    ::= { sensorIntegerValueEntry 1 }
+    	
+--sensorIntegerTemperature  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Sensor's Temperature value.
+--        This value indicates that 1,000 times.
+--        Value -300000 represents empty value."
+--    ::= { sensorIntegerValueEntry 2 }    
+    
+--sensorIntegerHumidity  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Sensor's Humidity value.
+--        This value indicates that 1,000 times.
+--        Value -300000 represents empty value."
+--    ::= { sensorIntegerValueEntry 3 } 
+    
+--sensorIntegerPressure  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Sensor's Pressure value.
+--        This value indicates that 1,000 times.
+--        Value -300000 represents empty value."
+--    ::= { sensorIntegerValueEntry 4 }
+    
+--sensorIntegerProperty  OBJECT-TYPE
+--    SYNTAX INTEGER { intake(1), exhaust(2), floor(3) }
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Sensor's Property."
+--    ::= { sensorIntegerValueEntry 5 } 
+                  
+-- Device Control End 
+
+-- Outlet Control 
+outletValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OutletValueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Display total outlet value table"
+    ::= { outlet 1 }
+
+outletValueEntry OBJECT-TYPE
+    SYNTAX OutletValueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single outletValue entry containing outlet info."
+    INDEX { outletValueIndex }
+     ::= { outletValueTable 1 }
+     
+OutletValueEntry ::=
+    SEQUENCE {
+        outletValueIndex
+            INTEGER,
+        outletCurrent
+            DisplayString,
+        outletVoltage
+            DisplayString,
+		outletPower
+            DisplayString,
+		outletPowerDissipation
+            DisplayString,
+        outletMaxCurrent
+        	INTEGER,
+        outletPowerFactor
+        	DisplayString
+    }
+
+outletValueIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of outlet number"
+    ::= { outletValueEntry 1 }
+outletCurrent  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Outlet electric current value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { outletValueEntry 2 }
+outletVoltage  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Outlet voltage value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { outletValueEntry 3 }
+outletPower  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Outlet power value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { outletValueEntry 4 }
+outletPowerDissipation  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Outlet power dissipation value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { outletValueEntry 5 }
+
+outletMaxCurrent  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Outlet Max Current value. unit: (A).
+        If the device does not support this OID, we show value 0.
+        "
+    ::= { outletValueEntry 6 }
+    
+outletPowerFactor  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Outlet Power Factor value.
+        If the device does not support this OID, it returns: not-support."
+    ::= { outletValueEntry 7 }
+    	
+outlet1Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 1 status. Can't set pending status."
+    ::= { outlet 2 }
+    
+outlet2Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 2 status. Can't set pending status."
+    ::= { outlet 3 }
+outlet3Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 3 status. Can't set pending status."
+    ::= { outlet 4 }
+outlet4Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 4 status. Can't set pending status."
+    ::= { outlet 5 }
+outlet5Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 5 status. Can't set pending status."
+    ::= { outlet 6 }
+outlet6Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 6 status. Can't set pending status."
+    ::= { outlet 7 }
+outlet7Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 7 status. Can't set pending status."
+    ::= { outlet 8 }
+outlet8Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 8 status. Can't set pending status."
+    ::= { outlet 9 }
+
+outlet9Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 9 status. Can't set pending status."
+    ::= { outlet 11 }
+    
+outlet10Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 10 status. Can't set pending status."
+    ::= { outlet 12 }
+    
+outlet11Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 11 status. Can't set pending status."
+    ::= { outlet 13 }
+
+outlet12Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 12 status. Can't set pending status."
+    ::= { outlet 14 }
+
+outlet13Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 13 status. Can't set pending status."
+    ::= { outlet 15 }
+
+outlet14Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 14 status. Can't set pending status."
+    ::= { outlet 16 }
+
+outlet15Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 15 status. Can't set pending status."
+    ::= { outlet 17 }
+
+outlet16Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 16 status. Can't set pending status."
+    ::= { outlet 18 }
+
+outlet17Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 17 status. Can't set pending status."
+    ::= { outlet 19 }
+    
+outlet18Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 18 status. Can't set pending status."
+    ::= { outlet 20 }    
+
+outlet19Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 19 status. Can't set pending status."
+    ::= { outlet 21 }
+
+outlet20Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 20 status. Can't set pending status."
+    ::= { outlet 22 }
+    
+outlet21Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 21 status. Can't set pending status."
+    ::= { outlet 23 }
+
+outlet22Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 22 status. Can't set pending status."
+    ::= { outlet 24 }
+    
+outlet23Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 23 status. Can't set pending status."
+    ::= { outlet 25 }
+        
+outlet24Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 24 status. Can't set pending status."
+    ::= { outlet 26 }    
+
+outlet25Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 25 status. Can't set pending status."
+    ::= { outlet 27 }
+    
+outlet26Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 26 status. Can't set pending status."
+    ::= { outlet 28 }    
+    
+outlet27Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 27 status. Can't set pending status."
+    ::= { outlet 29 }
+    
+outlet28Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 28 status. Can't set pending status."
+    ::= { outlet 30 }
+            
+outlet29Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 29 status. Can't set pending status."
+    ::= { outlet 31 }
+    
+outlet30Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 30 status. Can't set pending status."
+    ::= { outlet 32 }
+    
+outlet31Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 31 status. Can't set pending status."
+    ::= { outlet 33 } 
+    
+outlet32Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 32 status. Can't set pending status."
+    ::= { outlet 34 }
+    
+outlet33Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 33 status. Can't set pending status."
+    ::= { outlet 35 }  
+    
+    
+outlet34Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 34 status. Can't set pending status."
+    ::= { outlet 36 }
+    
+outlet35Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 35 status. Can't set pending status."
+    ::= { outlet 37 }  
+  
+outlet36Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 36 status. Can't set pending status."
+    ::= { outlet 38 }  
+    
+outlet37Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 37 status. Can't set pending status."
+    ::= { outlet 39 }  
+    
+outlet38Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 38 status. Can't set pending status."
+    ::= { outlet 40 }      
+    
+outlet39Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 39 status. Can't set pending status."
+    ::= { outlet 41 } 
+
+outlet40Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 40 status. Can't set pending status."
+    ::= { outlet 42 } 
+
+outlet41Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 41 status. Can't set pending status."
+    ::= { outlet 43 } 
+
+outlet42Status OBJECT-TYPE
+    SYNTAX INTEGER { off(1), on(2), pending(3), reboot(4), fault(5), noauth(6), not-support(7), pop(8)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Display and control outlet 42 status. Can't set pending status."
+    ::= { outlet 44 } 
+
+--
+
+outletSwitchableTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OutletSwitchableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "
+		"
+    ::= { outlet 70 }
+
+outletSwitchableEntry OBJECT-TYPE
+    SYNTAX OutletSwitchableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        ""
+    INDEX { outletSwitchableIndex }
+     ::= { outletSwitchableTable 1 }
+     
+ OutletSwitchableEntry ::=
+    SEQUENCE {
+        outletSwitchableIndex
+            INTEGER,
+        outletSwitchable
+            INTEGER
+         	
+    }
+
+outletSwitchableIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of outlet number.
+        "
+    ::= { outletSwitchableEntry 1 }
+    
+outletSwitchable  OBJECT-TYPE
+    SYNTAX INTEGER {no(1), yes(2) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "
+        "
+    ::= { outletSwitchableEntry 2 }
+
+
+--outlet integer value
+
+--outletIntegerValueTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF OutletIntegerValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Display total outlet value table"
+--    ::= { outlet 99 }
+
+--outletIntegerValueEntry OBJECT-TYPE
+--    SYNTAX OutletIntegerValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Single outletValue entry containing outlet info."
+--    INDEX { outletIntegerValueIndex }
+--     ::= { outletIntegerValueTable 1 }
+     
+--OutletIntegerValueEntry ::=
+--    SEQUENCE {
+--        outletIntegerValueIndex
+--            INTEGER,
+--        outletIntegerCurrent
+--            INTEGER,
+--        outletIntegerVoltage
+--            INTEGER,
+--		outletIntegerPower
+--            INTEGER,
+--		outletIntegerPowerDissipation
+--            INTEGER
+--         }
+
+--outletIntegerValueIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1..30)
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Index of outlet number.
+--        "
+--    ::= { outletIntegerValueEntry 1 }
+    
+--outletIntegerCurrent  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Outlet electric current value.
+--        This value indicates that 1,000 times.
+--        "
+--    ::= { outletIntegerValueEntry 2 }
+    
+--outletIntegerVoltage  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Outlet voltage value.
+--        This value indicates that 1,000 times.
+--        "
+--    ::= { outletIntegerValueEntry 3 } 
+    
+--outletIntegerPower  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Outlet power value.
+--        This value indicates that 1,000 times."
+--    ::= { outletIntegerValueEntry 4 }   
+    
+--outletIntegerPowerDissipation  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Outlet power dissipation value.
+--        This value indicates that 1,000 times."
+--    ::= { outletIntegerValueEntry 5 }
+
+
+
+
+                           	
+outletConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OutletConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Outlet configuration table"
+    ::= { outlet 10 }
+
+outletConfigEntry OBJECT-TYPE
+    SYNTAX OutletConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Outlet Config entry containing outlet info."
+    INDEX { outletConfigIndex }
+     ::= { outletConfigTable 1 }
+     
+OutletConfigEntry ::=
+    SEQUENCE {
+        outletConfigIndex
+            INTEGER,
+		outletName
+            DisplayString,
+        outletConfirmation
+            INTEGER,
+        outletOnDelayTime
+            INTEGER,
+		outletOffDelayTime
+            INTEGER,
+		outletShutdownMethod
+            INTEGER,
+        outletMAC
+            DisplayString,
+		outletMinCurMT
+            INTEGER,
+		outletMaxCurMT
+            INTEGER,
+		
+        outletMinVolMT
+            INTEGER,
+		outletMaxVolMT
+            INTEGER,
+		
+		outletMinPMT
+            INTEGER,
+        outletMaxPMT
+            INTEGER,
+		--outletMinPDMT
+            --INTEGER,
+        outletMaxPDMT
+            INTEGER
+        --outletCurFlu
+            --INTEGER,
+        --outletVolFlu
+            --INTEGER,
+        --outletPFlu
+            --INTEGER    
+        --outletPDFlu
+            --INTEGER
+    }
+
+outletConfigIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of outlet number"
+    ::= { outletConfigEntry 1 }
+outletName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the name of outlet.   
+        If the device does not support this OID, we show n/a.
+        string length: 0~15
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { outletConfigEntry 2 }
+outletConfirmation  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) , noauth(3), not-support(4)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the confirmation of outlet."
+    ::= { outletConfigEntry 3 }
+outletOnDelayTime  OBJECT-TYPE
+    SYNTAX INTEGER (0..999 | -1)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the ON delay time of outlet.
+        When this model does not support the OID, we show value -1. "
+    ::= { outletConfigEntry 4 }
+outletOffDelayTime  OBJECT-TYPE
+    SYNTAX INTEGER (0..999 | -1)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the OFF delay time of outlet.
+        When this model does not support the OID, we show value -1. "
+    ::= { outletConfigEntry 5 }
+outletShutdownMethod  OBJECT-TYPE
+    SYNTAX INTEGER { kill-the-power(1), wake-on-lan(2), after-ac-back(3), not-support(4)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the shutdown mehtod of outlet."
+    ::= { outletConfigEntry 6 }
+outletMAC  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the MAC address of ShutdownMethod.
+        If the device does not support this OID, we show n/a.
+        string length: 12
+        "
+    ::= { outletConfigEntry 7 }
+outletMinCurMT  OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet minimum electric current measurment threshold. 
+         Example: range 0.0 ~16.0 rerpresnts 0~160
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { outletConfigEntry 8 }
+outletMaxCurMT  OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet maximum electric current measurment threshold. 
+         Example: range 0.0 ~16.0 represents 0~160
+         NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { outletConfigEntry 9 }
+
+outletMinVolMT  OBJECT-TYPE
+    SYNTAX INTEGER (900..2600 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet minimum voltage measurment threshold. 
+        Example: range 90.0 ~260.0 represents 900~2600
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { outletConfigEntry 10 }
+outletMaxVolMT  OBJECT-TYPE
+    SYNTAX INTEGER (900..2600 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet maximum voltage measurment threshold. 
+        Example: range 90.0 ~260.0 represents 900~2600
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { outletConfigEntry 11 }
+
+outletMinPMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..99999 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet minimum power measurment threshold.
+        Example: range 0.0 ~ 9999.9 represents 0~99999
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { outletConfigEntry 12 }
+outletMaxPMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..99999 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet maximum power measurment threshold.
+        Example: range 0.0 ~ 9999.9 represents 0~99999
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { outletConfigEntry 13 }
+
+--outletMinPDMT  OBJECT-TYPE
+    --SYNTAX INTEGER (0..100)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the outlet minimum power dissipation measurment threshold ."
+    --::= { outletConfigEntry 14 }
+outletMaxPDMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..999990 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet maximum power dissipation measurment threshold.
+        Example: range 0.0 ~ 99999.0 represents 0~999990
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { outletConfigEntry 14 }
+    
+--outletCurFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display the outlet electric current fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { outletConfigEntry 15 }
+        
+--outletVolFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display the outlet voltage fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { outletConfigEntry 16 }
+--outletPFlu  OBJECT-TYPE
+    --SYNTAX INTEGER 
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display the outlet power fluctuation threshold. 
+    --    Fluctuation Range = (MaxThreshold-MinThreshold)/2 x10
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { outletConfigEntry 17 }
+        
+--outletPDFlu  OBJECT-TYPE
+    --SYNTAX INTEGER (0..100)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display the outlet power dissipation fluctuation threshold ."
+    --::= { outletConfigEntry 19 }
+
+-- Outlet Control End 
+-- Bank control
+breakerStatusTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BreakerStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Display total bank value table"
+    ::= { bank 1 }
+
+breakerStatusEntry OBJECT-TYPE
+    SYNTAX BreakerStatusEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single bankValue entry containing bank info."
+    INDEX { breakerStatusIndex }
+     ::= { breakerStatusTable 1 }
+     
+BreakerStatusEntry ::=
+    SEQUENCE {
+        breakerStatusIndex
+            INTEGER,
+        breakerStatus
+            INTEGER
+            }
+
+breakerStatusIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of breaker number."
+    ::= { breakerStatusEntry 1 }
+
+breakerStatus  OBJECT-TYPE
+   SYNTAX INTEGER { off(1), on(2), not-support(3)}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Breaker status."
+    ::= { breakerStatusEntry 2 }
+
+
+bankValueTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BankValueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Display total bank value table"
+    ::= { bank 2 }
+
+bankValueEntry OBJECT-TYPE
+    SYNTAX BankValueEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single bankValue entry containing bank info."
+    INDEX { bankValueIndex }
+     ::= { bankValueTable 1 }
+     
+BankValueEntry ::=
+    SEQUENCE {
+        bankValueIndex
+            INTEGER,
+        bankCurrent
+            DisplayString,
+        bankVoltage
+            DisplayString,
+		bankPower
+            DisplayString,
+		bankPowerDissipation
+            DisplayString,        
+        bankMaxCurrent
+        	INTEGER,
+        bankAttachStatus
+        	INTEGER,
+        bankPowerFactor
+        	DisplayString
+    }
+
+bankValueIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of bank number"
+    ::= { bankValueEntry 1 }
+bankCurrent  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bank electric current value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { bankValueEntry 2 }
+bankVoltage  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bank voltage value.
+        We put this OID to write access type for user to set the reference voltage on EC1000 model.
+        And the setting should be the numbers. You can set 0 to clear the setting.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { bankValueEntry 3 }
+    
+bankPower  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bank power value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { bankValueEntry 4 }
+    
+bankPowerDissipation  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bank power dissipation value.
+        If this measurement value is not available, it returns: N/A.
+        If the device does not support this OID, it returns: not-support."
+    ::= { bankValueEntry 5 }
+
+           
+bankMaxCurrent  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Bank Max Current value. unit: (A)
+        EC1000:0A~320A
+        "
+    ::= { bankValueEntry 6 }
+
+bankAttachStatus  OBJECT-TYPE
+    SYNTAX INTEGER { noattached(1), attached(2), error(3), noexisted(4) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The status of Energy sensor Bank attached status."
+    ::= { bankValueEntry 7 }
+    
+bankPowerFactor  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Bank Power Factor value.
+        If the device does not support this OID, it returns: not-support."
+    ::= { bankValueEntry 8 }
+    
+bankConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BankConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Bank configuration table"
+    ::= { bank 3 }
+
+bankConfigEntry OBJECT-TYPE
+    SYNTAX BankConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Bank Config entry containing Bank info."
+    INDEX { bankConfigIndex }
+     ::= { bankConfigTable 1 }
+     
+BankConfigEntry ::=
+    SEQUENCE {
+        bankConfigIndex
+            INTEGER,
+		bankName
+            DisplayString,		
+		bankMinCurMT
+            INTEGER,
+		bankMaxCurMT
+            INTEGER,
+		
+        bankMinVolMT
+            INTEGER,
+		bankMaxVolMT
+            INTEGER,
+		
+		bankMinPMT
+            INTEGER,
+        bankMaxPMT
+            INTEGER,
+		--outletMinPDMT
+            --INTEGER,
+        bankMaxPDMT
+            INTEGER
+        --outletCurFlu
+            --INTEGER,
+        --outletVolFlu
+            --INTEGER,
+        --outletPFlu
+            --INTEGER    
+        --outletPDFlu
+            --INTEGER
+    }
+
+bankConfigIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..30)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of bank number"
+    ::= { bankConfigEntry 1 }
+    
+bankName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the name of bank.
+        When this model does not support the OID, we show n/a.
+        string length: 0~15
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { bankConfigEntry 2 }
+
+
+bankMinCurMT  OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet minimum electric current measurment threshold. 
+        Example: range 0.0 ~16.0 rerpresnts 0~160
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { bankConfigEntry 3 }
+    
+bankMaxCurMT  OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet maximum electric current measurment threshold. 
+        Example: range 0.0 ~16.0 represents 0~160
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { bankConfigEntry 4}
+
+bankMinVolMT  OBJECT-TYPE
+    SYNTAX INTEGER (900..2600 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet minimum voltage measurment threshold. 
+        Example: range 90.0 ~260.0 represents 900~2600
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { bankConfigEntry 5 }
+bankMaxVolMT  OBJECT-TYPE
+    SYNTAX INTEGER (900..2600 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet maximum voltage measurment threshold. 
+        Example: range 90.0 ~260.0 represents 900~2600
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { bankConfigEntry 6 }
+
+bankMinPMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..99999| -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet minimum power measurment threshold.
+        Example: range 0.0 ~ 9999.9 represents 0~99999
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { bankConfigEntry 7 }
+bankMaxPMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..99999 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet maximum power measurment threshold.
+        Example: range 0.0 ~ 9999.9 represents 0~99999
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { bankConfigEntry 8 }
+
+--outletMinPDMT  OBJECT-TYPE
+    --SYNTAX INTEGER (0..100)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the outlet minimum power dissipation measurment threshold ."
+    --::= { outletConfigEntry 14 }
+    
+bankMaxPDMT  OBJECT-TYPE
+    SYNTAX INTEGER (0..999990 | -3000 | -2000000)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the outlet maximum power dissipation measurment threshold.
+        Example: range 0.0 ~ 99999.0 represents 0~999990
+        NOTICE: Minimum threshold should be smaller than maximum threshold.
+        Empty value: -3000.
+        If the device does not support this OID, it returns value -2000000."
+    ::= { bankConfigEntry 9 }
+ 
+
+bankControlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BankControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Bank Control table"
+    ::= { bank 4 }
+
+bankControlEntry OBJECT-TYPE
+    SYNTAX BankControlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Bank control entry."
+    INDEX { bankControlIndex }
+     ::= { bankControlTable 1 }
+     
+BankControlEntry ::=
+    SEQUENCE {
+        bankControlIndex
+            INTEGER,
+		bankControlStatus
+            INTEGER		
+    }
+
+bankControlIndex  OBJECT-TYPE
+    SYNTAX INTEGER (1..4)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of bank number"
+    ::= { bankControlEntry 1 }
+    
+bankControlStatus  OBJECT-TYPE
+    SYNTAX INTEGER {off(1), on(2), reboot(3), nostatus(4), not-support(5)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " This function is used for outlet control of bank.
+          Set off(1) to turn off for outlet control of bank.
+          Set on(2) to turn on for all outlet control of bank.
+          Set reboot(3) to turn on for outlet control of bank.
+          Get this object always return nostatus(3), because there is no bank status.
+        "
+    ::= { bankControlEntry 2 }
+  
+-- Bank control End
+
+
+--bankIntegerValueTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF BankIntegerValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Display total bank value table"
+--    ::= { bank 99 }
+
+--bankIntegerValueEntry OBJECT-TYPE
+--    SYNTAX BankIntegerValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Single bankValue entry containing bank info."
+--    INDEX { bankIntegerValueIndex }
+--     ::= { bankIntegerValueTable 1 }
+     
+--BankIntegerValueEntry ::=
+--    SEQUENCE {
+--        bankIntegerValueIndex
+--            INTEGER,
+--        bankIntegerCurrent
+--            INTEGER,
+--        bankIntegerVoltage
+--            INTEGER,
+--		bankIntegerPower
+--            INTEGER,
+--		bankIntegerPowerDissipation
+--            INTEGER       
+        --bankIntegerMaxCurrent
+        --	INTEGER,
+        --bankIntegerAttachStatus
+        --	INTEGER, 
+        --bankIntegerPowerFactor 
+        	--INTEGER
+--    }
+
+--bankIntegerValueIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1..30)
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Index of bank number.
+--        "
+--    ::= { bankIntegerValueEntry 1 }
+    
+--bankIntegerCurrent  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Bank electric current value.
+--        This value indicates that 1,000 times."
+--    ::= { bankIntegerValueEntry 2 }
+--bankIntegerVoltage  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Bank voltage value.
+--        This value indicates that 1,000 times."
+--    ::= { bankIntegerValueEntry 3 }
+    
+--bankIntegerPower  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Bank power value.
+--        This value indicates that 1,000 times."
+--    ::= { bankIntegerValueEntry 4 }
+    
+--bankIntegerPowerDissipation  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Bank power dissipation value.
+--        This value indicates that 1,000 times."
+--    ::= { bankIntegerValueEntry 5 }
+
+           
+--bankMaxCurrent  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "The Bank Max Current value. unit: (A)
+--        EC1000:0A~320A
+--        "
+--    ::= { bankValueEntry 6 }
+
+--bankAttachStatus  OBJECT-TYPE
+--    SYNTAX INTEGER { noattached(1), attached(2), error(3) }
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "The status of Energy sensor Bank attached status."
+--    ::= { bankValueEntry 7 }
+    
+--bankPowerFactor  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Bank Power Factor value"
+--    ::= { bankValueEntry 8 }   
+
+
+
+-- Device Management 
+deviceMAC OBJECT-TYPE		
+	SYNTAX DisplayString	
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"Display device MAC address."
+	::= { config 1 }
+	
+deviceIPv4 OBJECT-TYPE		
+	SYNTAX IpAddress	
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"Display device IP address."
+	::= { config 2 }
+	
+deviceFWversion OBJECT-TYPE		
+	SYNTAX DisplayString	
+	MAX-ACCESS read-only	
+	STATUS current	
+	DESCRIPTION	
+		"Display device FW version."
+	::= { config 3 }
+
+-- dashboard settings
+dashboardRow OBJECT-TYPE		
+	SYNTAX INTEGER	(1..26)
+	MAX-ACCESS read-write	
+	STATUS current	
+	DESCRIPTION	
+		"Display or set device's dashboard row number."
+	::= { dashBoard 1 }
+	
+dashboardColumn OBJECT-TYPE		
+	SYNTAX INTEGER	(1..26)
+	MAX-ACCESS read-write	
+	STATUS current	
+	DESCRIPTION	
+		"Display or set device's dashboard column number."
+	::= { dashBoard 2 }
+
+dashboardRackName OBJECT-TYPE		
+	SYNTAX DisplayString
+	MAX-ACCESS read-write	
+	STATUS current	
+	DESCRIPTION	
+		"Display or set device's dashboard rack name.
+		string length: 1~32
+		NOTE: Input string as /empty to set this object to NULL. 
+		"
+	::= { dashBoard 3 }	
+	
+httpPort OBJECT-TYPE		
+	SYNTAX INTEGER	(1..65535)
+	MAX-ACCESS read-write	
+	STATUS current	
+	DESCRIPTION	
+		"Display or set the HTTP port of PE device."
+	::= { servicePorts 1 }
+	
+httpsPort OBJECT-TYPE		
+	SYNTAX INTEGER	(1..65535)
+	MAX-ACCESS read-write	
+	STATUS current	
+	DESCRIPTION	
+		"Display or set the HTTPs port of PE device."
+	::= { servicePorts 2 }
+
+httpsOnlyEnable OBJECT-TYPE		
+	SYNTAX INTEGER	{yes(1), no(2) }
+	MAX-ACCESS read-write	
+	STATUS current	
+	DESCRIPTION	
+		"Enable to use Webpage HTTPs only or disable to use Webpage HTTP/HTTPs"
+	::= { servicePorts 3 }  
+	
+
+
+staticIPEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set IPv4 address automatically or not"
+    ::= { ipv4config 1 }
+fixedIPv4  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set fixed IPv4 address"
+    ::= { ipv4config 2 }
+subnetMask  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set subnet mask address"
+    ::= { ipv4config 3 }
+gateway  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set gateway address"
+    ::= { ipv4config 4 }
+staticDNSEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set DNS address automatically or not"
+    ::= { ipv4config 5 }
+dnsPreferIPv4  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set prefer DNS address"
+    ::= { ipv4config 6 }
+dnsAlternateIPv4  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set alternate DNS address"
+    ::= { ipv4config 7 }
+	
+trapEnabled OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Indicates if this trap entry is enabled or not.
+        You should set the username/auth-password/priv-password first, when choosing snmpv3.
+		You should set the community string first, when choosing snmpv1/v2c."
+    ::= { devicesnmp 1 }
+
+trapVersion OBJECT-TYPE
+	SYNTAX INTEGER { v1(1), v2c(2), v3(3)}
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " Choose SNMP Trap version to send trap.
+	You should set the username/auth-password/priv-password first, when choosing snmpv3.
+	You should set the community string first, when choosing snmpv1/v2c."
+    ::= { devicesnmp 2 }
+    
+snmpTrapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF SnmpTrapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "PE SNMP agent trap setup table. If users want to use trap, 
+		they must set enable trap, ip and community first."
+    ::= { devicesnmp 3 }     
+    
+snmpTrapEntry OBJECT-TYPE
+    SYNTAX SnmpTrapEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Single trap entry containing trap receiver info."
+    INDEX { trapReceiverNumber }
+     ::= { snmpTrapTable 1 }
+     
+SnmpTrapEntry ::=
+    SEQUENCE {
+        trapReceiverNumber
+            INTEGER,
+        --trapEnabled
+            --INTEGER,
+        trapReceiverIPAddress
+            IpAddress,
+        --trapCommunity
+            --DisplayString,
+		trapPort
+			INTEGER,
+		trapCommunity
+			DisplayString,
+		trapUsername
+			DisplayString,
+		trapAuthpassword
+			DisplayString,
+		trapPrivpassword
+		    DisplayString
+    }
+	
+trapReceiverNumber  OBJECT-TYPE
+    SYNTAX INTEGER (1..2)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Index of trap receiver"
+    ::= { snmpTrapEntry 1 }
+    
+
+
+trapReceiverIPAddress OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Trap receiver IP address"
+    ::= { snmpTrapEntry 2 }
+
+	
+trapPort OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "NMS trap port to be used by agent to send trap"
+    ::= { snmpTrapEntry 3 }
+    
+trapCommunity OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "If use SNMPv1/v2c to receive trap should set this Community string.
+        MAX string length: 20
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { snmpTrapEntry 4 }
+trapUsername OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..20))
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "If use SNMPv3 to receive trap should set this string.
+        NOTE: Input string as /empty to set this object to NULL.
+        MAX string length: 20
+        "
+    ::= { snmpTrapEntry 5 }
+trapAuthpassword OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (8..20))
+    MAX-ACCESS  read-write 
+    STATUS current
+    DESCRIPTION
+        "If use SNMPv3 to receive trap should set this string.
+        MAX string length: 20
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { snmpTrapEntry 6 }
+trapPrivpassword OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (8..20))
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "If use SNMPv3 to receive trap should set this string.
+        MAX string length: 20
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { snmpTrapEntry 7 }
+    
+        
+--privacypassword OBJECT-TYPE
+--    SYNTAX  DisplayString
+--    MAX-ACCESS  read-write
+--    STATUS current
+--    DESCRIPTION
+--        "SNMPv3 privacy password to be used by agent to send trap
+--        string length: 8~20
+--        "
+--    ::= { devicesnmp 4 }
+
+--engineID OBJECT-TYPE		
+--	SYNTAX DisplayString 	
+--	MAX-ACCESS read-only	
+--	STATUS current	
+--	DESCRIPTION	
+--		"EngineID"
+--	::= { devicesnmp 5 }
+--engineBoot OBJECT-TYPE		
+--	SYNTAX INTEGER 	
+--	MAX-ACCESS read-only	
+--	STATUS current	
+--	DESCRIPTION	
+--		"EngineBoot"
+--	::= { devicesnmp 6 }
+--engineTime OBJECT-TYPE		
+--	SYNTAX INTEGER 	
+--	MAX-ACCESS read-only	
+--	STATUS current	
+--	DESCRIPTION	
+--		"EngineTime"
+--	::= { devicesnmp 7 }
+--engineMaxMSG OBJECT-TYPE		
+--	SYNTAX INTEGER 	
+--	MAX-ACCESS read-only	
+--	STATUS current	
+--	DESCRIPTION	
+--		"EngineMaxMSG"
+--	::= { devicesnmp 8 }
+sysLogServerEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set syslog server address automatically or not"
+    ::= { syslog 1 }
+sysLogServerIPv4  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set syslog server address"
+    ::= { syslog 2 }
+sysLogServerPort  OBJECT-TYPE
+    SYNTAX INTEGER (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set syslog server port"
+    ::= { syslog 3 }
+
+smtpServerEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set SMTP server enable status."
+    ::= { smtp 1 }
+smtpServerName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set a SMTP server name.
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { smtp 2 }
+smtpAuthEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set authentication of SMTP server."
+    ::= { smtp 3 }
+smtpAccountName  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set a user's name of SMTP server.
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { smtp 4 }
+smtpAccountPwd  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set a user's password of SMTP server.
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { smtp 5 }
+smtpMailFrom  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set a mail of SMTP server.
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { smtp 6 }
+smtpMailTo  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set a mail of SMTP server.
+        NOTE: Input string as /empty to set this object to NULL.
+        "
+    ::= { smtp 7 }
+--    
+    
+configurationNotifyEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        " "
+    ::= { configurationNotification 1 }     
+    
+configurationNotifyTrapMSG NOTIFICATION-TYPE
+    STATUS  current
+    --OBJECTS { customTrapMSG }
+    DESCRIPTION " "
+        ::= { configurationNotification 2 }
+
+    
+--	
+timeZoneSetting  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set the time zone of PE device.
+		 (0) [GMT-12:00] Eniwetok Kwajalein
+         (1) [GMT-11:00] Midway Island Samoa
+         (2) [GMT-10:00] Hawaii
+         (3) [GMT-09:00] Alaska
+         (4) [GMT-08:00] Pacific Time (US & Canada); Tijuana
+         (5) [GMT-07:00] Mountain Time (US & Canada)
+         (6) [GMT-07:00] Arizona
+         (7) [GMT-06:00] Central Time (US & Canada)
+         (8) [GMT-06:00] Mexico City
+         (9) [GMT-06:00] Saskatchewan
+         (10)[GMT-06:00] Central America
+         (11)[GMT-05:00] Eastern Time (US & Canada)
+         (12)[GMT-05:00] Indiana (East)
+         (13)[GMT-05:00] Bogota Lima Quito
+         (14)[GMT-04:00] Atlantic Time (Canada)
+         (15)[GMT-04:00] Caracas La Paz
+         (16)[GMT-04:00] Santiago
+         (17)[GMT-03:30] Newfoundland
+         (18)[GMT-03:00] Buenos Aires Georgetown
+         (19)[GMT-03:00] Brasilia
+         (20)[GMT-03:00] Greenland
+         (21)[GMT-02:00] Mid-Atlantic
+         (22)[GMT-01:00] Azores
+         (23)[GMT-01:00] Cape Verde Is
+         (24)[GMT]       Casablanca Monrovia
+         (25)[GMT]       Greenwich Mean Time: Dublin Edinburgh Lisbon London
+         (26)[GMT+01:00] Amsterdam Copenhagen Madrid Paris Vilnius
+         (27)[GMT+01:00] West Central Africa
+         (28)[GMT+01:00] Belgrade Sarajevo Skopje Sofija Zagreb
+         (29)[GMT+01:00] Bratislava Budapest Ljubljana Prague Warsaw
+         (30)[GMT+01:00] Brussels Berlin Bern Rome Stockholm Vienna
+         (31)[GMT+02:00] Cairo
+         (32)[GMT+02:00] Harare Pretoria
+         (33)[GMT+02:00] Jerusalem
+         (34)[GMT+02:00] Bucharest
+         (35)[GMT+02:00] Helsinki Riga Tallinn
+         (36)[GMT+02:00] Athens Istanbul Minsk
+         (37)[GMT+03:00] Kuwait Riyadh
+         (38)[GMT+03:00] Nairobi
+         (39)[GMT+03:00] Baghdad
+         (40)[GMT+03:00] Moscow St. Petersburg Volgograd
+         (41)[GMT+03:30] Tehran
+         (42)[GMT+04:00] Abu Dhabi Muscat
+         (43)[GMT+04:00] Baku Tbilisi Yerevan
+         (44)[GMT+04:30] Kabul
+         (45)[GMT+05:00] Islamabad Karachi Tashkent
+         (46)[GMT+05:00] Ekaterinburg
+         (47)[GMT+05:30] Calcutta Chennai Mumbai New Delhi
+         (48)[GMT+05:45] Kathmandu
+         (49)[GMT+06:00] Astana Dhaka
+         (50)[GMT+06:00] Sri Jayawardenepura
+         (51)[GMT+06:00] Almaty Novosibirsk
+         (52)[GMT+06:30] Rangoon
+         (53)[GMT+07:00] Bangkok Hanoi Jakarta
+         (54)[GMT+07:00] Krasnoyarsk
+         (55)[GMT+08:00] Beijing Chongqing Hong Kong Urumqi
+         (56)[GMT+08:00] Perth
+         (57)[GMT+08:00] Kuala Lumpur Singapore
+         (58)[GMT+08:00] Taipei
+         (59)[GMT+08:00] Irkutsk Ulaan Bataar
+         (60)[GMT+09:00] Osaka Sapporo Tokyo
+         (61)[GMT+09:00] Seoul
+         (62)[GMT+09:00] Yakutsk
+         (63)[GMT+09:30] Darwin
+         (64)[GMT+09:30] Adelaide
+         (65)[GMT+10:00] Canberra Melbourne Sydney
+         (66)[GMT+10:00] Brisbane
+         (67)[GMT+10:00] Guam Port Moresby
+         (68)[GMT+10:00] Hobart
+         (69)[GMT+10:00] Vladivostok
+         (70)[GMT+11:00] Magadan Solomon Is New Caledonia
+         (71)[GMT+12:00] Fiji Kamchatka Marshall Is.
+         (72)[GMT+12:00] Auckland Wellington
+         (73)[GMT+13:00] Nuku'alofa
+		"
+    ::= { timeZone 1 }
+	
+dstEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set daylight savings time ."
+    ::= { timeZone 2 }
+
+dateSetting  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set date in a manual way.(This is Greenwich Mean Time, GMT)
+         string length: 10
+		 This value format must match the following form:
+		 YYYY-MM-DD
+		 ex. 2011-01-01
+		 Note: range of year: 2000-2099
+		 	   range of month: 01-12
+		 	   range of day: 01-31
+		"
+    ::= { manualInput 1 }
+	
+timeSetting  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set time in a manual way.(This is Greenwich Mean Time, GMT)
+         string length: 8
+		 This value format must match the following form:
+		 HH:MM:SS
+		 ex. 02:02:02
+		 Note: range of hour: 00-24
+		 	   range of minute: 00-60
+		 	   range of second: 00-60
+
+		"
+    ::= { manualInput 2 }
+	
+--syncWithPC  OBJECT-TYPE
+--    SYNTAX INTEGER { no(1), yes(2) }
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set date time useing sync PC way."
+--    ::= { manualInput 3 }
+	
+autoAdjustEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set date time useing auto adjustment way."
+    ::= { networkTime 1 }
+	
+preferNTP  OBJECT-TYPE
+    SYNTAX INTEGER 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+       "Display or set prefer NTP server.
+        AU | ntp1.cs.mu.OZ.AU(0),  
+	AU | ntp0.cs.mu.OZ.AU(1),                        
+	BE | ntp2.oma.be(2),                             
+	BE | ntp1.oma.be(3),                           
+	BR | ntps1.pads.ufrj.br(4),                      
+	CH | swisstime.ethz.ch(5),                       
+	CL | ntp.shoa.cl(6),                           
+	CZ | ntp.nic.cz(7),                              
+	DE | ntp.stairweb.de(8),                       
+	DE | ntps1-0.cs.tu-berlin.de(9),                					
+	DE | ptbtime1.ptb.de(10),                       					
+	DE | ntp1.fau.de(11),                           					  
+	DE | ptbtime2.ptb.de(12),                       					  
+	DE | time1.one4vision.de(13),                   					
+	DE | rustime01.rus.uni-stuttgart.de(14),        					
+	DE | ntp.probe-networks.de(15),                 					
+	DE | ntp2.fau.de(16),                           					  
+	ES | hora.roa.es(17),                           					  
+	HK | stdtime.gov.hk(18),                        					
+	IE | ntp-galway.hea.net(19),                    					  
+	IT | ntp1.inrim.it(20),                         					  
+	IT | ntp2.inrim.it(21),                         					
+	JP | clock.tl.fukuoka-u.ac.jp(22),              					
+	JP | ntp.nict.jp(23),                           					
+	JP | clock.nc.fukuoka-u.ac.jp(24),              					
+	KR | ntp.xbsd.kr(25),                           					
+	MX | cronos.cenam.mx(26),                       					  
+	NL | ntp0.nl.uu.net(27),                        					  
+	NL | ntp1.nl.uu.net(28),                        					
+	NL | ntp.remco.org(29),                         					  
+	NL | ntp0.nl.net(30),                           					  
+	PL | vega.cbk.poznan.pl(31),                  				
+	PL | ntp.ntp-servers.com(32),                 				
+	RO | ntp3.usv.ro(33),                         				  
+	RO | ntp2.usv.ro(34),                         				  
+	RU | ntp1.vniiftri.ru; ntp1.imvp.ru(35),      				
+	RU | ntp2.vniiftri.ru; ntp2.imvp.ru(36),      				
+	SE | ntp1.mmo.netnod.se(37),                  				  
+	SE | ntp1.sth.netnod.se(38),                  				  
+	SE | ntp2.mmo.netnod.se(39),                  				
+	SE | ntp2.sth.netnod.se(40),                  				
+	SE | time2.stupi.se(41),                      				  
+	SE | ntp1.sp.se(42),                          				  
+	SE | timehost.lysator.liu.se(43),             				
+	SI | ntp.mostovna.com(44),                    				
+	US CA | timekeeper.isi.edu(45),               				
+	US CA | clock.sjc.he.net(46),                 				
+	US CA | nist1.symmetricom.com(47),            				
+	US CA | clock.via.net(48),                    				
+	US CA | nist1.aol-ca.truetime.com(49),        				
+	US CA | clock.isc.org(50),                    				
+	US CA | clepsydra.dec.com(51),                				  
+	US CA | gps.layer42.net(52),                  				  
+	US CA | time.no-such-agency.net(53),          				
+	US CA | nist1-sj.WiTime.net(54),              				
+	US CA | clock.fmt.he.net(55),                 				
+	US CO | time-b.timefreq.bldrdoc.gov(56),      				
+	US CO | time-a.timefreq.bldrdoc.gov(57),      				
+	US CO | utcnist.colorado.edu(58),             				
+	US CO | time-c.timefreq.bldrdoc.gov(59),      				
+	US DE | rackety.udel.edu(60),                 				
+	US DE | mizbeaver.udel.edu(61),               				
+	US GA | nist1.columbiacountyga.gov(62),       				
+	US IL | ntp.your.org(63),                     				
+	US MA | bonehed.lcs.mit.edu(64),              				
+	US MA | time.keneli.org(65),                  				
+	US MA | ntp0.broad.mit.edu(66),               				
+	US MD | time-a.nist.gov(67),                  				
+	US MD | time-b.nist.gov(68),                  				  
+	US MI | nist.netservicesgroup.com(69),        				  
+	US NY | nist1-ny.WiTime.net(70),              				
+	US NY | clock.nyc.he.net(71),                 				
+	US UT | time.xmission.com(72),                				
+	US VA | nist1-dc.WiTime.net(73),              				
+	US VA | nist1.aol-va.truetime.com(74),        				
+	US WA | time-nw.nist.gov(75),                 				
+	FR | utp.univ-lyon1.fr(76),                   				  
+	FR | ntp-sop.inria.fr(77),                    				  
+	FR | ntp.tuxfamily.net(78),                   				
+	UK | bear.zoo.bt.co.uk(79)                    
+	"									
+    ::= { networkTime 2 }
+
+preferServerIPenable  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable or disable prefer custom server IP."
+    ::= { networkTime 3 }
+	
+preferNTPIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set prefer NTP server IP."
+    ::= { networkTime 4 }
+	
+alternateNtpEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set date time using alternate NTP server."
+    ::= { networkTime 5 }
+	
+alternateNtp  OBJECT-TYPE
+    SYNTAX INTEGER			      		
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set alternative NTP server.
+        AU | ntp1.cs.mu.OZ.AU(0),  
+	AU | ntp0.cs.mu.OZ.AU(1),                        
+	BE | ntp2.oma.be(2),                             
+	BE | ntp1.oma.be(3),                           
+	BR | ntps1.pads.ufrj.br(4),                      
+	CH | swisstime.ethz.ch(5),                       
+	CL | ntp.shoa.cl(6),                           
+	CZ | ntp.nic.cz(7),                              
+	DE | ntp.stairweb.de(8),                       
+	DE | ntps1-0.cs.tu-berlin.de(9),                					
+	DE | ptbtime1.ptb.de(10),                       					
+	DE | ntp1.fau.de(11),                           					  
+	DE | ptbtime2.ptb.de(12),                       					  
+	DE | time1.one4vision.de(13),                   					
+	DE | rustime01.rus.uni-stuttgart.de(14),        					
+	DE | ntp.probe-networks.de(15),                 					
+	DE | ntp2.fau.de(16),                           					  
+	ES | hora.roa.es(17),                           					  
+	HK | stdtime.gov.hk(18),                        					
+	IE | ntp-galway.hea.net(19),                    					  
+	IT | ntp1.inrim.it(20),                         					  
+	IT | ntp2.inrim.it(21),                         					
+	JP | clock.tl.fukuoka-u.ac.jp(22),              					
+	JP | ntp.nict.jp(23),                           					
+	JP | clock.nc.fukuoka-u.ac.jp(24),              					
+	KR | ntp.xbsd.kr(25),                           					
+	MX | cronos.cenam.mx(26),                       					  
+	NL | ntp0.nl.uu.net(27),                        					  
+	NL | ntp1.nl.uu.net(28),                        					
+	NL | ntp.remco.org(29),                         					  
+	NL | ntp0.nl.net(30),                           					  
+	PL | vega.cbk.poznan.pl(31),                  				
+	PL | ntp.ntp-servers.com(32),                 				
+	RO | ntp3.usv.ro(33),                         				  
+	RO | ntp2.usv.ro(34),                         				  
+	RU | ntp1.vniiftri.ru; ntp1.imvp.ru(35),      				
+	RU | ntp2.vniiftri.ru; ntp2.imvp.ru(36),      				
+	SE | ntp1.mmo.netnod.se(37),                  				  
+	SE | ntp1.sth.netnod.se(38),                  				  
+	SE | ntp2.mmo.netnod.se(39),                  				
+	SE | ntp2.sth.netnod.se(40),                  				
+	SE | time2.stupi.se(41),                      				  
+	SE | ntp1.sp.se(42),                          				  
+	SE | timehost.lysator.liu.se(43),             				
+	SI | ntp.mostovna.com(44),                    				
+	US CA | timekeeper.isi.edu(45),               				
+	US CA | clock.sjc.he.net(46),                 				
+	US CA | nist1.symmetricom.com(47),            				
+	US CA | clock.via.net(48),                    				
+	US CA | nist1.aol-ca.truetime.com(49),        				
+	US CA | clock.isc.org(50),                    				
+	US CA | clepsydra.dec.com(51),                				  
+	US CA | gps.layer42.net(52),                  				  
+	US CA | time.no-such-agency.net(53),          				
+	US CA | nist1-sj.WiTime.net(54),              				
+	US CA | clock.fmt.he.net(55),                 				
+	US CO | time-b.timefreq.bldrdoc.gov(56),      				
+	US CO | time-a.timefreq.bldrdoc.gov(57),      				
+	US CO | utcnist.colorado.edu(58),             				
+	US CO | time-c.timefreq.bldrdoc.gov(59),      				
+	US DE | rackety.udel.edu(60),                 				
+	US DE | mizbeaver.udel.edu(61),               				
+	US GA | nist1.columbiacountyga.gov(62),       				
+	US IL | ntp.your.org(63),                     				
+	US MA | bonehed.lcs.mit.edu(64),              				
+	US MA | time.keneli.org(65),                  				
+	US MA | ntp0.broad.mit.edu(66),               				
+	US MD | time-a.nist.gov(67),                  				
+	US MD | time-b.nist.gov(68),                  				  
+	US MI | nist.netservicesgroup.com(69),        				  
+	US NY | nist1-ny.WiTime.net(70),              				
+	US NY | clock.nyc.he.net(71),                 				
+	US UT | time.xmission.com(72),                				
+	US VA | nist1-dc.WiTime.net(73),              				
+	US VA | nist1.aol-va.truetime.com(74),        				
+	US WA | time-nw.nist.gov(75),                 				
+	FR | utp.univ-lyon1.fr(76),                   				  
+	FR | ntp-sop.inria.fr(77),                    				  
+	FR | ntp.tuxfamily.net(78),                   				
+	UK | bear.zoo.bt.co.uk(79) 
+        "
+    ::= { networkTime 6 }
+        
+alternateServerIPenable  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Enable or disable alternate custom server IP."
+    ::= { networkTime 7 }
+	
+alternateNtpIp  OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set alternative NTP server IP."
+    ::= { networkTime 8 }
+	
+adjustTimeEveryDays  OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set frequency of adjustment in days."
+	::= { networkTime 9 }
+		
+--adjustTimeNow  OBJECT-TYPE
+    --SYNTAX INTEGER { no(1), yes(2) }
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Adjust time using NTP server."
+	--::= { networkTime 8 }
+	
+loginAllowTimes  OBJECT-TYPE
+    SYNTAX INTEGER (1..99)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set time of login faliure."
+	::= { loginFailures 1 }
+	
+loginTimeOut  OBJECT-TYPE
+    SYNTAX INTEGER (1..240)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set login time out."
+	::= { loginFailures 2 }
+	
+icmpEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set status of ICMP."
+	::= { workingMode 1 }
+	
+--multiUserEnabled  OBJECT-TYPE
+    --SYNTAX INTEGER { no(1), yes(2) }
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set status of multi-user operation."
+	--::= { workingMode 2 }
+	
+--browserEnabled  OBJECT-TYPE
+    --SYNTAX INTEGER { no(1), yes(2) }
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set status of browser."
+	--::= { workingMode 3 }
+	
+minUserNameLen  OBJECT-TYPE
+    SYNTAX INTEGER (1..16)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set minimum length of user name."
+	::= { accountPolicy 1 }
+	
+minUserPwdLen  OBJECT-TYPE
+    SYNTAX INTEGER (1..16)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set minimum length of user password.
+        "
+	::= { accountPolicy 2 }
+	
+upperCaseEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set one upper case rule in user password."
+	::= { accountPolicy 3 }
+	
+lowerCaseEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set one lower case rule in user password."
+	::= { accountPolicy 4 }
+	
+numberEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set one number rule in user password."
+	::= { accountPolicy 5 }
+	
+disableDuplicateLogin  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set status of disabled duplicate login rule."
+	::= { accountPolicy 6 }
+	
+loginString  OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set a login string.
+        string length: 0~32
+        NOTE: Input string as /empty to set this object to NULL. 
+        "
+	::= { loginRestriction 1 }
+	
+ipFilterEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set status of ip filter."
+	::= { ipFilter 1 }
+	
+ipFilterRule  OBJECT-TYPE
+    SYNTAX INTEGER { include(1), exclude(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set status of ip filter rule."
+	::= { ipFilter 2 }
+
+ipFilterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF IpFilterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of restricted ip."
+    ::= { ipFilter 3 }
+ 
+ipFilterEntry OBJECT-TYPE
+	SYNTAX IpFilterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Status and parameter values for a PE's restricted IP."
+	INDEX { ipFilterIndex }
+	::= { ipFilterTable 1 }
+
+IpFilterEntry ::=
+	SEQUENCE {
+		ipFilterIndex
+			INTEGER,
+		ipFilterFrom
+			IpAddress,
+		ipFilterTo
+		    IpAddress
+	}
+
+ipFilterIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..5)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The value of index for the ip filter.
+		"
+	::= { ipFilterEntry 1 }
+
+ipFilterFrom OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A set of restricted ip.
+		 ex. 192.168.0.1
+		  
+		 Note: Users must follow in order to set the ip address. 
+		 Note: To clear the settings to set the ip 0.0.0.0
+		"
+	::= { ipFilterEntry 2 }
+
+ipFilterTo OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A set of restricted ip.
+		 ex. 192.168.0.255 
+		 
+		 Note: Users must follow in order to set the ip address. 
+		 Note: To clear the settings to set the ip 0.0.0.0
+		"
+	::= { ipFilterEntry 3 }
+	
+macFilterEnabled  OBJECT-TYPE
+    SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set status of mac filter."
+	::= { macFilter 1 }
+	
+macFilterRule  OBJECT-TYPE
+    SYNTAX INTEGER { include(1), exclude(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Display or set status of mac filter rule."
+	::= { macFilter 2 }
+	
+macFilterTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF MacFilterEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of restricted mac."
+    ::= { macFilter 3 }
+ 
+macFilterEntry OBJECT-TYPE
+	SYNTAX MacFilterEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Status and parameter values for a PE's restricted MAC."
+	INDEX { macFilterIndex }
+	::= { macFilterTable 1 }
+
+MacFilterEntry ::=
+	SEQUENCE {
+		macFilterIndex
+			INTEGER,
+		macFilterSet
+			DisplayString
+	}
+
+macFilterIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..5)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The value of index for the mac filter.
+		"
+	::= { macFilterEntry 1 }
+
+macFilterSet OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"A set of restricted mac.
+		 string length: 12
+		 ex. 004854655511
+		 
+		 Note: Users must follow in order to set the MAC address. 
+		 Note: To clear the settings to set the MAC 000000000000
+		"
+	::= { macFilterEntry 2 }
+	
+--LocalAuth  OBJECT-TYPE
+	--SYNTAX INTEGER { no(1), yes(2) }
+	--MAX-ACCESS read-write
+	--STATUS current
+	--DESCRIPTION
+	--	"Display or set status of disable local authentication."
+	--::= { authentication 1 }
+	
+radiusEnabled  OBJECT-TYPE
+	SYNTAX INTEGER { no(1), yes(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set status of RADIUS server."
+	::= { radius 1 }
+	
+preferRadiusIp  OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set prefer RADIUS server IP."
+	::= { radius 2 }
+	
+preferRadiusPort  OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set prefer RADIUS server port."
+	::= { radius 3 }
+
+alternateRadiusIp  OBJECT-TYPE
+	SYNTAX IpAddress
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set alternative RADIUS server IP."
+	::= { radius 4 }
+	
+alternateRadiusPort  OBJECT-TYPE
+	SYNTAX INTEGER (1..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set alternative RADIUS server port."
+	::= { radius 5 }
+	
+radiusTimeOut  OBJECT-TYPE
+	SYNTAX INTEGER (1..60)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set time out of authentication using RADIUS server.
+		 The unit is sec.
+		"
+	::= { radius 6 }
+	
+radiusRetry  OBJECT-TYPE
+	SYNTAX INTEGER (0..10)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set retry times of authentication using RADIUS server."
+	::= { radius 7 }
+	
+radiusSecret  OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set shared secret of RADIUS server.
+		 string length: 6~15
+		 At least 6 characters.
+		 NOTE: Input string as /empty to set this object to NULL.
+		"
+	::= { radius 8 }
+	
+-- Device Management End
+
+-- User Management 
+usrListTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF UsrListEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of user. The number of user is
+            given by the value of usrcfgNumber."
+    ::= { userManagement 1 }
+ 
+usrListEntry OBJECT-TYPE
+	SYNTAX UsrListEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"Status and parameter values for a pe8208 user."
+	INDEX { usrIndex }
+	::= { usrListTable 1 }
+
+UsrListEntry ::=
+	SEQUENCE {
+		usrIndex
+			INTEGER,
+		usrType
+			INTEGER,
+		usrName
+			DisplayString,
+		usrPassword
+			DisplayString,
+		usrPort1Auth
+			INTEGER,
+		usrPort2Auth
+			INTEGER,
+		usrPort3Auth
+			INTEGER,
+		usrPort4Auth
+			INTEGER,
+		usrPort5Auth
+			INTEGER,
+		usrPort6Auth
+			INTEGER,
+		usrPort7Auth
+			INTEGER,
+		usrPort8Auth
+			INTEGER,
+		
+		usrPort9Auth
+			INTEGER,
+		usrPort10Auth
+			INTEGER,
+		usrPort11Auth
+			INTEGER,
+		usrPort12Auth
+			INTEGER,
+		usrPort13Auth
+			INTEGER,
+		usrPort14Auth
+			INTEGER,
+		usrPort15Auth
+			INTEGER,
+		usrPort16Auth
+			INTEGER,
+		usrPort17Auth
+			INTEGER,
+		usrPort18Auth
+			INTEGER,
+		usrPort19Auth
+			INTEGER,
+		usrPort20Auth
+			INTEGER,
+		usrPort21Auth
+			INTEGER,
+		usrPort22Auth
+			INTEGER,
+		usrPort23Auth
+			INTEGER,
+		usrPort24Auth
+			INTEGER,
+		usrPort25Auth
+			INTEGER,
+		usrPort26Auth
+			INTEGER,
+		usrPort27Auth
+			INTEGER,
+		usrPort28Auth
+			INTEGER,
+		usrPort29Auth
+			INTEGER,
+		usrPort30Auth
+			INTEGER,
+		usrPort31Auth
+			INTEGER,
+		usrPort32Auth
+			INTEGER,
+		usrPort33Auth
+			INTEGER,
+		usrPort34Auth
+			INTEGER,
+		usrPort35Auth
+			INTEGER,
+		usrPort36Auth
+			INTEGER,
+		usrPort37Auth
+			INTEGER,
+		usrPort38Auth
+			INTEGER,
+		usrPort39Auth
+			INTEGER,
+		usrPort40Auth
+			INTEGER,
+		usrPort41Auth
+			INTEGER,
+		usrPort42Auth
+			INTEGER,
+		usrEnable
+			INTEGER
+	}
+
+usrIndex OBJECT-TYPE
+	SYNTAX INTEGER (1..9)
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The value of usrIndex for the user. We have 1 administrator and 8 users.
+		 The index 9 will be the administrator.
+		"
+	::= { usrListEntry 1 }
+
+usrType OBJECT-TYPE
+	SYNTAX INTEGER { administrator(1), user(2)}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The user's type."
+	::= { usrListEntry 2 }
+
+usrName OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (1..16))
+   MAX-ACCESS  read-write
+   STATUS  current
+   DESCRIPTION
+		   "A textual string containing name of the user.
+		   string length: 1~16
+		   "
+	::= { usrListEntry 3 }
+
+usrPassword OBJECT-TYPE
+   SYNTAX  DisplayString (SIZE (1..16))
+   MAX-ACCESS  read-write
+   STATUS  current
+   DESCRIPTION
+		   "A textual string containing password of the user.
+		   string length: 1~16
+		   "
+	::= { usrListEntry 4 }
+
+usrPort1Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 1 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 5 }
+usrPort2Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 2 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 6 }
+usrPort3Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 3 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 7 }
+usrPort4Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 4 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 8 }
+usrPort5Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 5 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 9 }
+usrPort6Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Dispaly or set this user's outlet 6 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 10 }
+usrPort7Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 7 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 11 }
+usrPort8Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 8 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 12 }
+usrEnable OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), enable(2) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user is enable or not"
+	::= { usrListEntry 47 }
+
+usrPort9Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 9 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 13 }
+	
+usrPort10Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 10 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 14 }
+	
+usrPort11Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 11 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 15 }
+	
+usrPort12Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 12 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 16 }
+
+usrPort13Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 13 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 17 }
+	
+
+usrPort14Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 14 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 18 }
+
+usrPort15Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 15 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 19 }
+	
+usrPort16Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 16 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 20 }
+
+usrPort17Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 17 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 21 }
+	
+usrPort18Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 18 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 22 }
+	
+usrPort19Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 19 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 23 }
+	
+usrPort20Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 20 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 24 }
+	
+usrPort21Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 21 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 25 }
+	
+usrPort22Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 22 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 26 }
+	
+usrPort23Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 23 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 27 }
+
+usrPort24Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 24 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 28 }
+
+usrPort25Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 25 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 29 }	
+	
+usrPort26Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 26 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 30 }
+
+usrPort27Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 27 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 31 }
+usrPort28Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 28 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 32 }
+
+usrPort29Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 29 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 33 }
+
+usrPort30Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 30 authority.
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 34 }
+	
+usrPort31Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 31 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."		
+	::= { usrListEntry 35 }
+	
+usrPort32Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 32 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 36 }
+
+usrPort33Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 33 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 37 }
+
+usrPort34Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 34 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 38 }
+
+usrPort35Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 35 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 39 }
+
+usrPort36Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 36 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 40 }
+
+usrPort37Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 37 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 41 }
+
+usrPort38Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 38 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 42 }
+
+usrPort39Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 39 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 43 }
+
+usrPort40Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 40 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 44 }
+
+usrPort41Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 41 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 45 }
+
+usrPort42Auth OBJECT-TYPE
+	SYNTAX INTEGER { disable(1), view(2), modify(3), not-support(4) }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Display or set this user's outlet 42 authority
+		Port in the pe of series represents outlet.
+		Port in the Energy monitor of series represents a bank or a pdu."
+	::= { usrListEntry 46 }
+						
+-- User Management End 
+
+-- SNMPv3 USM Settings
+--snmpv3UsmUserTable     OBJECT-TYPE
+--    SYNTAX       SEQUENCE OF Snmpv3UsmUserEntry
+--    MAX-ACCESS   not-accessible
+--    STATUS       current
+--   DESCRIPTION "This table is used to configure PE SNMPv3 USM.
+--			     To get the SNMPv3 access, One need to configure security 
+--		         name,authentication,auth password,priv protocol and priv 
+--                 password.
+--		        "
+--    ::= { snmp 2 }
+
+--snmpv3UsmUserEntry     OBJECT-TYPE
+--    SYNTAX       	Snmpv3UsmUserEntry
+--    MAX-ACCESS      	not-accessible
+--    STATUS       	current
+--    DESCRIPTION 	"A user configured for the User-based
+--                 		Security Model.
+--                		"
+--    INDEX       { usmIndex }
+--    ::= { snmpv3UsmUserTable 1 }
+
+--Snmpv3UsmUserEntry   ::= SEQUENCE {
+--	usmIndex		INTEGER,
+--	usmSecurityName	SnmpAdminString,
+--    smAuthProtocol  SNMPv3UsmAuthPrivProtocol,
+--    usmPrivPassword	SnmpAdminString
+--    }
+
+--usmIndex	  	OBJECT-TYPE
+--    SYNTAX 		INTEGER (1)     
+--   MAX-ACCESS   not-accessible
+--    STATUS       current
+--    DESCRIPTION  "Usm configuration index. "
+--    ::= { snmpv3UsmUserEntry 1 }
+
+
+--usmSecurityName  OBJECT-TYPE
+--    SYNTAX       SnmpAdminString
+--    MAX-ACCESS   read-only
+--   STATUS       current
+--    DESCRIPTION "A human readable string representing the user in
+--                 Security Model independent format.
+
+--                The default transformation of the User-based Security
+--                 Model dependent security ID to the securityName and
+--                 vice versa is the identity function so that the
+--                 securityName is the same as the userName.
+--                "
+--    ::= { snmpv3UsmUserEntry 2 }
+
+
+--usmKeyAlgorithm OBJECT-TYPE
+--    SYNTAX       SNMPv3UsmAuthPrivProtocol
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION  "
+--		     If usmAuthProtocol == HMACMD5Auth , supports MD5 AuthKey and PrivKey
+--		     If usmAuthProtocol == HMACSHAAuth, supports SHA AuthKey and PrivKey 	
+--                "
+--    ::= { snmpv3UsmUserEntry 3 }
+
+--usmPrivProtocol OBJECT-TYPE
+--    SYNTAX       SNMPv3UsmAuthPrivProtocol
+--    MAX-ACCESS   read-only
+ --   STATUS       current
+ --   DESCRIPTION " A privacy protocol to provide encryption and decryption
+--			SNMPv3 pdu. 
+ --               "
+ --   ::= { snmpv3UsmUserEntry 4 }
+
+--usmPrivPassword OBJECT-TYPE
+--    SYNTAX   SnmpAdminString
+--    MAX-ACCESS   read-only
+--    STATUS       current
+--    DESCRIPTION "An user's privacy password, Associated protocol
+--			and a secret key is used to establish a connection 
+--			for the snmp agent and manager commnucation.
+--                "
+--   ::= { snmpv3UsmUserEntry 4 }
+
+
+-- SNMPv3 Target MIB
+
+--snmpv3TargetTable OBJECT-TYPE
+--       SYNTAX      SEQUENCE OF Snmpv3TargetEntry
+--       MAX-ACCESS      not-accessible
+--       STATUS      current
+--       DESCRIPTION
+ --          "A table of SNMP target information to be used
+ --           in the generation of SNMP trap messages."
+ --      ::= { snmp 3 }
+
+--snmpv3TargetEntry OBJECT-TYPE
+--       SYNTAX      Snmpv3TargetEntry
+--       MAX-ACCESS      not-accessible
+--       STATUS      current
+--       DESCRIPTION
+--           "A set of SNMP target information.
+--           "
+--       INDEX { snmpv3TargetIndex }
+--       ::= { snmpv3TargetTable 1 }
+
+--Snmpv3TargetEntry ::= SEQUENCE {
+--       snmpv3TargetIndex          INTEGER,
+--       snmpv3TargetMPModel        SnmpMessageProcessingModel,
+--       snmpv3TargetSecurityModel  SnmpSecurityModel,
+ --      snmpv3TargetSecurityName   SnmpAdminString
+--}
+--snmpv3TargetIndex OBJECT-TYPE
+ --      SYNTAX      INTEGER(1)
+ --      MAX-ACCESS  	 not-accessible
+ --      STATUS      current
+ --      DESCRIPTION
+ --          "The locally arbitrary, but unique identifier associated
+ --           with this snmpv3TargetEntry."
+ --      ::= { snmpv3TargetEntry 1 }
+
+--snmpv3TargetMPModel OBJECT-TYPE
+ --      SYNTAX      SnmpMessageProcessingModel
+ --      MAX-ACCESS      read-only
+ --      STATUS      current
+ --      DESCRIPTION
+ --          "The Message Processing Model to be used when generating
+ --           SNMP messages using this entry."
+ --      ::= { snmpv3TargetEntry 2 }
+
+--snmpv3TargetSecurityModel OBJECT-TYPE
+ --      SYNTAX      SnmpSecurityModel (1..2147483647)
+ --      MAX-ACCESS      read-only
+ --     STATUS      current
+  --     DESCRIPTION
+  --         "The Security Model to be used when generating SNMP
+  --           messages using this entry.  An implementation may
+  --           choose to return an inconsistentValue error if an
+  --           attempt is made to set this variable to a value
+  --           for a security model which the implementation does
+  --           not support."
+  --     ::= { snmpv3TargetEntry 3 }
+
+--snmpv3TargetSecurityName OBJECT-TYPE
+ --      SYNTAX      SnmpAdminString
+  --     MAX-ACCESS      read-only
+  --     STATUS      current
+  --     DESCRIPTION
+ --          "The securityName which identifies the Principal on
+ --           whose behalf SNMP messages will be generated using
+ --          this entry."
+  --     ::= { snmpv3TargetEntry 4 }
+	   
+--snmpv3TargetSecurityLevel OBJECT-TYPE
+ --      SYNTAX      SnmpSecurityLevel
+  --     MAX-ACCESS      read-only
+  --     STATUS      current
+  --     DESCRIPTION
+  --         "The Level of Security to be used when generating
+  --          SNMP messages using this entry."
+   --    ::= { snmpv3TargetEntry 5 }
+
+-- Custom Trap Message
+
+customTrapMSG NOTIFICATION-TYPE
+    STATUS  current
+    --OBJECTS { customTrapMSG }
+    DESCRIPTION "Display custom trap message."
+        ::= { pe 5 }
+        
+rebootDevice OBJECT-TYPE
+	SYNTAX INTEGER { no(1), yes(2) }
+    MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION "Reboot PE Device"
+        ::= { pe 6 } 
+-- CPM
+--modelName OBJECT-TYPE		
+--	SYNTAX DisplayString	
+--	MAX-ACCESS read-only	
+--	STATUS current	
+--	DESCRIPTION	
+--		"Indicate CPM device model name."
+--	::= { CPM 1 }
+
+--cpmName OBJECT-TYPE		
+--	SYNTAX DisplayString	
+--	MAX-ACCESS read-write	
+--	STATUS current	
+--	DESCRIPTION	
+--		"The name of CPM device.
+--		string length: 1~39  
+--		NOTE: Input string as /empty to set this object to NULL. 
+--		"
+--	::= { CPM 2 } 
+	
+--cpmswitchable OBJECT-TYPE
+--   SYNTAX INTEGER { no(1), yes(2) }
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION 
+--        " Switchable or not. "
+--    ::= { CPM 3 }
+    
+--cpmPDUreading OBJECT-TYPE
+--    SYNTAX INTEGER { no(1), yes(2) }
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION 
+--        " CPM is per-PDU reading or not."
+--    ::= { CPM 4 }
+    
+--cpmSensornumber OBJECT-TYPE
+--   SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION 
+--        " CPM's Sensor number."
+--    ::= { CPM 5 }
+    
+--cpmOutletnumber OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION 
+--        " CPM's Outlet number."
+--    ::= { CPM 6 }
+                
+--cpmbreaker OBJECT-TYPE
+    --SYNTAX INTEGER { off(1), on(2) }
+    --MAX-ACCESS read-only
+    --STATUS current
+    --DESCRIPTION 
+    --    "CPM's breaker status."
+    --::= { CPM 7 }
+     
+-- Device
+--cpmdeviceValueTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF cpmDeviceValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Device value table. This table displays device's current.
+--		"
+--    ::= { CPMDevice 1 }
+
+--cpmdeviceValueEntry OBJECT-TYPE
+--    SYNTAX cpmDeviceValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Single deviceValue entry containing device info."
+--    INDEX { cpmdeviceValueIndex }
+--     ::= { cpmdeviceValueTable 1 }
+     
+--cpmDeviceValueEntry ::=
+--    SEQUENCE {
+--        cpmdeviceValueIndex
+--            INTEGER,
+--        cpmdeviceCurrent
+--            DisplayString,
+        --cpmdeviceVoltage
+        --    DisplayString,
+		--cpmdevicePower
+        --    DisplayString,
+		--cpmdevicePowerDissipation
+        --    DisplayString,
+        --cpminputMaxVoltage
+        --	INTEGER,
+--        cpminputMaxCurrent
+--        	INTEGER
+        --cpmpowerCapacity
+        --	INTEGER
+          	
+--    }
+
+--cpmdeviceValueIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1)
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Index of device Value."
+--    ::= { cpmdeviceValueEntry 1 }
+    
+--cpmdeviceCurrent  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device electric current value.
+--        "
+--    ::= { cpmdeviceValueEntry 2 }
+
+--cpmdeviceVoltage  OBJECT-TYPE
+--    SYNTAX DisplayString
+--   MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device voltage value."
+--    ::= { cpmdeviceValueEntry 3 }
+--cpmdevicePower  OBJECT-TYPE
+--    SYNTAX DisplayString 
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device power value."
+--    ::= { cpmdeviceValueEntry 4 }
+    
+--cpmdevicePowerDissipation  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device power dissipation value."
+--    ::= { cpmdeviceValueEntry 5 }
+
+--cpminputMaxVoltage  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device input Voltage value. unit:(V)"
+--    ::= { cpmdeviceValueEntry 6 }
+    
+--cpminputMaxCurrent  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device input Current value. unit:(A)"
+--    ::= { cpmdeviceValueEntry 7 }
+
+--cpmpowerCapacity  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "Device power Capacity value.unit:(VA)"
+--    ::= { cpmdeviceValueEntry 8 } 
+
+--cpmdeviceConfigTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF cpmDeviceConfigEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Device configuration table"
+--    ::= { CPMDevice 2 }
+
+--cpmdeviceConfigEntry OBJECT-TYPE
+--    SYNTAX cpmDeviceConfigEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Single deviceConfig entry containing device info."
+--    INDEX { cpmdeviceConfigIndex }
+--     ::= { cpmdeviceConfigTable 1 }
+     
+--cpmDeviceConfigEntry ::=
+--    SEQUENCE {
+--        cpmdeviceConfigIndex
+--            INTEGER,
+        --cpmdeviceMinCurMT
+        --    INTEGER,
+--        cpmdeviceMaxCurMT
+--            INTEGER		
+		--cpmdeviceMinVolMT
+        --    INTEGER,
+        --cpmdeviceMaxVolMT
+        --    INTEGER,
+--    }
+
+--cpmdeviceConfigIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1)
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Index of deviceConfig"
+--    ::= { cpmdeviceConfigEntry 1 }
+    
+--cpmdeviceMinCurMT  OBJECT-TYPE
+--    SYNTAX INTEGER 
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set device minimum electric current measurement threshold.
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL. 
+--        range:0.0~32.0 represents:0~320
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--        "
+--    ::= { cpmdeviceConfigEntry 2 }
+    
+--cpmdeviceMaxCurMT  OBJECT-TYPE 
+--    SYNTAX INTEGER 
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set device maximum electric current measurement threshold.  
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+--        Example: range 0.0~32.0 represents: 0~320
+     
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--       "
+--    ::= { cpmdeviceConfigEntry 3 }
+
+--cpmdeviceMinVolMT  OBJECT-TYPE
+--    SYNTAX INTEGER (900..2600 | -3000)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set device minimum voltage measurement threshold. 
+--        range:90.0~260.0 represents:900~2600
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--        "
+--    ::= { cpmdeviceConfigEntry 4 } 
+    
+--cpmdeviceMaxVolMT  OBJECT-TYPE
+--    SYNTAX INTEGER (900..2600 | -3000)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set device maximum voltage measurement threshold. 
+--        range:90.0~260.0 represents:900~2600
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold 
+--       "
+--    ::= { cpmdeviceConfigEntry 5 }
+
+
+    
+-- Sensor
+--cpmSensorValueTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF cpmSensorValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's sensor value table. This table displays sensor's temperature, humidity and
+--		 pressure.
+--		"
+--    ::= { Sensor 1 }
+
+--cpmSensorValueEntry OBJECT-TYPE
+--    SYNTAX cpmSensorValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's sensor value entry containing Sensor info."
+--    INDEX { cpmSensorValueIndex }
+--     ::= { cpmSensorValueTable 1 }
+     
+--cpmSensorValueEntry ::=
+--   SEQUENCE {
+--    	cpmSensorValueIndex
+--    		INTEGER,
+--		cpmSensorTemperature
+--            DisplayString,
+--		cpmSensorHumidity
+--			DisplayString,
+--		cpmSensorPressure
+--			DisplayString,
+--		cpmSensorProperty
+--			INTEGER
+--    }
+
+--cpmSensorValueIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1..4)
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Index of CPM's Sensor number."
+--    ::= { cpmSensorValueEntry 1 }
+    	
+--cpmSensorTemperature  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's Sensor Temperature value."
+--    ::= { cpmSensorValueEntry 2 }
+    
+--cpmSensorHumidity  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's Sensor Humidity value."
+--    ::= { cpmSensorValueEntry 3 }
+    
+--cpmSensorPressure  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's Sensor Pressure value."
+--    ::= { cpmSensorValueEntry 4 }
+    
+--cpmSensorProperty  OBJECT-TYPE
+--    SYNTAX INTEGER { intake(1), exhaust(2) }
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's Sensor Property."
+--    ::= { cpmSensorValueEntry 5 }
+
+--cpmSensorThresholdTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF cpmSensorThresholdEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's Sensor value table"
+--    ::= { Sensor 2 }
+
+--cpmSensorThresholdEntry OBJECT-TYPE
+--    SYNTAX cpmSensorThresholdEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--   DESCRIPTION
+--        "CPM's sensor threshold entry containing sensor info."
+--    INDEX { cpmSensorThresholdIndex }
+--     ::= { cpmSensorThresholdTable 1 }
+     
+--cpmSensorThresholdEntry ::=
+--    SEQUENCE {
+--        cpmSensorThresholdIndex
+--            INTEGER,
+--        cpmsensorMinTempMT
+--            INTEGER,
+--        cpmsensorMaxTempMT
+--            INTEGER,
+		
+--		cpmsensorMinHumMT
+--            INTEGER,
+--		cpmsensorMaxHumMT
+--            INTEGER,
+--		cpmsensorMinPressMT
+--            INTEGER,
+--        cpmsensorMaxPressMT
+--            INTEGER
+        --sensorTempFlu
+            --INTEGER,
+        --sensorHumFlu
+			--INTEGER,
+		--sensorPressFlu
+            --INTEGER
+--    }
+    
+--cpmSensorThresholdIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1..4)
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Index of CPM's sensor number"
+--    ::= { cpmSensorThresholdEntry 1 }   
+    
+--cpmsensorMinTempMT  OBJECT-TYPE
+--    SYNTAX INTEGER (-200..600 | -3000)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set sensor minimum temperature measurement threshold. 
+--        Example: range 0.0 ~ 60.0 represents 0~600
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+        
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold.
+--        "
+--    ::= { cpmSensorThresholdEntry 2 }
+    
+--cpmsensorMaxTempMT  OBJECT-TYPE
+--    SYNTAX INTEGER (-200..600 | -3000)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set sensor maximum temperature measurement threshold. 
+--        Example: range 0.0 ~ 60.0 represents 0~600
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+        
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--        "
+--    ::= { cpmSensorThresholdEntry 3 }
+
+--cpmsensorMinHumMT  OBJECT-TYPE
+--    SYNTAX INTEGER (150..950 | -3000)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set sensor minimum humidity measurement threshold. 
+--        Example: range 15.0 ~ 95.0 represents 150~950
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+        
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--        "
+--    ::= { cpmSensorThresholdEntry 4 }
+--cpmsensorMaxHumMT  OBJECT-TYPE
+--    SYNTAX INTEGER (150..950 | -3000)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set sensor maximum humidity measurement threshold. 
+--        Example: range 15.0 ~ 95.0 represents 150~950
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+        
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--        "
+--    ::= { cpmSensorThresholdEntry 5 }
+
+--cpmsensorMinPressMT  OBJECT-TYPE
+--    SYNTAX INTEGER (-2500..2500 | -3000)
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set sensor minimum pressure measurement threshold. 
+--        Example: range -250.0 ~ 250.0 represents -2500 ~ 2500
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+        
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--        "
+--    ::= { cpmSensorThresholdEntry 6 }
+    
+--cpmsensorMaxPressMT  OBJECT-TYPE
+--    SYNTAX INTEGER (-2500..2500 | -3000)
+--   MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set sensor maximum pressure measurement threshold. 
+--        Example: range -250.0 ~ 250.0 represents -2500 ~ 2500
+--        When this value is -3000,it indicate this is NULL.
+--        When set this value to -3000, indicate set this object as NULL.
+        
+--        NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--        "
+--    ::= { cpmSensorThresholdEntry 7 }
+    
+        
+-- pdu
+
+--cpmPDUValueTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF cpmPDUValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Display the PDU's current value of CPM"
+--    ::= { EnergySensor 1 }
+
+--cpmPDUValueEntry OBJECT-TYPE
+--    SYNTAX cpmPDUValueEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's monitor pdu Value entry containing outlet info."
+--    INDEX { cpmPDUValueIndex }
+--     ::= { cpmPDUValueTable 1 }
+     
+--cpmPDUValueEntry ::=
+--    SEQUENCE {
+--        cpmPDUValueIndex
+--            INTEGER,
+--        cpmPDUCurrent
+--           DisplayString,
+        --cpmPDUVoltage
+        --    DisplayString,
+		--cpmPDUPower
+        --    DisplayString,
+		--cpmPDUPowerDissipation
+        --    DisplayString,
+--        cpmPDUMaxCurrent
+--        	INTEGER
+--    }
+
+--cpmPDUValueIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1..4)
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Index of PDU number"
+--    ::= { cpmPDUValueEntry 1 }
+    
+--cpmPDUCurrent  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's monitor PDU electric current value"
+--    ::= { cpmPDUValueEntry 2 }
+    
+--cpmPDUVoltage  OBJECT-TYPE
+    --SYNTAX DisplayString
+    --MAX-ACCESS read-only
+    --STATUS current
+    --DESCRIPTION
+    --    "CPM's monitor PDU voltage value"
+    --::= { cpmPDUValueEntry 3 }
+    
+--cpmPDUPower  OBJECT-TYPE
+    --SYNTAX DisplayString
+    --MAX-ACCESS read-only
+    --STATUS current
+    --DESCRIPTION
+    --    "CPM's monitor PDU power value"
+    --::= { cpmPDUValueEntry 4 }
+    
+--cpmPDUPowerDissipation  OBJECT-TYPE
+    --SYNTAX DisplayString
+    --MAX-ACCESS read-only
+    --STATUS current
+    --DESCRIPTION
+    --    "CPM's monitor PDU power dissipation value"
+    --::= { cpmPDUValueEntry 5 }
+
+--cpmPDUMaxCurrent  OBJECT-TYPE
+--    SYNTAX INTEGER
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's monitor PDU Max Current value. unit: (A)"
+--    ::= { cpmPDUValueEntry 6 }
+    
+--cpmBankStatus  OBJECT-TYPE
+--    SYNTAX INTEGER { noattached(1), attached(2) }
+--    MAX-ACCESS read-only
+--    STATUS current
+--    DESCRIPTION
+--        "The status CPM device Bank status."
+--    ::= { cpmPDUValueEntry 7 }
+    
+
+--cpmPDUConfigTable OBJECT-TYPE
+--    SYNTAX SEQUENCE OF cpmPDUConfigEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's monitor PDU configuration table"
+--    ::= { EnergySensor 2 }
+
+--cpmPDUConfigEntry OBJECT-TYPE
+--    SYNTAX cpmPDUConfigEntry
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "CPM's monitor PDU config entry containing PDU info."
+--    INDEX { cpmPDUConfigIndex }
+--     ::= { cpmPDUConfigTable 1 }
+     
+--cpmPDUConfigEntry ::=
+--    SEQUENCE {
+--        cpmPDUConfigIndex
+--            INTEGER,
+--		cpmPDUName
+--            DisplayString,
+        --cpmPDUConfirmation
+        --    INTEGER,
+        --cpmPDUOnDelayTime
+        --    INTEGER,
+		--cpmPDUOffDelayTime
+        --    INTEGER,
+		--cpmPDUShutdownMethod
+        --    INTEGER,
+        --cpmPDUMAC
+        --    DisplayString,
+		--cpmPDUMinCurMT
+        --    INTEGER,
+--		cpmPDUMaxCurMT
+--           INTEGER
+		
+        --cpmPDUMinVolMT
+        --    INTEGER,
+		--cpmPDUMaxVolMT
+        --    INTEGER,
+		
+
+--    }
+
+--cpmPDUConfigIndex  OBJECT-TYPE
+--    SYNTAX INTEGER (1..4)
+--    MAX-ACCESS not-accessible
+--    STATUS current
+--    DESCRIPTION
+--        "Index of PDU number"
+--    ::= { cpmPDUConfigEntry 1 }
+    
+--cpmPDUName  OBJECT-TYPE
+--    SYNTAX DisplayString
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set the name of pdu.
+--        string length: 0~15
+--        NOTE: Input string as /empty to set this object to NULL.
+--        "
+--    ::= { cpmPDUConfigEntry 2 }
+    
+--cpmPDUConfirmation  OBJECT-TYPE
+    --SYNTAX INTEGER { no(1), yes(2) }
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the confirmation of outlet."
+    --::= { cpmPDUConfigEntry 3 }
+    
+--cpmPDUOnDelayTime  OBJECT-TYPE
+    --SYNTAX INTEGER (0..999)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the ON delay time of outlet."
+    --::= { cpmPDUConfigEntry 4 }
+    
+--cpmPDUOffDelayTime  OBJECT-TYPE
+    --SYNTAX INTEGER (0..999)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the OFF delay time of outlet."
+    --::= { cpmPDUConfigEntry 5 }
+    
+--cpmPDUShutdownMethod  OBJECT-TYPE
+    --SYNTAX INTEGER { kill-the-power(1), wake-on-lan(2), after-ac-back(3) }
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the shutdown mehtod of outlet."
+    --::= { cpmPDUConfigEntry 6 }
+    
+--cpmPDUMAC  OBJECT-TYPE
+    --SYNTAX DisplayString
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the MAC address of ShutdownMethod.
+    --    string length: 12
+    --    "
+    --::= { cpmPDUConfigEntry 7 }
+    
+--cpmPDUMinCurMT  OBJECT-TYPE
+--    SYNTAX INTEGER 
+--    MAX-ACCESS read-write
+--    STATUS current
+--    DESCRIPTION
+--        "Display or set the PDU minimum electric current measurment threshold. 
+--         Range:0.0 ~16.0 rerpresnts 0~160
+--         When this value is -3000,it indicate this is NULL.
+--         When set this value to -3000, indicate set this object as NULL.
+--         
+--         NOTICE:Minimum threshold should be setted smaller than Maxima threshold      
+--        "
+--    ::= { cpmPDUConfigEntry 3 }
+    
+--cpmPDUMaxCurMT  OBJECT-TYPE
+--    SYNTAX INTEGER 
+--    MAX-ACCESS read-write
+--   STATUS current
+--    DESCRIPTION
+--        "Display or set the PDU maximum electric current measurment threshold. 
+--         Example: range 0.0 ~16.0 represents 0~160
+--        When this value is -3000,it indicate this is NULL.
+--         When set this value to -3000, indicate set this object as NULL.
+         
+--         NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+--        "
+--    ::= { cpmPDUConfigEntry 4 }
+
+--cpmPDUMinVolMT  OBJECT-TYPE
+    --SYNTAX INTEGER (900..2600)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the outlet minimum voltage measurment threshold. 
+    --    Range:90.0 ~260.0 represents 900~2600
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL. 
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { cpmPDUConfigEntry 10 }
+    
+--cpmPDUMaxVolMT  OBJECT-TYPE
+    --SYNTAX INTEGER (900..2600)
+    --MAX-ACCESS read-write
+    --STATUS current
+    --DESCRIPTION
+    --    "Display or set the outlet maximum voltage measurment threshold. 
+    --    Range:90.0 ~260.0 represents 900~2600
+    --    When this value is -3000,it indicate this is NULL.
+    --    When set this value to -3000, indicate set this object as NULL.
+    --    NOTICE:Minimum threshold should be setted smaller than Maxima threshold
+    --    "
+    --::= { cpmPDUConfigEntry 11 }
+
+            
+END

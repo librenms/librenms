@@ -2,12 +2,14 @@
 
 use LibreNMS\Config;
 
+$param = [];
 $sql = ' FROM `devices` AS D ';
 
 if (!Auth::user()->hasGlobalAdmin()) {
     $sql .= ", devices_perms AS P ";
 }
 
+$sql .= " LEFT JOIN `locations` as L ON `D`.`location_id`=`L`.`id`";
 $sql .= " LEFT JOIN `poller_groups` ON `D`.`poller_group`=`poller_groups`.`id`";
 
 if (!Auth::user()->hasGlobalAdmin()) {
@@ -17,7 +19,11 @@ if (!Auth::user()->hasGlobalAdmin()) {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (hostname LIKE '%$searchPhrase%' OR sysName LIKE '%$searchPhrase%' OR last_polled LIKE '%$searchPhrase%' OR last_polled_timetaken LIKE '%$searchPhrase%')";
+    $sql .= " AND (hostname LIKE ? OR sysName LIKE ? OR last_polled LIKE ? OR last_polled_timetaken LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 if ($vars['type'] == "unpolled") {
@@ -35,7 +41,7 @@ $count_sql = "SELECT COUNT(`D`.`device_id`) $sql";
 
 $sql .= " ORDER BY $sort";
 
-$total     = dbFetchCell($count_sql);
+$total     = dbFetchCell($count_sql, $param);
 if (empty($total)) {
     $total = 0;
 }
@@ -49,16 +55,17 @@ if ($rowCount != -1) {
     $sql .= " LIMIT $limit_low,$limit_high";
 }
 
-$sql = "SELECT D.device_id, D.hostname AS `hostname`, D.sysName, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
+$sql = "SELECT D.device_id, L.location as `location`, D.hostname AS `hostname`, D.sysName, D.last_polled AS `last_polled`, `group_name`, D.last_polled_timetaken AS `last_polled_timetaken` $sql";
 
-foreach (dbFetchRows($sql, array()) as $device) {
+foreach (dbFetchRows($sql, $param) as $device) {
     if (empty($device['group_name'])) {
         $device['group_name'] = 'General';
     }
     $response[] = array(
-        'hostname'              => "<a class='list-device' href='".generate_device_url($device, array('tab' => 'graphs', 'group' => 'poller'))."'>".format_hostname($device).'</a>',
+        'hostname'              => generate_device_link($device, format_hostname($device), array('tab' => 'graphs', 'group' => 'poller')),
         'last_polled'           => $device['last_polled'],
         'poller_group'          => $device['group_name'],
+        'location'              => $device['location'],
         'last_polled_timetaken' => round($device['last_polled_timetaken'], 2),
     );
 }

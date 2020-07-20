@@ -30,7 +30,8 @@ COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
 LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 
 # get the librenms user
-LIBRENMS_USER=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['user']) ? \$config['user'] : 'root';")
+source ".env"
+LIBRENMS_USER="${LIBRENMS_USER:-librenms}"
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 
 #######################################
@@ -131,7 +132,7 @@ check_dependencies() {
     local ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
     local ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
     local ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
-    local python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 5)))" 2> /dev/null)
+    local python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
     local python_deps=$(scripts/check_requirements.py > /dev/null 2>&1; echo $?)
     local phpver="master"
     local pythonver="master"

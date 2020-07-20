@@ -26,7 +26,6 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
-use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
 class Php extends BaseValidation
@@ -44,7 +43,6 @@ class Php extends BaseValidation
     public function validate(Validator $validator)
     {
         $this->checkVersion($validator);
-        $this->checkSessionDirWritable($validator);
         $this->checkExtensions($validator);
         $this->checkFunctions($validator);
         $this->checkTimezone($validator);
@@ -64,30 +62,9 @@ class Php extends BaseValidation
         }
     }
 
-    private function checkSessionDirWritable(Validator $validator)
-    {
-        $path = session_save_path() === '' ? '/tmp' : session_save_path();
-        if (!is_writable($path)) {
-            $result = ValidationResult::fail("The session directory ($path) is not writable.");
-
-            $group_id = filegroup($path);
-            if ($group_id !== 0 && check_file_permissions($path, '060')) {
-                // don't suggest adding users to the root group or a group that doesn't have write permission.
-                if (function_exists('posix_getgrgid')) {
-                    $group_info = posix_getgrgid($group_id);
-                    $group = $group_info['name'];
-                    $user = $validator->getUsername();
-                    $result->setFix("usermod -a -G $group $user");
-                }
-            }
-
-            $validator->result($result);
-        }
-    }
-
     private function checkExtensions(Validator $validator)
     {
-        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'session', 'xml', 'gd', 'sockets', 'dom'];
+        $required_modules = ['mysqlnd', 'mbstring', 'pcre', 'curl', 'xml', 'gd', 'sockets', 'dom'];
 
         if (Config::get('distributed_poller')) {
             $required_modules[] = 'memcached';
