@@ -5,13 +5,8 @@ $i = '1';
 $processors = dbFetchRows('SELECT * FROM `processors` WHERE device_id = ?', array($device['device_id']));
 
 foreach ($processors as $proc) {
-    if ('processor_usage' == 'device_processor') {
-        $id = 'device';
-        $val = $device['device_id'];
-    } else {
-        $id = 'id';
-        $val = $proc['processor_id'];
-    }
+    $id = 'id';
+    $val = $proc['processor_id'];
     $proc_url = 'graphs/'.$id.'='.$val.'/type=processor_usage/';
     $base_url = 'graph.php?' . $id . '=' . $val . '&amp;type=processor_usage&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
     $mini_url = $base_url.'&amp;width=80&amp;height=20&amp;bg=f4f4f4';
