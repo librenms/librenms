@@ -132,7 +132,7 @@ if (is_numeric($ss['ssCpuRawSteal'])) {
 
 $snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memAvailReal.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
 if (is_array($snmpdata[0])) {
-    list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $snmpdata[0];
+    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
     foreach (array_keys($snmpdata[0]) as $key) {
         $$key = $snmpdata[0][$key];
     }
@@ -191,7 +191,7 @@ if (is_numeric($load_raw[2]['laLoadInt'])) {
     $tags = compact('rrd_def');
     data_update($device, 'ucd_load', $tags, $fields);
 
-    $graphs['ucd_load'] = 'TRUE';
+    $os->enableGraph('ucd_load');
 }
 
 unset($ss, $load_raw, $snmpdata);

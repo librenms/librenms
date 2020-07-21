@@ -1,4 +1,5 @@
 <?php
+
 use LibreNMS\RRD\RrdDefinition;
 
 $associations=array();
@@ -28,8 +29,6 @@ if (\LibreNMS\Config::get('xirrus_disable_stations') != true) {
         data_update($device, $measurement, $tags, $fields);
     }
     $os->enableGraph('xirrus_stations');
-} else {
-    $graphs['xirrus_stations'] = false;
 }
 
 // cleanup
