@@ -1,0 +1,42 @@
+TAIT-INFRA93-94SERIES-COMMON-MIB DEFINITIONS ::= BEGIN
+------------------------------------------------------------------------
+-- TAIT Communications Enterprise definition MIB for the Infrastructure-93-94-Series
+--  of Base Stations which comprises the following product types:
+--  - TB9300 DMR Base Station
+--  - TB9400 P25 Base Station
+------------------------------------------------------------------------
+
+IMPORTS
+    MODULE-IDENTITY
+	FROM SNMPv2-SMI
+    taitModules
+	FROM TAIT-COMMON-MIB;
+
+------------------------------------------------------------------------
+
+infra93-94MibModule MODULE-IDENTITY
+    LAST-UPDATED    "201406171100Z"
+    ORGANIZATION    "www.taitradio.com"
+    CONTACT-INFO    "Tait Communications
+                     245 Wooldridge Road
+                     PO Box 1645
+                     Christchurch
+                     New Zealand
+
+             phone:  +64 3358 3399
+             email:  support@taitradio.com"
+    DESCRIPTION   "Add system alarms for TDMA."
+
+    REVISION      "201406171100Z"
+    DESCRIPTION  "Define the module and product root OIDs for monitored Tait 93/94-series Base Stations"
+
+    REVISION     "201401260000Z"
+    DESCRIPTION  "1.04.00 - Remove unused import"
+
+    REVISION     "201401141100Z"
+    DESCRIPTION  "1.01.01 - Initial version prior to change log entries"
+    ::= { taitModules 10 }
+
+------------------------------------------------------------------------
+
+END
