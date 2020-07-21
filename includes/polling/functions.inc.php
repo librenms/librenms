@@ -353,19 +353,6 @@ function poll_device($device, $force_module = false)
             }
         }
 
-        if (!$force_module) {
-            echo "Enabling graphs: ";
-            DeviceGraph::deleted(function ($graph) {
-                echo '-';
-            });
-            DeviceGraph::created(function ($graph) {
-                echo '+';
-            });
-
-            $os->persistGraphs();
-            echo PHP_EOL;
-        }
-
         // Ping response
         if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
@@ -402,6 +389,17 @@ function poll_device($device, $force_module = false)
             // don't update last_polled time if we are forcing a specific module to be polled
             $update_array['last_polled']           = array('NOW()');
             $update_array['last_polled_timetaken'] = $device_time;
+
+            echo "Enabling graphs: ";
+            DeviceGraph::deleted(function ($graph) {
+                echo '-';
+            });
+            DeviceGraph::created(function ($graph) {
+                echo '+';
+            });
+
+            $os->persistGraphs();
+            echo PHP_EOL;
         }
 
         $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
