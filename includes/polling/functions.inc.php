@@ -382,7 +382,7 @@ function poll_device($device, $force_module = false)
             );
 
             data_update($device, 'poller-perf', $tags, $fields);
-            $os->enableGraph('modules_perf');
+            $os->enableGraph('poller_modules_perf');
         }
 
         if (!$force_module) {
