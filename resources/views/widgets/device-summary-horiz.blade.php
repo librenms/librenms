@@ -1,5 +1,6 @@
-<div class="panel panel-default panel-condensed table-responsive">
-    <table class="table table-hover table-condensed table-striped">
+<x-panel class="table-responsive">
+    <x-slot name="table">
+     <table class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
                 <th>&nbsp;</th>
@@ -55,4 +56,5 @@
             @endif
         </tbody>
     </table>
-</div>
+    </x-slot>
+</x-panel>
