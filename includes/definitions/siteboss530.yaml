@@ -1,7 +1,7 @@
 os: siteboss530
 text: 'Asentria SiteBoss 530'
 type: server
-group: siteboss
+group: asentria
 icon: siteboss
 over:
     - { graph: device_bits, text: 'Device Traffic' }
