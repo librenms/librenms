@@ -31,7 +31,7 @@ if ($width > '1500') {
 
 $stacked = generate_stacked_graphs();
 
-$units_descr = substr(rrdtool_escape($units_descr, $rrddescr_len + 5), 0, $rrddescr_len + 5);
+$units_descr = rrdtool_escape($units_descr, $rrddescr_len + 5);
 
 if ($format == 'octets' || $format == 'bytes') {
     $units = 'Bps';
