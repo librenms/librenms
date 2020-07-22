@@ -49,39 +49,20 @@ if ($auth && is_customoid_graph($type, $subtype)) {
 
 function graph_error($string)
 {
-    global $vars, $debug, $graphfile;
+    global $vars, $debug;
 
-    $vars['bg'] = 'FFBBBB';
-
-    include 'includes/html/graphs/common.inc.php';
-
-    $rrd_options .= ' HRULE:0#555555';
-    $rrd_options .= ' --title=' . escapeshellarg($string);
-
-    rrdtool_graph($graphfile, $rrd_options);
-
-    if ($height > '99') {
-        shell_exec($rrd_cmd);
-        d_echo('<pre>' . $rrd_cmd . '</pre>');
-
-        if (is_file($graphfile) && ! $debug) {
-            header('Content-type: image/png');
-            $fd = fopen($graphfile, 'r');
-            fpassthru($fd);
-            fclose($fd);
-            unlink($graphfile);
-        }
-    } else {
-        if (! $debug) {
-            header('Content-type: image/png');
-        }
-
-        $im = imagecreate($width, $height);
-        $px = ((imagesx($im) - 7.5 * strlen($string)) / 2);
-        imagestring($im, 3, $px, ($height / 2 - 8), $string, imagecolorallocate($im, 128, 0, 0));
-        imagepng($im);
-        imagedestroy($im);
+    if (!$debug) {
+        header('Content-type: image/png');
     }
+    $width = $vars['width'] ?? 150;
+    $height = $vars['height'] ?? 60;
+
+    $im = imagecreate($width, $height);
+    imagecolorallocate($im, 255, 255, 255); // background
+    $px = ((imagesx($im) - 7.5 * strlen($string)) / 2);
+    imagestring($im, 3, $px, ($height / 2 - 8), $string, imagecolorallocate($im, 128, 0, 0));
+    imagepng($im);
+    imagedestroy($im);
 }
 
 if ($error_msg) {
@@ -89,11 +70,7 @@ if ($error_msg) {
     graph_error($graph_error);
 } elseif ($auth === null) {
     // We are unauthenticated :(
-    if ($width < 200) {
-        graph_error('No Auth');
-    } else {
-        graph_error('No Authorisation');
-    }
+    graph_error($width < 200 ? 'No Auth' : 'No Authorisation');
 } else {
     // $rrd_options .= " HRULE:0#999999";
     if ($graph_type === 'svg') {
@@ -103,13 +80,7 @@ if ($error_msg) {
         }
     }
 
-    if ($no_file) {
-        if ($width < 200) {
-            graph_error('No RRD');
-        } else {
-            graph_error('Missing RRD Datafile');
-        }
-    } elseif ($command_only) {
+    if ($command_only) {
         echo "<div class='infobox'>";
         echo "<p style='font-size: 16px; font-weight: bold;'>RRDTool Command</p>";
         echo "<pre class='rrd-pre'>";
@@ -122,7 +93,9 @@ if ($error_msg) {
         echo '</pre>';
         unlink($graphfile);
         echo '</div>';
-    } else {
+    } elseif ($no_file || (isset($rrd_filename) && !Rrd::checkRrdExists($rrd_filename))) {
+        graph_error($width < 200 ? 'No RRD' : 'Missing RRD Datafile');
+    }  else {
         if ($rrd_options) {
             rrdtool_graph($graphfile, $rrd_options);
             d_echo($rrd_cmd);
@@ -178,18 +151,10 @@ if ($error_msg) {
                 }
                 unlink($graphfile);
             } else {
-                if ($width < 200) {
-                    graph_error('Draw Error');
-                } else {
-                    graph_error('Error Drawing Graph');
-                }
+                graph_error($width < 200 ? 'Draw Error' : 'Error Drawing Graph');
             }
         } else {
-            if ($width < 200) {
-                graph_error('Def Error');
-            } else {
-                graph_error('Graph Definition Error');
-            }
+            graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
         }
     }
 }
