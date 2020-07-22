@@ -105,4 +105,16 @@ class DevicePolicy
     {
         return $user->isAdmin();
     }
+
+    /**
+     * Determine whether the user can update device notes.
+     *
+     * @param \App\Models\User $user
+     * @param \App\Models\Device $device
+     * @return mixed
+     */
+    public function updateNotes(User $user, Device $device)
+    {
+        return $user->isAdmin();
+    }
 }
