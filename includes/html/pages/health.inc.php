@@ -48,6 +48,7 @@ $type_text = [
     'loss' => 'Loss',
     'state' => "State",
     'count' => "Count",
+    'percent' => "Percent",
     'signal' => "Signal",
     'snr' => "SNR",
     'pressure' => "Pressure",
