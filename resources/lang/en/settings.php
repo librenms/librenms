@@ -1366,5 +1366,7 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'executable' => ':value is not a valid executable',
+        'directory' => ':value is not a valid directory',
     ]
 ];
