@@ -47,30 +47,12 @@ if ($auth && is_customoid_graph($type, $subtype)) {
     // Graph Template Missing");
 }
 
-function graph_error($string)
-{
-    global $vars, $debug;
-
-    if (!$debug) {
-        header('Content-type: image/png');
-    }
-    $width = $vars['width'] ?? 150;
-    $height = $vars['height'] ?? 60;
-
-    $im = imagecreate($width, $height);
-    imagecolorallocate($im, 255, 255, 255); // background
-    $px = ((imagesx($im) - 7.5 * strlen($string)) / 2);
-    imagestring($im, 3, $px, ($height / 2 - 8), $string, imagecolorallocate($im, 128, 0, 0));
-    imagepng($im);
-    imagedestroy($im);
-}
-
 if ($error_msg) {
     // We have an error :(
     graph_error($graph_error);
 } elseif ($auth === null) {
     // We are unauthenticated :(
-    graph_error($width < 200 ? 'No Auth' : 'No Authorisation');
+    graph_error($width < 200 ? 'No Auth' : 'No Authorization');
 } else {
     // $rrd_options .= " HRULE:0#999999";
     if ($graph_type === 'svg') {
@@ -93,68 +75,33 @@ if ($error_msg) {
         echo '</pre>';
         unlink($graphfile);
         echo '</div>';
-    } elseif ($no_file || (isset($rrd_filename) && !Rrd::checkRrdExists($rrd_filename))) {
-        graph_error($width < 200 ? 'No RRD' : 'Missing RRD Datafile');
-    }  else {
-        if ($rrd_options) {
-            rrdtool_graph($graphfile, $rrd_options);
-            d_echo($rrd_cmd);
-            if (is_file($graphfile)) {
-                if (! $debug) {
-                    set_image_type();
-                    if (Config::get('trim_tobias') && $graph_type !== 'svg') {
-                        [$w, $h, $type, $attr] = getimagesize($graphfile);
-                        $src_im = imagecreatefrompng($graphfile);
-                        $src_x = '0';
-                        // begin x
-                        $src_y = '0';
-                        // begin y
-                        $src_w = ($w - 12);
-                        // width
-                        $src_h = $h;
-                        // height
-                        $dst_x = '0';
-                        // destination x
-                        $dst_y = '0';
-                        // destination y
-                        $dst_im = imagecreatetruecolor($src_w, $src_h);
-                        imagesavealpha($dst_im, true);
-                        $white = imagecolorallocate($dst_im, 255, 255, 255);
-                        $trans_colour = imagecolorallocatealpha($dst_im, 0, 0, 0, 127);
-                        imagefill($dst_im, 0, 0, $trans_colour);
-                        imagecopy($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h);
-                        if ($output === 'base64') {
-                            ob_start();
-                            imagepng($png);
-                            $imagedata = ob_get_contents();
-                            imagedestroy($png);
-                            ob_end_clean();
-
-                            $base64_output = base64_encode($imagedata);
-                        } else {
-                            imagepng($dst_im);
-                            imagedestroy($dst_im);
-                        }
-                    } else {
-                        if ($output === 'base64') {
-                            $imagedata = file_get_contents($graphfile);
-                            $base64_output = base64_encode($imagedata);
-                        } else {
-                            $fd = fopen($graphfile, 'r');
-                            fpassthru($fd);
-                            fclose($fd);
-                        }
-                    }
+    } elseif ($no_file) {
+        graph_error($width < 200 ? 'No Data' : 'No Data file');
+    } elseif ($rrd_options) {
+        rrdtool_graph($graphfile, $rrd_options);
+        d_echo($rrd_cmd);
+        if (is_file($graphfile)) {
+            if (!$debug) {
+                set_image_type();
+                if ($output === 'base64') {
+                    $imagedata = file_get_contents($graphfile);
+                    $base64_output =  base64_encode($imagedata);
                 } else {
-                    echo `ls -l $graphfile`;
-                    echo '<img src="' . data_uri($graphfile, 'image/svg+xml') . '" alt="graph" />';
+                    $fd = fopen($graphfile, 'r');
+                    fpassthru($fd);
+                    fclose($fd);
                 }
-                unlink($graphfile);
             } else {
-                graph_error($width < 200 ? 'Draw Error' : 'Error Drawing Graph');
+                echo `ls -l $graphfile`;
+                echo '<img src="'.data_uri($graphfile, 'image/svg+xml').'" alt="graph" />';
             }
+            unlink($graphfile);
+        } elseif (isset($rrd_filename) && !Rrd::checkRrdExists($rrd_filename)) {
+            graph_error($width < 200 ? 'No Data' : 'No Data file');
         } else {
-            graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
+            graph_error($width < 200 ? 'Draw Error' : 'Error Drawing Graph');
         }
+    } else {
+        graph_error($width < 200 ? 'Def Error' : 'Graph Definition Error');
     }
 }

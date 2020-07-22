@@ -592,39 +592,48 @@ function generate_port_thumbnail($port)
 }//end generate_port_thumbnail()
 
 /**
+ * Create image to output text instead of a graph.
+ *
+ * @param string $text
+ * @param int[] $color
+ */
+function graph_error($text, $color = [128, 0, 0])
+{
+    global $vars, $debug;
+
+    if (!$debug) {
+        header('Content-type: image/png');
+    }
+    $width = $vars['width'] ?? 150;
+    $height = $vars['height'] ?? 60;
+
+    $img = imagecreate($width, $height);
+    imagecolorallocatealpha($img, 255,255,255, 127); // transparent background
+
+    $px = ((imagesx($img) - 7.5 * strlen($text)) / 2);
+    $font = $width < 200 ? 3 : 5;
+    imagestring($img, $font, $px, ($height / 2 - 8), $text, imagecolorallocate($img, ...$color));
+
+    // Output the image
+    imagepng($img);
+    imagedestroy($img);
+}
+
+/**
  * Output message to user in image format.
  *
- * @param int $width image width in pixels
- * @param int $height image height in pixels
  * @param string $text string to display
- * @param array $vars http input vars (checking showcommand)
  */
-function graph_text_and_exit($width, $height, $text, $vars = [])
+function graph_text_and_exit($text)
 {
+    global $vars;
+
     if ($vars['showcommand'] == 'yes') {
         echo $text;
         return;
     }
 
-    $text_size = $width < 300 ? 12 : 24;
-    $im = imagecreate($width, $height);
-
-    $font = \LibreNMS\Config::get('install_dir') . '/html/fonts/DejaVuSans.ttf';
-    $bounds = imagettfbbox($text_size, 0, $font, $text);
-    $text_width = $bounds[2] - $bounds[0];
-    $text_x = (int)(($width - $text_width) / 2);
-    $text_height = $bounds[1] - $bounds[7];
-    $text_y = (int)(($height + $text_height) / 2);
-
-    imagecolorallocate($im, 250, 250, 250); // background
-    $text_color = imagecolorallocate($im, 13, 21, 210);
-
-    imagettftext($im, $text_size, 0, $text_x, $text_y, $text_color, $font, $text);
-
-    // Output the image
-    header('Content-type: image/png');
-    imagepng($im);
-    imagedestroy($im);
+    graph_error($text, [13, 21, 210]);
     exit;
 }
 

@@ -11,7 +11,7 @@ $rrd_options .= " COMMENT:'                        Size      Used    % Used\\l'"
 $storages = dbFetchRows('SELECT * FROM storage where device_id = ?', [$device['device_id']]);
 
 if (empty($storages)) {
-    graph_text_and_exit($width, $height, 'No Storage', $vars);
+    graph_text_and_exit('No Storage');
 }
 
 foreach ($storages as $storage) {
