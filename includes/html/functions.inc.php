@@ -602,21 +602,30 @@ function graph_error($text, $color = [128, 0, 0])
     global $vars, $debug;
 
     if (!$debug) {
-        header('Content-type: image/png');
+        set_image_type();
     }
+
     $width = $vars['width'] ?? 150;
     $height = $vars['height'] ?? 60;
 
-    $img = imagecreate($width, $height);
-    imagecolorallocatealpha($img, 255,255,255, 127); // transparent background
+    if (Config::get('webui.graph_type') === 'svg') {
+        $rgb = implode(', ', $color);
+        $font_size = 20;
+        $svg_x = 100;
+        $svg_y = min($font_size, $width ? (($height / $width) * $svg_x) : 1);
+        echo "<svg viewBox=\"0 0 $svg_x $svg_y\" xmlns=\"http://www.w3.org/2000/svg\"><text x=\"50%\" y=\"50%\" dominant-baseline=\"middle\" text-anchor=\"middle\" style=\"font-family: sans-serif; fill: rgb($rgb);\">$text</text></svg>";
+    } else {
+        $img = imagecreate($width, $height);
+        imagecolorallocatealpha($img, 255,255,255, 127); // transparent background
 
-    $px = ((imagesx($img) - 7.5 * strlen($text)) / 2);
-    $font = $width < 200 ? 3 : 5;
-    imagestring($img, $font, $px, ($height / 2 - 8), $text, imagecolorallocate($img, ...$color));
+        $px = ((imagesx($img) - 7.5 * strlen($text)) / 2);
+        $font = $width < 200 ? 3 : 5;
+        imagestring($img, $font, $px, ($height / 2 - 8), $text, imagecolorallocate($img, ...$color));
 
-    // Output the image
-    imagepng($img);
-    imagedestroy($img);
+        // Output the image
+        imagepng($img);
+        imagedestroy($img);
+    }
 }
 
 /**
