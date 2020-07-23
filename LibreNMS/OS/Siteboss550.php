@@ -23,10 +23,13 @@
 
 namespace LibreNMS\OS;
 
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\OS;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 
-class Siteboss550 extends OS implements OSDiscovery
+class Siteboss550 extends OS implements
+    OSDiscovery, 
+    OSPolling
 {
     public function discoverOS(): void
     {
@@ -34,6 +37,12 @@ class Siteboss550 extends OS implements OSDiscovery
         $device->version = preg_replace('/^\s*(\S+\s+\S+\s+)/', '', $device['sysDescr']);
         preg_match('/^\S+\s+\d+\s+/', $device['sysDescr'], $matches);
         $device->hardware = trim($matches[0]);
+        $device->sysName = snmp_get($this->getDevice(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
+    }
+
+    public function pollOS(): void
+    {
+        $device = $this->getDeviceModel();
         $device->sysName = snmp_get($this->getDevice(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
     }
 }
