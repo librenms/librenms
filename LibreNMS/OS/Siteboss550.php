@@ -33,16 +33,17 @@ class Siteboss550 extends OS implements
 {
     public function discoverOS(): void
     {
-        $device = $this->getDeviceModel();
-        $device->version = preg_replace('/^\s*(\S+\s+\S+\s+)/', '', $device['sysDescr']);
-        preg_match('/^\S+\s+\d+\s+/', $device['sysDescr'], $matches);
-        $device->hardware = trim($matches[0]);
-        $device->sysName = snmp_get($this->getDevice(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
+        $deviceModel = $this->getDeviceModel();
+        $deviceModel->version = preg_replace('/^\s*(\S+\s+\S+\s+)/', '', $deviceModel['sysDescr']);
+        preg_match('/^\S+\s+\d+\s+/', $deviceModel['sysDescr'], $matches);
+        $deviceModel->hardware = trim($matches[0]);
+        $deviceModel->sysName = snmp_get($this->getDevice(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
     }
 
     public function pollOS(): void
     {
-        $device = $this->getDeviceModel();
-        $device->sysName = snmp_get($this->getDevice(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
+        $deviceModel = $this->getDeviceModel();
+        $deviceModel->sysName = snmp_get($this->getDevice(), 'siteName.0', '-Osqnv', 'SITEBOSS-550-STD-MIB');
+        $deviceModel->save();
     }
 }
