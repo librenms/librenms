@@ -12,11 +12,3 @@ discovery:
     -
         sysDescr:
             - ServerIron
-register_mibs:
-    snL4slbTotalConnections: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB
-    snL4slbLimitExceeds: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB
-    snL4slbForwardTraffic: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB
-    snL4slbReverseTraffic: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB
-    snL4slbFinished: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB
-    snL4FreeSessionCount: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB
-    snL4unsuccessfulConn: FOUNDRY-SN-SW-L4-SWITCH-GROUP-MIB

@@ -603,16 +603,6 @@ function c_echo($string, $enabled = true)
     }
 }
 
-
-/*
- * @return true if the given graph type is a dynamic MIB graph
- */
-function is_mib_graph($type, $subtype)
-{
-    return \LibreNMS\Util\Graph::isMibGraph($type, $subtype);
-} // is_mib_graph
-
-
 /*
  * @return true if client IP address is authorized to access graphs
  */
@@ -656,28 +646,9 @@ function get_graph_subtypes($type, $device = null)
         closedir($handle);
     }
 
-    if ($device != null) {
-        // find the MIB subtypes
-        $graphs = get_device_graphs($device);
-
-        foreach (Config::get('graph_types') as $type => $unused1) {
-            foreach (Config::get("graph_types.$type") as $subtype => $unused2) {
-                if (is_mib_graph($type, $subtype) && in_array($subtype, $graphs)) {
-                    $types[] = $subtype;
-                }
-            }
-        }
-    }
-
     sort($types);
     return $types;
 } // get_graph_subtypes
-
-function get_device_graphs($device)
-{
-    $query = 'SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?';
-    return dbFetchColumn($query, array($device['device_id']));
-}
 
 function get_smokeping_files($device)
 {
@@ -710,112 +681,6 @@ function round_Nth($val, $round_to)
 } // end round_Nth
 
 
-/*
- * @return true if this device should be polled with MIB-based discovery
- */
-function is_mib_poller_enabled($device)
-{
-    $val = get_dev_attrib($device, 'poll_mib');
-    if ($val == null) {
-        return Config::get("poller_modules.mib", false);
-    }
-    return $val;
-} // is_mib_poller_enabled
-
-
-/*
- * FIXME: Dummy implementation
- */
-function count_mib_mempools($device)
-{
-    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
-        return 1;
-    }
-    return 0;
-} // count_mib_mempools
-
-
-/*
- * FIXME: Dummy implementation
- */
-function count_mib_processors($device)
-{
-    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
-        return 1;
-    }
-    return 0;
-} // count_mib_processors
-
-
-function count_mib_health($device)
-{
-    return count_mib_mempools($device) + count_mib_processors($device);
-} // count_mib_health
-
-
-function get_mibval($device, $oid)
-{
-    $sql = 'SELECT * FROM `device_oids` WHERE `device_id` = ? AND `oid` = ?';
-    return dbFetchRow($sql, array($device['device_id'], $oid));
-} // get_mibval
-
-
-/*
- * FIXME: Dummy implementation - needs an abstraction for each device
- */
-function get_mib_mempools($device)
-{
-    $mempools = array();
-    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
-        $mempool = array();
-        $mibvals = get_mibval($device, '.1.3.6.1.4.1.25053.1.2.1.1.1.15.14.0');
-        $mempool['mempool_descr'] = $mibvals['object_type'];
-        $mempool['mempool_id'] = 0;
-        $mempool['mempool_total'] = 100;
-        $mempool['mempool_used'] = $mibvals['numvalue'];
-        $mempool['mempool_free'] = 100 - $mibvals['numvalue'];
-        $mempool['percentage'] = true;
-        $mempools[] = $mempool;
-    }
-    return $mempools;
-} // get_mib_mempools
-
-
-/*
- * FIXME: Dummy implementation - needs an abstraction for each device
- */
-function get_mib_processors($device)
-{
-    $processors = array();
-    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless') {
-        $proc = array();
-        $mibvals = get_mibval($device, '.1.3.6.1.4.1.25053.1.2.1.1.1.15.13.0');
-        $proc['processor_descr'] = $mibvals['object_type'];
-        $proc['processor_id'] = 0;
-        $proc['processor_usage'] = $mibvals['numvalue'];
-        $processors[] = $proc;
-    }
-    return $processors;
-} // get_mib_processors
-
-
-/*
- * FIXME: Dummy implementation - needs an abstraction for each device
- * @return true if there is a custom graph defined for this type, subtype, and device
- */
-function is_custom_graph($type, $subtype, $device)
-{
-    if (is_mib_poller_enabled($device) && $device['os'] == 'ruckuswireless' && $type == 'device') {
-        switch ($subtype) {
-            case 'cpumem':
-            case 'mempool':
-            case 'processor':
-                return true;
-        }
-    }
-    return false;
-} // is_custom_graph
-
 function is_customoid_graph($type, $subtype)
 {
     if (!empty($subtype) && $type == 'customoid') {
@@ -823,37 +688,6 @@ function is_customoid_graph($type, $subtype)
     }
     return false;
 } // is_customoid_graph
-
-/*
- * FIXME: Dummy implementation
- * Set section/graph entries in $graph_enable for graphs specific to $os.
- */
-function enable_os_graphs($os, &$graph_enable)
-{
-    /*
-    foreach (dbFetchRows("SELECT * FROM graph_conditions WHERE graph_type = 'device' AND condition_name = 'os' AND condition_value = ?", array($os)) as $graph) {
-        $graph_enable[$graph['graph_section']][$graph['graph_subtype']] = "device_".$graph['graph_subtype'];
-    }
-    */
-} // enable_os_graphs
-
-
-/*
- * For each os-based or global graph relevant to $device, set its section/graph entry in $graph_enable.
- */
-function enable_graphs($device, &$graph_enable)
-{
-    // These are standard graphs we should have for (almost) all systems
-    $graph_enable['poller']['poller_perf']         = 'device_poller_perf';
-    if (!$device['snmp_disable']) {
-        $graph_enable['poller']['poller_modules_perf'] = 'device_poller_modules_perf';
-    }
-    if (get_dev_attrib($device, "override_icmp_disable") != "true" && can_ping_device($device) === true) {
-        $graph_enable['poller']['ping_perf'] = 'device_ping_perf';
-    }
-
-    enable_os_graphs($device['os'], $graph_enable);
-} // enable_graphs
 
 
 //
@@ -909,39 +743,11 @@ function begins_with($str, $arr)
     return true;
 } // begins_with
 
-
-/*
- * @return the longest starting portion of $str that matches everything in $arr
- */
-function longest_matching_prefix($str, $arr)
-{
-    $len = strlen($str);
-    while ($len > 0) {
-        $prefix = substr($str, 0, $len);
-        if (begins_with($prefix, $arr)) {
-            return $prefix;
-        }
-        $len -= 1;
-    }
-    return '';
-} // longest_matching_prefix
-
-
 function search_phrase_column($c)
 {
     global $searchPhrase;
     return "$c LIKE '%$searchPhrase%'";
 } // search_phrase_column
-
-
-function print_mib_poller_disabled()
-{
-    echo '<h4>MIB polling is not enabled</h4>
-<p>
-Set \'poller_modules.mib\' in your config or enable for this device specifically to enable.
-</p>';
-} // print_mib_poller_disabled
-
 
 /**
  * Constructs the path to an RRD for the Ceph application
@@ -1299,32 +1105,6 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
 }
 
 /**
- * Print a list of items up to a max amount
- * If over that number, a line will print the total items
- *
- * @param array $list
- * @param string $format format as consumed by printf()
- * @param int $max the max amount of items to print, default 10
- */
-function print_list($list, $format, $max = 10)
-{
-    if (is_array(current($list))) {
-        $list = array_map(function ($item) {
-            return implode(' ', $item);
-        }, $list);
-    }
-
-    foreach (array_slice($list, 0, $max) as $item) {
-        printf($format, $item);
-    }
-
-    $extra = count($list) - $max;
-    if ($extra > 0) {
-        printf($format, " and $extra more...");
-    }
-}
-
-/**
  * @param $value
  * @param bool $strip_tags
  * @return string
@@ -1463,78 +1243,6 @@ function get_vm_parent_id($device)
     }
 
     return dbFetchCell("SELECT `device_id` FROM `vminfo` WHERE `vmwVmDisplayName` = ? OR `vmwVmDisplayName` = ?", [$device['hostname'], $device['hostname'] . '.' . Config::get('mydomain')]);
-}
-
-/**
- * Fetch a user preference from the database
- * Do not use strict comparison as results could be strings
- *
- * @param string $name preference name
- * @param mixed $default value to return if the preference is not set
- * @param int $user_id for this user_id otherwise, the currently logged in user
- * @return mixed value of this preference
- */
-function get_user_pref($name, $default = null, $user_id = null)
-{
-    global $user_prefs;
-
-    if (is_array($user_prefs) && array_key_exists($name, $user_prefs)) {
-        return $user_prefs[$name];
-    }
-
-    if (is_null($user_id)) {
-        $user_id = Auth::id();
-    }
-
-    $pref = dbFetchCell(
-        'SELECT `value` FROM `users_prefs` WHERE `user_id`=? AND `pref`=?',
-        array($user_id, $name)
-    );
-
-    if (!is_null($pref)) {
-        $pref = json_decode($pref, true);
-        $user_prefs[$name] = $pref;
-        return $pref;
-    }
-
-    return $default;
-}
-
-/**
- * Set a user preference value
- *
- * @param string $name preference name
- * @param mixed $value value of this preference
- * @param int $user_id for this user_id otherwise, the currently logged in user
- * @return bool whether the setting was changed or not
- */
-function set_user_pref($name, $value, $user_id = null)
-{
-    global $user_prefs;
-    if (is_null($user_id)) {
-        $user_id = Auth::id();
-    }
-
-    $pref = array(
-        'user_id' => $user_id,
-        'pref' => $name,
-        'value' => json_encode($value),
-    );
-
-    if (dbFetchCell('SELECT count(*) FROM `users_prefs` WHERE `user_id`=? AND `pref`=?', array($user_id, $name))) {
-        $update = array('value' => json_encode($value));
-        $params = array($user_id, $name);
-
-        $result = dbUpdate($update, 'users_prefs', '`user_id`=? AND `pref`=?', $params) > 0;
-    } else {
-        $result = dbInsert($pref, 'users_prefs') !== null;
-    }
-
-    if ($result) {
-        $user_prefs[$name] = $value;
-    }
-
-    return $result;
 }
 
 /**

@@ -1,10 +1,10 @@
 <?php
 
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Config;
+use LibreNMS\RRD\RrdDefinition;
 
 if (isset($device['uptime']) && ($device['uptime'] > 0 )) {
-    $graphs['availability'] = true;
+    $os->enableGraph('availability');
 
     $col = dbFetchColumn('SELECT duration FROM availability WHERE device_id = ?', array($device['device_id']));
     foreach (Config::get('graphing.availability') as $duration) {

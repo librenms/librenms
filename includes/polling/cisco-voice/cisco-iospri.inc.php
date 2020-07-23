@@ -48,7 +48,7 @@ if ($device['os_group'] == "cisco") {
             $tags = compact('rrd_def');
             data_update($device, 'cisco-iospri', $tags, $fields);
 
-            $graphs['cisco-iospri'] = true;
+            $os->enableGraph('cisco-iospri');
             echo(" Cisco IOS PRI ");
         }
         unset($rrd_def, $total, $active, $fields, $tags);

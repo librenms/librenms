@@ -49,7 +49,7 @@ if ($uptime != 0 && Config::get("os.{$device['os']}.bad_uptime") !== true) {
     );
     data_update($device, 'uptime', $tags, $uptime);
 
-    $graphs['uptime'] = true;
+    $os->enableGraph('uptime');
 
     echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
 
