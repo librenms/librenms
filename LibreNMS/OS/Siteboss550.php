@@ -28,7 +28,7 @@ use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Polling\OSPolling;
 
 class Siteboss550 extends OS implements
-    OSDiscovery, 
+    OSDiscovery,
     OSPolling
 {
     public function discoverOS(): void
