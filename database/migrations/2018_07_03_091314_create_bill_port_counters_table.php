@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateBillPortCountersTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -21,7 +20,7 @@ class CreateBillPortCountersTable extends Migration
             $table->bigInteger('out_counter')->nullable();
             $table->bigInteger('out_delta')->default(0);
             $table->unsignedInteger('bill_id');
-            $table->primary(['port_id','bill_id']);
+            $table->primary(['port_id', 'bill_id']);
         });
     }
 

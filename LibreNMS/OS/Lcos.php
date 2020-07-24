@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Vitali Kari
  * @author     Vitali Kari <vitali.kari@gmail.com>
@@ -26,14 +25,14 @@
 namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
-use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCapacityDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
 use LibreNMS\OS;
 use LibreNMS\Util\Rewrite;
 
@@ -56,8 +55,9 @@ class Lcos extends OS implements
     private function strToDecOid($index)
     {
         for ($i = 0, $j = strlen($index); $i < $j; $i++) {
-                $dec_index[] = ord($index[$i]);
+            $dec_index[] = ord($index[$i]);
         }
+
         return implode('.', $dec_index);
     }
 
@@ -88,6 +88,7 @@ class Lcos extends OS implements
                 WirelessSensor::channelToFrequency($entry['lcsStatusWlanRadiosEntryRadioChannel'])
             );
         }
+
         return $sensors;
     }
 
@@ -130,6 +131,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryModemLoad']
             );
         }
+
         return $sensors;
     }
 
@@ -160,6 +162,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryNoiseLevel']
             );
         }
+
         return $sensors;
     }
 
@@ -191,6 +194,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanRadiosEntryTransmitPower']
             );
         }
+
         return $sensors;
     }
 
@@ -223,6 +227,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanCompetingNetworksEntryPhySigal']
             );
         }
+
         return $sensors;
     }
 
@@ -256,6 +261,7 @@ class Lcos extends OS implements
                 1000000
             );
         }
+
         return $sensors;
     }
 
@@ -289,6 +295,7 @@ class Lcos extends OS implements
                 $entry['lcsStatusWlanCompetingNetworksEntrySignalLevel']
             );
         }
+
         return $sensors;
     }
 }

@@ -17,7 +17,6 @@ class LocationController extends Controller
             'maps_engine' => $maps_api ? Config::get('geoloc.engine') : '',
         ];
 
-
         $data['graph_template'] = '';
         Config::set('enable_lazy_load', false);
         $graph_array = [

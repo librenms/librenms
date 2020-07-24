@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -28,8 +27,8 @@ namespace LibreNMS\DB;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Version;
+use Schema as LaravelSchema;
 use Symfony\Component\Yaml\Yaml;
-use \Schema as LaravelSchema;
 
 class Schema
 {
@@ -75,6 +74,7 @@ class Schema
             ->map(function ($migration_file) {
                 return basename($migration_file, '.php');
             });
+
         return $migrations;
     }
 
@@ -102,7 +102,7 @@ class Schema
 
     public function getSchema()
     {
-        if (!isset($this->schema)) {
+        if (! isset($this->schema)) {
             $file = Config::get('install_dir') . '/misc/db_schema.yaml';
             $this->schema = Yaml::parse(file_get_contents($file));
         }
@@ -129,6 +129,7 @@ class Schema
     public function getColumns($table)
     {
         $schema = $this->getSchema();
+
         return array_column($schema[$table]['Columns'], 'Field');
     }
 
@@ -163,7 +164,7 @@ class Schema
 
             $cache = [
                 'version' => $db_version,
-                $base => $paths
+                $base => $paths,
             ];
 
             if (is_writable($cache_file)) {
@@ -202,7 +203,7 @@ class Schema
         $relationships = $this->getTableRelationships();
 
         d_echo("Starting Tables: " . json_encode($tables) . PHP_EOL);
-        if (!empty($history)) {
+        if (! empty($history)) {
             $tables = array_diff($tables, $history);
             d_echo("Filtered Tables: " . json_encode($tables) . PHP_EOL);
         }
@@ -211,15 +212,17 @@ class Schema
             // check for direct relationships
             if (in_array($table, $relationships[$target])) {
                 d_echo("Direct relationship found $target -> $table\n");
+
                 return [$table, $target];
             }
 
             $table_relations = $relationships[$table] ?? [];
             d_echo("Searching $table: " . json_encode($table_relations) . PHP_EOL);
 
-            if (!empty($table_relations)) {
+            if (! empty($table_relations)) {
                 if (in_array($target, $relationships[$table])) {
                     d_echo("Found in $table\n");
+
                     return [$target, $table]; // found it
                 } else {
                     $recurse = $this->findPathRecursive($relationships[$table], $target, array_merge($history, $tables));
@@ -245,7 +248,7 @@ class Schema
 
     public function getTableRelationships()
     {
-        if (!isset($this->relationships)) {
+        if (! isset($this->relationships)) {
             $schema = $this->getSchema();
 
             $relations = array_column(array_map(function ($table, $data) {
@@ -256,8 +259,6 @@ class Schema
                     if ($guess != $table) {
                         return $guess;
                     }
-
-                    return null;
                 }, $columns));
 
                 // renumber $related array
@@ -284,7 +285,7 @@ class Schema
             // try to guess assuming key_id = keys table
             $guessed_table = substr($key, 0, -3);
 
-            if (!Str::endsWith($guessed_table, 's')) {
+            if (! Str::endsWith($guessed_table, 's')) {
                 if (Str::endsWith($guessed_table, 'x')) {
                     $guessed_table .= 'es';
                 } else {
@@ -296,8 +297,6 @@ class Schema
                 return $guessed_table;
             }
         }
-
-        return null;
     }
 
     public function columnExists($table, $column)

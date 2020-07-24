@@ -2,7 +2,7 @@
 
 // https://www.iana.org/assignments/bgp-parameters/bgp-parameters.xhtml#bgp-parameters-3
 return [
- 'error_codes' => [
+    'error_codes' => [
         0 => "Reserved",
         1 => "Message Header Error",
         2 => "OPEN Message Error",
@@ -11,8 +11,8 @@ return [
         5 => "Finite State Machine Error",
         6 => "Cease",
         7 => "ROUTE-REFRESH Message Error",
- ],
- 'error_subcodes' => [
+    ],
+    'error_subcodes' => [
         1 => [
             0 => "Unspecific",
             1 => "Connection Not Synchronized",

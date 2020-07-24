@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -27,5 +26,4 @@ namespace LibreNMS\Exceptions;
 
 class HostUnreachablePingException extends HostUnreachableException
 {
-
 }

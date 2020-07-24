@@ -4,8 +4,6 @@
  *
  *   This file is part of LibreNMS.
  *
- * @package    librenms
- * @subpackage graphing
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
@@ -14,13 +12,13 @@ use LibreNMS\Data\Store\Datastore;
 
 $start = microtime(true);
 
-$init_modules = array('web', 'graphs', 'auth');
+$init_modules = ['web', 'graphs', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!Auth::check()) {
+if (! Auth::check()) {
     // check for unauthenticated graphs and set auth
     $auth = is_client_authorized($_SERVER['REMOTE_ADDR']);
-    if (!$auth) {
+    if (! $auth) {
         die('Unauthorized');
     }
 }

@@ -90,10 +90,10 @@ return [
         //     'table' => 'users',
         // ],
 
-         'legacy' => [
-             'driver' => 'legacy',
-             'model' => App\Models\User::class,
-         ],
+        'legacy' => [
+            'driver' => 'legacy',
+            'model' => App\Models\User::class,
+        ],
     ],
 
     /*

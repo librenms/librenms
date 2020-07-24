@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateBillDataTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -20,10 +19,9 @@ class CreateBillDataTable extends Migration
             $table->bigInteger('delta');
             $table->bigInteger('in_delta');
             $table->bigInteger('out_delta');
-            $table->primary(['bill_id','timestamp']);
+            $table->primary(['bill_id', 'timestamp']);
         });
     }
-
 
     /**
      * Reverse the migrations.

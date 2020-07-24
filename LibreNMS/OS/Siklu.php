@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -38,7 +37,6 @@ class Siklu extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
-
     /**
      * Discover wireless frequency.  This is in GHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -48,9 +46,10 @@ class Siklu extends OS implements
     public function discoverWirelessFrequency()
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.4.1'; // RADIO-BRIDGE-MIB::rfOperationalFrequency.1
-        return array(
+
+        return [
             new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'siklu', 1, 'Frequency', null, 1, 1000),
-        );
+        ];
     }
 
     /**
@@ -62,9 +61,10 @@ class Siklu extends OS implements
     public function discoverWirelessPower()
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.42.1'; // RADIO-BRIDGE-MIB::rfTxPower.1
-        return array(
+
+        return [
             new WirelessSensor('power', $this->getDeviceId(), $oid, 'siklu', 1, 'Tx Power'),
-        );
+        ];
     }
 
     /**
@@ -76,9 +76,10 @@ class Siklu extends OS implements
     public function discoverWirelessRssi()
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.19.1'; // RADIO-BRIDGE-MIB::rfAverageRssi.1
-        return array(
+
+        return [
             new WirelessSensor('rssi', $this->getDeviceId(), $oid, 'siklu', 1, 'RSSI'),
-        );
+        ];
     }
 
     /**
@@ -90,8 +91,9 @@ class Siklu extends OS implements
     public function discoverWirelessSnr()
     {
         $oid = '.1.3.6.1.4.1.31926.2.1.1.18.1'; // RADIO-BRIDGE-MIB::rfAverageCinr.1
-        return array(
+
+        return [
             new WirelessSensor('snr', $this->getDeviceId(), $oid, 'siklu', 1, 'CINR'),
-        );
+        ];
     }
 }

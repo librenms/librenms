@@ -63,7 +63,7 @@ class DeviceController extends Controller
         $device_id = $device->device_id;
         DeviceCache::setPrimary($device_id);
 
-        if (!$device->exists) {
+        if (! $device->exists) {
             abort(404);
         }
 
@@ -91,7 +91,7 @@ class DeviceController extends Controller
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device);
         $primary_device_link_name = Config::get('html.device.primary_link', 'edit');
-        if (!isset($device_links[$primary_device_link_name])) {
+        if (! isset($device_links[$primary_device_link_name])) {
             $primary_device_link_name = array_key_first($device_links);
         }
         $primary_device_link = $device_links[$primary_device_link_name];
@@ -102,6 +102,7 @@ class DeviceController extends Controller
         }
 
         $tab_content = $this->renderLegacyTab($current_tab, $device, $data);
+
         return view('device.tabs.legacy', get_defined_vars());
     }
 

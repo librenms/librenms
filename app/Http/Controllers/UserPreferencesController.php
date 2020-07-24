@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -84,7 +83,7 @@ class UserPreferencesController extends Controller
             $data['twofactor'] = $twofactor;
         }
 
-        if (!$user->hasGlobalRead()) {
+        if (! $user->hasGlobalRead()) {
             $data['devices'] = Device::hasAccess($user)->get();
         }
 
@@ -126,18 +125,18 @@ class UserPreferencesController extends Controller
     private function getValidLocales()
     {
         return array_reduce(glob(resource_path('lang') . '/*', GLOB_ONLYDIR), function ($locales, $locale) {
-            {
-                $locale = basename($locale);
-                $lang = __('preferences.lang', [], $locale);
-                $locales[$locale] = ($lang == 'preferences.lang' ? $locale : $lang);
-                return $locales;
-            }
+            $locale = basename($locale);
+            $lang = __('preferences.lang', [], $locale);
+            $locales[$locale] = ($lang == 'preferences.lang' ? $locale : $lang);
+
+            return $locales;
         }, []);
     }
 
     private function getValidStyles()
     {
         $definitions = new DynamicConfig();
+
         return $definitions->get('site_style')->getOptions();
     }
 

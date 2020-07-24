@@ -33,7 +33,7 @@ class Sonicwall extends OS implements ProcessorDiscovery
     public function discoverProcessors()
     {
         if (Str::startsWith($this->getDevice()['sysObjectID'], '.1.3.6.1.4.1.8741.1')) {
-            return array(
+            return [
                 Processor::discover(
                     'sonicwall',
                     $this->getDeviceId(),
@@ -41,10 +41,10 @@ class Sonicwall extends OS implements ProcessorDiscovery
                     0,
                     'CPU',
                     1
-                )
-            );
+                ),
+            ];
         } else {
-            return array(
+            return [
                 Processor::discover(
                     'sonicwall',
                     $this->getDeviceId(),
@@ -52,8 +52,8 @@ class Sonicwall extends OS implements ProcessorDiscovery
                     0,
                     'CPU',
                     1
-                )
-            );
+                ),
+            ];
         }
     }
 }

@@ -6,5 +6,5 @@ header('Content-type: application/json');
 exit(json_encode([
     'html' => '<script>window.location.reload(false);</script>',
     'status' => 'ok',
-    'title' => 'Reload Dasbhoard'
+    'title' => 'Reload Dasbhoard',
 ]));

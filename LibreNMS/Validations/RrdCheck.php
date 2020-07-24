@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -97,15 +96,15 @@ class RrdCheck extends BaseValidation
         $command = Config::get('rrdtool') . ' info ' . escapeshellarg($path);
         $process = proc_open(
             $command,
-            array (
-                0 => array('pipe', 'r'),
-                1 => array('pipe', 'w'),
-                2 => array('pipe', 'w'),
-            ),
+            [
+                0 => ['pipe', 'r'],
+                1 => ['pipe', 'w'],
+                2 => ['pipe', 'w'],
+            ],
             $pipes
         );
 
-        if (!is_resource($process)) {
+        if (! is_resource($process)) {
             throw new \RuntimeException('Could not create a valid process');
         }
 
@@ -116,8 +115,9 @@ class RrdCheck extends BaseValidation
         }
 
         $stdOutput = stream_get_contents($pipes[1]);
-        $stdError  = stream_get_contents($pipes[2]);
+        $stdError = stream_get_contents($pipes[2]);
         proc_close($process);
+
         return $status['exitcode'];
     }
 }

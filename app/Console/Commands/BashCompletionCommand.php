@@ -61,8 +61,9 @@ class BashCompletionCommand extends Command
                     foreach ($input->getArguments() as $name => $value) {
                         if ($current == $value) {
                             $values = $command->completeArgument($name, $value);
-                            if (!empty($values)) {
+                            if (! empty($values)) {
                                 echo implode(PHP_EOL, $values);
+
                                 return 0;
                             }
                             break;
@@ -74,7 +75,7 @@ class BashCompletionCommand extends Command
                     $completions = $this->completeOptionValue($option, $current);
                 } else {
                     $completions = collect();
-                    if (!Str::startsWith($previous, '-')) {
+                    if (! Str::startsWith($previous, '-')) {
                         $completions = $this->completeArguments($command_name, $current, end($words));
                     }
                     $completions = $completions->merge($this->completeOption($command_def, $current, $this->getPreviousOptions($words)));
@@ -85,6 +86,7 @@ class BashCompletionCommand extends Command
         \Log::debug('Bash completion values', get_defined_vars());
 
         echo $completions->implode(PHP_EOL);
+
         return 0;
     }
 
@@ -98,7 +100,7 @@ class BashCompletionCommand extends Command
     {
         // handle long option =
         if (Str::startsWith($current, '--') && Str::contains($current, '=')) {
-            list($previous, $current) = explode('=', $current);
+            [$previous, $current] = explode('=', $current);
         }
 
         if (Str::startsWith($previous, '-')) {
@@ -152,6 +154,7 @@ class BashCompletionCommand extends Command
                 return substr($cmd, strpos($cmd, ':') + 1);
             });
         }
+
         return $completions;
     }
 
@@ -189,6 +192,7 @@ class BashCompletionCommand extends Command
                     if (array_intersect($option_flags, $prev_options)) {
                         return [];
                     }
+
                     return $option_flags;
                 })->merge($options);
         }
@@ -205,6 +209,7 @@ class BashCompletionCommand extends Command
                 $split = explode('=', $word, 2); // users may use equals for values
                 $result[] = reset($split);
             }
+
             return $result;
         }, []);
     }
@@ -227,6 +232,7 @@ class BashCompletionCommand extends Command
                     return empty($partial) || Str::startsWith($value, $partial);
                 });
         }
+
         return collect();
     }
 

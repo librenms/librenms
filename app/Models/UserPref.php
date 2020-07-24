@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -43,7 +42,7 @@ class UserPref extends BaseModel
 
     public static function setPref(User $user, $pref, $value)
     {
-        return UserPref::updateOrCreate(['user_id' => $user->user_id, 'pref' => $pref], ['value' => $value]);
+        return self::updateOrCreate(['user_id' => $user->user_id, 'pref' => $pref], ['value' => $value]);
     }
 
     public static function forgetPref(User $user, $pref)
@@ -86,7 +85,6 @@ class UserPref extends BaseModel
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
-
     /**
      * Set the keys for a save update query. (no primary key)
      *
@@ -96,7 +94,7 @@ class UserPref extends BaseModel
     protected function setKeysForSaveQuery(Builder $query)
     {
         $keys = $this->getKeyName();
-        if (!is_array($keys)) {
+        if (! is_array($keys)) {
             return parent::setKeysForSaveQuery($query);
         }
 

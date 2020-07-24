@@ -3,8 +3,8 @@
 namespace App\Policies;
 
 use App\Facades\Permissions;
-use App\Models\User;
 use App\Models\Port;
+use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class PortPolicy

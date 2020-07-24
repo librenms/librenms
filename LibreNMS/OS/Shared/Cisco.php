@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -44,15 +43,15 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
     public function discoverProcessors()
     {
         $processors_data = snmpwalk_group($this->getDevice(), 'cpmCPU', 'CISCO-PROCESS-MIB');
-        $processors = array();
+        $processors = [];
 
         foreach ($processors_data as $index => $entry) {
             if (is_numeric($entry['cpmCPUTotal5minRev'])) {
-                $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.'.$index;
-                $usage     = $entry['cpmCPUTotal5minRev'];
+                $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.8.' . $index;
+                $usage = $entry['cpmCPUTotal5minRev'];
             } elseif (is_numeric($entry['cpmCPUTotal5min'])) {
-                $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.'.$index;
-                $usage     = $entry['cpmCPUTotal5min'];
+                $usage_oid = '.1.3.6.1.4.1.9.9.109.1.1.1.1.5.' . $index;
+                $usage = $entry['cpmCPUTotal5min'];
             } else {
                 continue; // skip bad data
             }
@@ -66,7 +65,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
                 }
 
                 if (empty($descr)) {
-                    $descr = snmp_get($this->getDevice(), 'entPhysicalName.'.$entPhysicalIndex, '-Oqv', 'ENTITY-MIB');
+                    $descr = snmp_get($this->getDevice(), 'entPhysicalName.' . $entPhysicalIndex, '-Oqv', 'ENTITY-MIB');
                 }
             }
 
@@ -132,7 +131,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
                     $qfp_descr = $entPhysicalName_array[$entQfpPhysicalIndex];
                 }
                 if (empty($qfp_descr)) {
-                    $qfp_descr = snmp_get($this->getDevice(), 'entPhysicalName.'.$entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
+                    $qfp_descr = snmp_get($this->getDevice(), 'entPhysicalName.' . $entQfpPhysicalIndex, '-Oqv', 'ENTITY-MIB');
                 }
             }
 
@@ -161,10 +160,11 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
         $nac = collect();
 
         $portAuthSessionEntry = snmpwalk_cache_oid($this->getDevice(), 'cafSessionEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB');
-        if (!empty($portAuthSessionEntry)) {
+        if (! empty($portAuthSessionEntry)) {
             $cafSessionMethodsInfoEntry = collect(snmpwalk_cache_oid($this->getDevice(), 'cafSessionMethodsInfoEntry', [], 'CISCO-AUTH-FRAMEWORK-MIB'))->mapWithKeys(function ($item, $key) {
                 $key_parts = explode('.', $key);
                 $key = implode('.', array_slice($key_parts, 0, 2)); // remove the auth method
+
                 return [$key => ['method' => $key_parts[2], 'authc_status' => $item['cafSessionMethodState']]];
             });
 
@@ -173,7 +173,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
 
             // update the DB
             foreach ($portAuthSessionEntry as $index => $portAuthSessionEntryParameters) {
-                list($ifIndex, $auth_id) = explode('.', str_replace("'", '', $index));
+                [$ifIndex, $auth_id] = explode('.', str_replace("'", '', $index));
                 $session_info = $cafSessionMethodsInfoEntry->get($ifIndex . '.' . $auth_id);
                 $mac_address = strtolower(implode(array_map('zeropad', explode(':', $portAuthSessionEntryParameters['cafSessionClientMacAddress']))));
 
@@ -183,7 +183,7 @@ class Cisco extends OS implements ProcessorDiscovery, NacPolling
                     'auth_id' => $auth_id,
                     'domain' => $portAuthSessionEntryParameters['cafSessionDomain'],
                     'username' => $portAuthSessionEntryParameters['cafSessionAuthUserName'],
-                    'ip_address' => (string)IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
+                    'ip_address' => (string) IP::fromHexString($portAuthSessionEntryParameters['cafSessionClientAddress'], true),
                     'host_mode' => $portAuthSessionEntryParameters['cafSessionAuthHostMode'],
                     'authz_status' => $portAuthSessionEntryParameters['cafSessionStatus'],
                     'authz_by' => $portAuthSessionEntryParameters['cafSessionAuthorizedBy'],

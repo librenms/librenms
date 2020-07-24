@@ -84,7 +84,6 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('ripe/raw', 'RipeNccApiController@raw');
         });
 
-
         Route::get('settings/list', 'SettingsController@listAll')->name('settings.list');
 
         // form ajax handlers, perhaps should just be page controllers

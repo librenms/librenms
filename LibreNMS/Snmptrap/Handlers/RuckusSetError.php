@@ -20,7 +20,6 @@
  * ruckusEventSetErrorTrap is sent when there is error setting a
  * value via SNMP. Contains the OID that is errored.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>

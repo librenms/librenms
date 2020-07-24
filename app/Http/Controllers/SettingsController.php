@@ -44,14 +44,14 @@ class SettingsController extends Controller
     {
         $value = $request->get('value');
 
-        if (!$config->isValidSetting($id)) {
+        if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
         }
 
         $current = \LibreNMS\Config::get($id);
         $config_item = $config->get($id);
 
-        if (!$config_item->checkValue($value)) {
+        if (! $config_item->checkValue($value)) {
             return $this->jsonResponse($id, $config_item->getValidationMessage($value), $current, 400);
         }
 
@@ -71,7 +71,7 @@ class SettingsController extends Controller
      */
     public function destroy(DynamicConfig $config, $id)
     {
-        if (!$config->isValidSetting($id)) {
+        if (! $config->isValidSetting($id)) {
             return $this->jsonResponse($id, ":id is not a valid setting", null, 400);
         }
 

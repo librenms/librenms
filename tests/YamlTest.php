@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <librenms+n@laf.io>
@@ -81,6 +80,7 @@ class YamlTest extends TestCase
             ->reduce(function ($array, $file) {
                 $name = basename($file);
                 $array[$name] = $file;
+
                 return $array;
             }, []);
     }
@@ -91,7 +91,7 @@ class YamlTest extends TestCase
      */
     private function validateFileAgainstSchema($filePath, $schema_file)
     {
-        $schema = (object)['$ref' => 'file://' . Config::get('install_dir') . $schema_file];
+        $schema = (object) ['$ref' => 'file://' . Config::get('install_dir') . $schema_file];
         $filename = basename($filePath);
         $filePath = Str::start($filePath, Config::get('install_dir'));
 

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -40,8 +39,9 @@ class Airport extends OS implements WirelessClientsDiscovery
     public function discoverWirelessClients()
     {
         $oid = '.1.3.6.1.4.1.63.501.3.2.1.0'; //AIRPORT-BASESTATION-3-MIB::wirelessNumber.0
-        return array(
-            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'airport', 0, 'Clients')
-        );
+
+        return [
+            new WirelessSensor('clients', $this->getDeviceId(), $oid, 'airport', 0, 'Clients'),
+        ];
     }
 }

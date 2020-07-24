@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -25,10 +24,10 @@
 
 namespace LibreNMS\Tests;
 
+use const false;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\OS;
-use const false;
 use const true;
 
 class OSDiscoveryTest extends TestCase
@@ -147,21 +146,21 @@ class OSDiscoveryTest extends TestCase
     {
         // make sure all OS are loaded
         $config_os = array_keys(Config::get('os'));
-        if (count($config_os) < count(glob(Config::get('install_dir').'/includes/definitions/*.yaml'))) {
+        if (count($config_os) < count(glob(Config::get('install_dir') . '/includes/definitions/*.yaml'))) {
             OS::loadAllDefinitions(false, true);
             $config_os = array_keys(Config::get('os'));
         }
 
-        $excluded_os = array(
+        $excluded_os = [
             'default',
             'generic',
             'ping',
-        );
+        ];
         $filtered_os = array_diff($config_os, $excluded_os);
 
-        $all_os = array();
+        $all_os = [];
         foreach ($filtered_os as $os) {
-            $all_os[$os] = array($os);
+            $all_os[$os] = [$os];
         }
 
         return $all_os;

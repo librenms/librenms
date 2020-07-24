@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
@@ -31,5 +30,5 @@ class PollerClusterStat extends Model
 {
     public $timestamps = false;
     protected $primaryKey = 'id';
-#    protected $fillable = ['poller_name'];
+//    protected $fillable = ['poller_name'];
 }

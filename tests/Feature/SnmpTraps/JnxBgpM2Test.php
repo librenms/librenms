@@ -19,7 +19,6 @@
  * Tests Junipers BGPv4 traps, specificaly jnxBgpM2Established and
  * jnxBgpM2BackwardTransition
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -37,7 +36,6 @@ class JnxBgpM2Test extends SnmpTrapTestCase
 {
     public function testBgpPeerUnknown()
     {
-
         $device = factory(Device::class)->create();
 
         $trapText = "$device->hostname
@@ -65,7 +63,6 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameSRX2
 
     public function testBgpBackwardTrasition()
     {
-
         $device = factory(Device::class)->create();
         $bgppeer = factory(BgpPeer::class)->make(['bgpPeerIdentifier' => '2001:d88:1::2', 'bgpPeerState' => 'established']);
         $device->bgppeers()->save($bgppeer);

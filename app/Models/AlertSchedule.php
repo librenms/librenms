@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -105,6 +104,7 @@ class AlertSchedule extends Model
     public function getEndRecurringDtAttribute()
     {
         $end = $this->end;
+
         return $end->year == '9000' ? null : $end->toDateString();
     }
 
@@ -144,7 +144,7 @@ class AlertSchedule extends Model
             return self::SCHEDULE_LAPSED;
         }
 
-        if (!$this->recurring) {
+        if (! $this->recurring) {
             return $now > $this->start ? self::SCHEDULE_ACTIVE : self::SCHEDULE_SET;
         }
 

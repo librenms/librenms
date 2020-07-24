@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Vitali Kari
  * @author     Vitali Kari <vitali.kari@gmail.com>
@@ -62,6 +61,7 @@ class EquipStatusTrap implements SnmptrapHandler
             'nonAlarmed' => 1,
             '1' => 1,
         ];
+
         return $severity_map[$state] ?? 0;
     }
 }

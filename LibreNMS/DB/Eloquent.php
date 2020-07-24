@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -40,12 +39,12 @@ class Eloquent
     public static function boot()
     {
         // boot Eloquent outside of Laravel
-        if (!Laravel::isBooted() && is_null(self::$capsule)) {
+        if (! Laravel::isBooted() && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
 
             Dotenv::create($install_dir)->load();
 
-            $db_config = include($install_dir . '/config/database.php');
+            $db_config = include $install_dir . '/config/database.php';
             $settings = $db_config['connections'][$db_config['default']];
 
             self::$capsule = new Capsule;
@@ -92,7 +91,7 @@ class Eloquent
         try {
             $conn = self::DB($name);
             if ($conn) {
-                return !is_null($conn->getPdo());
+                return ! is_null($conn->getPdo());
             }
         } catch (\PDOException $e) {
             return false;
@@ -115,7 +114,7 @@ class Eloquent
         }
 
         if (is_null(self::$capsule)) {
-            return null;
+            return;
         }
 
         return self::$capsule->getDatabaseManager()->connection($name);
@@ -124,6 +123,7 @@ class Eloquent
     public static function getDriver()
     {
         $connection = config('database.default');
+
         return config("database.connections.{$connection}.driver");
     }
 
@@ -141,7 +141,7 @@ class Eloquent
             "collation" => "utf8_unicode_ci",
             "prefix" => "",
             "strict" => true,
-            "engine" => null
+            "engine" => null,
         ]);
         \Config::set('database.default', $name);
     }

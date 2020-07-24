@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -60,7 +59,7 @@ class FileLock implements Lock
      */
     public function release()
     {
-        if (!$this->acquired) {
+        if (! $this->acquired) {
             return;
         }
 
@@ -93,6 +92,7 @@ class FileLock implements Lock
         for ($i = 0; $i <= $wait || $wait < 0; $i++) {
             if (flock($lock->handle, $wait < 0 ? LOCK_EX : LOCK_EX | LOCK_NB)) {
                 $lock->acquired = true;
+
                 return $lock;
             }
 

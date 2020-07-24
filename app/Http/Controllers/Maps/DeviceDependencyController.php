@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
@@ -31,7 +30,6 @@ use LibreNMS\Util\Url;
 
 class DeviceDependencyController extends MapController
 {
-
     protected $isolatedDeviceId = -1;
 
     protected $deviceIdAll = [];
@@ -55,8 +53,9 @@ class DeviceDependencyController extends MapController
                 },
                 'children' => function ($query) use ($request) {
                     $query->hasAccess($request->user());
-                }])
+                }, ])
             ->get();
+
         return $devices->merge($devices->map->only('children', 'parents')->flatten())->loadMissing('parents', 'location');
     }
 
@@ -134,7 +133,7 @@ class DeviceDependencyController extends MapController
                     'to'    => $parent->device_id,
                     'width' => 2,
                 ];
-            };
+            }
         }
 
         // highlight isolated Devices

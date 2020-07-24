@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -30,9 +29,9 @@ use LibreNMS\Util\Snmpsim;
 
 $install_dir = realpath(__DIR__ . '/..');
 
-$init_modules = array('web', 'discovery', 'polling', 'nodb');
+$init_modules = ['web', 'discovery', 'polling', 'nodb'];
 
-if (!getenv('SNMPSIM')) {
+if (! getenv('SNMPSIM')) {
     $init_modules[] = 'mocksnmp';
 }
 
@@ -73,7 +72,7 @@ if (getenv('DBTEST')) {
 
     // try to avoid erasing people's primary databases
     if ($db_config['database'] !== \config('database.connections.mysql.database', 'librenms')) {
-        if (!getenv('SKIP_DB_REFRESH')) {
+        if (! getenv('SKIP_DB_REFRESH')) {
             echo "Refreshing database...";
             $migrate_result = Artisan::call('migrate:fresh', ['--seed' => true, '--env' => 'testing', '--database' => 'testing']);
             $migrate_output = Artisan::output();

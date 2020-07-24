@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateAlertRulesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -16,7 +15,7 @@ class CreateAlertRulesTable extends Migration
         Schema::create('alert_rules', function (Blueprint $table) {
             $table->increments('id');
             $table->text('rule');
-            $table->enum('severity', array('ok','warning','critical'));
+            $table->enum('severity', ['ok', 'warning', 'critical']);
             $table->string('extra');
             $table->boolean('disabled');
             $table->string('name')->unique();
@@ -25,7 +24,6 @@ class CreateAlertRulesTable extends Migration
             $table->string('proc', 80)->nullable();
         });
     }
-
 
     /**
      * Reverse the migrations.

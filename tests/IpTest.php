@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -117,7 +116,6 @@ class IpTest extends TestCase
         $this->assertTrue(IP::parse('192.168.1.255')->inNetwork('192.168.1.0/24'));
         $this->assertFalse(IP::parse('192.168.1.1')->inNetwork('192.168.1.0'));
         $this->assertFalse(IP::parse('10.4.3.2')->inNetwork('192.168.1.0/16'));
-
 
         $this->assertTrue(IP::parse('::1')->inNetwork('::/64'));
         $this->assertTrue(IP::parse('2001:db7:85a3::8a2e:370:7334')->inNetwork('::/0'));

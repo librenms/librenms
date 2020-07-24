@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -30,7 +29,6 @@ use LibreNMS\Interfaces\UI\DeviceTab;
 
 class WirelessController implements DeviceTab
 {
-
     public function visible(Device $device): bool
     {
         return $device->wirelessSensors()->exists();

@@ -18,19 +18,19 @@
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Enum\AlertState;
 
 class Nagios extends Transport
 {
     public function deliverAlert($obj, $opts)
     {
         $opts = $this->config['nagios-fifo'];
+
         return $this->contactNagios($obj, $opts);
     }
 
@@ -60,6 +60,7 @@ class Nagios extends Transport
         $format .= str_replace("\n", "", nl2br($obj['msg'])) . "\t";
         $format .= "NULL"; //FIXME: What's the HOSTPERFDATA equivalent for LibreNMS? Oo
         $format .= "\n";
+
         return file_put_contents($opts, $format);
     }
 
@@ -76,7 +77,7 @@ class Nagios extends Transport
             ],
             'validation' => [
                 'nagios-fifo' => 'required',
-            ]
+            ],
         ];
     }
 }

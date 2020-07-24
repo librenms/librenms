@@ -11,7 +11,7 @@
 * the source code distribution for details.
 */
 
-$init_modules = array();
+$init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 ?>
 
@@ -25,7 +25,7 @@ foreach (dbFetchRows("SELECT `type` FROM `devices` WHERE `disabled` = 0 AND `typ
     echo '+ ' . str_replace(['.', ' '], '_', $groups['type']) . PHP_EOL;
     echo 'menu = ' . $groups['type'] . PHP_EOL;
     echo 'title = ' . $groups['type'] . PHP_EOL;
-    foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `disabled` = 0", array($groups['type'])) as $devices) {
+    foreach (dbFetchRows("SELECT `hostname` FROM `devices` WHERE `type` = ? AND `disabled` = 0", [$groups['type']]) as $devices) {
         echo '++ ' . str_replace(['.', ' '], '_', $devices['hostname']) . PHP_EOL;
         echo 'menu = ' . $devices['hostname'] . PHP_EOL;
         echo 'title = ' . $devices['hostname'] . PHP_EOL;

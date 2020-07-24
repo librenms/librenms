@@ -27,9 +27,9 @@ class VerifyTwoFactor
 
             $twofactor = $request->session()->get('twofactoradd', UserPref::getPref($request->user(), 'twofactor'));
 
-            if (!empty($twofactor)) {
+            if (! empty($twofactor)) {
                 // user has 2fa enabled
-                if (!$request->session()->get('twofactor')) {
+                if (! $request->session()->get('twofactor')) {
                     // verification is needed
                     return redirect('/2fa');
                 }

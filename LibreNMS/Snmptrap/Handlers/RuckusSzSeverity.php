@@ -20,7 +20,6 @@
  * Sets the LibreNMS alert level based on ruckusSZEventSeverity in the
  * trap.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -52,6 +51,7 @@ class RuckusSzSeverity
                 $severityNum = 2;
                 break;
         }
+
         return $severityNum;
     }
 }

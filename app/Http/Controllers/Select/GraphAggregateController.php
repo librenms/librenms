@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -48,7 +47,7 @@ class GraphAggregateController extends Controller
             'core',
         ];
 
-        foreach ((array)Config::get('custom_descr', []) as $custom) {
+        foreach ((array) Config::get('custom_descr', []) as $custom) {
             if ($custom) {
                 $types[] = $custom;
             }
@@ -57,7 +56,7 @@ class GraphAggregateController extends Controller
         // handle search
         if ($search = strtolower($request->get('term'))) {
             $types = array_filter($types, function ($type) use ($search) {
-                return !Str::contains(strtolower($type), $search);
+                return ! Str::contains(strtolower($type), $search);
             });
         }
 
@@ -69,7 +68,7 @@ class GraphAggregateController extends Controller
                     'text' => ucwords($type),
                 ];
             }, $types),
-            'pagination' => ['more' => false]
+            'pagination' => ['more' => false],
         ]);
     }
 }

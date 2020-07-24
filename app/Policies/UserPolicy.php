@@ -43,7 +43,6 @@ class UserPolicy
         return $user->isAdmin();
     }
 
-
     /**
      * Determine whether the user can create users.
      *

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -85,7 +84,7 @@ class Clean
             $value = htmlentities($value);
         }
 
-        if (!isset($purifier)) {
+        if (! isset($purifier)) {
             // initialize HTML Purifier here since this is the only user
             $p_config = HTMLPurifier_Config::createDefault();
             $p_config->set('Cache.SerializerPath', Config::get('temp_dir', '/tmp'));

@@ -19,7 +19,6 @@
  *
  * Adva Threshold Exceeded Alarms.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>
@@ -62,6 +61,7 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
                 return $descr;
             }
         }
+
         return 'unknown';
     }
 

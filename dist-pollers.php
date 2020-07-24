@@ -13,7 +13,7 @@
  * the source code distribution for details.
  */
 
-$init_modules = array('polling', 'alerts');
+$init_modules = ['polling', 'alerts'];
 require __DIR__ . '/includes/init.php';
 
 $options = getopt('l:u:r::');
@@ -21,30 +21,30 @@ $options = getopt('l:u:r::');
 if (isset($options['l'])) {
     if ($options['l'] == 'pollers') {
         $tbl = new Console_Table();
-        $tbl->setHeaders(array('ID', 'Poller Name', 'Last Polled', '# Devices', 'Poll Time'));
+        $tbl->setHeaders(['ID', 'Poller Name', 'Last Polled', '# Devices', 'Poll Time']);
         foreach (dbFetchRows('SELECT * FROM `pollers`') as $poller) {
-            $tbl->addRow(array($poller['id'], $poller['poller_name'], $poller['last_polled'], $poller['devices'], $poller['time_taken']));
+            $tbl->addRow([$poller['id'], $poller['poller_name'], $poller['last_polled'], $poller['devices'], $poller['time_taken']]);
         }
 
         echo $tbl->getTable();
     } elseif ($options['l'] == 'groups') {
         $tbl = new Console_Table();
-        $tbl->setHeaders(array('ID', 'Group Name', 'Description'));
+        $tbl->setHeaders(['ID', 'Group Name', 'Description']);
         foreach (dbFetchRows('SELECT * FROM `poller_groups`') as $groups) {
-            $tbl->addRow(array($groups['id'], $groups['group_name'], $groups['descr']));
+            $tbl->addRow([$groups['id'], $groups['group_name'], $groups['descr']]);
         }
 
         echo $tbl->getTable();
     }
-} elseif (isset($options['u']) && !empty($options['u'])) {
+} elseif (isset($options['u']) && ! empty($options['u'])) {
     if (is_numeric($options['u'])) {
         $db_column = 'id';
     } else {
         $db_column = 'poller_name';
     }
 
-    if (dbDelete('pollers', "`$db_column` = ?", array($options['u'])) >= 0) {
-        echo 'Poller '.$options['u']." has been removed\n";
+    if (dbDelete('pollers', "`$db_column` = ?", [$options['u']]) >= 0) {
+        echo 'Poller ' . $options['u'] . " has been removed\n";
     }
 } elseif (isset($options['r'])) {
     if (dbInsert(['poller_name' => Config::get('distributed_poller_name'), 'last_polled' => '0000-00-00 00:00:00', 'devices' => 0, 'time_taken' => 0], 'pollers') >= 0) {

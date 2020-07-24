@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -48,7 +47,7 @@ class Configuration extends BaseValidation
             $validator->warn('Debug enabled.  This is a security risk.');
         }
 
-        if (Eloquent::isConnected() && !\DB::table('devices')->exists()) {
+        if (Eloquent::isConnected() && ! \DB::table('devices')->exists()) {
             $validator->warn('You have no devices.', 'Consider adding a device such as localhost: ' . $validator->getBaseURL() . '/addhost');
         }
     }

@@ -17,7 +17,7 @@ return [
             'value' => 'value to set, unset setting if this is omitted',
         ],
         'options' => [
-            'ignore-checks' => 'Ignore all safety checks'
+            'ignore-checks' => 'Ignore all safety checks',
         ],
         'confirm' => 'Reset :setting to the default?',
         'errors' => [
@@ -25,7 +25,7 @@ return [
             'invalid' => 'This is not a valid setting. Please check your spelling',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
-        ]
+        ],
     ],
     'dev:check' => [
         'description' => 'LibreNMS code checks. Running with no options runs all checks',
@@ -41,7 +41,7 @@ return [
             'os' => 'Specific OS to run tests on. Implies unit, --db, --snmpsim',
             'quiet' => 'Hide output unless there is an error',
             'snmpsim' => 'Use snmpsim for unit tests',
-        ]
+        ],
     ],
     'user:add' => [
         'description' => 'Add a local user, you can only log in with this user if auth is set to mysql',
@@ -61,5 +61,5 @@ return [
     ],
     'translation:generate' => [
         'description' => 'Generate updated json language files for use in the web frontend',
-    ]
+    ],
 ];

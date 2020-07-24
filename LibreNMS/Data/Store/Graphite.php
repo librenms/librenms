@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @copyright  2017 Falk Stern <https://github.com/fstern/>
@@ -84,8 +83,9 @@ class Graphite extends BaseDatastore
      */
     public function put($device, $measurement, $tags, $fields)
     {
-        if (!$this->connection) {
+        if (! $this->connection) {
             d_echo("Graphite Error: not connected\n");
+
             return;
         }
 

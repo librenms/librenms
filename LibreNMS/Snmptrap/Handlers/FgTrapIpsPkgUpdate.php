@@ -19,7 +19,6 @@
  *
  * Trap sent when Fortigate IPS signature database was updated.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>

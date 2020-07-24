@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateStorageTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -27,7 +26,7 @@ class CreateStorageTable extends Migration
             $table->integer('storage_perc')->default(0);
             $table->integer('storage_perc_warn')->nullable()->default(60);
             $table->boolean('storage_deleted')->default(0);
-            $table->unique(['device_id','storage_mib','storage_index']);
+            $table->unique(['device_id', 'storage_mib', 'storage_index']);
         });
     }
 

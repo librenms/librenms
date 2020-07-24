@@ -19,7 +19,6 @@
  *
  * Test Juniper configuration change trap jnxCmCfgChange
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
@@ -36,7 +35,6 @@ class JnxCmCfgChangeTest extends SnmpTrapTestCase
 {
     public function testConfigChangeTrap()
     {
-
         $device = factory(Device::class)->create();
 
         $trapText = "$device->hostname

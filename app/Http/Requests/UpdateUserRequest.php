@@ -23,6 +23,7 @@ class UpdateUserRequest extends FormRequest
         if ($user && $this->user()->can('update', $user)) {
             // normal users cannot edit their level or ability to modify a password
             unset($this['level'], $this['can_modify_passwd']);
+
             return true;
         }
 
@@ -58,11 +59,11 @@ class UpdateUserRequest extends FormRequest
     {
         $validator->after(function ($validator) {
             // if not an admin and new_password is set, check old password matches
-            if (!$this->user()->isAdmin()) {
+            if (! $this->user()->isAdmin()) {
                 if ($this->has('new_password')) {
                     if ($this->has('old_password')) {
                         $user = $this->route('user');
-                        if ($user && !Hash::check($this->old_password, $user->password)) {
+                        if ($user && ! Hash::check($this->old_password, $user->password)) {
                             $validator->errors()->add('old_password', __('Existing password did not match'));
                         }
                     } else {

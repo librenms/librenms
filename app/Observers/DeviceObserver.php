@@ -26,7 +26,7 @@ class DeviceObserver
             }
         }
         if ($device->isDirty('location_id')) {
-            \Log::event(self::attributeChangedMessage('location', (string)$device->location, null), $device, 'system', 3);
+            \Log::event(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
         }
     }
 

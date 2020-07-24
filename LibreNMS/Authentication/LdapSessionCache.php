@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -36,30 +35,29 @@ trait LdapSessionCache
         $ttl = Config::get('auth_ldap_cache_ttl', 300);
 
         // no session, don't cache
-        if (!class_exists('Session')) {
-            return null;
+        if (! class_exists('Session')) {
+            return;
         }
 
         // auth_ldap cache present in this session?
-        if (!Session::has('auth_ldap')) {
-            return null;
+        if (! Session::has('auth_ldap')) {
+            return;
         }
 
         $cache = Session::get('auth_ldap');
 
         // $attr present in cache?
         if (! isset($cache[$attr])) {
-            return null;
+            return;
         }
 
         // Value still valid?
         if (time() - $cache[$attr]['last_updated'] >= $ttl) {
-            return null;
+            return;
         }
 
         return $cache[$attr]['value'];
     }
-
 
     protected function authLdapSessionCacheSet($attr, $value)
     {

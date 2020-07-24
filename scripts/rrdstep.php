@@ -18,7 +18,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
@@ -26,7 +25,7 @@
 
 use LibreNMS\Config;
 
-$init_modules = array();
+$init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $options = getopt('h:');
@@ -43,7 +42,7 @@ if (empty($hostname)) {
 }
 
 if ($hostname !== 'all') {
-    $hostname = !ctype_digit($hostname) ? $hostname : gethostbyid($hostname);
+    $hostname = ! ctype_digit($hostname) ? $hostname : gethostbyid($hostname);
 }
 
 if (empty($hostname)) {
@@ -51,11 +50,11 @@ if (empty($hostname)) {
     exit;
 }
 
-$system_step      = Config::get('rrd.step', 300);
-$icmp_step        = Config::get('ping_rrd_step', $system_step);
+$system_step = Config::get('rrd.step', 300);
+$icmp_step = Config::get('ping_rrd_step', $system_step);
 $system_heartbeat = Config::get('rrd.heartbeat', $system_step * 2);
-$rrdtool          = Config::get('rrdtool', 'rrdtool');
-$tmp_path         = Config::get('temp_dir', '/tmp');
+$rrdtool = Config::get('rrdtool', 'rrdtool');
+$tmp_path = Config::get('temp_dir', '/tmp');
 
 if ($hostname === 'all') {
     $hostname = '*';
@@ -67,7 +66,7 @@ $skipped = 0;
 $failed = 0;
 
 foreach ($files as $file) {
-    $random = $tmp_path.'/'.mt_rand() . '.xml';
+    $random = $tmp_path . '/' . mt_rand() . '.xml';
     $rrd_file = basename($file, '.rrd');
 
     if ($rrd_file == 'ping-perf') {

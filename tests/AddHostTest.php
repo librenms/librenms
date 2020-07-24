@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link http://librenms.org
  * @copyright  2020 Lars Elgtvedt Susaas
  * @author     Lars Elgtvedt Susaas
@@ -76,11 +75,11 @@ class AddHostTest extends DBTestCase
 
     public function testAddping()
     {
-        $additional = array(
+        $additional = [
             'snmp_disable' => 1,
             'os'           => 'nameOfOS',
             'hardware'     => 'hardware',
-        );
+        ];
         addHost($this->host, "", 0, 0, 0, true, "ifIndex", $additional);
         $device = Device::findByHostname($this->host);
         $this->assertNotNull($device);

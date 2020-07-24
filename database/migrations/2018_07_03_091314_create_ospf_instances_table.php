@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateOspfInstancesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -32,7 +31,7 @@ class CreateOspfInstancesTable extends Migration
             $table->integer('ospfExitOverflowInterval')->nullable();
             $table->string('ospfDemandExtensions', 32)->nullable();
             $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id','ospf_instance_id','context_name']);
+            $table->unique(['device_id', 'ospf_instance_id', 'context_name']);
         });
     }
 

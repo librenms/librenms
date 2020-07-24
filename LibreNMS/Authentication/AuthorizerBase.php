@@ -17,11 +17,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
+
 namespace LibreNMS\Authentication;
 
 use LibreNMS\Interfaces\Authentication\Authorizer;
@@ -85,7 +85,5 @@ abstract class AuthorizerBase implements Authorizer
         } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
             return $_SERVER['PHP_AUTH_USER'];
         }
-
-        return null;
     }
 }

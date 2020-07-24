@@ -19,7 +19,6 @@
  *
  * Traffic pattern matches Fortigate IPS signature.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>

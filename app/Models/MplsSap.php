@@ -42,7 +42,7 @@ class MplsSap extends Model implements Keyable
     {
         return $this->hasMany(\App\Models\MplsSdpBind::class, 'svc_id');
     }
-    
+
     public function services()
     {
         return $this->hasMany(\App\Models\MplsService::class, 'svc_id');

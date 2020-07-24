@@ -18,14 +18,13 @@
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 class Mail extends Transport
 {
@@ -51,11 +50,11 @@ class Mail extends Transport
                     'name' => 'email',
                     'descr' => 'Email address of contact',
                     'type'  => 'text',
-                ]
+                ],
             ],
             'validation' => [
-                'email' => 'required|email'
-            ]
+                'email' => 'required|email',
+            ],
         ];
     }
 }

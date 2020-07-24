@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\DB;
 
 class Notification extends Model
 {
-
     /**
      * Indicates if the model should be timestamped.
      *
@@ -44,7 +43,7 @@ class Notification extends Model
     /**
      * Mark this notification as sticky or unsticky
      *
-     * @var bool $enabled
+     * @var bool
      * @return bool
      */
     public function markSticky($enabled = true)
@@ -65,6 +64,7 @@ class Notification extends Model
             $read->key = $name;
             $read->value = 1;
             $this->attribs()->save($read);
+
             return true;
         } else {
             return $this->attribs()->where('key', $name)->delete();

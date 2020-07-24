@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -37,7 +36,7 @@ class OpenTSDBStoreTest extends TestCase
 {
     protected $timestamp = 990464400;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +44,7 @@ class OpenTSDBStoreTest extends TestCase
         Carbon::setTestNow(Carbon::createFromTimestamp($this->timestamp));
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         // restore Carbon:now() to normal
         Carbon::setTestNow();

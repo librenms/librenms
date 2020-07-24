@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <librenms+n@laf.io>
@@ -44,7 +43,7 @@ class DBSetupTest extends DBTestCase
         $result = Artisan::call('migrate:fresh', [
             '--seed' => true,
             '--env' => 'testing',
-            '--database' => $this->connection
+            '--database' => $this->connection,
         ]);
 
         $this->assertSame(0, $result, "Errors loading DB Schema: " . Artisan::output());

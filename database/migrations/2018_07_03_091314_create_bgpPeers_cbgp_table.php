@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateBgpPeersCbgpTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -37,8 +36,8 @@ class CreateBgpPeersCbgpTable extends Migration
             $table->integer('WithdrawnPrefixes_delta');
             $table->integer('WithdrawnPrefixes_prev');
             $table->string('context_name', 128)->nullable();
-            $table->unique(['device_id','bgpPeerIdentifier','afi','safi']);
-            $table->index(['device_id','bgpPeerIdentifier','context_name']);
+            $table->unique(['device_id', 'bgpPeerIdentifier', 'afi', 'safi']);
+            $table->index(['device_id', 'bgpPeerIdentifier', 'context_name']);
         });
     }
 

@@ -2,11 +2,11 @@
 <?php
 
 use Illuminate\Support\Str;
-use LibreNMS\Config;
 use LibreNMS\Authentication\LegacyAuth;
+use LibreNMS\Config;
 
 $options = getopt('u:rldvh');
-if (isset($options['h']) || (!isset($options['l']) && !isset($options['u']))) {
+if (isset($options['h']) || (! isset($options['l']) && ! isset($options['u']))) {
     echo ' -u <username>  (Required) username to test
  -l             List all users (checks that auth can enumerate all allowed users)
  -d             Enable debug output
@@ -62,7 +62,7 @@ try {
         $bind_success = false;
         if (Config::has('auth_ad_binduser') && Config::has('auth_ad_bindpassword')) {
             $bind_success = $adbind_rm->invoke($authorizer, false, true);
-            if (!$bind_success) {
+            if (! $bind_success) {
                 $ldap_error = ldap_error($lc_rp->getValue($authorizer));
                 echo $ldap_error . PHP_EOL;
                 if ($ldap_error == 'Invalid credentials') {
@@ -74,7 +74,7 @@ try {
             }
         } else {
             $bind_success = $adbind_rm->invoke($authorizer, true, true);
-            if (!$bind_success) {
+            if (! $bind_success) {
                 echo ldap_error($lc_rp->getValue($authorizer)) . PHP_EOL;
                 print_message("Could not anonymous bind to AD");
             } else {
@@ -82,7 +82,7 @@ try {
             }
         }
 
-        if (!$bind_success) {
+        if (! $bind_success) {
             print_error("Could not bind to AD, you will not be able to use the API or alert AD users");
         }
     }

@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -46,13 +45,13 @@ class MoxaEtherdevice extends OS implements ProcessorDiscovery
         // .1.3.6.1.4.1.8691.7.69.1.54.0 = MOXA-EDSG508E-MIB::cpuLoading30s.0
         $oid = $device['sysObjectID'] . '.1.54.0';
 
-        return array(
+        return [
             Processor::discover(
                 $this->getName(),
                 $this->getDeviceId(),
                 $oid,
                 0
-            )
-        );
+            ),
+        ];
     }
 }

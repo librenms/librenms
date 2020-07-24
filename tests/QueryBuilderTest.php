@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -42,7 +41,6 @@ class QueryBuilderTest extends TestCase
     }
 
     /**
-     *
      * @dataProvider loadQueryData
      * @param string $legacy
      * @param array $builder
@@ -51,7 +49,7 @@ class QueryBuilderTest extends TestCase
      */
     public function testQueryConversion($legacy, $builder, $display, $sql, $query)
     {
-        if (!empty($legacy)) {
+        if (! empty($legacy)) {
             // some rules don't have a legacy representation
             $this->assertEquals($builder, QueryBuilderParser::fromOld($legacy)->toArray());
         }
@@ -68,6 +66,7 @@ class QueryBuilderTest extends TestCase
     {
         $base = Config::get('install_dir');
         $data = file_get_contents("$base/$this->data_file");
+
         return json_decode($data, true);
     }
 }

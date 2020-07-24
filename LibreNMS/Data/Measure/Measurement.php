@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -56,6 +55,7 @@ class Measurement
     public function end()
     {
         $this->duration = microtime(true) - $this->start;
+
         return $this;
     }
 

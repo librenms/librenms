@@ -12,7 +12,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
     protected static $CAN_UPDATE_USER = 1;
     protected static $CAN_UPDATE_PASSWORDS = 0;
 
-    /** @var Radius $radius */
+    /** @var Radius */
     protected $radius;
 
     public function __construct()
@@ -35,6 +35,7 @@ class RadiusAuthorizer extends MysqlAuthorizer
         $password = $credentials['password'] ?? null;
         if ($this->radius->accessRequest($credentials['username'], $password) === true) {
             $this->addUser($credentials['username'], $password, Config::get('radius.default_level', 1));
+
             return true;
         }
 

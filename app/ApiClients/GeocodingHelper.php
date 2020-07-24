@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -46,8 +45,9 @@ trait GeocodingHelper
      */
     public function getCoordinates($address)
     {
-        if (!Config::get('geoloc.latlng', true)) {
+        if (! Config::get('geoloc.latlng', true)) {
             Log::debug('Geocoding disabled');
+
             return [];
         }
 

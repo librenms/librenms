@@ -11,7 +11,7 @@
 * the source code distribution for details.
 */
 
-$init_modules = array();
+$init_modules = [];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 ?>
@@ -26,30 +26,29 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
  * Maybe we can add this somewhere?
  */
 $rancid_map['arista_eos'] = 'arista';
-$rancid_map['asa']        = 'cisco';
-$rancid_map['avocent']    = 'avocent';
-$rancid_map['edgeos']     = 'edgerouter';
+$rancid_map['asa'] = 'cisco';
+$rancid_map['avocent'] = 'avocent';
+$rancid_map['edgeos'] = 'edgerouter';
 $rancid_map['edgeswitch'] = 'edgemax';
-$rancid_map['f5']         = 'f5';
-$rancid_map['fortigate']  = 'fortigate';
-$rancid_map['ftos']       = 'force10';
-$rancid_map['ios']        = 'cisco';
-$rancid_map['iosxe']      = 'cisco';
-$rancid_map['iosxr']      = 'cisco-xr';
-$rancid_map['ironware']   = 'foundry';
-$rancid_map['junos']      = 'juniper';
-$rancid_map['pfsense']    = 'pfsense';
-$rancid_map['procurve']   = 'hp';
-$rancid_map['nxos']       = 'cisco-nx';
-$rancid_map['mikrotik']   = 'mikrotik';
-$rancid_map['routeros']   = 'mikrotik';
-$rancid_map['screenos']   = 'netscreen';
-$rancid_map['xos']        = 'extreme';
-$rancid_map['ciscosb']    = 'cisco-sb';
-$rancid_map['allied']     = 'at';
-$rancid_map['radlan']     = 'at';
-$rancid_map['ciscowlc']   = 'cisco-wlc8';
-
+$rancid_map['f5'] = 'f5';
+$rancid_map['fortigate'] = 'fortigate';
+$rancid_map['ftos'] = 'force10';
+$rancid_map['ios'] = 'cisco';
+$rancid_map['iosxe'] = 'cisco';
+$rancid_map['iosxr'] = 'cisco-xr';
+$rancid_map['ironware'] = 'foundry';
+$rancid_map['junos'] = 'juniper';
+$rancid_map['pfsense'] = 'pfsense';
+$rancid_map['procurve'] = 'hp';
+$rancid_map['nxos'] = 'cisco-nx';
+$rancid_map['mikrotik'] = 'mikrotik';
+$rancid_map['routeros'] = 'mikrotik';
+$rancid_map['screenos'] = 'netscreen';
+$rancid_map['xos'] = 'extreme';
+$rancid_map['ciscosb'] = 'cisco-sb';
+$rancid_map['allied'] = 'at';
+$rancid_map['radlan'] = 'at';
+$rancid_map['ciscowlc'] = 'cisco-wlc8';
 
 foreach (dbFetchRows("SELECT `hostname`,`os`,`disabled`,`status` FROM `devices` WHERE `ignore` = 0 AND `type` != '' GROUP BY `hostname`") as $devices) {
     if (isset($rancid_map[$devices['os']])) {

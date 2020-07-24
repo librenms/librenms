@@ -40,31 +40,36 @@ class SetConfigCommand extends LnmsCommand
         $value = $this->argument('value');
         $force = $this->option('ignore-checks');
 
-        if (!$force && !$definition->isValidSetting($setting)) {
+        if (! $force && ! $definition->isValidSetting($setting)) {
             $this->error(trans('commands.config:set.errors.invalid'));
+
             return 2;
         }
 
-        if (!Eloquent::isConnected()) {
+        if (! Eloquent::isConnected()) {
             $this->error(trans('commands.config:set.errors.nodb'));
+
             return 1;
         }
 
-        if (!$force && !$value) {
+        if (! $force && ! $value) {
             if ($this->confirm(trans('commands.config:set.confirm', ['setting' => $setting]))) {
                 Config::erase($setting);
+
                 return 0;
             }
+
             return 3;
         }
 
         $value = $this->juggleType($value);
         $configItem = $definition->get($setting);
-        if (!$force && !$configItem->checkValue($value)) {
+        if (! $force && ! $configItem->checkValue($value)) {
             $message = ($configItem->type || $configItem->validate)
                 ? $configItem->getValidationMessage($value)
                 : trans('commands.config:set.errors.no-validation', ['setting' => $setting]);
             $this->error($message);
+
             return 2;
         }
 
@@ -73,6 +78,7 @@ class SetConfigCommand extends LnmsCommand
         }
 
         $this->error(trans('commands.config:set.errors.failed', ['setting' => $setting]));
+
         return 1;
     }
 
@@ -85,6 +91,7 @@ class SetConfigCommand extends LnmsCommand
     private function juggleType($value)
     {
         $json = json_decode($value, true);
+
         return json_last_error() ? $value : $json;
     }
 }

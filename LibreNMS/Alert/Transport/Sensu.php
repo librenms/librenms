@@ -17,18 +17,16 @@
  * @author Adam Bishop <adam@omega.org.uk>
  * @copyright 2020 Adam Bishop, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
-namespace LibreNMS\Alert\Transport;
 
-use LibreNMS\Enum\AlertState;
-use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
+namespace LibreNMS\Alert\Transport;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Facades\Log;
+use LibreNMS\Alert\Transport;
+use LibreNMS\Config;
+use LibreNMS\Enum\AlertState;
 
 class Sensu extends Transport
 {
@@ -38,19 +36,19 @@ class Sensu extends Transport
     const CRITICAL = 2;
     const UNKNOWN = 3;
 
-    private static $status = array(
-        'ok' => Sensu::OK,
-        'warning' => Sensu::WARNING,
-        'critical' => Sensu::CRITICAL
-    );
+    private static $status = [
+        'ok' => self::OK,
+        'warning' => self::WARNING,
+        'critical' => self::CRITICAL,
+    ];
 
-    private static $severity = array(
+    private static $severity = [
         'recovered' => AlertState::RECOVERED,
         'alert' => AlertState::ACTIVE,
         'acknowledged' => AlertState::ACKNOWLEDGED,
         'worse' => AlertState::WORSE,
         'better' => AlertState::BETTER,
-    );
+    ];
 
     private static $client = null;
 
@@ -58,11 +56,11 @@ class Sensu extends Transport
     {
         $sensu_opts = [];
         $sensu_opts['url'] = $this->config['sensu-url'] ? $this->config['sensu-url'] : 'http://127.0.0.1:3031';
-        $sensu_opts['namespace'] =  $this->config['sensu-namespace'] ? $this->config['sensu-namespace'] : 'default';
-        $sensu_opts['prefix'] =  $this->config['sensu-prefix'];
+        $sensu_opts['namespace'] = $this->config['sensu-namespace'] ? $this->config['sensu-namespace'] : 'default';
+        $sensu_opts['prefix'] = $this->config['sensu-prefix'];
         $sensu_opts['source-key'] = $this->config['sensu-source-key'];
 
-        Sensu::$client = new Client();
+        self::$client = new Client();
 
         try {
             return $this->contactSensu($obj, $sensu_opts);
@@ -75,16 +73,16 @@ class Sensu extends Transport
     {
         // The Sensu agent should be running on the poller - events can be sent directly to the backend but this has not been tested, and likely needs mTLS.
         // The agent API is documented at https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api
-        if (Sensu::$client->request('GET', $opts['url'] . '/healthz')->getStatusCode() !== 200) {
+        if (self::$client->request('GET', $opts['url'] . '/healthz')->getStatusCode() !== 200) {
             return 'Sensu API is not responding';
         }
 
         if ($obj['state'] !== AlertState::RECOVERED && $obj['state'] !== AlertState::ACKNOWLEDGED && $obj['alerted'] === 0) {
             // If this is the first event, send a forced "ok" dated (rrd.step / 2) seconds ago to tell Sensu the last time the check was healthy
-            $data = Sensu::generateData($obj, $opts, Sensu::OK, round(Config::get('rrd.step', 300) / 2));
+            $data = self::generateData($obj, $opts, self::OK, round(Config::get('rrd.step', 300) / 2));
             Log::debug('Sensu transport sent last good event to socket: ', $data);
 
-            $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
+            $result = self::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
             if ($result->getStatusCode() !== 202) {
                 return $result->getReasonPhrase();
             }
@@ -92,10 +90,10 @@ class Sensu extends Transport
             sleep(5);
         }
 
-        $data = Sensu::generateData($obj, $opts, Sensu::calculateStatus($obj['state'], $obj['severity']));
+        $data = self::generateData($obj, $opts, self::calculateStatus($obj['state'], $obj['severity']));
         Log::debug('Sensu transport sent event to socket: ', $data);
 
-        $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
+        $result = self::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
         if ($result->getStatusCode() === 202) {
             return true;
         }
@@ -108,9 +106,9 @@ class Sensu extends Transport
         return [
             'check' => [
                 'metadata' => [
-                    'name' => Sensu::checkName($opts['prefix'], $obj['name']),
+                    'name' => self::checkName($opts['prefix'], $obj['name']),
                     'namespace' => $opts['namespace'],
-                    'annotations' => Sensu::generateAnnotations($obj),
+                    'annotations' => self::generateAnnotations($obj),
                 ],
                 'command' => sprintf('LibreNMS: %s', $obj['builder']),
                 'executed' => time() - $offset,
@@ -121,13 +119,13 @@ class Sensu extends Transport
             ],
             'entity' => [
                 'metadata' => [
-                    'name' => Sensu::getEntityName($obj, $opts['source-key']),
+                    'name' => self::getEntityName($obj, $opts['source-key']),
                     'namespace' => $opts['namespace'],
                 ],
                 'system' => [
                     'hostname' => $obj['hostname'],
                     'os' => $obj['os'],
-                ]
+                ],
             ],
         ];
     }
@@ -154,22 +152,22 @@ class Sensu extends Transport
 
         if ($state === AlertState::RECOVERED) {
             // LibreNMS alert is resolved, send ok
-            return Sensu::OK;
+            return self::OK;
         }
 
-        if (array_key_exists($severity, Sensu::$status)) {
+        if (array_key_exists($severity, self::$status)) {
             // Severity is known, map the LibreNMS severity to the Sensu status
-            return Sensu::$status[$severity];
+            return self::$status[$severity];
         }
 
         // LibreNMS severity does not map to Sensu, send unknown
-        return Sensu::UNKNOWN;
+        return self::UNKNOWN;
     }
 
     public static function getEntityName($obj, $key)
     {
         if ($key === 'shortname') {
-            return Sensu::shortenName($obj['hostname']);
+            return self::shortenName($obj['hostname']);
         }
 
         return $obj[$key];
@@ -237,15 +235,15 @@ class Sensu extends Transport
                     'options' => [
                         'hostname' => 'hostname',
                         'sysName' => 'sysName',
-                        'shortname' => 'shortname'
+                        'shortname' => 'shortname',
                     ],
-                    'default' => 'hostname'
+                    'default' => 'hostname',
                 ],
             ],
             'validation' => [
                 'sensu-url' => 'url',
                 'sensu-source-key' => 'required|in:hostname,sysName,shortname',
-            ]
+            ],
         ];
     }
 }

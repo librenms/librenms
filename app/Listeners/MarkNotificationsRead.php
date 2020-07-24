@@ -39,7 +39,7 @@ class MarkNotificationsRead
                 'notifications_id' => $notif->notifications_id,
                 'user_id' => $user->user_id,
                 'key' => 'read',
-                'value' => 1
+                'value' => 1,
             ];
         })->toArray());
 

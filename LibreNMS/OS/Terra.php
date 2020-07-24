@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
@@ -41,24 +40,24 @@ class Terra extends OS implements ProcessorDiscovery
     {
         $device = $this->getDevice();
 
-        $query = array(
+        $query = [
             "sti410C" => ".1.3.6.1.4.1.30631.1.9.1.1.3.0",
-            "sti440" =>  ".1.3.6.1.4.1.30631.1.18.1.326.3.0"
-        );
+            "sti440" =>  ".1.3.6.1.4.1.30631.1.18.1.326.3.0",
+        ];
 
         foreach ($query as $decr => $oid) {
             if (strpos($device["sysDescr"], $decr) !== false) {
-                return array(
+                return [
                     Processor::discover(
                         'cpu',
                         $this->getDeviceId(),
                         $oid,
                         0
-                    )
-                );
+                    ),
+                ];
             }
         }
 
-        return array();
+        return [];
     }
 }

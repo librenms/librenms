@@ -20,7 +20,6 @@
  * ruckusEventAssocTrap is sent when a client associated to the AP.
  * Contains the clients MAC addr.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net

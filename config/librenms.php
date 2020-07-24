@@ -32,7 +32,6 @@ return [
 
     'group' => env('LIBRENMS_GROUP', env('LIBRENMS_USER', 'librenms')),
 
-
     /*
     |--------------------------------------------------------------------------
     | Install

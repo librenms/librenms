@@ -13,10 +13,10 @@
  * the source code distribution for details.
  */
 
-$init_modules = array('web', 'auth');
+$init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
-if (!Auth::check()) {
+if (! Auth::check()) {
     die('Unauthorized');
 }
 
@@ -27,10 +27,10 @@ $type = basename($_REQUEST['type']);
 if ($type && file_exists("includes/html/list/$type.inc.php")) {
     header('Content-type: application/json');
 
-    list($results, $more) = include "includes/html/list/$type.inc.php";
+    [$results, $more] = include "includes/html/list/$type.inc.php";
 
     die(json_encode([
         'results' => $results,
-        'pagination' => ['more' => $more]
+        'pagination' => ['more' => $more],
     ]));
 }

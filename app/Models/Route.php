@@ -24,7 +24,7 @@ class Route extends DeviceRelatedModel
         'bgp',
         'idpr',
         'ciscoEigrp',
-        'dvmrp'
+        'dvmrp',
     ];
 
     public static $translateType = [

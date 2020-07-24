@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateIpv4NetworksTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
