@@ -36,7 +36,7 @@ function get_service_status($device = null)
     return $service_count;
 }
 
-function add_service($device, $type, $desc, $ip = 'localhost', $param = "", $ignore = 0, $disabled = 0)
+function add_service($device, $type, $desc, $ip = '', $param = "", $ignore = 0, $disabled = 0)
 {
 
     if (!is_array($device)) {
