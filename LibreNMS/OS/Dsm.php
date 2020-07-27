@@ -17,13 +17,12 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
  * @copyright  2018 Nick Peelman
  * @copyright  2020 Daniel Baeza
  * @author     Nick Peelman <nick@peelman.us>
  * @author     Daniel Baeza <doctoruve@gmail.com>
-*/
+ */
 
 namespace LibreNMS\OS;
 
