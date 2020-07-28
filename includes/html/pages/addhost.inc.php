@@ -241,10 +241,10 @@ foreach (get_port_assoc_modes() as $mode) {
               <select name="authalgo" id="authalgo" class="form-control input-sm">
                 <option value="MD5" selected>MD5</option>
                 <option value="SHA">SHA</option>
-                <option value="SHA-512">SHA-512</option>
-                <option value="SHA-384">SHA-384</option>
-                <option value="SHA-256">SHA-256</option>
                 <option value="SHA-224">SHA-224</option>
+                <option value="SHA-256">SHA-256</option>
+                <option value="SHA-384">SHA-384</option>
+                <option value="SHA-512">SHA-512</option>
               </select>
             </div>
           </div>

@@ -478,7 +478,7 @@ devices:
     - { Field: authlevel, Type: 'enum(''noAuthNoPriv'',''authNoPriv'',''authPriv'')', 'Null': true, Extra: '' }
     - { Field: authname, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: authpass, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: authalgo, Type: 'enum(''MD5'',''SHA'',''SHA-512'', ''SHA-384'', ''SHA-256'', ''SHA-224'')', 'Null': true, Extra: '' }
+    - { Field: authalgo, Type: 'enum(''MD5'',''SHA'',''SHA-224'', ''SHA-256'', ''SHA-384'', ''SHA-512'')', 'Null': true, Extra: '' }
     - { Field: cryptopass, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: cryptoalgo, Type: 'enum(''AES'',''DES'','''')', 'Null': true, Extra: '' }
     - { Field: snmpver, Type: varchar(4), 'Null': false, Extra: '', Default: v2c }

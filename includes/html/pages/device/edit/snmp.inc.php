@@ -359,10 +359,10 @@ echo "        </select>
     <select id='authalgo' name='authalgo' class='form-control'>
     <option value='MD5'>MD5</option>
     <option value='SHA' ".($device['authalgo'] === 'SHA' ? 'selected' : '').">SHA</option>
-    <option value='SHA-512' ".($device['authalgo'] === 'SHA-512' ? 'selected' : '').">SHA-512</option>
-    <option value='SHA-384' ".($device['authalgo'] === 'SHA-384' ? 'selected' : '').">SHA-384</option>
-    <option value='SHA-256' ".($device['authalgo'] === 'SHA-256' ? 'selected' : '').">SHA-256</option>
     <option value='SHA-224' ".($device['authalgo'] === 'SHA-224' ? 'selected' : '').">SHA-224</option>
+    <option value='SHA-256' ".($device['authalgo'] === 'SHA-256' ? 'selected' : '').">SHA-256</option>
+    <option value='SHA-384' ".($device['authalgo'] === 'SHA-384' ? 'selected' : '').">SHA-384</option>
+    <option value='SHA-512' ".($device['authalgo'] === 'SHA-512' ? 'selected' : '').">SHA-512</option>
     </select>
     </div>
     </div>
