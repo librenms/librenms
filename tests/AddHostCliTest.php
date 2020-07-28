@@ -102,8 +102,8 @@ class AddHostCliTest extends DBTestCase
 
     public function testSnmpV3AuthProtocol()
     {
-//        $modes = array('md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224');
-        $modes = array('md5', 'sha');
+        $modes = array('MD5', 'SHA', 'SHA-224', 'SHA-256', 'SHA-384', 'SHA-512');
+//        $modes = array('md5', 'sha');
         foreach ($modes as $mode) {
             $host = "hostName".$mode;
             $result = \Artisan::call('device:add '.$host.' -force -a '.$mode.' --v3');
@@ -111,7 +111,7 @@ class AddHostCliTest extends DBTestCase
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
-            $this->assertEquals(strtoupper($mode), $device->authalgo, "Wrong snmp v3 password algoritme");
+            $this->assertEquals(strtoupper($mode), $device->authalgo, "Wrong snmp v3 password algorithm");
         }
     }
 
