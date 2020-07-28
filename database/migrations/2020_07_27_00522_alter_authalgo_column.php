@@ -14,7 +14,7 @@ class AlterAuthalgoColumn extends Migration
     public function up()
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->string('authalgo', 10)->nullable()->change(); 
+            $table->string('authalgo', 10)->nullable()->change();
         });
     }
     /**
