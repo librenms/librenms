@@ -210,7 +210,7 @@ $config['rrdcached'] = "IPADDRESS:42217";
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
 
-## RRDCached installation CentOS 7
+## RRDCached installation CentOS 7/8
 
 1: Create `/etc/systemd/system/rrdcached.service` with this content:
 
