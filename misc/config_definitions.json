@@ -4948,7 +4948,7 @@
                 }
             ],
             "validate": {
-                "value.*.authalgo": "in:MD5,SHA"
+                "value.*.authalgo": "in:MD5,SHA,SHA-512,SHA-384,SHA-256,SHA-224"
             }
         },
         "snmp.version": {
