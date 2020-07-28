@@ -25,7 +25,7 @@ class AlterAuthalgoColumn extends Migration
     public function down()
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->enum('authalgo', array('MD5','SHA'))->nullable()->change();
+            $table->string('authalgo', 10)->nullable()->change(); //Rolling back to enum fails.
         });
     }
 }
