@@ -14,7 +14,7 @@ class AlterAuthalgoColumn extends Migration
     public function up()
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->enum('authalgo', array('MD5','SHA', 'sha-512', 'sha-384', 'sha-256', 'sha-224'))->nullable()->change();
+            $table->enum('authalgo', array('MD5','SHA', 'SHA-512', 'SHA-384', 'SHA-256', 'SHA-224'))->nullable()->change();
         });
     }
     /**
