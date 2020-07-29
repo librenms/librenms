@@ -1376,6 +1376,22 @@ function set_curl_proxy($curl)
 }
 
 /**
+ * Return the proxy url in guzzle format
+ *
+ * @return 'tcp://' + $proxy
+ */
+function get_guzzle_proxy()
+{
+    $proxy = get_proxy();
+
+    $tmp = rtrim($proxy, "/");
+    $proxy = str_replace(array("http://", "https://"), "", $tmp);
+    if (!empty($proxy)) {
+        return 'tcp://' . $proxy;
+    }
+}
+
+/**
  * Return the proxy url
  *
  * @return array|bool|false|string
