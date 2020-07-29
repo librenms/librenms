@@ -3,7 +3,7 @@
 echo "Toshiba Tec Printer \n";
 
 # alternative node HOST-RESOURCES-MIB::hrDeviceDescr.1 (contains model, serial and firmware on table printers)
-if (preg_match('/Toshiba\s+([\w\-]+)/i', snmp_get($device, "sysDescr.0", "-OQv"), $DESCR_PARTS) ) {
+if (preg_match('/Toshiba\s+([\w\-]+)/i', snmp_get($device, "sysDescr.0", "-OQv"), $DESCR_PARTS)) {
     $hardware = $DESCR_PARTS[1];
 }
 
