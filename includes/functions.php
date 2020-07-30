@@ -862,33 +862,6 @@ function snmp2ipv6($ipv6_snmp)
     return implode(':', $ipv6_2);
 }
 
-
-/**
- * checks if System is SNMPv3 SHA2 Capable for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * @return boolean
- */
-function snmpv3_sha2_capable()
-{
-    $netsnmp_minimum = '5.8.0';
-    $openssl_minimum = '1.1.0';
-
-    $netsnmp_ver = explode(' ', str_replace('version: ', '', rtrim(shell_exec(
-        Config::get('snmpget', 'snmpget') . ' -V 2>&1'
-    ))))[1];
-    $openssl_ver = explode(' ', rtrim(shell_exec(
-        Config::get('openssl', 'openssl') . ' version 2>&1'
-    )))[1];
-
-    if ($netsnmp_ver < $netsnmp_minimum) {
-        return false;
-    }
-    if ($openssl_ver < $openssl_minimum) {
-        return false;
-    }
-
-    return true;
-}
-
 function get_astext($asn)
 {
     global $cache;

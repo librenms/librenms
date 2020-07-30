@@ -829,6 +829,30 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
+ * checks if System is SNMPv3 SHA2 Capable for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
+ * @return boolean
+ */
+function snmpv3_sha2_capable()
+{
+    $netsnmp_minimum = '5.8.0';
+    $openssl_minimum = '1.1.0';
+
+    $version_info = version_info();
+
+    $netsnmp_ver = explode(' ', $version_info['netsnmp_ver'])[1];
+    $openssl_ver = $version_info['openssl_ver'];
+
+    if ($netsnmp_ver < $netsnmp_minimum) {
+        return false;
+    }
+    if ($openssl_ver < $openssl_minimum) {
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
  * @return string Empty if not valid.
