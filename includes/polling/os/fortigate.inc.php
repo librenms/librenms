@@ -24,7 +24,7 @@ if (is_numeric($sessions)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'fortigate_sessions', $tags, $fields);
-    $graphs['fortigate_sessions'] = true;
+    $os->enableGraph('fortigate_sessions');
 }
 
 $cpu_usage = snmp_get($device, 'FORTINET-FORTIGATE-MIB::fgSysCpuUsage.0', '-Ovq');
@@ -38,5 +38,5 @@ if (is_numeric($cpu_usage)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'fortigate_cpu', $tags, $fields);
-    $graphs['fortigate_cpu'] = true;
+    $os->enableGraph('fortigate_cpu');
 }

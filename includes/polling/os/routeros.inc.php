@@ -22,7 +22,7 @@ if (is_numeric($leases)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'routeros_leases', $tags, $fields);
-    $graphs['routeros_leases'] = true;
+    $os->enableGraph('routeros_leases');
 }
 
 unset($leases);
@@ -38,7 +38,7 @@ if (is_numeric($pppoe_sessions)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'routeros_pppoe_sessions', $tags, $fields);
-    $graphs['routeros_pppoe_sessions'] = true;
+    $os->enableGraph('routeros_pppoe_sessions');
 }
 
 unset($pppoe_sessions);

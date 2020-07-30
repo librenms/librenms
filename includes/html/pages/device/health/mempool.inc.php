@@ -1,15 +1,8 @@
 <?php
 
-$graph_type = 'mempool_usage';
-
 $i = '1';
 
-if (count_mib_mempools($device) > 0) {
-    $mempools = get_mib_mempools($device);
-    $graph_type = 'device_mempool';
-} else {
-    $mempools = dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', array($device['device_id']));
-}
+$mempools = dbFetchRows('SELECT * FROM `mempools` WHERE device_id = ?', array($device['device_id']));
 
 // FIXME css alternating colours
 foreach ($mempools as $mempool) {
@@ -21,18 +14,13 @@ foreach ($mempools as $mempool) {
 
     $text_descr = rewrite_entity_descr($mempool['mempool_descr']);
 
-    if ($graph_type == 'device_mempool') {
-        $id = 'device';
-        $val = $device['device_id'];
-    } else {
-        $id = 'id';
-        $val = $mempool['mempool_id'];
-    }
-    $mempool_url = 'graphs/'.$id.'='.$val.'/type='.$graph_type.'/';
-    $mini_url = 'graph.php?' . $id . '=' . $val . '&amp;type=' . $graph_type . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . '&amp;width=80&amp;height=20&amp;bg=f4f4f4';
+    $id = 'id';
+    $val = $mempool['mempool_id'];
+    $mempool_url = 'graphs/'.$id.'='.$val.'/type=mempool_usage/';
+    $mini_url = 'graph.php?' . $id . '=' . $val . '&amp;type=mempool_usage&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now') . '&amp;width=80&amp;height=20&amp;bg=f4f4f4';
 
     $mempool_popup  = "onmouseover=\"return overlib('<div class=list-large>".$device['hostname'].' - '.$text_descr;
-    $mempool_popup .= "</div><img src=\'graph.php?'.$id.'=" . $val . '&amp;type=' . $graph_type . '&amp;from=' . \LibreNMS\Config::get('time.month') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=400&amp;height=125\'>";
+    $mempool_popup .= "</div><img src=\'graph.php?'.$id.'=" . $val . '&amp;type=mempool_usage&amp;from=' . \LibreNMS\Config::get('time.month') . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=400&amp;height=125\'>";
     $mempool_popup .= "', RIGHT" . \LibreNMS\Config::get('overlib_defaults') . ');" onmouseout="return nd();"';
 
     $total = formatStorage($mempool['mempool_total']);
@@ -51,7 +39,7 @@ foreach ($mempools as $mempool) {
     $left_background  = $background['left'];
 
     $graph_array[$id] = $val;
-    $graph_array['type'] = $graph_type;
+    $graph_array['type'] = 'mempool_usage';
 
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>";

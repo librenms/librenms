@@ -44,7 +44,10 @@ if ($device['os_group'] == "cisco") {
                 $rrd_def = RrdDefinition::make()
                     ->addDataset('postbits', 'COUNTER', 0)
                     ->addDataset('bufferdrops', 'COUNTER', 0)
-                    ->addDataset('qosdrops', 'COUNTER', 0);
+                    ->addDataset('qosdrops', 'COUNTER', 0)
+                    ->addDataset('prebits', 'COUNTER', 0)
+                    ->addDataset('prepkts', 'COUNTER', 0)
+                    ->addDataset('droppkts', 'COUNTER', 0);
 
                 // Let's print some debugging info.
                 d_echo("\n\nComponent: ".$key."\n");
@@ -53,11 +56,17 @@ if ($device['os_group'] == "cisco") {
                 d_echo("    PostBytes:   1.3.6.1.4.1.9.9.166.1.15.1.1.10.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$array['sp-id']][$array['sp-obj']]."\n");
                 d_echo("    BufferDrops: 1.3.6.1.4.1.9.9.166.1.15.1.1.21.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.21'][$array['sp-id']][$array['sp-obj']]."\n");
                 d_echo("    QOSDrops:    1.3.6.1.4.1.9.9.166.1.15.1.1.17.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$array['sp-id']][$array['sp-obj']]."\n");
+                d_echo("    PreBytes:   1.3.6.1.4.1.9.9.166.1.15.1.1.6.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.6'][$array['sp-id']][$array['sp-obj']]."\n");
+                d_echo("    PrePkts:   1.3.6.1.4.1.9.9.166.1.15.1.1.3.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.3'][$array['sp-id']][$array['sp-obj']]."\n");
+                d_echo("    DropPkts:   1.3.6.1.4.1.9.9.166.1.15.1.1.14.".$array['sp-id'].".".$array['sp-obj']." = ".$tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.14'][$array['sp-id']][$array['sp-obj']]."\n");
 
                 $fields = array(
                     'postbits' => $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.10'][$array['sp-id']][$array['sp-obj']],
                     'bufferdrops' => $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.21'][$array['sp-id']][$array['sp-obj']],
-                    'qosdrops' => $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$array['sp-id']][$array['sp-obj']]
+                    'qosdrops' => $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.17'][$array['sp-id']][$array['sp-obj']],
+                    'prebits' => $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.6'][$array['sp-id']][$array['sp-obj']],
+                    'prepkts' => $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.3'][$array['sp-id']][$array['sp-obj']],
+                    'droppkts' => $tblcbQosClassMapStats['1.3.6.1.4.1.9.9.166.1.15.1.1.14'][$array['sp-id']][$array['sp-obj']]
                 );
 
                 $tags = compact('rrd_name', 'rrd_def', 'ifIndex', 'spid', 'spobj');

@@ -45,7 +45,7 @@ if (is_numeric($FdbAddressCount)) {
     $tags = compact('rrd_def');
     data_update($device, 'fdb_count', $tags, $fields);
 
-    $graphs['fdb_count'] = true;
+    $os->enableGraph('fdb_count');
 
     echo 'FDB Count ';
 }

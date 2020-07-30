@@ -12,6 +12,7 @@
         <th data-column-id="hostname">@lang('Hostname')</th>
         <th data-column-id="last_polled">@lang('Last Polled')</th>
         <th data-column-id="poller_group">@lang('Poller Group')</th>
+        <th data-column-id="location">@lang('Location')</th>
         <th data-column-id="last_polled_timetaken" data-order="desc">@lang('Polling Duration') (@lang('Seconds'))</th>
     </tr>
     </thead>

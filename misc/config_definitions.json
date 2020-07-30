@@ -1272,7 +1272,7 @@
         },
         "dot": {
             "default": "/usr/bin/dot",
-            "type": "text"
+            "type": "executable"
         },
         "email_auto_tls": {
             "default": true,
@@ -1317,7 +1317,7 @@
             "group": "alerting",
             "section": "email",
             "order": 5,
-            "type": "text",
+            "type": "executable",
             "when": {
                 "setting": "email_backend",
                 "operator": "equals",
@@ -1542,12 +1542,12 @@
             "group": "external",
             "section": "binaries",
             "order": 0,
-            "type": "text"
+            "type": "executable"
         },
         "fping6": {
             "default": "fping6",
             "group": "external",
-            "section": "binaries",
+            "section": "executable",
             "order": 1,
             "type": "text"
         },
@@ -3326,7 +3326,7 @@
             }
         },
         "html_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "http_proxy": {
             "group": "system",
@@ -3484,7 +3484,7 @@
             "order": 8
         },
         "install_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "int_core": {
             "default": true,
@@ -3532,7 +3532,7 @@
             "group": "external",
             "section": "binaries",
             "order": 3,
-            "type": "text"
+            "type": "executable"
         },
         "irc_alert": {
             "default": false,
@@ -3644,7 +3644,7 @@
             "type": "color"
         },
         "log_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "log_file": {
             "type": "text"
@@ -3669,7 +3669,7 @@
             "type": "text"
         },
         "mib_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "mono_font": {
             "default": "DejaVuSansMono",
@@ -3680,7 +3680,7 @@
             "group": "external",
             "section": "binaries",
             "order": 4,
-            "type": "text"
+            "type": "executable"
         },
         "mydomain": {
             "type": "text",
@@ -3695,7 +3695,7 @@
         },
         "nagios_plugins": {
             "default": "/usr/lib/nagios/plugins",
-            "type": "text"
+            "type": "directory"
         },
         "network_map_items": {
             "default": [
@@ -3760,7 +3760,7 @@
             "group": "external",
             "section": "binaries",
             "order": 8,
-            "type": "text"
+            "type": "executable"
         },
         "nfsen_enable": {
             "default": false,
@@ -3886,7 +3886,7 @@
             "group": "external",
             "section": "binaries",
             "order": 5,
-            "type": "text"
+            "type": "executable"
         },
         "notifications.LibreNMS": {
             "default": "http://www.librenms.org/notifications.rss",
@@ -4079,10 +4079,10 @@
             "group": "external",
             "section": "binaries",
             "order": 6,
-            "type": "text"
+            "type": "executable"
         },
         "plugin_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "poller_modules.unix-agent": {
             "order": 420,
@@ -4540,7 +4540,7 @@
             "group": "poller",
             "section": "rrdtool",
             "order": 6,
-            "type": "text"
+            "type": "directory"
         },
         "rrd_purge": {
             "group": "system",
@@ -4587,7 +4587,7 @@
             "group": "external",
             "section": "binaries",
             "order": -1,
-            "type": "text"
+            "type": "executable"
         },
         "rrdtool_tune": {
             "default": false,
@@ -4771,7 +4771,7 @@
             "group": "external",
             "section": "binaries",
             "order": 7,
-            "type": "text"
+            "type": "executable"
         },
         "shorthost_target_length": {
             "group": "webui",
@@ -4970,28 +4970,28 @@
             "group": "external",
             "section": "binaries",
             "order": 8,
-            "type": "text"
+            "type": "executable"
         },
         "snmpget": {
             "default": "/usr/bin/snmpget",
             "group": "external",
             "section": "binaries",
             "order": 9,
-            "type": "text"
+            "type": "executable"
         },
         "snmpgetnext": {
             "default": "snmpgetnext",
             "group": "external",
             "section": "binaries",
             "order": 10,
-            "type": "text"
+            "type": "executable"
         },
         "snmptranslate": {
             "default": "/usr/bin/snmptranslate",
             "group": "external",
             "section": "binaries",
             "order": 11,
-            "type": "text"
+            "type": "executable"
         },
         "snmptraps.eventlog": {
             "default": "unhandled",
@@ -5006,7 +5006,7 @@
             "group": "external",
             "section": "binaries",
             "order": 12,
-            "type": "text"
+            "type": "executable"
         },
         "sso.create_users": {
             "default": true,
@@ -5052,7 +5052,7 @@
             "type": "integer"
         },
         "temp_dir": {
-            "type": "text"
+            "type": "directory"
         },
         "title_image": {
             "group": "webui",
@@ -5073,14 +5073,14 @@
             "group": "external",
             "section": "binaries",
             "order": 13,
-            "type": "text"
+            "type": "executable"
         },
         "traceroute6": {
             "default": "traceroute6",
             "group": "external",
             "section": "binaries",
             "order": 14,
-            "type": "text"
+            "type": "executable"
         },
         "transit_descr": {
             "default": ["transit"],
@@ -5158,7 +5158,7 @@
             "group": "external",
             "section": "binaries",
             "order": 15,
-            "type": "text"
+            "type": "executable"
         },
         "warn.ifdown": {
             "default": true,
@@ -5258,7 +5258,7 @@
             "group": "external",
             "section": "binaries",
             "order": 16,
-            "type": "text"
+            "type": "executable"
         },
         "xirrus_disable_stations": {
             "default": false,
@@ -5276,7 +5276,7 @@
             "group": "external",
             "section": "smokeping",
             "order": 1,
-            "type": "text"
+            "type": "directory"
         },
         "smokeping.url": {
             "group": "external",

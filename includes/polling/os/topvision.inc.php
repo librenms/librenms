@@ -25,7 +25,7 @@ if (is_numeric($cmtotal)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'topvision_cmtotal', $tags, $fields);
-    $graphs['topvision_cmtotal'] = true;
+    $os->enableGraph('topvision_cmtotal');
 }
 
 if (is_numeric($cmreg)) {
@@ -35,7 +35,7 @@ if (is_numeric($cmreg)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'topvision_cmreg', $tags, $fields);
-    $graphs['topvision_cmreg'] = true;
+    $os->enableGraph('topvision_cmreg');
 }
 
 if (is_numeric($cmoffline)) {
@@ -45,5 +45,5 @@ if (is_numeric($cmoffline)) {
     );
     $tags = compact('rrd_def');
     data_update($device, 'topvision_cmoffline', $tags, $fields);
-    $graphs['topvision_cmoffline'] = true;
+    $os->enableGraph('topvision_cmoffline');
 }

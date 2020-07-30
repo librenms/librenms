@@ -16,7 +16,7 @@ discovery:
         sysDescr_regex:
             - '/^EdgeSwitch/'
             - '/^EdgePoint/'
-            - '/^USW-/'
+            - '/^USW[ -]/'
             - '/^UBNT US/'
     -
         sysObjectID:

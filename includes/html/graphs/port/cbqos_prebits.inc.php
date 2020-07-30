@@ -1,9 +1,6 @@
 <?php
 /*
- * LibreNMS MIB-based polling
- *
- * Author: Paul Gear
- * Copyright (c) 2015 Gear Consulting Pty Ltd <github@libertysys.com.au>
+ * LibreNMS module to display Cisco Class-Based QoS Details
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
@@ -12,4 +9,7 @@
  * the source code distribution for details.
  */
 
-poll_mibs($device, $graphs);
+$cbqos_parameter_name = "prebits";
+$cbqos_operator = "*";
+$cbqos_operator_param = "8";
+include "includes/html/graphs/port/cbqos_generic.inc.php";

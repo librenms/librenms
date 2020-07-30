@@ -186,6 +186,7 @@
   }
   small {
     font-size: 80%;
+    color: #FFF;  
   }
   sub,
   sup {
@@ -7206,4 +7207,7 @@
   }
   .bootgrid-table th:active, .bootgrid-table th:hover {
     background: #525961;
+  }
+  .vis-legend-text {
+    color: black;
   }
