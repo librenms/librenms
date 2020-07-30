@@ -15,6 +15,7 @@ class AlterAuthalgoColumn extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             $table->string('authalgo', 10)->nullable()->change();
+            $table->string('cryptoalgo', 10)->nullable()->change();
         });
     }
     /**
@@ -26,6 +27,7 @@ class AlterAuthalgoColumn extends Migration
     {
         Schema::table('devices', function (Blueprint $table) {
             $table->string('authalgo', 10)->nullable()->change(); //Rolling back to enum fails.
+            $table->string('cryptoalgo', 10)->nullable()->change();
         });
     }
 }

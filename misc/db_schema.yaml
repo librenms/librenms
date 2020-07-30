@@ -480,7 +480,7 @@ devices:
     - { Field: authpass, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: authalgo, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: cryptopass, Type: varchar(64), 'Null': true, Extra: '' }
-    - { Field: cryptoalgo, Type: 'enum(''AES'',''DES'','''')', 'Null': true, Extra: '' }
+    - { Field: cryptoalgo, Type: varchar(10), 'Null': true, Extra: '' }
     - { Field: snmpver, Type: varchar(4), 'Null': false, Extra: '', Default: v2c }
     - { Field: port, Type: 'smallint unsigned', 'Null': false, Extra: '', Default: '161' }
     - { Field: transport, Type: varchar(16), 'Null': false, Extra: '', Default: udp }

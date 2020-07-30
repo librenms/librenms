@@ -260,8 +260,12 @@ foreach (get_port_assoc_modes() as $mode) {
             <label for="cryptoalgo" class="col-sm-3 control-label">Crypto Algorithm</label>
             <div class="col-sm-9">
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
-                <option value="AES" selected>AES</option>
-                <option value="DES">DES</option>
+                <option value="DES" selected>DES</option>
+                <option value="AES">AES</option>
+                <?php if (snmpv3_sha2_capable()) {?>
+                <option value="AES-192">AES-192</option>
+                <option value="AES-256">AES-256</option>
+                <?php } ?>
               </select>
             </div>
           </div>

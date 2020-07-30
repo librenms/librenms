@@ -360,14 +360,14 @@ echo "        </select>
     <option value='MD5'>MD5</option>
     <option value='SHA' ".($device['authalgo'] === 'SHA' ? 'selected' : '').">SHA</option>
     ";
-    if (snmpv3_sha2_capable()) {
+if (snmpv3_sha2_capable()) {
     echo "
     <option value='SHA-224' ".($device['authalgo'] === 'SHA-224' ? 'selected' : '').">SHA-224</option>
     <option value='SHA-256' ".($device['authalgo'] === 'SHA-256' ? 'selected' : '').">SHA-256</option>
     <option value='SHA-384' ".($device['authalgo'] === 'SHA-384' ? 'selected' : '').">SHA-384</option>
     <option value='SHA-512' ".($device['authalgo'] === 'SHA-512' ? 'selected' : '').">SHA-512</option>
     ";
-    }
+}
     echo "
     </select>
     </div>
@@ -382,8 +382,16 @@ echo "        </select>
     <label for='cryptoalgo' class='col-sm-2 control-label'>Crypto Algorithm</label>
     <div class='col-sm-4'>
     <select id='cryptoalgo' name='cryptoalgo' class='form-control'>
-    <option value='AES'>AES</option>
-    <option value='DES' ".($device['cryptoalgo'] === 'DES' ? 'selected' : '').">DES</option>
+    <option value='DES'>AES</option>
+    <option value='AES' ".($device['cryptoalgo'] === 'AES' ? 'selected' : '').">AES</option>
+    ";
+if (snmpv3_sha2_capable()) {
+    echo "
+    <option value='AES-192' ".($device['cryptoalgo'] === 'AES-192' ? 'selected' : '').">AES-192</option>
+    <option value='DES-256' ".($device['cryptoalgo'] === 'AES-256' ? 'selected' : '').">AES-256</option>
+    ";
+}
+    echo "
     </select>
     </div>
     </div>
