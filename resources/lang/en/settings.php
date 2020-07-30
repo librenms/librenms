@@ -878,6 +878,9 @@ return [
         'nmap' => [
             'description' => 'Path to nmap'
         ],
+        'openssl' => [
+            'description' => 'Path to openssl'
+        ],
         'opentsdb' => [
             'enable' => [
                 'description' => 'Enable',

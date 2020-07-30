@@ -161,6 +161,7 @@ Python    | ${versions['python_ver']}
 MySQL     | ${versions['mysql_ver']}
 RRDTool   | ${versions['rrdtool_ver']}
 SNMP      | ${versions['netsnmp_ver']}
+OpenSSL   | ${versions['openssl_ver']}
 ====================================
 
 $output

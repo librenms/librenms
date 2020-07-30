@@ -821,6 +821,9 @@ function version_info($remote = false)
     $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
         Config::get('snmpget', 'snmpget') . ' -V 2>&1'
     )));
+    $output['openssl_ver'] = explode(' ', rtrim(shell_exec(
+        Config::get('openssl', 'openssl') . ' version 2>&1'
+    )))[1];
 
     return $output;
 }//end version_info()
