@@ -6,37 +6,37 @@ A big thank you to the following 28 contributors this last month:
   - [murrant](https://github.com/murrant) (17)
   - [Jellyfrog](https://github.com/Jellyfrog) (8)
   - [SourceDoctor](https://github.com/SourceDoctor) (5)
+  - [TheGreatDoc](https://github.com/TheGreatDoc) (4)
   - [peelman](https://github.com/peelman) (4)
-  - [TheGreatDoc](https://github.com/TheGreatDoc) (3)
   - [cppmonkey](https://github.com/cppmonkey) (2)
   - [TheMysteriousX](https://github.com/TheMysteriousX) (2)
   - [arrmo](https://github.com/arrmo) (2)
   - [seros1521](https://github.com/seros1521) (2)
   - [hanserasmus](https://github.com/hanserasmus) (2)
-  - [javichumellamo](https://github.com/javichumellamo) (1)
+  - [NotARobotDude](https://github.com/NotARobotDude) (1)
+  - [allwaysoft](https://github.com/allwaysoft) (1)
   - [Oirbsiu](https://github.com/Oirbsiu) (1)
   - [penfold1972](https://github.com/penfold1972) (1)
   - [cwispy](https://github.com/cwispy) (1)
   - [hrtrd](https://github.com/hrtrd) (1)
   - [louis-oui](https://github.com/louis-oui) (1)
   - [ppasserini](https://github.com/ppasserini) (1)
-  - [allwaysoft](https://github.com/allwaysoft) (1)
+  - [kleinem86](https://github.com/kleinem86) (1)
+  - [javichumellamo](https://github.com/javichumellamo) (1)
   - [CirnoT](https://github.com/CirnoT) (1)
-  - [dependabot](https://github.com/apps/dependabot) (1)
   - [awein](https://github.com/awein) (1)
   - [Wooboy](https://github.com/Wooboy) (1)
   - [AnaelMobilia](https://github.com/AnaelMobilia) (1)
-  - [kleinem86](https://github.com/kleinem86) (1)
   - [twelch24](https://github.com/twelch24) (1)
   - [hp197](https://github.com/hp197) (1)
-  - [NotARobotDude](https://github.com/NotARobotDude) (1)
+  - [dependabot](https://github.com/apps/dependabot) (1)
   - [craig-nokia](https://github.com/craig-nokia) (1)
 
 Thanks to maintainers and others that helped with pull requests this month:
 
-  - [murrant](https://github.com/murrant) (39)
-  - [Jellyfrog](https://github.com/Jellyfrog) (29)
-  - [SourceDoctor](https://github.com/SourceDoctor) (12)
+  - [Jellyfrog](https://github.com/Jellyfrog) (28)
+  - [murrant](https://github.com/murrant) (26)
+  - [SourceDoctor](https://github.com/SourceDoctor) (11)
   - [githonk](https://github.com/githonk) (1)
   - [kkrumm1](https://github.com/kkrumm1) (1)
   - [laf](https://github.com/laf) (1)
@@ -110,6 +110,7 @@ Thanks to maintainers and others that helped with pull requests this month:
 * Added check for incorrect ifConnectorPresent truth values, if invalid… ([#11634](https://github.com/librenms/librenms/pull/11634)) - [craig-nokia](https://github.com/craig-nokia)
 
 #### Bug
+* Fix latency.blade.php to show smokeping integration ([#11980](https://github.com/librenms/librenms/pull/11980)) - [TheGreatDoc](https://github.com/TheGreatDoc)
 * Dispatch Service Fix maintenance issues ([#11973](https://github.com/librenms/librenms/pull/11973)) - [murrant](https://github.com/murrant)
 * Fix .env path in daily.sh ([#11972](https://github.com/librenms/librenms/pull/11972)) - [murrant](https://github.com/murrant)
 * Fix QNAP os polling ([#11938](https://github.com/librenms/librenms/pull/11938)) - [TheGreatDoc](https://github.com/TheGreatDoc)
@@ -169,7 +170,7 @@ A big thank you to the following 42 contributors this last month:
   - [arrmo](https://github.com/arrmo) (1)
   - [moisseev](https://github.com/moisseev) (1)
   - [XxPatrickxX](https://github.com/XxPatrickxX) (1)
-  - [scouball](https://github.com/scouball) (1)
+  - [kuhball](https://github.com/kuhball) (1)
   - [rkandilarov](https://github.com/rkandilarov) (1)
   - [hanserasmus](https://github.com/hanserasmus) (1)
   - [systeembeheer-rtvu](https://github.com/systeembeheer-rtvu) (1)
@@ -184,10 +185,10 @@ A big thank you to the following 42 contributors this last month:
 
 Thanks to maintainers and others that helped with pull requests this month:
 
-  - [murrant](https://github.com/murrant) (89)
-  - [SourceDoctor](https://github.com/SourceDoctor) (42)
-  - [Jellyfrog](https://github.com/Jellyfrog) (21)
-  - [PipoCanaja](https://github.com/PipoCanaja) (12)
+  - [murrant](https://github.com/murrant) (48)
+  - [SourceDoctor](https://github.com/SourceDoctor) (27)
+  - [Jellyfrog](https://github.com/Jellyfrog) (20)
+  - [PipoCanaja](https://github.com/PipoCanaja) (11)
   - [TheGreatDoc](https://github.com/TheGreatDoc) (6)
   - [kkrumm1](https://github.com/kkrumm1) (6)
   - [f0o](https://github.com/f0o) (3)
@@ -250,7 +251,7 @@ Thanks to maintainers and others that helped with pull requests this month:
 * Fix poller settings display ([#11801](https://github.com/librenms/librenms/pull/11801)) - [murrant](https://github.com/murrant)
 * Fix smokeping slave not found causing error ([#11799](https://github.com/librenms/librenms/pull/11799)) - [murrant](https://github.com/murrant)
 * Add device groups in overview tab ([#11796](https://github.com/librenms/librenms/pull/11796)) - [Negatifff](https://github.com/Negatifff)
-* Fixed typo in function htmlspecialchars within snmp edit ([#11794](https://github.com/librenms/librenms/pull/11794)) - [scouball](https://github.com/scouball)
+* Fixed typo in function htmlspecialchars within snmp edit ([#11794](https://github.com/librenms/librenms/pull/11794)) - [kuhball](https://github.com/kuhball)
 * Fix 2 latency tab bugs ([#11787](https://github.com/librenms/librenms/pull/11787)) - [murrant](https://github.com/murrant)
 * Alert Template - sort Alert Rules alphabetic ([#11786](https://github.com/librenms/librenms/pull/11786)) - [SourceDoctor](https://github.com/SourceDoctor)
 * Lighter RRD graph colors ([#11759](https://github.com/librenms/librenms/pull/11759)) - [willhseitz](https://github.com/willhseitz)
@@ -404,11 +405,11 @@ A big thank you to the following 56 contributors this last month:
   - [loopodoopo](https://github.com/loopodoopo) (1)
   - [deajan](https://github.com/deajan) (1)
 
-Thanks to maintainers that helped with pull requests this month:
+Thanks to maintainers and others that helped with pull requests this month:
 
-  - [murrant](https://github.com/murrant) (137)
-  - [SourceDoctor](https://github.com/SourceDoctor) (37)
-  - [Jellyfrog](https://github.com/Jellyfrog) (21)
+  - [murrant](https://github.com/murrant) (84)
+  - [SourceDoctor](https://github.com/SourceDoctor) (32)
+  - [Jellyfrog](https://github.com/Jellyfrog) (20)
   - [PipoCanaja](https://github.com/PipoCanaja) (14)
   - [TheGreatDoc](https://github.com/TheGreatDoc) (10)
   - [kkrumm1](https://github.com/kkrumm1) (2)
@@ -653,12 +654,12 @@ A big thank you to the following 41 contributors this last month:
   - [Cormoran96](https://github.com/Cormoran96) (1)
   - [TvL2386](https://github.com/TvL2386) (1)
 
-Thanks to maintainers that helped with pull requests this month:
+Thanks to maintainers and others that helped with pull requests this month:
 
-  - [murrant](https://github.com/murrant) (66)
-  - [Jellyfrog](https://github.com/Jellyfrog) (34)
-  - [SourceDoctor](https://github.com/SourceDoctor) (27)
-  - [PipoCanaja](https://github.com/PipoCanaja) (21)
+  - [murrant](https://github.com/murrant) (44)
+  - [Jellyfrog](https://github.com/Jellyfrog) (31)
+  - [SourceDoctor](https://github.com/SourceDoctor) (23)
+  - [PipoCanaja](https://github.com/PipoCanaja) (19)
   - [TheGreatDoc](https://github.com/TheGreatDoc) (5)
   - [laf](https://github.com/laf) (3)
   - [kkrumm1](https://github.com/kkrumm1) (1)
@@ -780,12 +781,14 @@ Thanks to maintainers that helped with pull requests this month:
 * Update Images.md ([#11418](https://github.com/librenms/librenms/pull/11418)) - [TheGreatDoc](https://github.com/TheGreatDoc)
 * Fix RRDTune.md ([#11369](https://github.com/librenms/librenms/pull/11369)) - [jozefrebjak](https://github.com/jozefrebjak)
 
+#### Tests
+* Addhost tests ([#11385](https://github.com/librenms/librenms/pull/11385)) - [nimrof](https://github.com/nimrof)
+
 #### Misc
 * Set PHP 7.2.5 as minimum supported version ([#11470](https://github.com/librenms/librenms/pull/11470)) - [Jellyfrog](https://github.com/Jellyfrog)
 * Show full path to ini file for timezone validation failures ([#11444](https://github.com/librenms/librenms/pull/11444)) - [murrant](https://github.com/murrant)
 * Global setting better naming ([#11412](https://github.com/librenms/librenms/pull/11412)) - [SourceDoctor](https://github.com/SourceDoctor)
 * Updated MIB from Palo Alto ([#11402](https://github.com/librenms/librenms/pull/11402)) - [dneto82](https://github.com/dneto82)
-* Addhost tests ([#11385](https://github.com/librenms/librenms/pull/11385)) - [nimrof](https://github.com/nimrof)
 * Update PHP dependencies ([#11377](https://github.com/librenms/librenms/pull/11377)) - [murrant](https://github.com/murrant)
 
 
@@ -802,7 +805,7 @@ A big thank you to the following 34 contributors this last month:
   - [mpikzink](https://github.com/mpikzink) (3)
   - [cjwbath](https://github.com/cjwbath) (3)
   - [kedare](https://github.com/kedare) (3)
-  - [Brickbr1](https://github.com/Brickbr1) (2)
+  - [ghost](https://github.com/ghost) (2)
   - [dlangille](https://github.com/dlangille) (2)
   - [Munzy](https://github.com/Munzy) (2)
   - [jozefrebjak](https://github.com/jozefrebjak) (2)
@@ -829,12 +832,17 @@ A big thank you to the following 34 contributors this last month:
   - [chrisocalypse](https://github.com/chrisocalypse) (1)
   - [crcro](https://github.com/crcro) (1)
 
-Thanks to maintainers that helped merge pull requests this month:
+Thanks to maintainers and others that helped with pull requests this month:
 
-  - [SourceDoctor](https://github.com/SourceDoctor) (35)
-  - [murrant](https://github.com/murrant) (29)
-  - [PipoCanaja](https://github.com/PipoCanaja) (20)
-  - [kkrumm1](https://github.com/kkrumm1) (2)
+  - [SourceDoctor](https://github.com/SourceDoctor) (26)
+  - [PipoCanaja](https://github.com/PipoCanaja) (24)
+  - [murrant](https://github.com/murrant) (22)
+  - [kkrumm1](https://github.com/kkrumm1) (8)
+  - [Jellyfrog](https://github.com/Jellyfrog) (6)
+  - [vdchuyen](https://github.com/vdchuyen) (1)
+  - [sp1rr3](https://github.com/sp1rr3) (1)
+  - [TheGreatDoc](https://github.com/TheGreatDoc) (1)
+  - [laf](https://github.com/laf) (1)
 
 #### Feature
 * Geographical map: Show network links between locations ([#11269](https://github.com/librenms/librenms/pull/11269)) - [kedare](https://github.com/kedare)
@@ -854,7 +862,7 @@ Thanks to maintainers that helped merge pull requests this month:
 * Add support for Cisco SX350X-24 ([#11272](https://github.com/librenms/librenms/pull/11272)) - [Chewza](https://github.com/Chewza)
 * Add device support for SilverPeak ([#11270](https://github.com/librenms/librenms/pull/11270)) - [shepherdjay](https://github.com/shepherdjay)
 * Update OPNsense definition due to incorrect OID on second detection method ([#11265](https://github.com/librenms/librenms/pull/11265)) - [FingerlessGlov3s](https://github.com/FingerlessGlov3s)
-* Added additional Cisco FirePOWER device ID's for 2100 series ([#11260](https://github.com/librenms/librenms/pull/11260)) - [Brickbr1](https://github.com/Brickbr1)
+* Added additional Cisco FirePOWER device ID's for 2100 series ([#11260](https://github.com/librenms/librenms/pull/11260)) - [ghost](https://github.com/ghost)
 * Fix "inteno" and "quanta" OS collision ([#11238](https://github.com/librenms/librenms/pull/11238)) - [PipoCanaja](https://github.com/PipoCanaja)
 * Collect average server CPU usage on Huawei RH servers (IBMC) ([#11236](https://github.com/librenms/librenms/pull/11236)) - [PipoCanaja](https://github.com/PipoCanaja)
 * Added support for Inteno devices ([#11229](https://github.com/librenms/librenms/pull/11229)) - [PipoCanaja](https://github.com/PipoCanaja)
@@ -1122,14 +1130,16 @@ A big thank you to the following 21 contributors this last month:
   - [Atroskelis](https://github.com/Atroskelis) (1)
   - [jasoncheng7115](https://github.com/jasoncheng7115) (1)
 
-Thanks to maintainers that helped merge pull requests this month:
+Thanks to maintainers and others that helped with pull requests this month:
 
-  - [SourceDoctor](https://github.com/SourceDoctor) (29)
-  - [murrant](https://github.com/murrant) (18)
-  - [PipoCanaja](https://github.com/PipoCanaja) (16)
-  - [kkrumm1](https://github.com/kkrumm1) (10)
-  - [Jellyfrog](https://github.com/Jellyfrog) (10)
-  - [laf](https://github.com/laf) (5)
+  - [kkrumm1](https://github.com/kkrumm1) (24)
+  - [SourceDoctor](https://github.com/SourceDoctor) (21)
+  - [PipoCanaja](https://github.com/PipoCanaja) (20)
+  - [Jellyfrog](https://github.com/Jellyfrog) (17)
+  - [murrant](https://github.com/murrant) (14)
+  - [laf](https://github.com/laf) (7)
+  - [louis-oui](https://github.com/louis-oui) (1)
+  - [arrmo](https://github.com/arrmo) (1)
 
 #### Feature
 * Option to default open Location Map on Device View ([#11167](https://github.com/librenms/librenms/pull/11167)) - [SourceDoctor](https://github.com/SourceDoctor)
@@ -1228,31 +1238,32 @@ Thanks to maintainers that helped merge pull requests this month:
 ## 1.60
 *(2020-02-04)*
 
-A big thank you to the following 32 contributors this last month:
+A big thank you to the following 33 contributors this last month:
 
   - [SourceDoctor](https://github.com/SourceDoctor) (19)
   - [louis-oui](https://github.com/louis-oui) (12)
   - [josephtingiris](https://github.com/josephtingiris) (11)
   - [martijn-schmidt](https://github.com/martijn-schmidt) (3)
-  - [h-barnhart](https://github.com/h-barnhart) (2)
+  - [vitalisator](https://github.com/vitalisator) (2)
   - [murrant](https://github.com/murrant) (2)
+  - [h-barnhart](https://github.com/h-barnhart) (2)
   - [joshuabaird](https://github.com/joshuabaird) (2)
   - [LEV82](https://github.com/LEV82) (2)
   - [cjwbath](https://github.com/cjwbath) (2)
-  - [vitalisator](https://github.com/vitalisator) (2)
   - [arrmo](https://github.com/arrmo) (2)
   - [nistorj](https://github.com/nistorj) (1)
+  - [kkrumm1](https://github.com/kkrumm1) (1)
   - [AnaelMobilia](https://github.com/AnaelMobilia) (1)
   - [clmcavaney](https://github.com/clmcavaney) (1)
   - [arjitc](https://github.com/arjitc) (1)
   - [dagbdagb](https://github.com/dagbdagb) (1)
   - [Jellyfrog](https://github.com/Jellyfrog) (1)
   - [klui2k1](https://github.com/klui2k1) (1)
-  - [kkrumm1](https://github.com/kkrumm1) (1)
-  - [zombah](https://github.com/zombah) (1)
   - [ccperilla](https://github.com/ccperilla) (1)
+  - [laf](https://github.com/laf) (1)
   - [craig-nokia](https://github.com/craig-nokia) (1)
   - [JohnSPeach](https://github.com/JohnSPeach) (1)
+  - [zombah](https://github.com/zombah) (1)
   - [opalivan](https://github.com/opalivan) (1)
   - [mpikzink](https://github.com/mpikzink) (1)
   - [TheGreatDoc](https://github.com/TheGreatDoc) (1)
@@ -1263,12 +1274,13 @@ A big thank you to the following 32 contributors this last month:
   - [ajsiersema](https://github.com/ajsiersema) (1)
   - [PipoCanaja](https://github.com/PipoCanaja) (1)
 
-Thanks to maintainers that helped merge pull requests this month:
+Thanks to maintainers and others that helped with pull requests this month:
 
-  - [kkrumm1](https://github.com/kkrumm1) (43)
-  - [PipoCanaja](https://github.com/PipoCanaja) (21)
-  - [Jellyfrog](https://github.com/Jellyfrog) (13)
+  - [kkrumm1](https://github.com/kkrumm1) (45)
+  - [PipoCanaja](https://github.com/PipoCanaja) (32)
+  - [Jellyfrog](https://github.com/Jellyfrog) (18)
   - [laf](https://github.com/laf) (3)
+  - [murrant](https://github.com/murrant) (3)
 
 #### Feature
 * Maintenance Mode for a complete Location ([#11089](https://github.com/librenms/librenms/pull/11089)) - [SourceDoctor](https://github.com/SourceDoctor)
