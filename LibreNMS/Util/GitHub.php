@@ -234,6 +234,11 @@ GRAPHQL;
                 }
             }
 
+            // If the Gihub profile doesnt exist anymore, the author is null
+            if(empty($pr['author']))  {
+                $pr['author'] = ['login' => 'ghost', 'url' => 'https://github.com/ghost'];
+            }
+
             // only add the changelog if it isn't set to ignore
             if (!in_array('ignore changelog', $pr['labels'])) {
                 $title = addcslashes(ucfirst(trim(preg_replace('/^[\S]+: /', '', $pr['title']))), '<>');
