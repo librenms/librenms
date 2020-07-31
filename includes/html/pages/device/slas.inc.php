@@ -31,9 +31,7 @@ if ($vars['id']) {
     }
 
     echo '</div>';
-
 } else {
-
     print_optionbar_start();
 
     $slas = dbFetchRows('SELECT * FROM `slas` WHERE `device_id` = ? AND `deleted` = 0 ORDER BY `sla_nr`', array($device['device_id']));
