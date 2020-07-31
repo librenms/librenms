@@ -235,7 +235,7 @@ GRAPHQL;
             }
 
             // If the Gihub profile doesnt exist anymore, the author is null
-            if(empty($pr['author']))  {
+            if (empty($pr['author'])) {
                 $pr['author'] = ['login' => 'ghost', 'url' => 'https://github.com/ghost'];
             }
 
@@ -247,7 +247,7 @@ GRAPHQL;
 
             $this->recordUserInfo($pr['author']);
             // Let's not count self-merges
-            if($pr['author']['login'] != $pr['mergedBy']['login']) {
+            if ($pr['author']['login'] != $pr['mergedBy']['login']) {
                 $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
             }
 
