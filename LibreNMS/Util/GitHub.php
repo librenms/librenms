@@ -246,7 +246,10 @@ GRAPHQL;
             }
 
             $this->recordUserInfo($pr['author']);
-            $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
+            // Let's not count self-merges
+            if($pr['author']['login'] != $pr['mergedBy']['login']) {
+                $this->recordUserInfo($pr['mergedBy'], 'changelog_mergers');
+            }
 
             $ignore = [$pr['author']['login'], $pr['mergedBy']['login']];
             foreach (array_unique($pr['reviews']['nodes'], SORT_REGULAR) as $reviewer) {
