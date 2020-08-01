@@ -69,10 +69,10 @@ modules:
                     state_name: hdStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'Ready' }
-                        - { value: -5, generic: 3, graph: -5, descr: 'No Disk' }
-                        - { value: -6, generic: 2, graph: -6, descr: 'Invalid' }
-                        - { value: -9, generic: 2, graph: -9, descr: 'RW Error' }
-                        - { value: -4, generic: 3, graph: -4, descr: 'Unknown' }
+                        - { value: -5, generic: 3, graph: 0, descr: 'No Disk' }
+                        - { value: -6, generic: 2, graph: 0, descr: 'Invalid' }
+                        - { value: -9, generic: 2, graph: 0, descr: 'RW Error' }
+                        - { value: -4, generic: 3, graph: 0, descr: 'Unknown' }
                 -
                     oid: diskTable
                     value: diskSmartInfo
@@ -82,10 +82,10 @@ modules:
                     group: 'Disk S.M.A.R.T. enclosure {{ $diskEnclosureID }}'
                     state_name: diskSmartInfo
                     states:
-                        - { value: 2, generic: 2, graph: 2, descr: 'Abnormal' }
-                        - { value: 1, generic: 1, graph: 1, descr: 'Warning' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Abnormal' }
+                        - { value: 1, generic: 1, graph: 0, descr: 'Warning' }
                         - { value: 0, generic: 0, graph: 0, descr: 'Good' }
-                        - { value: -1, generic: 2, graph: -1, descr: 'Error' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Error' }
                 -
                     oid: systemFan2Table
                     value: systemFanStatus
@@ -96,7 +96,7 @@ modules:
                     state_name: systemFanStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value: -1, generic: 2, graph: -1, descr: 'Fail' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Fail' }
                 -
                     oid: systemPowerTable
                     value: systemPowerStatus
@@ -107,7 +107,7 @@ modules:
                     state_name: systemPowerStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
-                        - { value: -1, generic: 2, graph: -1, descr: 'Fail' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Fail' }
                 -
                     oid: raidGroupTable
                     value: raidStatus
@@ -118,8 +118,8 @@ modules:
                     state_name: raidStatus
                     states:
                         - { value: 0, generic: 0, graph: 0, descr: 'Ready' }
-                        - { value: 3, generic: 2, graph: 3, descr: 'Synchronizing' }
-                        - { value: 2, generic: 2, graph: 2, descr: 'Rebulding' }
-                        - { value: 1, generic: 1, graph: 1, descr: 'Degraded' }
-                        - { value: 5, generic: 3, graph: 5, descr: 'Offline' }
-                        - { value: 4, generic: 1, graph: 4, descr: 'Failure' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'Synchronizing' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Rebulding' }
+                        - { value: 1, generic: 1, graph: 0, descr: 'Degraded' }
+                        - { value: 5, generic: 3, graph: 0, descr: 'Offline' }
+                        - { value: 4, generic: 1, graph: 0, descr: 'Failure' }
