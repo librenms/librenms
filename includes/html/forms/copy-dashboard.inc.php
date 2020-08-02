@@ -51,7 +51,7 @@ if ((! empty($dashboard)) && (! empty($target_user_id))) {
 
 if ($dash_id) {
     $widgets = dbFetchRows("SELECT * FROM `users_widgets` WHERE `dashboard_id` = ? AND user_id = ?", array($dashboard_id, Auth::id()));
-    foreach($widgets as $widget) {
+    foreach ($widgets as $widget) {
         $data = ['user_id' => $target_user_id,
                  'widget_id' => $widget['widget_id'],
                  'col' => $widget['col'],
