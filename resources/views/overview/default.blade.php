@@ -48,6 +48,19 @@
             <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Remove Dashboard"><i class="fa fa-trash fa-fw"></i></button>
             <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="New Dashboard"><i class="fa fa-plus fa-fw"></i></button>
         </div>
+        @if ($user_list->count())
+        <div class="btn-group btn-lg" style="position:absolute;right:0px;">
+            <div class="btn-group">
+            <select class="form-control" id=dashboard_copy_target name=dashboard_copy_target>
+                <option value="0"> Copy Dashboard to </option>
+            @foreach ($user_list as $user)
+                <option value="{{ $user->user_id }}"> {{ $user->username }} </option>
+            @endforeach
+            </select>
+            </div>
+            <button class="btn btn-primary" href="#copy_dash" onclick="dashboard_copy(this)" data-toggle="tooltip" data-container="body" data-placement="top" title="Copy Dashboard"><i class="fa fa-copy fa-fw"></i></button>
+        </div>
+        @endif
         <div class="dash-collapse" id="add_dash" style="display: none;" >
             <div class="row" style="margin-top:5px;">
                 <div class="col-md-6">
@@ -461,6 +474,33 @@
                     setTimeout(function (){
                         window.location.href = "{{ url('/?dashboard=') }}" + data.dashboard_id;
                     }, 500);
+                }
+                else {
+                    toastr.error(data.message);
+                }
+            },
+            error: function(data) {
+                toastr.error(data.message);
+            }
+        });
+    }
+
+    function dashboard_copy(data) {
+        if (! confirm('Do you really want to copy your Dashboard to selected User?')) {
+            return;
+        }
+
+        var user_id = document.getElementById("dashboard_copy_target").value;
+        var dashboard_id = {{ $dashboard->dashboard_id }};
+
+        $.ajax({
+            type: 'POST',
+            url: 'ajax_form.php',
+            data: {type: 'copy-dashboard', user_id: user_id, dashboard_id: dashboard_id},
+            dataType: "json",
+            success: function (data) {
+                if( data.status == "ok" ) {
+                    toastr.success(data.message);
                 }
                 else {
                     toastr.error(data.message);
