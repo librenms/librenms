@@ -71,7 +71,13 @@ if (!empty($entity_oids)) {
             if ($descr) {
                 $descr = rewrite_entity_descr($descr);
             } else {
-                $descr = $entity_array[$index]['entPhysicalDescr'];
+                if ($device['os'] === 'arista_eos') {
+                    $descr = $entity_array[$index]['entPhysicalDescr'];
+                    if (preg_match("/(Input|Output) (voltage|current) sensor/i", $descr) || Str::startsWith($descr, 'Power supply')) {
+                        $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . " " . ucwords($entity_array[$index]['entPhysicalDescr']);
+
+                    }
+                }
                 $descr = rewrite_entity_descr($descr);
             }
             $valid_sensor = check_entity_sensor($descr, $device);
@@ -183,8 +189,34 @@ if (!empty($entity_oids)) {
                             $high_limit = $entry['aristaEntSensorThresholdHighCritical'] / $divisor;
                         }
                     }
+                    // Grouping sensors
+                    $group = null;
+                    if (preg_match("/DOM /i", $descr)) {
+                            $group = "SFPs";
+                    }
+                    if (preg_match("/Cpu/i", $descr)) {
+                        $group = preg_match("/CpucardPwrCon/i", $descr) ? 'CPU Card': 'CPU';
+                        $descr = Str::replaceFirst('CpucardPwrCon', '', $descr);
+                    }
+                    if (preg_match("/Switchcard/i", $descr)) {
+                        $descr = Str::replaceFirst('SwitchcardPwrCon', '', $descr);
+                        $group = "Switch Card";
+                    }
+                    // I only know replies for Trident platform. If you have another please add to the preg_match
+                    if (preg_match("/Trident /i", $descr)) {
+                        $group = "Platform";
+                    }
+                    if (preg_match("/^(Power|PSU)/i", $descr)) {
+                        $group = "PSUs";
+                    }
+                    if (preg_match("/(Board|Front|Rear)/i", $descr)) {
+                        $group = "System";
+                        $descr = Str::replaceLast('temp sensor', '', $descr);
+                    }
+                    // End grouping sensors
+
                 }
-                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity']);
+                discover_sensor($valid['sensor'], $type, $device, $oid, $index, 'entity-sensor', $descr, $divisor, $multiplier, $low_limit, $low_warn_limit, $warn_limit, $high_limit, $current, 'snmp', $entPhysicalIndex, $entry['entSensorMeasuredEntity'], null, $group);
             }
         }//end if
     }//end foreach
