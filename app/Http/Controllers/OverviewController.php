@@ -108,7 +108,10 @@ class OverviewController extends Controller
         $user_list = User::select(['username', 'user_id'])
             ->where('user_id', '!=', $user->user_id)
             ->orderBy('username')
-            ->get();
+            ->get()
+            ->filter(function ($users) use ($user) {
+                return $user->isAdmin();
+            });
 
         return view('overview.default', compact('bare', 'dash_config', 'dashboard', 'hide_dashboard_editor', 'user_dashboards', 'shared_dashboards', 'widgets', 'user_list'));
     }
