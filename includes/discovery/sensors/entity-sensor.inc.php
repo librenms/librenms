@@ -75,8 +75,9 @@ if (!empty($entity_oids)) {
                     $descr = $entity_array[$index]['entPhysicalDescr'];
                     if (preg_match("/(Input|Output) (voltage|current) sensor/i", $descr) || Str::startsWith($descr, 'Power supply')) {
                         $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . " " . preg_replace('/(Voltage|Current|Power Supply) Sensor$/i', '', ucwords($entity_array[$index]['entPhysicalDescr']));
-                        d_echo($descr . "\n");
-
+                    }
+                    if (preg_match('/temp sensor$/', $descr)) {
+                        $descr = preg_replace('/temp sensor$/', '', $descr);
                     }
                 }
                 $descr = rewrite_entity_descr($descr);
@@ -196,7 +197,7 @@ if (!empty($entity_oids)) {
                             $group = "SFPs";
                     }
                     if (preg_match("/Cpu/i", $descr)) {
-                        $group = preg_match("/CpucardPwrCon/i", $descr) ? 'CPU Card': 'CPU';
+                        $group = preg_match("/CpucardPwrCon/i", $descr) ? 'CPU Card': 'System';
                         $descr = Str::replaceFirst('CpucardPwrCon', '', $descr);
                     }
                     if (preg_match("/Switchcard/i", $descr)) {
