@@ -74,7 +74,8 @@ if (!empty($entity_oids)) {
                 if ($device['os'] === 'arista_eos') {
                     $descr = $entity_array[$index]['entPhysicalDescr'];
                     if (preg_match("/(Input|Output) (voltage|current) sensor/i", $descr) || Str::startsWith($descr, 'Power supply')) {
-                        $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . " " . ucwords($entity_array[$index]['entPhysicalDescr']);
+                        $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . " " . preg_replace('/(Voltage|Current|Power Supply) Sensor$/i', '', ucwords($entity_array[$index]['entPhysicalDescr']));
+                        d_echo($descr . "\n");
 
                     }
                 }
