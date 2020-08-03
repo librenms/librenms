@@ -48,7 +48,7 @@
             <button class="btn btn-danger" href="#del_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="Remove Dashboard"><i class="fa fa-trash fa-fw"></i></button>
             <button class="btn btn-success" href="#add_dash" onclick="dashboard_collapse($(this).attr('href'))" data-toggle="tooltip" data-container="body" data-placement="top" title="New Dashboard"><i class="fa fa-plus fa-fw"></i></button>
         </div>
-        @if ($user_list->count())
+        @if (count($user_list))
         <div class="btn-group btn-lg" style="position:absolute;right:0px;">
             <div class="btn-group">
             <select class="form-control" id=dashboard_copy_target name=dashboard_copy_target>
