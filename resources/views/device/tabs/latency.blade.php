@@ -4,7 +4,12 @@
     @if($data['smokeping']->hasGraphs())
         <x-panel class="with-nav-tabs">
             <x-slot name="heading">
-                <a href="{{ \LibreNMS\Config::get('smokeping.url') }}?target={{ $device->type }}.{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">@lang('Smokeping') <i class="glyphicon glyphicon-share-alt"></i></span></a>
+                @if(\LibreNMS\Config::get('smokeping.url'))
+                    <a href="{{ \LibreNMS\Config::get('smokeping.url') }}?target={{ $device->type }}.{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">@lang('Smokeping') <i class="glyphicon glyphicon-share-alt"></i></span></a>
+                @else
+                    <span class="panel-title">@lang('Smokeping')</span>
+                @endif
+
                 <ul class="nav nav-tabs" style="display: inline-block">
                     @foreach($data['smokeping_tabs'] as $tab)
                         <li @if($loop->first) class="active" @endif><a href="#{{ $tab }}" data-toggle="tab">@lang('smokeping.' . $tab)</a></li>
