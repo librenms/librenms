@@ -365,9 +365,9 @@ echo "        </select>
     <option value='SHA-512' ".($device['authalgo'] === 'SHA-512' ? 'selected' : '').(snmpv3_sha2_capable()?:" disabled").">SHA-512</option>
     </select>
     ";
-    if (!snmpv3_sha2_capable()) {
+if (!snmpv3_sha2_capable()) {
         echo "<label class=\"text-left\"><small>Optional requirements not resolved so some options are disabled</small></label>";
-    }
+}
     echo "
     </div>
     </div>
@@ -387,9 +387,9 @@ echo "        </select>
     <option value='DES'>DES</option>
     </select>
     ";
-    if (!snmpv3_sha2_capable()) {
+if (!snmpv3_sha2_capable()) {
         echo "<label class=\"text-left\"><small>Optional requirements not resolved so some options are disabled</small></label>";
-    }
+}
     echo "
     </div>
     </div>
