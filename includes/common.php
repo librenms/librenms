@@ -842,10 +842,10 @@ function snmpv3_sha2_capable()
     $netsnmp_ver = explode(' ', $version_info['netsnmp_ver'])[1];
     $openssl_ver = $version_info['openssl_ver'];
 
-    if ($netsnmp_ver < $netsnmp_minimum) {
+    if (version_compare($netsnmp_ver, $netsnmp_minimum, '<')) {
         return false;
     }
-    if ($openssl_ver < $openssl_minimum) {
+    if (version_compare($openssl_ver, $openssl_minimum, '<')) {
         return false;
     }
 

@@ -1,0 +1,32 @@
+diff --git a/includes/common.php b/includes/common.php
+index b928cceab..cc37b4844 100644
+--- a/includes/common.php
++++ b/includes/common.php
+@@ -842,10 +842,10 @@ function snmpv3_sha2_capable()
+     $netsnmp_ver = explode(' ', $version_info['netsnmp_ver'])[1];
+     $openssl_ver = $version_info['openssl_ver'];
+ 
+-    if ($netsnmp_ver < $netsnmp_minimum) {
++    if (version_compare($netsnmp_ver, $netsnmp_minimum, '<')) {
+         return false;
+     }
+-    if ($openssl_ver < $openssl_minimum) {
++    if (version_compare($openssl_ver, $openssl_minimum, '<')) {
+         return false;
+     }
+ 
+diff --git a/misc/config_definitions.json b/misc/config_definitions.json
+index 82b691286..903eec9cb 100644
+--- a/misc/config_definitions.json
++++ b/misc/config_definitions.json
+@@ -4955,9 +4955,7 @@
+                 }
+             ],
+             "validate": {
+-                "value.*.authalgo": "in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512"
+-            },
+-            "validate": {
++                "value.*.authalgo": "in:MD5,SHA,SHA-224,SHA-256,SHA-384,SHA-512",
+                 "value.*.cryptoalgo": "in:AES,AES-192,AES-256,DES"
+             }
+         },
