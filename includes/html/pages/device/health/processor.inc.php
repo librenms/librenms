@@ -1,26 +1,14 @@
 <?php
 
-$graph_type = 'processor_usage';
-
 $i = '1';
 
-if (count_mib_processors($device) > 0) {
-    $processors = get_mib_processors($device);
-    $graph_type = 'device_processor';
-} else {
-    $processors = dbFetchRows('SELECT * FROM `processors` WHERE device_id = ?', array($device['device_id']));
-}
+$processors = dbFetchRows('SELECT * FROM `processors` WHERE device_id = ?', array($device['device_id']));
 
 foreach ($processors as $proc) {
-    if ($graph_type == 'device_processor') {
-        $id = 'device';
-        $val = $device['device_id'];
-    } else {
-        $id = 'id';
-        $val = $proc['processor_id'];
-    }
-    $proc_url = 'graphs/'.$id.'='.$val.'/type='.$graph_type.'/';
-    $base_url = 'graph.php?' . $id . '=' . $val . '&amp;type=' . $graph_type . '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
+    $id = 'id';
+    $val = $proc['processor_id'];
+    $proc_url = 'graphs/'.$id.'='.$val.'/type=processor_usage/';
+    $base_url = 'graph.php?' . $id . '=' . $val . '&amp;type=processor_usage&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
     $mini_url = $base_url.'&amp;width=80&amp;height=20&amp;bg=f4f4f4';
 
     $text_descr = rewrite_entity_descr($proc['processor_descr']);
@@ -31,7 +19,7 @@ foreach ($processors as $proc) {
     $percent = round($proc['processor_usage']);
 
     $graph_array[$id] = $val;
-    $graph_array['type'] = $graph_type;
+    $graph_array['type'] = 'processor_usage';
 
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>

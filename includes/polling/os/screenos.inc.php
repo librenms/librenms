@@ -27,4 +27,4 @@ $fields = array(
 $tags = compact('rrd_def');
 data_update($device, 'screenos_sessions', $tags, $fields);
 
-$graphs['screenos_sessions'] = true;
+$os->enableGraph('screenos_sessions');

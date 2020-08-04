@@ -194,7 +194,7 @@ availability:
     - { Field: availability_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: duration, Type: bigint, 'Null': false, Extra: '' }
-    - { Field: availability_perc, Type: 'double(6,6)', 'Null': false, Extra: '', Default: '0.000000' }
+    - { Field: availability_perc, Type: 'decimal(9,6)', 'Null': false, Extra: '', Default: '0.000000' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [availability_id], Unique: true, Type: BTREE }
     availability_device_id_index: { Name: availability_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -590,27 +590,6 @@ device_group_device:
   Constraints:
     device_group_device_device_group_id_foreign: { name: device_group_device_device_group_id_foreign, foreign_key: device_group_id, table: device_groups, key: id, extra: 'ON DELETE CASCADE' }
     device_group_device_device_id_foreign: { name: device_group_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
-device_mibs:
-  Columns:
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: module, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: mib, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: included_by, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: last_modified, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [device_id, module, mib], Unique: true, Type: BTREE }
-device_oids:
-  Columns:
-    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: oid, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: module, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: mib, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: object_type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: value, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: numvalue, Type: bigint, 'Null': true, Extra: '' }
-    - { Field: last_modified, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [device_id, oid], Unique: true, Type: BTREE }
 device_perf:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -626,6 +605,7 @@ device_perf:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_perf_device_id_index: { Name: device_perf_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    device_perf_device_id_timestamp_index: { Name: device_perf_device_id_timestamp_index, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
 device_relationships:
   Columns:
     - { Field: parent_device_id, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
@@ -902,20 +882,6 @@ mempools:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [mempool_id], Unique: true, Type: BTREE }
     mempools_device_id_index: { Name: mempools_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-mibdefs:
-  Columns:
-    - { Field: module, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: mib, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: object_type, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: oid, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: syntax, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: description, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: max_access, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: status, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: included_by, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: last_modified, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [module, mib, object_type], Unique: true, Type: BTREE }
 migrations:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

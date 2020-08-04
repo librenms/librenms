@@ -49,7 +49,7 @@ $validator = new Validator();
 $validator->validate();
 
 foreach ($validator->getAllResults() as $group => $results) {
-    echo '<div class="panel-group"><div class="panel panel-default"><div class="panel-heading"> ';
+    echo '<div class="panel-group" style="margin-bottom: 5px"><div class="panel panel-default"><div class="panel-heading"> ';
     echo "<h4 class='panel-title'><a data-toggle='collapse' data-target='#${group}Body'>";
     echo ucfirst($group);
 
@@ -127,7 +127,7 @@ foreach ($validator->getAllResults() as $group => $results) {
         }
         echo '</div>';
     }
-    echo '</div></div></div>';
+    echo '</div></div></div></div>';
 }
 
 

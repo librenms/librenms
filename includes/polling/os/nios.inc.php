@@ -35,7 +35,7 @@ $fields = array(
 
 $tags = compact('rrd_def');
 data_update($device, 'ib_dns_dyn_updates', $tags, $fields);
-$graphs['ib_dns_dyn_updates'] = true;
+$os->enableGraph('ib_dns_dyn_updates');
 
 
 ##################
@@ -60,7 +60,7 @@ $fields = array(
 
 $tags = compact('rrd_def');
 data_update($device, 'ib_dns_performance', $tags, $fields);
-$graphs['ib_dns_performance'] = true;
+$os->enableGraph('ib_dns_performance');
 
 ##################
 # Create dns request return code graph
@@ -90,7 +90,7 @@ $fields = array(
 
 $tags = compact('rrd_def');
 data_update($device, 'ib_dns_request_return_codes', $tags, $fields);
-$graphs['ib_dns_request_return_codes'] = true;
+$os->enableGraph('ib_dns_request_return_codes');
 
 
 ##################
@@ -136,4 +136,4 @@ $fields = array(
 
 $tags = compact('rrd_def');
 data_update($device, 'ib_dhcp_messages', $tags, $fields);
-$graphs['ib_dhcp_messages'] = true;
+$os->enableGraph('ib_dhcp_messages');

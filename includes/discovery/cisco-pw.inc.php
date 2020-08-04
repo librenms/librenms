@@ -20,6 +20,13 @@ if (Config::get('enable_pseudowires') && $device['os_group'] == 'cisco') {
     $pws = snmpwalk_cache_oid($device, 'cpwVcMplsPeerLdpID', $pws, 'CISCO-IETF-PW-MPLS-MIB');
 
     foreach ($pws as $pw_id => $pw) {
+        // Added By Oirbsiu
+        // To correct Interface names that use escaped '/' e.g. GigabitEthernet0_4_0_12
+        // and translate the underscore back to a slash - e.g. GigabitEthernet0/4/0/12
+        // Thank you @murrant
+        $pw['cpwVcName'] = preg_replace('/(?<=\d)_(?=\d)/', '/', $pw['cpwVcName']);
+        // END
+
         list($cpw_remote_id) = explode(':', $pw['cpwVcMplsPeerLdpID']);
         $cpw_remote_device   = dbFetchCell('SELECT device_id from ipv4_addresses AS A, ports AS I WHERE A.ipv4_address=? AND A.port_id=I.port_id', array($cpw_remote_id));
         $if_id               = dbFetchCell('SELECT port_id from ports WHERE `ifDescr`=? AND `device_id`=?', array($pw['cpwVcName'], $device['device_id']));

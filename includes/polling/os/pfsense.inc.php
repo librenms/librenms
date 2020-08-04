@@ -26,7 +26,7 @@ if (is_numeric($states)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_states', $tags, $fields);
 
-    $graphs['pf_states'] = true;
+    $os->enableGraph('pf_states');
 }
 
 if (is_numeric($searches)) {
@@ -39,7 +39,7 @@ if (is_numeric($searches)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_searches', $tags, $fields);
 
-    $graphs['pf_searches'] = true;
+    $os->enableGraph('pf_searches');
 }
 
 if (is_numeric($inserts)) {
@@ -52,7 +52,7 @@ if (is_numeric($inserts)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_inserts', $tags, $fields);
 
-    $graphs['pf_inserts'] = true;
+    $os->enableGraph('pf_inserts');
 }
 
 if (is_numeric($removals)) {
@@ -65,7 +65,7 @@ if (is_numeric($removals)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_removals', $tags, $fields);
 
-    $graphs['pf_removals'] = true;
+    $os->enableGraph('pf_removals');
 }
 
 if (is_numeric($matches)) {
@@ -78,7 +78,7 @@ if (is_numeric($matches)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_matches', $tags, $fields);
 
-    $graphs['pf_matches'] = true;
+    $os->enableGraph('pf_matches');
 }
 
 if (is_numeric($badoffset)) {
@@ -91,7 +91,7 @@ if (is_numeric($badoffset)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_badoffset', $tags, $fields);
 
-    $graphs['pf_badoffset'] = true;
+    $os->enableGraph('pf_badoffset');
 }
 
 if (is_numeric($fragmented)) {
@@ -104,7 +104,7 @@ if (is_numeric($fragmented)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_fragmented', $tags, $fields);
 
-    $graphs['pf_fragmented'] = true;
+    $os->enableGraph('pf_fragmented');
 }
 
 if (is_numeric($short)) {
@@ -117,7 +117,7 @@ if (is_numeric($short)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_short', $tags, $fields);
 
-    $graphs['pf_short'] = true;
+    $os->enableGraph('pf_short');
 }
 
 if (is_numeric($normalized)) {
@@ -130,7 +130,7 @@ if (is_numeric($normalized)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_normalized', $tags, $fields);
 
-    $graphs['pf_normalized'] = true;
+    $os->enableGraph('pf_normalized');
 }
 
 if (is_numeric($memdropped)) {
@@ -143,5 +143,5 @@ if (is_numeric($memdropped)) {
     $tags = compact('rrd_def');
     data_update($device, 'pf_memdropped', $tags, $fields);
 
-    $graphs['pf_memdropped'] = true;
+    $os->enableGraph('pf_memdropped');
 }

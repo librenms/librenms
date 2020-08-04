@@ -4,47 +4,48 @@
 
 @section('content')
 <div class="container-fluid">
-    <div id="manage-users-panel" class="panel panel-default">
-        <div class="panel-heading"><h4 class="panel-title"><i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> @lang('Manage Users')</h4></div>
-        <div class="panel-body">
-            <div class="table-responsive">
-                <table id="users" class="table table-bordered table-condensed" style="display: none;">
-                    <thead>
-                    <tr>
-                        <th data-column-id="user_id" data-visible="false" data-identifier="true" data-type="numeric">@lang('ID')</th>
-                        <th data-column-id="username">@lang('Username')</th>
-                        <th data-column-id="realname">@lang('Real Name')</th>
-                        <th data-column-id="level" data-formatter="level" data-type="numeric">@lang('Access')</th>
-                        <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">@lang('auth.title')</th>
-                        <th data-column-id="email">@lang('Email')</th>
-                        @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
-                        <th data-column-id="enabled" data-formatter="enabled">@lang('Enabled')</th>
-                        @endif
-                        <th data-column-id="descr">@lang('Description')</th>
-                        <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">@lang('Actions')</th>
-                    </tr>
-                    </thead>
-                    <tbody id="users_rows">
-                        @foreach($users as $user)
-                            <tr>
-                                <td>{{ $user->user_id }}</td>
-                                <td>{{ $user->username }}</td>
-                                <td>{{ $user->realname }}</td>
-                                <td>{{ $user->level }}</td>
-                                <td>{{ $user->auth_type }}</td>
-                                <td>{{ $user->email }}</td>
-                                @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
-                                <td>{{ $user->enabled }}</td>
-                                @endif
-                                <td>{{ $user->descr }}</td>
-                                <td></td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
+    <x-panel>
+        <x-slot name="title">
+            <i class="fa fa-user-circle-o fa-fw fa-lg" aria-hidden="true"></i> @lang('Manage Users')
+        </x-slot>
+
+        <div class="table-responsive">
+            <table id="users" class="table table-bordered table-condensed" style="display: none;">
+                <thead>
+                <tr>
+                    <th data-column-id="user_id" data-visible="false" data-identifier="true" data-type="numeric">@lang('ID')</th>
+                    <th data-column-id="username">@lang('Username')</th>
+                    <th data-column-id="realname">@lang('Real Name')</th>
+                    <th data-column-id="level" data-formatter="level" data-type="numeric">@lang('Access')</th>
+                    <th data-column-id="auth_type" data-visible="{{ $multiauth ? 'true' : 'false' }}">@lang('auth.title')</th>
+                    <th data-column-id="email">@lang('Email')</th>
+                    @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
+                    <th data-column-id="enabled" data-formatter="enabled">@lang('Enabled')</th>
+                    @endif
+                    <th data-column-id="descr">@lang('Description')</th>
+                    <th data-column-id="action" data-formatter="actions" data-sortable="false" data-searchable="false">@lang('Actions')</th>
+                </tr>
+                </thead>
+                <tbody id="users_rows">
+                    @foreach($users as $user)
+                        <tr>
+                            <td>{{ $user->user_id }}</td>
+                            <td>{{ $user->username }}</td>
+                            <td>{{ $user->realname }}</td>
+                            <td>{{ $user->level }}</td>
+                            <td>{{ $user->auth_type }}</td>
+                            <td>{{ $user->email }}</td>
+                            @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
+                            <td>{{ $user->enabled }}</td>
+                            @endif
+                            <td>{{ $user->descr }}</td>
+                            <td></td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
-    </div>
+    </x-panel>
 </div>
 @endsection
 
@@ -132,7 +133,6 @@
 
 @section('css')
 <style>
-    #manage-users-panel .panel-title { font-size: 18px; }
     #users form { display:inline; }
 </style>
 @endsection

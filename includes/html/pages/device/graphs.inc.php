@@ -22,8 +22,6 @@ foreach (dbFetchRows('SELECT * FROM device_graphs WHERE device_id = ? ORDER BY g
     }
 }
 
-enable_graphs($device, $graph_enable);
-
 $sep = '';
 foreach ($graph_enable as $section => $nothing) {
     if (isset($graph_enable) && is_array($graph_enable[$section])) {
@@ -58,7 +56,7 @@ $group = $vars['group'];
 $graph_enable = $graph_enable[$group];
 
 $metric = basename($vars['metric']);
-if (is_file("includes/html/pages/device/graphs/$group.inc.php")) {
+if (($group != 'customoid') && (is_file("includes/html/pages/device/graphs/$group.inc.php"))) {
     include "includes/html/pages/device/graphs/$group.inc.php";
 } else {
     foreach ($graph_enable as $graph => $entry) {

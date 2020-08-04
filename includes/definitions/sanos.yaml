@@ -28,5 +28,6 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysDescr:
-        - SAN-OS
+    -
+        sysDescr:
+            - SAN-OS

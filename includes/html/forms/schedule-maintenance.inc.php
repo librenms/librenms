@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\UserPref;
 use Illuminate\Support\Str;
 
 /*
@@ -13,8 +14,6 @@ use Illuminate\Support\Str;
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
-
-use Carbon\Carbon;
 
 if (!Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
@@ -43,7 +42,7 @@ if ($sub_type == 'new-maintenance') {
     $end_recurring_hr = mres($_POST['end_recurring_hr']);
     $recurring_day = mres($_POST['recurring_day']);
     $start    = mres($_POST['start']);
-    list($duration_hour, $duration_min) = explode(':', mres($_POST['duration']));
+    [$duration_hour, $duration_min] = explode(':', mres($_POST['duration']));
     $end      = mres($_POST['end']);
     $maps     = mres($_POST['maps']);
 
@@ -60,19 +59,20 @@ if ($sub_type == 'new-maintenance') {
     }
 
     // check values if recurring is set to yes
+    $recurring_day = null;
     if ($recurring == 1) {
         if (empty($start_recurring_dt)) {
             $message .= 'Missing start recurring date<br />';
         } else {
             // check if date is correct
-            list($ysrd, $msrd, $dsrd) = explode('-', $start_recurring_dt);
+            [$ysrd, $msrd, $dsrd] = explode('-', $start_recurring_dt);
             if (!checkdate($msrd, $dsrd, $ysrd)) {
                 $message .= 'Please check start recurring date<br />';
             }
         }
         // end recurring dt not mandatory.. but if set, check if correct
         if (!empty($end_recurring_dt) && $end_recurring_dt != '0000-00-00' && $end_recurring_dt != '') {
-            list($yerd, $merd, $derd) = explode('-', $end_recurring_dt);
+            [$yerd, $merd, $derd] = explode('-', $end_recurring_dt);
             if (!checkdate($merd, $derd, $yerd)) {
                 $message .= 'Please check end recurring date<br />';
             }
@@ -89,9 +89,7 @@ if ($sub_type == 'new-maintenance') {
         }
 
         if (isset($_POST['recurring_day']) && is_array($_POST['recurring_day']) && !empty($_POST['recurring_day'])) {
-            $recurring_day = implode(',', $_POST['recurring_day']);
-        } else {
-            $recurring_day = null;
+            $recurring_day = $_POST['recurring_day'];
         }
 
         // recurring = 1 => empty no reccurency values to be sure.
@@ -111,7 +109,6 @@ if ($sub_type == 'new-maintenance') {
         $end_recurring_dt = '1970-01-02';
         $start_recurring_hr = '00:00:00';
         $end_recurring_hr = '00:00:00';
-        $recurring_day = null;
     }
 
     if (!is_array($_POST['maps'])) {
@@ -131,6 +128,7 @@ if ($sub_type == 'new-maintenance') {
             $alert_schedule->start_recurring_hr = $start_recurring_hr;
             $alert_schedule->end_recurring_dt = $end_recurring_dt;
             $alert_schedule->end_recurring_hr = $end_recurring_hr;
+            $alert_schedule->recurring_day = $recurring_day;
         }
         $alert_schedule->save();
 
@@ -153,7 +151,7 @@ if ($sub_type == 'new-maintenance') {
                 }
 
                 $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
-                if ($notes && $type = 'device' && get_user_pref('add_schedule_note_to_device', false)) {
+                if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
                     $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
                     $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
                     dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);
@@ -186,10 +184,10 @@ if ($sub_type == 'new-maintenance') {
         'message' => $message,
     );
 } elseif ($sub_type == 'parse-maintenance') {
-    $schedule_id = mres($_POST['schedule_id']);
-    $alert_schedule    = \App\Models\AlertSchedule::findOrFail($schedule_id);
-    $items       = [];
-    foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$schedule_id]) as $target) {
+    $alert_schedule = \App\Models\AlertSchedule::findOrFail($_POST['schedule_id']);
+    $items = [];
+
+    foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$alert_schedule->schedule_id]) as $target) {
         $id = $target['alert_schedulable_id'];
         if ($target['alert_schedulable_type'] == 'location') {
             $text = dbFetchCell('SELECT location FROM locations WHERE id = ?', [$id]);

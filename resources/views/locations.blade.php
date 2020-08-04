@@ -16,28 +16,24 @@
         </tr>
     </script>
 
-
-    <div id="locations-panel" class="panel panel-default">
-        <div class="panel-heading"><h4 class="panel-title">@lang('Locations')</h4></div>
-        <div class="panel-body">
-            <div class="table-responsive">
-                <table id="locations" class="table table-hover table-condensed table-striped">
-                    <thead>
-                    <tr>
-                        <th data-column-id="location" data-formatter="location" data-order="asc">@lang('Location')</th>
-                        <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">@lang('Coordinates')</th>
-                        <th data-column-id="devices" data-formatter="primaryLabel">@lang('Devices')</th>
-                        <th data-column-id="network" data-formatter="defaultLabel">@lang('Network')</th>
-                        <th data-column-id="servers" data-formatter="defaultLabel">@lang('Servers')</th>
-                        <th data-column-id="firewalls" data-formatter="defaultLabel">@lang('Firewalls')</th>
-                        <th data-column-id="down" data-formatter="down">@lang('Down')</th>
-                        <th data-column-id="actions" data-formatter="actions" data-sortable="false">@lang('Actions')</th>
-                    </tr>
-                    </thead>
-                </table>
-            </div>
+    <x-panel title="{{ __('Locations') }}" id="locations-panel">
+        <div class="table-responsive">
+            <table id="locations" class="table table-hover table-condensed table-striped">
+                <thead>
+                <tr>
+                    <th data-column-id="location" data-formatter="location" data-order="asc">@lang('Location')</th>
+                    <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">@lang('Coordinates')</th>
+                    <th data-column-id="devices" data-formatter="primaryLabel">@lang('Devices')</th>
+                    <th data-column-id="network" data-formatter="defaultLabel">@lang('Network')</th>
+                    <th data-column-id="servers" data-formatter="defaultLabel">@lang('Servers')</th>
+                    <th data-column-id="firewalls" data-formatter="defaultLabel">@lang('Firewalls')</th>
+                    <th data-column-id="down" data-formatter="down">@lang('Down')</th>
+                    <th data-column-id="actions" data-formatter="actions" data-sortable="false">@lang('Actions')</th>
+                </tr>
+                </thead>
+            </table>
         </div>
-    </div>
+    </x-panel>
 
     <div class="modal fade" id="edit-location" tabindex="-1" role="dialog" aria-labelledby="edit-location-title">
         <div class="modal-dialog" role="document">

@@ -7,6 +7,6 @@ mib_dir:
 over:
     - { graph: device_temperature, text: temperature }
 discovery:
-    - 
+    -
         sysObjectID: .0.9.43.6.1.4.1
         sysDescr: Quidos

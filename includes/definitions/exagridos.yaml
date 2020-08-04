@@ -10,5 +10,6 @@ over:
 mib_dir:
     - exagrid
 discovery:
-    - sysDescr:
-        -  'ExaGrid'
+    -
+        sysDescr:
+            - 'ExaGrid'

@@ -115,7 +115,7 @@ if ($device['os_group'] == 'cisco') {
             $tags = compact('address', 'rrd_name', 'rrd_def');
             data_update($device, 'ipsectunnel', $tags, $fields);
 
-            // $graphs['ipsec_tunnels'] = TRUE;
+            // $os->enableGraph('ipsec_tunnels');
         }
     }//end foreach
 

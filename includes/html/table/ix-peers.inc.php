@@ -38,7 +38,10 @@ if ($status === 'unconnected') {
 }
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`remote_ipaddr4` LIKE '%$searchPhrase%' OR `remote_asn` LIKE '%$searchPhrase%' OR `P`.`name` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`remote_ipaddr4` LIKE ? OR `remote_asn` LIKE ? OR `P`.`name` LIKE ?)";
+    $params[] = "%$searchPhrase%";
+    $params[] = "%$searchPhrase%";
+    $params[] = "%$searchPhrase%";
 }
 
 $sql .= ' GROUP BY `bgpPeerIdentifier`, `P`.`name`, `P`.`remote_ipaddr4`, `P`.`peer_id`, `P`.`remote_asn` ';

@@ -4,7 +4,7 @@ namespace App\Models;
 
 use DB;
 use Illuminate\Database\Eloquent\Builder;
-use LibreNMS\Data\Store\Rrd;
+use Illuminate\Support\Str;
 use LibreNMS\Util\Rewrite;
 use Permissions;
 
@@ -72,7 +72,7 @@ class Port extends DeviceRelatedModel
         }
 
         foreach ((array)\LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
-            if (str_i_contains($label, $src)) {
+            if (Str::contains(strtolower($label), strtolower($src))) {
                 $label = $val;
             }
         }

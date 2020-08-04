@@ -2,8 +2,8 @@
 
 $storage   = dbFetchCell('select count(*) from storage WHERE device_id = ?', array($device['device_id']));
 $diskio    = get_disks($device['device_id']);
-$mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id'])) + count_mib_mempools($device);
-$processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id'])) + count_mib_processors($device);
+$mempools  = dbFetchCell('select count(*) from mempools WHERE device_id = ?', array($device['device_id']));
+$processor = dbFetchCell('select count(*) from processors WHERE device_id = ?', array($device['device_id']));
 
 /*
  * QFP count for cisco devices

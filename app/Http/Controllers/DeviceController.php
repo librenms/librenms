@@ -24,6 +24,7 @@ class DeviceController extends Controller
         'apps' => \App\Http\Controllers\Device\Tabs\AppsController::class,
         'processes' => \App\Http\Controllers\Device\Tabs\ProcessesController::class,
         'collectd' => \App\Http\Controllers\Device\Tabs\CollectdController::class,
+        'munin' => \App\Http\Controllers\Device\Tabs\MuninController::class,
         'ports' => \App\Http\Controllers\Device\Tabs\PortsController::class,
         'port' => \App\Http\Controllers\Device\Tabs\PortController::class,
         'slas' => \App\Http\Controllers\Device\Tabs\SlasController::class,
@@ -71,7 +72,7 @@ class DeviceController extends Controller
 
         if ($current_tab == 'port') {
             $vars = Url::parseLegacyPath($request->path());
-            $port = Port::findOrFail($vars->get('port'));
+            $port = $device->ports()->findOrFail($vars->get('port'));
             $this->authorize('view', $port);
         } else {
             $this->authorize('view', $device);

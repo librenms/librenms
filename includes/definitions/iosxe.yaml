@@ -34,14 +34,13 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
     cisco-qfp: true
-register_mibs:
-    ciscoAAASessionMIB: CISCO-AAA-SESSION-MIB
 discovery:
-    - sysDescr:
-        - IOS-XE
-        - IOSXE
-        - LINUX_IOSD
-        - CAT3K_CAA
+    -
+        sysDescr:
+            - IOS-XE
+            - IOSXE
+            - LINUX_IOSD
+            - CAT3K_CAA
 bad_iftype:
     - macSecControlledIF
     - macSecUncontrolledIF

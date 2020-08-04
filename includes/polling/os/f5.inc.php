@@ -85,7 +85,7 @@ if (is_numeric($data[0]['sysClientsslStatTotNativeConns']) && is_numeric($data[0
     );
     $tags = compact('rrd_def');
     data_update($device, 'bigip_system_tps', $tags, $fields);
-    $graphs['bigip_system_tps'] = true;
+    $os->enableGraph('bigip_system_tps');
 }
 
 

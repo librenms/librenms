@@ -5,6 +5,7 @@ return [
     'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Alerting',
+        'api' => 'API',
         'auth' => 'Authentication',
         'authorization' => 'Authorization',
         'external' => 'External',
@@ -21,6 +22,9 @@ return [
             'general' => 'General Alert Settings',
             'email' => 'Email Options',
             'rules' => 'Alert Rule Default Settings',
+        ],
+        'api' => [
+            'cors' => 'CORS',
         ],
         'auth' => [
             'general' => 'General Authentication Settings',
@@ -193,6 +197,38 @@ return [
             'description' => 'Allow the given networks graph access',
             'help' => 'Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)'
         ],
+        'api' => [
+            'cors' => [
+                'allowheaders' => [
+                    'description' => 'Allow Headers',
+                    'help' => 'Sets the Access-Control-Allow-Headers response header',
+                ],
+                'allowcredentials' => [
+                    'description' => 'Allow Credentials',
+                    'help' => 'Sets the Access-Control-Allow-Credentials header',
+                ],
+                'allowmethods' => [
+                    'description' => 'Allowed Methods',
+                    'help' => 'Matches the request method.',
+                ],
+                'enabled' => [
+                    'description' => 'Enable CORS support for the API',
+                    'help' => 'Allows you to load api resources from a web client',
+                ],
+                'exposeheaders' => [
+                    'description' => 'Expose Headers',
+                    'help' => 'Sets the Access-Control-Expose-Headers response header',
+                ],
+                'maxage' => [
+                    'description' => 'Max Age',
+                    'help' => 'Sets the Access-Control-Max-Age response header',
+                ],
+                'origin' => [
+                    'description' => 'Allow Request Origins',
+                    'help' => 'Matches the request origin. Wildcards can be used, eg. *.mydomain.com',
+                ],
+            ],
+        ],
         'api_demo' => [
             'description' => 'This is the demo'
         ],
@@ -234,6 +270,10 @@ return [
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting users'
+        ],
+        'auth_ad_url' => [
+            'description' => 'Active Directory Server(s)',
+            'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com'
         ],
         'auth_ldap_attr' => [
             'uid' => [
@@ -609,17 +649,21 @@ return [
         ],
         'geoloc' => [
             'api_key' => [
-                'description' => 'Geocoding API Key',
+                'description' => 'Mapping Engine API Key',
                 'help' => 'Geocoding API Key (Required to function)'
             ],
             'engine' => [
-                'description' => 'Geocoding Engine',
+                'description' => 'Mapping Engine',
                 'options' => [
                     'google' => 'Google Maps',
                     'openstreetmap' => 'OpenStreetMap',
                     'mapquest' => 'MapQuest',
                     'bing' => 'Bing Maps'
                 ]
+            ],
+            'latlng' => [
+                'description' => 'Attempt to Geocode Locations',
+                'help' => 'Try to lookup latitude and longitude via geocoding API during polling'
             ]
         ],
         'graphite' => [
@@ -1322,5 +1366,7 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'executable' => ':value is not a valid executable',
+        'directory' => ':value is not a valid directory',
     ]
 ];

@@ -37,8 +37,8 @@ if (!Str::startsWith($device['os'], ['Snom', 'asa'])) {
         $tags = compact('rrd_def');
         data_update($device, 'netstats-ip', $tags, $fields);
 
-        $graphs['netstat_ip']      = true;
-        $graphs['netstat_ip_frag'] = true;
+        $os->enableGraph('netstat_ip');
+        $os->enableGraph('netstat_ip_frag');
 
         unset($rrd_def, $fields, $tags, $oid);
     }

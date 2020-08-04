@@ -51,7 +51,7 @@ if (is_numeric($ss['ssCpuRawUser']) && is_numeric($ss['ssCpuRawNice']) && is_num
     $tags = compact('rrd_def');
     data_update($device, 'ucd_cpu', $tags, $fields);
 
-    $graphs['ucd_cpu'] = true;
+    $os->enableGraph('ucd_cpu');
 }
 
 // This is how we'll collect in the future, start now so people don't have zero data.
@@ -86,33 +86,33 @@ foreach ($collect_oids as $oid) {
         $tags = compact('oid', 'rrd_name', 'rrd_def');
         data_update($device, 'ucd_cpu', $tags, $fields);
 
-        $graphs['ucd_cpu'] = true;
+        $os->enableGraph('ucd_cpu');
     }
 }
 
 // Set various graphs if we've seen the right OIDs.
 if (is_numeric($ss['ssRawSwapIn'])) {
-    $graphs['ucd_swap_io'] = true;
+    $os->enableGraph('ucd_swap_io');
 }
 
 if (is_numeric($ss['ssIORawSent'])) {
-    $graphs['ucd_io'] = true;
+    $os->enableGraph('ucd_io');
 }
 
 if (is_numeric($ss['ssRawContexts'])) {
-    $graphs['ucd_contexts'] = true;
+    $os->enableGraph('ucd_contexts');
 }
 
 if (is_numeric($ss['ssRawInterrupts'])) {
-    $graphs['ucd_interrupts'] = true;
+    $os->enableGraph('ucd_interrupts');
 }
 
 if (is_numeric($ss['ssCpuRawWait'])) {
-    $graphs['ucd_io_wait'] = true;
+    $os->enableGraph('ucd_io_wait');
 }
 
 if (is_numeric($ss['ssCpuRawSteal'])) {
-    $graphs['ucd_cpu_steal'] = true;
+    $os->enableGraph('ucd_cpu_steal');
 }
 
 // #
@@ -132,7 +132,7 @@ if (is_numeric($ss['ssCpuRawSteal'])) {
 
 $snmpdata = snmp_get_multi($device, ['memTotalSwap.0', 'memAvailSwap.0', 'memTotalReal.0', 'memAvailReal.0', 'memTotalFree.0', 'memShared.0', 'memBuffer.0', 'memCached.0'], '-OQUs', 'UCD-SNMP-MIB');
 if (is_array($snmpdata[0])) {
-    list($memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached) = $snmpdata[0];
+    [$memTotalSwap, $memAvailSwap, $memTotalReal, $memAvailReal, $memTotalFree, $memShared, $memBuffer, $memCached] = $snmpdata[0];
     foreach (array_keys($snmpdata[0]) as $key) {
         $$key = $snmpdata[0][$key];
     }
@@ -165,7 +165,7 @@ if (is_numeric($memTotalReal) && is_numeric($memAvailReal) && is_numeric($memTot
     $tags = compact('rrd_def');
     data_update($device, 'ucd_mem', $tags, $fields);
 
-    $graphs['ucd_memory'] = true;
+    $os->enableGraph('ucd_memory');
 }
 
 //
@@ -191,7 +191,7 @@ if (is_numeric($load_raw[2]['laLoadInt'])) {
     $tags = compact('rrd_def');
     data_update($device, 'ucd_load', $tags, $fields);
 
-    $graphs['ucd_load'] = 'TRUE';
+    $os->enableGraph('ucd_load');
 }
 
 unset($ss, $load_raw, $snmpdata);

@@ -28,11 +28,11 @@ namespace App\Http\Controllers\Table;
 use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
+use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
-use LibreNMS\Util\Url;
 use LibreNMS\Util\Time;
-use LibreNMS\Alert\AlertUtil;
+use LibreNMS\Util\Url;
 
 class DeviceController extends TableController
 {
@@ -75,7 +75,7 @@ class DeviceController extends TableController
             'hostname' => 'hostname',
             'hardware' => 'hardware',
             'os' => 'os',
-            'uptime' => \DB::raw("IF(`status` = 1, `uptime`, `last_polled` - NOW()))"),
+            'uptime' => \DB::raw("IF(`status` = 1, `uptime`, `last_polled` - NOW())"),
             'location' => 'location'
         ];
     }

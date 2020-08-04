@@ -30,8 +30,8 @@ if ($device['os_group'] == 'cisco') {
             $tags = compact('type', 'rrd_name', 'rrd_def');
             data_update($device, 'vpdn', $tags, $fields);
 
-            $graphs['vpdn_sessions_'.$type] = true;
-            $graphs['vpdn_tunnels_'.$type]  = true;
+            $os->enableGraph("vpdn_sessions_$type");
+            $os->enableGraph("vpdn_tunnels_$type");
 
             echo " Cisco VPDN ($type) ";
         }

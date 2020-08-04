@@ -10,5 +10,6 @@ over:
 mib_dir:
     - cisco
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.41916.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.41916.
