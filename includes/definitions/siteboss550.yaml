@@ -5,8 +5,8 @@ group: asentria
 icon: siteboss
 over:
     - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_processor, text: 'CPU Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_humidity, text: 'Device Humidity' }
+    - { graph: device_temperature, text: 'Device Temperature' }
 mib_dir:
     - asentria
 discovery:
