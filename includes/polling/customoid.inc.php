@@ -8,7 +8,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     $prev_oid_value = $customoid['customoid_current'];
 
     $rawdata = snmp_get($device, $customoid['customoid_oid'], '-Oqv');
-    
+
     $user_funcs = array(
         "celsius_to_fahrenheit",
         "fahrenheit_to_celsius",
@@ -16,7 +16,7 @@ foreach (dbFetchRows("SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     );
 
     if (is_numeric($rawdata)) {
-        $graphs['customoid'] = true;
+        $os->enableGraph('customoid');
         $oid_value = $rawdata;
     } else {
         $oid_value = 0;

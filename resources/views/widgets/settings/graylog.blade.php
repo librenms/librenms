@@ -63,11 +63,22 @@
             <option value="2592000" @if($range == 2592000) selected @endif>@lang('Search last 30 days')</option>
         </select>
     </div>
+    <div class="form-group">
+        <label for="hidenavigation-{{ $id }}" class="control-label">@lang('Hide Navigation')</label>
+        <input type="checkbox" class="form-control" name="hidenavigation" id="hidenavigation-{{ $id }}" value="{{ $hidenavigation }}" data-size="normal" @if($hidenavigation) checked @endif>
+    </div>
 @endsection
 
 @section('javascript')
     <script type="application/javascript">
         init_select2('#device-{{ $id }}', 'device', {limit: 100}, '{{ $device ? $device->device_id : '' }}');
         init_select2('#stream-{{ $id }}', 'graylog-streams', {}, '{{ $stream }}');
+
+        $('#hidenavigation-{{ $id }}')
+            .bootstrapSwitch('offColor','danger')
+            .on('switchChange.bootstrapSwitch', function (e, data) {
+                var hidenav = $(this).is(':checked') ? "1": "0";
+                $('#hidenavigation-{{ $id }}').val(hidenav);
+            });
     </script>
 @endsection

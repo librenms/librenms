@@ -1,17 +1,16 @@
 <?php
 
+use App\Models\DeviceGraph;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Enum\Alert;
-use LibreNMS\Exceptions\JsonAppException;
-use LibreNMS\Exceptions\JsonAppPollingFailedException;
-use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\Exceptions\JsonAppBlankJsonException;
-use LibreNMS\Exceptions\JsonAppMissingKeysException;
-use LibreNMS\Exceptions\JsonAppWrongVersionException;
 use LibreNMS\Exceptions\JsonAppExtendErroredException;
-use App\Models\Location;
+use LibreNMS\Exceptions\JsonAppMissingKeysException;
+use LibreNMS\Exceptions\JsonAppParsingFailedException;
+use LibreNMS\Exceptions\JsonAppPollingFailedException;
+use LibreNMS\Exceptions\JsonAppWrongVersionException;
+use LibreNMS\RRD\RrdDefinition;
 
 function bulk_sensor_snmpget($device, $sensors)
 {
@@ -161,8 +160,8 @@ function record_sensor_data($device, $all_sensors)
         $sensor_value      = $sensor['new_value'];
         $prev_sensor_value = $sensor['sensor_current'];
 
-        if ($sensor_value == -32768) {
-            echo 'Invalid (-32768) ';
+        if ($sensor_value == -32768 || is_nan($sensor_value)) {
+            echo 'Invalid (-32768 or NaN)';
             $sensor_value = 0;
         }
 
@@ -239,6 +238,7 @@ function poll_device($device, $force_module = false)
     $device['attribs'] = $attribs;
 
     load_os($device);
+    $os = \LibreNMS\OS::make($device);
 
     unset($array);
 
@@ -290,9 +290,6 @@ function poll_device($device, $force_module = false)
     $response = device_is_up($device, true);
 
     if ($response['status'] == '1') {
-        $graphs    = array();
-        $oldgraphs = array();
-
         if ($device['snmp_disable']) {
             Config::set('poller_modules', []);
         } else {
@@ -339,6 +336,7 @@ function poll_device($device, $force_module = false)
                     'poller' => $module_time,
                 );
                 data_update($device, 'poller-perf', $tags, $fields);
+                $os->enableGraph('poller_perf');
 
                 // remove old rrd
                 $oldrrd = rrd_name($device['hostname'], array('poller', $module, 'perf'));
@@ -355,41 +353,6 @@ function poll_device($device, $force_module = false)
             }
         }
 
-        // Update device_groups
-        echo "### Start Device Groups ###\n";
-        $dg_start = microtime(true);
-
-        $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
-        d_echo("Groups Added: " . implode(',', $group_changes['attached']) . PHP_EOL);
-        d_echo("Groups Removed: " . implode(',', $group_changes['detached']) . PHP_EOL);
-
-        echo "### End Device Groups, runtime: " . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
-
-        if (!$force_module && !empty($graphs)) {
-            echo "Enabling graphs: ";
-            // FIXME EVENTLOGGING -- MAKE IT SO WE DO THIS PER-MODULE?
-            // This code cycles through the graphs already known in the database and the ones we've defined as being polled here
-            // If there any don't match, they're added/deleted from the database.
-            // Ideally we should hold graphs for xx days/weeks/polls so that we don't needlessly hide information.
-            foreach (dbFetch('SELECT `graph` FROM `device_graphs` WHERE `device_id` = ?', array($device['device_id'])) as $graph) {
-                if (isset($graphs[$graph['graph']])) {
-                    $oldgraphs[$graph['graph']] = true;
-                } else {
-                    dbDelete('device_graphs', '`device_id` = ? AND `graph` = ?', array($device['device_id'], $graph['graph']));
-                }
-            }
-
-            foreach ($graphs as $graph => $value) {
-                if (!isset($oldgraphs[$graph])) {
-                    echo '+';
-                    dbInsert(array('device_id' => $device['device_id'], 'graph' => $graph), 'device_graphs');
-                }
-
-                echo $graph.' ';
-            }
-            echo PHP_EOL;
-        }//end if
-
         // Ping response
         if (can_ping_device($attribs) === true  &&  !empty($response['ping_time'])) {
             $tags = array(
@@ -403,6 +366,7 @@ function poll_device($device, $force_module = false)
             $update_array['last_ping_timetaken']   = $response['ping_time'];
 
             data_update($device, 'ping-perf', $tags, $fields);
+            $os->enableGraph('ping_perf');
         }
 
         $device_time  = round(microtime(true) - $device_start, 3);
@@ -418,12 +382,24 @@ function poll_device($device, $force_module = false)
             );
 
             data_update($device, 'poller-perf', $tags, $fields);
+            $os->enableGraph('poller_modules_perf');
         }
 
         if (!$force_module) {
             // don't update last_polled time if we are forcing a specific module to be polled
             $update_array['last_polled']           = array('NOW()');
             $update_array['last_polled_timetaken'] = $device_time;
+
+            echo "Enabling graphs: ";
+            DeviceGraph::deleted(function ($graph) {
+                echo '-';
+            });
+            DeviceGraph::created(function ($graph) {
+                echo '+';
+            });
+
+            $os->persistGraphs();
+            echo PHP_EOL;
         }
 
         $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', array($device['device_id']));
@@ -449,89 +425,6 @@ function poll_device($device, $force_module = false)
 
     return false; // device not polled
 }//end poll_device()
-
-/**
- * if no rrd_name parameter is passed, the MIB name is used as the rrd_file_name
- */
-function poll_mib_def($device, $mib_name_table, $mib_subdir, $mib_oids, $mib_graphs, &$graphs, $rrd_name = null)
-{
-    echo "This is poll_mib_def Processing\n";
-    $mib = null;
-
-    list($mib, $file) = explode(':', $mib_name_table, 2);
-
-    if (is_null($rrd_name)) {
-        if (str_i_contains($mib_name_table, 'UBNT')) {
-            $rrd_name = strtolower($mib);
-        } else {
-            $rrd_name = strtolower($file);
-        }
-    }
-
-    $rrd_def = new RrdDefinition();
-    $oidglist  = array();
-    $oidnamelist = array();
-    foreach ($mib_oids as $oid => $param) {
-        $oidindex  = $param[0];
-        $oiddsname = $param[1];
-        $oiddsdesc = $param[2];
-        $oiddstype = $param[3];
-        $oiddsopts = $param[4];
-
-        if (empty($oiddsopts)) {
-            $rrd_def->addDataset($oiddsname, $oiddstype, null, 100000000000);
-        } else {
-            $min = array_key_exists('min', $oiddsopts) ? $oiddsopts['min'] : null;
-            $max = array_key_exists('max', $oiddsopts) ? $oiddsopts['max'] : null;
-            $heartbeat = array_key_exists('heartbeat', $oiddsopts) ? $oiddsopts['heartbeat'] : null;
-            $rrd_def->addDataset($oiddsname, $oiddstype, $min, $max, $heartbeat);
-        }
-
-        if ($oidindex != '') {
-            $fulloid = $oid.'.'.$oidindex;
-        } else {
-            $fulloid = $oid;
-        }
-
-        // Add to oid GET list
-        $oidglist[] = $fulloid;
-        $oidnamelist[] = $oiddsname;
-    }//end foreach
-
-    // Implde for LibreNMS Version
-    $oidilist = implode(' ', $oidglist);
-
-    $snmpdata = snmp_get_multi($device, $oidilist, '-OQUs', $mib);
-    if (isset($GLOBALS['exec_status']['exitcode']) && $GLOBALS['exec_status']['exitcode'] !== 0) {
-        print_debug('  ERROR, bad snmp response');
-        return false;
-    }
-
-    $oid_count = 0;
-    $fields = array();
-    foreach ($oidglist as $fulloid) {
-        list($splitoid, $splitindex) = explode('.', $fulloid, 2);
-        $val = $snmpdata[$splitindex][$splitoid];
-        if (is_numeric($val)) {
-            $fields[$oidnamelist[$oid_count]] = $val;
-        } elseif (preg_match("/^\"(.*)\"$/", $val, $number) && is_numeric($number[1])) {
-            $fields[$oidnamelist[$oid_count]] = $number[1];
-        } else {
-            $fields[$oidnamelist[$oid_count]] = 'U';
-        }
-        $oid_count++;
-    }
-
-    $tags = compact('rrd_def');
-    data_update($device, $rrd_name, $tags, $fields);
-
-    foreach ($mib_graphs as $graphtoenable) {
-        $graphs[$graphtoenable] = true;
-    }
-
-    return true;
-}//end poll_mib_def()
-
 
 function get_main_serial($device)
 {

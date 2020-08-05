@@ -34,6 +34,4 @@ $os = OS::make($device);
 
 echo "OS: " . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";
 
-register_mibs($device, Config::getOsSetting($device['os'], 'register_mibs', []), 'includes/discovery/os/' . $device['os'] . '.inc.php');
-
 unset($snmpdata, $attribute, $value, $deviceModel);

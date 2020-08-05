@@ -29,7 +29,9 @@ discovery_modules:
     vrf: true
     cisco-vrf-lite: true
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.9.1.1117
-    - sysDescr:
-        - 'Cisco Secure Access Control System'
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.1.1117
+    -
+        sysDescr:
+            - 'Cisco Secure Access Control System'

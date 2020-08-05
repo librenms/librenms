@@ -31,8 +31,6 @@ use Auth;
 use Cache;
 use Carbon\Carbon;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\FilePermissionsException;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Toastr;
 
 class Checks
@@ -116,6 +114,28 @@ class Checks
         }
     }
 
+    /**
+     * Check the script is running as the right user (works before config is available)
+     */
+    public static function runningUser()
+    {
+        if (function_exists('posix_getpwuid') && posix_getpwuid(posix_geteuid())['name'] !== get_current_user()) {
+            if (get_current_user() == 'root') {
+                self::printMessage(
+                    'Error: lnms file is owned by root, it should be owned and ran by a non-privileged user.',
+                    null,
+                    true
+                );
+            }
+
+            self::printMessage(
+                'Error: You must run lnms as the user ' . get_current_user(),
+                null,
+                true
+            );
+        }
+    }
+
     private static function printMessage($title, $content, $exit = false)
     {
         $content = (array)$content;
@@ -145,7 +165,7 @@ class Checks
             return ['mysqlnd'];
         }
 
-        $required_modules = ['mbstring', 'pcre', 'curl', 'session', 'xml', 'gd'];
+        $required_modules = ['mbstring', 'pcre', 'curl', 'xml', 'gd'];
 
         return array_filter($required_modules, function ($module) {
             return !extension_loaded($module);

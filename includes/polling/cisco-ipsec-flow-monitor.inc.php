@@ -105,10 +105,10 @@ if ($device['os_group'] == 'cisco') {
         $tags = compact('rrd_def');
         data_update($device, 'cipsec_flow', $tags, $fields);
 
-        $graphs['cipsec_flow_tunnels'] = true;
-        $graphs['cipsec_flow_pkts']    = true;
-        $graphs['cipsec_flow_bits']    = true;
-        $graphs['cipsec_flow_stats']   = true;
+        $os->enableGraph('cipsec_flow_tunnels');
+        $os->enableGraph('cipsec_flow_pkts');
+        $os->enableGraph('cipsec_flow_bits');
+        $os->enableGraph('cipsec_flow_stats');
 
         echo ' cipsec_flow';
     }//end if

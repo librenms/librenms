@@ -200,12 +200,6 @@
                     @endif
                     @admin
                         <li role="presentation" class="divider"></li>
-                        @config('poller_modules.mib')
-                        <li><a href="{{ url('mib_assoc') }}"><i class="fa fa-file-text-o fa-fw fa-lg"
-                                                                aria-hidden="true"></i> @lang('MIB associations')</a>
-                        </li>
-                            <li role="presentation" class="divider"></li>
-                        @endconfig
                         @can('manage', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
                                                                         aria-hidden="true"></i> @lang('Manage Groups')
@@ -540,12 +534,15 @@
                                                               aria-hidden="true"></i> @lang('Auth History')</a></li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="{{ url('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a>
+                            <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ route('poller') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
+                                <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
                                 @config('distributed_poller')
                                 <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
                                 @endconfig
+                                @if($poller_clusters)
+                                <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> @lang('Settings')</a></li>
+                                @endif
                                 <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
                                 <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('Log')</a></li>
                             </ul>

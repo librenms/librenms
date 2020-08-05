@@ -30,7 +30,8 @@ COMPOSER="php ${LIBRENMS_DIR}/scripts/composer_wrapper.php --no-interaction"
 LOG_DIR=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['log_dir']) ? \$config['log_dir'] : '${LIBRENMS_DIR}/logs';")
 
 # get the librenms user
-LIBRENMS_USER=$(php -r "@include '${LIBRENMS_DIR}/config.php'; echo isset(\$config['user']) ? \$config['user'] : 'root';")
+source "${LIBRENMS_DIR}/.env"
+LIBRENMS_USER="${LIBRENMS_USER:-librenms}"
 LIBRENMS_USER_ID=$(id -u "$LIBRENMS_USER")
 
 #######################################
@@ -131,8 +132,8 @@ check_dependencies() {
     local ver_56=$(php -r "echo (int)version_compare(PHP_VERSION, '5.6.4', '<');")
     local ver_71=$(php -r "echo (int)version_compare(PHP_VERSION, '7.1.3', '<');")
     local ver_72=$(php -r "echo (int)version_compare(PHP_VERSION, '7.2.5', '<');")
-    local python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 5)))" 2> /dev/null)
-    local python_deps=$(scripts/check_requirements.py > /dev/null 2>&1; echo $?)
+    local python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
+    local python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
     local phpver="master"
     local pythonver="master"
 
@@ -175,6 +176,49 @@ check_dependencies() {
         return 0;
     fi
     return 1;
+}
+
+#######################################
+# Compare two numeric versions
+# Arguments:
+#   args:
+#        version 1
+#        version 2
+#        parts: Number of parts to compare, from the left, compares all if unspecified
+# Returns:
+#   Exit-Code: 0: if equal 1: if 1 > 2  2: if 1 < 2
+#######################################
+version_compare () {
+    if [[ "$1" == "$2" ]]; then
+        return 0
+    fi
+    local IFS=.
+    local i ver1=($1) ver2=($2)
+
+    local parts2=${#ver2[@]}
+    [[ -n $3 ]] && parts2=$3
+
+    # fill empty fields in ver1 with zeros
+    for ((i=${#ver1[@]}; i<parts2; i++)); do
+        ver1[i]=0
+    done
+
+    local parts1=${#ver1[@]}
+    [[ -n $3 ]] && parts1=$3
+
+    for ((i=0; i<parts1; i++)); do
+        if [[ -z ${ver2[i]} ]]; then
+            # fill empty fields in ver2 with zeros
+            ver2[i]=0
+        fi
+        if ((10#${ver1[i]} > 10#${ver2[i]})); then
+            return 1
+        fi
+        if ((10#${ver1[i]} < 10#${ver2[i]})); then
+            return 2
+        fi
+    done
+    return 0
 }
 
 
@@ -243,10 +287,28 @@ main () {
             new_ver=$(git rev-parse --short HEAD)
         else
             # Update to last Tag
-            old_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
-            status_run 'Updating to latest release' 'git fetch --tags && git checkout $(git describe --tags $(git rev-list --tags --max-count=1))' 'update'
-            update_res=$?
-            new_ver=$(git describe --exact-match --tags $(git log -n1 --pretty='%h'))
+            old_ver=$(git describe --exact-match --tags "$(git log -n1 --pretty='%h')" 2> /dev/null)
+
+            # fetch new tags
+            status_run 'Fetching new release information' "git fetch --tags" 'update'
+
+            # collect versions full, base, new tag and hash
+            IFS='-' read -ra full_version <<< "$(git describe --tags 2>/dev/null)"
+            base_ver="${full_version[0]}"
+            latest_hash=$(git rev-list --tags --max-count=1)
+            latest_tag=$(git describe --exact-match --tags "${latest_hash}")
+
+            #compare current base and latest version numbers (only the first two sections)
+            version_compare "$base_ver" "$latest_tag" 2
+            newer_check=$?
+
+            if [[ -z $old_ver ]] && [[ $newer_check -eq 0 ]]; then
+                echo 'Between releases, waiting for newer release'
+            else
+                status_run 'Updating to latest release' "git checkout ${latest_hash}" 'update'
+                update_res=$?
+                new_ver=$(git describe --exact-match --tags "$(git log -n1 --pretty='%h')")
+            fi
         fi
 
         if (( $update_res > 0 )); then
@@ -254,7 +316,7 @@ main () {
         fi
 
         # Call ourself again in case above pull changed or added something to daily.sh
-        ${DAILY_SCRIPT} post-pull ${old_ver} ${new_ver}
+        ${DAILY_SCRIPT} post-pull "${old_ver}" "${new_ver}"
     else
         case $arg in
             no-code-update)

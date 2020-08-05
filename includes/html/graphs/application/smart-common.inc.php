@@ -6,11 +6,12 @@ $dostack       = 0;
 $printtotal    = 0;
 $addarea       = 1;
 $transparency  = 15;
+$scale_min     = 0;
 
 if (isset($vars['disk'])) {
     $disks=array($vars['disk']);
 } else {
-    $disks=get_disks_with_smart($device, $app['app_id']);
+    $disks = get_arrays_with_application($device, $app_id, $name);
 }
 
 $smart_enhancements = array('id9');

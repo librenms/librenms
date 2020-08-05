@@ -16,5 +16,5 @@ if (is_numeric($flows)) {
     $tags = compact('rrd_def');
     data_update($device, 'arbos_flows', $tags, $fields);
 
-    $graphs['arbos_flows'] = true;
+    $os->enableGraph('arbos_flows');
 }

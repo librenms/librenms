@@ -25,8 +25,10 @@
 
 namespace LibreNMS\Util;
 
-use App\Facades\DeviceCache;
+use DeviceCache;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Component;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
@@ -145,6 +147,7 @@ class ModuleTestHelper
         $snmp_oids = $this->collectOids($device_id);
 
         $device = device_by_id_cache($device_id, true);
+        DeviceCache::setPrimary($device_id);
 
         $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
@@ -174,6 +177,7 @@ class ModuleTestHelper
         global $debug, $vdebug, $device;
 
         $device = device_by_id_cache($device_id);
+        DeviceCache::setPrimary($device_id);
 
         // Run discovery
         ob_start();
@@ -244,7 +248,7 @@ class ModuleTestHelper
 
         foreach (glob(Config::get('install_dir') . "/tests/data/*.json") as $file) {
             $base_name = basename($file, '.json');
-            list($os, $variant) = self::extractVariant($file);
+            [$os, $variant] = self::extractVariant($file);
 
             // calculate valid modules
             $data_modules = array_keys(json_decode(file_get_contents($file), true));
@@ -293,7 +297,7 @@ class ModuleTestHelper
         } elseif (is_file(Config::get('install_dir') . "/includes/definitions/$full_name.yaml")) {
             return [$full_name, ''];
         } else {
-            list($rvar, $ros) = explode('_', strrev($full_name), 2);
+            [$rvar, $ros] = explode('_', strrev($full_name), 2);
             return [strrev($ros), strrev($rvar)];
         }
     }
@@ -357,17 +361,17 @@ class ModuleTestHelper
             }
 
             if (preg_match('/^\.[.\d]+ =/', $line)) {
-                list($oid, $raw_data) = explode(' =', $line, 2);
+                [$oid, $raw_data] = explode(' =', $line, 2);
                 $oid = ltrim($oid, '.');
                 $raw_data = trim($raw_data);
 
                 if (empty($raw_data)) {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
-                    list($raw_type, $data) = explode(':', $raw_data, 2);
+                    [$raw_type, $data] = explode(':', $raw_data, 2);
                     if (Str::startsWith($raw_type, 'Wrong Type (should be ')) {
                         // device returned the wrong type, save the wrong type to emulate the device behavior
-                        list($raw_type, $data) = explode(':', ltrim($data), 2);
+                        [$raw_type, $data] = explode(':', ltrim($data), 2);
                     }
                     $data = ltrim($data, ' "');
                     $type = $this->getSnmprecType($raw_type);
@@ -390,7 +394,7 @@ class ModuleTestHelper
                 // multi-line data, append to last
                 $last = end($result);
 
-                list($oid, $type, $data) = explode('|', $last, 3);
+                [$oid, $type, $data] = explode('|', $last, 3);
                 if ($type == '4x') {
                     $result[key($result)] .= bin2hex(PHP_EOL . $line);
                 } else {
@@ -468,7 +472,7 @@ class ModuleTestHelper
 
         foreach ($snmprec_data as $line) {
             if (!empty($line)) {
-                list($oid,) = explode('|', $line, 2);
+                [$oid,] = explode('|', $line, 2);
                 $result[$oid] = $line;
             }
         }
@@ -520,7 +524,6 @@ class ModuleTestHelper
         try {
             Config::set('snmp.community', [$this->file_name]);
             $device_id = addHost($snmpsim->getIp(), 'v2c', $snmpsim->getPort());
-            DeviceCache::setPrimary($device_id);
 
             // disable to block normal pollers
             dbUpdate(['disabled' => 1], 'devices', 'device_id=?', [$device_id]);
@@ -533,6 +536,7 @@ class ModuleTestHelper
 
         // Populate the device variable
         $device = device_by_id_cache($device_id, true);
+        DeviceCache::setPrimary($device_id);
 
         $data = [];  // array to hold dumped data
 
@@ -679,6 +683,15 @@ class ModuleTestHelper
         // only dump data for the given modules
         foreach ($modules as $module) {
             foreach ($module_dump_info[$module] ?: [] as $table => $info) {
+                if ($table == 'component') {
+                    if (isset($key)) {
+                        $data[$module][$key][$table] = $this->collectComponents($device_id);
+                    } else {
+                        $data[$module][$table] = $this->collectComponents($device_id);
+                    }
+                    continue;
+                }
+
                 // check for custom where
                 $where = isset($info['custom_where']) ? $info['custom_where'] : "WHERE `$table`.`device_id`=?";
                 $params = [$device_id];
@@ -692,8 +705,8 @@ class ModuleTestHelper
 
                         $default_select = [];
                     } else {
-                        list($left, $lkey) = explode('.', $join_info['left']);
-                        list($right, $rkey) = explode('.', $join_info['right']);
+                        [$left, $lkey] = explode('.', $join_info['left']);
+                        [$right, $rkey] = explode('.', $join_info['right']);
                         $join .= " LEFT JOIN `$right` ON (`$left`.`$lkey` = `$right`.`$rkey`)";
 
                         $default_select = ["`$right`.*"];
@@ -820,6 +833,13 @@ class ModuleTestHelper
             return ltrim(str_replace(Config::get('install_dir'), '', $this->json_file), '/');
         }
         return $this->json_file;
+    }
+
+    private function collectComponents($device_id)
+    {
+        $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
+        $components = Arr::sort($components, 'label');
+        return array_values($components);
     }
 
     private function dataIsEmpty($data)

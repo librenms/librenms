@@ -112,8 +112,8 @@ if ($data) {
         data_update($device, 'ipSystemStats', $tags, $fields);
 
         // FIXME per-AF?
-        $graphs['ipsystemstats_'.$af]         = true;
-        $graphs['ipsystemstats_'.$af.'_frag'] = true;
+        $os->enableGraph("ipsystemstats_$af");
+        $os->enableGraph("ipsystemstats_{$af}_frag");
     }//end foreach
 }//end if
 

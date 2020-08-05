@@ -14,9 +14,13 @@ site_url: http://docs.librenms.org
 markdown_extensions:
     - pymdownx.tasklist
     - pymdownx.tilde
+    - pymdownx.superfences
+    - pymdownx.tabbed
 extra_css:
     - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css
     - librenms.css
+extra_javascript:
+    - librenms-docs.js
 extra:
     article_nav_top: false
     article_nav_bottom: true
@@ -35,13 +39,9 @@ nav:
       - Features: Support/Features.md
       - Welcome to Observium users: General/Welcome-to-Observium-users.md
   - 2. Installing:
-      - Installing LibreNMS: Installation/index.md
+      - How to install LibreNMS: Installation/index.md
+      - Install LibreNMS: Installation/Install-LibreNMS.md
       - LibreNMS VMs: Installation/Images.md
-      - Ubuntu 18.04 (Nginx): Installation/Installation-Ubuntu-1804-Nginx.md
-      - Ubuntu 18.04 (Apache): Installation/Installation-Ubuntu-1804-Apache.md
-      - Debian 10 (Nginx): Installation/Installation-Debian-10-Nginx.md
-      - CentOS 7 (Nginx): Installation/Installation-CentOS-7-Nginx.md
-      - CentOS 7 (Apache): Installation/Installation-CentOS-7-Apache.md
       - Migrating from Observium: Installation/Migrating-from-Observium.md
   - 3. Getting started:
       - Choosing a release: General/Releases.md
@@ -78,6 +78,7 @@ nav:
       - SNMP Proxy: Extensions/SNMP-Proxy.md
       - SNMP Trap Handler: Extensions/SNMP-Trap-Handler.md
       - Customizing the Web UI: Extensions/Customizing-the-Web-UI.md
+      - Bare Dashboard: Support/Bare-Dashboard.md
       - Cleanup Options: Support/Cleanup-options.md
   - 6. 3rd Party Integration:
       - Gateone: Extensions/Gateone.md
@@ -147,7 +148,6 @@ nav:
       - Creating Documentation: Developing/Creating-Documentation.md
       - Licensing: Developing/Licensing.md
       - Component: Extensions/Component.md
-      - Mib Based Polling (Deprecated): Extensions/MIB-based-polling.md
       - Support for a new OS:
           - Intro: Developing/Support-New-OS.md
           - Initial Detection: Developing/os/Initial-Detection.md
@@ -169,3 +169,4 @@ nav:
       - Device Notes:
           - Intro: Support/Device-Notes/index.md
           - Carel pCOweb: Support/Device-Notes/Carel-pCOweb-Devices.md
+          - OpenWRT: Support/Device-Notes/Openwrt.md

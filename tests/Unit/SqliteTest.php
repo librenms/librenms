@@ -43,7 +43,9 @@ class SqliteTest extends TestCase
             $this->assertNotEmpty($output, 'Migrations not run');
         } catch (QueryException $queryException) {
             preg_match('/Migrating: (\w+)$/', Artisan::output(), $matches);
-            $this->fail("Could not run migration {$matches[1]}) on SQLite\n\n" . $queryException->getMessage());
+            $migration = $matches[1] ?? '?';
+            $output = isset($matches[1]) ? '' : "\n\n" . Artisan::output();
+            $this->fail($queryException->getMessage() . $output . "\n\nCould not run migration {$migration}) on SQLite");
         }
 
         $count = \DB::connection($this->connection)->table('alert_templates')->count();

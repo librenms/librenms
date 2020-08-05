@@ -361,21 +361,6 @@ Template: CPU alert <br>
 @endif
 ```
 
-#### MS Teams formatted default template
-
-```
-<a href="https://your.librenms.url/device/device={{ $alert->device_id }}/">{{ $alert->title }}</a>
-<pre><strong>Device name:</strong> {{ $alert->sysName }}
-<strong>Severity:</strong> {{ $alert->severity }}
-@if ($alert->state == 0)<strong>Time elapsed:</strong>{{ $alert->elapsed }}
-@endif<strong>Timestamp:</strong> {{ $alert->timestamp }}
-<strong>Unique-ID:</strong> {{ $alert->uid }}
-<strong>Rule:</strong>@if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif</pre>
-<pre style="white-space:normal;">@if ($alert->faults) <strong>Faults:</strong>
- @foreach ($alert->faults as $key => $value)  #{{ $key }}: {{ $value['string'] }}
- @endforeach </pre>  @endif
-```
-
 ## Included
 
 We include a few templates for you to use, these are specific to the
@@ -388,3 +373,131 @@ The included templates apart from the default template are:
 - BGP Sessions
 - Ports
 - Temperature
+
+## Other Examples
+
+#### Microsoft Teams - Markdown
+
+```
+[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
+**Device name:** {{ $alert->sysName }}  
+**Severity:** {{ $alert->severity }}  
+@if ($alert->state == 0)
+**Time elapsed:** {{ $alert->elapsed }}  
+@endif
+**Timestamp:** {{ $alert->timestamp }}  
+**Unique-ID:** {{ $alert->uid }}  
+@if ($alert->name)
+**Rule:** {{ $alert->name }}  
+@else
+**Rule:** {{ $alert->rule }}  
+@endif
+@if ($alert->faults)
+**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
+@endforeach
+@endif
+```
+
+#### Microsoft Teams - JSON
+
+```
+{
+    "@context": "https://schema.org/extensions",
+    "@type": "MessageCard",
+    "title": "{{ $alert->title }}",
+@if ($alert->state === 0)
+    "themeColor": "00FF00",
+@elseif ($alert->state === 1)
+    "themeColor": "FF0000",
+@elseif ($alert->state === 2)
+    "themeColor": "337AB7",
+@elseif ($alert->state === 3)
+    "themeColor": "FF0000",
+@elseif ($alert->state === 4)
+    "themeColor": "F0AD4E",
+@else
+    "themeColor": "337AB7",
+@endif
+    "summary": "LibreNMS",
+    "sections": [
+        {
+@if ($alert->name)
+            "facts": [
+                {
+                    "name": "Rule:",
+                    "value": "[{{ $alert->name }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)"
+                },
+@else
+                {
+                    "name": "Rule:",
+                    "value": "[{{ $alert->rule }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)"
+                },
+@endif
+                {
+                    "name": "Severity:",
+                    "value": "{{ $alert->severity }}"
+                },
+                {
+                    "name": "Unique-ID:",
+                    "value": "{{ $alert->uid }}"
+                },
+                {
+                    "name": "Timestamp:",
+                    "value": "{{ $alert->timestamp }}"
+                },
+@if ($alert->state == 0)
+                {
+                    "name": "Time elapsed:",
+                    "value": "{{ $alert->elapsed }}"
+                },
+@endif
+                {
+                    "name": "Hostname:",
+                    "value": "[{{ $alert->hostname }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)"
+                },
+                {
+                    "name": "Hardware:",
+                    "value": "{{ $alert->hardware }}"
+                },
+                {
+                    "name": "IP:",
+                    "value": "{{ $alert->ip }}"
+                },
+                {
+                    "name": "Faults:",
+                    "value": " "
+                }
+            ]
+@if ($alert->faults)
+@foreach ($alert->faults as $key => $value)
+        },
+        {
+            "facts": [
+                {
+                    "name": "Port:",
+                    "value": "[{{ $value['ifName'] }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=port/port={{ $value['port_id'] }}/)"
+                },
+                {
+                    "name": "Description:",
+                    "value": "{{ $value['ifAlias'] }}"
+                },
+@if ($alert->state != 0)
+                {
+                    "name": "Status:",
+                    "value": "down"
+                }
+            ]
+@else
+                {
+                    "name": "Status:",
+                    "value": "up"
+                }
+            ]
+@endif
+@endforeach
+@endif
+        }
+    ]
+}
+```
+

@@ -1,17 +1,19 @@
 <?php
 
+$param = array();
 // Exclude Private and reserved ASN ranges
 // 64512 - 65535
 // 4200000000 - 4294967295
 $sql = " FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 ";
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`bgpLocalAs` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`bgpLocalAs` LIKE ?)";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(*) $sql";
 
-$total     = dbFetchCell($count_sql);
+$total     = dbFetchCell($count_sql, $param);
 if (empty($total)) {
     $total = 0;
 }
@@ -33,7 +35,7 @@ if ($rowCount != -1) {
 
 $sql = "SELECT `bgpLocalAs` $sql";
 
-foreach (dbFetchRows($sql) as $asn) {
+foreach (dbFetchRows($sql, $param) as $asn) {
     $astext = get_astext($asn['bgpLocalAs']);
     $response[] = array(
         'bgpLocalAs'    => $asn['bgpLocalAs'],

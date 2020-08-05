@@ -182,11 +182,6 @@ function discover_device(&$device, $force_module = false)
         }
     }
 
-    if (is_mib_poller_enabled($device)) {
-        $devicemib = array($device['sysObjectID'] => 'all');
-        register_mibs($device, $devicemib, "includes/discovery/functions.inc.php");
-    }
-
     $device_time  = round(microtime(true) - $device_start, 3);
 
     dbUpdate(array('last_discovered' => array('NOW()'), 'last_discovered_timetaken' => $device_time), 'devices', '`device_id` = ?', array($device['device_id']));
@@ -1068,6 +1063,9 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                             if (is_numeric($$limit)) {
                                 $$limit = ($$limit / $divisor) * $multiplier;
                             }
+                            if (is_numeric($$limit) && isset($user_function) && is_callable($user_function)) {
+                                $$limit = $user_function($$limit);
+                            }
                         }
                     }
 
@@ -1361,9 +1359,6 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
     $params = array();
 
     if ($name && is_valid_hostname($name)) {
-        $where[] = '`sysName`=?';
-        $params[] = $name;
-
         $where[] = '`hostname`=?';
         $params[] = $name;
 
@@ -1399,6 +1394,32 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
     if ($mac_address && $mac_address != '000000000000') {
         if ($device_id = dbFetchCell('SELECT `device_id` FROM `ports` WHERE `ifPhysAddress`=?', array($mac_address))) {
             return (int)$device_id;
+        }
+    }
+
+    if ($name) {
+        $where = array();
+        $params = array();
+
+        $where[] = '`sysName`=?';
+        $params[] = $name;
+
+        if ($mydomain = Config::get('mydomain')) {
+            $where[] = '`sysName`=?';
+            $params[] = "$name.$mydomain";
+
+            $where[] = 'concat(`sysName`, \'.\', ?) =?';
+            $params[] = "$mydomain";
+            $params[] = "$name";
+        }
+
+        $sql = 'SELECT `device_id` FROM `devices` WHERE ' . implode(' OR ', $where) . ' LIMIT 2';
+        $ids = dbFetchColumn($sql, $params);
+        if (count($ids) == 1) {
+            return (int)$ids[0];
+        } elseif (count($ids) > 1) {
+            d_echo("find_device_id: more than one device found with sysName '$name'.\n");
+            // don't do anything, try other methods, if any
         }
     }
 

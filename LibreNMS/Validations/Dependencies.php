@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Validations;
 
-use LibreNMS\Util\Env;
+use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
@@ -40,7 +40,7 @@ class Dependencies extends BaseValidation
      */
     public function validate(Validator $validator)
     {
-        if (Env::librenmsDocker()) {
+        if (EnvHelper::librenmsDocker()) {
             $validator->ok("Installed from the official Docker image; no Composer required");
             return;
         }

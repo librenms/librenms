@@ -6,12 +6,15 @@ icon: canon
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr:
-        - Canon MF
-        - Canon iR
-    - sysObjectID:
-        - .1.3.6.1.4.1.1602.4.2
-        - .1.3.6.1.4.1.1602.4.7
+    -
+        sysDescr:
+            - Canon MF
+            - Canon iR
+            - Canon iP
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1602.4.2
+            - .1.3.6.1.4.1.1602.4.7
 discovery_modules:
     toner: true
 poller_modules:

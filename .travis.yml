@@ -27,7 +27,7 @@ before_install:
   - sudo apt-get -qq update
   - sudo apt-get install -y snmp fping python3-pip python3-setuptools
   - mysql -e 'CREATE DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
-  - cp tests/config/config.test.php config.php
+  - cp .env.travis .env
 
 install:
   - travis_retry composer install --no-interaction --prefer-dist --no-suggest
@@ -36,6 +36,9 @@ install:
 
 after_failure:
   - tail /tmp/snmpsimd.log
+
+after_success:
+  - scripts/deploy-docs.sh
 
 before_script:
   - phpenv config-rm xdebug.ini

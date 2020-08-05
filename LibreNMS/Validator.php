@@ -252,7 +252,7 @@ class Validator
     public function execAsUser($command, &$output = null, &$code = null)
     {
         if (self::getUsername() === 'root') {
-            $command = 'su ' . Config::get('user') . ' -s /bin/sh -c "' . $command . '"';
+            $command = 'su ' . \config('librenms.user') . ' -s /bin/sh -c "' . $command . '"';
         }
         exec($command, $output, $code);
     }

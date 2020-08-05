@@ -222,6 +222,9 @@ class MenuComposer
                 $query->isUnread($user);
             })->count();
 
+        // Poller Settings
+        $vars['poller_clusters'] = \App\Models\PollerCluster::exists();
+
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
 

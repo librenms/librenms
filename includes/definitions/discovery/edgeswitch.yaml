@@ -31,7 +31,7 @@ modules:
                         - { value: 4, descr: shutdown, graph: 1, generic: 2 }
                         - { value: 5, descr: notpresent, graph: 1, generic: 3 }
                         - { value: 6, descr: notoperational, graph: 1, generic: 2 }
- 
+
                 -
                     oid: boxServicesFansEntry
                     value: boxServicesFanItemState

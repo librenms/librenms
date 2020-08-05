@@ -6,7 +6,11 @@ $sql = " FROM `mempools` AS `M` LEFT JOIN `devices` AS `D` ON `M`.`device_id` = 
 $param[] = $device_id;
 
 if (isset($searchPhrase) && !empty($searchPhrase)) {
-    $sql .= " AND (`D`.`hostname` LIKE '%$searchPhrase%' OR `M`.`mempool_descr` LIKE '%$searchPhrase%' OR `S`.`mempool_perc` LIKE '%$searchPhrase%' OR `M`.`mempool_perc_warn` LIKE '%$searchPhrase%')";
+    $sql .= " AND (`D`.`hostname` LIKE ? OR `M`.`mempool_descr` LIKE ? OR `S`.`mempool_perc` LIKE ? OR `M`.`mempool_perc_warn` LIKE ?)";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
+    $param[] = "%$searchPhrase%";
 }
 
 $count_sql = "SELECT COUNT(`mempool_id`) $sql";

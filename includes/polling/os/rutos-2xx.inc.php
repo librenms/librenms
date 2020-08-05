@@ -22,7 +22,7 @@ if ($usage_sent >= 0 && $usage_received >= 0) {
     $rrd_def = RrdDefinition::make()
         ->addDataset('usage_sent', 'GAUGE', 0)
         ->addDataset('usage_received', 'GAUGE', 0);
-    
+
         $fields = array(
         'usage_sent' => $usage_sent,
         'usage_received' => $usage_received,
@@ -30,5 +30,5 @@ if ($usage_sent >= 0 && $usage_received >= 0) {
 
         $tags = compact('rrd_def');
         data_update($device, 'rutos_2xx_mobileDataUsage', $tags, $fields);
-        $graphs['rutos_2xx_mobileDataUsage'] = true;
+        $os->enableGraph('rutos_2xx_mobileDataUsage');
 }

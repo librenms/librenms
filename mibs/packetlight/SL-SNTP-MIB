@@ -66,14 +66,12 @@ slSntpConfigRetryCount OBJECT-TYPE
     ::= { slSntpConfig 3 }
 
 slSntpConfigTimeZone   OBJECT-TYPE
-    SYNTAX          INTEGER (0..23)
+    SYNTAX          INTEGER
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
     "The time zone this node is currently located in, expressed as
-    an integer ranging from 0 to 23, representing the 24 hr time-
-    zones starting at UTC which is equal to 0 and proceeding in
-    the positive westerly direction. ie: Boston = 5, California=8.
+    as an hours offset to the GMT (-12..+12).
     Note:  Daylight savings time is not automatically calculated."
     DEFVAL { 0 }
 
@@ -87,6 +85,15 @@ slSntpConfigDayLightSaving   OBJECT-TYPE
     "It specifies if daylight saving time is applicable."
     DEFVAL { false }
     ::= { slSntpConfig 5 }
+
+slSntpConfigFractTimeZone   OBJECT-TYPE
+    SYNTAX          INTEGER
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+    "The fractional part of the timezone specified in minutes (-60..+60)."
+    DEFVAL { 0 }
+    ::= { slSntpConfig 6 }
 
 
 -- ----------------------------------------------------------------------

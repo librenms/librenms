@@ -99,7 +99,7 @@ $config['poller_modules']['aruba-controller']            = false;
 $config['poller_modules']['entity-physical']             = true;
 $config['poller_modules']['entity-state']                = false;
 $config['poller_modules']['applications']                = true;
-$config['poller_modules']['mib']                         = false;
+$config['poller_modules']['availability']                = true;
 $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['services']                    = true;
@@ -189,6 +189,8 @@ configured to be ignored by config options.
 `entity-physical`: Module to pick up the devices hardware support.
 
 `applications`: Device application support.
+
+`availability`: Device Availability Calculation.
 
 `cisco-asa-firewall`: Cisco ASA firewall support.
 

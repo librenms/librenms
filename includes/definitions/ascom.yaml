@@ -25,5 +25,6 @@ discovery_modules:
     ucd-diskio: false
     vlans: false
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.27614
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.27614

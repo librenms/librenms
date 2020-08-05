@@ -42,6 +42,6 @@ if (strcmp($device['sysObjectID'], '.1.3.6.1.4.1.15497.1.2') == 0) {
         $tags = compact('rrd_def');
         data_update($device, 'asyncos_conns', $tags, $fields);
 
-        $graphs['asyncos_conns'] = true;
+        $os->enableGraph('asyncos_conns');
     }
 }
