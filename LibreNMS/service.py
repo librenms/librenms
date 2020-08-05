@@ -244,7 +244,18 @@ class ServiceConfig:
         if g is None:
             return [0]
         elif type(g) is int:
-            return [g]exit
+            return [g]
+        elif type(g) is str:
+            try:
+                return [int(x) for x in set(g.split(','))]
+            except ValueError:
+                pass
+
+        error("Could not parse group string, defaulting to 0")
+        return [0]
+
+
+class Service:
     config = ServiceConfig()
     _fp = False
     _started = False
