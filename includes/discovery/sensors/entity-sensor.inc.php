@@ -73,11 +73,11 @@ if (!empty($entity_oids)) {
             } else {
                 if ($device['os'] === 'arista_eos') {
                     $descr = $entity_array[$index]['entPhysicalDescr'];
-                    if (preg_match("/(Input|Output) (voltage|current) sensor/i", $descr) || Str::startsWith($descr, 'Power supply')) {
+                    if (preg_match("/(Input|Output) (voltage|current) sensor/i", $descr) || Str::startsWith($descr, 'Power supply') || preg_match('/^(Power Supply|Hotspot|Inlet|Board)/i', $descr)) {
                         $descr = ucwords($entity_array[substr_replace($index, '000', -3)]['entPhysicalDescr']) . " " . preg_replace('/(Voltage|Current|Power Supply) Sensor$/i', '', ucwords($entity_array[$index]['entPhysicalDescr']));
                     }
-                    if (preg_match('/temp sensor$/', $descr)) {
-                        $descr = preg_replace('/temp sensor$/', '', $descr);
+                    if (preg_match('/(temp|temperature) sensor$/i', $descr)) {
+                        $descr = preg_replace('/(temp|temperature) sensor$/i', '', $descr);
                     }
                 }
                 $descr = rewrite_entity_descr($descr);
@@ -195,7 +195,17 @@ if (!empty($entity_oids)) {
                     $group = null;
                     if (preg_match("/DOM /i", $descr)) {
                             $group = "SFPs";
+                    } elseif (preg_match('/PwrCon/', $descr)) {
+                        $string = explode(' ', $descr);
+                        if (preg_match('/PwrCon[0-9]/', $string[0])){
+                            $group = $string[0];
+                        } else {
+                            $group = preg_replace('/PwrCon/i', '', $string[0]);
+                            //$descr = preg_replace('/^.*?(PwrCon)/i', '', $descr);
+                        }
+                        $descr = preg_replace('/^.*?(PwrCon)[0-9]*/i', '', $descr);
                     }
+                    /*
                     if (preg_match("/Cpu/i", $descr)) {
                         $group = preg_match("/CpucardPwrCon/i", $descr) ? 'CPU Card': 'System';
                         $descr = Str::replaceFirst('CpucardPwrCon', '', $descr);
@@ -204,14 +214,13 @@ if (!empty($entity_oids)) {
                         $descr = Str::replaceFirst('SwitchcardPwrCon', '', $descr);
                         $group = "Switch Card";
                     }
+                    */
                     // I only know replies for Trident platform. If you have another please add to the preg_match
-                    if (preg_match("/Trident /i", $descr)) {
+                    elseif (preg_match("/^(Trident.*|Jericho[0-9]|FM6000)/i", $descr)) {
                         $group = "Platform";
-                    }
-                    if (preg_match("/^(Power|PSU)/i", $descr)) {
+                    } elseif (preg_match("/^(Power|PSU)/i", $descr)) {
                         $group = "PSUs";
-                    }
-                    if (preg_match("/(Board|Front|Rear)/i", $descr)) {
+                    } else {
                         $group = "System";
                         $descr = Str::replaceLast('temp sensor', '', $descr);
                     }
