@@ -230,7 +230,7 @@ class ServiceConfig:
 
         except ImportError as e:
             exception("Could not import .env - check that the poller user can read the file, and that composer install has been run recently")
-            self.exit(3)
+            sys.exit(3)
 
         config_cmd = ['/usr/bin/env', 'php', '{}/config_to_json.php'.format(self.BASE_DIR), '2>&1']
         try:
@@ -244,18 +244,7 @@ class ServiceConfig:
         if g is None:
             return [0]
         elif type(g) is int:
-            return [g]
-        elif type(g) is str:
-            try:
-                return [int(x) for x in set(g.split(','))]
-            except ValueError:
-                pass
-
-        error("Could not parse group string, defaulting to 0")
-        return [0]
-
-
-class Service:
+            return [g]exit
     config = ServiceConfig()
     _fp = False
     _started = False
